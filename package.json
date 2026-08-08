@@ -4,6 +4,7 @@
   "private": true,
   "description": "1日1個Webアプリを作って公開する100日チャレンジ",
   "scripts": {
-    "build": "node scripts/build.mjs"
+    "build": "node scripts/build.mjs",
+    "precheck": "node scripts/precheck.mjs"
   }
 }

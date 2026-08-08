@@ -24,6 +24,16 @@ AIと一緒に作りながら、「AIに任せたこと」と「自分で考え�
 - ホスティング: Cloudflare Pages（1プロジェクトに全アプリをパスでルーティング）
 
 ```bash
-npm run build   # dist/ を生成
+npm run precheck   # 初回は下記の個人NGワード設定が必要
+npm run build      # dist/ を生成
 npx wrangler pages deploy dist --project-name=hundred-days
 ```
+
+初回のみ、公開したくない実名・所属ID・取引先名などをローカル専用ファイルに設定します。
+
+```bash
+cp .precheck-ng.example.txt .precheck-ng.txt
+npm run precheck   # 公開前チェック（シークレット等の漏洩スキャン）
+```
+
+`.precheck-ng.txt`はGitの追跡対象外です。ファイルが無い場合、公開前チェックは失敗します。
