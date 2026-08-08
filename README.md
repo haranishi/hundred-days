@@ -37,3 +37,15 @@ npm run precheck   # 公開前チェック（シークレット等の漏洩ス�
 ```
 
 `.precheck-ng.txt`はGitの追跡対象外です。ファイルが無い場合、公開前チェックは失敗します。
+
+## X投稿の準備
+
+本文・リプライを`meta.json`から生成し、公開前チェック、本番URL、縦型動画、文字数をまとめて検証します。
+
+```bash
+npm run x:prepare -- --day 1 \
+  --video "$HOME/Downloads/day-001-focus-timer-demo-x.mp4" \
+  --media-reviewed
+```
+
+出力先は`.social-output/day-NNN/`です。実際の公開前に、Xのアカウント、本文、添付動画、最終プレビューを人が確認します。

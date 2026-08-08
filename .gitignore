@@ -10,6 +10,9 @@ CLAUDE.md
 # ビルド成果物
 dist/
 
+# SNS投稿準備のローカル出力（動画の絶対パス等を含む）
+.social-output/
+
 # 依存
 node_modules/
 

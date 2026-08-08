@@ -5,6 +5,7 @@
   "description": "1日1個Webアプリを作って公開する100日チャレンジ",
   "scripts": {
     "build": "node scripts/build.mjs",
-    "precheck": "node scripts/precheck.mjs"
+    "precheck": "node scripts/precheck.mjs",
+    "x:prepare": "node scripts/prepare-x-post.mjs"
   }
 }
