@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>集中タイマー</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="script.js" defer></script>
+</head>
+<body data-state="idle">
+  <main class="app">
+    <h1 class="app__title">集中タイマー</h1>
+
+    <!-- 残り時間 -->
+    <div class="display">
+      <p class="display__time" id="time" role="timer" aria-live="off">25:00</p>
+      <p class="display__status" id="status" aria-live="polite">準備OK。「開始」を押してください</p>
+    </div>
+
+    <!-- 時間セット -->
+    <section class="setter" aria-labelledby="setter-label">
+      <h2 class="setter__label" id="setter-label">時間をセット</h2>
+
+      <div class="presets" id="presets">
+        <button type="button" class="btn btn--preset" data-minutes="5" aria-pressed="false">5分</button>
+        <button type="button" class="btn btn--preset" data-minutes="15" aria-pressed="false">15分</button>
+        <button type="button" class="btn btn--preset is-selected" data-minutes="25" aria-pressed="true">25分</button>
+        <button type="button" class="btn btn--preset" data-minutes="45" aria-pressed="false">45分</button>
+      </div>
+
+      <div class="custom">
+        <label class="custom__label" for="custom-minutes">自由入力</label>
+        <input
+          class="custom__input"
+          id="custom-minutes"
+          type="number"
+          min="1"
+          max="600"
+          step="1"
+          inputmode="numeric"
+          placeholder="分">
+        <button type="button" class="btn btn--ghost" id="custom-apply">セット</button>
+      </div>
+      <p class="custom__error" id="custom-error" aria-live="polite" hidden></p>
+    </section>
+
+    <!-- 操作 -->
+    <section class="controls" aria-label="タイマー操作">
+      <button type="button" class="btn btn--primary" id="start">開始</button>
+      <button type="button" class="btn btn--secondary" id="pause" disabled>一時停止</button>
+      <button type="button" class="btn btn--secondary" id="reset" disabled>リセット</button>
+    </section>
+
+    <p class="hint">スペースキーで開始／一時停止、Rキーでリセット</p>
+  </main>
+</body>
+</html>

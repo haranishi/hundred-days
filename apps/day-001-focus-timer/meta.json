@@ -1,0 +1,20 @@
+{
+  "day": 1,
+  "season": 1,
+  "title": "集中タイマー",
+  "description": "時間をセットして開始・一時停止・リセットできる集中用カウントダウンタイマー",
+  "tags": ["timer", "vanilla-js", "no-dependencies"],
+  "difficulty": "B",
+  "sourceOfIdea": "候補案から本人が選定",
+  "startedAt": "2026-08-08",
+  "finishedAt": "",
+  "actualMinutes": 0,
+  "aiHandled": [],
+  "humanHandled": [],
+  "failuresAndFixes": [],
+  "publicUrl": "https://hundred-days.pages.dev/day-001-focus-timer/",
+  "repoPath": "apps/day-001-focus-timer",
+  "shortVideoUrl": "",
+  "longVideoChapter": "",
+  "status": "published"
+}

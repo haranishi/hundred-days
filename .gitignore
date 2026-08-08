@@ -1,0 +1,20 @@
+# ローカル専用の運用メモ（非公開の戦略・内部情報を含むため公開しない）
+CLAUDE.md
+
+# wranglerのローカルキャッシュ（CloudflareアカウントIDを含むため公開しない）
+.wrangler/
+
+# ビルド成果物
+dist/
+
+# 依存
+node_modules/
+
+# OS
+.DS_Store
+
+# ログ・環境変数
+*.log
+.env
+.env.*
+.dev.vars

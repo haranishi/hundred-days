@@ -1,0 +1,9 @@
+{
+  "name": "hundred-days",
+  "version": "0.1.0",
+  "private": true,
+  "description": "1日1個Webアプリを作って公開する100日チャレンジ",
+  "scripts": {
+    "build": "node scripts/build.mjs"
+  }
+}
