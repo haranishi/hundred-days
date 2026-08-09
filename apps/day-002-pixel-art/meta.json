@@ -1,0 +1,22 @@
+{
+  "day": 2,
+  "season": 1,
+  "title": "ドット絵メーカー",
+  "description": "画像をドロップするとドット絵に変換してPNG保存できるツール",
+  "tags": ["image", "canvas", "vanilla-js", "no-dependencies"],
+  "difficulty": "B",
+  "sourceOfIdea": "AIが出した画像・デザインツール系10案から本人が選定",
+  "startedAt": "2026-08-09",
+  "finishedAt": "",
+  "actualMinutes": 0,
+  "aiHandled": ["要件定義と実装"],
+  "humanHandled": ["作るもの・機能範囲の判断"],
+  "failuresAndFixes": [],
+  "publicUrl": "",
+  "repoPath": "apps/day-002-pixel-art",
+  "shortVideoUrl": "",
+  "longVideoChapter": "",
+  "status": "draft",
+  "xPostUrl": "",
+  "social": { "x": { "summary": "", "hashtags": ["100日チャレンジ", "個人開発"] } }
+}

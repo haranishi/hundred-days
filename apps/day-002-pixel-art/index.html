@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ドット絵メーカー</title>
+  <meta name="description" content="画像をドロップするとドット絵に変換してPNG保存できるツール">
+  <link rel="stylesheet" href="style.css">
+  <script src="script.js" defer></script>
+</head>
+<body data-state="empty">
+  <main class="app">
+    <header class="app__head">
+      <h1 class="app__title">ドット絵メーカー</h1>
+      <span class="app__day">Day 002</span>
+    </header>
+
+    <!-- 画像の受け取り口。クリックでファイル選択、ドラッグ&ドロップの両方に対応 -->
+    <section class="drop" id="drop">
+      <input class="drop__input" id="file" type="file" accept="image/*">
+      <label class="drop__label" for="file">
+        <span class="drop__lead">画像をドロップ</span>
+        <span class="drop__sub">またはクリックしてファイルを選ぶ</span>
+      </label>
+      <p class="drop__note" id="drop-note" aria-live="polite"></p>
+    </section>
+
+    <p class="hint">画像はブラウザの中だけで処理します。どこにも送信しません</p>
+
+    <!-- 変換の設定。変えるとその場で作り直す -->
+    <section class="controls" aria-label="変換の設定">
+      <div class="control">
+        <label class="control__label" for="dots">横ドット数</label>
+        <input
+          class="control__range"
+          id="dots"
+          type="range"
+          min="8"
+          max="128"
+          step="4"
+          value="48">
+        <span class="control__value" id="dots-value" aria-hidden="true">48ドット</span>
+      </div>
+
+      <div class="control">
+        <span class="control__label" id="palette-label">減色</span>
+        <div class="segmented" id="palette" role="group" aria-labelledby="palette-label">
+          <button type="button" class="btn btn--seg is-selected" data-palette="none" aria-pressed="true">なし</button>
+          <button type="button" class="btn btn--seg" data-palette="retro" aria-pressed="false">レトロ8色</button>
+          <button type="button" class="btn btn--seg" data-palette="green" aria-pressed="false">緑4階調</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 結果。画像を読み込むまでは出さない -->
+    <section class="result" id="result" hidden>
+      <div class="frames">
+        <figure class="frame">
+          <figcaption class="frame__label">元の画像</figcaption>
+          <div class="frame__box">
+            <img class="frame__media" id="source" alt="読み込んだ元の画像">
+          </div>
+        </figure>
+
+        <figure class="frame frame--main">
+          <figcaption class="frame__label">ドット絵</figcaption>
+          <div class="frame__box">
+            <canvas class="frame__media frame__media--pixel" id="output" role="img" aria-label="変換後のドット絵"></canvas>
+          </div>
+        </figure>
+      </div>
+
+      <p class="result__info" id="info"></p>
+      <button type="button" class="btn btn--primary" id="save">PNGで保存</button>
+    </section>
+
+    <footer class="foot">
+      <a class="foot__link" href="../">← 100 DAYS / 100 APPS</a>
+    </footer>
+  </main>
+</body>
+</html>
