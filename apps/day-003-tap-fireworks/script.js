@@ -18,6 +18,8 @@
   var WELCOME_DELAY = 800;
   var AUTO_MIN_INTERVAL = 2500;
   var AUTO_MAX_INTERVAL = 3500;
+  var MAX_SOUND_VOICES = 8;
+  var MASTER_VOLUME = .78;
   var TAU = Math.PI * 2;
 
   var TYPE_BUTTON = 0;
@@ -35,6 +37,7 @@
   var canvas = document.getElementById('fireworks-canvas');
   var ctx = canvas.getContext('2d', { alpha: false });
   var hintEl = document.getElementById('hint');
+  var soundToggle = document.getElementById('sound-toggle');
   var motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
 
   // ---- 状態 ----
@@ -54,6 +57,11 @@
   var lastInteraction = lastFrame;
   var nextAutoTime = lastFrame + IDLE_DELAY;
   var welcomePending = !reducedMotion;
+  var soundMuted = false;
+  var audioContext = null;
+  var masterGain = null;
+  var noiseBuffer = null;
+  var activeSoundVoices = 0;
 
   // 粒子オブジェクトは起動時に一度だけ作り、以後は値を書き換えて使う。
   for (var poolIndex = 0; poolIndex < MAX_PARTICLES; poolIndex++) {
@@ -129,6 +137,144 @@
   }
 
   // ------------------------------------------------------------------
+  // Web Audio（音源ファイルなし）
+  // ------------------------------------------------------------------
+  function ensureAudio() {
+    if (soundMuted) return null;
+
+    if (!audioContext) {
+      var AudioContextClass = window.AudioContext || window.webkitAudioContext;
+      if (!AudioContextClass) return null;
+
+      audioContext = new AudioContextClass();
+      masterGain = audioContext.createGain();
+      var compressor = audioContext.createDynamicsCompressor();
+      masterGain.gain.value = MASTER_VOLUME;
+      compressor.threshold.value = -18;
+      compressor.knee.value = 12;
+      compressor.ratio.value = 6;
+      compressor.attack.value = .003;
+      compressor.release.value = .25;
+      masterGain.connect(compressor);
+      compressor.connect(audioContext.destination);
+
+      noiseBuffer = audioContext.createBuffer(1, audioContext.sampleRate * 2, audioContext.sampleRate);
+      var noiseData = noiseBuffer.getChannelData(0);
+      for (var i = 0; i < noiseData.length; i++) noiseData[i] = Math.random() * 2 - 1;
+    }
+
+    if (audioContext.state === 'suspended') audioContext.resume();
+    return audioContext;
+  }
+
+  function beginSoundVoice() {
+    if (soundMuted || !audioContext || activeSoundVoices >= MAX_SOUND_VOICES) return false;
+    activeSoundVoices++;
+    return true;
+  }
+
+  function finishSoundVoiceWhen(source) {
+    source.addEventListener('ended', function () {
+      activeSoundVoices = Math.max(0, activeSoundVoices - 1);
+    }, { once: true });
+  }
+
+  function playLaunchSound(durationSeconds) {
+    if (!beginSoundVoice()) return;
+
+    var now = audioContext.currentTime;
+    var oscillator = audioContext.createOscillator();
+    var gain = audioContext.createGain();
+    oscillator.type = 'triangle';
+    oscillator.frequency.setValueAtTime(900, now);
+    oscillator.frequency.exponentialRampToValueAtTime(300, now + durationSeconds);
+    gain.gain.setValueAtTime(.0001, now);
+    gain.gain.exponentialRampToValueAtTime(.026, now + .035);
+    gain.gain.exponentialRampToValueAtTime(.0001, now + durationSeconds);
+    oscillator.connect(gain);
+    gain.connect(masterGain);
+    oscillator.start(now);
+    oscillator.stop(now + durationSeconds + .01);
+    finishSoundVoiceWhen(oscillator);
+  }
+
+  function playBoomSound(type) {
+    if (!beginSoundVoice()) return;
+
+    var now = audioContext.currentTime;
+    var isKiku = type === TYPE_KIKU;
+    var bassDuration = isKiku ? .48 : .38;
+    var noiseDuration = isKiku ? .68 : .52;
+    var bass = audioContext.createOscillator();
+    var bassGain = audioContext.createGain();
+    bass.type = 'sine';
+    bass.frequency.setValueAtTime(90, now);
+    bass.frequency.exponentialRampToValueAtTime(45, now + bassDuration);
+    bassGain.gain.setValueAtTime(.0001, now);
+    bassGain.gain.exponentialRampToValueAtTime(.14, now + .012);
+    bassGain.gain.exponentialRampToValueAtTime(.0001, now + bassDuration);
+    bass.connect(bassGain);
+    bassGain.connect(masterGain);
+    bass.start(now);
+    bass.stop(now + bassDuration + .01);
+
+    var noise = audioContext.createBufferSource();
+    var bodyFilter = audioContext.createBiquadFilter();
+    var bodyGain = audioContext.createGain();
+    noise.buffer = noiseBuffer;
+    bodyFilter.type = 'lowpass';
+    bodyFilter.frequency.value = 620;
+    bodyFilter.Q.value = .8;
+    bodyGain.gain.setValueAtTime(.075, now);
+    bodyGain.gain.exponentialRampToValueAtTime(.0001, now + noiseDuration);
+    noise.connect(bodyFilter);
+    bodyFilter.connect(bodyGain);
+    bodyGain.connect(masterGain);
+    noise.start(now, randomBetween(0, noiseBuffer.duration - noiseDuration), noiseDuration);
+    finishSoundVoiceWhen(noise);
+  }
+
+  function playCrackleSound() {
+    if (!beginSoundVoice()) return;
+
+    var now = audioContext.currentTime;
+    var count = 8 + Math.floor(Math.random() * 7);
+    var highpass = audioContext.createBiquadFilter();
+    var lastSource = null;
+    var lastEnd = 0;
+    highpass.type = 'highpass';
+    highpass.frequency.value = 2200;
+    highpass.Q.value = .65;
+    highpass.connect(masterGain);
+
+    for (var i = 0; i < count; i++) {
+      var when = now + randomBetween(.1, .9);
+      var duration = randomBetween(.014, .034);
+      var noise = audioContext.createBufferSource();
+      var gain = audioContext.createGain();
+      noise.buffer = noiseBuffer;
+      gain.gain.setValueAtTime(.0001, when);
+      gain.gain.linearRampToValueAtTime(randomBetween(.009, .018), when + .003);
+      gain.gain.exponentialRampToValueAtTime(.0001, when + duration);
+      noise.connect(gain);
+      gain.connect(highpass);
+      noise.start(when, randomBetween(0, noiseBuffer.duration - duration), duration);
+      if (when + duration > lastEnd) {
+        lastEnd = when + duration;
+        lastSource = noise;
+      }
+    }
+
+    finishSoundVoiceWhen(lastSource);
+  }
+
+  function playBurstSound(type) {
+    if (soundMuted || !audioContext) return;
+    playBoomSound(type);
+    if (type === TYPE_WILLOW || type === TYPE_GLITTER) playCrackleSound();
+  }
+
+  // ------------------------------------------------------------------
   // 粒子と6種類の開花
   // ------------------------------------------------------------------
   function takeParticle() {
@@ -173,6 +319,7 @@
 
   function burst(x, y) {
     var type = chooseType();
+    playBurstSound(type);
     var baseHue = Math.random() * 360;
     var secondHue = (baseHue + (Math.random() < .5 ? 180 : randomBetween(42, 76))) % 360;
     var wanted = TYPE_COUNTS[type];
@@ -257,6 +404,8 @@
     var distance = Math.max(120, height - safeY);
     var duration = Math.max(520, Math.min(1050, 520 + distance * .58));
 
+    if (!soundMuted && audioContext) playLaunchSound(duration / 1000);
+
     rockets.push({
       startX: startX,
       startY: height + 8,
@@ -314,6 +463,7 @@
 
   canvas.addEventListener('pointerdown', function (event) {
     event.preventDefault();
+    ensureAudio();
     var point = pointerPosition(event);
     var now = performance.now();
     pointers[event.pointerId] = { x: point.x, y: point.y, nextFire: now + HOLD_INTERVAL };
@@ -343,6 +493,26 @@
   canvas.addEventListener('pointercancel', releasePointer);
   canvas.addEventListener('lostpointercapture', releasePointer);
   canvas.addEventListener('contextmenu', function (event) { event.preventDefault(); });
+
+  soundToggle.addEventListener('pointerdown', function (event) {
+    event.stopPropagation();
+  });
+
+  soundToggle.addEventListener('click', function (event) {
+    event.preventDefault();
+    event.stopPropagation();
+    soundMuted = !soundMuted;
+    soundToggle.textContent = soundMuted ? '🔇' : '🔊';
+    soundToggle.setAttribute('aria-pressed', String(soundMuted));
+    soundToggle.setAttribute('aria-label', soundMuted ? '音をオンにする' : '音をミュート');
+
+    if (audioContext && masterGain) {
+      var now = audioContext.currentTime;
+      masterGain.gain.cancelScheduledValues(now);
+      masterGain.gain.setValueAtTime(masterGain.gain.value, now);
+      masterGain.gain.linearRampToValueAtTime(soundMuted ? 0 : MASTER_VOLUME, now + .02);
+    }
+  });
 
   function updateHeldPointers(now) {
     // for-inなら、押されていない大半のフレームで一時配列を作らずに済む。
