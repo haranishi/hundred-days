@@ -1,0 +1,22 @@
+{
+  "day": 3,
+  "season": 1,
+  "title": "スクショ映えメーカー",
+  "description": "スクショをドロップ/貼り付けすると余白・角丸・影・グラデ背景つきのSNS映え画像にしてPNG保存できるツール",
+  "tags": ["image", "canvas", "vanilla-js", "no-dependencies"],
+  "difficulty": "B",
+  "sourceOfIdea": "1週目バックログ（重複チェック済み）からAIが本日分として提案し、本人が承認",
+  "startedAt": "2026-08-10",
+  "finishedAt": "",
+  "actualMinutes": 31,
+  "aiHandled": ["要件定義と実装"],
+  "humanHandled": ["作るもの・機能範囲の判断"],
+  "failuresAndFixes": [],
+  "publicUrl": "",
+  "repoPath": "apps/day-003-shot-frame",
+  "shortVideoUrl": "",
+  "longVideoChapter": "",
+  "status": "draft",
+  "xPostUrl": "",
+  "social": { "x": { "summary": "", "hashtags": ["100日チャレンジ", "個人開発"] } }
+}

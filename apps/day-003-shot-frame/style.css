@@ -1,0 +1,347 @@
+/* スクショ映えメーカー — Day 003
+   外部フォント・外部CSSは一切読み込まない（file:// で単体動作させるため） */
+
+:root {
+  --bg: #14161c;
+  --panel: #1d212b;
+  --panel-2: #262b38;
+  --line: #39404f;
+  --text: #eef1f6;
+  --muted: #9aa3b2;
+  --accent: #4f9cff;
+  --accent-strong: #2f7ff0;
+  --danger: #ff8a8a;
+  --radius: 12px;
+}
+
+* { box-sizing: border-box; }
+
+[hidden] { display: none !important; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans",
+               "Yu Gothic", "Noto Sans JP", "Segoe UI", sans-serif;
+  line-height: 1.6;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 24px 16px 48px;
+}
+
+.app {
+  width: 100%;
+  max-width: 960px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* ---- 見出し ---- */
+.app__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.app__title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: .08em;
+  color: var(--muted);
+}
+
+.app__day {
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  font-size: .7rem;
+  letter-spacing: .08em;
+  color: var(--muted);
+  border: 1px solid var(--line);
+  border-radius: 99px;
+  padding: 2px 10px;
+}
+
+/* ---- ドロップゾーン ---- */
+.drop {
+  position: relative;              /* 中のfile inputを隠す位置の基準 */
+  background: var(--panel);
+  border-radius: var(--radius);
+  padding: 8px;
+}
+
+/* file input は見た目だけ消す。キーボードのフォーカスは残す */
+.drop__input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+.drop__label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  min-height: 132px;
+  padding: 20px 16px;
+  border: 2px dashed var(--line);
+  border-radius: 10px;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color .15s ease, background-color .15s ease;
+}
+
+.drop__label:hover,
+.drop.is-dragover .drop__label {
+  border-color: var(--accent);
+  background: var(--panel-2);
+}
+
+/* キーボードでfile inputにフォーカスが来たことを枠で示す */
+.drop__input:focus-visible + .drop__label {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.drop__lead {
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+.drop__sub {
+  font-size: .85rem;
+  color: var(--muted);
+}
+
+/* 画像を読み込んだあとは受け取り口を小さくして、プレビューを主役にする */
+body[data-state="ready"] .drop__label {
+  min-height: 64px;
+  padding: 12px 16px;
+}
+
+body[data-state="ready"] .drop__lead { font-size: .9rem; }
+
+.drop__note {
+  margin: 8px 0 2px;
+  text-align: center;
+  font-size: .8rem;
+  color: var(--muted);
+  min-height: 1.6em;
+}
+
+.drop__note--warn { color: var(--danger); }
+
+.hint {
+  margin: -8px 0 0;
+  text-align: center;
+  font-size: .75rem;
+  color: var(--muted);
+}
+
+/* ---- 編集エリア（プレビュー＋設定） ---- */
+.editor {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+
+/* プレビューの土台。canvasの大きさはJSがpxで入れる */
+.stage {
+  background: var(--panel);
+  border-radius: var(--radius);
+  padding: 16px;
+  min-height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.stage__canvas {
+  display: block;
+  max-width: 100%;
+  /* 背景が暗いプリセットのときに画像の外周が分かるように、細い輪郭だけ足す */
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, .07);
+}
+
+/* ---- 設定パネル ---- */
+.panel {
+  background: var(--panel);
+  border-radius: var(--radius);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* ラベルと現在値を1行目に、スライダー/チップを2行目に置く */
+.control {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 4px 8px;
+}
+
+.control__label {
+  font-size: .8rem;
+  font-weight: 600;
+  letter-spacing: .08em;
+  color: var(--muted);
+}
+
+.control__value {
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  font-size: .85rem;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.control__range {
+  grid-column: 1 / -1;
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+  accent-color: var(--accent);
+  height: 32px;
+  cursor: pointer;
+}
+
+.control__range:focus-visible,
+.chip:focus-visible,
+.btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* ---- 背景プリセットのチップ ---- */
+.chips {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.chip {
+  appearance: none;
+  -webkit-appearance: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--panel-2);
+  color: var(--muted);
+  font-family: inherit;
+  font-size: .7rem;
+  line-height: 1.3;
+  padding: 6px;
+  cursor: pointer;
+  transition: border-color .15s ease, color .15s ease;
+}
+
+/* 色見本。中身の background はJSがプリセット定義から入れる */
+.chip__swatch {
+  display: block;
+  height: 30px;
+  border-radius: 6px;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .12);
+}
+
+.chip__name { text-align: center; }
+
+.chip:hover { border-color: var(--muted); }
+
+.chip.is-selected {
+  border-color: var(--accent);
+  color: var(--text);
+}
+
+/* ---- ボタン ---- */
+.btn {
+  appearance: none;
+  -webkit-appearance: none;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  background: var(--panel-2);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 600;
+  padding: 14px 8px;
+  min-height: 48px;
+  cursor: pointer;
+  transition: background-color .15s ease, opacity .15s ease;
+}
+
+.btn:hover:not(:disabled) { background: #323847; }
+
+.btn--primary {
+  background: var(--accent-strong);
+  width: 100%;
+}
+
+.btn--primary:hover:not(:disabled) { background: var(--accent); }
+
+.panel__info {
+  margin: 0;
+  font-size: .78rem;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+  min-height: 1.6em;
+}
+
+/* ---- フッター ---- */
+.foot {
+  text-align: center;
+  font-size: .8rem;
+}
+
+.foot__link {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.foot__link:hover { text-decoration: underline; }
+
+/* PCではプレビューを左、設定を右に置く（プレビューを大きく見せる） */
+@media (min-width: 800px) {
+  .editor {
+    grid-template-columns: minmax(0, 1fr) 300px;
+    align-items: start;
+  }
+}
+
+/* 狭い画面（375px想定）でも詰まらないように余白と文字を少し落とす */
+@media (max-width: 420px) {
+  body { padding: 20px 12px 40px; }
+  .stage { padding: 12px; }
+  .panel { padding: 14px; gap: 14px; }
+  .drop__sub { font-size: .78rem; }
+  .drop__label { min-height: 112px; }
+}
+
+/* マウス操作でないデバイス向けにhoverの残留を防ぐ */
+@media (hover: none) {
+  .btn:hover:not(:disabled) { background: var(--panel-2); }
+  .btn--primary:hover:not(:disabled) { background: var(--accent-strong); }
+  .chip:hover { border-color: var(--line); }
+  .chip.is-selected:hover { border-color: var(--accent); }
+  .drop__label:hover { border-color: var(--line); background: transparent; }
+}
