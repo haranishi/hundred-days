@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>タップ花火</title>
+  <meta name="description" content="夜空をタップした場所へ花火を打ち上げるブラウザのおもちゃ">
+  <link rel="stylesheet" href="style.css">
+  <script src="script.js" defer></script>
+</head>
+<body>
+  <main class="fireworks">
+    <canvas
+      class="fireworks__canvas"
+      id="fireworks-canvas"
+      aria-label="タップした場所に花火が上がる夜空"></canvas>
+
+    <header class="app-head">
+      <h1 class="app-head__title">タップ花火</h1>
+      <span class="app-head__day">Day 003</span>
+    </header>
+
+    <p class="fireworks__hint" id="hint">タップで打ち上げ<span aria-hidden="true">🎆</span></p>
+
+    <footer class="foot">
+      <a class="foot__link" href="../">← 100 DAYS / 100 APPS</a>
+    </footer>
+  </main>
+</body>
+</html>
