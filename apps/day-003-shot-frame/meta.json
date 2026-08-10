@@ -7,16 +7,16 @@
   "difficulty": "B",
   "sourceOfIdea": "1週目バックログ（重複チェック済み）からAIが本日分として提案し、本人が承認",
   "startedAt": "2026-08-10",
-  "finishedAt": "",
+  "finishedAt": "2026-08-10",
   "actualMinutes": 31,
   "aiHandled": ["要件定義と実装"],
   "humanHandled": ["作るもの・機能範囲の判断"],
   "failuresAndFixes": [],
-  "publicUrl": "",
+  "publicUrl": "https://hundred-days.pages.dev/day-003-shot-frame/",
   "repoPath": "apps/day-003-shot-frame",
   "shortVideoUrl": "",
   "longVideoChapter": "",
-  "status": "draft",
+  "status": "published",
   "xPostUrl": "",
-  "social": { "x": { "summary": "", "hashtags": ["100日チャレンジ", "個人開発"] } }
+  "social": { "x": { "summary": "スクショを⌘Vで貼るだけ。背景6種・余白・角丸・影で整えて、元解像度＋余白のPNGで保存。処理はブラウザの中だけ。", "hashtags": ["100日チャレンジ", "個人開発"] } }
 }

@@ -2,7 +2,7 @@
 
 スクリーンショットを1枚入れると、余白・角丸・影・グラデ背景をつけたSNS映えする画像に整形して、PNGで保存できるツール。
 
-※ いまは制作記録のみ（`meta.json` の `status` が `draft`）。公開したらここに公開URLを追記する。
+**公開URL: https://hundred-days.pages.dev/day-003-shot-frame/**
 
 ## 使い方
 

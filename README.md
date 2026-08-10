@@ -11,6 +11,7 @@ AIと一緒に作りながら、「AIに任せたこと」と「自分で考え�
 |---|---|---|
 | 001 | [集中タイマー](apps/day-001-focus-timer/) | https://hundred-days.pages.dev/day-001-focus-timer/ |
 | 002 | [ドット絵メーカー](apps/day-002-pixel-art/) | https://hundred-days.pages.dev/day-002-pixel-art/ |
+| 003 | [スクショ映えメーカー](apps/day-003-shot-frame/) | https://hundred-days.pages.dev/day-003-shot-frame/ |
 
 ## 1日アプリのルール
 
