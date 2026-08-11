@@ -36,8 +36,9 @@ AIと一緒に作りながら、「AIに任せたこと」と「自分で考え�
 
 ## 構成
 
-- `apps/day-NNN-<name>/` — 各日のアプリ本体と記録（`meta.json`）
+- `apps/day-NNN-<name>/` — 各日のアプリ本体と記録（`meta.json`）＋一覧用スクショ（`screenshot.webp`・任意）
 - `scripts/build.mjs` — `dist/` に一覧ページと各アプリを生成（依存パッケージなし）
+- `static/` — 一覧ページ用の静的ファイル（OG画像など）。中身がそのまま `dist/` 直下に入る
 - ホスティング: Cloudflare Pages（1プロジェクトに全アプリをパスでルーティング）
 
 ```bash

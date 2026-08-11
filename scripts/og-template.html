@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>OG image source</title>
+<style>
+  :root{
+    --bg:#14161c; --line:#2c3342;
+    --text:#eef1f6; --muted:#9aa3b2; --accent:#4f9cff; --live:#4ade80;
+    --mono:ui-monospace,"SF Mono",Menlo,monospace;
+    --sans:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic","Noto Sans JP","Segoe UI",sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html,body{width:1200px;height:630px;}
+  body{
+    background:
+      radial-gradient(900px 520px at 8% -10%, rgba(79,156,255,.16), transparent 60%),
+      radial-gradient(700px 460px at 105% 115%, rgba(74,222,128,.10), transparent 62%),
+      var(--bg);
+    color:var(--text);font-family:var(--sans);
+    padding:88px 84px 76px;display:flex;flex-direction:column;
+  }
+  .eyebrow{display:flex;align-items:center;gap:14px;font-family:var(--mono);
+    font-size:20px;letter-spacing:.16em;color:var(--text);}
+  .eyebrow::before{content:"";width:11px;height:11px;border-radius:50%;background:var(--live);}
+  .title{margin-top:26px;font-family:var(--mono);font-weight:700;font-size:78px;
+    letter-spacing:.02em;line-height:1.1;white-space:nowrap;}
+  .title .slash{color:var(--accent);}
+  .sub{margin-top:22px;font-size:29px;color:var(--muted);letter-spacing:.01em;}
+  .rule{margin-top:auto;height:2px;border-radius:2px;
+    background:linear-gradient(90deg,var(--accent),var(--live));}
+  .foot{margin-top:38px;display:flex;align-items:center;justify-content:space-between;gap:24px;}
+  .chips{display:flex;gap:16px;}
+  .chip{border:1px solid var(--line);border-radius:999px;padding:12px 22px;
+    font-size:21px;color:var(--muted);white-space:nowrap;}
+  .url{font-family:var(--mono);font-size:25px;letter-spacing:.02em;color:var(--accent);white-space:nowrap;}
+</style>
+</head>
+<body>
+  <p class="eyebrow">100日チャレンジ</p>
+  <h1 class="title">100 DAYS <span class="slash">/</span> 100 APPS</h1>
+  <p class="sub">1日1個、Webアプリを作って公開する実験と記録</p>
+  <div class="rule"></div>
+  <div class="foot">
+    <div class="chips">
+      <span class="chip">アカウント登録不要</span>
+      <span class="chip">課金なし</span>
+      <span class="chip">個人データなし</span>
+    </div>
+    <span class="url">hundred-days.pages.dev</span>
+  </div>
+</body>
+</html>

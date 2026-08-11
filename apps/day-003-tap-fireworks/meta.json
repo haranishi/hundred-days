@@ -14,6 +14,8 @@
   "failuresAndFixes": [{ "problem": "1作目のスクショ整形が微妙", "fix": "夜に花火へ作り直し" }],
   "publicUrl": "https://hundred-days.pages.dev/day-003-tap-fireworks/",
   "repoPath": "apps/day-003-tap-fireworks",
+  "screenshot": "screenshot.webp",
+  "demo": "demo.mp4",
   "shortVideoUrl": "",
   "longVideoChapter": "",
   "status": "published",

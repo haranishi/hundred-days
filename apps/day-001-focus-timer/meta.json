@@ -8,7 +8,7 @@
   "sourceOfIdea": "候補案から本人が選定",
   "startedAt": "2026-08-08",
   "finishedAt": "2026-08-09",
-  "actualMinutes": 0,
+  "actualMinutes": 10,
   "aiHandled": ["要件整理と実装"],
   "humanHandled": ["作るものと機能範囲の判断"],
   "failuresAndFixes": [
@@ -19,6 +19,8 @@
   ],
   "publicUrl": "https://hundred-days.pages.dev/day-001-focus-timer/",
   "repoPath": "apps/day-001-focus-timer",
+  "screenshot": "screenshot.webp",
+  "demo": "demo.mp4",
   "shortVideoUrl": "",
   "longVideoChapter": "",
   "status": "published",
