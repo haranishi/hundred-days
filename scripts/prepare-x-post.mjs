@@ -68,19 +68,32 @@ const hashtags = hashtagValues.map((value) => {
   return tag;
 });
 
+// meta.json の aiHandled / humanHandled / failuresAndFixes は「正確な記録」なので長くてよい。
+// そのまま貼ると280を超えるため、social.x 側に短縮版を書けるようにする。
+// 未指定なら従来どおり記録の先頭をそのまま使う。
+//   "social": { "x": { "ai": "…", "human": "…", "failure": "…", "emoji": "💸" } }
+// failure に空文字を明示すると、失敗の行を省略できる。
 const failure = meta.failuresAndFixes?.find((item) => item?.problem?.trim());
-const failureLine = failure
+const defaultFailureLine = failure
   ? `⚠️ ${failure.problem.trim()}${failure.fix?.trim() ? `→${failure.fix.trim()}` : ''}`
   : '';
+
+const aiLine = xConfig?.ai?.trim() || aiHandled.trim();
+const humanLine = xConfig?.human?.trim() || humanHandled.trim();
+const failureLine =
+  typeof xConfig?.failure === 'string'
+    ? (xConfig.failure.trim() ? `⚠️ ${xConfig.failure.trim()}` : '')
+    : defaultFailureLine;
+const emoji = xConfig?.emoji?.trim() || '⏱️';
 
 const post = [
   `Day ${day} / 100`,
   '',
-  `「${meta.title}」を作りました⏱️`,
+  `「${meta.title}」を作りました${emoji}`,
   summary,
   '',
-  `🤖 AI：${aiHandled.trim()}`,
-  `🙋 自分：${humanHandled.trim()}`,
+  `🤖 AI：${aiLine}`,
+  `🙋 自分：${humanLine}`,
   failureLine,
   '',
   '実際に触れます。リンクはリプ欄👇',
