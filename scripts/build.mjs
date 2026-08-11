@@ -204,7 +204,7 @@ const cardHtml = (app) => {
     ? `<details class="memo"><summary class="memo__summary">制作メモ</summary><dl class="memo__body">${memoRows}</dl></details>`
     : '';
 
-  return `<article class="card" data-tags="${esc(app.tags.join(' '))}">
+  return `<article class="card" data-tags="${esc(app.tags.join(' '))}" data-day="${num}" data-title="${esc(app.title)}">
   ${thumbBox}
   <div class="card__body">
     <div class="card__meta"><span class="card__day">Day ${num}</span>${badge}</div>
@@ -571,6 +571,54 @@ ${cards}
   // 背景（バックドロップ）のクリックで閉じる
   dialog.addEventListener('click', function (e) {
     if (e.target === dialog) close();
+  });
+})();
+
+// 計測イベント。GA4を入れていないときは何もしない。
+//
+// なぜ必要か：各アプリのページには計測タグを入れない方針なので、アプリを開かれても
+// 遷移先では何も記録されない。GA4の「離脱クリック」は別ドメイン宛のリンクだけが対象で、
+// 同一ドメインのアプリページへのリンクは拾わない。つまりここで拾わないと
+// 「どのアプリが実際に触られたか」が永久に分からない。
+//
+// 送るのは匿名の操作内容だけ（Day番号・アプリ名・タグ名）。個人を特定する値は送らない。
+(function () {
+  if (typeof gtag !== 'function') return;
+
+  function send(name, params) {
+    gtag('event', name, params || {});
+  }
+  function cardOf(el) {
+    var card = el.closest ? el.closest('.card') : null;
+    return card ? { day: card.getAttribute('data-day') || '', app_title: card.getAttribute('data-title') || '' } : {};
+  }
+
+  // アプリを開いた（サムネのリンクと「アプリを開く」ボタンの両方）
+  document.addEventListener('click', function (e) {
+    var link = e.target.closest ? e.target.closest('.thumb__link, .btn--primary') : null;
+    if (link) { send('app_open', cardOf(link)); return; }
+
+    // デモ動画の再生
+    var play = e.target.closest ? e.target.closest('.thumb__play') : null;
+    if (play) { send('demo_play', cardOf(play)); return; }
+
+    // タグで絞り込んだ
+    var chip = e.target.closest ? e.target.closest('.chip') : null;
+    if (chip) { send('tag_filter', { tag_name: chip.getAttribute('data-tag') || '' }); return; }
+
+    // XやGitHubへ回遊した
+    var out = e.target.closest ? e.target.closest('.pill, .footer__links a, .about__link a') : null;
+    if (out) {
+      var href = out.getAttribute('href') || '';
+      send('profile_click', { link_name: href.indexOf('x.com') !== -1 ? 'x' : href.indexOf('github') !== -1 ? 'github' : 'other' });
+    }
+  });
+
+  // 制作メモを開いた（AIに任せた／自分でやった、が読まれているか）
+  document.querySelectorAll('.memo').forEach(function (memo) {
+    memo.addEventListener('toggle', function () {
+      if (memo.open) send('memo_open', cardOf(memo));
+    });
   });
 })();
 </script>
