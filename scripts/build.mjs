@@ -28,7 +28,7 @@ const SITE = {
   // 各アプリのページには入れない。アプリ側には「外部通信なし」「どこにも送信も
   // 保存もされません」と書いてあり、GA4を入れるとその記述が事実と食い違うため。
   // アプリページの検索流入は Search Console 側で見る（あちらはページに何も置かない）。
-  analyticsId: '',
+  analyticsId: 'G-DSGH6NYRM5',
 
   // Search Console の所有権確認用トークン（meta タグの content の値だけ）。
   // 空なら meta タグを出力しない。ファイル設置方式を使うなら static/ に置くのでこれは不要
