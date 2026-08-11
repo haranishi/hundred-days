@@ -1,0 +1,391 @@
+:root {
+  --paper: #F2F4F7;
+  --card: #FFFFFF;
+  --ink: #16202E;
+  --ink-2: #45566C;
+  --muted: #7A889C;
+  --line: #D9DFE8;
+  --brand: #0B4F86;
+  --brand-soft: #E4EDF6;
+  --on-brand: #FFFFFF;
+  --money: #0B4F86;
+  --alert: #A83A16;
+  --alert-soft: #F7E7E0;
+  --radius: 10px;
+  --gothic: "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic", YuGothic, "Noto Sans JP", "Helvetica Neue", Arial, sans-serif;
+  --num: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #0F141B;
+    --card: #171E28;
+    --ink: #E6EBF2;
+    --ink-2: #AEBBCB;
+    --muted: #7E8CA0;
+    --line: #2A3543;
+    --brand: #5AA6E0;
+    --brand-soft: #13293D;
+    --on-brand: #0F141B;
+    --money: #7CBDF0;
+    --alert: #E58A63;
+    --alert-soft: #33211A;
+  }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--gothic);
+  font-size: 15px;
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+  -webkit-text-size-adjust: 100%;
+}
+
+.app {
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 28px 16px 48px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* ---------- head ---------- */
+
+.head { display: flex; flex-direction: column; gap: 6px; }
+
+.head__day {
+  margin: 0;
+  font-family: var(--num);
+  font-size: 11px;
+  letter-spacing: .16em;
+  color: var(--brand);
+}
+
+.head__title {
+  margin: 0;
+  font-size: 25px;
+  font-weight: 700;
+  line-height: 1.35;
+  letter-spacing: .01em;
+  text-wrap: balance;
+}
+
+.head__lede { margin: 2px 0 0; font-size: 13.5px; color: var(--ink-2); }
+.head__lede b { color: var(--ink); }
+
+.head__unofficial {
+  margin: 4px 0 0;
+  font-size: 12px;
+  color: var(--alert);
+  background: var(--alert-soft);
+  border-radius: 6px;
+  padding: 7px 11px;
+  line-height: 1.6;
+}
+
+.head__unofficial b { font-weight: 700; }
+
+/* ---------- panel ---------- */
+
+.panel, .result, .burden, .notes, .why {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 16px;
+}
+
+.panel { display: flex; flex-direction: column; gap: 18px; }
+
+.field { display: flex; flex-direction: column; gap: 8px; }
+
+/* .field の display:flex がブラウザ標準の [hidden]{display:none} に勝ってしまうため打ち消す */
+[hidden] { display: none !important; }
+
+.field__label {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--ink-2);
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.field__out {
+  font-family: var(--num);
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--money);
+  font-variant-numeric: tabular-nums;
+}
+
+.field__note { margin: 0; font-size: 12px; color: var(--muted); line-height: 1.6; }
+.field__note b { color: var(--ink-2); }
+
+/* segmented control */
+
+.seg { display: flex; gap: 6px; }
+
+.seg button {
+  flex: 1 1 0;
+  min-width: 0;
+  font-family: var(--gothic);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink-2);
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  padding: 9px 4px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  transition: background .12s, color .12s, border-color .12s;
+}
+
+.seg button small { font-size: 10px; font-weight: 400; opacity: .75; }
+.seg button:hover { border-color: var(--brand); color: var(--brand); }
+
+.seg button[aria-checked="true"] {
+  background: var(--brand);
+  border-color: var(--brand);
+  color: var(--on-brand);
+}
+
+.seg button[aria-checked="true"] small { opacity: .85; }
+
+/* slider */
+
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 26px;
+  background: transparent;
+  cursor: pointer;
+  margin: 0;
+}
+
+input[type="range"]::-webkit-slider-runnable-track {
+  height: 6px;
+  border-radius: 3px;
+  background: var(--line);
+}
+
+input[type="range"]::-moz-range-track {
+  height: 6px;
+  border-radius: 3px;
+  background: var(--line);
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 24px;
+  height: 24px;
+  margin-top: -9px;
+  border-radius: 50%;
+  background: var(--brand);
+  border: 3px solid var(--card);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, .28);
+}
+
+input[type="range"]::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--brand);
+  border: 3px solid var(--card);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, .28);
+}
+
+:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
+
+/* ---------- result ---------- */
+
+.result { text-align: center; padding: 22px 16px 18px; }
+
+.result__lead { margin: 0; font-size: 13px; color: var(--ink-2); }
+
+.result__age { margin: 2px 0 6px; display: flex; align-items: baseline; justify-content: center; gap: 4px; }
+
+.result__age-num {
+  font-family: var(--num);
+  font-size: 68px;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--money);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -.02em;
+}
+
+.result__age-unit { font-size: 22px; font-weight: 700; color: var(--ink-2); }
+
+.result__pay { margin: 0; font-size: 15px; color: var(--ink-2); }
+
+.result__pay b {
+  font-family: var(--num);
+  font-size: 24px;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+  margin-left: 2px;
+}
+
+.result__span { margin: 2px 0 0; font-size: 12.5px; color: var(--muted); }
+.result__span span { font-family: var(--num); font-variant-numeric: tabular-nums; color: var(--ink-2); }
+
+.figures {
+  margin: 16px 0 0;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px 4px;
+}
+
+.figures div { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+.figures dt { font-size: 11px; color: var(--muted); }
+
+.figures dd {
+  margin: 0;
+  font-family: var(--num);
+  font-size: 14px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+  word-break: break-all;
+}
+
+/* ---------- burden ---------- */
+
+.burden { display: flex; flex-direction: column; gap: 12px; }
+.burden__line { margin: 0; font-size: 14px; color: var(--ink-2); }
+
+.burden__line b {
+  font-family: var(--num);
+  font-size: 19px;
+  color: var(--alert);
+  font-variant-numeric: tabular-nums;
+}
+
+.bar { height: 9px; border-radius: 5px; background: var(--alert-soft); overflow: hidden; }
+
+.bar__fill {
+  display: block;
+  height: 100%;
+  background: var(--alert);
+  border-radius: 5px;
+  transition: width .25s ease;
+}
+
+/* ---------- why ---------- */
+
+.why { padding: 0; }
+
+.why summary {
+  padding: 14px 16px;
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  color: var(--brand);
+  list-style: none;
+}
+
+.why summary::-webkit-details-marker { display: none; }
+.why summary::before { content: "＋ "; font-family: var(--num); }
+.why[open] summary::before { content: "− "; }
+.why[open] summary { border-bottom: 1px solid var(--line); }
+
+.why__text { margin: 0; padding: 14px 16px 10px; font-size: 13px; color: var(--ink-2); }
+.why__text b { color: var(--ink); }
+
+/* 年数が決まるまでの道筋。表を丸ごと出さず、該当する区分と計算だけを見せる */
+
+.path { padding: 4px 16px 0; display: flex; flex-direction: column; }
+
+.path__step {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: var(--paper);
+}
+
+.path__k { font-size: 12px; color: var(--ink-2); }
+
+.path__v {
+  font-family: var(--num);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.path__step--result { border-color: var(--brand); background: var(--brand-soft); }
+.path__step--result .path__k { font-family: var(--num); font-variant-numeric: tabular-nums; color: var(--brand); }
+.path__step--result .path__v { color: var(--brand); }
+
+.path__arrow {
+  margin: 0;
+  padding: 7px 12px 7px 26px;
+  font-size: 11.5px;
+  color: var(--muted);
+  position: relative;
+  line-height: 1.5;
+}
+
+.path__arrow::before {
+  content: "↓";
+  position: absolute;
+  left: 10px;
+  top: 6px;
+  font-family: var(--num);
+  color: var(--brand);
+}
+
+.why__more { margin: 0; padding: 14px 16px 16px; font-size: 11.5px; color: var(--muted); line-height: 1.7; }
+.why__more a { color: var(--brand); }
+
+/* ---------- notes ---------- */
+
+.notes { display: flex; flex-direction: column; gap: 10px; }
+.notes__h { margin: 0; font-size: 13px; font-weight: 700; color: var(--ink-2); }
+.notes__list { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 7px; font-size: 12.5px; color: var(--ink-2); }
+.notes__list b { color: var(--ink); }
+.notes__src { margin: 4px 0 0; font-size: 11.5px; color: var(--muted); line-height: 1.75; }
+
+.notes__disc {
+  margin: 6px 0 0;
+  padding: 10px 12px;
+  border-left: 2px solid var(--alert);
+  background: var(--alert-soft);
+  border-radius: 0 6px 6px 0;
+  font-size: 11.5px;
+  color: var(--ink-2);
+  line-height: 1.8;
+}
+
+.notes__disc b { color: var(--alert); }
+.notes a { color: var(--brand); }
+
+/* ---------- foot ---------- */
+
+.foot { text-align: center; padding-top: 4px; }
+.foot__link { font-size: 12.5px; color: var(--muted); text-decoration: none; }
+.foot__link:hover { color: var(--brand); }
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; }
+}

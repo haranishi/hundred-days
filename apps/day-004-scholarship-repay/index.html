@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>奨学金、何歳まで返す？</title>
+  <meta name="description" content="奨学金の返還年数は自分で選べません。借りた総額から自動的に決まります。日本学生支援機構の算出表どおりに計算して、返し終わる年齢と毎月の返還額を出します。">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230B4F86'/%3E%3Ctext x='16' y='23' font-size='19' text-anchor='middle' fill='%23fff' font-family='sans-serif'%3E%C2%A5%3C/text%3E%3C/svg%3E">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="奨学金、何歳まで返す？">
+  <meta property="og:description" content="返還年数は自分で選べない。借りた総額で自動的に決まる。日本学生支援機構の算出表どおりに計算します。">
+  <meta property="og:url" content="https://hundred-days.pages.dev/day-004-scholarship-repay/">
+  <link rel="stylesheet" href="style.css">
+  <script src="script.js" defer></script>
+</head>
+<body>
+<main class="app">
+
+  <header class="head">
+    <p class="head__day">Day 004</p>
+    <h1 class="head__title">奨学金、何歳まで返す？</h1>
+    <p class="head__lede">返還年数は<b>自分で選べません</b>。借りた総額から自動的に決まります。日本学生支援機構（JASSO）の算出表どおりに計算します。</p>
+    <p class="head__unofficial">これは個人が作った<b>非公式</b>のツールです。JASSOとは関係ありません。</p>
+  </header>
+
+  <section class="panel" aria-label="借りる条件">
+
+    <div class="field">
+      <span class="field__label" id="lbl-kind">種類</span>
+      <div class="seg" role="radiogroup" aria-labelledby="lbl-kind" id="seg-kind">
+        <button type="button" role="radio" aria-checked="true"  data-v="1">第一種<small>無利子</small></button>
+        <button type="button" role="radio" aria-checked="false" data-v="2">第二種<small>有利子</small></button>
+      </div>
+    </div>
+
+    <div class="field">
+      <label class="field__label" for="amount">毎月借りる額 <output class="field__out" id="amount-out">54,000円</output></label>
+      <input type="range" id="amount" min="0" max="10" step="1" value="6" aria-describedby="amount-note">
+      <p class="field__note" id="amount-note">大学の第一種は最大64,000円、第二種は最大120,000円です。</p>
+      <p class="field__note">大学（2018年度以降の入学者）の月額です。短期大学・高専・専修学校・大学院は選べる額が違います。</p>
+    </div>
+
+    <div class="field">
+      <span class="field__label" id="lbl-years">借りる期間</span>
+      <div class="seg" role="radiogroup" aria-labelledby="lbl-years" id="seg-years">
+        <button type="button" role="radio" aria-checked="false" data-v="24">2年</button>
+        <button type="button" role="radio" aria-checked="true"  data-v="48">4年</button>
+        <button type="button" role="radio" aria-checked="false" data-v="60">5年</button>
+        <button type="button" role="radio" aria-checked="false" data-v="72">6年</button>
+      </div>
+    </div>
+
+    <div class="field" id="field-rate" hidden>
+      <span class="field__label" id="lbl-rate">利率（年）</span>
+      <div class="seg" role="radiogroup" aria-labelledby="lbl-rate" id="seg-rate">
+        <button type="button" role="radio" aria-checked="false" data-v="0.005">0.5%</button>
+        <button type="button" role="radio" aria-checked="true"  data-v="0.01">1%</button>
+        <button type="button" role="radio" aria-checked="false" data-v="0.02">2%</button>
+        <button type="button" role="radio" aria-checked="false" data-v="0.03">3%</button>
+      </div>
+      <p class="field__note">第二種の利率は<b>貸与が終わるとき</b>に決まります。法律上の上限は年3%です。近年は上昇傾向にあるので、最新の値はJASSOで確認してください。</p>
+    </div>
+
+    <div class="field">
+      <span class="field__label" id="lbl-age">卒業するときの年齢</span>
+      <div class="seg" role="radiogroup" aria-labelledby="lbl-age" id="seg-age">
+        <button type="button" role="radio" aria-checked="true"  data-v="22">22歳</button>
+        <button type="button" role="radio" aria-checked="false" data-v="24">24歳</button>
+        <button type="button" role="radio" aria-checked="false" data-v="27">27歳</button>
+      </div>
+    </div>
+
+  </section>
+
+  <section class="result" aria-live="polite">
+    <p class="result__lead">返し終わるのは</p>
+    <p class="result__age"><span class="result__age-num" id="r-age">35</span><span class="result__age-unit">歳</span></p>
+
+    <p class="result__pay">毎月 <b id="r-monthly">¥14,400</b></p>
+    <p class="result__span"><span id="r-span">15年 · 180回</span>（返還開始は卒業の半年後）</p>
+
+    <dl class="figures">
+      <div><dt>借りた総額</dt><dd id="r-principal">¥2,592,000</dd></div>
+      <div><dt>返す総額</dt><dd id="r-total">¥2,592,000</dd></div>
+      <div><dt>うち利息</dt><dd id="r-interest">¥0</dd></div>
+    </dl>
+  </section>
+
+  <section class="burden">
+    <div class="field">
+      <span class="field__label" id="lbl-take">手取りの月収で比べる</span>
+      <div class="seg" role="radiogroup" aria-labelledby="lbl-take" id="seg-take">
+        <button type="button" role="radio" aria-checked="false" data-v="180000">18万</button>
+        <button type="button" role="radio" aria-checked="true"  data-v="220000">22万</button>
+        <button type="button" role="radio" aria-checked="false" data-v="250000">25万</button>
+        <button type="button" role="radio" aria-checked="false" data-v="300000">30万</button>
+      </div>
+    </div>
+    <p class="burden__line">手取りの <b id="r-ratio">6.5%</b> が毎月返還に消えます。</p>
+    <div class="bar"><span class="bar__fill" id="r-bar" style="width:6.5%"></span></div>
+  </section>
+
+  <details class="why">
+    <summary>なぜこの年数になるのか</summary>
+    <p class="why__text">JASSOは、借りた総額を「割賦金の基礎額」で割り、<b>小数点以下を切り捨てた数</b>を返還年数にします。だから返還年数は本人が選べず、<b>途中で額を増やして早く終わらせることもできません</b>（繰上返還は別途申請できます）。</p>
+
+    <div class="path">
+      <div class="path__step">
+        <span class="path__k">借りた総額</span>
+        <span class="path__v" id="p-principal">¥2,592,000</span>
+      </div>
+      <p class="path__arrow" id="p-band">この額の区分に対応する基礎額は</p>
+      <div class="path__step">
+        <span class="path__k">割賦金の基礎額</span>
+        <span class="path__v" id="p-base">¥170,000</span>
+      </div>
+      <p class="path__arrow">割って、小数点以下を切り捨てる</p>
+      <div class="path__step path__step--result">
+        <span class="path__k" id="p-formula">2,592,000 ÷ 170,000 = 15.24</span>
+        <span class="path__v" id="p-years">15年</span>
+      </div>
+    </div>
+
+    <p class="why__more">基礎額は総額の区分ごとに決まっています。区分の一覧は JASSO「<a href="https://www.jasso.go.jp/shogakukin/henkan/houhou/henkan_hoshiki/henkan_kikan/index.html" target="_blank" rel="noopener">返還期間と割賦金</a>」で確認できます。</p>
+  </details>
+
+  <section class="notes">
+    <h2 class="notes__h">この数字について</h2>
+    <ul class="notes__list">
+      <li><b>第一種（無利子）は公式の返還例10件すべてと完全に一致</b>します（借りた総額・毎月の返還額・返還回数）。</li>
+      <li><b>第二種（有利子）は概算</b>です。返還回数は公式の返還例60件すべてと一致しますが、毎月の返還額は公式より<b>1〜11円ほど高め</b>に出ます（総額で+0.03%以内）。安全側に振ってあります。</li>
+      <li>月賦返還・定額返還方式で計算しています。所得連動返還方式、半年賦併用返還、減額返還、返還期限猶予、繰上返還、第一種と第二種の併用には対応していません。</li>
+      <li>大学（2018年度以降の入学者）の貸与月額だけを扱っています。短期大学・高等専門学校・専修学校・大学院の月額区分、私立大学の医・歯・薬・獣医学課程の増額（第二種で12万円を選んだ場合のみ可能）には対応していません。</li>
+      <li>入力した内容はこの画面の中だけで計算され、どこにも送信も保存もされません。</li>
+    </ul>
+    <p class="notes__src">出典：日本学生支援機構「<a href="https://www.jasso.go.jp/shogakukin/henkan/houhou/henkan_hoshiki/henkan_kikan/index.html" target="_blank" rel="noopener">返還期間と割賦金</a>」「<a href="https://www.jasso.go.jp/shogakukin/henkan/houhou/henkan_hoshiki/kappu/sample/daigaku.html" target="_blank" rel="noopener">大学・返還例</a>」「<a href="https://www.jasso.go.jp/shogakukin/about/taiyo/taiyo_1shu/kingaku/2018ikou.html" target="_blank" rel="noopener">平成30年度以降入学者の貸与月額</a>」（2026年8月11日取得）。</p>
+    <p class="notes__disc"><b>免責</b>：これは個人が趣味で作った非公式のツールで、JASSOが提供・監修したものではありません。制度は改正されることがあり、内容の正確性・最新性を保証しません。実際の返還額は必ず<a href="https://www.jasso.go.jp/shogakukin/oyakudachi/document/simulation.html" target="_blank" rel="noopener">JASSOの公式シミュレーション</a>で確認してください。この結果を用いて生じた損害について、作者は責任を負いません。</p>
+  </section>
+
+  <footer class="foot">
+    <a class="foot__link" href="../">← 100 DAYS / 100 APPS</a>
+  </footer>
+
+</main>
+</body>
+</html>
