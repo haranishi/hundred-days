@@ -73,8 +73,43 @@ const has = (cmd) => {
 
 // ---------------------------------------------------------------- 動画
 
-const VIDEO = { width: 720, height: 1280 };
-const VIEW = { width: 540, height: 960 }; // 9:16。VIDEOへ1.333倍に引き伸ばされる
+const VIDEO = { width: 720, height: 1280 }; // 最終出力（ffmpegで拡大）
+const VIEW = { width: 540, height: 960 }; // 録画時のビューポート。9:16
+
+// ⚠️ recordVideo.size は必ず VIEW と一致させる。
+// Playwrightはページ映像を**拡大しない**。録画サイズの方が大きいと、原寸のまま左上に置いて
+// 余白を #808080 のグレーで埋める（アスペクト比が同じでも起きる）。
+// 実際にDay004で右180px・下320pxがグレーになった。720×1280への拡大はffmpeg側で行う。
+const RECORD = VIEW;
+
+/** 動画の指定位置の平均色を取る。グレー余白の混入を機械的に検出するために使う。 */
+function sampleColor(file, x, y, seconds = 2) {
+  const buf = execFileSync('ffmpeg', [
+    '-v', 'error', '-ss', String(seconds), '-i', file, '-frames:v', '1',
+    '-vf', `crop=40:40:${x}:${y},scale=1:1`, '-pix_fmt', 'rgb24', '-f', 'rawvideo', '-'
+  ], { maxBuffer: 1 << 20 });
+  return [...buf.subarray(0, 3)].map((n) => n.toString(16).padStart(2, '0')).join('');
+}
+
+/** 右端・下端・右下がPlaywrightの余白色になっていないか検査する。 */
+function assertNoPadding(file) {
+  const points = [
+    ['右端', VIDEO.width - 60, Math.round(VIDEO.height * 0.3)],
+    ['下端', Math.round(VIDEO.width * 0.5), VIDEO.height - 60],
+    ['右下', VIDEO.width - 60, VIDEO.height - 60]
+  ];
+  const bad = points
+    .map(([name, x, y]) => [name, sampleColor(file, x, y)])
+    .filter(([, hex]) => hex === '808080');
+
+  if (bad.length) {
+    console.error(`✖ 余白のグレー(#808080)が混入しています: ${bad.map(([n]) => n).join('・')}`);
+    console.error('  recordVideo.size とビューポートが一致しているか確認すること。');
+    process.exitCode = 1;
+    return false;
+  }
+  return true;
+}
 
 async function recordVideo() {
   if (!existsSync(scenarioPath)) {
@@ -94,7 +129,7 @@ async function recordVideo() {
     viewport: VIEW,
     locale: 'ja-JP',
     reducedMotion: 'no-preference',
-    recordVideo: { dir: work, size: VIDEO }
+    recordVideo: { dir: work, size: RECORD }
   });
   const page = await context.newPage();
   await page.goto(indexUrl, { waitUntil: 'load' });
@@ -147,6 +182,7 @@ async function recordVideo() {
   ], { stdio: ['ignore', 'ignore', 'pipe'] });
 
   rmSync(work, { recursive: true, force: true });
+  assertNoPadding(out);
   return out;
 }
 
