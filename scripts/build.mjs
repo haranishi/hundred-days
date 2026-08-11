@@ -20,7 +20,19 @@ const SITE = {
   xUrl: 'https://x.com/haranishi_ikki',
   xHandle: '@haranishi_ikki',
   repoUrl: 'https://github.com/haranishi/hundred-days',
-  repoName: 'haranishi/hundred-days'
+  repoName: 'haranishi/hundred-days',
+
+  // GA4の測定ID（G-XXXXXXXXXX）。空なら計測タグを一切出力しない。
+  //
+  // ⚠️ 計測タグを入れるのは、この一覧ページ（dist/index.html）だけにする。
+  // 各アプリのページには入れない。アプリ側には「外部通信なし」「どこにも送信も
+  // 保存もされません」と書いてあり、GA4を入れるとその記述が事実と食い違うため。
+  // アプリページの検索流入は Search Console 側で見る（あちらはページに何も置かない）。
+  analyticsId: '',
+
+  // Search Console の所有権確認用トークン（meta タグの content の値だけ）。
+  // 空なら meta タグを出力しない。ファイル設置方式を使うなら static/ に置くのでこれは不要
+  searchConsoleToken: ''
 };
 
 // カード内に出すタグの上限（グリッドの行高を揃えるため。フィルタは全タグを対象にする）
@@ -216,6 +228,22 @@ const chips = [
 ].join('');
 
 const gridHeading = apps.length && apps.every((a) => a.published) ? '公開したアプリ' : 'つくったアプリ';
+
+// 計測タグ（この一覧ページ限定。SITE.analyticsId が空なら1行も出力しない）
+const analyticsTag = SITE.analyticsId
+  ? `<script async src="https://www.googletagmanager.com/gtag/js?id=${esc(SITE.analyticsId)}"></script>
+<script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', '${esc(SITE.analyticsId)}');
+</script>`
+  : '';
+const searchConsoleTag = SITE.searchConsoleToken
+  ? `<meta name="google-site-verification" content="${esc(SITE.searchConsoleToken)}">`
+  : '';
+// どちらも未設定なら head に空行すら足さない
+const headExtras = [searchConsoleTag, analyticsTag].filter(Boolean).join('\n');
 const favicon =
   "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%92%AF%3C/text%3E%3C/svg%3E";
 
@@ -239,7 +267,7 @@ const html = `<!DOCTYPE html>
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="${esc(SITE.title)}">
 <meta name="twitter:description" content="${esc(SITE.tagline)}">
-<meta name="twitter:image" content="${SITE.origin}/assets/og.png">
+<meta name="twitter:image" content="${SITE.origin}/assets/og.png">${headExtras ? '\n' + headExtras : ''}
 <style>
 :root{
   --bg:#14161c; --panel:#1d212b; --panel-2:#242a36; --line:#2c3342;
