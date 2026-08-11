@@ -1,0 +1,4 @@
+# Cloudflare Pages は .html を拡張子なしURLへ308でリダイレクトする。
+# Search Console の所有権確認ファイルは、Googleが要求する .html のURLで
+# そのまま200を返す必要があるため、リダイレクトさせず中身を返す（末尾の200が書き換え指定）。
+/google0bc49e21bba788f9.html  /google0bc49e21bba788f9  200
