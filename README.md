@@ -12,6 +12,7 @@ AIと一緒に作りながら、「AIに任せたこと」と「自分で考え�
 | 001 | [集中タイマー](apps/day-001-focus-timer/) | https://hundred-days.pages.dev/day-001-focus-timer/ |
 | 002 | [ドット絵メーカー](apps/day-002-pixel-art/) | https://hundred-days.pages.dev/day-002-pixel-art/ |
 | 003 | [タップ花火](apps/day-003-tap-fireworks/) | https://hundred-days.pages.dev/day-003-tap-fireworks/ |
+| 004 | [奨学金、何歳まで返す？](apps/day-004-scholarship-repay/) | https://hundred-days.pages.dev/day-004-scholarship-repay/ |
 
 ## 1日アプリのルール
 
@@ -36,7 +37,7 @@ AIと一緒に作りながら、「AIに任せたこと」と「自分で考え�
 
 ## 構成
 
-- `apps/day-NNN-<name>/` — 各日のアプリ本体と記録（`meta.json`）＋一覧用スクショ（`screenshot.webp`・任意）
+- `apps/day-NNN-<name>/` — 各日のアプリ本体と記録（`meta.json`）＋一覧用スクショ（`screenshot.webp`）とデモ動画（`demo.mp4`）。どちらも任意
 - `scripts/build.mjs` — `dist/` に一覧ページと各アプリを生成（依存パッケージなし）
 - `static/` — 一覧ページ用の静的ファイル（OG画像など）。中身がそのまま `dist/` 直下に入る
 - ホスティング: Cloudflare Pages（1プロジェクトに全アプリをパスでルーティング）
