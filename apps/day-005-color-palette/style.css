@@ -1,0 +1,338 @@
+:root {
+  --paper: #F2F4F7;
+  --card: #FFFFFF;
+  --ink: #16202E;
+  --ink-2: #45566C;
+  --muted: #7A889C;
+  --line: #D9DFE8;
+  --brand: #4A45C4;
+  --brand-soft: #EBEBFA;
+  --on-brand: #FFFFFF;
+  --radius: 10px;
+  --gothic: "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic", YuGothic, "Noto Sans JP", "Helvetica Neue", Arial, sans-serif;
+  --num: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  /* スウォッチの縁。抽出した色は白にも黒にもなりうるので、どちらでも見える中間グレーで囲む */
+  --swatch-edge: rgba(128, 128, 128, .26);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #0F141B;
+    --card: #171E28;
+    --ink: #E6EBF2;
+    --ink-2: #AEBBCB;
+    --muted: #7E8CA0;
+    --line: #2A3543;
+    --brand: #A6A0F2;
+    --brand-soft: #1F2138;
+    --on-brand: #0F141B;
+  }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--gothic);
+  font-size: 15px;
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+  -webkit-text-size-adjust: 100%;
+}
+
+.app {
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 28px 16px 48px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* ---------- head ---------- */
+
+.head { display: flex; flex-direction: column; gap: 6px; }
+
+.head__day {
+  margin: 0;
+  font-family: var(--num);
+  font-size: 11px;
+  letter-spacing: .16em;
+  color: var(--brand);
+}
+
+.head__title {
+  margin: 0;
+  font-size: 25px;
+  font-weight: 700;
+  line-height: 1.35;
+  letter-spacing: .01em;
+  text-wrap: balance;
+}
+
+.head__lede { margin: 2px 0 0; font-size: 13.5px; color: var(--ink-2); }
+.head__lede b { color: var(--ink); }
+
+.head__local {
+  margin: 4px 0 0;
+  font-size: 12px;
+  color: var(--brand);
+  background: var(--brand-soft);
+  border-radius: 6px;
+  padding: 7px 11px;
+  line-height: 1.6;
+}
+
+.head__local b { font-weight: 700; }
+
+/* ---------- panel ---------- */
+
+.panel, .result, .notes {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 16px;
+}
+
+.panel { position: relative; display: flex; flex-direction: column; gap: 14px; }
+
+/* .panel などの display:flex がブラウザ標準の [hidden]{display:none} に勝ってしまうため打ち消す */
+[hidden] { display: none !important; }
+
+/* ドロップゾーン。クリックでファイル選択も開くので、キーボードで押せる button にしている */
+
+.drop {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  padding: 24px 16px 22px;
+  background: var(--paper);
+  border: 1.5px dashed var(--line);
+  border-radius: 9px;
+  font-family: var(--gothic);
+  color: var(--ink-2);
+  cursor: pointer;
+  transition: background .12s, border-color .12s;
+}
+
+.drop:hover, .drop.is-over { background: var(--brand-soft); border-color: var(--brand); }
+.drop.is-over { border-style: solid; }
+
+.drop__icon { display: block; line-height: 0; color: var(--brand); margin-bottom: 2px; }
+.drop__title { font-size: 14px; font-weight: 700; color: var(--ink); line-height: 1.5; }
+.drop__hint { font-size: 11.5px; color: var(--muted); line-height: 1.5; }
+
+/* ファイル入力は見せないが、レイアウトから消すと選択ダイアログを開けない環境があるので
+   display:none ではなく 1px に潰して隠す */
+.file {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.samples { display: flex; flex-direction: column; gap: 7px; }
+.samples__label { font-size: 12px; color: var(--muted); }
+.samples__row { display: flex; gap: 6px; }
+
+.chip {
+  flex: 1 1 0;
+  min-width: 0;
+  font-family: var(--gothic);
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--ink-2);
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 8px 6px;
+  cursor: pointer;
+  transition: background .12s, color .12s, border-color .12s;
+}
+
+.chip:hover { border-color: var(--brand); color: var(--brand); }
+
+.chip[aria-pressed="true"] {
+  background: var(--brand);
+  border-color: var(--brand);
+  color: var(--on-brand);
+}
+
+/* 通知行。読めない入力やコピー結果を1行返すだけの場所。
+   空でも高さを取っておく（あとから現れて下の内容を押し下げないように） */
+.notice {
+  margin: -8px 0 0;
+  min-height: 17px;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--brand);
+}
+
+:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
+
+/* ---------- result ---------- */
+
+.result { display: flex; flex-direction: column; gap: 11px; }
+
+.shot {
+  margin: 0;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--paper);
+}
+
+/* 高さを固定した「舞台」に画像を収める。縦長の写真が画面を占領するのを防ぎつつ、
+   画像を差し替えても下のパレットが動かない。余りは紙の色で埋まる */
+.shot__img {
+  display: block;
+  width: 100%;
+  height: 240px;
+  object-fit: contain;
+}
+
+.shot__meta {
+  padding: 6px 10px 7px;
+  border-top: 1px solid var(--line);
+  font-family: var(--num);
+  font-size: 11px;
+  color: var(--muted);
+  letter-spacing: .02em;
+}
+
+/* 占有率の帯。幅は flex-grow に画素数をそのまま入れて分配する（丸め誤差で隙間ができない） */
+.band {
+  display: flex;
+  height: 16px;
+  border-radius: 5px;
+  overflow: hidden;
+  box-shadow: inset 0 0 0 1px var(--swatch-edge);
+}
+
+.band__seg { flex-basis: 0; flex-shrink: 1; min-width: 0; }
+
+.result__hint { margin: 0; font-size: 12px; color: var(--muted); }
+.result__hint b { color: var(--ink-2); font-weight: 600; }
+
+.palette {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.swatch {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1px;
+  min-height: 86px;
+  padding: 10px 11px 11px;
+  border: 0;
+  border-radius: 8px;
+  box-shadow: inset 0 0 0 1px var(--swatch-edge);
+  font-family: var(--num);
+  text-align: left;
+  cursor: pointer;
+  transition: transform .12s;
+}
+
+.swatch:hover { transform: translateY(-1px); }
+.swatch:active { transform: translateY(0); }
+
+/* 色の上の枠線は、明るい色でも暗い色でも見える必要がある。
+   カード色に対して確実に効く --ink を使い、色面から2px離す */
+.swatch:focus-visible { outline: 3px solid var(--ink); outline-offset: 2px; }
+
+.swatch__hex { font-size: 16px; font-weight: 700; letter-spacing: .02em; }
+.swatch__rgb { font-size: 11px; opacity: .72; white-space: nowrap; }
+
+.swatch__share {
+  margin-top: auto;
+  font-size: 13px;
+  font-weight: 700;
+  opacity: .88;
+  font-variant-numeric: tabular-nums;
+}
+
+/* コピー直後の表示。色面の上に重ねるので、どの色でも読める暗い幕＋白文字にする */
+.swatch__toast {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  background: rgba(10, 12, 18, .76);
+  color: #FFFFFF;
+  font-family: var(--gothic);
+  font-size: 13px;
+  font-weight: 700;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .14s;
+}
+
+.swatch.is-copied .swatch__toast { opacity: 1; }
+
+.copyall {
+  width: 100%;
+  padding: 12px;
+  font-family: var(--gothic);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--on-brand);
+  background: var(--brand);
+  border: 1px solid var(--brand);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background .12s, color .12s;
+}
+
+.copyall__off { display: none; }
+.copyall.is-copied { background: var(--brand-soft); color: var(--brand); }
+.copyall.is-copied .copyall__on { display: none; }
+.copyall.is-copied .copyall__off { display: inline; }
+
+@media (min-width: 560px) {
+  .palette { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .shot__img { height: 260px; }
+}
+
+/* ---------- notes ---------- */
+
+.notes { display: flex; flex-direction: column; gap: 10px; }
+.notes__h { margin: 0; font-size: 13px; font-weight: 700; color: var(--ink-2); }
+
+.notes__list {
+  margin: 0;
+  padding-left: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  font-size: 12.5px;
+  color: var(--ink-2);
+}
+
+.notes__list b { color: var(--ink); }
+
+/* ---------- foot ---------- */
+
+.foot { text-align: center; padding-top: 4px; }
+.foot__link { font-size: 12.5px; color: var(--muted); text-decoration: none; }
+.foot__link:hover { color: var(--brand); }
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; }
+}

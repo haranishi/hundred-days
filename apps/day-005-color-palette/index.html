@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>その写真、何色でできてる？</title>
+  <meta name="description" content="画像を1枚入れるだけで、その写真を占めている主要な6色をHEXで取り出します。メディアンカット法で色を6つに整理し、タップでコピー。画像はどこにも送信されず、すべてブラウザの中だけで処理されます。">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%2316202E'/%3E%3Crect x='6' y='6' width='9' height='9' rx='2' fill='%23F2794A'/%3E%3Crect x='17' y='6' width='9' height='9' rx='2' fill='%234ED0C0'/%3E%3Crect x='6' y='17' width='9' height='9' rx='2' fill='%23F0C24B'/%3E%3Crect x='17' y='17' width='9' height='9' rx='2' fill='%238A7BF0'/%3E%3C/svg%3E">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="その写真、何色でできてる？">
+  <meta property="og:description" content="画像を1枚入れると、その写真を占めている主要な6色がHEXで出ます。色をタップすればコピー。画像はどこにも送信されません。">
+  <meta property="og:url" content="https://hundred-days.pages.dev/day-005-color-palette/">
+  <link rel="stylesheet" href="style.css">
+  <script src="script.js" defer></script>
+</head>
+<body>
+<main class="app">
+
+  <header class="head">
+    <p class="head__day">Day 005</p>
+    <h1 class="head__title">その写真、何色でできてる？</h1>
+    <p class="head__lede">画像を1枚入れると、その写真を<b>いちばん占めている6色</b>を取り出します。色をタップすればHEXがコピーされます。</p>
+    <p class="head__local"><b>画像はどこにも送信されません。</b>すべてこの画面の中だけで処理されます。</p>
+  </header>
+
+  <section class="panel" aria-label="画像を読み込む">
+
+    <button class="drop" id="drop" type="button">
+      <span class="drop__icon" aria-hidden="true">
+        <svg width="38" height="38" viewBox="0 0 38 38" fill="none">
+          <rect x="3.6" y="5.6" width="30.8" height="21.8" rx="3.4" stroke="currentColor" stroke-width="1.6"/>
+          <circle cx="12" cy="13" r="2.6" fill="currentColor" opacity=".5"/>
+          <path d="M5 24.6 14 16.6 21 22 27 17 33 23.6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" opacity=".75"/>
+          <circle cx="9.6" cy="33" r="3.2" fill="#F2794A"/>
+          <circle cx="17.2" cy="33" r="3.2" fill="#3FBFA8"/>
+          <circle cx="24.8" cy="33" r="3.2" fill="#F0C24B"/>
+          <circle cx="32.4" cy="33" r="3.2" fill="#8A7BF0"/>
+        </svg>
+      </span>
+      <span class="drop__title">画像をドロップ、またはタップして選ぶ</span>
+      <span class="drop__hint">Ctrl / ⌘ + V の貼り付けでも読み込めます</span>
+    </button>
+
+    <input class="file" id="file" type="file" accept="image/*" aria-label="画像ファイルを選ぶ">
+
+    <div class="samples" id="samples">
+      <span class="samples__label">手元に画像がなければ、サンプルで</span>
+      <span class="samples__row">
+        <button class="chip" type="button" data-sample="sunset" aria-pressed="false">夕焼け</button>
+        <button class="chip" type="button" data-sample="green" aria-pressed="false">新緑</button>
+        <button class="chip" type="button" data-sample="night" aria-pressed="false">夜の街</button>
+      </span>
+    </div>
+
+    <p class="notice" id="notice" aria-live="polite"></p>
+
+  </section>
+
+  <section class="result" id="result" hidden aria-label="取り出した色">
+
+    <figure class="shot">
+      <img class="shot__img" id="preview" alt="読み込んだ画像のプレビュー">
+      <figcaption class="shot__meta" id="shot-meta"></figcaption>
+    </figure>
+
+    <div class="band" id="band" role="img" aria-label="占有率に比例した幅で色を並べた帯"></div>
+
+    <p class="result__hint">面積の大きい順。<b>タップでHEXをコピー</b>できます。</p>
+
+    <div class="palette" id="palette"></div>
+
+    <button class="copyall" id="copy-all" type="button">
+      <span class="copyall__on">6色まとめてコピー</span>
+      <span class="copyall__off">コピーしました</span>
+    </button>
+
+  </section>
+
+  <section class="notes">
+    <h2 class="notes__h">この仕組みについて</h2>
+    <ul class="notes__list">
+      <li><b>メディアンカット法</b>で6色に整理しています。全画素をひとつの箱に入れ、色のばらつきがいちばん大きい箱をその中央値で2つに割る、を6箱になるまで繰り返して、箱ごとの平均色を代表色にします。写真に無い色は出てきません。</li>
+      <li>占有率が<b>25%・12.5%のような刻みに揃う</b>のは、この方法が画素数を半分ずつに割っていくからです。色ごとの実面積そのものではなく、6色に振り分けたあとの画素数の割合が出ています。</li>
+      <li>数えるのは<b>最大辺120pxに縮小した画素</b>です。1点の色を拾うスポイトではなく、写真全体の面積で効いている色が出ます。</li>
+      <li><b>色数は6色固定</b>です。設定を持たないぶん、入れた瞬間に結果が出ることを優先しました（べた塗りの画像のように色が6種類に届かないときは、出る色も少なくなります）。</li>
+      <li>色の上の文字は、その色の<b>相対輝度</b>（WCAGの計算式）で黒と白を切り替えています。明るい色には黒、暗い色には白が乗ります。</li>
+      <li>読めるのは<b>ブラウザが表示できる画像形式</b>だけです。iPhoneのHEICは環境によって開けません（開けなかったときは1行だけお知らせします）。</li>
+      <li><b>画像はどこにも送信されません。</b>読み込みも縮小も色の計算もすべてこの画面の中で行われ、保存もしません。ページを離れれば消えます。サンプルの3枚も画像ファイルではなく、開くたびにその場で描いています。</li>
+    </ul>
+  </section>
+
+  <footer class="foot">
+    <a class="foot__link" href="../">← 100 DAYS / 100 APPS</a>
+  </footer>
+
+</main>
+</body>
+</html>
