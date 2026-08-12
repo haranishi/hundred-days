@@ -13,6 +13,7 @@ AIと一緒に作りながら、「AIに任せたこと」と「自分で考え�
 | 002 | [ドット絵メーカー](apps/day-002-pixel-art/) | https://hundred-days.pages.dev/day-002-pixel-art/ |
 | 003 | [タップ花火](apps/day-003-tap-fireworks/) | https://hundred-days.pages.dev/day-003-tap-fireworks/ |
 | 004 | [奨学金、何歳まで返す？](apps/day-004-scholarship-repay/) | https://hundred-days.pages.dev/day-004-scholarship-repay/ |
+| 005 | [その写真、何色でできてる？](apps/day-005-color-palette/) | https://hundred-days.pages.dev/day-005-color-palette/ |
 
 ## 1日アプリのルール
 
