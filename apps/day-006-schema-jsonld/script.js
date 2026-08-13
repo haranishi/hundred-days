@@ -174,12 +174,32 @@ function compact(object) {
 
 function renderTypeButtons() {
   for (const [key, definition] of Object.entries(SCHEMA_TYPES)) {
-    const button = make('button', `type-button${definition.retired ? ' type-button--retired' : ''}`, definition.label);
+    const button = make('button', `type-button${definition.retired ? ' type-button--retired' : ''}`);
     button.type = 'button';
     button.dataset.type = key;
-    button.setAttribute('aria-pressed', String(key === activeType));
+    button.append(make('span', 'type-button__label', definition.label));
+    // 「廃止」を打ち消し線と文字色だけで示すと、読み上げにも色覚特性のある人にも届かない。
+    // このアプリの主張そのものなので、文字でも持たせる
+    if (definition.retired) button.append(make('span', 'type-button__badge', '廃止'));
+
+    // 5つから1つを選ぶ集合であることを支援技術へ伝える（トグルボタンの集まりではない）。
+    // 選択中のものだけをタブ順に置き、集合内は矢印キーで移動する＝ラジオグループの作法
+    button.setAttribute('role', 'radio');
+    button.setAttribute('aria-checked', String(key === activeType));
+    button.tabIndex = key === activeType ? 0 : -1;
     el.types.appendChild(button);
   }
+}
+
+/** 矢印・Home・Endで選択を動かす。端は反対側へ回す。 */
+function moveType(current, step) {
+  const keys = Object.keys(SCHEMA_TYPES);
+  const next = step === 'first' ? 0
+    : step === 'last' ? keys.length - 1
+      : (keys.indexOf(current) + step + keys.length) % keys.length;
+  const key = keys[next];
+  selectType(key);
+  el.types.querySelector(`.type-button[data-type="${key}"]`).focus();
 }
 
 function tagFor(definition) {
@@ -459,7 +479,9 @@ function selectType(key, focusForm = false) {
   if (!definition) return;
   activeType = key;
   for (const button of el.types.querySelectorAll('.type-button')) {
-    button.setAttribute('aria-pressed', String(button.dataset.type === key));
+    const selected = button.dataset.type === key;
+    button.setAttribute('aria-checked', String(selected));
+    button.tabIndex = selected ? 0 : -1;
   }
 
   const retired = Boolean(definition.retired);
@@ -514,6 +536,15 @@ function legacyCopy(text) {
 el.types.addEventListener('click', (event) => {
   const button = event.target.closest('.type-button');
   if (button) selectType(button.dataset.type);
+});
+
+const ARROW_STEPS = { ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1, Home: 'first', End: 'last' };
+el.types.addEventListener('keydown', (event) => {
+  const button = event.target.closest('.type-button');
+  const step = ARROW_STEPS[event.key];
+  if (!button || step === undefined) return;
+  event.preventDefault();
+  moveType(button.dataset.type, step);
 });
 
 el.form.addEventListener('input', updateOutput);
