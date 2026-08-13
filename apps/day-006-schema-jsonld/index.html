@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>構造化データ、いま出るやつだけ</title>
+  <meta name="description" content="2026年8月時点でGoogleがサポートしている3タイプのJSON-LDを作ります。廃止済みのFAQ・HowToは生成せず、その理由を案内します。">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23182522'/%3E%3Cpath d='M11 8 6 16l5 8M21 8l5 8-5 8M18 6l-4 20' fill='none' stroke='%235BD6A7' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="構造化データ、いま出るやつだけ">
+  <meta property="og:description" content="2026年8月時点のGoogle対応タイプだけを生成。廃止済みのFAQ・HowToは作りません。">
+  <meta property="og:url" content="https://hundred-days.pages.dev/day-006-schema-jsonld/">
+  <link rel="stylesheet" href="style.css">
+  <script src="script.js" defer></script>
+</head>
+<body>
+<main class="app">
+
+  <header class="head">
+    <p class="head__day">Day 006</p>
+    <h1 class="head__title">構造化データ、<br>いま出るやつだけ</h1>
+    <p class="head__lede">ページの種類を選んで埋めると、<b>そのまま貼れるJSON-LD</b>が出ます。検索結果にもう出ないタイプは、生成する前に止めます。</p>
+    <p class="head__local"><b>入力はこの画面の中だけで組み立てています。</b>どこにも送信せず、保存もしません。</p>
+  </header>
+
+  <section class="chooser" aria-labelledby="chooser-title">
+    <div class="section-head">
+      <span class="section-head__num">01</span>
+      <h2 class="section-head__title" id="chooser-title">ページの種類を選ぶ</h2>
+    </div>
+    <div class="types" id="types"></div>
+    <p class="chooser__hint"><span aria-hidden="true">※</span> 打ち消し線の2つは、選ぶと廃止理由を確認できます。</p>
+  </section>
+
+  <section class="panel" id="form-panel" aria-labelledby="form-title">
+    <div class="section-head">
+      <span class="section-head__num">02</span>
+      <h2 class="section-head__title" id="form-title">内容を入れる</h2>
+    </div>
+    <div id="form-intro"></div>
+    <form class="form" id="schema-form" novalidate></form>
+  </section>
+
+  <section class="warning" id="warning" hidden aria-live="polite"></section>
+
+  <section class="output" id="output-section" aria-labelledby="output-title">
+    <div class="section-head section-head--output">
+      <span class="section-head__num">03</span>
+      <h2 class="section-head__title" id="output-title">貼れるコード</h2>
+      <button class="copy" id="copy" type="button" disabled>コピー</button>
+    </div>
+    <pre class="code"><code id="output-code"></code></pre>
+    <p class="copy-status" id="copy-status" aria-live="polite"></p>
+  </section>
+
+  <section class="guide" id="guide" aria-labelledby="guide-title">
+    <div class="section-head">
+      <span class="section-head__num">04</span>
+      <h2 class="section-head__title" id="guide-title">貼り方と確かめ方</h2>
+    </div>
+    <ol class="guide__steps">
+      <li>コピーしたコードを、対象ページの <code>&lt;head&gt;</code> の中に貼ります。<code>&lt;body&gt;</code> でも読まれますが、基本は <code>&lt;head&gt;</code> です。</li>
+      <li><a href="https://search.google.com/test/rich-results" target="_blank" rel="noopener noreferrer">リッチリザルトテスト</a>で、Google検索の対象として読めるか確かめます。</li>
+      <li><a href="https://validator.schema.org/" target="_blank" rel="noopener noreferrer">Schema Markup Validator</a>で、Schema.orgとしての構文を確かめます。</li>
+    </ol>
+  </section>
+
+  <section class="notes">
+    <h2 class="notes__h">この仕組みについて</h2>
+    <ul class="notes__list">
+      <li>対応するのは店舗・事業所、記事・お知らせ、パンくずの3タイプです。Product、Event、Recipe、JobPostingなどは扱いません。</li>
+      <li>店舗の <code>aggregateRating</code> と <code>review</code> は作りません。自分のサイトに自分で星を付ける用途ではなく、第三者のレビューを集めるサイト向けだからです。</li>
+      <li>生成結果の正しさや検索結果への表示は保証できません。公開前に公式の検証ツールで確かめてください。</li>
+      <li>Google公式ツールではありません。仕様は変わるため、内容は<b>2026年8月13日に確認した情報</b>に基づいています。</li>
+      <li>入力内容は外部へ送らず、端末にも保存しません。ページを閉じると消えます。</li>
+    </ul>
+  </section>
+
+  <footer class="foot">
+    <a class="foot__link" href="../">← 100 DAYS / 100 APPS</a>
+  </footer>
+
+</main>
+</body>
+</html>
