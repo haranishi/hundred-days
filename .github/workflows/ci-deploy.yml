@@ -79,7 +79,8 @@ jobs:
         run: |
           test -n "$PRECHECK_NG_PATTERNS"
           printf '%s\n' "$PRECHECK_NG_PATTERNS" > .precheck-ng.txt
-          git config user.email "$(git log -1 --format='%ae')"
+          git config user.name "$GITHUB_ACTOR"
+          git config user.email "${GITHUB_ACTOR_ID}+${GITHUB_ACTOR}@users.noreply.github.com"
           npm run precheck
 
       - name: Deploy to Cloudflare Pages
