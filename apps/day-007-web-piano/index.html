@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#f4efe6" />
+    <meta
+      name="description"
+      content="クリック、タッチ、PCキーボードで気軽に弾けるブラウザピアノ"
+    />
+    <title>ひといきピアノ</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='86'>🎹</text></svg>"
+    />
+    <link rel="stylesheet" href="styles.css" />
+    <script src="app.js" defer></script>
+  </head>
+  <body>
+    <main class="app-shell">
+      <header class="hero">
+        <div>
+          <p class="eyebrow">PLAY A LITTLE</p>
+          <h1>ひといきピアノ</h1>
+          <p class="lead">画面の鍵盤をタッチするか、PCのキーを押して演奏できます。</p>
+        </div>
+        <div class="now-playing" aria-live="polite" aria-atomic="true">
+          <span class="now-playing__label">NOW PLAYING</span>
+          <strong id="current-note">—</strong>
+          <span id="current-frequency">キーを押すと音が出ます</span>
+        </div>
+      </header>
+
+      <section class="controls" aria-label="演奏設定">
+        <label class="volume-control" for="volume">
+          <span>音量</span>
+          <input id="volume" type="range" min="0" max="100" value="68" />
+          <output id="volume-value" for="volume">68%</output>
+        </label>
+
+        <div class="control-actions">
+          <button id="sustain" class="control-button" type="button" aria-pressed="false">
+            サステイン <kbd>Space</kbd>
+          </button>
+          <button id="stop-all" class="control-button control-button--quiet" type="button">
+            音を止める
+          </button>
+        </div>
+      </section>
+
+      <section class="instrument" aria-labelledby="piano-heading">
+        <div class="instrument__heading">
+          <div>
+            <p class="section-kicker">TWO OCTAVES</p>
+            <h2 id="piano-heading">鍵盤</h2>
+          </div>
+          <p>スマホでは横にスクロールできます</p>
+        </div>
+
+        <div class="piano-scroll">
+          <div id="piano" class="piano" role="group" aria-label="2オクターブのピアノ鍵盤"></div>
+        </div>
+      </section>
+
+      <section class="keyboard-guide" aria-labelledby="keyboard-heading">
+        <div>
+          <p class="section-kicker">KEYBOARD</p>
+          <h2 id="keyboard-heading">PCキーでも演奏</h2>
+        </div>
+        <div class="octave-guide">
+          <p><span>低いオクターブ</span><code>Z S X D C V G B H N J M</code></p>
+          <p><span>高いオクターブ</span><code>Q 2 W 3 E R 5 T 6 Y 7 U I</code></p>
+        </div>
+      </section>
+
+      <footer>
+        音は端末の中で合成されます。録音や外部送信は行いません。
+      </footer>
+    </main>
+  </body>
+</html>

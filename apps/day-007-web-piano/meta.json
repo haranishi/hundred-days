@@ -1,0 +1,43 @@
+{
+  "day": 7,
+  "season": 1,
+  "title": "ひといきピアノ",
+  "description": "クリック、タッチ、PCキーで演奏できる25鍵のWebピアノ。和音、サステイン、音量変更に対応し、音はWeb Audio APIで端末内合成する",
+  "tags": ["music", "web-audio", "vanilla-js", "no-dependencies", "responsive"],
+  "difficulty": "B",
+  "sourceOfIdea": "2026-08-15、本人が今日作るアプリとして『Webでピアノが弾ける簡単なアプリ』を選定",
+  "startedAt": "2026-08-15",
+  "finishedAt": "2026-08-15",
+  "actualMinutes": 0,
+  "aiHandled": [
+    "Web Audio APIによる音声合成、25鍵のUI、和音・サステイン・音量・全停止の実装",
+    "PC・スマートフォン相当の画面で操作確認し、X投稿用のデモ動画と投稿文を作成"
+  ],
+  "humanHandled": [
+    "Webで弾けるピアノを今日のアプリに選び、動画とX投稿素材も作る判断"
+  ],
+  "failuresAndFixes": [
+    {
+      "problem": "100日チャレンジ本体ではなく、別アカウントの単独リポジトリにPRを作ったため一覧へ反映されなかった",
+      "fix": "本人の指摘を受けて正しい個人用リポジトリを確認し、Day 007として移植した"
+    }
+  ],
+  "publicUrl": "https://hundred-days.pages.dev/day-007-web-piano/",
+  "repoPath": "apps/day-007-web-piano",
+  "screenshot": "screenshot.webp",
+  "demo": "demo.mp4",
+  "shortVideoUrl": "",
+  "longVideoChapter": "",
+  "status": "published",
+  "xPostUrl": "",
+  "social": {
+    "x": {
+      "emoji": "🎹",
+      "summary": "25鍵のWebピアノ。クリック・タッチ・PCキー対応。",
+      "ai": "Web Audio APIの音づくりと実装",
+      "human": "ピアノを作る判断",
+      "failure": "別リポジトリにPRを作り、一覧に反映されなかった",
+      "hashtags": ["100日チャレンジ", "個人開発"]
+    }
+  }
+}

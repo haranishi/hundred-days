@@ -15,6 +15,7 @@ AIと一緒に作りながら、「AIに任せたこと」と「自分で考え�
 | 004 | [奨学金、何歳まで返す？](apps/day-004-scholarship-repay/) | https://hundred-days.pages.dev/day-004-scholarship-repay/ |
 | 005 | [その写真、何色でできてる？](apps/day-005-color-palette/) | https://hundred-days.pages.dev/day-005-color-palette/ |
 | 006 | [構造化データ、いま出るやつだけ](apps/day-006-schema-jsonld/) | https://hundred-days.pages.dev/day-006-schema-jsonld/ |
+| 007 | [ひといきピアノ](apps/day-007-web-piano/) | https://hundred-days.pages.dev/day-007-web-piano/ |
 
 ## 1日アプリのルール
 
