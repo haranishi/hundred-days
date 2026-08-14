@@ -196,11 +196,12 @@ function setSustain(enabled) {
   sustainButton.setAttribute("aria-pressed", String(enabled));
 
   if (!enabled) {
-    for (const midi of sustainedNotes) {
+    const notesToRelease = [...sustainedNotes];
+    sustainedNotes.clear();
+    for (const midi of notesToRelease) {
       if (!activeSources.has(midi)) releaseVoice(midi);
       updateKeyState(midi);
     }
-    sustainedNotes.clear();
   }
 }
 

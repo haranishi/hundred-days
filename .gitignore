@@ -16,6 +16,11 @@ dist/
 # 依存
 node_modules/
 
+# Playwrightのローカルテスト成果物
+test-results/
+playwright-report/
+blob-report/
+
 # OS
 .DS_Store
 
