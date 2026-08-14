@@ -6,6 +6,10 @@
   "scripts": {
     "build": "node scripts/build.mjs",
     "precheck": "node scripts/precheck.mjs",
+    "test:e2e": "playwright test",
     "x:prepare": "node scripts/prepare-x-post.mjs"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.62.1"
   }
 }
