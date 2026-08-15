@@ -1,0 +1,47 @@
+{
+  "day": 8,
+  "season": 1,
+  "title": "じはんきレーダー",
+  "description": "近くの自動販売機を方角と距離のレーダーで示す。OpenStreetMap収録の全国データを同梱し、位置情報は端末の中だけで処理する",
+  "tags": ["geolocation", "canvas", "web-audio", "openstreetmap", "vanilla-js", "no-dependencies"],
+  "difficulty": "B",
+  "sourceOfIdea": "2026-08-15、本人が『近くの自動販売機を見つけてくれるアプリ』を発案。OSM収録が実際の自販機の約1.3%しかない現実を確認した上で、それを正直に見せるレーダー型として採用",
+  "startedAt": "2026-08-15",
+  "finishedAt": "2026-08-15",
+  "actualMinutes": 0,
+  "aiHandled": [
+    "OpenStreetMapの自販機データ取得・日本クリップ・軽量化パイプラインの実装",
+    "レーダー描画・8方位と距離の計算・ソナー音合成・テストの実装"
+  ],
+  "humanHandled": [
+    "近くの自販機を探すアプリという題材の発案と、収録データが実際の約1.3%しかない前提で進める判断"
+  ],
+  "failuresAndFixes": [
+    {
+      "problem": "Overpass APIが混雑していて、全国データの取得が最初は何度もタイムアウトした",
+      "fix": "メインとミラーを順に切り替えて再試行する取得スクリプトにして、日本全域の絞り込みクエリで取り切った"
+    },
+    {
+      "problem": "デモ動画の収録ツールがページをfile://で開くため、ESモジュールとfetchを使うこのアプリは録画中に動かなかった",
+      "fix": "振り付けスクリプト内で小さなローカルHTTPサーバーを立て、そこから開き直して収録した"
+    }
+  ],
+  "publicUrl": "https://hundred-days.pages.dev/day-008-vending-radar/",
+  "repoPath": "apps/day-008-vending-radar",
+  "screenshot": "screenshot.webp",
+  "demo": "demo.mp4",
+  "shortVideoUrl": "",
+  "longVideoChapter": "",
+  "status": "published",
+  "xPostUrl": "",
+  "social": {
+    "x": {
+      "emoji": "📡",
+      "summary": "近くの自販機を方角と距離で示すレーダー。地図なし・位置情報は端末の中だけ。",
+      "ai": "OSMデータの軽量化パイプラインとレーダーUIの実装",
+      "human": "題材の発案と、収録1.3%を正直に見せる判断",
+      "failure": "日本の自販機約388万台のうち、OSMに登録されているのは約5万台＝約1.3%だけだった",
+      "hashtags": ["100日チャレンジ", "個人開発"]
+    }
+  }
+}
