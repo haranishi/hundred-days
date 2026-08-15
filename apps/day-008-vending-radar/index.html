@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#07131d" />
+    <meta name="description" content="近くの自動販売機を方角と距離で示す、地図なしのレーダー" />
+    <title>じはんきレーダー</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='86'>📡</text></svg>" />
+    <link rel="stylesheet" href="styles.css" />
+    <script type="module" src="app.js"></script>
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="site-header">
+        <div class="brand">
+          <span class="brand__mark" aria-hidden="true"></span>
+          <span><small>VENDING MACHINE LOCATOR</small>じはんきレーダー</span>
+        </div>
+        <button id="mute-button" class="icon-button" type="button" aria-pressed="false" aria-label="音をミュートする">
+          <span class="mute-icon" aria-hidden="true">♪</span><span class="mute-label">音オン</span>
+        </button>
+      </header>
+
+      <main>
+        <section class="intro-card" aria-labelledby="intro-title">
+          <p class="kicker">LOCAL SCAN / JAPAN</p>
+          <h1 id="intro-title">近くの一台を、<br />レーダーで探す。</h1>
+          <p class="intro-copy">地図を開かず、<span class="nobr">方角と距離</span>だけで<span class="nobr">近くの自動販売機</span>を表示します。</p>
+          <p class="privacy"><span class="privacy-dot" aria-hidden="true"></span><span class="nobr">位置情報は端末の中だけで使います。</span><span class="nobr">送信・保存はしません。</span></p>
+          <div class="intro-actions">
+            <p id="intro-condition" class="intro-condition" hidden></p>
+            <button id="locate-button" class="primary-button" type="button">現在地からさがす <span aria-hidden="true">→</span></button>
+            <button id="show-stations-button" class="text-button" type="button" aria-expanded="false" aria-controls="station-panel">場所をえらんでさがす</button>
+          </div>
+        </section>
+
+        <section id="station-panel" class="station-panel" aria-labelledby="station-title" hidden>
+          <div class="section-heading">
+            <div><p class="kicker">SELECT LOCATION</p><h2 id="station-title">主要駅から探す</h2></div>
+            <p>位置情報を使わずに試せます</p>
+          </div>
+          <div id="station-list" class="station-list"></div>
+        </section>
+
+        <section id="status-panel" class="status-panel" aria-live="polite" hidden>
+          <span class="status-pulse" aria-hidden="true"></span>
+          <p id="status-message"></p>
+          <button id="retry-button" class="secondary-button" type="button" hidden>再読み込み</button>
+        </section>
+
+        <section id="results" class="results" aria-labelledby="results-title" hidden>
+          <div class="section-heading results-heading">
+            <div><p class="kicker">SCAN COMPLETE</p><h2 id="results-title">近くの自販機</h2></div>
+            <div class="results-actions">
+              <p id="location-label" class="location-label"></p>
+              <button id="research-button" class="secondary-button" type="button">もう一度さがす</button>
+            </div>
+          </div>
+          <p id="result-summary" class="sr-only" aria-live="polite"></p>
+          <div class="result-grid">
+            <div class="radar-panel">
+              <div class="radar-readout"><span>RANGE</span><strong id="range-label">—</strong></div>
+              <canvas id="radar" aria-hidden="true"></canvas>
+              <p class="radar-caption">
+                <span>NORTH UP</span>
+                <span class="radar-legend"><span class="legend-dot" aria-hidden="true"></span>現在地</span>
+                <span class="radar-legend"><span class="legend-dot legend-dot--other" aria-hidden="true"></span>圏内のその他</span>
+                <span>OSM DATA</span>
+              </p>
+            </div>
+            <div class="list-panel">
+              <div id="list-head" class="list-head">
+                <span class="list-head__label">NEAREST</span>
+                <span id="list-count" class="list-head__count"></span>
+              </div>
+              <ol id="result-list" class="result-list"></ol>
+              <div id="empty-state" class="empty-state" hidden>
+                <strong>このあたりはまだ未登録地帯</strong>
+                <p>「見つからない」は「存在しない」ではありません。主要駅を選んでレーダーを試せます。</p>
+                <button id="empty-stations-button" class="secondary-button" type="button">主要駅で試す</button>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <footer>
+        <p id="coverage">収録データを読み込み中…</p>
+        <p id="coverage-share">日本の自販機 約388万台に対する収録率を表示します（<span class="nobr">日本自動販売システム機械工業会</span>・2025年末）</p>
+        <p>データ: © OpenStreetMap contributors（ODbL）</p>
+      </footer>
+    </div>
+  </body>
+</html>
