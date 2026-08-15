@@ -16,6 +16,7 @@ AIと一緒に作りながら、「AIに任せたこと」と「自分で考え�
 | 005 | [その写真、何色でできてる？](apps/day-005-color-palette/) | https://hundred-days.pages.dev/day-005-color-palette/ |
 | 006 | [構造化データ、いま出るやつだけ](apps/day-006-schema-jsonld/) | https://hundred-days.pages.dev/day-006-schema-jsonld/ |
 | 007 | [ひといきピアノ](apps/day-007-web-piano/) | https://hundred-days.pages.dev/day-007-web-piano/ |
+| 008 | [じはんきレーダー](apps/day-008-vending-radar/) | https://hundred-days.pages.dev/day-008-vending-radar/ |
 
 ## 1日アプリのルール
 
