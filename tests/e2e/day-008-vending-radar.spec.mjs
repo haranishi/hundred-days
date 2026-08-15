@@ -54,7 +54,7 @@ test.describe('Day 008 vending radar (geolocation denied)', () => {
 test('Given the portfolio, when Day 008 assets are inspected, then data, demo, and screenshot are published', async ({ page, request }) => {
   await page.goto('/');
   const demoButton = page.getByRole('button', { name: /Day 008.*じはんきレーダー.*再生/ });
-  await expect(demoButton).toHaveAttribute('data-demo', './day-008-vending-radar/demo.mp4');
+  await expect(demoButton).toHaveAttribute('data-demo', './day-008-vending-radar/demo-with-audio.mp4');
 
   const data = await request.get('/day-008-vending-radar/data/vending.json');
   expect(data.ok()).toBe(true);
@@ -62,7 +62,7 @@ test('Given the portfolio, when Day 008 assets are inspected, then data, demo, a
   expect(parsed.count).toBeGreaterThan(10_000);
   expect(parsed.count).toBe(parsed.points.length);
 
-  const demo = await request.get('/day-008-vending-radar/demo.mp4');
+  const demo = await request.get('/day-008-vending-radar/demo-with-audio.mp4');
   expect(demo.ok()).toBe(true);
   expect((await demo.body()).byteLength).toBeGreaterThan(100_000);
 
