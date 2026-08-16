@@ -11,7 +11,7 @@ import {
   headingVector,
   projectPoint,
 } from "./lib/projection.js";
-import { dayTypeLabel, jstParts, serviceStatus } from "./lib/service.js";
+import { dayTypeLabel, jstParts, partitionByService, serviceStatus } from "./lib/service.js";
 
 const API_URL = "/api/day-009/vehicles";
 const NETWORK_URL = "./data/network.json";
@@ -82,6 +82,7 @@ const retryButton = document.querySelector("#retry-button");
 const runningCount = document.querySelector("#running-count");
 const freshness = document.querySelector("#freshness");
 const staleNote = document.querySelector("#stale-note");
+const offhoursNote = document.querySelector("#offhours-note");
 const busList = document.querySelector("#bus-list");
 const busListWrap = document.querySelector("#bus-list-wrap");
 const busListFoot = document.querySelector("#bus-list-foot");
@@ -142,7 +143,16 @@ let tracks = new Map();
 let selectedKey = null;
 let listExpanded = false;
 let busScreen = [];
-let feed = { state: "loading", vehicles: [], sources: [], updatedAt: null, receivedAt: 0, staleDropped: 0, error: "" };
+let feed = {
+  state: "loading",
+  vehicles: [],
+  sources: [],
+  updatedAt: null,
+  receivedAt: 0,
+  staleDropped: 0,
+  offServiceDropped: 0,
+  error: "",
+};
 let failures = 0;
 let pollTimer = null;
 let nextAttemptAt = 0;
@@ -841,7 +851,11 @@ async function poll() {
 
 function applyFeed(payload) {
   const now = Date.now();
-  const vehicles = payload.vehicles.filter((vehicle) => isInsideAkita(vehicle.lat, vehicle.lon));
+  const inside = payload.vehicles.filter((vehicle) => isInsideAkita(vehicle.lat, vehicle.lon));
+  /* 走行中に数えないものを2つ落とす。中継APIが「10分以上古い位置」を落とし（staleDropped）、
+     ここで「その事業者の運行時間外に届いた位置」を落とす。理由が違うので数も別々に持つ。
+     地図にも一覧にも出さないため、tracks へ渡す前に落とす。 */
+  const { vehicles, offService } = partitionByService(inside, network.serviceByOp, jstParts(new Date(now)));
   const sources = Array.isArray(payload.sources) ? payload.sources : [];
   // 実際の受信間隔で補間する。タブが止まっていた後などに、一気に飛ばさないため
   const gap = feed.receivedAt ? now - feed.receivedAt : POLL_MS;
@@ -864,6 +878,7 @@ function applyFeed(payload) {
     updatedAt: payload.updatedAt ? new Date(payload.updatedAt) : new Date(now),
     receivedAt: now,
     staleDropped: sources.reduce((total, source) => total + (Number(source.staleDropped) || 0), 0),
+    offServiceDropped: [...offService.values()].reduce((total, count) => total + count, 0),
     error: failedSources.map((source) => `${operatorLabel(source.op)}: ${source.error}`).join(" / "),
   };
 
@@ -953,12 +968,21 @@ function renderStatus() {
   retryNote.hidden = state !== "error";
   // 中身が全部隠れている行を残すと、カードの下だけ12px広がって上下の余白が揃わない
   statusActions.hidden = state !== "error";
+  /* 除外は理由が2つあり、意味がまったく違う（位置が古い／運行時間外に送り続けている）。
+     まとめて「除外2台」と書くと何が起きているのか分からないので、行を分けて別々に数える。
+     「除外」だけだと伝わらないので、何分ぶん古いのかまで書く。
+     前半・後半をそれぞれ塊にして、「バス」と「1台」の間で折り返さないようにする */
   staleNote.hidden = feed.staleDropped === 0;
-  // 「除外」だけだと何が起きたのか伝わらない。何分ぶん古いのかまで書く。
-  // 前半・後半をそれぞれ塊にして、「バス」と「1台」の間で折り返さないようにする
   if (feed.staleDropped > 0) {
     setRich(staleNote, [
       { text: `位置が${STALE_MINUTES}分以上古いバス${feed.staleDropped}台は` },
+      { text: "数に入れていません" },
+    ]);
+  }
+  offhoursNote.hidden = feed.offServiceDropped === 0;
+  if (feed.offServiceDropped > 0) {
+    setRich(offhoursNote, [
+      { text: `運行時間外に位置を送り続けている車両${feed.offServiceDropped}台は` },
       { text: "数に入れていません" },
     ]);
   }

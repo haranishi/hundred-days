@@ -23,6 +23,22 @@ export function resolveOperatorIndex(operators, op) {
   return operators.findIndex((operator) => operator?.name === entry.name);
 }
 
+/* 中継APIの op コードごとの時刻表。service[].op は operators 配列の添字なので、
+   ここで対応表を通して op コードに引き直しておく。添字のまま画面へ渡すと、
+   「秋田市の時刻表」を数字の勘で拾うコードが増えて、事業者が1つ増えた日に静かにずれる。
+   対応が取れない事業者は null（＝時刻表による判定をしない）。 */
+export function serviceByOperator(service, operators) {
+  const table = {};
+  for (const { op } of OPERATOR_TABLE) {
+    const index = resolveOperatorIndex(operators, op);
+    const entry = index < 0 || !Array.isArray(service)
+      ? null
+      : service.find((item) => Number(item?.op) === index);
+    table[op] = entry ?? null;
+  }
+  return table;
+}
+
 /* shaped は「道なりの形状(shapes.txt)を公開しているか」。無い版のデータでも落とさず、
    欠けていたら true 扱いにする（誤って全路線を「近似」と表示するほうが害が大きい）。 */
 function normalizeOperators(operators) {
@@ -80,6 +96,7 @@ export function buildNetwork(data) {
     generatedAt: String(data?.generatedAt ?? ""),
     operators,
     service: Array.isArray(data?.service) ? data.service : null,
+    serviceByOp: serviceByOperator(data?.service, operators),
     lines: { xy: lineXY, starts, live: lineLive, shaped: lineShaped, count: rawLines.length },
     stops: { xy: stopXY, live: stopLive, count: rawStops.length },
     totals: {
