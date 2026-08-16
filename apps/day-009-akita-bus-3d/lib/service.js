@@ -25,18 +25,31 @@ export function scheduleFor(entry, day) {
   return entry?.[DAY_KEYS[day] ?? "weekday"] ?? null;
 }
 
+/** 曜日をまたいで時刻をずらす。0時の1時間前は前日の23時で、曜日区分（平日／土日祝）も変わる。 */
+function shiftHour(parts, offset) {
+  const absolute = parts.hour + offset;
+  const dayOffset = Math.floor(absolute / 24);
+  return { day: ((parts.day + dayOffset) % 7 + 7) % 7, hour: ((absolute % 24) + 24) % 24 };
+}
+
+/** 1事業者ぶんの時刻表の、その曜日・その時刻の便数。読めなければ null。 */
+export function hourlyCount(entry, day, hour) {
+  const hourly = scheduleFor(entry, day)?.hourly;
+  if (!Array.isArray(hourly) || hourly.length !== 24) return null;
+  const value = Number(hourly[hour]);
+  return Number.isFinite(value) ? value : null;
+}
+
 /** その曜日・その時刻に走っているはずの便数。service が無い・壊れている場合は null。 */
 export function expectedAt(service, day, hour) {
   if (!Array.isArray(service)) return null;
   let total = 0;
   let known = false;
   for (const entry of service) {
-    const hourly = scheduleFor(entry, day)?.hourly;
-    if (!Array.isArray(hourly) || hourly.length !== 24) continue;
-    const value = Number(hourly[hour]);
-    if (!Number.isFinite(value)) continue;
+    const count = hourlyCount(entry, day, hour);
+    if (count === null) continue;
     known = true;
-    total += value;
+    total += count;
   }
   return known ? total : null;
 }
@@ -83,4 +96,41 @@ export function serviceStatus(service, parts) {
   const expected = expectedAt(service, parts.day, parts.hour);
   if (expected === null) return { known: false, expected: null, next: null };
   return { known: true, expected, next: expected > 0 ? null : nextServiceStart(service, parts) };
+}
+
+/* 運行時間外なのに位置を送り続けている車両を、走行中から外すための判定。
+
+   秋田市の車両1007を3回観測した（2026-08-16 21:24 / 21:36 / 08-17 00:44）。
+   座標は3回ともビット単位で同一。前2回は送信時刻も11:54:58のまま止まっていたので
+   中継API側の「10分以上古い位置は捨てる」（functions/api/day-009/vehicles.js）で落ちたが、
+   00:44の回は座標が同じまま送信時刻だけ3秒前に化けていて、この判定を素通りする。
+   時刻に頼れなくなった以上、時刻表側から「そもそも走っているはずのない時間か」を見る。
+
+   前後1時間の猶予を置く。hourly[h] は「h時に走っている便数」の丸めた集計なので、
+   21:53発の便が22時台まで走ることも、5:55発の便のために5時台から動き出すこともある。
+   境界ぴったりで本当に走っている車両を消すほうが、幽霊を1台残すより害が大きい。 */
+const OFF_SERVICE_GRACE_HOURS = 1;
+
+/** その事業者がいま運行時間外か。時刻表が読めないときは false＝除外しない。 */
+export function isOffService(entry, parts) {
+  for (let offset = -OFF_SERVICE_GRACE_HOURS; offset <= OFF_SERVICE_GRACE_HOURS; offset += 1) {
+    const at = shiftHour(parts, offset);
+    const count = hourlyCount(entry, at.day, at.hour);
+    if (count === null || count > 0) return false;
+  }
+  return true;
+}
+
+/** 運行時間外の事業者から届いた車両を走行中から外す。除外した台数は事業者ごとに数える。 */
+export function partitionByService(vehicles, serviceByOp, parts) {
+  const running = [];
+  const offService = new Map();
+  for (const vehicle of vehicles ?? []) {
+    if (!isOffService(serviceByOp?.[vehicle?.op] ?? null, parts)) {
+      running.push(vehicle);
+      continue;
+    }
+    offService.set(vehicle.op, (offService.get(vehicle.op) ?? 0) + 1);
+  }
+  return { vehicles: running, offService };
 }

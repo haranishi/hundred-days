@@ -40,14 +40,20 @@ async function ensureServer() {
 const API_PATTERN = "**/api/day-009/vehicles";
 let fixture = null;
 
+/* アプリは「その事業者の運行時間外に届いた位置」を走行中に数えない（lib/service.js）。
+   撮影した時刻がたまたま深夜だと、固定データの25台も全部そこで落ちて、
+   0台の真っ暗な絵が録れてしまう。ページの時計ごと運行時間帯へ固定して開く。
+   日曜17:01＝両事業者とも運行中で、固定データの送信時刻とも揃えてある。 */
+const DEMO_NOW = new Date("2026-08-16T17:01:20+09:00");
+
 async function runningPayload() {
   fixture ??= JSON.parse(await readFile(join(appDir, "tests/fixtures/vehicles-running.json"), "utf8"));
   // 固定データの送信時刻は過去の一点なので、そのまま返すと「9時間前の位置」と表示される。
-  // 20秒ごとのポーリングのたびに、いまの時刻へ寄せ直す
-  const now = Math.floor(Date.now() / 1000);
+  // ページに見せている時刻（DEMO_NOW）の直前へ寄せ直す
+  const now = Math.floor(DEMO_NOW.getTime() / 1000);
   return {
     ...fixture,
-    updatedAt: new Date().toISOString(),
+    updatedAt: DEMO_NOW.toISOString(),
     vehicles: fixture.vehicles.map((vehicle, index) => ({ ...vehicle, ts: now - 12 - (index % 9) })),
     sources: fixture.sources.map((source) => ({ ...source, feedTs: now - 8 })),
   };
@@ -55,6 +61,7 @@ async function runningPayload() {
 
 async function prepareRunning(page) {
   const base = await ensureServer();
+  await page.clock.setFixedTime(DEMO_NOW);
   await page.route(API_PATTERN, async (route) =>
     route.fulfill({
       status: 200,

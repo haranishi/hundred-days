@@ -1,0 +1,11 @@
+{
+  "_note": "2026-08-17(月) 00:44:34 JST の本番の実データ。秋田市の終バスは20:02なのに、車両1007が座標(39.64194,140.11482)のまま送信時刻だけ3秒前に更新して送り続けている。秋田中央交通側には従来どおり位置が10分以上古い車両が1台あり、中継APIが落としている。",
+  "updatedAt": "2026-08-16T15:44:34.000Z",
+  "vehicles": [
+    { "id": "1007", "op": "akitacity", "lat": 39.64194, "lon": 140.11482, "bearing": null, "speed": null, "ts": 1786895071 }
+  ],
+  "sources": [
+    { "op": "chuo", "ok": true, "error": null, "feedTs": 1786895070, "staleDropped": 1, "count": 0 },
+    { "op": "akitacity", "ok": true, "error": null, "feedTs": 1786895074, "staleDropped": 0, "count": 1 }
+  ]
+}
