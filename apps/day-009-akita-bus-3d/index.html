@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#0b1016" />
+    <meta name="description" content="いま秋田県を走っているバスの実測GPS位置を、自前の3Dマップで走らせる" />
+    <title>秋田バスライブ</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='86'>🚌</text></svg>" />
+    <link rel="stylesheet" href="styles.css" />
+    <script type="module" src="app.js"></script>
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="site-header">
+        <div class="brand">
+          <span class="brand__lead">秋田県の路線バスの現在地をリアルタイム表示</span>
+          <span class="brand__name">秋田バスライブ<span class="brand__mark" aria-hidden="true"></span></span>
+        </div>
+        <p class="header-note"><span class="nobr">実測GPS位置</span><span class="nobr">・20秒ごとに更新</span></p>
+      </header>
+
+      <main class="layout">
+        <section class="map-card" aria-labelledby="stage-title">
+          <h1 id="stage-title" class="sr-only">いま秋田県を走っているバスの3Dマップ</h1>
+
+          <div class="stage">
+            <canvas id="scene" tabindex="0" role="img" aria-label="秋田県の路線網と走行中のバスの3Dマップ" aria-describedby="scene-help"></canvas>
+            <p id="scene-help" class="sr-only">
+              ドラッグ・1本指のスワイプ・矢印キーで視点を回せます。2本指のピンチ、プラス・マイナスキー、マウスホイールで拡大縮小、Rキーで県全体の視点に戻します。
+              走行中のバスは「走行中のバス」の一覧からも選べます。
+            </p>
+
+            <div class="hud hud--summary">
+              <p class="hud-label">走行中</p>
+              <p class="hud-count"><span id="running-count">—</span><span class="hud-unit">台</span></p>
+              <p class="hud-fresh" id="freshness">読み込み中…</p>
+              <p class="hud-stale" id="stale-note" hidden></p>
+            </div>
+          </div>
+
+          <!-- 操作ボタンは地図のすぐ後ろに置く。狭い画面で縦に積んだとき、
+               地図と操作の間に凡例が割り込まないようにするため -->
+          <div class="map-tools">
+            <button id="zoom-city" class="ghost-button" type="button">秋田市周辺にズーム</button>
+            <button id="reset-view" class="ghost-button" type="button">県全体に戻す</button>
+            <button id="autorotate" class="ghost-button" type="button" aria-pressed="true">自動回転</button>
+          </div>
+
+          <!-- 記号の意味と操作方法を1枚にまとめる。線だけでなく、画面でいちばん目立つ
+               オレンジの車体と、地図に出る「密集○台」のバッジ・破線の円もここで説明する
+               （画面に出る記号を凡例から漏らさない）。
+               画面幅で中身も形も変えない＝広い画面では地図の左下に重ね、狭い画面では地図の下に置くだけ -->
+          <div class="map-key">
+            <p class="map-key__title">地図の見かた</p>
+            <ul class="legend" aria-label="路線と記号の凡例">
+              <li><span class="legend-bus" aria-hidden="true"></span><span>オレンジの立体＝実測位置がわかっているバス1台</span></li>
+              <li><span class="legend-line legend-line--live" aria-hidden="true"></span><span>実測位置あり（2事業者）</span></li>
+              <li><span class="legend-line legend-line--shaped" aria-hidden="true"></span><span>実測なし・道なりの形状</span></li>
+              <li><span class="legend-line legend-line--approx" aria-hidden="true"></span><span>実測なし・停留所を直線でつないだ近似</span></li>
+              <li><span class="legend-badge" aria-hidden="true"></span><span>密集○台＝この範囲に集まっている台数</span></li>
+              <li><span class="legend-ring" aria-hidden="true"></span><span>破線の円＝その範囲</span></li>
+            </ul>
+            <!-- 操作の案内は入力装置で出し分ける（app.js）。スマホにホイールは無い。
+                 既定値はマウス向けの文言＝タッチ端末では読み込み時に置き換わる -->
+            <p class="map-key__hint" id="map-key-hint">ドラッグで回転・ホイールで拡大。バスを選ぶと詳細が出ます。</p>
+          </div>
+        </section>
+
+        <aside class="panel">
+          <!-- 状態カードと詳細カードは入れ替えて出す。枠に最低の高さを持たせてあるので、
+               バスを選んでも解除しても右レール全体の高さが動かない（styles.css の --rail-top-min） -->
+          <div class="rail-top">
+            <section id="status-panel" class="status-panel" data-state="loading" aria-live="polite">
+              <p class="status-title" id="status-title">読み込み中…</p>
+              <p class="status-body" id="status-body">秋田県の路線網といまのバスの位置を読み込んでいます。</p>
+              <p class="status-service" id="status-service" hidden></p>
+              <p class="status-hint" id="status-hint" hidden>地図か一覧からバスを選ぶと詳細が出ます。</p>
+              <!-- 再試行の行は取得失敗のときだけ。空のまま置くと下の余白だけが増える -->
+              <div class="status-actions" id="status-actions" hidden>
+                <p class="status-retry" id="retry-note" hidden></p>
+                <button id="retry-button" class="secondary-button" type="button" hidden>いますぐ再試行</button>
+              </div>
+            </section>
+
+            <div id="bus-detail" class="bus-detail" hidden>
+              <div class="bus-detail__head">
+                <p class="bus-detail__operator" id="detail-operator"></p>
+                <button id="detail-close" class="link-button" type="button">選択を解除</button>
+              </div>
+              <dl class="bus-detail__rows">
+                <div><dt>車両ID</dt><dd id="detail-id">—</dd></div>
+                <div><dt>速度</dt><dd id="detail-speed">—</dd></div>
+                <div><dt>位置の送信</dt><dd id="detail-age">—</dd></div>
+              </dl>
+              <p class="bus-detail__note">速度は事業者が送っている値のままです。</p>
+            </div>
+          </div>
+
+          <section class="bus-panel" aria-labelledby="bus-title">
+            <div class="section-heading">
+              <h2 id="bus-title">走行中のバス</h2>
+              <span class="section-count" id="bus-count"></span>
+            </div>
+            <p class="panel-hint" id="bus-list-hint" hidden>行を選ぶと地図で光ります（停車中＝一時停止中）</p>
+            <div class="bus-list-wrap" id="bus-list-wrap" hidden>
+              <ul id="bus-list" class="bus-list"></ul>
+            </div>
+            <div class="bus-list-foot" id="bus-list-foot" hidden>
+              <p class="bus-list-note" id="bus-list-note"></p>
+              <button id="bus-list-toggle" class="link-button" type="button">すべて見る</button>
+            </div>
+            <!-- 「路線網はそのまま表示しています」は状態カードで言っている。ここで繰り返すと
+                 340pxの幅に短い行が3本並んで、右端がぎざぎざになる -->
+            <p id="bus-empty" class="bus-empty" hidden>位置を送信中のバスがないため、一覧はありません。</p>
+          </section>
+
+          <section id="next-service" class="next-service" aria-labelledby="next-service-title" hidden>
+            <p class="next-service__label" id="next-service-title">次の始発</p>
+            <p class="next-service__time" id="next-service-time">—</p>
+            <p class="next-service__note" id="next-service-note"></p>
+          </section>
+
+          <section class="network-panel" aria-labelledby="network-title">
+            <h2 id="network-title" class="section-heading">路線網</h2>
+            <p id="network-summary">路線データを読み込み中…</p>
+            <dl class="network-facts" id="network-facts" hidden>
+              <div><dt>実測位置あり</dt><dd id="fact-live">—</dd></div>
+              <div><dt>道なりの形状／直線近似</dt><dd id="fact-shaped">—</dd></div>
+            </dl>
+          </section>
+        </aside>
+      </main>
+
+      <footer>
+        <p class="note note--strong">
+          秋田県内18事業者のうち、実測位置を公開しているのは<strong class="nobr">2事業者だけ</strong>です。ほかの路線は線として描かれますが、バスは走りません。
+        </p>
+        <p class="note" id="shape-note">道なりの形状を公開している事業者と、停留所を直線でつないだ近似の事業者が混ざっています。</p>
+        <p class="note">表示位置は各事業者が送信した時刻のものです。実際の車両より数十秒遅れます。<span class="nobr">位置情報の取得・送信</span>は一切しません。</p>
+        <!-- 出典は2件を1行に詰めると「実測位置:」だけが行末に取り残されるので、初めから行を分ける -->
+        <p class="note">
+          <span class="note-line">路線データ: <span class="nobr">秋田県バス協会 公共交通オープンデータ</span>（<span class="nobr">CC BY 4.0</span>）</span>
+          <span class="note-line">実測位置: <span class="nobr">秋田中央交通</span>・<span class="nobr">秋田市</span>（<span class="nobr">GTFS-RT</span>）</span>
+        </p>
+      </footer>
+    </div>
+  </body>
+</html>

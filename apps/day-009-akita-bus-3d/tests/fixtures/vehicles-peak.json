@@ -1,0 +1,410 @@
+{
+  "updatedAt": "2026-08-16T12:01:00.000Z",
+  "vehicles": [
+    {
+      "id": "84",
+      "op": "chuo",
+      "lat": 39.7175,
+      "lon": 140.1172,
+      "bearing": 285,
+      "speed": 0,
+      "ts": 1786867200
+    },
+    {
+      "id": "76",
+      "op": "chuo",
+      "lat": 39.7152,
+      "lon": 140.1086,
+      "bearing": 357,
+      "speed": 31,
+      "ts": 1786867258
+    },
+    {
+      "id": "72",
+      "op": "chuo",
+      "lat": 39.7175,
+      "lon": 140.1279,
+      "bearing": 278,
+      "speed": 31,
+      "ts": 1786867231
+    },
+    {
+      "id": "30",
+      "op": "chuo",
+      "lat": 39.7007,
+      "lon": 140.1598,
+      "bearing": 205,
+      "speed": 44,
+      "ts": 1786867247
+    },
+    {
+      "id": "77",
+      "op": "chuo",
+      "lat": 39.7085,
+      "lon": 140.1585,
+      "bearing": 83,
+      "speed": 38,
+      "ts": 1786867215
+    },
+    {
+      "id": "61",
+      "op": "chuo",
+      "lat": 39.6685,
+      "lon": 140.0978,
+      "bearing": 0,
+      "speed": 28,
+      "ts": 1786867229
+    },
+    {
+      "id": "90",
+      "op": "chuo",
+      "lat": 39.7494,
+      "lon": 140.094,
+      "bearing": 2,
+      "speed": 11,
+      "ts": 1786867230
+    },
+    {
+      "id": "42",
+      "op": "chuo",
+      "lat": 39.7137,
+      "lon": 140.1168,
+      "bearing": 15,
+      "speed": 11,
+      "ts": 1786867248
+    },
+    {
+      "id": "83",
+      "op": "chuo",
+      "lat": 39.6904,
+      "lon": 140.0785,
+      "bearing": 116,
+      "speed": 0,
+      "ts": 1786867258
+    },
+    {
+      "id": "88",
+      "op": "chuo",
+      "lat": 39.7531,
+      "lon": 140.0926,
+      "bearing": 211,
+      "speed": 0,
+      "ts": 1786867253
+    },
+    {
+      "id": "52",
+      "op": "chuo",
+      "lat": 39.6318,
+      "lon": 140.2077,
+      "bearing": 260,
+      "speed": 17,
+      "ts": 1786867203
+    },
+    {
+      "id": "36",
+      "op": "chuo",
+      "lat": 39.7223,
+      "lon": 140.1198,
+      "bearing": 184,
+      "speed": 23,
+      "ts": 1786867239
+    },
+    {
+      "id": "80",
+      "op": "chuo",
+      "lat": 39.7203,
+      "lon": 140.1193,
+      "bearing": 196,
+      "speed": 31,
+      "ts": 1786867239
+    },
+    {
+      "id": "79",
+      "op": "chuo",
+      "lat": 39.7311,
+      "lon": 140.1446,
+      "bearing": 86,
+      "speed": 0,
+      "ts": 1786867231
+    },
+    {
+      "id": "95",
+      "op": "chuo",
+      "lat": 39.7124,
+      "lon": 140.1031,
+      "bearing": 252,
+      "speed": 28,
+      "ts": 1786867241
+    },
+    {
+      "id": "78",
+      "op": "chuo",
+      "lat": 39.7512,
+      "lon": 140.094,
+      "bearing": 303,
+      "speed": 44,
+      "ts": 1786867213
+    },
+    {
+      "id": "53",
+      "op": "chuo",
+      "lat": 39.7064,
+      "lon": 140.142,
+      "bearing": 54,
+      "speed": 23,
+      "ts": 1786867232
+    },
+    {
+      "id": "39",
+      "op": "chuo",
+      "lat": 39.7122,
+      "lon": 140.1023,
+      "bearing": 150,
+      "speed": 36,
+      "ts": 1786867209
+    },
+    {
+      "id": "49",
+      "op": "chuo",
+      "lat": 39.7079,
+      "lon": 140.082,
+      "bearing": 308,
+      "speed": 11,
+      "ts": 1786867220
+    },
+    {
+      "id": "58",
+      "op": "chuo",
+      "lat": 39.7165,
+      "lon": 140.1183,
+      "bearing": 96,
+      "speed": 17,
+      "ts": 1786867240
+    },
+    {
+      "id": "57",
+      "op": "chuo",
+      "lat": 39.7383,
+      "lon": 140.1255,
+      "bearing": 322,
+      "speed": 23,
+      "ts": 1786867229
+    },
+    {
+      "id": "99",
+      "op": "chuo",
+      "lat": 39.7034,
+      "lon": 140.1052,
+      "bearing": 14,
+      "speed": 41,
+      "ts": 1786867211
+    },
+    {
+      "id": "56",
+      "op": "chuo",
+      "lat": 39.7216,
+      "lon": 140.1259,
+      "bearing": 185,
+      "speed": 38,
+      "ts": 1786867208
+    },
+    {
+      "id": "35",
+      "op": "chuo",
+      "lat": 39.7494,
+      "lon": 140.094,
+      "bearing": 2,
+      "speed": 0,
+      "ts": 1786867213
+    },
+    {
+      "id": "92",
+      "op": "chuo",
+      "lat": 39.7275,
+      "lon": 140.128,
+      "bearing": 94,
+      "speed": 11,
+      "ts": 1786867221
+    },
+    {
+      "id": "31",
+      "op": "chuo",
+      "lat": 39.7062,
+      "lon": 140.1082,
+      "bearing": 230,
+      "speed": 38,
+      "ts": 1786867243
+    },
+    {
+      "id": "45",
+      "op": "chuo",
+      "lat": 39.7159,
+      "lon": 140.1268,
+      "bearing": 9,
+      "speed": 41,
+      "ts": 1786867253
+    },
+    {
+      "id": "74",
+      "op": "chuo",
+      "lat": 39.6486,
+      "lon": 140.2104,
+      "bearing": 85,
+      "speed": 17,
+      "ts": 1786867255
+    },
+    {
+      "id": "62",
+      "op": "chuo",
+      "lat": 39.7061,
+      "lon": 140.1368,
+      "bearing": 142,
+      "speed": 0,
+      "ts": 1786867235
+    },
+    {
+      "id": "86",
+      "op": "chuo",
+      "lat": 39.7229,
+      "lon": 140.1089,
+      "bearing": 352,
+      "speed": 0,
+      "ts": 1786867220
+    },
+    {
+      "id": "89",
+      "op": "chuo",
+      "lat": 39.7263,
+      "lon": 140.15,
+      "bearing": 358,
+      "speed": 44,
+      "ts": 1786867218
+    },
+    {
+      "id": "67",
+      "op": "chuo",
+      "lat": 39.7167,
+      "lon": 140.118,
+      "bearing": 131,
+      "speed": 0,
+      "ts": 1786867230
+    },
+    {
+      "id": "1035",
+      "op": "akitacity",
+      "lat": 39.8181,
+      "lon": 140.0667,
+      "bearing": null,
+      "speed": null,
+      "ts": 1786867233
+    },
+    {
+      "id": "1023",
+      "op": "akitacity",
+      "lat": 39.7903,
+      "lon": 140.11,
+      "bearing": null,
+      "speed": null,
+      "ts": 1786867204
+    },
+    {
+      "id": "1018",
+      "op": "akitacity",
+      "lat": 39.6594,
+      "lon": 140.1149,
+      "bearing": null,
+      "speed": null,
+      "ts": 1786867255
+    },
+    {
+      "id": "1030",
+      "op": "akitacity",
+      "lat": 39.8004,
+      "lon": 140.0645,
+      "bearing": null,
+      "speed": null,
+      "ts": 1786867241
+    },
+    {
+      "id": "1016",
+      "op": "akitacity",
+      "lat": 39.5642,
+      "lon": 140.2198,
+      "bearing": null,
+      "speed": null,
+      "ts": 1786867227
+    },
+    {
+      "id": "1004",
+      "op": "akitacity",
+      "lat": 39.7401,
+      "lon": 140.1685,
+      "bearing": null,
+      "speed": null,
+      "ts": 1786867232
+    },
+    {
+      "id": "1014",
+      "op": "akitacity",
+      "lat": 39.5702,
+      "lon": 140.2183,
+      "bearing": null,
+      "speed": null,
+      "ts": 1786867230
+    },
+    {
+      "id": "1019",
+      "op": "akitacity",
+      "lat": 39.7803,
+      "lon": 140.0681,
+      "bearing": null,
+      "speed": null,
+      "ts": 1786867210
+    },
+    {
+      "id": "1025",
+      "op": "akitacity",
+      "lat": 39.7766,
+      "lon": 140.0782,
+      "bearing": null,
+      "speed": null,
+      "ts": 1786867227
+    },
+    {
+      "id": "1007",
+      "op": "akitacity",
+      "lat": 39.6936,
+      "lon": 140.1616,
+      "bearing": null,
+      "speed": null,
+      "ts": 1786867237
+    },
+    {
+      "id": "1028",
+      "op": "akitacity",
+      "lat": 39.7716,
+      "lon": 140.0831,
+      "bearing": null,
+      "speed": null,
+      "ts": 1786867200
+    }
+  ],
+  "sources": [
+    {
+      "op": "chuo",
+      "ok": true,
+      "error": null,
+      "feedTs": 1786867260,
+      "staleDropped": 0,
+      "count": 32
+    },
+    {
+      "op": "akitacity",
+      "ok": true,
+      "error": null,
+      "feedTs": 1786867255,
+      "staleDropped": 0,
+      "count": 11
+    }
+  ]
+}
