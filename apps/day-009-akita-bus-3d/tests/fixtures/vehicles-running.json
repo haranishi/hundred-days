@@ -1,0 +1,248 @@
+{
+  "updatedAt": "2026-08-16T12:01:00.000Z",
+  "vehicles": [
+    {
+      "id": "48",
+      "op": "chuo",
+      "lat": 39.6732,
+      "lon": 140.0928,
+      "bearing": 311,
+      "speed": 23,
+      "ts": 1786867258
+    },
+    {
+      "id": "76",
+      "op": "chuo",
+      "lat": 39.7676,
+      "lon": 140.0947,
+      "bearing": 149,
+      "speed": 41,
+      "ts": 1786867237
+    },
+    {
+      "id": "30",
+      "op": "chuo",
+      "lat": 39.7716,
+      "lon": 140.0883,
+      "bearing": 65,
+      "speed": 0,
+      "ts": 1786867249
+    },
+    {
+      "id": "33",
+      "op": "chuo",
+      "lat": 39.7151,
+      "lon": 140.1086,
+      "bearing": 174,
+      "speed": 0,
+      "ts": 1786867209
+    },
+    {
+      "id": "32",
+      "op": "chuo",
+      "lat": 39.746,
+      "lon": 140.0861,
+      "bearing": 287,
+      "speed": 17,
+      "ts": 1786867225
+    },
+    {
+      "id": "58",
+      "op": "chuo",
+      "lat": 39.7127,
+      "lon": 140.1039,
+      "bearing": 237,
+      "speed": 28,
+      "ts": 1786867258
+    },
+    {
+      "id": "54",
+      "op": "chuo",
+      "lat": 39.7057,
+      "lon": 140.1372,
+      "bearing": 79,
+      "speed": 41,
+      "ts": 1786867205
+    },
+    {
+      "id": "92",
+      "op": "chuo",
+      "lat": 39.7776,
+      "lon": 140.0689,
+      "bearing": 339,
+      "speed": 23,
+      "ts": 1786867215
+    },
+    {
+      "id": "99",
+      "op": "chuo",
+      "lat": 39.7196,
+      "lon": 140.1255,
+      "bearing": 9,
+      "speed": 23,
+      "ts": 1786867213
+    },
+    {
+      "id": "40",
+      "op": "chuo",
+      "lat": 39.6094,
+      "lon": 140.2041,
+      "bearing": 59,
+      "speed": 0,
+      "ts": 1786867226
+    },
+    {
+      "id": "50",
+      "op": "chuo",
+      "lat": 39.7364,
+      "lon": 140.1176,
+      "bearing": 38,
+      "speed": 0,
+      "ts": 1786867203
+    },
+    {
+      "id": "44",
+      "op": "chuo",
+      "lat": 39.7174,
+      "lon": 140.1183,
+      "bearing": 277,
+      "speed": 11,
+      "ts": 1786867254
+    },
+    {
+      "id": "62",
+      "op": "chuo",
+      "lat": 39.8521,
+      "lon": 140.0148,
+      "bearing": 356,
+      "speed": 31,
+      "ts": 1786867236
+    },
+    {
+      "id": "93",
+      "op": "chuo",
+      "lat": 39.7344,
+      "lon": 140.1112,
+      "bearing": 350,
+      "speed": 44,
+      "ts": 1786867259
+    },
+    {
+      "id": "70",
+      "op": "chuo",
+      "lat": 39.7175,
+      "lon": 140.1279,
+      "bearing": 278,
+      "speed": 17,
+      "ts": 1786867244
+    },
+    {
+      "id": "80",
+      "op": "chuo",
+      "lat": 39.7232,
+      "lon": 140.1327,
+      "bearing": 358,
+      "speed": 0,
+      "ts": 1786867227
+    },
+    {
+      "id": "78",
+      "op": "chuo",
+      "lat": 39.7175,
+      "lon": 140.1279,
+      "bearing": 277,
+      "speed": 41,
+      "ts": 1786867227
+    },
+    {
+      "id": "38",
+      "op": "chuo",
+      "lat": 39.7175,
+      "lon": 140.1172,
+      "bearing": 285,
+      "speed": 0,
+      "ts": 1786867246
+    },
+    {
+      "id": "1009",
+      "op": "akitacity",
+      "lat": 39.5875,
+      "lon": 140.1762,
+      "bearing": null,
+      "speed": null,
+      "ts": 1786867202
+    },
+    {
+      "id": "1029",
+      "op": "akitacity",
+      "lat": 39.6152,
+      "lon": 140.1334,
+      "bearing": null,
+      "speed": null,
+      "ts": 1786867208
+    },
+    {
+      "id": "1033",
+      "op": "akitacity",
+      "lat": 39.7843,
+      "lon": 140.1053,
+      "bearing": null,
+      "speed": null,
+      "ts": 1786867215
+    },
+    {
+      "id": "1003",
+      "op": "akitacity",
+      "lat": 39.7972,
+      "lon": 140.1255,
+      "bearing": null,
+      "speed": null,
+      "ts": 1786867216
+    },
+    {
+      "id": "1027",
+      "op": "akitacity",
+      "lat": 39.6928,
+      "lon": 140.1564,
+      "bearing": null,
+      "speed": null,
+      "ts": 1786867228
+    },
+    {
+      "id": "1017",
+      "op": "akitacity",
+      "lat": 39.5994,
+      "lon": 140.1086,
+      "bearing": null,
+      "speed": null,
+      "ts": 1786867234
+    },
+    {
+      "id": "1034",
+      "op": "akitacity",
+      "lat": 39.6618,
+      "lon": 140.1608,
+      "bearing": null,
+      "speed": null,
+      "ts": 1786867252
+    }
+  ],
+  "sources": [
+    {
+      "op": "chuo",
+      "ok": true,
+      "error": null,
+      "feedTs": 1786867260,
+      "staleDropped": 0,
+      "count": 18
+    },
+    {
+      "op": "akitacity",
+      "ok": true,
+      "error": null,
+      "feedTs": 1786867255,
+      "staleDropped": 0,
+      "count": 7
+    }
+  ]
+}

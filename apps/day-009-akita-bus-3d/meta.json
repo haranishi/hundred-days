@@ -1,0 +1,48 @@
+{
+  "day": 9,
+  "season": 1,
+  "title": "秋田バスライブ",
+  "description": "いま秋田県を走っているバスの実測GPS位置を、自前の3Dマップの上で走らせる。路線網は県内17事業者のGTFS-JPから作り、実測位置はGTFS-RTを20秒ごとに中継する",
+  "tags": ["gtfs-realtime", "canvas", "3d", "protobuf", "cloudflare-pages-functions", "vanilla-js", "no-dependencies"],
+  "difficulty": "A",
+  "sourceOfIdea": "2026-08-16、本人が『公共交通のリアルタイム3Dマップを無料APIで作れるか』を発案。調査の結果、電車と飛行機は無料では実用にならず、秋田県のバスだけが本当に取れると分かったのでバスに絞った。同日『ルールが厳しすぎる』という本人判断で、Day 1〜10の『外部依存0個』フェーズ制約そのものを廃止し、外部APIとサーバー処理を使っている",
+  "startedAt": "2026-08-16",
+  "finishedAt": "2026-08-16",
+  "actualMinutes": 0,
+  "aiHandled": [
+    "GTFS-RTのProtocol Buffersを外部ライブラリなしで読む中継API（Cloudflare Pages Functions）の実装",
+    "緯度経度→平面→カメラ回転→透視投影の自前3Dパイプラインと、20秒ごとの位置を補間して走らせる処理",
+    "17事業者のGTFS-JPから路線網を抽出するツールと、ユニットテスト・E2E・スクリーンショット撮影の整備"
+  ],
+  "humanHandled": [
+    "外部APIとサーバー処理を解禁する判断と、実測位置が2事業者しかない現実を隠さずに見せる方針の決定"
+  ],
+  "failuresAndFixes": [
+    {
+      "problem": "秋田市のフィードは数十秒ごとに作り直されているのに、中の車両の位置送信時刻が9時間41分前で止まったままだった。そのまま描くと動かないバスが夜通し『走行中』に見える",
+      "fix": "中継APIで10分以上古い位置を除外し、除外した台数を画面に出すようにした"
+    },
+    {
+      "problem": "17事業者のうち12事業者は道なりの路線形状を公開しておらず、停留所を直線で結んだ角ばった線にしかならない",
+      "fix": "実形状と近似を線の太さと破線で描き分け、17事業者中5事業者しか形状を公開していないことを画面に明記した"
+    }
+  ],
+  "publicUrl": "https://hundred-days.pages.dev/day-009-akita-bus-3d/",
+  "repoPath": "apps/day-009-akita-bus-3d",
+  "screenshot": "screenshot.webp",
+  "demo": "",
+  "shortVideoUrl": "",
+  "longVideoChapter": "",
+  "status": "published",
+  "xPostUrl": "",
+  "social": {
+    "x": {
+      "emoji": "🚌",
+      "summary": "いま秋田を走っているバスの実測位置を、地図ライブラリなしの自前3Dで走らせるアプリ。",
+      "ai": "protobufデコーダと3D投影の実装ほぼ全部",
+      "human": "外部API解禁の判断と、見せ方の方針決め",
+      "failure": "秋田県内18事業者のうち実測位置を出しているのは2社だけ。しかも片方は9時間前の位置を送り続けていた",
+      "hashtags": ["100日チャレンジ", "個人開発"]
+    }
+  }
+}

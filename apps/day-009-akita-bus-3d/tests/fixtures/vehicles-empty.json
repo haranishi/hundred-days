@@ -1,0 +1,22 @@
+{
+  "updatedAt": "2026-08-16T14:20:00.000Z",
+  "vehicles": [],
+  "sources": [
+    {
+      "op": "chuo",
+      "ok": true,
+      "error": null,
+      "feedTs": 1786875600,
+      "staleDropped": 0,
+      "count": 0
+    },
+    {
+      "op": "akitacity",
+      "ok": true,
+      "error": null,
+      "feedTs": 1786875590,
+      "staleDropped": 1,
+      "count": 0
+    }
+  ]
+}

@@ -1,0 +1,692 @@
+:root {
+  color-scheme: dark;
+  --void: #0b1016;
+  --panel: #131c28;
+  --panel-soft: #172232;
+  --ink: #e7eef8;
+  --ink-mute: rgb(198 213 234 / 72%);
+  /* いちばん控えめな文字色。半透明（52%）のままだと背景と混ざって 3.94:1 まで落ちてAAを割る。
+     合成後の色を直に置く＝一覧の行 #172232 に対して 5.20:1、カード #131c28 に対して 5.57:1。
+     --ink-mute（6.25:1）より弱い、という役割の差は保っている */
+  --ink-faint: #8794a7;
+  --line: rgb(126 158 198 / 22%);
+  --line-soft: rgb(126 158 198 / 14%);
+
+  /* 色は役割ごとに1つずつ。1色に複数の意味を持たせない。
+     赤×緑の組み合わせは避ける（色覚特性で区別できなくなるため） */
+  --live: #4cc2ff;   /* 実測位置を公開している事業者 */
+  --count: #ffb545;  /* 走行台数（数量そのもの） */
+  --bus: #ffb545;    /* 3Dの車体 */
+  --select: #ffe9b0; /* 選択中（枠の太さと▶印でも示す。色だけに頼らない） */
+  --calm: #9db4d4;   /* 運行時間外・0台（正常だが説明が要る状態） */
+  --alert: #ff7a6b;  /* 取得失敗 */
+
+  --radius-pill: 999px;
+  --radius-card: 14px;
+  --card-pad: clamp(16px, 3vw, 22px);
+  --rail-pad: 14px;
+  /* 押せるものの高さは1つに統一する。地図の操作ボタンだけ大きい、一覧のボタンだけ小さい、
+     という状態を作らない（指で押せる最小の44px） */
+  --tap: 44px;
+  /* 状態カードと詳細カードを入れ替えても右レールの高さを動かさないための最低高さ。
+     広い画面（右レール340px幅）で、走行中の状態カードと詳細カードの両方が収まる値。
+     ずれると tests/e2e の「選択してもレールの高さが変わらない」で落ちる */
+  --rail-top-min: 176px;
+
+  /* 一覧の行は半端に切れると故障に見えるので、高さを固定して整数行だけ見せる。
+     たたんだ状態は4行ぶん、開いた状態は10行ぶんの高さ（どちらも行の途中で切れない）。
+     4行なのは縦900pxの画面で、フッターの出典と限界表示までスクロールなしで届かせるため */
+  --bus-row: 52px;
+  --bus-gap: 6px;
+  --bus-list-collapsed: calc(52px * 4 + 6px * 3);
+  --bus-list-expanded: calc(52px * 10 + 6px * 9);
+
+  --stage-h: min(56vh, 420px);
+
+  font-family: "Hiragino Sans", "Yu Gothic", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  font-variant-numeric: tabular-nums;
+}
+
+* { box-sizing: border-box; }
+
+html { overflow-x: hidden; }
+
+body {
+  min-width: 320px;
+  min-height: 100vh;
+  margin: 0;
+  overflow-x: hidden;
+  color: var(--ink);
+  background: radial-gradient(120% 70% at 50% 0%, #16202d 0%, var(--void) 62%);
+  line-height: 1.65;
+}
+
+button { font: inherit; color: inherit; }
+
+button:focus-visible,
+canvas:focus-visible {
+  outline: 3px solid var(--count);
+  outline-offset: 3px;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* 固有名詞・日付・強調は途中で折らない。本文側は word-break: keep-all で
+   語のまとまりを保ち、どうしても入りきらないときだけ overflow-wrap で折る */
+.nobr { white-space: nowrap; }
+
+.app-shell {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: min(1320px, calc(100% - 24px));
+  min-height: 100vh;
+  min-height: 100dvh;
+  margin: 0 auto;
+  padding-bottom: 6px;
+}
+
+/* ヘッダー */
+.site-header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 66px;
+  border-bottom: 1px solid var(--line);
+}
+
+.brand { display: grid; gap: 2px; }
+
+.brand__lead {
+  color: var(--live);
+  font-size: .68rem;
+  font-weight: 700;
+  letter-spacing: .02em;
+  line-height: 1.3;
+}
+
+.brand__name {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 1.05rem;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.brand__mark {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--count);
+  box-shadow: 0 0 12px rgb(255 181 69 / 65%);
+}
+
+.header-note {
+  margin: 0;
+  color: var(--ink-mute);
+  font-size: .78rem;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+
+/* レイアウト：狭い画面は縦積み、広い画面は3Dビュー＋右パネル */
+.layout {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+@media (min-width: 980px) {
+  /* 縦900pxの画面でも、ヘッダー・地図・右レール・フッターが1画面に収まる高さ。
+     フッターの出典と限界表示はスクロールなしで届かせたい */
+  :root { --stage-h: min(70vh, 700px); }
+
+  /* 左右は同じ高さの行に入る。地図カードは最低でも --stage-h、右レールが
+     それより高ければ地図がそこまで伸びる。どちらも途中で切れない */
+  .layout { grid-template-columns: minmax(0, 1fr) 340px; align-items: stretch; }
+}
+
+/* 3Dビューと、その周りの操作・凡例 */
+.map-card {
+  position: relative;
+  display: grid;
+  gap: 10px;
+}
+
+.stage {
+  position: relative;
+  height: var(--stage-h);
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-card);
+  background: var(--void);
+}
+
+@media (min-width: 561px) {
+  .map-card { grid-template-rows: minmax(var(--stage-h), 1fr); }
+  .stage { height: auto; min-height: var(--stage-h); }
+}
+
+/* キャンバスは中身の大きさ（width/height属性）を持つので、そのまま流し込むと
+   「一覧を開いて地図が伸びる → キャンバスが大きくなる → 縮められなくなる」の一方通行になる。
+   絶対配置で流れから外し、高さは .stage 側だけで決める */
+#scene {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  cursor: grab;
+  touch-action: none;
+}
+
+#scene:active { cursor: grabbing; }
+
+.hud {
+  position: absolute;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.hud--summary {
+  top: 12px;
+  left: 12px;
+  max-width: min(260px, calc(100% - 24px));
+  padding: 10px 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-card);
+  background: rgb(11 16 22 / 76%);
+  backdrop-filter: blur(6px);
+}
+
+.hud-label { margin: 0; color: var(--ink-mute); font-size: .68rem; letter-spacing: .12em; }
+.hud-count { margin: 2px 0 0; font-size: 1.9rem; font-weight: 800; line-height: 1.05; color: var(--count); }
+.hud-unit { margin-left: 4px; font-size: .8rem; font-weight: 700; color: var(--ink-mute); }
+.hud-fresh { margin: 4px 0 0; color: var(--ink-mute); font-size: .72rem; }
+
+/* 除外件数は「数量」ではなく注釈。台数のオレンジとは別の色にする */
+.hud-stale {
+  margin: 6px 0 0;
+  padding-left: 8px;
+  border-left: 2px solid var(--calm);
+  color: var(--ink-faint);
+  font-size: .68rem;
+  line-height: 1.45;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+
+.map-tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.ghost-button {
+  min-height: var(--tap);
+  padding: 8px 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-pill);
+  background: rgb(11 16 22 / 76%);
+  color: var(--ink-mute);
+  font-size: .74rem;
+  font-weight: 700;
+  white-space: nowrap;
+  cursor: pointer;
+  backdrop-filter: blur(6px);
+}
+
+.ghost-button:hover:not(:disabled) { border-color: var(--live); color: var(--live); }
+.ghost-button[aria-pressed="true"] { border-color: var(--live); color: var(--live); }
+.ghost-button:disabled { opacity: .45; cursor: not-allowed; }
+
+/* 地図の記号と操作を1枚にまとめた札。画面幅で中身も形も変えない */
+.map-key {
+  max-width: min(330px, 100%);
+  padding: 10px 12px;
+  border: 1px solid var(--line-soft);
+  border-radius: 10px;
+  background: rgb(11 16 22 / 78%);
+  backdrop-filter: blur(6px);
+}
+
+.map-key__title {
+  margin: 0 0 6px;
+  color: var(--ink);
+  font-size: .72rem;
+  font-weight: 800;
+  letter-spacing: .04em;
+}
+
+.map-key__hint {
+  margin: 8px 0 0;
+  padding-top: 7px;
+  border-top: 1px solid var(--line-soft);
+  color: var(--ink-mute);
+  font-size: .72rem;
+  line-height: 1.45;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+
+.legend {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  color: var(--ink-mute);
+  font-size: .75rem;
+  line-height: 1.45;
+  list-style: none;
+}
+
+.legend li { display: flex; align-items: center; gap: 8px; }
+
+/* 画面でいちばん目立つオレンジの車体そのもの。3Dの箱と同じ配色（明るい屋根＋暗い側面）で
+   小さく置く。印の幅は線・バッジと同じ22pxにそろえ、説明文の左端を1本の線に保つ */
+.legend-bus {
+  flex: none;
+  width: 22px;
+  height: 13px;
+  border: 1px solid rgb(10 14 20 / 70%);
+  border-radius: 2px;
+  background: linear-gradient(170deg, #e8a83f 0 58%, #8d6023 58%);
+}
+
+.legend-line { flex: none; width: 22px; height: 0; border-top: 2px solid var(--live); }
+.legend-line--shaped { border-top: 1px solid #5a6b86; }
+.legend-line--approx { border-top: 1px dashed #4a5568; }
+
+/* 地図に描くバッジと破線の円を、そのままの見た目で小さく置く */
+.legend-badge {
+  flex: none;
+  width: 22px;
+  height: 12px;
+  border: 1px solid rgb(255 181 69 / 50%);
+  border-radius: 2px;
+  background: rgb(8 13 20 / 86%);
+}
+
+.legend-ring {
+  flex: none;
+  width: 14px;
+  height: 14px;
+  margin: 0 4px;
+  border: 1px dashed rgb(255 181 69 / 55%);
+  border-radius: 50%;
+}
+
+/* 地図が大きい画面でだけ、記号の札と操作ボタンを地図の上に重ねる。
+   スケールバーはキャンバスの右下に描くので、札は左下へ置く。
+   縦が短い画面で重ねると、札が路線網の南西部を隠してしまう */
+@media (min-width: 980px) {
+  .map-tools {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    z-index: 2;
+    justify-content: flex-end;
+  }
+
+  .map-key {
+    position: absolute;
+    bottom: 12px;
+    left: 12px;
+    z-index: 2;
+    pointer-events: none;
+  }
+}
+
+/* 重ねない画面では、札もカードと同じ幅にして右端をそろえる */
+@media (max-width: 979px) {
+  .map-key { max-width: none; }
+}
+
+/* 狭い画面では指のドラッグ領域とボタンを分け、ボタンは横幅いっぱいに広げる */
+@media (max-width: 560px) {
+  .ghost-button { flex: 1 1 auto; padding: 8px 12px; }
+}
+
+/* 右パネル */
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.status-panel,
+.bus-panel,
+.next-service,
+.network-panel,
+.bus-detail {
+  padding: var(--rail-pad);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-card);
+  background: var(--panel);
+}
+
+.rail-top,
+.bus-panel,
+.next-service { flex: none; }
+
+/* いちばん下のカードで余りを埋める。0台の夜でも右下に穴が開かない */
+.network-panel { flex: 1 1 auto; }
+
+.rail-top { display: grid; gap: 8px; }
+
+/* 右レールがある広い画面では、状態カードと詳細カードが入る枠に最低の高さを持たせる。
+   隠したほうを場所取りに使う（＝見えないカードの高さで枠が決まる）と、背の低いほうを
+   出したときにカードの下だけ余白が伸びて、カードの間隔が8pxからずれる。
+   枠の高さを先に決めておけば、入れ替えてもレールの高さは動かず、間隔も8pxのまま */
+@media (min-width: 980px) {
+  .rail-top { min-height: var(--rail-top-min); }
+  /* 枠より中身が低いときは上下に均等に振り分ける（下だけ余るのを防ぐ）。
+     :not([hidden]) を外すと、この display が hidden 属性の display:none に勝って
+     隠したはずのカードが出てくる（作者スタイルはUAスタイルより強い） */
+  .rail-top > *:not([hidden]) { display: flex; flex-direction: column; justify-content: center; }
+}
+
+.status-panel { border-left: 3px solid var(--line); }
+.status-panel[data-state="running"] { border-left-color: var(--live); }
+.status-panel[data-state="empty"] { border-left-color: var(--calm); }
+.status-panel[data-state="partial"] { border-left-color: var(--calm); }
+.status-panel[data-state="error"] { border-left-color: var(--alert); background: rgb(38 20 20 / 60%); }
+
+.status-title { margin: 0; font-size: 1.02rem; font-weight: 800; line-height: 1.35; }
+.status-panel[data-state="error"] .status-title { color: var(--alert); }
+
+.status-body {
+  margin: 6px 0 0;
+  color: var(--ink-mute);
+  font-size: .8rem;
+  line-height: 1.55;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+
+.status-service {
+  margin: 8px 0 0;
+  padding: 9px 11px;
+  border-radius: 10px;
+  background: var(--panel-soft);
+  color: var(--ink);
+  font-size: .78rem;
+  line-height: 1.55;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+
+.status-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 12px; }
+.status-actions[hidden] { display: none; }
+.status-retry { margin: 0; color: var(--ink-mute); font-size: .76rem; }
+
+/* 何ができるかの一言。本文より弱く、でも読める強さにする */
+.status-hint,
+.panel-hint {
+  margin: 8px 0 0;
+  color: var(--ink-mute);
+  font-size: .74rem;
+  line-height: 1.5;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+
+.status-hint[hidden],
+.panel-hint[hidden] { display: none; }
+
+.secondary-button {
+  min-height: var(--tap);
+  padding: 10px 18px;
+  border: 1px solid rgb(255 122 107 / 55%);
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--alert);
+  font-size: .8rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.secondary-button:hover { background: rgb(255 122 107 / 14%); }
+
+.link-button {
+  min-height: var(--tap);
+  padding: 6px 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--ink-mute);
+  font-size: .72rem;
+  font-weight: 700;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.link-button:hover { border-color: var(--live); color: var(--live); }
+
+.section-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  margin: 0;
+  font-size: .92rem;
+  font-weight: 800;
+  line-height: 1.35;
+}
+
+.section-heading h2 { margin: 0; font-size: .92rem; }
+.section-count { color: var(--ink-mute); font-size: .76rem; font-weight: 700; }
+
+.bus-list-wrap { position: relative; margin-top: 8px; }
+.bus-list-wrap[hidden] { display: none; }
+
+/* スクロールできるときだけ、続きがあることをフェードで示す。
+   たたんだ状態は5行ちょうどで切ってあるので、フェードを出すと
+   最後の行の文字を薄くするだけになる（読みにくくなる） */
+.bus-list-wrap::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 16px;
+  background: linear-gradient(to top, var(--panel), rgb(19 28 40 / 0%));
+  pointer-events: none;
+}
+
+.bus-list-wrap[data-overflow="false"]::after { display: none; }
+
+.bus-list {
+  display: grid;
+  gap: var(--bus-gap);
+  max-height: var(--bus-list-collapsed);
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  list-style: none;
+}
+
+.bus-list[data-expanded="true"] {
+  max-height: var(--bus-list-expanded);
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+
+.bus-item {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-content: center;
+  gap: 2px 10px;
+  width: 100%;
+  height: var(--bus-row);
+  padding: 6px 26px 6px 12px;
+  border: 1px solid var(--line-soft);
+  border-radius: 10px;
+  background: var(--panel-soft);
+  text-align: left;
+  cursor: pointer;
+}
+
+/* 押せる行であることを、見た目でも示す（隣の「路線網」カードは押せない） */
+.bus-item::after {
+  content: "›";
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  color: var(--ink-faint);
+  font-size: 1rem;
+  line-height: 1;
+  transform: translateY(-50%);
+}
+
+.bus-item:hover { border-color: var(--live); }
+.bus-item:hover::after { color: var(--live); }
+
+/* 選択は色相だけに頼らない。左の太い縁と▶印で示す。
+   面を暖色で塗ると、画面でここだけが暖色の面になって浮くのでやらない */
+.bus-item[aria-pressed="true"] {
+  border-color: var(--select);
+  border-left: 5px solid var(--select);
+  padding-left: 8px;
+}
+
+.bus-item[aria-pressed="true"] .bus-item__id::before { content: "▶ "; color: var(--select); }
+
+.bus-item__op { color: var(--ink-mute); font-size: .68rem; line-height: 16px; grid-column: 1 / -1; }
+.bus-item__id { font-size: .84rem; font-weight: 700; line-height: 20px; }
+.bus-item__speed { color: var(--ink); font-size: .84rem; font-weight: 700; line-height: 20px; }
+/* 止まっている・速度を送っていないは「数字が0」ではなく状態。数字の強調から外す */
+.bus-item__speed--idle,
+.bus-item__speed--none { color: var(--ink-faint); font-size: .74rem; font-weight: 400; }
+
+.bus-list-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.bus-list-foot[hidden] { display: none; }
+.bus-list-note { margin: 0; color: var(--ink-mute); font-size: .74rem; }
+
+/* 1行に収まる長さにしてある。入りきらない画面では読点で折る（語の途中では折らない） */
+.bus-empty {
+  margin: 12px 0 0;
+  color: var(--ink-mute);
+  font-size: .8rem;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+
+.bus-empty[hidden] { display: none; }
+
+.bus-detail {
+  border-color: rgb(255 233 176 / 45%);
+  border-left: 5px solid var(--select);
+}
+
+.bus-detail__head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.bus-detail__operator { margin: 0; font-size: .86rem; font-weight: 800; color: var(--select); }
+.bus-detail__rows { display: grid; gap: 2px; margin: 8px 0 0; font-size: .8rem; }
+.bus-detail__rows > div { display: flex; justify-content: space-between; gap: 12px; }
+.bus-detail__rows dt { color: var(--ink-mute); }
+.bus-detail__rows dd { margin: 0; font-weight: 700; text-align: right; }
+
+.bus-detail__note {
+  margin: 6px 0 0;
+  color: var(--ink-mute);
+  font-size: .68rem;
+  line-height: 1.55;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+
+/* 0台は1日9時間続く通常の状態。次の始発を主役に置いて、待つ画面として成立させる */
+.next-service { border-left: 3px solid var(--calm); }
+.next-service[hidden] { display: none; }
+.next-service__label { margin: 0; color: var(--ink-mute); font-size: .72rem; letter-spacing: .1em; }
+
+.next-service__time {
+  margin: 2px 0 0;
+  color: var(--calm);
+  font-size: 1.7rem;
+  font-weight: 800;
+  line-height: 1.15;
+  white-space: nowrap;
+}
+
+.next-service__note {
+  margin: 8px 0 0;
+  color: var(--ink-mute);
+  font-size: .74rem;
+  line-height: 1.55;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+
+.network-panel p {
+  margin: 6px 0 0;
+  color: var(--ink-mute);
+  font-size: .76rem;
+  line-height: 1.5;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+
+.network-facts { display: grid; gap: 2px; margin: 8px 0 0; font-size: .74rem; line-height: 1.5; }
+.network-facts[hidden] { display: none; }
+.network-facts > div { display: flex; justify-content: space-between; gap: 12px; }
+.network-facts dt { color: var(--ink-mute); }
+.network-facts dd { margin: 0; font-weight: 700; white-space: nowrap; }
+
+/* フッター：出典と「正直に見せること」はスクロールしなくても届く位置に置く。
+   1行が長すぎると日本語は読みにくいので幅を詰め、そのぶん広い画面では段組みにする */
+footer {
+  display: grid;
+  gap: 4px 28px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+}
+
+@media (min-width: 980px) {
+  footer { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+.note {
+  max-width: 42em;
+  margin: 0;
+  color: var(--ink-mute);
+  font-size: .74rem;
+  line-height: 1.5;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+
+/* 出典は1件ずつ行にする（行末に「実測位置:」だけが残らないように） */
+.note-line { display: block; }
+
+.note--strong { color: var(--ink); }
+/* 「2事業者だけ」＝実測位置を公開している事業者のこと。凡例のシアンと意味をそろえる */
+.note--strong strong { color: var(--live); }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .001ms !important;
+    transition-duration: .001ms !important;
+  }
+}
