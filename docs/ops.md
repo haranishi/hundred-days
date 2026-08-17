@@ -8,8 +8,9 @@
 2. **一覧用のスクショとデモ動画を作る**（下記「デモ動画とスクショを作る」）
    - `meta.json` に `"screenshot": "screenshot.webp"` と `"demo": "demo.mp4"` を書く（フォルダ内のファイル名だけ。パスは書かない）
    - 省略しても壊れない。スクショが無い場合はトップページで夜空グラデーション＋Day番号のプレースホルダになる
-3. `npm run build` → `npm run precheck` → デプロイ
-4. X投稿後に `meta.json` の `xPostUrl` を追記して再デプロイすると、カードに「X投稿」リンクが出る
+3. **外部のAPIを叩くDayなら** `scripts/build.mjs` の `CONNECT_BY_APP` に接続先を足す（CSPで止まる。→ [security.md](security.md)）
+4. `npm run build` → `npm run test:unit` → `npm run precheck` → デプロイ
+5. X投稿後に `meta.json` の `xPostUrl` を追記して再デプロイすると、カードに「X投稿」リンクが出る
 
 トップページ（`dist/index.html`）は `scripts/build.mjs` が `meta.json` から自動生成する。
 公開アプリ数・制作時間・制作日数・タグフィルタ・制作メモは、すべて `meta.json` の実値から作られるので、
@@ -74,6 +75,12 @@ npm run precheck   # 公開前チェック（シークレット等の漏洩ス�
 ```
 
 `.precheck-ng.txt` はGitの追跡対象外。ファイルが無い場合、公開前チェックは失敗する。
+
+CI（`.github/workflows/ci-deploy.yml`）では**PRの時点で**このチェックが走る。デプロイ直前ではなく
+PRで止めるのは、公開リポジトリではmainに入った時点でもう世に出ているため。
+NGワードはリポジトリに置かず、GitHub Secrets の `PRECHECK_NG_PATTERNS` から渡している。
+
+レスポンスヘッダ（CSP等）とAPIの守り方は [security.md](security.md) に分けてある。
 
 ## X投稿の準備
 

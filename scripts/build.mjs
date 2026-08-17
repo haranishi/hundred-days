@@ -104,6 +104,72 @@ for (const app of apps) {
   }
 }
 
+// ---------------------------------------------------------------- セキュリティヘッダ（dist/_headers）
+
+/* Cloudflare Pages は dist/_headers を読んでレスポンスヘッダを足す。既定で付くのは
+   X-Content-Type-Options と Referrer-Policy だけで、CSPも枠内表示の禁止も付かない。
+
+   静的ファイルとして static/ に置かずここで生成するのは、アプリのパスを1つずつ書き出すため。
+   ワイルドカード1本で済ませると、書き方を間違えても静かに無効化されるだけで気付けない。
+   Dayが増えても自動で付いてほしいので、公開するアプリの実体から組み立てる。
+
+   HSTSは入れない。`.dev` はTLDごとHSTSプリロード済みで pages.dev は常にHTTPSになるため。
+   独自ドメインを当てる日が来たら、そのときに足す。 */
+
+/* 各値はアプリ側の使用実態を数えた結果。緩める前に本当に必要か確かめること。
+     script-src  : アプリ配下にインラインscriptも外部scriptも1つも無い → 'self' だけで足りる
+     style-src   : day-004 に style 属性があるので 'unsafe-inline' が要る（属性を消せば外せる）
+     img-src     : canvasの書き出しとインラインSVGで data:/blob: を使う
+     connect-src : day-009 は同一オリジンのAPI、day-010 はウィキメディアの各プロジェクト
+                   （apps/day-010-wikipedia-live/lib/coords.js が通すホストと対応させること） */
+const WIKIMEDIA_CONNECT = [
+  'wikipedia', 'wikibooks', 'wikinews', 'wikiquote', 'wikisource', 'wikiversity',
+  'wikivoyage', 'wiktionary', 'wikimedia', 'wikidata', 'wikifunctions', 'mediawiki'
+].map((project) => `https://*.${project}.org`).join(' ');
+
+/* 外部へ接続するのはこのDayだけ。ほかのアプリは同一オリジンに閉じている。
+   ⚠️ 新しいDayで外部のAPIを叩くときは、ここに足さないとブラウザ側で接続が止まる（黙って失敗する）。 */
+const CONNECT_BY_APP = {
+  'day-010-wikipedia-live': WIKIMEDIA_CONNECT
+};
+
+const appCsp = (dir) => [
+  "default-src 'self'",
+  "script-src 'self'",
+  "style-src 'self' 'unsafe-inline'",
+  "img-src 'self' data: blob:",
+  "media-src 'self'",
+  "font-src 'self'",
+  `connect-src 'self'${CONNECT_BY_APP[dir] ? ` ${CONNECT_BY_APP[dir]}` : ''}`,
+  "frame-ancestors 'none'",
+  "base-uri 'none'",
+  "form-action 'self'",
+  "object-src 'none'"
+].join('; ');
+
+/* 一覧ページ（/）にCSPを入れていないのは、インラインscriptが2本とGA4があり、
+   ハッシュを付けないと動かなくなるため。枠内表示の禁止は X-Frame-Options が全ページに掛かる。
+   一覧ページのCSPは別途対応する。 */
+const headerLines = [
+  '# scripts/build.mjs が生成する。直接編集しても次のビルドで消える',
+  '',
+  '/*',
+  '  X-Frame-Options: DENY',
+  '  X-Content-Type-Options: nosniff',
+  '  Referrer-Policy: strict-origin-when-cross-origin',
+  '  Cross-Origin-Opener-Policy: same-origin',
+  '  Permissions-Policy: geolocation=(self), camera=(), microphone=(), payment=(), usb=()',
+  ''
+];
+
+// パス末尾のアスタリスクは空文字にも当たるので、この1本でアプリの正式なURL
+// （/day-010-wikipedia-live/）と配下のファイルの両方に掛かる。
+// wrangler pages dev で実測して確認済み（末尾なしのパスも併記するとCSPが二重に付く）。
+for (const app of apps.filter((a) => a.published)) {
+  headerLines.push(`/${app.dir}/*`, `  Content-Security-Policy: ${appCsp(app.dir)}`, '');
+}
+writeFileSync(join(distDir, '_headers'), headerLines.join('\n'));
+
 // ---------------------------------------------------------------- 集計（すべて meta.json の実値から）
 
 const publishedCount = apps.filter((a) => a.published).length;
@@ -462,6 +528,7 @@ img{max-width:100%;}
 .footer__links{display:flex;gap:20px;font-size:.8125rem;}
 .footer__links a{color:var(--muted);text-decoration:none;}
 .footer__links a:hover{color:var(--accent);}
+.footer__note{flex-basis:100%;margin:0;font-size:.75rem;line-height:1.7;color:var(--muted);}
 
 @media(prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;
@@ -523,6 +590,9 @@ ${cards}
       <a href="${SITE.repoUrl}" target="_blank" rel="noopener">GitHub</a>
       <a href="${SITE.xUrl}" target="_blank" rel="noopener">X ${esc(SITE.xHandle)}</a>
     </span>
+    ${SITE.analyticsId
+      ? '<p class="footer__note">このトップページだけ、Googleアナリティクスでアクセス数を見ています（閲覧者を特定する設定は使っていません）。各アプリのページには計測を入れていないので、アプリ内での操作は誰にも送られません。</p>'
+      : ''}
   </footer>
 </main>
 

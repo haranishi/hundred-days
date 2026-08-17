@@ -119,6 +119,9 @@ test.describe('Day 009 akita bus 3d', () => {
 
   test('Given any screen, when tap targets are measured, then buttons share one minimum height', async ({ page }) => {
     await openAt(page, SERVICE_HOURS, RUNNING);
+    // 「すべて見る」は台数が届いてから出る。待たずに測ると、応答が少し遅いサーバーでは
+    // 3個しか数えられずに落ちる（静的サーバーが速いので手元では見えなかった）
+    await expect(page.locator('#bus-list-toggle')).toBeVisible();
 
     for (const width of [390, 1440]) {
       await page.setViewportSize({ width, height: 900 });
