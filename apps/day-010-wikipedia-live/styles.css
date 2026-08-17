@@ -163,22 +163,23 @@ a:focus-visible {
   align-items: start;
 }
 
-.water {
+.map {
   position: relative;
-  height: clamp(340px, 56vh, 560px);
+  height: clamp(320px, 58vh, 600px);
   border: 1px solid var(--line);
   border-radius: var(--radius);
   overflow: hidden;
-  background: linear-gradient(180deg, #0b131d 0%, #0a1017 71%, #0d1926 73%, #12243a 100%);
+  /* 海。陸はキャンバス側で描く */
+  background: #08111c;
 }
 
-#water {
+#map {
   display: block;
   width: 100%;
   height: 100%;
 }
 
-.water__key {
+.map__key {
   position: absolute;
   left: 12px;
   bottom: 10px;
@@ -202,7 +203,7 @@ a:focus-visible {
 }
 
 .dot--other {
-  background: var(--other);
+  background: var(--down);
 }
 
 .dot--other {
@@ -254,6 +255,52 @@ a:focus-visible {
 .count__sub b {
   color: var(--ja);
   font-variant-numeric: tabular-nums;
+}
+
+/* ---------------------------------------------------------------- いちばん書き換わっている場所 */
+
+.hot {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+  padding: 16px;
+}
+
+.hot__label {
+  margin: 0;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.hot__name {
+  margin: 2px 0 2px;
+  font-size: clamp(1.5rem, 5vw, 1.9rem);
+  font-weight: 700;
+  line-height: 1.25;
+  color: var(--ja);
+}
+
+.hot__detail {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.hot__note {
+  margin: 8px 0 0;
+  padding-top: 8px;
+  border-top: 1px solid var(--line);
+  font-size: 0.78rem;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.hot__note b {
+  color: var(--text-2);
+  font-variant-numeric: tabular-nums;
+  padding: 0 2px;
 }
 
 /* ---------------------------------------------------------------- 一覧 */
@@ -401,8 +448,8 @@ a:focus-visible {
     grid-template-columns: minmax(0, 1fr);
   }
 
-  .water {
-    height: clamp(300px, 42vh, 420px);
+  .map {
+    height: clamp(260px, 38vh, 380px);
   }
 
   .head__controls {
