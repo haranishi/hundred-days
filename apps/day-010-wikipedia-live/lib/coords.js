@@ -19,7 +19,22 @@ export const MEMORY_MAX = 3000;
 export const TOP_WIKIS = 6;
 export const ALWAYS = ['jawiki'];
 
+/* 問い合わせ先はウィキメディアのドメインだけに限る。
+
+   ホスト名はストリームが送ってきた server_name をそのまま使っている。つまり上流が嘘をつけば、
+   閲覧者のブラウザが任意のホストへ問い合わせに行く。記事へのリンク（title_url）は events.js で
+   https かどうかを確かめているのに、ここだけ素通しだったので揃える。
+
+   サブドメインは1つ以上を必須にしている（`ja.wikipedia.org` は通り、`wikipedia.org.example.com`
+   は末尾一致しないので通らない）。CSPの connect-src もこの一覧と対応させること（scripts/build.mjs）。 */
+const WIKIMEDIA_HOST =
+  /^(?:[a-z0-9-]+\.)+(?:wikipedia|wikibooks|wikinews|wikiquote|wikisource|wikiversity|wikivoyage|wiktionary|wikimedia|wikidata|wikifunctions|mediawiki)\.org$/;
+
+export const isWikimediaHost = (host) => typeof host === 'string' && WIKIMEDIA_HOST.test(host);
+
 export function apiUrl(host, titles) {
+  // 待ち行列に積む時点（push）でも弾いているが、URLを組む所でも確かめる。ここが最後の砦
+  if (!isWikimediaHost(host)) throw new Error(`問い合わせ先として許していないホスト: ${host}`);
   const query = new URLSearchParams({
     action: 'query',
     prop: 'coordinates',
@@ -62,6 +77,8 @@ export function createLookup({ fetchJson, onFound, now = () => Date.now() }) {
   /** 編集を1件受け取る。聞く価値があるものだけ待ち行列に積む。 */
   function push(event) {
     if (!event || !event.title || !event.host || !event.wiki) return false;
+    // 許していないホストは待ち行列にも積まない（言語版の順位付けにも数えない）
+    if (!isWikimediaHost(event.host)) return false;
     seenWikis.set(event.wiki, (seenWikis.get(event.wiki) || 0) + 1);
 
     const key = `${event.wiki}:${event.title}`;

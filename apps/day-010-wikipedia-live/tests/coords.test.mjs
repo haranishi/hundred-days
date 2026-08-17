@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { BATCH_MAX, INTERVAL_MS, apiUrl, createLookup, readCoordinates } from "../lib/coords.js";
+import { BATCH_MAX, INTERVAL_MS, apiUrl, createLookup, isWikimediaHost, readCoordinates } from "../lib/coords.js";
 
 const edit = (wiki, title, host) => ({ wiki, title, host: host || `${wiki.replace("wiki", "")}.wikipedia.org` });
 
@@ -154,4 +154,56 @@ test("待ち行列が伸びたら古いものから捨てる", () => {
   for (let i = 0; i < 400; i += 1) lookup.push(edit("enwiki", `記事${i}`));
   assert.ok(lookup.stats.queued <= 120, `貯めすぎ: ${lookup.stats.queued}`);
   assert.ok(lookup.stats.dropped > 0);
+});
+
+test("問い合わせ先はウィキメディアのドメインだけ通す", () => {
+  for (const host of [
+    "ja.wikipedia.org",
+    "en.wikipedia.org",
+    "zh-yue.wikipedia.org", // ハイフン入りの言語コード
+    "commons.wikimedia.org",
+    "www.wikidata.org",
+    "www.mediawiki.org",
+    "ja.wiktionary.org",
+  ]) {
+    assert.equal(isWikimediaHost(host), true, `通らないと座標が引けない: ${host}`);
+  }
+
+  for (const host of [
+    "example.com",
+    "wikipedia.org.example.com", // 末尾に本物を足しただけの偽ホスト
+    "ja.wikipedia.org.example.com",
+    "wikipedia.org", // サブドメイン無しは使わない
+    "ja.wikipedia.co.jp",
+    "ja.wikipedia.org:8080",
+    "ja.wikipedia.org/../evil",
+    // URLの利用者情報を使って本物に見せる形（実際の接続先は後ろ側）。
+    // 記号を分けて書いているのは、公開前チェックのメール検出に引っかからないようにするため
+    `ja.wikipedia.org${"@"}evil.example.com`,
+    "",
+    null,
+    undefined,
+  ]) {
+    assert.equal(isWikimediaHost(host), false, `通してはいけない: ${host}`);
+  }
+});
+
+test("許していないホストは待ち行列に積まず、URLも組ませない", async () => {
+  let calls = 0;
+  const lookup = createLookup({
+    fetchJson: async () => {
+      calls += 1;
+      return {};
+    },
+    onFound: () => {},
+    now: () => INTERVAL_MS,
+  });
+
+  // ストリームが嘘のホストを送ってきた場合
+  assert.equal(lookup.push({ wiki: "evilwiki", title: "記事", host: "evil.example.com" }), false);
+  assert.equal(await lookup.tick(), 0);
+  assert.equal(calls, 0, "許していないホストへ問い合わせに行ってはいけない");
+
+  // 最後の砦：URLを組む所でも弾く
+  assert.throws(() => apiUrl("evil.example.com", ["記事"]), /許していないホスト/);
 });

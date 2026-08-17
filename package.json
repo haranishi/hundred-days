@@ -6,6 +6,7 @@
   "scripts": {
     "build": "node scripts/sync-shared.mjs --check && node scripts/build.mjs",
     "precheck": "node scripts/precheck.mjs",
+    "test:unit": "node --test apps/*/tests/",
     "test:e2e": "playwright test",
     "x:prepare": "node scripts/prepare-x-post.mjs",
     "shared:sync": "node scripts/sync-shared.mjs"
