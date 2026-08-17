@@ -6,19 +6,19 @@
     <title>いま、誰かが書き直している | 100日チャレンジ Day 010</title>
     <meta
       name="description"
-      content="世界中のウィキペディアで、いまこの瞬間に行われている編集が届きます。日本語版の編集は記事名まで読めます。"
+      content="世界中のウィキペディアで、いまこの瞬間に書き換えられている記事の場所が world map に立ちます。いちばん書き換わっている国も出ます。"
     />
     <link rel="stylesheet" href="./styles.css" />
-    <link rel="stylesheet" href="./shared/share.css">
-  <script src="./shared/share.js" defer></script>
-</head>
+    <link rel="stylesheet" href="./shared/share.css" />
+    <script src="./shared/share.js" defer></script>
+  </head>
   <body>
     <main class="page">
       <header class="head">
         <div class="head__text">
           <h1>いま、誰かが書き直している</h1>
           <p class="lede">
-            世界中のウィキペディアで、いまこの瞬間に行われている編集です。粒がひとつ落ちるたびに、どこかの記事が書き換わっています。
+            世界中のウィキペディアで、いまこの瞬間に書き換えられている記事の<strong>場所</strong>です。ピンがひとつ光るたびに、その土地について書かれた記事が更新されています。
           </p>
         </div>
         <div class="head__controls">
@@ -31,9 +31,9 @@
       </header>
 
       <div class="stage">
-        <div class="water">
-          <canvas id="water" aria-hidden="true"></canvas>
-          <p class="water__key" aria-hidden="true">
+        <div class="map">
+          <canvas id="map" aria-hidden="true"></canvas>
+          <p class="map__key" aria-hidden="true">
             <span class="dot dot--ja"></span>日本語版
             <span class="dot dot--other"></span>その他の言語
           </p>
@@ -49,10 +49,19 @@
             </p>
           </section>
 
+          <section class="hot" aria-labelledby="hot-label">
+            <h2 class="hot__label" id="hot-label">いま、いちばん書き換わっている場所</h2>
+            <p class="hot__name" id="hot-name">まだ分かりません</p>
+            <p class="hot__detail" id="hot-detail">場所のわかる編集が届くと出ます</p>
+            <p class="hot__note">
+              地図に立つのは<b id="pin-count">0</b>件。場所を持たない記事の編集<b id="no-place-count">0</b>件は地図に出せません。
+            </p>
+          </section>
+
           <section class="feed" aria-labelledby="feed-label">
             <h2 class="feed__label" id="feed-label">日本語版で、いま直された記事</h2>
             <ul class="feed__list" id="feed-list"></ul>
-            <p class="feed__empty" id="feed-empty">日本語版の編集を待っています。だいたい5秒に1件です。</p>
+            <p class="feed__empty" id="feed-empty">日本語版の編集を待っています。だいたい5〜6秒に1件です。</p>
             <p class="feed__note" id="feed-note">新しい10件だけ残します。読みたいときは一時停止してください。</p>
           </section>
         </div>
@@ -62,17 +71,22 @@
 
       <footer class="foot">
         <p>
-          データ: <a href="https://stream.wikimedia.org/?doc" target="_blank" rel="noopener noreferrer">Wikimedia EventStreams</a>
-          の公開ストリームにブラウザから直接つないでいます。記事名と編集要約はウィキペディアの内容なので
-          <a href="https://creativecommons.org/licenses/by-sa/4.0/deed.ja" target="_blank" rel="noopener noreferrer">CC BY-SA 4.0</a> です。
+          <b>これは「編集した人の場所」ではありません。</b>地図に立つのは、書き換えられた
+          <b>記事そのものが持つ座標</b>です。「東京駅」が編集されれば東京に立ち、「カレーライス」は座標を持たないので立ちません。編集した人がどこにいるかは、このアプリでは分かりませんし、調べてもいません。
         </p>
         <p>
-          <b>利用者名は表示しません。</b>このストリームは匿名編集者のIPアドレスをそのまま流すので、受け取った時点で捨てています。編集要約に混ざったIPアドレスと利用者ページへのリンクも伏せ字（●●●）にしています。表示するのは「人間かボットか」だけです。
+          <b>利用者名は表示しません。</b>ストリームは匿名編集者のIPアドレスをそのまま流すので、受け取った時点で捨てています。編集要約に混ざったIPアドレスと利用者ページへのリンクも伏せ字（●●●）にしています。表示するのは「人間かボットか」だけです。
+        </p>
+        <p>
+          データ: <a href="https://stream.wikimedia.org/?doc" target="_blank" rel="noopener noreferrer">Wikimedia EventStreams</a>
+          と各ウィキペディアの座標API。記事名と編集要約はウィキペディアの内容なので
+          <a href="https://creativecommons.org/licenses/by-sa/4.0/deed.ja" target="_blank" rel="noopener noreferrer">CC BY-SA 4.0</a> です。地図の形は
+          Natural Earth（パブリックドメイン）を間引いて同梱しています。
         </p>
         <p>
           数えているのは編集と新規作成だけで、カテゴリ追加やログ操作は数えません。編集の本文そのものは取得していません。先に同じ発想で作られた
           <a href="https://listen.hatnote.com/" target="_blank" rel="noopener noreferrer">Listen to Wikipedia</a>
-          があります。あちらは世界の編集を音にする作品で、こちらは日本語版だけを読める形にしたものです。
+          があります。あちらは世界の編集を音にする作品です。
         </p>
         <p class="foot__nav">
           <a href="../">100日チャレンジの一覧へ</a>

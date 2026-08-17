@@ -42,6 +42,7 @@ async function openLive(page) {
   const base = await ensureServer();
   await page.goto(base, { waitUntil: "load" });
   await page.waitForSelector('#link-state[data-state="live"]', { timeout: 15_000 });
+  await page.waitForFunction(() => window.__day010?.stats.countries > 0, null, { timeout: 15_000 });
 }
 
 export async function shotSetup(page) {
@@ -106,21 +107,22 @@ function watchJaEdits(page) {
 export default async function (page, h) {
   await openLive(page);
   const stopWatching = watchJaEdits(page);
-  // 数字が増えていくところと、粒が水面に落ちるところ
-  await h.pause(3_500);
+  // 地図にピンが立ち始めるところを見せる（座標の問い合わせは2.5秒ごとなので少し待つ）
+  await page.waitForFunction(() => window.__day010.stats.marks >= 3, null, { timeout: 14_000 }).catch(() => {});
+  await h.pause(2_400);
   /* 一覧へ下りる前に、読ませるカードを2件そろえる。1件だけの状態で下りると
      「日本語版が読める」という主張が1件の例で終わってしまう（17秒で1件しか来ない回がある）。 */
   await page
     .waitForFunction(() => document.querySelectorAll(".edit").length >= 2, null, { timeout: 12_000 })
     .catch(() => {});
   await h.scrollTo("#feed-list", 800);
-  await h.pause(3_200);
+  await h.pause(2_800);
   // 一時停止で読める状態にする（このアプリで唯一の「操作」）
   await page.click("#pause-toggle");
-  await h.pause(2_200);
+  await h.pause(1_800);
   await page.click("#pause-toggle");
-  await h.pause(1_200);
+  await h.pause(1_000);
   await h.scrollTop(800);
-  await h.pause(2_400);
+  await h.pause(2_000);
   await stopWatching();
 }

@@ -1,45 +1,73 @@
 import { STREAM_URL, createSeen, isReadable, normalize, shorten } from './lib/events.js';
 import { createRate } from './lib/rate.js';
-import { createDrop, createRipple, createSink, stepDrops, stepRipples, stepSinks } from './lib/particles.js';
+import { createLookup } from './lib/coords.js';
+import { createHotspot } from './lib/hotspot.js';
+import { BOUNDS, countryAt, inBounds, project } from './lib/geo.js';
+import { createMark, createRipple, stepMarks, stepRipples } from './lib/particles.js';
 import { toneFor } from './lib/sound.js';
 
 const FEED_MAX = 10;
-const DROP_MAX = 300;
-const WATER_RATIO = 0.72; // styles.css の水面グラデーション（71〜73%）と合わせる
+const MARK_MAX = 900;
 
 const el = (id) => document.getElementById(id);
 const nodes = {
-  canvas: el('water'),
+  canvas: el('map'),
   linkState: el('link-state'),
   sound: el('sound-toggle'),
   pause: el('pause-toggle'),
   world: el('world-count'),
   ja: el('ja-count'),
   rate: el('rate'),
+  pins: el('pin-count'),
+  noPlace: el('no-place-count'),
+  hotName: el('hot-name'),
+  hotDetail: el('hot-detail'),
   list: el('feed-list'),
   empty: el('feed-empty'),
-  live: el('live-region'),
+  live: el('live-region')
 };
 
 const context = nodes.canvas.getContext('2d');
 const calm = window.matchMedia('(prefers-reduced-motion: reduce)');
 const seen = createSeen();
 const rate = createRate();
+const hotspot = createHotspot();
 
 const state = {
   world: 0,
   ja: 0,
+  pins: 0,
+  noPlace: 0,
   paused: false,
   sound: false,
-  link: 'connecting',
+  link: 'connecting'
 };
 
-let drops = [];
+let countries = [];
 let ripples = [];
-let sinks = [];
-let size = { width: 0, height: 0, waterY: 0, scale: 1 };
+let marks = [];
+let size = { width: 0, height: 0, scale: 1 };
 let frameId = 0;
 let audio = null;
+
+// ---------------------------------------------------------------- 座標の問い合わせ
+
+/* 座標が返ってくるのは問い合わせたあとなので、届いた編集の増減バイトを覚えておいて、
+   返事が来たときに点の大きさへ渡す。覚えておく数には上限をつける */
+const pendingDelta = new Map();
+const rememberDelta = (event) => {
+  pendingDelta.set(`${event.wiki}:${event.title}`, event.delta);
+  if (pendingDelta.size > 2000) pendingDelta.delete(pendingDelta.keys().next().value);
+};
+
+const lookup = createLookup({
+  fetchJson: async (url) => {
+    const response = await fetch(url);
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    return response.json();
+  },
+  onFound: (spot) => pin(spot)
+});
 
 // ---------------------------------------------------------------- 数字
 
@@ -48,13 +76,172 @@ const formatCount = (value) => value.toLocaleString('ja-JP');
 function renderCounts() {
   nodes.world.textContent = formatCount(state.world);
   nodes.ja.textContent = formatCount(state.ja);
+  nodes.pins.textContent = formatCount(state.pins);
+  nodes.noPlace.textContent = formatCount(state.noPlace);
   const perSecond = rate.perSecond(Date.now());
   nodes.rate.textContent = perSecond === null ? '—' : perSecond.toFixed(1);
 }
 
+function renderHotspot() {
+  const top = hotspot.top(Date.now());
+  if (!top) {
+    nodes.hotName.textContent = 'まだ分かりません';
+    nodes.hotDetail.textContent = '場所のわかる編集が届くと出ます';
+    return;
+  }
+  nodes.hotName.textContent = top.name;
+  nodes.hotDetail.textContent = `直近5分で${formatCount(top.count)}件（${formatCount(top.total)}件中・${formatCount(top.countries)}か国）`;
+}
+
 function announce() {
   if (!state.world) return;
-  nodes.live.textContent = `開いてから世界で${formatCount(state.world)}回、日本語版で${formatCount(state.ja)}回の編集がありました。`;
+  const top = hotspot.top(Date.now());
+  nodes.live.textContent =
+    `開いてから世界で${formatCount(state.world)}回、日本語版で${formatCount(state.ja)}回の編集がありました。` +
+    (top ? `いちばん書き換わっている場所は${top.name}です。` : '');
+}
+
+// ---------------------------------------------------------------- 地図
+
+function resize() {
+  const rect = nodes.canvas.getBoundingClientRect();
+  const ratio = Math.min(window.devicePixelRatio || 1, 2);
+
+  /* 経度360度・緯度142度をそのまま枠いっぱいに引き伸ばすと、南米やアフリカが縦長になる。
+     縦横の比を保った矩形を枠の中に置き、余りは上下（または左右）の余白にする */
+  const aspect = (BOUNDS.east - BOUNDS.west) / (BOUNDS.north - BOUNDS.south);
+  let viewWidth = rect.width;
+  let viewHeight = viewWidth / aspect;
+  if (viewHeight > rect.height) {
+    viewHeight = rect.height;
+    viewWidth = viewHeight * aspect;
+  }
+
+  size = {
+    width: rect.width,
+    height: rect.height,
+    scale: Math.max(0.55, Math.min(1, rect.width / 900)),
+    view: { x: (rect.width - viewWidth) / 2, y: (rect.height - viewHeight) / 2, w: viewWidth, h: viewHeight }
+  };
+  nodes.canvas.width = Math.max(1, Math.round(rect.width * ratio));
+  nodes.canvas.height = Math.max(1, Math.round(rect.height * ratio));
+  context.setTransform(ratio, 0, 0, ratio, 0, 0);
+  draw();
+}
+
+/** 緯度経度 → キャンバス上の座標（縦横比を保った矩形の中に置く）。 */
+function toScreen(lon, lat) {
+  const [x, y] = project(lon, lat, size.view.w, size.view.h);
+  return [x + size.view.x, y + size.view.y];
+}
+
+function drawWorld() {
+  /* 南極は画面に入れない緯度で切っているが、多角形そのものは枠の下へはみ出す。
+     切り口がそのまま見えると壊れて見えるので、枠の内側だけを描く */
+  context.save();
+  context.beginPath();
+  context.rect(size.view.x, size.view.y, size.view.w, size.view.h);
+  context.clip();
+
+  context.fillStyle = 'rgba(24, 36, 52, 0.95)';
+  context.strokeStyle = 'rgba(127, 147, 173, 0.45)';
+  context.lineWidth = 0.7;
+
+  for (const country of countries) {
+    for (const ring of country.r) {
+      context.beginPath();
+      let started = false;
+      for (const [lon, lat] of ring) {
+        const [x, y] = toScreen(lon, lat);
+        if (started) context.lineTo(x, y);
+        else {
+          context.moveTo(x, y);
+          started = true;
+        }
+      }
+      context.closePath();
+      context.fill();
+      context.stroke();
+    }
+  }
+
+  context.restore();
+}
+
+function draw() {
+  context.clearRect(0, 0, size.width, size.height);
+  drawWorld();
+
+  // 残っているしるし（集中している場所ほど重なって濃くなる）
+  for (const mark of marks) {
+    const [x, y] = toScreen(mark.lon, mark.lat);
+    context.fillStyle = mark.isJa
+      ? `rgba(111, 227, 196, ${mark.alpha * 0.95})`
+      : `rgba(242, 169, 106, ${mark.alpha * 0.85})`;
+    context.beginPath();
+    context.arc(x, y, mark.r * size.scale, 0, Math.PI * 2);
+    context.fill();
+  }
+
+  // 記事名は「いちばん新しい日本語版の波紋」1つだけ。全部に出すと重なって読めない
+  let newestJa = null;
+  for (const ripple of ripples) if (ripple.isJa && ripple.title) newestJa = ripple;
+
+  for (const ripple of ripples) {
+    const [x, y] = toScreen(ripple.lon, ripple.lat);
+    const radius = (ripple.radius ?? ripple.r) * size.scale;
+    const alpha = ripple.alpha ?? 1;
+    context.strokeStyle = ripple.isJa ? `rgba(111, 227, 196, ${alpha})` : `rgba(242, 169, 106, ${alpha * 0.85})`;
+    context.lineWidth = ripple.isJa ? 1.8 : 1.2;
+    context.beginPath();
+    context.arc(x, y, radius, 0, Math.PI * 2);
+    context.stroke();
+
+    if (ripple === newestJa) {
+      const label = shorten(ripple.title, 14);
+      context.font = `${size.width < 520 ? 12 : 15}px system-ui, sans-serif`;
+      context.textAlign = 'center';
+      // 地図の上に直接置くと陸の色と混ざるので、下敷きを引いてから書く
+      /* 広がりきった波紋の外側に置くと、記事名だけが遠くに浮いてどのピンの話か分からなくなる。
+         点のすぐ上に固定する */
+      const width = context.measureText(label).width;
+      const top = y - 26;
+      context.fillStyle = `rgba(10, 16, 23, ${alpha * 0.8})`;
+      context.fillRect(x - width / 2 - 5, top, width + 10, 18);
+      context.fillStyle = `rgba(234, 240, 247, ${Math.min(1, alpha * 1.3)})`;
+      context.fillText(label, x, top + 13);
+    }
+  }
+}
+
+let lastFrame = 0;
+function frame(now) {
+  const delta = lastFrame ? Math.min(64, now - lastFrame) : 16;
+  lastFrame = now;
+  ripples = stepRipples(ripples, delta);
+  marks = stepMarks(marks, delta);
+  draw();
+  frameId = requestAnimationFrame(frame);
+}
+
+/** 座標が取れた編集を地図に立てる。 */
+function pin(spot) {
+  if (state.paused) return;
+  state.pins += 1;
+  hotspot.add(countryAt(spot.lon, spot.lat, countries), Date.now());
+  renderCounts();
+  renderHotspot();
+
+  if (!inBounds(spot.lon, spot.lat, BOUNDS) || !size.width) return;
+  const isJa = spot.wiki === 'jawiki';
+  const key = `${spot.wiki}:${spot.title}`;
+  const delta = spot.delta ?? pendingDelta.get(key) ?? 0;
+  pendingDelta.delete(key);
+
+  marks.push(createMark({ lon: spot.lon, lat: spot.lat, delta, isJa }));
+  if (marks.length > MARK_MAX) marks.splice(0, marks.length - MARK_MAX);
+  if (!calm.matches) ripples.push(createRipple({ lon: spot.lon, lat: spot.lat, delta, isJa, title: spot.title }));
+  if (calm.matches) draw();
 }
 
 // ---------------------------------------------------------------- 一覧
@@ -68,7 +255,6 @@ function renderEdit(event) {
   const head = document.createElement('p');
   head.className = 'edit__head';
 
-  // 記事名から本物のウィキペディアへ飛べるようにする（これは本当のデータだ、と自分で確かめられる）
   const title = document.createElement(event.url ? 'a' : 'span');
   title.className = 'edit__title';
   title.textContent = event.title;
@@ -89,7 +275,6 @@ function renderEdit(event) {
   if (event.comment) {
     const comment = document.createElement('p');
     comment.className = 'edit__comment';
-    // 一覧の見た目が1件で崩れないよう、要約はカード2行ぶんで切る
     comment.textContent = shorten(event.comment, 60);
     item.append(comment);
   }
@@ -137,126 +322,6 @@ function play(delta) {
   oscillator.stop(now + seconds + 0.05);
 }
 
-// ---------------------------------------------------------------- 水面
-
-function resize() {
-  const rect = nodes.canvas.getBoundingClientRect();
-  const ratio = Math.min(window.devicePixelRatio || 1, 2);
-  size = {
-    width: rect.width,
-    height: rect.height,
-    waterY: rect.height * WATER_RATIO,
-    // 狭い画面では粒を小さくする。同じ半径のままだと、スマホでは風船のように見える
-    scale: Math.max(0.5, Math.min(1, rect.width / 900)),
-  };
-  nodes.canvas.width = Math.max(1, Math.round(rect.width * ratio));
-  nodes.canvas.height = Math.max(1, Math.round(rect.height * ratio));
-  context.setTransform(ratio, 0, 0, ratio, 0, 0);
-  if (calm.matches) draw();
-}
-
-function spawn(event) {
-  if (calm.matches || !size.width) return;
-  const margin = 24;
-  const x = margin + Math.random() * Math.max(1, size.width - margin * 2);
-  drops.push(
-    createDrop({
-      id: event.id,
-      x,
-      delta: event.delta,
-      isJa: event.isJa,
-      title: event.title,
-      // 日本語版は5〜6秒に1件しか来ない。ゆっくり落として、画面にいる時間を長くする
-      speed: event.isJa ? 130 + Math.random() * 60 : 230 + Math.random() * 150,
-    }),
-  );
-  if (drops.length > DROP_MAX) drops.splice(0, drops.length - DROP_MAX);
-}
-
-function drawWaterline() {
-  context.strokeStyle = 'rgba(111, 227, 196, 0.32)';
-  context.lineWidth = 1;
-  context.beginPath();
-  context.moveTo(0, size.waterY);
-  context.lineTo(size.width, size.waterY);
-  context.stroke();
-}
-
-function draw() {
-  context.clearRect(0, 0, size.width, size.height);
-  drawWaterline();
-
-  // 沈んでいく粒（水面下を空白にしないための余韻）
-  for (const sink of sinks) {
-    context.fillStyle = sink.isJa
-      ? `rgba(111, 227, 196, ${sink.alpha ?? 0.4})`
-      : `rgba(127, 147, 173, ${(sink.alpha ?? 0.4) * 0.8})`;
-    context.beginPath();
-    context.ellipse(sink.x, sink.y, (sink.radius ?? sink.r) * size.scale, (sink.radius ?? sink.r) * size.scale * 0.6, 0, 0, Math.PI * 2);
-    context.fill();
-  }
-
-  // 記事名は「いちばん新しい日本語版の波紋」1つだけに出す。
-  // 全部に出すと、近い場所に落ちた2件の文字が重なってどちらも読めなくなる
-  let newestJa = null;
-  for (const ripple of ripples) if (ripple.isJa && ripple.title) newestJa = ripple;
-
-  for (const ripple of ripples) {
-    const radius = (ripple.radius ?? ripple.r) * size.scale;
-    const alpha = ripple.alpha ?? 1;
-    context.strokeStyle = ripple.isJa
-      ? `rgba(111, 227, 196, ${alpha})`
-      : `rgba(127, 147, 173, ${alpha * 0.75})`;
-    context.lineWidth = ripple.isJa ? 1.8 : 1.2;
-    context.beginPath();
-    context.ellipse(ripple.x, ripple.y, radius, radius * 0.32, 0, 0, Math.PI * 2);
-    context.stroke();
-
-    if (ripple === newestJa) {
-      context.fillStyle = `rgba(234, 240, 247, ${Math.min(1, alpha * 1.3)})`;
-      context.font = `${size.width < 520 ? 13 : 17}px system-ui, sans-serif`;
-      context.textAlign = 'center';
-      context.fillText(shorten(ripple.title, 14), ripple.x, ripple.y - 14 - radius * 0.32);
-    }
-  }
-
-  for (const drop of drops) {
-    const radius = drop.r * size.scale;
-    // 縦にのばして雨粒の形にする（丸のままだと落ちている感じが出ない）
-    context.fillStyle = drop.isJa ? 'rgba(111, 227, 196, 0.95)' : 'rgba(127, 147, 173, 0.62)';
-    context.beginPath();
-    context.ellipse(drop.x, drop.y, radius, radius * 1.45, 0, 0, Math.PI * 2);
-    context.fill();
-
-    if (drop.isJa) {
-      // 日本語版はめったに落ちてこないので、落下中から光らせて見つけやすくする
-      context.strokeStyle = 'rgba(111, 227, 196, 0.28)';
-      context.lineWidth = 2;
-      context.beginPath();
-      context.ellipse(drop.x, drop.y, radius + 4, radius * 1.45 + 4, 0, 0, Math.PI * 2);
-      context.stroke();
-    }
-  }
-}
-
-let lastFrame = 0;
-function frame(now) {
-  const delta = lastFrame ? Math.min(64, now - lastFrame) : 16;
-  lastFrame = now;
-
-  const stepped = stepDrops(drops, delta, size.waterY);
-  drops = stepped.drops;
-  for (const landed of stepped.landed) {
-    ripples.push(createRipple(landed));
-    sinks.push(createSink(landed));
-  }
-  ripples = stepRipples(ripples, delta);
-  sinks = stepSinks(sinks, delta);
-
-  draw();
-  frameId = requestAnimationFrame(frame);
-}
-
 // ---------------------------------------------------------------- ストリーム
 
 function setLink(next) {
@@ -265,7 +330,7 @@ function setLink(next) {
     connecting: 'つないでいます',
     live: 'つながっています',
     reconnecting: 'つなぎ直しています',
-    error: 'つながりません',
+    error: 'つながりません'
   }[next];
   nodes.linkState.dataset.state = next;
   nodes.linkState.textContent = state.paused ? `${label}（一時停止中）` : label;
@@ -283,12 +348,16 @@ function receive(raw) {
 
   const event = normalize(parsed);
   if (!event) return;
-  // 再接続でストリームが同じイベントを送り直しても、数字を二重に増やさない
   if (!seen.accept(event.id)) return;
 
   state.world += 1;
   rate.push(Date.now());
-  spawn(event);
+
+  // 記事本体の編集だけが場所を持ちうる（ノートや利用者ページに座標は無い）
+  if (event.namespace === 0) {
+    rememberDelta(event);
+    lookup.push(event);
+  }
 
   if (isReadable(event)) {
     state.ja += 1;
@@ -301,14 +370,11 @@ function receive(raw) {
 
 function connect() {
   const stream = new EventSource(STREAM_URL);
-
   stream.addEventListener('open', () => setLink('live'));
   stream.addEventListener('message', (message) => receive(message.data));
   stream.addEventListener('error', () => {
-    // EventSource は自分で再接続する。閉じ切った時だけ「つながりません」にする
     setLink(stream.readyState === EventSource.CLOSED ? 'error' : 'reconnecting');
   });
-
   return stream;
 }
 
@@ -334,19 +400,54 @@ nodes.pause.addEventListener('click', () => {
 
 // ---------------------------------------------------------------- 起動
 
-resize();
-window.addEventListener('resize', resize);
+async function loadWorld() {
+  try {
+    const response = await fetch('./data/world.json');
+    const world = await response.json();
+    countries = Array.isArray(world.countries) ? world.countries : [];
+  } catch {
+    countries = [];
+  }
+  resize();
+}
+
 setLink('connecting');
 renderCounts();
+renderHotspot();
+resize();
+window.addEventListener('resize', resize);
+await loadWorld();
 connect();
 
 if (!calm.matches) frameId = requestAnimationFrame(frame);
 setInterval(renderCounts, 1000);
+setInterval(renderHotspot, 2000);
 setInterval(announce, 10_000);
+
+/* 座標の問い合わせ。間隔そのものは lib/coords.js が守るので、ここは声をかけるだけ。
+   「聞いたのに座標が無かった」件数＝地図に出せない編集として画面に出す */
+setInterval(async () => {
+  if (state.paused) return;
+  const before = lookup.stats.asked;
+  await lookup.tick();
+  if (lookup.stats.asked !== before) {
+    state.noPlace = Math.max(0, lookup.stats.asked - lookup.stats.found);
+    renderCounts();
+  }
+}, 500);
 
 // E2Eから中身を確かめるための覗き穴
 window.__day010 = {
   get stats() {
-    return { ...state, drops: drops.length, ripples: ripples.length, sinks: sinks.length, calm: calm.matches, frameId };
+    return {
+      ...state,
+      marks: marks.length,
+      ripples: ripples.length,
+      countries: countries.length,
+      lookup: lookup.stats,
+      calm: calm.matches,
+      frameId
+    };
   },
+  pin
 };
