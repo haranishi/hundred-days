@@ -1,0 +1,417 @@
+/* 夜の水面。増減の色は赤緑にせず、アクア（増）とアンバー（減）で分ける。 */
+
+:root {
+  --bg: #0a1017;
+  --surface: #141c27;
+  --surface-2: #1b2432;
+  --line: #2a3646;
+  --text: #eaf0f7;
+  --text-2: #c6d3e2;
+  --muted: #9fb0c4;
+  --ja: #6fe3c4;
+  --other: #7f93ad;
+  --down: #f2a96a;
+  --radius: 14px;
+  --font: system-ui, -apple-system, "Hiragino Sans", "Noto Sans JP", sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  line-height: 1.7;
+}
+
+a {
+  color: var(--ja);
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.page {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 24px 16px 48px;
+}
+
+/* ---------------------------------------------------------------- 見出し */
+
+.head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.head__text {
+  flex: 1 1 420px;
+}
+
+h1 {
+  margin: 0 0 6px;
+  font-size: clamp(1.5rem, 4.4vw, 2.1rem);
+  letter-spacing: 0.01em;
+}
+
+.lede {
+  margin: 0;
+  max-width: 46em;
+  color: var(--text-2);
+  font-size: 0.95rem;
+}
+
+.head__controls {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: flex-end;
+}
+
+.link-state {
+  margin: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.link-state::before {
+  content: "";
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--muted);
+}
+
+.link-state[data-state="live"] {
+  color: var(--ja);
+}
+
+.link-state[data-state="live"]::before {
+  background: var(--ja);
+}
+
+.link-state[data-state="reconnecting"],
+.link-state[data-state="error"] {
+  color: var(--down);
+}
+
+.link-state[data-state="reconnecting"]::before,
+.link-state[data-state="error"]::before {
+  background: var(--down);
+}
+
+.buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.ghost-button {
+  min-height: 44px;
+  min-width: 96px;
+  padding: 0 16px;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.ghost-button:hover {
+  background: var(--surface-2);
+}
+
+.ghost-button[aria-pressed="true"] {
+  border-color: var(--ja);
+  color: var(--ja);
+}
+
+.ghost-button:focus-visible,
+a:focus-visible {
+  outline: 2px solid var(--ja);
+  outline-offset: 2px;
+}
+
+/* ---------------------------------------------------------------- 本体 */
+
+.stage {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 360px;
+  gap: 16px;
+  /* stretch にすると、一覧のカードが長い要約で伸びたぶん水面も伸び、水面線が画面の外へ出る */
+  align-items: start;
+}
+
+.water {
+  position: relative;
+  height: clamp(340px, 56vh, 560px);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: linear-gradient(180deg, #0b131d 0%, #0a1017 71%, #0d1926 73%, #12243a 100%);
+}
+
+#water {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.water__key {
+  position: absolute;
+  left: 12px;
+  bottom: 10px;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+
+.dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.dot--ja {
+  background: var(--ja);
+}
+
+.dot--other {
+  background: var(--other);
+}
+
+.dot--other {
+  margin-left: 10px;
+}
+
+.rail {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+
+/* ---------------------------------------------------------------- 数字 */
+
+.count {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+  padding: 16px;
+}
+
+.count__label {
+  margin: 0;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.count__value {
+  margin: 4px 0 2px;
+  font-size: clamp(2.6rem, 9vw, 3.4rem);
+  font-weight: 700;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+  color: var(--text);
+}
+
+.count__sub {
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.count__sub b {
+  color: var(--ja);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------------------------------------------------------------- 一覧 */
+
+.feed {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  flex: 1 1 auto;
+}
+
+.feed__label {
+  margin: 0 0 10px;
+  font-size: 0.92rem;
+  color: var(--text-2);
+}
+
+.feed__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.edit {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface-2);
+  padding: 10px 12px;
+  animation: rise 260ms ease-out;
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.edit__head {
+  margin: 0;
+  display: flex;
+  gap: 10px;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.edit__title {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--text);
+  text-decoration: none;
+  border-bottom: 1px solid var(--line);
+  overflow-wrap: anywhere;
+}
+
+.edit__title:hover {
+  border-bottom-color: var(--ja);
+}
+
+.edit__delta {
+  flex: 0 0 auto;
+  font-size: 0.85rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--ja);
+}
+
+.edit__delta[data-dir="down"] {
+  color: var(--down);
+}
+
+.edit__comment {
+  margin: 4px 0 0;
+  font-size: 0.82rem;
+  color: var(--muted);
+  overflow-wrap: anywhere;
+}
+
+.edit__badges {
+  margin: 6px 0 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.badge {
+  font-size: 0.72rem;
+  padding: 1px 8px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  color: var(--muted);
+}
+
+.feed__empty,
+.feed__note {
+  margin: 10px 0 0;
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.feed__note {
+  margin-top: auto;
+  padding-top: 10px;
+}
+
+/* ---------------------------------------------------------------- 脚注 */
+
+.foot {
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.foot p {
+  margin: 0 0 8px;
+  max-width: 78ch;
+}
+
+.foot__nav {
+  margin-top: 12px;
+}
+
+.foot__nav a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+}
+
+/* ---------------------------------------------------------------- 画面が狭いとき */
+
+@media (max-width: 900px) {
+  .stage {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .water {
+    height: clamp(300px, 42vh, 420px);
+  }
+
+  .head__controls {
+    align-items: flex-start;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .edit {
+    animation: none;
+  }
+}

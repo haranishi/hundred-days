@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>いま、誰かが書き直している | 100日チャレンジ Day 010</title>
+    <meta
+      name="description"
+      content="世界中のウィキペディアで、いまこの瞬間に行われている編集が届きます。日本語版の編集は記事名まで読めます。"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="page">
+      <header class="head">
+        <div class="head__text">
+          <h1>いま、誰かが書き直している</h1>
+          <p class="lede">
+            世界中のウィキペディアで、いまこの瞬間に行われている編集です。粒がひとつ落ちるたびに、どこかの記事が書き換わっています。
+          </p>
+        </div>
+        <div class="head__controls">
+          <p class="link-state" id="link-state" data-state="connecting">つないでいます</p>
+          <div class="buttons">
+            <button type="button" class="ghost-button" id="sound-toggle" aria-pressed="false">音を出す</button>
+            <button type="button" class="ghost-button" id="pause-toggle" aria-pressed="false">一時停止</button>
+          </div>
+        </div>
+      </header>
+
+      <div class="stage">
+        <div class="water">
+          <canvas id="water" aria-hidden="true"></canvas>
+          <p class="water__key" aria-hidden="true">
+            <span class="dot dot--ja"></span>日本語版
+            <span class="dot dot--other"></span>その他の言語
+          </p>
+        </div>
+
+        <div class="rail">
+          <section class="count" aria-labelledby="count-label">
+            <h2 class="count__label" id="count-label">このページを開いてから<br />世界のウィキペディアが書き換わった回数</h2>
+            <p class="count__value" id="world-count">0</p>
+            <p class="count__sub">
+              <span>うち日本語版 <b id="ja-count">0</b> 回</span>
+              <span>いま毎秒 <b id="rate">—</b> 回</span>
+            </p>
+          </section>
+
+          <section class="feed" aria-labelledby="feed-label">
+            <h2 class="feed__label" id="feed-label">日本語版で、いま直された記事</h2>
+            <ul class="feed__list" id="feed-list"></ul>
+            <p class="feed__empty" id="feed-empty">日本語版の編集を待っています。だいたい5秒に1件です。</p>
+            <p class="feed__note" id="feed-note">新しい10件だけ残します。読みたいときは一時停止してください。</p>
+          </section>
+        </div>
+      </div>
+
+      <p class="sr-only" id="live-region" role="status" aria-live="polite"></p>
+
+      <footer class="foot">
+        <p>
+          データ: <a href="https://stream.wikimedia.org/?doc" target="_blank" rel="noopener noreferrer">Wikimedia EventStreams</a>
+          の公開ストリームにブラウザから直接つないでいます。記事名と編集要約はウィキペディアの内容なので
+          <a href="https://creativecommons.org/licenses/by-sa/4.0/deed.ja" target="_blank" rel="noopener noreferrer">CC BY-SA 4.0</a> です。
+        </p>
+        <p>
+          <b>利用者名は表示しません。</b>このストリームは匿名編集者のIPアドレスをそのまま流すので、受け取った時点で捨てています。編集要約に混ざったIPアドレスと利用者ページへのリンクも伏せ字（●●●）にしています。表示するのは「人間かボットか」だけです。
+        </p>
+        <p>
+          数えているのは編集と新規作成だけで、カテゴリ追加やログ操作は数えません。編集の本文そのものは取得していません。先に同じ発想で作られた
+          <a href="https://listen.hatnote.com/" target="_blank" rel="noopener noreferrer">Listen to Wikipedia</a>
+          があります。あちらは世界の編集を音にする作品で、こちらは日本語版だけを読める形にしたものです。
+        </p>
+        <p class="foot__nav">
+          <a href="../">100日チャレンジの一覧へ</a>
+        </p>
+      </footer>
+    </main>
+    <script type="module" src="./app.js"></script>
+  </body>
+</html>
