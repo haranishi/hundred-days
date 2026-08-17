@@ -137,6 +137,43 @@ const duration = (min) => {
   if (h) return `${h}時間`;
   return `${m}分`;
 };
+// ---------------------------------------------------------------- 各アプリのOGP・canonical
+/* SNSでリンクを貼ったときに、タイトル・説明・スクリーンショットが出るようにする。
+   共有機能（shared/share.js）が公開URLを知るための <link rel="canonical"> もここで入れる。
+   10個のHTMLへ手で書くと必ずどれかが古くなるので、meta.json を出どころにして dist へ差し込む。
+   アプリ側が自分でog:タグを書いている場合は、そちらを優先して上書きしない。 */
+function injectAppMeta(app) {
+  const file = join(distDir, app.dir, 'index.html');
+  if (!existsSync(file)) return false;
+  const html = readFileSync(file, 'utf8');
+  if (!html.includes('</head>')) return false;
+
+  const pageUrl = `${SITE.origin}/${app.dir}/`;
+  const image = app.hasShot ? `${SITE.origin}/${app.dir}/${app.shot}` : `${SITE.origin}/assets/og.png`;
+  const description = app.description || SITE.description;
+
+  const wanted = [
+    ['rel="canonical"', `<link rel="canonical" href="${pageUrl}">`],
+    ['property="og:title"', `<meta property="og:title" content="${esc(app.title)}">`],
+    ['property="og:description"', `<meta property="og:description" content="${esc(description)}">`],
+    ['property="og:image"', `<meta property="og:image" content="${image}">`],
+    ['property="og:url"', `<meta property="og:url" content="${pageUrl}">`],
+    ['property="og:type"', '<meta property="og:type" content="website">'],
+    ['property="og:site_name"', `<meta property="og:site_name" content="${esc(SITE.title)}">`],
+    ['name="twitter:card"', '<meta name="twitter:card" content="summary_large_image">'],
+    ['name="twitter:title"', `<meta name="twitter:title" content="${esc(app.title)}">`],
+    ['name="twitter:description"', `<meta name="twitter:description" content="${esc(description)}">`],
+    ['name="twitter:image"', `<meta name="twitter:image" content="${image}">`]
+  ];
+
+  const add = wanted.filter(([probe]) => !html.includes(probe)).map(([, tag]) => tag);
+  if (!add.length) return false;
+  writeFileSync(file, html.replace('</head>', `${add.map((tag) => `  ${tag}`).join('\n')}\n</head>`));
+  return true;
+}
+
+const metaInjected = apps.filter((app) => app.published).filter(injectAppMeta).length;
+
 // 統計ストリップ用：数値は大きく、単位は小さく
 const statValue = (min) => {
   const h = Math.floor(min / 60);
@@ -629,7 +666,7 @@ ${cards}
 writeFileSync(join(distDir, 'index.html'), html);
 console.log(
   `build: ${apps.length} day(s) / 公開 ${publishedCount} / スクショ ${apps.filter((a) => a.hasShot).length}` +
-    ` / 動画 ${apps.filter((a) => a.hasDemo).length} -> dist/` +
+    ` / 動画 ${apps.filter((a) => a.hasDemo).length} / OGP付与 ${metaInjected} -> dist/` +
     // 除外したものは必ず名前を出す（黙って落とすと「全部載っている」と誤解する）
     (drafts.length ? `\n  draft のため一覧から除外: ${drafts.map((d) => d.dir).join(', ')}` : '')
 );

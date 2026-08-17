@@ -4,10 +4,11 @@
   "private": true,
   "description": "1日1個Webアプリを作って公開する100日チャレンジ",
   "scripts": {
-    "build": "node scripts/build.mjs",
+    "build": "node scripts/sync-shared.mjs --check && node scripts/build.mjs",
     "precheck": "node scripts/precheck.mjs",
     "test:e2e": "playwright test",
-    "x:prepare": "node scripts/prepare-x-post.mjs"
+    "x:prepare": "node scripts/prepare-x-post.mjs",
+    "shared:sync": "node scripts/sync-shared.mjs"
   },
   "devDependencies": {
     "@playwright/test": "1.62.1"
