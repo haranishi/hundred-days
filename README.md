@@ -17,6 +17,8 @@ AIと一緒に作りながら、「AIに任せたこと」と「自分で考え�
 | 006 | [構造化データ、いま出るやつだけ](apps/day-006-schema-jsonld/) | https://hundred-days.pages.dev/day-006-schema-jsonld/ |
 | 007 | [ひといきピアノ](apps/day-007-web-piano/) | https://hundred-days.pages.dev/day-007-web-piano/ |
 | 008 | [じはんきレーダー](apps/day-008-vending-radar/) | https://hundred-days.pages.dev/day-008-vending-radar/ |
+| 009 | [秋田バスライブ](apps/day-009-akita-bus-3d/) | https://hundred-days.pages.dev/day-009-akita-bus-3d/ |
+| 010 | [いま、誰かが書き直している](apps/day-010-wikipedia-live/) | https://hundred-days.pages.dev/day-010-wikipedia-live/ |
 
 ## 1日アプリのルール
 
