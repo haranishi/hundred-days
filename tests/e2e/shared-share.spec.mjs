@@ -61,6 +61,60 @@ for (const { dir, meta } of published) {
       await expect(share.locator('.share__note')).toContainText('YouTube');
     });
 
+    test('ボタンが枠で見分けられる（地色に対して3:1以上）', async ({ page }) => {
+      await page.goto(`/${dir}/`);
+
+      /* 枠は currentColor から作った半透明なので、指定値だけ読んでも見え方は分からない。
+         地色に混ぜてから測る（文字側で opacity を見ていなかったのと同じ穴を、枠でも作らない）。 */
+      const measured = await page.locator('.share__button').evaluateAll((nodes) => {
+        const parse = (value) => {
+          const numbers = (value.match(/[\d.]+/g) ?? []).map(Number);
+          /* color-mix() の計算結果は Chromium では color(srgb 0.93 0.94 0.96 / 0.75) の形で返り、
+             各成分が0〜1になる。rgb() と同じ読み方をすると、どんな色もほぼ黒として測ってしまう。 */
+          const scale = value.startsWith('color(') ? 255 : 1;
+          return { rgb: numbers.slice(0, 3).map((one) => one * scale), alpha: numbers.length > 3 ? numbers[3] : 1 };
+        };
+        const channel = (value) => {
+          const scaled = value / 255;
+          return scaled <= 0.03928 ? scaled / 12.92 : ((scaled + 0.055) / 1.055) ** 2.4;
+        };
+        const luminance = (rgb) => 0.2126 * channel(rgb[0]) + 0.7152 * channel(rgb[1]) + 0.0722 * channel(rgb[2]);
+        const ratio = (one, other) => (Math.max(one, other) + 0.05) / (Math.min(one, other) + 0.05);
+
+        /* 背景を持ついちばん近い先祖まで遡る。グラデーションで塗っているアプリ（Day009）は
+           backgroundColor が透明のままなので、そこで止めると「白の上」として測ってしまう。
+           その場合は色の停止点を全部拾い、いちばん条件の悪いところで判定する。 */
+        const groundsOf = (node) => {
+          let behind = node.parentElement;
+          while (behind) {
+            const style = getComputedStyle(behind);
+            const back = parse(style.backgroundColor);
+            if (back.alpha > 0) return [back.rgb];
+            if (style.backgroundImage !== 'none') {
+              const stops = style.backgroundImage.match(/rgba?\([^)]*\)|color\(srgb[^)]*\)/g);
+              if (stops?.length) return stops.map((one) => parse(one).rgb);
+            }
+            behind = behind.parentElement;
+          }
+          return [[255, 255, 255]];
+        };
+
+        /* 見るのは「枠と地色」。枠と面の比は見ない——塗りのあるボタン（--primary）は
+           面そのものが地色との境目になるので、そこまで求めると塗りを濃くできなくなる。 */
+        return nodes.map((node) => {
+          const edge = parse(getComputedStyle(node).borderTopColor);
+          const scores = groundsOf(node).map((ground) => {
+            const border = edge.rgb.map((value, index) => edge.alpha * value + (1 - edge.alpha) * ground[index]);
+            return ratio(luminance(border), luminance(ground));
+          });
+          return { name: node.textContent.trim(), ratio: Math.min(...scores) };
+        });
+      });
+
+      expect(measured.length).toBeGreaterThanOrEqual(3);
+      for (const { name, ratio } of measured) expect(ratio, `${name} の枠と地色`).toBeGreaterThanOrEqual(3);
+    });
+
     test('シェアのボタンが押せる大きさで、スマホ幅でも崩れない', async ({ page }) => {
       await page.setViewportSize({ width: 390, height: 844 });
       await page.goto(`/${dir}/`);
