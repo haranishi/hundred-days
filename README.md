@@ -19,6 +19,7 @@ AIと一緒に作りながら、「AIに任せたこと」と「自分で考え�
 | 008 | [じはんきレーダー](apps/day-008-vending-radar/) | https://hundred-days.pages.dev/day-008-vending-radar/ |
 | 009 | [秋田バスライブ](apps/day-009-akita-bus-3d/) | https://hundred-days.pages.dev/day-009-akita-bus-3d/ |
 | 010 | [いま、誰かが書き直している](apps/day-010-wikipedia-live/) | https://hundred-days.pages.dev/day-010-wikipedia-live/ |
+| 011 | [この写真、まだ場所を覚えている](apps/day-011-photo-metadata/) | https://hundred-days.pages.dev/day-011-photo-metadata/ |
 
 ## 1日アプリのルール
 

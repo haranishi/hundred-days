@@ -1,0 +1,970 @@
+/* 明るい紙面＋アクセント1色。直近のDay009・010が暗い画面なので、並べたときに見分けがつくようにする。
+
+   ■ 色は4系統しか持たない
+   赤（場所）／琥珀（本人につながるもの・消す前の警告）／紫（権利表示）／青（リンクと主要ボタン）＋グレー。
+   「撮影の設定」は4分類でいちばん軽いので専用色を持たせず、本文の補助色（--muted）に寄せてある。
+   危険度は色だけで示さない（.badge の文字で必ず言う）。赤と緑の対で意味を分けない（色覚によっては同じに見えるため）。
+
+   ■ 左の帯（--bar）のルールは1本だけ
+   カードは全部、左に同じ太さの帯を持つ。帯の色は「そのカードの分類色（＝中のバッジと同じ色）」、
+   分類を持たないカードは中立のグレー。特定のカードにだけ帯を付けない（読み手にルールが見えなくなる）。
+   太さが全カードで同じなので、本文の左端もカードをまたいでそろう。
+   例外は写真の置き場所（.drop）だけ。あれはカードではなく破線の的で、枠そのものが役割を持っている。
+
+   ■ 本文の折り返し幅は、段落ではなくカードが決める
+   段落に max-width を持たせると、広い画面ではカードの右にだけ空白が残る（1440pxで約260px空いていた）。
+   カードの内寸（--measure）のほうを読みやすい行長に合わせ、本文はカードいっぱいに流す。 */
+
+:root {
+  --paper: #f6f4ef;
+  --card: #ffffff;
+  --ink: #1f2329;
+  --ink-2: #3d444d;
+  --muted: #545c67;
+  --line: #ddd8cd;
+  --line-strong: #c6bfb1;
+  --accent: #1f5fa8;
+  /* 塗りボタンは本文リンクと同じ色にしない（押せるものと読むものを色で区別する） */
+  --accent-strong: #184c88;
+  --place: #a33a28;
+  /* 琥珀は「本人につながるもの」と「消す前の警告」で共用する（同系の色を2つ持たない） */
+  --person: #8a5f10;
+  --rights: #6b3fa0;
+  --warn-bg: #fdf4e3;
+  --radius: 14px;
+  /* 本文が読みやすい行長。カードの内寸をこの幅に合わせる（日本語で1行35文字前後）。
+     32remだと「どこにも送られていません。」の最後の1文字だけが2行目に落ちたので、1rem広げてある */
+  --measure: 33rem;
+  --card-pad-x: 20px;
+  --bar: 4px;
+  /* カード同士の間隔はこの2段階だけ。近い話は12px、話が変わるところは20px */
+  --gap-tight: 12px;
+  --gap-block: 20px;
+  --font: system-ui, -apple-system, "Hiragino Sans", "Noto Sans JP", sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font);
+  line-height: 1.75;
+}
+
+/* 最終行に1〜2文字だけ残る折り返し（「…ありま／す。」）を、行の分け方を変えて避ける。
+   対応していないブラウザでは無視されるだけで、いまと同じ折り返しになる。 */
+p,
+li,
+dd,
+figcaption span,
+a {
+  text-wrap: pretty;
+}
+
+a {
+  color: var(--accent);
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+.page {
+  /* カードの内寸がちょうど --measure になる幅。広い画面でも本文の右に空白を残さない */
+  max-width: calc(var(--measure) + var(--card-pad-x) * 2 + 32px);
+  margin: 0 auto;
+  padding: 28px 16px 8px;
+}
+
+/* ---------------------------------------------------------------- 見出し */
+
+.head__day {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+}
+
+h1 {
+  margin: 2px 0 10px;
+  font-size: clamp(1.55rem, 5.2vw, 2.2rem);
+  /* 2行になる幅があるので、行間は詰めすぎない */
+  line-height: 1.45;
+  letter-spacing: 0.01em;
+}
+
+/* 折り返しを画面幅任せにすると、狭い画面で最後の1文字だけが2行目に落ちる。
+   意味の切れ目（読点のあと）でだけ折れるようにして、2行を均等に割る。 */
+.h1__part {
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.lede {
+  margin: 0 0 24px;
+  color: var(--ink-2);
+}
+
+/* 「あなたにつながる情報」が「情／報」で行またぎに割れると、読み手は一度戻って読み直す。
+   強調している語は途中で折らない（どれも10文字以内なので、行送りが破綻することはない） */
+.lede strong {
+  color: var(--ink);
+  white-space: nowrap;
+}
+
+/* ---------------------------------------------------------------- 状態ごとの出し分け */
+
+.panel {
+  display: none;
+}
+
+.page[data-state='empty'] .panel--empty,
+.page[data-state='loading'] .panel--loading,
+.page[data-state='result'] .panel--result,
+.page[data-state='unsupported'] .panel--unsupported,
+.page[data-state='error'] .panel--error,
+.page[data-state='invalid'] .panel--invalid {
+  display: block;
+}
+
+.panel--unsupported,
+.panel--error,
+.panel--invalid {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-left: var(--bar) solid var(--line-strong);
+  border-radius: var(--radius);
+  padding: 22px var(--card-pad-x);
+}
+
+.panel--unsupported p,
+.panel--error p,
+.panel--invalid p {
+  margin: 0 0 16px;
+  color: var(--ink-2);
+}
+
+/* ---------------------------------------------------------------- 空状態 */
+
+.drop {
+  background: var(--card);
+  border: 2px dashed var(--line-strong);
+  border-radius: var(--radius);
+  padding: 44px var(--card-pad-x);
+  text-align: center;
+}
+
+.drop[data-over='true'] {
+  border-color: var(--accent);
+  background: #eef4fb;
+}
+
+.drop__title {
+  margin: 0 0 6px;
+  font-size: clamp(1.1rem, 3.6vw, 1.35rem);
+}
+
+.drop__hint {
+  margin: 0 0 20px;
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+/* 想定した使い方は、ファイルを選ぶ手の届くところに置く */
+.drop__intended {
+  margin: 18px 0 0;
+  color: var(--muted);
+  font-size: 0.86rem;
+  line-height: 1.7;
+  text-align: start;
+}
+
+.drop__buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+}
+
+/* ---------------------------------------------------------------- ボタン */
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  min-width: 48px;
+  padding: 0 20px;
+  border: 1px solid var(--line-strong);
+  border-radius: 10px;
+  background: var(--card);
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.95rem;
+  line-height: 1.2;
+  cursor: pointer;
+}
+
+.button:hover {
+  border-color: var(--muted);
+}
+
+.button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.button--primary {
+  background: var(--accent-strong);
+  border-color: var(--accent-strong);
+  color: #fff;
+  font-weight: 700;
+}
+
+.button--primary:hover {
+  background: #123a6b;
+  border-color: #123a6b;
+}
+
+.button--ghost {
+  background: transparent;
+}
+
+/* 主要な行動。どの画面幅でも横いっぱいに使う（広い画面で半分の幅になると弱く見える） */
+.button--wide {
+  width: 100%;
+  min-height: 54px;
+  font-size: 1.02rem;
+}
+
+/* 値をコピーするような、本筋の隣に置くボタン。押せる大きさ（44px）は下回らない */
+.button--slim {
+  min-height: 44px;
+  padding: 0 14px;
+  font-size: 0.86rem;
+}
+
+/* ---------------------------------------------------------------- 読込中 */
+
+.loading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0;
+  padding: 26px 20px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  color: var(--ink-2);
+}
+
+.loading__bar {
+  display: block;
+  width: 84px;
+  height: 6px;
+  border-radius: 3px;
+  background: linear-gradient(90deg, var(--line) 0 40%, var(--accent) 40% 60%, var(--line) 60% 100%);
+  background-size: 250% 100%;
+  animation: slide 1s linear infinite;
+}
+
+@keyframes slide {
+  from {
+    background-position: 100% 0;
+  }
+  to {
+    background-position: 0 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .loading__bar {
+    animation: none;
+    background: var(--accent);
+  }
+}
+
+/* ---------------------------------------------------------------- 結果 */
+
+.verdict {
+  padding: 18px var(--card-pad-x);
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-left: var(--bar) solid var(--muted);
+  border-radius: var(--radius);
+}
+
+.verdict[data-level='place'] {
+  border-left-color: var(--place);
+}
+
+.verdict[data-level='person'] {
+  border-left-color: var(--person);
+}
+
+.verdict[data-level='rights'] {
+  border-left-color: var(--rights);
+}
+
+.verdict[data-level='none'] {
+  border-left-color: var(--line-strong);
+}
+
+.verdict__tag {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.verdict__title {
+  margin: 2px 0 6px;
+  font-size: clamp(1.2rem, 4.2vw, 1.6rem);
+  line-height: 1.4;
+}
+
+.verdict__file {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.88rem;
+}
+
+.groups {
+  display: grid;
+  gap: var(--gap-tight);
+  margin-top: var(--gap-block);
+}
+
+/* 分類カード。左の帯は必ずバッジと同じ色にする（帯だけ見ても、どの分類かが分かる） */
+.group {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-left: var(--bar) solid var(--line-strong);
+  border-radius: var(--radius);
+  padding: 16px var(--card-pad-x);
+}
+
+.group__head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 10px;
+  font-size: 1.02rem;
+  cursor: default;
+}
+
+/* 開閉できる行は、文字（「開く」）ではなく行そのものを押させる。
+   padding が無いと行の高さが25pxしかなく、指では狙いにくい。 */
+details.group {
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+
+details.group[open] {
+  padding-bottom: 16px;
+}
+
+details.group > summary.group__head {
+  cursor: pointer;
+  list-style: none;
+  margin-bottom: 0;
+  min-height: 44px;
+  padding: 8px 0;
+}
+
+details.group > summary.group__head::-webkit-details-marker {
+  display: none;
+}
+
+details.group[open] > summary.group__head {
+  margin-bottom: 10px;
+}
+
+details.group > summary.group__head::after {
+  content: '開く';
+  margin-left: auto;
+  color: var(--accent);
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+details.group[open] > summary.group__head::after {
+  content: '閉じる';
+}
+
+.badge {
+  flex: none;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: var(--muted);
+  color: #fff;
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.group[data-level='place'] .badge {
+  background: var(--place);
+}
+
+.group[data-level='person'] .badge {
+  background: var(--person);
+}
+
+/* 権利表示は危険度の高低ではなく、性質が違うもの。ほかの3つと別の色にする */
+.group[data-level='rights'] .badge {
+  background: var(--rights);
+}
+
+.group[data-level='place'] {
+  border-left-color: var(--place);
+}
+
+.group[data-level='person'] {
+  border-left-color: var(--person);
+}
+
+.group[data-level='rights'] {
+  border-left-color: var(--rights);
+}
+
+.group[data-level='settings'] {
+  border-left-color: var(--muted);
+}
+
+.group__title {
+  font-weight: 700;
+}
+
+.group__count {
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-weight: 400;
+}
+
+details.group > summary .group__count {
+  margin-left: 0;
+}
+
+.group__list {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 12rem 1fr;
+  gap: 4px 16px;
+  padding-top: 10px;
+  border-top: 1px solid var(--line);
+}
+
+.row:first-child {
+  padding-top: 0;
+  border-top: 0;
+}
+
+.row__label {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.88rem;
+}
+
+.row__value {
+  margin: 0;
+}
+
+.row__text {
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.row__note {
+  margin: 4px 0 0;
+  color: var(--muted);
+  font-size: 0.86rem;
+  line-height: 1.6;
+}
+
+.row__copy {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.row__said {
+  color: var(--ink-2);
+  font-size: 0.86rem;
+}
+
+@media (max-width: 640px) {
+  .row {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* 本体の写真と埋め込みサムネイルを見比べる。
+   片方だけ出しても「何と見比べるのか」が分からないので、必ず2枚を並べてラベルを付ける。 */
+
+.compare {
+  margin: var(--gap-tight) 0 0;
+  padding: 16px var(--card-pad-x);
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-left: var(--bar) solid var(--line-strong);
+  border-radius: var(--radius);
+}
+
+.compare__title {
+  margin: 0 0 12px;
+  font-size: 0.98rem;
+}
+
+.compare__pair {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  /* 行は「表札」「大きさ」「画像」の3つ。3行とも2枚で共有して、見比べる基準線を作る */
+  grid-template-rows: auto auto auto;
+  column-gap: 16px;
+  row-gap: 4px;
+  align-items: start;
+}
+
+/* 2枚のラベルは長さが違い、狭い画面では片方だけが2行になる。
+   figure ごとに高さを決めさせると、そのぶん画像の開始位置が上下にずれて見比べにくい。
+   表札・大きさ・画像の3行を、2枚で共有する行（subgrid）にそろえる。
+   subgrid が無い環境でも .shot__label の min-height が2行ぶんを確保するので、ずれない。 */
+.shot {
+  display: grid;
+  grid-template-rows: subgrid;
+  grid-row: span 3;
+  margin: 0;
+}
+
+/* ラベルは画像の上に置く。2枚は縦横比が違って高さがそろわないので、
+   下に置くとラベルの行だけが左右でずれる。 */
+.shot figcaption {
+  display: grid;
+  grid-row: 1 / span 2;
+  grid-template-rows: subgrid;
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.88rem;
+  line-height: 1.4;
+}
+
+/* 表札と大きさを同じ行に流すと、表札が折り返した側だけ「8.4KB」が1行ぶん（約25px）下がる。
+   行を分けたうえで、表札には2行ぶんの高さを最初から与えて行数を固定する。 */
+.shot__label {
+  grid-row: 1;
+  min-height: calc(2 * 1.4em);
+  color: var(--ink);
+  font-weight: 700;
+}
+
+.shot__sub {
+  grid-row: 2;
+}
+
+/* 本体は横長、サムネイルはもっと小さい。高さを画像まかせにすると下端が29pxずれて、
+   見比べるための並びなのに基準線が無くなる。2枚を同じ比率の枠に入れて contain で収める。 */
+.shot img {
+  grid-row: 3;
+  align-self: start;
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  height: auto;
+  object-fit: contain;
+  margin-top: 4px;
+  border: 1px solid var(--line-strong);
+  border-radius: 6px;
+  background: #ece8e0;
+}
+
+.compare__note {
+  margin: var(--gap-tight) 0 0;
+  color: var(--ink-2);
+  font-size: 0.9rem;
+  line-height: 1.7;
+}
+
+/* 狭い画面でも2枚を並べたままにする。縦に積むと2枚の距離が230px開いて、
+   「見比べてください」と書いてあるのに同時に見られなくなる（390pxでも表札の文字は読める大きさに残る）。 */
+@media (max-width: 640px) {
+  .compare__pair {
+    column-gap: 10px;
+  }
+}
+
+.others,
+.containers {
+  margin: var(--gap-tight) 0 0;
+  color: var(--muted);
+  font-size: 0.88rem;
+}
+
+/* 保証しないことのうち、誤解すると実害が出る2点は保存ボタンより上（.limits）。
+   全文は同じ画面の下（.limits-more）に置く。読ませる位置は変えても、読める状態は変えない。 */
+
+.limits {
+  margin-top: var(--gap-block);
+  padding: 14px var(--card-pad-x);
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-left: var(--bar) solid var(--line-strong);
+  border-radius: var(--radius);
+}
+
+.limits-more {
+  margin-top: var(--gap-block);
+  padding: 16px var(--card-pad-x);
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-left: var(--bar) solid var(--line-strong);
+  border-radius: var(--radius);
+}
+
+.limits__title {
+  margin: 0 0 10px;
+  font-size: 0.98rem;
+}
+
+.limits p,
+.limits-more p {
+  margin: 0 0 10px;
+  color: var(--ink-2);
+  font-size: 0.9rem;
+  line-height: 1.7;
+}
+
+.limits p:last-child,
+.limits-more p:last-child {
+  margin-bottom: 0;
+}
+
+/* 下の全文へ降りる案内。文字リンクでも指で押せる高さにする */
+.limits__link {
+  margin-bottom: 0;
+}
+
+.limits__link a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+}
+
+/* 書き出したファイルを読み直した結果 */
+
+.verify {
+  width: 100%;
+  padding: 14px var(--card-pad-x);
+  background: #f4f7fb;
+  border: 1px solid #bcd3ec;
+  border-left: var(--bar) solid #bcd3ec;
+  border-radius: var(--radius);
+}
+
+.verify__title {
+  margin: 0 0 10px;
+  font-size: 0.94rem;
+}
+
+.verify__list {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+}
+
+.verify__row {
+  display: grid;
+  grid-template-columns: 11rem 1fr;
+  gap: 2px 12px;
+  padding-top: 6px;
+  border-top: 1px solid #dae5f1;
+}
+
+.verify__row:first-child {
+  padding-top: 0;
+  border-top: 0;
+}
+
+.verify__label {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.86rem;
+}
+
+.verify__value {
+  margin: 0;
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+
+/* 残したものは、消し忘れではなく決めて残したもの。消えたものと見分けがつくようにする */
+.verify__row[data-kept='true'] .verify__value {
+  color: var(--person);
+}
+
+.verify__row[data-ok='false'] .verify__value {
+  color: var(--place);
+}
+
+.verify__note {
+  margin: 10px 0 0;
+  color: var(--muted);
+  font-size: 0.82rem;
+  line-height: 1.6;
+}
+
+@media (max-width: 640px) {
+  .verify__row {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* 権利表示の警告 */
+
+/* 常時表示は変えない（一度きりの通知にしない）が、面積では主要な行動に勝たせない。
+   閉じるボタンも折りたたみも付けない。
+   保存ボタンとは別のカードに分けてある。同じ箱に入れていたときは「警告に対するボタン」に見えていた。 */
+.warn {
+  margin: var(--gap-tight) 0 0;
+  padding: 12px var(--card-pad-x);
+  background: var(--warn-bg);
+  border: 1px solid var(--person);
+  border-left: var(--bar) solid var(--person);
+  border-radius: var(--radius);
+}
+
+.warn p {
+  margin: 0 0 6px;
+  color: var(--ink-2);
+  font-size: 0.86rem;
+  line-height: 1.65;
+}
+
+.warn p:last-child {
+  margin-bottom: 0;
+}
+
+/* 値を控えてから消せるようにする（消したら二度と戻らないため） */
+.warn__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.warn__hint {
+  color: var(--ink-2);
+  font-size: 0.86rem;
+}
+
+.warn__said {
+  color: var(--ink-2);
+  font-size: 0.86rem;
+  min-height: 1.4em;
+}
+
+.warn__title {
+  font-weight: 700;
+  color: var(--ink) !important;
+  font-size: 0.9rem;
+  margin-bottom: 4px !important;
+}
+
+.warn__list {
+  margin: 6px 0;
+  padding-left: 1.2em;
+  color: var(--ink);
+  font-size: 0.9rem;
+}
+
+.warn__list li {
+  font-weight: 600;
+}
+
+.warn__key {
+  font-weight: 400;
+  color: var(--ink-2);
+}
+
+/* 値は途中で折らない。「(C) 2026 SAMPLE PHOTOGRAPHER」が行またぎで割れると、
+   どこまでが1つの値なのか読めなくなる。等幅にして1行で見せ、入りきらない値だけ横に送る。 */
+.warn__value {
+  display: block;
+  overflow-x: auto;
+  white-space: nowrap;
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 0.86rem;
+}
+
+/* 消して保存する */
+
+.actions {
+  margin-top: var(--gap-tight);
+  padding: 18px var(--card-pad-x);
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-left: var(--bar) solid var(--line-strong);
+  border-radius: var(--radius);
+  display: grid;
+  gap: var(--gap-tight);
+  justify-items: start;
+}
+
+/* 間隔はグリッドの gap が持つ。段ごとに margin を足すと余白が二重になる */
+.actions > .note {
+  margin-top: 0;
+}
+
+.check {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  min-height: 44px;
+  padding: 8px 0;
+  color: var(--ink-2);
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.check input {
+  width: 20px;
+  height: 20px;
+  margin: 2px 0 0;
+  flex: none;
+  accent-color: var(--accent);
+}
+
+.saved {
+  width: 100%;
+  margin: 0;
+  padding: 12px var(--card-pad-x);
+  border-radius: var(--radius);
+  background: #eef4fb;
+  border: 1px solid #bcd3ec;
+  border-left: var(--bar) solid #bcd3ec;
+  color: var(--ink-2);
+  font-size: 0.9rem;
+}
+
+/* 送信していないこと（空状態と結果状態の両方に出す） */
+
+.privacy {
+  margin: var(--gap-block) 0 0;
+  padding: 12px var(--card-pad-x);
+  border: 1px solid var(--line);
+  border-left: var(--bar) solid var(--line-strong);
+  border-radius: var(--radius);
+  background: var(--card);
+  color: var(--ink-2);
+  /* カードの中の本文と同じ大きさにそろえる。0.92remだと最後の1文字だけが2行目に落ちた */
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.note {
+  margin: 10px 0 0;
+  color: var(--muted);
+  font-size: 0.88rem;
+}
+
+/* サンプルを読んだときだけ出る注記。ここだけ角丸を持たないと一点物に見えるので、
+   ほかのカードと同じ角丸・同じ帯にそろえる */
+.note--sample {
+  margin-top: var(--gap-tight);
+  padding: 10px var(--card-pad-x);
+  border: 1px solid var(--line);
+  border-left: var(--bar) solid var(--line-strong);
+  border-radius: var(--radius);
+  background: var(--card);
+}
+
+/* ---------------------------------------------------------------- いつも出しておく事実 */
+
+/* 結果の画面では、同じ内容を .limits が結果のすぐ横で出しているので二重に出さない */
+.page[data-state='result'] .facts {
+  display: none;
+}
+
+/* 左右に padding を持たせると、この節だけ本文が20px内側に入って揃わない */
+.facts {
+  margin: var(--gap-block) 0 0;
+  padding: 20px 0 4px;
+  border-top: 1px solid var(--line);
+}
+
+.facts h2 {
+  margin: 0 0 10px;
+  font-size: 1rem;
+}
+
+.facts p {
+  margin: 0 0 12px;
+  color: var(--ink-2);
+  font-size: 0.9rem;
+}
+
+.facts__disclaimer {
+  color: var(--muted) !important;
+  font-size: 0.86rem !important;
+}
+
+/* ---------------------------------------------------------------- 足元 */
+
+.foot {
+  max-width: calc(var(--measure) + var(--card-pad-x) * 2 + 32px);
+  margin: 0 auto;
+  padding: 8px 16px 48px;
+  color: var(--muted);
+  font-size: 0.86rem;
+}
+
+.foot p {
+  margin: 0 0 12px;
+}
+
+.foot__nav a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+}
+
+/* 限界の説明を読み終えた人が、上まで戻らずにもう一度試せるようにする。
+   結果を見ている人にしか意味が無いので、結果の状態のときだけ出す。 */
+.foot__again {
+  display: none;
+}
+
+#app[data-state='result'] + .foot .foot__again {
+  display: block;
+}
+
+#share {
+  margin-top: 8px;
+}
