@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>この写真、まだ場所を覚えている | 100日チャレンジ Day 011</title>
+    <meta
+      name="description"
+      content="写真に残っている位置情報・カメラのシリアル番号・編集前のサムネイルをその場で確かめて、画質を落とさずに取り除きます。写真はブラウザの中だけで処理され、どこにも送られません。"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+    <link rel="stylesheet" href="./shared/share.css" />
+    <script src="./shared/share.js" defer></script>
+  </head>
+  <body>
+    <!-- 画面の状態はここ1か所で切り替える。data-state-log は通った順の記録（テストで読む） -->
+    <main class="page" id="app" data-state="empty" data-state-log="empty">
+      <header class="head">
+        <p class="head__day">Day 011</p>
+        <!-- 狭い画面で「る」だけが2行目に落ちないよう、読点で割れる場所を自分で決めておく -->
+        <h1><span class="h1__part">この写真、まだ</span><span class="h1__part">場所を覚えている</span></h1>
+        <p class="lede">
+          SNSやフリマに出す前に、その写真が抱えている<strong>撮った場所</strong>と<strong>あなたにつながる情報</strong>を確かめて、<strong>画質を落とさずに</strong>取り除きます。
+        </p>
+      </header>
+
+      <input type="file" id="file" accept="image/jpeg,image/*" class="sr-only" />
+
+      <!-- 空 -->
+      <section class="panel panel--empty" aria-labelledby="drop-title">
+        <div class="drop" id="drop">
+          <h2 class="drop__title" id="drop-title">写真をここに置いてください</h2>
+          <p class="drop__hint">調べられるのは JPEG だけです。一度に1枚。</p>
+          <div class="drop__buttons">
+            <button type="button" class="button button--primary" id="pick">写真を選ぶ</button>
+            <button type="button" class="button" id="sample">サンプルで試す</button>
+          </div>
+          <p class="drop__intended" data-copy="intendedUse"></p>
+        </div>
+        <p class="privacy" data-copy="privacy"></p>
+        <p class="note" data-copy="privacyDetail"></p>
+      </section>
+
+      <!-- 読込中：文字は120ms以上かかったときだけ出す（一瞬で終わるのに偽の待ち時間を作らない） -->
+      <section class="panel panel--loading" aria-live="polite">
+        <p class="loading" id="loading" hidden><span class="loading__bar" aria-hidden="true"></span>調べています</p>
+      </section>
+
+      <!-- 結果。並べる順は「判定 → 何が入っていたか → 消す前に読む2点 → 消して保存 → 詳細」。
+           保存は「中身を見たあと」の行動なので、検出内容（#groups）とサムネイルの見比べ（#compare）より下に置く。
+           限界の要点（.limits）と権利表示の警告（#rights）は、これまでどおり保存ボタンより上を保つ -->
+      <section class="panel panel--result" aria-labelledby="verdict">
+        <div class="verdict" data-level="none">
+          <p class="verdict__tag" id="verdict-tag"></p>
+          <h2 class="verdict__title" id="verdict"></h2>
+          <p class="verdict__file" id="verdict-file"></p>
+        </div>
+
+        <p class="note note--sample" id="sample-note" data-copy="sampleNote" hidden></p>
+
+        <!-- 何が入っていたか。ここを読まないまま保存できる並びにしない（このアプリの目的そのもの） -->
+        <div id="groups" class="groups"></div>
+
+        <!-- 切り落としたはずのものが縮小画像にだけ残っていないか、その場で見比べられるように並べる -->
+        <section class="compare" id="compare" aria-labelledby="compare-title" hidden>
+          <h3 class="compare__title" id="compare-title">本体の写真と、埋め込まれたサムネイル</h3>
+          <div class="compare__pair">
+            <figure class="shot" id="main-shot">
+              <img id="main-image" alt="いま調べている写真そのもの" />
+              <figcaption>
+                <span class="shot__label">いま見えている写真</span>
+                <span class="shot__sub" id="main-caption"></span>
+              </figcaption>
+            </figure>
+            <figure class="shot" id="thumb">
+              <img id="thumb-image" alt="この写真に埋め込まれていたサムネイル" />
+              <figcaption>
+                <span class="shot__label">埋め込まれたサムネイル</span>
+                <span class="shot__sub" id="thumb-caption"></span>
+              </figcaption>
+            </figure>
+          </div>
+          <p class="compare__note" data-copy="thumbnailNote"></p>
+        </section>
+
+        <!-- 検出内容に付く補足。分類カードのすぐ後ろに置く -->
+        <p class="others" id="others" hidden></p>
+        <p class="containers" id="containers" hidden></p>
+
+        <!-- 消す前に必ず目に入れてほしい2点だけ。全文は同じ画面の下（#limits-more）に出している -->
+        <section class="limits" aria-labelledby="limits-title">
+          <h3 class="limits__title" id="limits-title">この結果で分からないこと</h3>
+          <p data-copy="limitsShortGuarantee"></p>
+          <p data-copy="limitsShortNotFound"></p>
+          <p class="limits__link"><a href="#limits-more">消せる範囲のくわしい説明は下にあります</a></p>
+        </section>
+
+        <!-- 権利表示を見つけているあいだ、除去ボタンのすぐ上に出したままにする（閉じられる通知にしない）。
+             保存ボタンとは別のカードにしてある。同じ箱に入れると「この警告に対するボタン」に見えるため -->
+        <div class="warn" id="rights" role="alert" hidden>
+          <p class="warn__title">消す前に確認してください</p>
+          <p id="rights-strong" data-copy="rightsWarningStrong" hidden></p>
+          <p id="rights-normal" data-copy="rightsWarning" hidden></p>
+          <ul class="warn__list" id="rights-list" hidden></ul>
+          <div class="warn__actions" id="rights-keep" hidden>
+            <span class="warn__hint" data-copy="rightsKeepHint"></span>
+            <button type="button" class="button button--slim" id="rights-copy">この値をコピー</button>
+            <span class="warn__said" id="rights-copied" role="status" aria-live="polite"></span>
+          </div>
+          <p id="rights-iptc" data-copy="rightsInOtherPlaces" hidden></p>
+        </div>
+
+        <div class="actions">
+          <button type="button" class="button button--primary button--wide" id="download">メタデータを消して保存</button>
+          <label class="check">
+            <input type="checkbox" id="drop-orientation" />
+            <span data-copy="orientationRemoveLabel"></span>
+          </label>
+          <p class="note" id="orientation-note" data-copy="orientationKept" hidden></p>
+
+          <!-- 保存したバイト列を、このアプリ自身で読み直した結果 -->
+          <section class="verify" id="verify" role="status" aria-labelledby="verify-title" hidden>
+            <h3 class="verify__title" id="verify-title" data-copy="verifyTitle"></h3>
+            <dl class="verify__list" id="verify-list"></dl>
+            <p class="verify__note" data-copy="verifyNote"></p>
+          </section>
+
+          <p class="saved" id="saved" data-copy="savedNote" role="status" hidden></p>
+          <button type="button" class="button button--ghost" id="again">別の写真を試す</button>
+        </div>
+
+        <!-- 上（.limits）が要点、ここが詳細。同じ文を2回読ませないよう、
+             「保証しない」「見つからない＝無い ではない」の2点はここでは繰り返さず、中身だけを書く -->
+        <section class="limits-more" id="limits-more" aria-labelledby="limits-more-title">
+          <h3 class="limits__title" id="limits-more-title" data-copy="limitsMoreLabel"></h3>
+          <p data-copy="disclaimerDetail"></p>
+          <p data-copy="otherPlaces"></p>
+          <p data-copy="notFoundIsNotSafe"></p>
+          <p data-copy="burnedIn"></p>
+        </section>
+
+        <p class="privacy" data-copy="privacy"></p>
+      </section>
+
+      <!-- 調べられない形式：「情報はありません」とは絶対に言わない -->
+      <section class="panel panel--unsupported">
+        <h2 class="verdict__title" data-copy="unsupportedTitle"></h2>
+        <p data-copy="unsupportedBody"></p>
+        <button type="button" class="button button--ghost" data-again>別の写真を試す</button>
+      </section>
+
+      <!-- 壊れている -->
+      <section class="panel panel--error">
+        <h2 class="verdict__title" data-copy="errorTitle"></h2>
+        <p id="error-body"></p>
+        <button type="button" class="button button--ghost" data-again>別の写真を試す</button>
+      </section>
+
+      <!-- 受け取れない -->
+      <section class="panel panel--invalid">
+        <h2 class="verdict__title">このファイルは調べられません</h2>
+        <p id="invalid-body"></p>
+        <button type="button" class="button button--ghost" data-again>別の写真を試す</button>
+      </section>
+
+      <!-- どの状態でも出しておく事実（このアプリの中身そのもの） -->
+      <section class="facts">
+        <h2>消すもの・消さないもの</h2>
+        <p data-copy="otherPlaces"></p>
+        <p data-copy="iccKept"></p>
+        <p data-copy="burnedIn"></p>
+        <p class="facts__disclaimer" data-copy="disclaimer"></p>
+      </section>
+    </main>
+
+    <footer class="foot">
+      <p>
+        JPEGのセグメント構造を直接編集しているので、圧縮された画素のデータ（SOS以降）は1バイトも変わりません。canvasで描き直して書き出す方式と違い、再圧縮も色の変換も起きません。
+      </p>
+      <p>
+        気づいたことや不具合があれば
+        <a href="https://github.com/haranishi/hundred-days" target="_blank" rel="noopener noreferrer">このリポジトリ</a>へ。
+      </p>
+      <p class="foot__again"><button type="button" class="button button--ghost" data-again>別の写真を試す</button></p>
+      <p class="foot__nav"><a href="../">100日チャレンジの一覧へ</a></p>
+      <div id="share"></div>
+    </footer>
+
+    <script type="module" src="./app.js"></script>
+  </body>
+</html>
