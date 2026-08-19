@@ -143,24 +143,28 @@ for (const note of chart.notes) {
 // ---------------------------------------------------------------- WAVにして重ねる
 
 const video = join(appDir, 'demo.mp4');
+const out = join(appDir, 'demo-with-audio.mp4');
 const duration = Number(execFileSync('ffprobe', [
   '-v', 'error', '-show_entries', 'format=duration', '-of', 'csv=p=0', video
 ], { encoding: 'utf8' }).trim());
 
-/* 曲の頭が動画のどこに来るか。キューは「振り付けの終わりから何秒前か」で持っている。
-   ⚠️ ffmpeg の -itsoffset は音を作り直すときに効かなかった（動画の頭から鳴ってしまう）。
-   WAV側の先頭に無音を入れて位置を合わせる。 */
+/* 頭のタイトル画面を切り落とし、**遊んでいる最中から始める**。
+   理由は2つある。
+   ①動画の1コマ目がそのままサムネになるので、文字だらけの画面ではなく砲弾が飛んでいる絵にしたい
+   ②タイトル画面の間は曲が鳴っていない。頭から4秒無音だと「音が入っていない」と受け取られる
+   拍1.2で切ると、最初の砲弾が中ほどまで来ていて、その0.4秒後に最初の判定が出る。 */
+const START_BEAT = 1.2;
+const audioFrom = beatToSeconds(START_BEAT, chart.bpm);
 const songStart = Math.max(0, duration - cues.songStartFromEnd);
-const lead = Math.round(songStart * RATE);
-console.log(`動画 ${duration.toFixed(2)}秒 / 曲の頭 ${songStart.toFixed(2)}秒`);
+const cutAt = songStart + audioFrom;
 
 let peak = 0;
 for (const sample of track) peak = Math.max(peak, Math.abs(sample));
 const gain = peak > 0 ? 0.82 / peak : 1;
 
-const pcm = Buffer.alloc((lead + track.length) * 2);
+const pcm = Buffer.alloc(track.length * 2);
 for (let i = 0; i < track.length; i += 1) {
-  pcm.writeInt16LE(Math.max(-32767, Math.min(32767, Math.round(track[i] * gain * 32767))), (lead + i) * 2);
+  pcm.writeInt16LE(Math.max(-32767, Math.min(32767, Math.round(track[i] * gain * 32767))), i * 2);
 }
 const header = Buffer.alloc(44);
 header.write('RIFF', 0);
@@ -179,15 +183,21 @@ header.writeUInt32LE(pcm.length, 40);
 const wav = join(tmpdir(), 'day-012-demo.wav');
 writeFileSync(wav, Buffer.concat([header, pcm]));
 
-const out = join(appDir, 'demo-with-audio.mp4');
+console.log(`録画 ${duration.toFixed(2)}秒 / 曲の頭 ${songStart.toFixed(2)}秒 / 切り出し ${cutAt.toFixed(2)}秒から`);
 
+// 途中から切るので映像は作り直す（コピーだと切れ目が固まる）
 execFileSync('ffmpeg', [
-  '-y', '-i', video, '-i', wav,
+  '-y',
+  '-ss', cutAt.toFixed(3), '-i', video,
+  '-ss', audioFrom.toFixed(3), '-i', wav,
   '-map', '0:v', '-map', '1:a',
-  '-c:v', 'copy', '-c:a', 'aac', '-b:a', '128k',
-  '-t', duration.toFixed(3),
-  '-movflags', '+faststart',
+  '-c:v', 'libx264', '-preset', 'slow', '-crf', '26', '-pix_fmt', 'yuv420p', '-r', '25',
+  '-c:a', 'aac', '-b:a', '128k',
+  '-shortest', '-movflags', '+faststart',
   out
 ], { stdio: ['ignore', 'ignore', 'pipe'] });
 
-console.log(`作成: ${out}`);
+const made = Number(execFileSync('ffprobe', [
+  '-v', 'error', '-show_entries', 'format=duration', '-of', 'csv=p=0', out
+], { encoding: 'utf8' }).trim());
+console.log(`作成: ${out}（${made.toFixed(2)}秒・1コマ目はプレイ中）`);
