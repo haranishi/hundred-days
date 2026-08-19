@@ -64,7 +64,7 @@ async function autoPlay(page) {
 
 export default async function (page, h) {
   const base = await ensureServer();
-  await page.goto(`${base}#dev=short`, { waitUntil: 'load' });
+  await page.goto(`${base}#dev=demo`, { waitUntil: 'load' });
   await h.pause(1600);
 
   await page.getByRole('button', { name: 'はじめる' }).click();
@@ -72,7 +72,7 @@ export default async function (page, h) {
   await autoPlay(page);
 
   await page.waitForFunction(() => document.getElementById('app').dataset.state === 'result', null, { timeout: 20_000 });
-  await h.pause(2200);
+  await h.pause(1800);
 
   /* 音は録れないので、あとから同じ音符データで合成して重ねる（tools/render-demo-audio.mjs）。
      位置合わせに要るのは「曲の頭が、振り付けの終わりから何秒前か」だけ。
@@ -80,7 +80,7 @@ export default async function (page, h) {
   const songStartFromEnd = await page.evaluate(() => window.__day012.songSeconds());
   await writeFile(
     join(tmpdir(), 'day-012-demo-cues.json'),
-    JSON.stringify({ chart: 'short', songStartFromEnd }, null, 2)
+    JSON.stringify({ chart: 'demo', songStartFromEnd }, null, 2)
   );
 }
 

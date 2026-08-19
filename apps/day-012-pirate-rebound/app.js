@@ -609,7 +609,8 @@ function applyCalibration(ms) {
 function boot() {
   const rawHash = window.location.hash.replace(/^#/, '');
   hashExtras = rawHash.split('&').filter((part) => part && !part.startsWith('cal=')).join('&');
-  if (/(^|&)dev=short(&|$)/.test(rawHash)) chartName = 'short';
+  const devChart = /(^|&)dev=(short|demo)(&|$)/.exec(rawHash);
+  if (devChart) chartName = devChart[2];
 
   const read = readCalibration(rawHash);
   if (read.invalid) {

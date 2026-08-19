@@ -46,9 +46,20 @@ const SHORT_EVENTS = [
   { beat: 8, kind: 'double' }, { beat: 12, kind: 'gull' }, { beat: 14, kind: 'cannon' }
 ];
 
+/* デモ動画用。本編より詰めてあり、20秒前後で敵船が「帆をすべて失う」まで壊れる。
+   短縮版（テスト用）を長くするとCIが遅くなるので、別に持つ。 */
+const DEMO_EVENTS = [
+  { beat: -6, kind: 'cannon', practice: true },
+  { beat: 0, kind: 'double' }, { beat: 4, kind: 'cannon' }, { beat: 6, kind: 'cannon' },
+  { beat: 8, kind: 'double' }, { beat: 12, kind: 'cannon' }, { beat: 14, kind: 'gull' },
+  { beat: 16, kind: 'double' }, { beat: 20, kind: 'cannon' }, { beat: 22, kind: 'double' },
+  { beat: 26, kind: 'cannon' }, { beat: 28, kind: 'double' }, { beat: 32, kind: 'cannon' }
+];
+
 export const CHARTS = {
   main: { bpm: 124, beats: 100, events: MAIN_EVENTS },
-  short: { bpm: 124, beats: 20, events: SHORT_EVENTS }
+  short: { bpm: 124, beats: 20, events: SHORT_EVENTS },
+  demo: { bpm: 124, beats: 38, events: DEMO_EVENTS }
 };
 
 /** 発射の列 → 飛んでくる物と打点。打点は時刻順に並べ、通し番号を振る。 */
