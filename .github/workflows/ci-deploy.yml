@@ -60,8 +60,13 @@ jobs:
       - name: Build site
         run: npm run build
 
+      # ⚠️ --with-deps は apt-get を走らせる。2026-08-19にUbuntuのミラーが応答せず
+      # ここで15分ハングし、ジョブのタイムアウトで2回続けて落ちた（テストは1件も走らなかった）。
+      # ランナーの標準イメージにChromiumの共有ライブラリは入っているので、ブラウザ本体だけ取る。
+      # 足りないものがあればブラウザの起動で明確に失敗するので、黙って壊れることはない。
       - name: Install Chromium
-        run: npx playwright install --with-deps chromium
+        timeout-minutes: 5
+        run: npx playwright install chromium
 
       - name: Run browser tests
         run: npm run test:e2e
