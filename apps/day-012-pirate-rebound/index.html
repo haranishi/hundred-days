@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>海賊船の打ち返し係 | 100日チャレンジ Day 012</title>
+    <meta
+      name="description"
+      content="敵船が撃つ音を聞いて、飛んでくる砲弾を拍で打ち返す1ボタンのリズムゲーム。曲も効果音も3Dも全部コードで作っていて、画像も音源も1つも読み込みません。"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+    <link rel="stylesheet" href="./shared/share.css" />
+    <script src="./shared/share.js" defer></script>
+    <script type="module" src="./app.js"></script>
+  </head>
+  <body>
+    <!-- 画面の状態はここ1か所で切り替える。data-state-log は通った順の記録（テストで読む） -->
+    <main class="page" id="app" data-state="empty" data-state-log="empty">
+      <header class="head">
+        <p class="head__day">Day 012</p>
+        <h1>海賊船の打ち返し係</h1>
+        <p class="lede">
+          敵船が撃つ<strong>音</strong>を聞いて、飛んでくる砲弾を<strong>拍</strong>で打ち返します。
+          目で追っても間に合いません。耳で数えてください。
+        </p>
+      </header>
+
+      <div class="stage" id="stage">
+        <canvas id="scene" aria-label="海の上の3D画面。敵船から砲弾が飛んでくる"></canvas>
+        <p class="verdict" id="verdict" role="status" aria-live="polite">
+          <span id="verdict-main"></span><span class="verdict__dir" id="verdict-dir"></span>
+        </p>
+        <!-- 敵船の状態は上。下に置くと自分の船首と重なって読めない -->
+        <div class="hud hud--top"><span id="ship" class="hud__ship"></span></div>
+        <div class="hud hud--bottom">
+          <span id="remaining"></span>
+          <span id="combo" class="hud__combo"></span>
+        </div>
+      </div>
+
+      <!-- 空：まだ音が鳴っていない -->
+      <section class="panel panel--title" aria-labelledby="title-heading">
+        <h2 id="title-heading">合図は、いつも音が先です</h2>
+        <ul class="rules">
+          <li><b>低い「ドン」</b>＝砲弾。<b>2拍あと</b>に届くので、そこで1回押す</li>
+          <li><b>速い「ドドン」</b>＝二連弾。半拍あけて2回押す</li>
+          <li><b>鳥の鳴き声</b>＝カモメ。これは<b>押しません</b></li>
+        </ul>
+        <p class="note">
+          <b>ドンピシャで返した弾だけが敵船に届きます。</b>おしいは失速して海に落ちます。
+          当てるほど帆が裂け、マストが折れ、最後は船が傾きます。
+        </p>
+        <p class="note">
+          押すのは<b>スペース／画面のどこか</b>のどちらでも。約50秒。スコアは保存しません。
+        </p>
+        <p class="note note--warn">
+          <b>Bluetoothのイヤホンは音が遅れます。</b>ずれるのはあなたのせいではありません。
+          有線か本体のスピーカーだと合いやすく、それでもずれるときは下の「音のズレを直す」で合わせられます。
+        </p>
+        <div class="buttons">
+          <button type="button" class="button button--primary" id="start">はじめる</button>
+          <button type="button" class="button" id="open-cal">音のズレを直す</button>
+        </div>
+      </section>
+
+      <!-- 不正入力のひとつ：URLに入っていた補正値が範囲の外だった -->
+      <p class="warning" id="cal-warning" hidden>
+        URLに入っていた補正値が使える範囲の外だったので、0ms に戻しました。
+      </p>
+
+      <section class="panel panel--cal" aria-labelledby="cal-heading">
+        <h2 id="cal-heading">音のズレを直す</h2>
+        <p class="note">
+          押しているのに「おしい」ばかり出るときに使います。
+          <b>遅れて押してしまうと感じるなら＋へ、早すぎると感じるなら−へ。</b>
+        </p>
+        <label class="cal" for="cal-range">
+          <span class="cal__label">判定をずらす量</span>
+          <input type="range" id="cal-range" min="-150" max="150" step="5" value="0" />
+          <output class="cal__value" id="cal-value">0 ms</output>
+        </label>
+        <p class="note">
+          範囲は<span id="cal-limit"></span>。
+          <b>保存はしません</b>（このアプリはまだ保存を使えないため）。
+          代わりに合わせた値がURLの末尾に付くので、ブックマークすれば次回もそこから始まります。
+        </p>
+        <div class="buttons">
+          <button type="button" class="button button--primary" id="close-cal">戻る</button>
+        </div>
+      </section>
+
+      <!-- 読込中：音の時計が動き出してから、拍が頭に来るまで -->
+      <p class="counting" id="counting">用意…</p>
+
+      <section class="panel panel--result" aria-labelledby="result-heading">
+        <h2 id="result-heading" class="sr-only">結果</h2>
+        <p class="rank" id="rank"></p>
+        <p class="rank__note" id="rank-note"></p>
+        <p class="ladder" id="ladder"></p>
+        <p class="ship-state" id="ship-state"></p>
+        <dl class="tally" id="tally"></dl>
+        <p class="note" id="offset-note"></p>
+        <p class="note" id="extra"></p>
+        <div class="buttons">
+          <button type="button" class="button button--primary" id="again">もう一度</button>
+          <button type="button" class="button" id="fix-from-result">音のズレを直す</button>
+        </div>
+      </section>
+
+      <!-- エラー：音が出せない・途中で時計が飛んだ -->
+      <section class="panel panel--error" aria-labelledby="error-heading">
+        <h2 id="error-heading">続けられませんでした</h2>
+        <p class="note" id="error-message"></p>
+        <div class="buttons">
+          <button type="button" class="button button--primary" id="retry">やり直す</button>
+        </div>
+      </section>
+
+      <button type="button" class="tap" id="tap">打つ</button>
+
+      <section class="about">
+        <h2>この中で何が起きているか</h2>
+        <p>
+          画像も音源も1つも読み込んでいません。曲・効果音・海・船・砲弾・カモメは、
+          すべてこのページのコードが組み立てています。3Dはライブラリを使わず、
+          自分で書いた透視投影で Canvas に面を塗っています。
+        </p>
+        <p>
+          拍の正本は音の時計（<code>AudioContext</code>）です。画面の描画が遅れても、
+          砲弾は音とずれない位置に描かれます。判定はドンピシャ±35ms・おしい±80ms。
+        </p>
+      </section>
+
+      <div id="share"></div>
+    </main>
+  </body>
+</html>

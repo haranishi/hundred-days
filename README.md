@@ -20,6 +20,7 @@ AIと一緒に作りながら、「AIに任せたこと」と「自分で考え�
 | 009 | [秋田バスライブ](apps/day-009-akita-bus-3d/) | https://hundred-days.pages.dev/day-009-akita-bus-3d/ |
 | 010 | [いま、誰かが書き直している](apps/day-010-wikipedia-live/) | https://hundred-days.pages.dev/day-010-wikipedia-live/ |
 | 011 | [この写真、まだ場所を覚えている](apps/day-011-photo-metadata/) | https://hundred-days.pages.dev/day-011-photo-metadata/ |
+| 012 | [海賊船の打ち返し係](apps/day-012-pirate-rebound/) | https://hundred-days.pages.dev/day-012-pirate-rebound/ |
 
 ## 1日アプリのルール
 
