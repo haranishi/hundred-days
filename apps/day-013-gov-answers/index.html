@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>政府はこう答えてきた | 100日チャレンジ Day 013</title>
+<meta name="description" content="テーマを入れると、国会会議録から政府側の答弁だけを抜き出して、いつ・どの省庁が・何と答えてきたかを年表にします。質問した議員と民間の参考人の発言は除いてあります。">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230072B2'/%3E%3Crect x='7' y='18' width='4' height='8' fill='white'/%3E%3Crect x='14' y='10' width='4' height='16' fill='white'/%3E%3Crect x='21' y='14' width='4' height='12' fill='%23D55E00'/%3E%3C/svg%3E">
+<!-- canonical と OGP は scripts/build.mjs が meta.json から入れるので、ここには書かない -->
+<meta name="share:text" content="テーマを入れると、政府が国会でいつ・どの省庁で・何と答えてきたかが年表で出ます">
+<link rel="stylesheet" href="./styles.css">
+<link rel="stylesheet" href="./shared/share.css">
+<script type="module" src="./app.js"></script>
+<script src="./shared/share.js" defer></script>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <p class="head__day">Day 013</p>
+  <h1>政府はこう答えてきた</h1>
+  <p class="lead">テーマを入れると、<strong>政府側の答弁だけ</strong>を国会会議録から抜き出し、いつ・どの省庁が答えてきたかを年表にします。</p>
+  <p class="lead">質問した議員の発言と、民間の参考人の発言は除いてあります。</p>
+</header>
+
+<form id="form">
+  <div class="row">
+    <div class="field">
+      <label for="q">テーマの言葉</label>
+      <input id="q" name="q" type="search" placeholder="例：特定外来生物" required autocomplete="off">
+    </div>
+    <div class="field" style="flex:0 0 130px">
+      <label for="from">開始年</label>
+      <input id="from" name="from" type="number" min="1947" max="2026" value="2010" inputmode="numeric">
+    </div>
+    <div class="field" style="flex:0 0 130px">
+      <label for="to">終了年</label>
+      <input id="to" name="to" type="number" min="1947" max="2026" value="2026" inputmode="numeric">
+    </div>
+    <div class="field" style="flex:0 0 auto">
+      <button type="submit" id="go">調べる</button>
+    </div>
+  </div>
+  <p class="hint">会議録は速記録のため、公開は実際の審議から3〜4週間遅れます。直近の答弁はまだ入っていません。</p>
+</form>
+
+<div class="status" id="status" role="status" aria-live="polite">
+  <h2>テーマを入れて「調べる」を押してください</h2>
+  <p>「特定外来生物」「奨学金」「インボイス」のように、政策で使われる言葉が向いています。</p>
+</div>
+
+<main id="results" hidden>
+  <section id="sec-year">
+    <h2>政府が答弁した回数の推移</h2>
+    <p class="sub">棒を選ぶと、その年の答弁だけを下に表示します。もう一度押すと解除します。</p>
+    <div class="chart"><div class="bars" id="bars"></div></div>
+  </section>
+
+  <section id="sec-ministry">
+    <h2>どの省庁が答えてきたか</h2>
+    <p class="sub">答弁者の役職から所管を判定しています。</p>
+    <div class="ministries" id="ministries"></div>
+  </section>
+
+  <section id="sec-list">
+    <h2>答弁を読む</h2>
+    <p class="sub" id="list-sub"></p>
+    <div class="toolbar">
+      <button type="button" class="chip" id="sort-old" aria-pressed="true">古い順</button>
+      <button type="button" class="chip" id="sort-new" aria-pressed="false">新しい順</button>
+      <span class="hint" id="filter-note"></span>
+    </div>
+    <div id="cards"></div>
+  </section>
+
+</main>
+
+<footer>
+  <p>出典：<a href="https://kokkai.ndl.go.jp/" target="_blank" rel="noopener">国会会議録検索システム</a>（国立国会図書館）。発言の著作権は発言者に帰属します。本サイトは抜粋のみを表示し、全文は原文リンク先でお読みください。</p>
+  <p>答弁の回数は関心の強さを示す目安であって、政策の重要度を示すものではありません。所管の判定は役職名にもとづく機械的なもので、誤りを含むことがあります。</p>
+</footer>
+
+<div id="share"></div>
+
+</div>
+
+</body>
+</html>
