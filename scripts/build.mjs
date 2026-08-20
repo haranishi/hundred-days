@@ -127,10 +127,11 @@ const WIKIMEDIA_CONNECT = [
   'wikivoyage', 'wiktionary', 'wikimedia', 'wikidata', 'wikifunctions', 'mediawiki'
 ].map((project) => `https://*.${project}.org`).join(' ');
 
-/* 外部へ接続するのはこのDayだけ。ほかのアプリは同一オリジンに閉じている。
+/* 外部へ接続するのはここに挙げたDayだけ。ほかのアプリは同一オリジンに閉じている。
    ⚠️ 新しいDayで外部のAPIを叩くときは、ここに足さないとブラウザ側で接続が止まる（黙って失敗する）。 */
 const CONNECT_BY_APP = {
-  'day-010-wikipedia-live': WIKIMEDIA_CONNECT
+  'day-010-wikipedia-live': WIKIMEDIA_CONNECT,
+  'day-013-gov-answers': 'https://kokkai.ndl.go.jp'
 };
 
 const appCsp = (dir) => [
