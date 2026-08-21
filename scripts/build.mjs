@@ -131,7 +131,8 @@ const WIKIMEDIA_CONNECT = [
    ⚠️ 新しいDayで外部のAPIを叩くときは、ここに足さないとブラウザ側で接続が止まる（黙って失敗する）。 */
 const CONNECT_BY_APP = {
   'day-010-wikipedia-live': WIKIMEDIA_CONNECT,
-  'day-013-gov-answers': 'https://kokkai.ndl.go.jp'
+  'day-013-gov-answers': 'https://kokkai.ndl.go.jp',
+  'day-014-hottest-now': 'https://www.jma.go.jp'
 };
 
 const appCsp = (dir) => [
