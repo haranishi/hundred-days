@@ -54,6 +54,60 @@ test('公開する全アプリにCSPが付く', () => {
   }
 });
 
+/* CSPへの足し忘れは画面に何も出ない。ローカルのテストは上流を差し替えて動かすので気付けず、
+   本番だけが黙って止まる（Day 014で実際に起きた）。コードに書いてある接続先と、そのDayのCSPが
+   食い違っていないかを機械で突き合わせる。
+
+   見るのは「変数に入れたURL」と「fetch等に直接渡したURL」だけ。プレースホルダや説明のリンク、
+   href に入れるだけのURLは接続ではないので数えない。組み立ててから渡す書き方（`https://${host}/…`）は
+   拾えないので、これは足し忘れの多くを捕まえる網であって、完全な保証ではない。 */
+const CONNECT_PATTERNS = [
+  /\b(?:const|let|var)\s+[A-Za-z_$][\w$]*\s*=\s*[`'"]https:\/\/([a-z0-9.-]+)/gi,
+  /(?:fetch|EventSource|WebSocket)\(\s*[`'"]https:\/\/([a-z0-9.-]+)/gi,
+];
+
+const connectSources = (dir) => {
+  const csp = (rules.get(`/${dir}/*`) || []).find((line) => line.startsWith('Content-Security-Policy:')) ?? '';
+  const found = csp.split(';').find((part) => part.trim().startsWith('connect-src'));
+  return (found ?? '').trim().split(/\s+/).slice(1);
+};
+
+const allows = (sources, host) =>
+  sources.some((source) => {
+    const pattern = source.replace(/^https:\/\//, '');
+    if (pattern === host) return true;
+    return pattern.startsWith('*.') && host.endsWith(pattern.slice(1));
+  });
+
+const codeFiles = (directory) => {
+  const skip = new Set(['tests', 'tools', 'shared']);
+  const walk = (place) =>
+    readdirSync(place, { withFileTypes: true }).flatMap((entry) => {
+      if (entry.isDirectory()) return skip.has(entry.name) ? [] : walk(join(place, entry.name));
+      return entry.name.endsWith('.js') && entry.name !== 'demo-scenario.mjs' ? [join(place, entry.name)] : [];
+    });
+  return walk(directory);
+};
+
+test('コードに書いてある接続先が、そのDayのCSPで許されている', () => {
+  const appsDir = fileURLToPath(new URL('../../apps/', import.meta.url));
+  let checked = 0;
+  for (const dir of publishedApps) {
+    const sources = connectSources(dir);
+    for (const file of codeFiles(join(appsDir, dir))) {
+      const code = readFileSync(file, 'utf8');
+      for (const pattern of CONNECT_PATTERNS) {
+        for (const [, host] of code.matchAll(pattern)) {
+          checked += 1;
+          expect(allows(sources, host), `${dir} は ${host} に繋ぐのに connect-src が許していない`).toBe(true);
+        }
+      }
+    }
+  }
+  // 網そのものが壊れて0件検査になっていないかを確かめる（外部に繋ぐDayは実在する）
+  expect(checked, '接続先が1件も見つからない＝検査が空回りしている').toBeGreaterThan(0);
+});
+
 test('外部への接続を許すのは、それが必要なDayだけ', () => {
   const day010 = (rules.get('/day-010-wikipedia-live/*') || []).join('\n');
   expect(day010, 'ウィキメディアへ繋げないと座標が引けない').toContain('https://*.wikipedia.org');
