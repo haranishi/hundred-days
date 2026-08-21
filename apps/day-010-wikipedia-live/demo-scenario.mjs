@@ -61,7 +61,7 @@ export async function shotSetup(page) {
     { timeout: 90_000 },
   );
 
-  // 水面にも記事名が出ている瞬間を撮る。次の1件が届いてから、粒が落ちきるぶんだけ待つ
+  // 地図に記事名のラベルが出ている瞬間を撮る。次の1件が届いてから、波紋が広がりきるぶんだけ待つ
   const before = await page.locator(".edit").count();
   await page.waitForFunction((count) => document.querySelectorAll(".edit").length > count, before, { timeout: 30_000 }).catch(() => {});
   await page.waitForTimeout(3_000);
@@ -79,15 +79,22 @@ const AUDIO_CUES = join(tmpdir(), "day-010-audio-cues.json");
 
 function watchJaEdits(page) {
   const marks = [];
-  let known = 0;
+  /* 一覧は10件で打ち止めなので、カードの件数では新着を数えられない（11件目以降は増えない）。
+     止まらずに増える日本語版のカウンタを見て、増えたぶんだけ一覧の先頭からバイト増減を取る。 */
+  let known = null;
   const timer = setInterval(async () => {
     try {
-      const items = await page.$$eval(".edit", (nodes) =>
-        nodes.map((node) => Number(node.dataset.delta ?? 0)));
-      if (items.length > known) {
-        for (let i = 0; i < items.length - known; i += 1) marks.push({ at: Date.now(), delta: items[i] });
-        known = items.length;
+      const now = await page.evaluate(() => ({
+        ja: window.__day010.stats.ja,
+        deltas: [...document.querySelectorAll(".edit")].map((node) => Number(node.dataset.delta ?? 0)),
+      }));
+      if (known === null) {
+        known = now.ja;
+        return;
       }
+      const added = Math.min(now.ja - known, now.deltas.length);
+      for (let i = added - 1; i >= 0; i -= 1) marks.push({ at: Date.now(), delta: now.deltas[i] });
+      if (now.ja > known) known = now.ja;
     } catch {
       // ページ遷移中などは読めない。次の周期で拾い直す
     }
@@ -102,27 +109,50 @@ function watchJaEdits(page) {
   };
 }
 
-/* 尺は15〜20秒に収める。日本語版の編集は5〜6秒に1件しか来ないので、
-   待ち時間は「上の画面を見せている間」に寄せて、待つためだけの秒数を作らない。 */
+/* ⚠️ この振り付けは「助走」を含めて30〜40秒を撮る。開いた直後は地図が空・数字が0で、
+   自動再生の最初の2秒がいちばん退屈な絵になるため、ピンがたまるまで待ってから見せ始める。
+   Playwrightの録画はページを作った瞬間から止められないので、**仕上げで頭を切り落とす**。
+   末尾（＝振り付けの終わり）を基準に20秒だけ残し、そこへ合成音を重ねて demo-with-audio.mp4 にする。
+
+   尺は切り出したあとで15〜20秒。日本語版の編集は5〜6秒に1件しか来ないので、
+   待ち時間は助走に寄せて、見せている間に「待つためだけの秒数」を作らない。 */
 export default async function (page, h) {
   await openLive(page);
-  const stopWatching = watchJaEdits(page);
-  // 地図にピンが立ち始めるところを見せる（座標の問い合わせは2.5秒ごとなので少し待つ）
-  await page.waitForFunction(() => window.__day010.stats.marks >= 3, null, { timeout: 14_000 }).catch(() => {});
-  await h.pause(2_400);
-  /* 一覧へ下りる前に、読ませるカードを2件そろえる。1件だけの状態で下りると
-     「日本語版が読める」という主張が1件の例で終わってしまう（17秒で1件しか来ない回がある）。 */
+
+  /* 助走の前半：ピンが数本立つまで。ここまでは確実に切り落とす。 */
   await page
-    .waitForFunction(() => document.querySelectorAll(".edit").length >= 2, null, { timeout: 12_000 })
+    .waitForFunction(() => window.__day010.stats.marks >= 6, null, { timeout: 40_000 })
     .catch(() => {});
-  await h.scrollTo("#feed-list", 800);
-  await h.pause(2_800);
-  // 一時停止で読める状態にする（このアプリで唯一の「操作」）
+
+  /* 音が鳴る状態にしてから撮る（音そのものは録れないので、後から同じ合成音を重ねる）。
+     音のキューは残す20秒に入りうる時点から拾い始める。助走の後半は「地図にピンが増えていく」
+     絵で、見せ場と区別がつかないので、切り出した窓に入っても構わない。 */
+  await page.click("#sound-toggle");
+  const stopWatching = watchJaEdits(page);
+
+  /* 助走の後半：読ませるカードが3件そろうまで。 */
+  await page
+    .waitForFunction(
+      () => window.__day010.stats.marks >= 14 && document.querySelectorAll(".edit").length >= 3,
+      null,
+      { timeout: 40_000 },
+    )
+    .catch(() => {});
+
+  // ①地図・大きい数字・いちばん書き換わっている国を見せる
+  await h.pause(4_200);
+  // ②日本語版の一覧まで下りて、記事名と直した内容を読ませる
+  await h.scrollTo("#feed-list", 900);
+  await h.pause(3_400);
+  /* ③一時停止で読める状態にする（このアプリで唯一の「操作」）。
+     ⚠️ page.click は押す要素を画面内へ入れるので、見出しにあるこのボタンを押すと自動で先頭へ戻る。
+     一時停止の絵は一覧ではなく地図の画面で写る。 */
   await page.click("#pause-toggle");
-  await h.pause(1_800);
+  await h.pause(2_400);
   await page.click("#pause-toggle");
-  await h.pause(1_000);
-  await h.scrollTop(800);
-  await h.pause(2_000);
+  await h.pause(1_200);
+  // ④地図へ戻る。助走のぶんピンが増えているので、集中している地域が濃く見える
+  await h.scrollTop(900);
+  await h.pause(3_000);
   await stopWatching();
 }
