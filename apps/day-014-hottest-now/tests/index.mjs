@@ -1,0 +1,1 @@
+import './amedas.test.mjs';

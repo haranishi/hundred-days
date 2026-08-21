@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>いま、日本でいちばん暑い場所 | 100日チャレンジ Day 014</title>
+<meta name="description" content="気象庁アメダスの実測気温を10分ごとに取り、いま日本でいちばん暑い場所と寒い場所、そしてあなたの街が全国で何番目かを出します。予報ではなく、いま測られている値です。">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230072B2'/%3E%3Crect x='13' y='5' width='6' height='15' rx='3' fill='white'/%3E%3Ccircle cx='16' cy='23' r='6' fill='%23D55E00'/%3E%3Crect x='14.5' y='9' width='3' height='13' fill='%23D55E00'/%3E%3C/svg%3E">
+<!-- canonical と OGP は scripts/build.mjs が meta.json から入れるので、ここには書かない -->
+<!-- 共通シェアの契約：投稿文にはアプリ名を必ず含める（tests/e2e/shared-share.spec.mjs） -->
+<meta name="share:text" content="いま、日本でいちばん暑い場所 — 気象庁アメダスの実測で、いま一番暑い場所と寒い場所、自分の街が全国で何番目かが出ます">
+<link rel="stylesheet" href="./styles.css">
+<link rel="stylesheet" href="./shared/share.css">
+<script type="module" src="./app.js"></script>
+<script src="./shared/share.js" defer></script>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <p class="head__day">Day 014</p>
+  <h1>いま、日本でいちばん暑い場所</h1>
+  <p class="lead">天気予報が出すのは「明日の最高気温」です。これは<strong>いま測られている値</strong>。気象庁のアメダスから10分ごとに受け取っています。</p>
+</header>
+
+<!-- 読込中 -->
+<div class="state" id="loading" role="status" aria-live="polite">
+  <h2>気象庁から受け取っています</h2>
+  <p>全国のアメダスの観測値を読み込んでいます。</p>
+</div>
+
+<!-- 通信エラー -->
+<div class="state state--error" id="error" hidden role="alert">
+  <h2>いまの気温を受け取れませんでした</h2>
+  <p id="error-detail">気象庁のデータに繋がりませんでした。時間をおいて、もう一度お試しください。</p>
+  <button type="button" id="retry">もう一度読み込む</button>
+</div>
+
+<main id="main" hidden>
+
+  <section class="hero">
+    <p class="stamp"><span id="stamp"></span>の実測値。10分ごとに更新されます。</p>
+    <p class="gap">いま、日本の中で <b id="gap"></b><span class="unit">℃</span> の差</p>
+    <div class="pair">
+      <article class="card card--hot">
+        <p class="card__label">いちばん暑い</p>
+        <p class="card__temp"><b id="hot-temp"></b><span class="unit">℃</span></p>
+        <p class="card__place" id="hot-place"></p>
+        <p class="card__sub" id="hot-sub"></p>
+      </article>
+      <article class="card card--cold">
+        <p class="card__label">いちばん寒い</p>
+        <p class="card__temp"><b id="cold-temp"></b><span class="unit">℃</span></p>
+        <p class="card__place" id="cold-place"></p>
+        <p class="card__sub" id="cold-sub"></p>
+      </article>
+    </div>
+    <p class="note" id="ground-note"></p>
+  </section>
+
+  <section class="you">
+    <h2>あなたの街は、<span id="measured-count"></span>地点の何番目？</h2>
+    <div class="finder">
+      <button type="button" id="locate">現在地から探す</button>
+      <form id="search" novalidate>
+        <label class="visually-hidden" for="q">地点名</label>
+        <input id="q" type="search" placeholder="地点名で探す（例：秋田）" autocomplete="off" enterkeyhint="search">
+        <button type="submit">探す</button>
+      </form>
+    </div>
+    <p class="hint">現在地は最寄りの観測所を選ぶためだけに使い、どこにも送りません。地点の一覧も気温も、気象庁が誰にでも同じものを配っているファイルです。</p>
+    <div id="you" class="you__result" aria-live="polite"></div>
+  </section>
+
+  <section class="dist">
+    <h2>全国の気温の散らばり</h2>
+    <p class="sub">横は気温、縦はその気温だった地点の数です。<span id="dist-note"></span></p>
+    <div class="chart"><canvas id="hist" height="200"></canvas></div>
+  </section>
+
+  <section class="lists">
+    <div class="two">
+      <div>
+        <h2>暑い順</h2>
+        <ol id="top" class="rank-list"></ol>
+      </div>
+      <div>
+        <h2>寒い順</h2>
+        <ol id="bottom" class="rank-list"></ol>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <p>出典：<a href="https://www.jma.go.jp/bosai/map.html#contents=amedas" target="_blank" rel="noopener">気象庁ホームページ</a>。表示しているのは自動で集められた<strong>速報値</strong>で、後から訂正されることがあります。</p>
+  <p><strong>順位・気温差・都道府県名は、気象庁の観測値をもとにこのページが計算したものです。</strong>気象庁が発表しているものではありません（気象庁の公共データ利用規約にもとづく加工の明示）。</p>
+  <p>アメダス<span id="total-count">-</span>地点のうち、気温を測っているのは<span id="thermometer-count">-</span>地点です。残りは雨量などだけを測っていて、この順位には入りません。都道府県は地点番号の府県ブロックから当てています。</p>
+</footer>
+
+<div id="share"></div>
+
+</div>
+</body>
+</html>

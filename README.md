@@ -22,6 +22,7 @@ AIと一緒に作りながら、「AIに任せたこと」と「自分で考え�
 | 011 | [この写真、まだ場所を覚えている](apps/day-011-photo-metadata/) | https://hundred-days.pages.dev/day-011-photo-metadata/ |
 | 012 | [海賊船の打ち返し係](apps/day-012-pirate-rebound/) | https://hundred-days.pages.dev/day-012-pirate-rebound/ |
 | 013 | [政府はこう答えてきた](apps/day-013-gov-answers/) | https://hundred-days.pages.dev/day-013-gov-answers/ |
+| 014 | [いま、日本でいちばん暑い場所](apps/day-014-hottest-now/) | https://hundred-days.pages.dev/day-014-hottest-now/ |
 
 ## 1日アプリのルール
 
