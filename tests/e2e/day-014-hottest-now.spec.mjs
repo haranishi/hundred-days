@@ -51,14 +51,14 @@ test('開いた直後に、いちばん暑い場所と寒い場所とその差�
 
 test('気温を測っていない地点は母数に入らない', async ({ page }) => {
   await open(page);
-  // 標本は10地点。うち雨量だけが1、品質フラグが立っているものが1で、残る8地点が順位の母数になる
-  await expect(page.locator('#measured-count')).toHaveText('8');
-  await expect(page.locator('#top li')).toHaveCount(8);
+  // 標本は11地点。うち雨量だけが1、品質フラグが立っているものが1で、残る9地点が順位の母数になる
+  await expect(page.locator('#measured-count')).toHaveText('9');
+  await expect(page.locator('#top li')).toHaveCount(9);
   await expect(page.locator('#top')).not.toContainText('小車');
   await expect(page.locator('#top')).not.toContainText('故障中');
   // 注記の地点数も、書き置きではなくその日の実数を出す
-  await expect(page.locator('#total-count')).toHaveText('10');
-  await expect(page.locator('#thermometer-count')).toHaveText('9');
+  await expect(page.locator('#total-count')).toHaveText('11');
+  await expect(page.locator('#thermometer-count')).toHaveText('10');
 });
 
 test('山の上とは別に、標高の低いところでいちばん寒い場所も出る', async ({ page }) => {
@@ -72,8 +72,8 @@ test('平仮名で探せて、同じ気温なら同率の地点数まで出る',
   await find(page, 'あきた');
   await expect(page.locator('#you .you__place')).toHaveText('秋田県 秋田');
   await expect(page.locator('#you .you__temp')).toHaveText('25.5℃');
-  await expect(page.locator('#you .you__rank')).toContainText('8地点中');
-  await expect(page.locator('#you .you__rank b')).toHaveText('2');
+  await expect(page.locator('#you .you__rank')).toContainText('9地点中');
+  await expect(page.locator('#you .you__rank b')).toHaveText('3');
   await expect(page.locator('#you .you__rank')).toContainText('同じ気温が2地点');
   await expect(page.locator('#you .you__sub')).toContainText('1位の牛深とは 5.0℃差');
 });
@@ -91,23 +91,34 @@ test('1時間前が取れなくても、いまの順位は出る', async ({ page
   await expect(page.locator('#hot-sub')).not.toContainText('1時間で');
 });
 
-test('棒が伸びている途中で地点を選んでも、印が消えない', async ({ page }) => {
+test('地図に観測所がぜんぶ描かれ、南西諸島も別枠で出る', async ({ page }) => {
   await open(page);
-  // 棒は画面に入ってから0.7秒かけて伸びる。その途中で地点が選ばれる状況を作る
-  await page.locator('.dist').scrollIntoViewIfNeeded();
+  const canvas = page.locator('#map');
+  // 標本11地点のうち、地図に出るのは11地点（那覇は左下の別枠に入る）
+  await expect(canvas).toHaveAttribute('data-drawn', '11');
+});
+
+test('地図の点を押すと、その土地のカードが出る', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' }); // 寄る動きを止めて、位置を確かめやすくする
+  await open(page);
   await find(page, '秋田');
-  await expect(page.locator('#you .you__place')).toBeVisible();
-  await page.waitForTimeout(1000);
-  const painted = await page.evaluate(() => {
-    const canvas = document.getElementById('hist');
-    const context = canvas.getContext('2d');
-    // 棒より上、印だけが描かれる帯に色が乗っているか
-    const band = context.getImageData(0, 0, canvas.width, Math.round(canvas.height * 0.12)).data;
-    let count = 0;
-    for (let index = 3; index < band.length; index += 4) if (band[index] > 0) count += 1;
-    return count;
-  });
-  expect(painted).toBeGreaterThan(0);
+  await expect(page.locator('#map')).toHaveAttribute('data-focus', '32402');
+
+  // 探した地点は画面の真ん中に来る。そこを押せば同じ地点が拾える
+  const box = await page.locator('#map').boundingBox();
+  await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
+  await expect(page.locator('#you .you__place')).toHaveText('秋田県 秋田');
+});
+
+test('地方を選ぶと、そこへ寄って、遠くの地点は画面から外れる', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await open(page);
+  await page.click('#regions button:has-text("北海道")');
+  const drawn = Number(await page.locator('#map').getAttribute('data-drawn'));
+  expect(drawn).toBeLessThan(11);
+  expect(drawn).toBeGreaterThan(0);
+  // 寄ったら南西諸島の別枠は消えるので、那覇は描かれない
+  await expect(page.locator('#regions button:has-text("北海道")')).toHaveAttribute('aria-pressed', 'true');
 });
 
 test('同じ名前の観測所が複数あるときは、都道府県つきで選ばせる', async ({ page }) => {
@@ -116,7 +127,7 @@ test('同じ名前の観測所が複数あるときは、都道府県つきで�
   await expect(page.locator('#you')).toContainText('2か所あります');
   await page.click('#you .choices button:has-text("岐阜県 金山")');
   await expect(page.locator('#you .you__place')).toHaveText('岐阜県 金山');
-  await expect(page.locator('#you .you__rank b')).toHaveText('5');
+  await expect(page.locator('#you .you__rank b')).toHaveText('6');
 });
 
 test('雨量しか測っていない地点を選ぶと、理由と近くの代わりが出る', async ({ page }) => {

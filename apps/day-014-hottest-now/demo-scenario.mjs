@@ -42,25 +42,30 @@ async function ready(page) {
 
 export default async function (page, h) {
   await ready(page);
-  await h.pause(1400);
-  await page.locator('#q').pressSequentially('秋田', { delay: 280 });
-  await h.pause(600);
+  await h.pause(900);
+  await h.scrollTo('.map', 800);          // 地図を画面いっぱいに置く
+  await h.pause(1200);
+  await page.click('#regions button:nth-child(2)');   // 北海道へ寄る
+  await h.pause(2600);
+  await page.click('#regions button:nth-child(9)');   // 九州へ寄る
+  await h.pause(2600);
+  await page.click('#regions button:nth-child(1)');   // 日本ぜんぶへ戻る
+  await h.pause(1800);
+  await page.locator('#q').pressSequentially('秋田', { delay: 260 });
   await page.click('#search button[type="submit"]');
   await page.waitForSelector('.you__place');
-  await h.pause(2800);
-  await h.scrollTo('.dist');
-  await h.pause(3200); // ここで棒が伸びる
-  await h.scrollTo('.lists');
-  await h.pause(3400);
-  await h.scrollTop();
-  await h.pause(2000);
+  await h.pause(2400);
+  await h.scrollTo('.you__result', 700);
+  await h.pause(2200);
+  await h.scrollTo('.lists', 700);
+  await h.pause(2200);
 }
 
 /* 一覧ページに出す静止画は、いちばん暑い場所と自分の街の順位が1枚に入る状態にする。 */
 export async function shotSetup(page) {
   await ready(page);
-  await page.locator('#q').fill('秋田');
-  await page.click('#search button[type="submit"]');
-  await page.waitForSelector('.you__place');
-  await page.waitForTimeout(1200);
+  await page.waitForTimeout(900);
 }
+
+/* 一覧ページのサムネは、地図が主役だと分かる位置で撮る */
+export const shotScroll = 520;
