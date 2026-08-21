@@ -86,7 +86,7 @@ const failureLine =
     : defaultFailureLine;
 const emoji = xConfig?.emoji?.trim() || '⏱️';
 
-const post = [
+const template = [
   `Day ${day} / 100`,
   '',
   `「${meta.title}」を作りました${emoji}`,
@@ -99,6 +99,17 @@ const post = [
   '実際に触れます。リンクはリプ欄👇',
   hashtags.join(' ')
 ].filter((line, index, lines) => line || (index > 0 && lines[index - 1])).join('\n').trim();
+
+/* 「何ができるか」の説明に本文を使いたい日など、上の型に収まらないときは
+   social.x.body に本文をそのまま書ける。書いてあればそちらを使う（summary・ai・human・
+   failure・emoji・hashtags は本文には入らないが、記録としてmeta.jsonに残しておく）。
+   本文に入りきらない説明は social.x.replies に並べる。リンクのリプライは常に1本目。
+   　"social": { "x": { "body": "…", "replies": ["…", "…"] } } */
+const post = xConfig?.body?.trim() || template;
+
+const extraReplies = Array.isArray(xConfig?.replies)
+  ? xConfig.replies.map((value) => String(value).trim()).filter(Boolean)
+  : [];
 
 const remote = execFileSync('git', ['remote', 'get-url', 'origin'], { cwd: root, encoding: 'utf8' }).trim();
 const sshGithubPrefix = ['git', 'github.com:'].join('@');
@@ -135,6 +146,12 @@ const postLength = weightedLength(post);
 const replyLength = weightedLength(reply);
 if (postLength > 280) fail(`本文がX換算${postLength}文字で上限280を超える`);
 if (replyLength > 280) fail(`リプライがX換算${replyLength}文字で上限280を超える`);
+
+const extraReplyLengths = extraReplies.map((text, index) => {
+  const length = weightedLength(text);
+  if (length > 280) fail(`リプライ${index + 2}がX換算${length}文字で上限280を超える`);
+  return length;
+});
 
 console.log('公開前チェックを実行');
 execFileSync(process.execPath, [join(root, 'scripts', 'precheck.mjs')], { cwd: root, stdio: 'inherit' });
@@ -194,7 +211,9 @@ const manifest = {
   appDirectory: dir,
   generatedAt: new Date().toISOString(),
   postWeightedLength: postLength,
+  postSource: xConfig?.body?.trim() ? 'social.x.body' : 'template',
   replyWeightedLength: replyLength,
+  extraReplyWeightedLengths: extraReplyLengths,
   video: {
     path: videoPath,
     file: basename(videoPath),
@@ -222,18 +241,28 @@ const checklist = [
   '- [ ] 本文と動画の最終プレビュー',
   '- [ ] 本文＋動画を公開',
   '- [ ] 公開URL＋GitHub URLをリプライ',
+  ...extraReplies.map((_, index) => `- [ ] reply-${index + 2}.txt を続けてリプライ`),
   '- [ ] 公開後にX投稿URLをmeta.jsonへ記録'
 ].join('\n');
 
 writeFileSync(join(outputDir, 'post.txt'), `${post}\n`);
 writeFileSync(join(outputDir, 'reply.txt'), `${reply}\n`);
+extraReplies.forEach((text, index) => {
+  writeFileSync(join(outputDir, `reply-${index + 2}.txt`), `${text}\n`);
+});
 writeFileSync(join(outputDir, 'checklist.md'), `${checklist}\n`);
 writeFileSync(join(outputDir, 'manifest.json'), `${JSON.stringify(manifest, null, 2)}\n`);
 
 console.log(`\nOK: X投稿準備完了 -> ${outputDir}`);
-console.log(`本文 ${postLength}/280、リプライ ${replyLength}/280、動画 ${duration.toFixed(1)}秒`);
+console.log(
+  `本文 ${postLength}/280、リプライ ${[replyLength, ...extraReplyLengths].map((n) => `${n}/280`).join('・')}、動画 ${duration.toFixed(1)}秒`
+);
 console.log('\n--- 本文 ---');
 console.log(post);
-console.log('\n--- リプライ ---');
+console.log('\n--- リプライ1（リンク） ---');
 console.log(reply);
+extraReplies.forEach((text, index) => {
+  console.log(`\n--- リプライ${index + 2} ---`);
+  console.log(text);
+});
 console.log('\n公開ボタンは、checklist.mdの未完了項目を確認してから押すこと。');
