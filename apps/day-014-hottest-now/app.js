@@ -1,7 +1,7 @@
 import {
-  aliasOf, buildStations, coldestBelow, distanceKm, extremes, formatClock, histogram,
-  nearestStation, normalizeQuery, rankByTemperature, rankSummary, searchStations,
-  shiftStamp, stampFromIso,
+  APART, LONGITUDE_SQUEEZE, REGIONS, aliasOf, belongsApart, boundsOf, buildStations, coldestBelow,
+  distanceKm, extremes, fitScale, formatClock, nearestStation, normalizeQuery, pickAt,
+  rankByTemperature, rankSummary, regionBounds, searchStations, shiftStamp, stampFromIso, toScreen,
 } from './lib/amedas.js';
 
 /* 気象庁の防災情報のファイルをそのまま読む。誰でも同じものが取れる静的ファイルで、
@@ -9,6 +9,10 @@ import {
 const BASE = 'https://www.jma.go.jp/bosai/amedas';
 const REFRESH_MS = 5 * 60 * 1000;
 const LIST_SIZE = 10;
+
+/* 全体を見ているか、どこかへ寄っているかの境目。寄っているときは南西諸島も
+   本物の位置で描く（＝海を越えて行ける）。 */
+const CLOSE_UP = 1.8;
 
 const dom = {};
 const state = {
@@ -18,14 +22,21 @@ const state = {
   previous: new Map(),
   selectedId: null,
   origin: null,
-  animateHistogram: true,
-  seenHistogram: false,
-  drawToken: 0,
+};
+const map = {
+  view: { longitude: 138, latitude: 38, scale: 20 },
+  base: 20,
+  home: null,
+  size: { width: 0, height: 0 },
+  drawn: [],
+  inset: null,
+  flight: null,
 };
 
 const $ = (id) => document.getElementById(id);
 const fixed = (value) => value.toFixed(1);
 const signed = (value) => `${value > 0 ? '+' : value < 0 ? '−' : '±'}${fixed(Math.abs(value))}`;
+const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 async function fetchWithTimeout(url, { asText = false, timeout = 12_000 } = {}) {
   const controller = new AbortController();
@@ -61,8 +72,8 @@ async function load() {
 
   dom.loading.hidden = true;
   dom.main.hidden = false;
+  setUpMap();
   render();
-  watchHistogram();
   loadPrevious(stamp);
 }
 
@@ -96,7 +107,7 @@ function failed(error) {
       : '気象庁のデータに繋がりませんでした。時間をおいて、もう一度お試しください。';
 }
 
-/* ---------- 描画 ---------- */
+/* ---------- 文字にする ---------- */
 
 function deltaText(id) {
   const now = state.ranked.find((station) => station.id === id) ?? state.stations.find((station) => station.id === id);
@@ -105,12 +116,10 @@ function deltaText(id) {
   return `1時間で ${signed(Math.round((now.temperature - before) * 10) / 10)}℃`;
 }
 
-function placeLabel(station) {
-  return `${station.prefecture} ${station.name}`.trim();
-}
+const placeLabel = (station) => `${station.prefecture} ${station.name}`.trim();
 
 /* 同じ名前の地点を選ばせるときと、選んだ地点を見せるときだけは、
-   読みの欄に入っている別名（「雄和：秋田空港」の後ろ）も出す。 */
+   読みの欄に入っている別名（「ユウワ：秋田空港」の後ろ）も出す。 */
 function detailedLabel(station) {
   const alias = aliasOf(station);
   return alias ? `${placeLabel(station)}（${alias}）` : placeLabel(station);
@@ -144,8 +153,9 @@ function render() {
       ? `いちばん寒い場所は、たいてい山の上です。標高1,000mより低い観測所に限ると、いちばん低いのは${placeLabel(ground)}の${fixed(ground.temperature)}℃。`
       : '';
 
+  renderLegend();
   renderLists();
-  renderHistogram();
+  drawMap();
   renderYou();
 }
 
@@ -172,117 +182,333 @@ function renderLists() {
   dom.bottom.replaceChildren(...state.ranked.slice(-LIST_SIZE).reverse().map(listItem));
 }
 
-function mix(ratio) {
-  const cold = [0, 114, 178];
-  const hot = [213, 94, 0];
-  const channel = (index) => Math.round(cold[index] + (hot[index] - cold[index]) * ratio);
+/* ---------- 地図 ---------- */
+
+/* 寒色から暖色へ。両端は色の見え方が違う人にも分かれる2色（青と朱）にしてある。 */
+const RAMP = [
+  { at: 0.00, rgb: [0, 92, 158] },
+  { at: 0.30, rgb: [86, 156, 200] },
+  { at: 0.52, rgb: [176, 176, 168] },
+  { at: 0.74, rgb: [214, 140, 60] },
+  { at: 1.00, rgb: [200, 74, 0] },
+];
+
+/* 点は900個以上あるので、上下の気温は描くたびに1回だけ出して使い回す。 */
+function heat(temperature, span) {
+  const { lo, hi } = span;
+  const t = hi === lo ? 0.5 : Math.min(1, Math.max(0, (temperature - lo) / (hi - lo)));
+  let a = RAMP[0];
+  let b = RAMP[RAMP.length - 1];
+  for (let i = 0; i < RAMP.length - 1; i += 1) {
+    if (t >= RAMP[i].at && t <= RAMP[i + 1].at) { a = RAMP[i]; b = RAMP[i + 1]; break; }
+  }
+  const k = b.at === a.at ? 0 : (t - a.at) / (b.at - a.at);
+  const channel = (index) => Math.round(a.rgb[index] + (b.rgb[index] - a.rgb[index]) * k);
   return `rgb(${channel(0)},${channel(1)},${channel(2)})`;
 }
 
-function renderHistogram() {
-  /* 棒は「画面に入ってから」伸ばす。先に描いてしまうと、スクロールして辿り着いた頃には
-     もう終わっていて、何がどれだけ多いのかが伝わらない。 */
-  if (!state.seenHistogram) return;
-  const canvas = dom.hist;
-  const temperatures = state.ranked.map((station) => station.temperature);
-  const bins = histogram(temperatures, 1);
-  if (!bins.length) return;
-
-  const lowest = bins[0].from;
-  const highest = bins[bins.length - 1].to;
-  const tallest = Math.max(...bins.map((bin) => bin.count), 1);
-  const selected = state.selectedId ? state.ranked.find((station) => station.id === state.selectedId) : null;
-
-  const coldest = state.ranked[state.ranked.length - 1];
-  dom.distNote.textContent =
-    coldest && Number.isFinite(coldest.altitude) && coldest.altitude >= 1000
-      ? `左端に1本だけ離れているのは${placeLabel(coldest)}（標高${coldest.altitude.toLocaleString('ja-JP')}m）です。`
-      : '';
-
-  const context = canvas.getContext('2d');
-  const start = performance.now();
-  const duration = state.animateHistogram ? 700 : 0;
-  state.animateHistogram = false;
-
-  /* 起動時の描き込みは0.7秒かけて伸びる。その途中で地点が選ばれると、
-     選んだ印を描いた上に、走り続けている古いコマが重ね書きして印を消してしまう。
-     新しい描画が始まったら古いコマは降りる。 */
-  const token = (state.drawToken += 1);
-
-  const frame = (now) => {
-    if (token !== state.drawToken) return;
-    const ratio = duration ? Math.min(1, (now - start) / duration) : 1;
-    const eased = 1 - (1 - ratio) ** 3;
-    const scale = Math.min(2, window.devicePixelRatio || 1);
-    const width = canvas.clientWidth || 600;
-    const height = canvas.clientHeight || 200;
-    canvas.width = Math.round(width * scale);
-    canvas.height = Math.round(height * scale);
-    context.setTransform(scale, 0, 0, scale, 0, 0);
-    context.clearRect(0, 0, width, height);
-
-    const padding = { left: 16, right: 16, top: 26, bottom: 22 };
-    const plotWidth = width - padding.left - padding.right;
-    const plotHeight = height - padding.top - padding.bottom;
-    const barWidth = plotWidth / bins.length;
-    const styles = getComputedStyle(document.body);
-    const muted = styles.getPropertyValue('--muted').trim() || '#888';
-
-    bins.forEach((bin, index) => {
-      /* 富士山だけが入る本は1地点しかない。比率のままだと線にもならず、
-         下の注記で名指ししているのに画面から消えてしまう。 */
-      const raw = (bin.count / tallest) * plotHeight;
-      const barHeight = (bin.count ? Math.max(2, raw) : 0) * eased;
-      context.fillStyle = mix((index + 0.5) / bins.length);
-      context.fillRect(
-        padding.left + index * barWidth + 0.5,
-        padding.top + plotHeight - barHeight,
-        Math.max(1, barWidth - 1),
-        barHeight,
-      );
-    });
-
-    context.fillStyle = muted;
-    context.font = '11px system-ui, sans-serif';
-    context.textAlign = 'center';
-    for (let value = Math.ceil(lowest / 5) * 5; value <= highest; value += 5) {
-      const x = padding.left + ((value - lowest) / (highest - lowest)) * plotWidth;
-      context.fillRect(x, padding.top + plotHeight, 1, 4);
-      context.fillText(`${value}℃`, x, height - 6);
-    }
-
-    if (selected) {
-      const x = padding.left + ((selected.temperature - lowest) / (highest - lowest)) * plotWidth;
-      context.fillStyle = styles.getPropertyValue('--text').trim() || '#000';
-      context.beginPath();
-      context.moveTo(x, padding.top - 4);
-      context.lineTo(x - 6, padding.top - 14);
-      context.lineTo(x + 6, padding.top - 14);
-      context.closePath();
-      context.fill();
-      context.textAlign = x > width - 60 ? 'right' : x < 60 ? 'left' : 'center';
-      context.fillText(selected.name, Math.min(width - 4, Math.max(4, x)), padding.top - 18);
-    }
-
-    if (ratio < 1) requestAnimationFrame(frame);
-  };
-  requestAnimationFrame(frame);
+function temperatureSpan() {
+  const summary = extremes(state.ranked);
+  return { lo: summary.coldest.temperature, hi: summary.hottest.temperature };
 }
 
-function watchHistogram() {
-  if (state.seenHistogram) return;
-  if (!('IntersectionObserver' in window)) {
-    state.seenHistogram = true;
-    renderHistogram();
+function renderLegend() {
+  const span = temperatureSpan();
+  dom.rampLo.textContent = `${Math.floor(span.lo)}℃`;
+  dom.rampHi.textContent = `${Math.ceil(span.hi)}℃`;
+  dom.ramp.style.background = `linear-gradient(90deg, ${RAMP
+    .map((stop) => `${heat(span.lo + (span.hi - span.lo) * stop.at, span)} ${stop.at * 100}%`)
+    .join(', ')})`;
+}
+
+function setUpMap() {
+  map.home = boundsOf(state.stations.filter((station) => !belongsApart(station)), 0.3);
+  layoutMap();
+  map.view.longitude = (map.home.west + map.home.east) / 2;
+  map.view.latitude = (map.home.south + map.home.north) / 2;
+  map.view.scale = map.base;
+}
+
+function layoutMap() {
+  const canvas = dom.map;
+  const rect = canvas.getBoundingClientRect();
+  map.size = { width: rect.width, height: rect.height };
+  const ratio = Math.min(2, window.devicePixelRatio || 1);
+  canvas.width = Math.round(rect.width * ratio);
+  canvas.height = Math.round(rect.height * ratio);
+  canvas.getContext('2d').setTransform(ratio, 0, 0, ratio, 0, 0);
+  if (map.home) map.base = fitScale(map.home, rect.width, rect.height, 18);
+}
+
+/* 南西諸島の別枠は、本土の点と重ならない隅に置く。画面の向きで空いている隅が
+   変わるので、描くたびにいちばん空いている隅を選ぶ。 */
+function placeInset(mainDots) {
+  const { width, height } = map.size;
+  const w = Math.min(220, Math.max(140, width * 0.32));
+  const h = Math.min(140, Math.max(96, height * 0.28));
+  const margin = 12;
+  const candidates = [
+    { x: margin, y: height - h - margin },
+    { x: margin, y: margin },
+    { x: width - w - margin, y: height - h - margin },
+    { x: width - w - margin, y: margin + 76 },
+  ];
+  let best = null;
+  for (const box of candidates) {
+    if (box.y < 0 || box.y + h > height) continue;
+    let hits = 0;
+    for (const dot of mainDots) {
+      if (dot.x > box.x - 8 && dot.x < box.x + w + 8 && dot.y > box.y - 8 && dot.y < box.y + h + 8) hits += 1;
+    }
+    if (!best || hits < best.hits) best = { ...box, hits };
+  }
+  const chosen = best ?? { x: margin, y: height - h - margin };
+  map.inset = {
+    x: chosen.x, y: chosen.y, w, h,
+    scale: fitScale(APART, w, h, 10),
+    longitude: (APART.west + APART.east) / 2,
+    latitude: (APART.south + APART.north) / 2,
+  };
+}
+
+function drawMap() {
+  if (!map.home || !state.stations.length) return;
+  const canvas = dom.map;
+  const context = canvas.getContext('2d');
+  const { width, height } = map.size;
+  const styles = getComputedStyle(document.body);
+  const muted = styles.getPropertyValue('--muted').trim() || '#888';
+  const surface = styles.getPropertyValue('--surface').trim() || '#fff';
+  const border = styles.getPropertyValue('--border').trim() || '#ccc';
+  const text = styles.getPropertyValue('--text').trim() || '#000';
+
+  const span = temperatureSpan();
+  context.clearRect(0, 0, width, height);
+  map.drawn = [];
+
+  const zoom = map.view.scale / map.base;
+  const overview = zoom <= CLOSE_UP;
+  const radius = Math.max(1.7, Math.min(6.5, 2.0 * Math.sqrt(zoom)));
+
+  const mainDots = [];
+  for (const station of state.stations) {
+    if (overview && belongsApart(station)) continue;
+    const point = toScreen(station, map.view, map.size);
+    if (point.x < -20 || point.x > width + 20 || point.y < -20 || point.y > height + 20) continue;
+    mainDots.push({ station, x: point.x, y: point.y });
+  }
+
+  const insetDots = [];
+  if (overview) {
+    placeInset(mainDots);
+    context.save();
+    context.globalAlpha = 0.6;
+    context.fillStyle = surface;
+    context.beginPath();
+    context.roundRect(map.inset.x, map.inset.y, map.inset.w, map.inset.h, 8);
+    context.fill();
+    context.globalAlpha = 1;
+    context.strokeStyle = border;
+    context.stroke();
+    context.fillStyle = muted;
+    context.font = '11px system-ui, sans-serif';
+    context.textAlign = 'left';
+    context.fillText('南西諸島（別の縮尺）', map.inset.x + 8, map.inset.y + 15);
+    context.restore();
+
+    for (const station of state.stations) {
+      if (!belongsApart(station)) continue;
+      const point = toScreen(station, { ...map.inset, scale: map.inset.scale }, { width: map.inset.w, height: map.inset.h });
+      const x = map.inset.x + point.x;
+      const y = map.inset.y + point.y;
+      if (x < map.inset.x + 2 || x > map.inset.x + map.inset.w - 2) continue;
+      if (y < map.inset.y + 19 || y > map.inset.y + map.inset.h - 2) continue;
+      insetDots.push({ station, x, y });
+    }
+  }
+
+  for (const dot of [...mainDots, ...insetDots]) {
+    map.drawn.push(dot);
+    if (dot.station.temperature === null) {
+      context.fillStyle = muted;
+      context.globalAlpha = 0.32;
+      context.beginPath();
+      context.arc(dot.x, dot.y, Math.max(1, radius * 0.5), 0, Math.PI * 2);
+      context.fill();
+      context.globalAlpha = 1;
+      continue;
+    }
+    context.fillStyle = heat(dot.station.temperature, span);
+    context.beginPath();
+    context.arc(dot.x, dot.y, radius, 0, Math.PI * 2);
+    context.fill();
+  }
+
+  /* 地名は「拡大率」ではなく「画面に見えている点の数」で出す。南西諸島のように
+     広くても点が少ない場所では、寄らなくても名前が読めたほうがいい。 */
+  const visible = map.drawn.filter((dot) => dot.station.temperature !== null);
+  if (visible.length <= 400) {
+    context.font = '600 11px "Hiragino Sans", system-ui, sans-serif';
+    context.textAlign = 'center';
+    context.lineWidth = 3;
+    context.strokeStyle = surface;
+    context.fillStyle = text;
+    const shown = [];
+    for (const dot of visible) {
+      if (shown.some((other) => Math.abs(other.x - dot.x) < 52 && Math.abs(other.y - dot.y) < 18)) continue;
+      shown.push(dot);
+      context.strokeText(dot.station.name, dot.x, dot.y - radius - 5);
+      context.fillText(dot.station.name, dot.x, dot.y - radius - 5);
+      if (shown.length > 80) break;
+    }
+  }
+
+  if (state.selectedId) {
+    const dot = map.drawn.find((item) => item.station.id === state.selectedId);
+    if (dot) {
+      context.strokeStyle = text;
+      context.lineWidth = 2;
+      context.beginPath();
+      context.arc(dot.x, dot.y, radius + 6, 0, Math.PI * 2);
+      context.stroke();
+    }
+  }
+
+  canvas.dataset.drawn = String(map.drawn.length);
+  canvas.dataset.focus = state.selectedId ?? '';
+}
+
+function flyTo(bounds, padding = 30) {
+  if (!bounds) return;
+  const target = {
+    longitude: (bounds.west + bounds.east) / 2,
+    latitude: (bounds.south + bounds.north) / 2,
+    scale: Math.max(map.base, fitScale(bounds, map.size.width, map.size.height, padding)),
+  };
+  if (reduceMotion) {
+    Object.assign(map.view, target);
+    drawMap();
     return;
   }
-  const observer = new IntersectionObserver((entries) => {
-    if (!entries.some((entry) => entry.isIntersecting)) return;
-    observer.disconnect();
-    state.seenHistogram = true;
-    renderHistogram();
-  }, { threshold: 0.3 });
-  observer.observe(dom.hist);
+  const from = { ...map.view };
+  const started = performance.now();
+  const token = Symbol('flight');
+  map.flight = token;
+  const step = (now) => {
+    if (map.flight !== token) return;
+    const t = Math.min(1, (now - started) / 620);
+    const eased = 1 - (1 - t) ** 3;
+    map.view.longitude = from.longitude + (target.longitude - from.longitude) * eased;
+    map.view.latitude = from.latitude + (target.latitude - from.latitude) * eased;
+    map.view.scale = from.scale + (target.scale - from.scale) * eased;
+    drawMap();
+    if (t < 1) requestAnimationFrame(step);
+  };
+  requestAnimationFrame(step);
+}
+
+function flyToStation(station) {
+  flyTo({
+    west: station.longitude - 1.1, east: station.longitude + 1.1,
+    south: station.latitude - 0.8, north: station.latitude + 0.8,
+  }, 26);
+}
+
+function setUpRegions() {
+  for (const region of REGIONS) {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.textContent = region.label;
+    button.setAttribute('aria-pressed', region.home ? 'true' : 'false');
+    button.addEventListener('click', () => {
+      for (const other of dom.regions.querySelectorAll('button')) other.setAttribute('aria-pressed', 'false');
+      button.setAttribute('aria-pressed', 'true');
+      flyTo(regionBounds(state.stations, region), region.home ? 18 : 34);
+    });
+    dom.regions.append(button);
+  }
+}
+
+function setUpPointer() {
+  const canvas = dom.map;
+  const pointers = new Map();
+  let dragging = false;
+  let moved = false;
+  let lastX = 0;
+  let lastY = 0;
+  let pinch = null;
+
+  canvas.addEventListener('pointerdown', (event) => {
+    canvas.setPointerCapture(event.pointerId);
+    pointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
+    if (pointers.size === 1) {
+      dragging = true;
+      moved = false;
+      lastX = event.clientX;
+      lastY = event.clientY;
+      canvas.classList.add('is-dragging');
+    } else if (pointers.size === 2) {
+      const [a, b] = [...pointers.values()];
+      pinch = { distance: Math.hypot(a.x - b.x, a.y - b.y), scale: map.view.scale };
+    }
+  });
+
+  canvas.addEventListener('pointermove', (event) => {
+    if (!pointers.has(event.pointerId)) return;
+    pointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
+    if (pointers.size === 2 && pinch) {
+      const [a, b] = [...pointers.values()];
+      const distance = Math.hypot(a.x - b.x, a.y - b.y);
+      map.view.scale = Math.min(map.base * 30, Math.max(map.base, pinch.scale * (distance / pinch.distance)));
+      map.flight = null;
+      drawMap();
+      return;
+    }
+    if (!dragging) return;
+    const dx = event.clientX - lastX;
+    const dy = event.clientY - lastY;
+    if (Math.abs(dx) + Math.abs(dy) > 3) moved = true;
+    lastX = event.clientX;
+    lastY = event.clientY;
+    map.view.longitude -= dx / (LONGITUDE_SQUEEZE * map.view.scale);
+    map.view.latitude += dy / map.view.scale;
+    map.flight = null;
+    drawMap();
+  });
+
+  const release = (event) => {
+    pointers.delete(event.pointerId);
+    if (pointers.size < 2) pinch = null;
+    if (pointers.size === 0) {
+      dragging = false;
+      canvas.classList.remove('is-dragging');
+    }
+  };
+
+  canvas.addEventListener('pointerup', (event) => {
+    const wasMoved = moved;
+    release(event);
+    if (wasMoved) return;
+    const rect = canvas.getBoundingClientRect();
+    const hit = pickAt(map.drawn, { x: event.clientX - rect.left, y: event.clientY - rect.top });
+    if (hit) select(hit.station.id, { fly: false });
+  });
+  canvas.addEventListener('pointercancel', release);
+
+  canvas.addEventListener('wheel', (event) => {
+    event.preventDefault();
+    const rect = canvas.getBoundingClientRect();
+    const x = event.clientX - rect.left - map.size.width / 2;
+    const y = event.clientY - rect.top - map.size.height / 2;
+    const before = map.view.scale;
+    const after = Math.min(map.base * 30, Math.max(map.base, before * (event.deltaY < 0 ? 1.16 : 0.86)));
+    // 指のある場所を動かさずに寄る
+    map.view.longitude += (x / LONGITUDE_SQUEEZE) * (1 / before - 1 / after);
+    map.view.latitude -= y * (1 / before - 1 / after);
+    map.view.scale = after;
+    map.flight = null;
+    drawMap();
+  }, { passive: false });
 }
 
 /* ---------- あなたの街（空・読込中・エラー・不正入力はここに集まる） ---------- */
@@ -314,10 +540,11 @@ function message(text, { empty = false, choices = [] } = {}) {
   youCard(nodes, { empty });
 }
 
-function select(id) {
+function select(id, { fly = true } = {}) {
   const station = state.stations.find((entry) => entry.id === id);
   if (!station) return;
   state.selectedId = id;
+  if (fly) flyToStation(station);
 
   if (station.temperature === null) {
     /* 空の状態。ここは故障ではなく「そもそも気温を測っていない」ことがほとんど。 */
@@ -330,7 +557,7 @@ function select(id) {
       : '';
     message(`${reason}${suffix}`, { empty: true, choices: alternative ? [alternative.station] : [] });
     renderLists();
-    renderHistogram();
+    drawMap();
     return;
   }
 
@@ -360,18 +587,19 @@ function select(id) {
     summary.id === hottest.id
       ? 'いまの日本でいちばん暑いのはここです'
       : `1位の${hottest.name}とは ${fixed(Math.round((hottest.temperature - summary.temperature) * 10) / 10)}℃差`,
+    Number.isFinite(station.altitude) ? `標高${station.altitude.toLocaleString('ja-JP')}m` : '',
     deltaText(id),
     state.origin ? `現在地から ${fixed(distanceKm(state.origin, station))}km` : '',
   ].filter(Boolean).join(' ／ ');
 
   youCard([place, temperature, rank, detail]);
   renderLists();
-  renderHistogram();
+  drawMap();
 }
 
 function locate() {
   if (!navigator.geolocation) {
-    message('この端末では現在地を取れませんでした。地点名で探せます。', { empty: true });
+    message('この端末では現在地を取れませんでした。地図から選ぶか、地点名で探せます。', { empty: true });
     return;
   }
   message('現在地を確認しています…');
@@ -388,8 +616,8 @@ function locate() {
     (error) => {
       message(
         error?.code === 1
-          ? '現在地の利用が許可されませんでした。地点名で探せます。'
-          : '現在地を取れませんでした。地点名で探せます。',
+          ? '現在地の利用が許可されませんでした。地図から選ぶか、地点名で探せます。'
+          : '現在地を取れませんでした。地図から選ぶか、地点名で探せます。',
         { empty: true },
       );
     },
@@ -417,7 +645,7 @@ function search(event) {
 }
 
 function renderYou() {
-  if (state.selectedId) select(state.selectedId);
+  if (state.selectedId) select(state.selectedId, { fly: false });
 }
 
 /* ---------- 起動 ---------- */
@@ -428,16 +656,21 @@ function boot() {
     main: $('main'), stamp: $('stamp'), gap: $('gap'), measuredCount: $('measured-count'),
     hotTemp: $('hot-temp'), hotPlace: $('hot-place'), hotSub: $('hot-sub'),
     coldTemp: $('cold-temp'), coldPlace: $('cold-place'), coldSub: $('cold-sub'),
-    groundNote: $('ground-note'), distNote: $('dist-note'), hist: $('hist'),
-    totalCount: $('total-count'), thermometerCount: $('thermometer-count'),
+    groundNote: $('ground-note'), map: $('map'), regions: $('regions'),
+    ramp: $('ramp'), rampLo: $('ramp-lo'), rampHi: $('ramp-hi'),
     top: $('top'), bottom: $('bottom'), you: $('you'), query: $('q'),
+    totalCount: $('total-count'), thermometerCount: $('thermometer-count'),
   });
 
   dom.retry.addEventListener('click', () => load().catch(failed));
   $('locate').addEventListener('click', locate);
   $('search').addEventListener('submit', search);
+  setUpRegions();
+  setUpPointer();
   window.addEventListener('resize', () => {
-    if (!dom.main.hidden) renderHistogram();
+    if (dom.main.hidden) return;
+    layoutMap();
+    drawMap();
   });
 
   load().catch(failed);

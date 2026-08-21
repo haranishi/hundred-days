@@ -168,21 +168,75 @@ export function aliasOf(station) {
   return alias ? alias.trim() : '';
 }
 
-export function histogram(values, binSize = 1) {
-  const numbers = values.filter((value) => Number.isFinite(value));
-  if (!numbers.length) return [];
-  const start = Math.floor(Math.min(...numbers) / binSize) * binSize;
-  const end = Math.ceil(Math.max(...numbers) / binSize) * binSize;
-  const bins = [];
-  for (let from = start; from < end; from += binSize) {
-    bins.push({ from, to: from + binSize, count: 0 });
+/* ── ここから地図 ──
+   海岸線のデータは持たない。観測点を緯度経度どおりに置くと、それだけで日本列島の形になる。
+   地図そのものが観測網の姿なので、線を引くより点を置くほうが正しい。 */
+
+export const REGIONS = [
+  { label: '日本ぜんぶ', home: true },
+  { label: '北海道', prefectures: ['北海道'] },
+  { label: '東北', prefectures: ['青森県', '岩手県', '宮城県', '秋田県', '山形県', '福島県'] },
+  { label: '関東', prefectures: ['茨城県', '栃木県', '群馬県', '埼玉県', '千葉県', '東京都', '神奈川県'] },
+  { label: '中部', prefectures: ['新潟県', '富山県', '石川県', '福井県', '山梨県', '長野県', '岐阜県', '静岡県', '愛知県'] },
+  { label: '近畿', prefectures: ['三重県', '滋賀県', '京都府', '大阪府', '兵庫県', '奈良県', '和歌山県'] },
+  { label: '中国', prefectures: ['鳥取県', '島根県', '岡山県', '広島県', '山口県'] },
+  { label: '四国', prefectures: ['徳島県', '香川県', '愛媛県', '高知県'] },
+  { label: '九州', prefectures: ['福岡県', '佐賀県', '長崎県', '熊本県', '大分県', '宮崎県', '鹿児島県'] },
+  { label: '南西諸島', bounds: { west: 122.4, east: 131.4, south: 23.8, north: 30.2 }, apart: true },
+];
+
+/* 南西諸島は本土から遠い。全体を1枚に収めると本土がつぶれるので、
+   全体表示のときだけ別枠に出す。寄ったときは本物の位置で描く（＝海を越えて行ける）。 */
+export const APART = REGIONS[REGIONS.length - 1].bounds;
+
+export function belongsApart(station) {
+  return station.latitude < APART.north && station.longitude <= APART.east;
+}
+
+export function boundsOf(stations, margin = 0.3) {
+  if (!stations.length) return null;
+  let west = Infinity, east = -Infinity, south = Infinity, north = -Infinity;
+  for (const station of stations) {
+    west = Math.min(west, station.longitude);
+    east = Math.max(east, station.longitude);
+    south = Math.min(south, station.latitude);
+    north = Math.max(north, station.latitude);
   }
-  if (!bins.length) bins.push({ from: start, to: start + binSize, count: 0 });
-  for (const value of numbers) {
-    const index = Math.min(bins.length - 1, Math.floor((value - start) / binSize));
-    bins[index].count += 1;
+  return { west: west - margin, east: east + margin, south: south - margin, north: north + margin };
+}
+
+export function regionBounds(stations, region, margin = 0.4) {
+  if (region.bounds) return region.bounds;
+  if (region.home) return boundsOf(stations.filter((station) => !belongsApart(station)), 0.3);
+  return boundsOf(stations.filter((station) => region.prefectures.includes(station.prefecture)), margin);
+}
+
+/* 緯度が上がるほど経度1度は短くなる。日本の真ん中の緯度で横を縮めておくと、
+   地図として素直な形になる。 */
+export const LONGITUDE_SQUEEZE = Math.cos((37.5 * Math.PI) / 180);
+
+export function fitScale(bounds, width, height, padding = 20) {
+  const spanX = (bounds.east - bounds.west) * LONGITUDE_SQUEEZE;
+  const spanY = bounds.north - bounds.south;
+  if (spanX <= 0 || spanY <= 0) return 1;
+  return Math.min((width - padding * 2) / spanX, (height - padding * 2) / spanY);
+}
+
+export function toScreen(station, view, size) {
+  return {
+    x: size.width / 2 + (station.longitude - view.longitude) * LONGITUDE_SQUEEZE * view.scale,
+    y: size.height / 2 - (station.latitude - view.latitude) * view.scale,
+  };
+}
+
+/* 画面のどこを押したかから、いちばん近い地点を返す。指の太さぶんは許す。 */
+export function pickAt(drawn, point, reach = 16) {
+  let best = null;
+  for (const item of drawn) {
+    const distance = Math.hypot(item.x - point.x, item.y - point.y);
+    if (distance <= reach && (!best || distance < best.distance)) best = { ...item, distance };
   }
-  return bins;
+  return best;
 }
 
 /* 配信ファイル名は日本時間の壁時計そのもの。端末のタイムゾーンに左右されないよう

@@ -59,7 +59,9 @@
   </section>
 
   <section class="you">
-    <h2>あなたの街は、<span id="measured-count"></span>地点の何番目？</h2>
+    <h2>日本地図で探す</h2>
+    <p class="sub">点はぜんぶ気象庁の観測所です。地図の形も、線ではなく<strong>観測所の並びそのもの</strong>でできています。点をさわると、その土地に行けます。</p>
+
     <div class="finder">
       <button type="button" id="locate">現在地から探す</button>
       <form id="search" novalidate>
@@ -69,13 +71,19 @@
       </form>
     </div>
     <p class="hint">現在地は最寄りの観測所を選ぶためだけに使い、どこにも送りません。地点の一覧も気温も、気象庁が誰にでも同じものを配っているファイルです。</p>
-    <div id="you" class="you__result" aria-live="polite"></div>
-  </section>
 
-  <section class="dist">
-    <h2>全国の気温の散らばり</h2>
-    <p class="sub">横は気温、縦はその気温だった地点の数です。<span id="dist-note"></span></p>
-    <div class="chart"><canvas id="hist" height="200"></canvas></div>
+    <div class="map">
+      <canvas id="map" role="img" aria-label="全国の観測所を気温の色で示した日本地図。地点は下の一覧と検索からも選べます。"></canvas>
+      <div class="legend" aria-hidden="true">
+        <p>いまの気温</p>
+        <div class="legend__ramp" id="ramp"></div>
+        <div class="legend__ends"><span id="ramp-lo"></span><span id="ramp-hi"></span></div>
+      </div>
+    </div>
+    <nav class="regions" id="regions" aria-label="行き先"></nav>
+
+    <h3 class="you__head">あなたの街は、<span id="measured-count"></span>地点の何番目？</h3>
+    <div id="you" class="you__result" aria-live="polite"></div>
   </section>
 
   <section class="lists">
