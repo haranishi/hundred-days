@@ -117,8 +117,11 @@ test('地方を選ぶと、そこへ寄って、遠くの地点は画面から�
   const drawn = Number(await page.locator('#map').getAttribute('data-drawn'));
   expect(drawn).toBeLessThan(11);
   expect(drawn).toBeGreaterThan(0);
-  // 寄ったら南西諸島の別枠は消えるので、那覇は描かれない
   await expect(page.locator('#regions button:has-text("北海道")')).toHaveAttribute('aria-pressed', 'true');
+
+  // よそを探したら、選んだ地方の印は外れる（いま見ている場所とずれるため）
+  await find(page, '秋田');
+  await expect(page.locator('#regions button:has-text("北海道")')).toHaveAttribute('aria-pressed', 'false');
 });
 
 test('同じ名前の観測所が複数あるときは、都道府県つきで選ばせる', async ({ page }) => {

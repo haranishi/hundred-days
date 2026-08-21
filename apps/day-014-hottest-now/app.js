@@ -408,6 +408,9 @@ function flyTo(bounds, padding = 30) {
 }
 
 function flyToStation(station) {
+  /* 地方ボタンで九州を見ていた人が秋田を探したら、九州は選ばれたままにしない。
+     押されている印は「いま見ている場所」を指すものなので、外れたら消す。 */
+  for (const button of dom.regions.querySelectorAll('button')) button.setAttribute('aria-pressed', 'false');
   flyTo({
     west: station.longitude - 1.1, east: station.longitude + 1.1,
     south: station.latitude - 0.8, north: station.latitude + 0.8,
