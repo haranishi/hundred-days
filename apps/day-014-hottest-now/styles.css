@@ -1,0 +1,124 @@
+:root{
+  --bg:#ffffff; --surface:#f6f7f9; --border:#d6dae0; --text:#14181d; --muted:#5c6672;
+  --accent:#0072B2; --accent-2:#D55E00; --focus:#0072B2;
+  --hot:#D55E00; --cold:#0072B2;
+  --radius:10px; --maxw:920px;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#12161b; --surface:#1b2027; --border:#2f3742; --text:#e8ecf1; --muted:#9aa5b1;
+    --accent:#4da3d9; --accent-2:#f08a3c; --hot:#f08a3c; --cold:#4da3d9;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#12161b; --surface:#1b2027; --border:#2f3742; --text:#e8ecf1; --muted:#9aa5b1;
+  --accent:#4da3d9; --accent-2:#f08a3c; --hot:#f08a3c; --cold:#4da3d9;
+}
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--bg); color:var(--text);
+  font-family:"Hiragino Sans","Hiragino Kaku Gothic ProN","Noto Sans JP",system-ui,sans-serif;
+  line-height:1.75; font-size:16px;
+}
+.wrap{max-width:var(--maxw); margin:0 auto; padding:24px 16px 72px}
+a{color:var(--accent)}
+:focus-visible{outline:3px solid var(--focus); outline-offset:2px}
+[hidden]{display:none !important}
+.visually-hidden{position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap}
+
+header{margin-bottom:20px}
+.head__day{margin:0 0 4px; font-size:.8rem; font-weight:700; letter-spacing:.08em; color:var(--muted)}
+header h1{font-size:1.6rem; line-height:1.4; margin:0 0 8px; text-wrap:balance}
+header p.lead{margin:0; color:var(--muted); font-size:.95rem}
+
+button{
+  font:inherit; font-weight:700; padding:10px 18px; border-radius:8px; cursor:pointer;
+  border:1px solid var(--accent); background:var(--accent); color:#fff;
+}
+button.secondary{background:transparent; color:var(--accent)}
+input{
+  font:inherit; padding:10px 12px; border:1px solid var(--border);
+  border-radius:8px; background:var(--bg); color:var(--text); width:100%; min-width:0;
+}
+h2{font-size:1.05rem; margin:0 0 6px}
+.sub,.hint,.note{color:var(--muted); font-size:.85rem; margin:0 0 10px}
+
+.state{
+  background:var(--surface); border:1px solid var(--border); border-left:4px solid var(--accent);
+  border-radius:var(--radius); padding:18px 16px; margin:20px 0;
+}
+.state h2{margin:0 0 4px}
+.state p{margin:0 0 10px; color:var(--muted); font-size:.9rem}
+.state--error{border-left-color:var(--accent-2)}
+
+section{margin:28px 0}
+
+/* いまの日本 */
+.hero .stamp{margin:0 0 6px; font-size:.85rem; color:var(--muted); font-variant-numeric:tabular-nums}
+.gap{margin:0 0 14px; font-size:1.15rem; font-weight:700; line-height:1.4}
+.gap b{font-size:2.6rem; font-variant-numeric:tabular-nums; letter-spacing:-.02em}
+.unit{font-size:.6em; margin-left:2px}
+.pair{display:grid; grid-template-columns:1fr 1fr; gap:12px}
+.card{
+  background:var(--surface); border:1px solid var(--border); border-radius:var(--radius);
+  padding:14px 16px; border-top:4px solid var(--border);
+}
+.card--hot{border-top-color:var(--hot)}
+.card--cold{border-top-color:var(--cold)}
+.card__label{margin:0; font-size:.8rem; font-weight:700; color:var(--muted)}
+.card__temp{margin:2px 0 2px; line-height:1.1}
+.card__temp b{font-size:2.2rem; font-variant-numeric:tabular-nums}
+.card--hot .card__temp b{color:var(--hot)}
+.card--cold .card__temp b{color:var(--cold)}
+.card__place{margin:0; font-weight:700}
+.card__sub{margin:2px 0 0; font-size:.8rem; color:var(--muted); font-variant-numeric:tabular-nums}
+
+/* あなたの街 */
+.finder{display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin:10px 0 8px}
+.finder form{display:flex; gap:8px; flex:1 1 260px; min-width:0; margin:0}
+.finder form button{flex:0 0 auto}
+.you__result:empty{display:none}
+.you__card{
+  background:var(--surface); border:1px solid var(--border); border-radius:var(--radius);
+  padding:16px; margin-top:6px;
+}
+.you__card--empty{border-left:4px solid var(--accent-2)}
+.you__place{margin:0; font-weight:700; font-size:1.05rem}
+.you__temp{margin:2px 0; font-size:2.2rem; font-weight:700; font-variant-numeric:tabular-nums; line-height:1.15}
+.you__rank{margin:0; font-size:1rem}
+.you__rank b{font-size:1.6rem; font-variant-numeric:tabular-nums; color:var(--accent)}
+.you__sub{margin:6px 0 0; font-size:.85rem; color:var(--muted); font-variant-numeric:tabular-nums}
+.you__card p.you__msg{margin:0 0 8px}
+.choices{display:flex; flex-wrap:wrap; gap:8px; margin-top:8px}
+.choices button{
+  background:transparent; color:var(--text); border:1px solid var(--border);
+  font-weight:400; padding:6px 12px; font-size:.9rem;
+}
+.choices button:hover{border-color:var(--accent); color:var(--accent)}
+
+/* 散らばり */
+.chart{background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:12px}
+canvas{width:100%; height:200px; display:block}
+
+/* 順位表 */
+.two{display:grid; grid-template-columns:1fr 1fr; gap:20px}
+.rank-list{margin:0; padding:0; list-style:none}
+.rank-list li{
+  display:flex; gap:8px; align-items:baseline; padding:6px 0;
+  border-bottom:1px solid var(--border); font-size:.92rem;
+}
+.rank-list li:last-child{border-bottom:0}
+.rank-list .r{width:2.2em; color:var(--muted); font-size:.8rem; font-variant-numeric:tabular-nums; flex:0 0 auto}
+.rank-list .n{flex:1 1 auto; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.rank-list .n small{color:var(--muted); font-weight:400; font-size:.8em; margin-right:4px}
+.rank-list .t{font-weight:700; font-variant-numeric:tabular-nums; flex:0 0 auto}
+.rank-list li.is-you{background:color-mix(in srgb, var(--accent) 12%, transparent); border-radius:6px}
+
+footer{margin-top:36px; border-top:1px solid var(--border); padding-top:14px}
+footer p{margin:0 0 8px; font-size:.8rem; color:var(--muted); line-height:1.7}
+
+@media (max-width:560px){
+  .pair{grid-template-columns:1fr}
+  .two{grid-template-columns:1fr; gap:12px}
+  .gap b{font-size:2.2rem}
+}
