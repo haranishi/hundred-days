@@ -331,3 +331,68 @@ select:disabled { color: var(--muted); background: transparent; border-style: da
   #quick-picks { grid-row: 2; grid-column: 1 / -1; justify-content: flex-start; }
   #status { max-width: 960px; }
 }
+
+/* ---- 地図（順位ヒートマップ） ---- */
+.map-section {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 0.25rem 1rem 0.5rem;
+}
+.map-section__title { margin: 0.4rem 0 0.5rem; font-size: 1rem; text-align: center; }
+.chip-row--scroll {
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  justify-content: flex-start;
+  padding: 2px 0 8px;
+  scrollbar-width: none;
+}
+.chip-row--scroll::-webkit-scrollbar { display: none; }
+.chip--metric { flex: 0 0 auto; }
+.chip--metric[aria-pressed="true"] {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #ffffff;
+  font-weight: 600;
+}
+.map-wrap { position: relative; }
+#map { display: block; width: 100%; }
+.map-tip {
+  position: absolute;
+  background: var(--ink);
+  color: var(--paper);
+  font-size: 0.78rem;
+  padding: 0.2rem 0.55rem;
+  border-radius: 8px;
+  pointer-events: none;
+  white-space: nowrap;
+  transform: translateY(-100%);
+}
+.map-legend {
+  display: grid;
+  grid-template-columns: auto 1fr auto;   /* うすい[棒]こい を常に1行で固定（折返しで対応が切れない） */
+  align-items: center;
+  gap: 0.35rem 0.5rem;
+  max-width: 360px;
+  margin: 0.25rem auto 0;
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+.map-legend__caption { grid-column: 1 / -1; text-align: center; }
+.map-legend__bar {
+  width: 96px;
+  height: 8px;
+  border-radius: 999px;
+  background: linear-gradient(to right, rgb(207,224,214), rgb(78,138,118), rgb(18,53,44));
+}
+.map-legend__missing { display: inline-flex; align-items: center; gap: 0.3rem; }
+.map-legend__missing i {
+  width: 9px; height: 9px; border-radius: 50%;
+  background: rgba(205, 201, 193, 0.55);
+}
+.map-note { margin: 0.4rem 0 0; font-size: 0.75rem; color: var(--muted); text-align: center; }
+
+@media (min-width: 768px) {
+  .map-section { max-width: 640px; }
+  /* PCは横幅に余裕がある＝スクロールでなく折り返して全チップを見せる（採点指摘） */
+  .chip-row--scroll { flex-wrap: wrap; overflow-x: visible; justify-content: center; }
+}

@@ -88,6 +88,39 @@ test('URLのc/vsから状態を復元でき、不正なコードは無視する'
   await expect(page.locator('#status')).toContainText('例として秋田市を表示しています');
 });
 
+test('順位ヒートマップの地図が出て、指標チップで凡例が切り替わる', async ({ page }) => {
+  await page.goto(PAGE);
+  await expect(page.locator('#map-section')).toBeVisible();
+  // 既定は平均年齢
+  await expect(page.locator('#map-metrics .chip[data-metric="ageAvg"]')).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.locator('#legend-caption')).toContainText('平均年齢が高い方');
+  // 総人口へ切り替え
+  await page.locator('#map-metrics .chip[data-metric="pop"]').click();
+  await expect(page.locator('#map-metrics .chip[data-metric="pop"]')).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.locator('#legend-caption')).toContainText('総人口が多い方');
+  // 地図はキャンバスに実際に描かれている（真っ白ではない）
+  const painted = await page.evaluate(() => {
+    const canvas = document.getElementById('map');
+    const ctx = canvas.getContext('2d');
+    const data = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+    let filled = 0;
+    for (let i = 3; i < data.length; i += 4) if (data[i] > 0) filled += 1;
+    return filled;
+  });
+  expect(painted).toBeGreaterThan(1000);
+});
+
+test('地図の点を押すと、その街のカードが出る', async ({ page }) => {
+  await page.goto(PAGE);
+  await expect(page.locator('#map-section')).toBeVisible();
+  await page.locator('#map').scrollIntoViewIfNeeded();   // 画面外の座標はクリックできない
+  const at = await page.evaluate(() => window.__day015Project('05201'));
+  expect(at).not.toBeNull();
+  await page.mouse.click(at[0], at[1]);
+  await expect(page.locator('#card-main .card__title')).toHaveText('秋田市');
+  await expect(page).toHaveURL(/c=05201/);
+});
+
 test('出典と非公式の断りが常設されている', async ({ page }) => {
   await page.goto(PAGE);
   const foot = page.locator('footer');

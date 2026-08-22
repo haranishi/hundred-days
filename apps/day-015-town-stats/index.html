@@ -34,6 +34,22 @@
 
   <div id="status" role="status" aria-live="polite" hidden></div>
 
+  <section id="map-section" class="map-section" aria-label="日本地図で眺める" hidden>
+    <h2 class="map-section__title">地図で眺める</h2>
+    <div id="map-metrics" class="chip-row chip-row--scroll" role="group" aria-label="地図で塗り分ける指標"></div>
+    <div class="map-wrap">
+      <canvas id="map" aria-label="市区町村のヒートマップ。点を押すとその街のカードが下に出ます"></canvas>
+      <div id="map-tip" class="map-tip" hidden></div>
+    </div>
+    <div class="map-legend">
+      <span id="legend-low">うすい＝下位</span>
+      <span class="map-legend__bar" aria-hidden="true"></span>
+      <span id="legend-high">こい＝上位</span>
+      <span class="map-legend__caption"><span id="legend-caption">こいほど上位</span> ・ <span class="map-legend__missing"><i aria-hidden="true"></i>データなし</span></span>
+    </div>
+    <p class="map-note">順位で塗るヒートマップ。海岸線は描いていない＝1,741の点が集まって日本の形になる。点は各市区町村の人口でならした代表点（国勢調査の境界データから独自計算）。点を押すと下にカードが出ます。</p>
+  </section>
+
   <p id="cards-legend" hidden>棒グラフの中央の線＝全国の中央値。指標により母数（値のある街の数）は少し異なります。</p>
 
   <main id="cards" class="cards">
@@ -53,7 +69,7 @@
   <div id="share"></div>
 
   <footer class="site-foot">
-    <p>「令和2年国勢調査」（総務省統計局・2020年10月1日時点）および「全国都道府県市区町村別面積調」（国土地理院・令和8年4月1日時点）を加工して作成。ひとり暮らし世帯の割合は一般世帯数から独自に計算。</p>
+    <p>「令和2年国勢調査」（総務省統計局・2020年10月1日時点）および「全国都道府県市区町村別面積調」（国土地理院・令和8年4月1日時点）を加工して作成。ひとり暮らし世帯の割合は一般世帯数から独自に計算。地図の代表点は「境界データ」（総務省統計局・e-Stat統計GIS）の小地域重心から人口加重で独自に計算。</p>
     <p>国の公式サービスではありません。数値の正確性は保証されません。順位は1,741市区町村（政令指定都市は市単位・東京は特別区単位）の中での位置です。</p>
   </footer>
 

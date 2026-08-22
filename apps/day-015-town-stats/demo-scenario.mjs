@@ -34,43 +34,45 @@ async function ensureServer() {
 }
 
 /* 一覧ページ用スクショ（1200×750）。record-demoのshoot()はfile://で開くので、
-   ここでもサーバー経由で開き直す。秋田市と新宿区の2枚並び＝このアプリの見どころ。 */
+   ここでもサーバー経由で開き直す。見どころ＝順位ヒートマップの日本列島。 */
 export async function shotSetup(page) {
   const base = await ensureServer();
-  await page.goto(`${base}?c=05201&vs=13104`, { waitUntil: 'load' });
-  await page.waitForSelector('#card-vs', { state: 'visible', timeout: 30_000 });
-  await page.evaluate(() => window.scrollTo(0, 240));
-  await page.waitForTimeout(250);
+  await page.goto(base, { waitUntil: 'load' });
+  await page.waitForSelector('#map-section', { state: 'visible', timeout: 30_000 });
+  await page.waitForTimeout(400);
+  await page.evaluate(() => {
+    document.getElementById('map').scrollIntoView({ block: 'center' });
+  });
+  await page.waitForTimeout(300);
 }
 
 export default async function (page, h) {
   const base = await ensureServer();
-  /* 1コマ目から「動いているところ」にする決まりなので、
-     空のトップではなく秋田市のカードが出た状態から録り始める。 */
-  await page.goto(`${base}?c=05201`, { waitUntil: 'load' });
-  await page.waitForSelector('#card-main', { state: 'visible', timeout: 30_000 });
-  await h.pause(1600);
-  await h.scrollTo('.stat-list', 900);
-  await h.pause(1400);
+  /* 1コマ目から「動いているところ」＝ヒートマップの日本列島を見せる */
+  await page.goto(base, { waitUntil: 'load' });
+  await page.waitForSelector('#map-section', { state: 'visible', timeout: 30_000 });
+  await h.scrollTo('#map-section', 400);
+  await h.pause(2000);
 
-  // べつの街とくらべる：横浜市
-  await h.scrollTo('#compare', 700);
-  await h.pause(600);
-  await page.selectOption('#vs-pref', '神奈川県');
-  await h.pause(700);
-  await page.selectOption('#vs-town', { label: '横浜市' });
-  await page.waitForSelector('#card-vs', { state: 'visible' });
-  await h.pause(500);
-  await h.scrollTo('#cards', 900);
-  await h.pause(2400);
+  // 指標を切り替えて塗りが変わるところ
+  await page.locator('#map-metrics .chip[data-metric="dens"]').click();
+  await h.pause(1800);
+  await page.locator('#map-metrics .chip[data-metric="single"]').click();
+  await h.pause(1800);
 
-  // 検索で東京の特別区へ乗り換える
-  await h.scrollTo('.picker', 600);
-  await page.fill('#search-input', '新宿');
+  // 地図の点を押して街を選ぶ（新宿区）
+  const at = await page.evaluate(() => window.__day015Project('13104'));
+  if (at) {
+    await page.mouse.click(at[0], at[1]);
+    await page.waitForSelector('#card-main', { state: 'visible' });
+  }
   await h.pause(900);
-  await page.locator('#search-results li', { hasText: '新宿区' }).first().click();
-  await page.waitForSelector('#card-main', { state: 'visible' });
+  await h.scrollTo('.stat-list', 900);
   await h.pause(2200);
-  await h.scrollTo('.stat-list', 800);
+
+  // 地図へ戻ると選択リングが付いている
+  await h.scrollTo('#map-section', 800);
+  await h.pause(1600);
+  await page.locator('#map-metrics .chip[data-metric="ageAvg"]').click();
   await h.pause(1800);
 }
