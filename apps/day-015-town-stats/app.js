@@ -4,6 +4,7 @@ import {
   METRICS, PREFS, barRatio, buildIndex, formatValue, medianOf,
   rankLabel, rankOf, searchTowns, townsOfPref,
 } from './lib/stats.js';
+import { MISSING_COLOR, fitProjection, nearestCode, rampColor, rankRatio } from './lib/map.js';
 
 const el = (id) => document.getElementById(id);
 const statusBox = el('status');
@@ -24,9 +25,13 @@ const SAMPLE_CODE = '05201';   // 空状態で例として見せる街（秋田�
 const QUICK_PICKS = ['01100', '05201', '13104', '27100', '47201']; // 札幌・秋田・新宿・大阪・那覇
 let towns = [];
 let index = null;
+let points = null;   // code → [lon, lat]（人口加重重心）
 let mainCode = null;
 let vsCode = null;
 let activeAt = -1;   // 検索候補のキーボード位置
+let mapMetric = 'ageAvg';   // 地図の既定は平均年齢（土地の物語がいちばん出る）
+let mapXY = null;    // code → 画面座標
+let mapCtx = null;
 
 /* ---- 状態表示（読込中・空・エラーは全部ここ） ---- */
 function showStatus(build) {
@@ -69,14 +74,19 @@ async function loadData() {
     box.textContent = '読み込み中…';
   });
   try {
-    const response = await fetch('./data/towns.json');
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
-    const data = await response.json();
+    const [townsRes, pointsRes] = await Promise.all([
+      fetch('./data/towns.json'),
+      fetch('./data/points.json'),
+    ]);
+    if (!townsRes.ok || !pointsRes.ok) throw new Error('HTTP error');
+    const data = await townsRes.json();
+    points = await pointsRes.json();
     towns = data.towns;
     index = buildIndex(towns);
     fillPrefOptions(prefSelect);
     fillPrefOptions(vsPref);
     fillQuickPicks();
+    initMap();
     restoreFromUrl();
     // 読み込み中に検索し始めていた人へ：データが届いた今、候補を出し直す
     //（フォーカスが検索箱にあるときだけ。復元で入れた街名から勝手に開かないように）
@@ -277,6 +287,133 @@ function renderCard(town, container) {
   el('cards-legend').hidden = false;
 }
 
+/* ---- 地図（順位ヒートマップ） ---- */
+const mapSection = el('map-section');
+const mapCanvas = el('map');
+const mapTip = el('map-tip');
+
+function fillMapMetrics() {
+  const row = el('map-metrics');
+  row.replaceChildren();
+  for (const metric of METRICS) {
+    const chip = document.createElement('button');
+    chip.type = 'button';
+    chip.className = 'chip chip--metric';
+    chip.dataset.metric = metric.key;
+    chip.textContent = metric.label;
+    chip.setAttribute('aria-pressed', metric.key === mapMetric ? 'true' : 'false');
+    chip.addEventListener('click', () => {
+      mapMetric = metric.key;
+      for (const c of row.children) c.setAttribute('aria-pressed', c === chip ? 'true' : 'false');
+      drawMap();
+    });
+    row.append(chip);
+  }
+  // 選択中のチップが横スクロールの外に隠れないようにする
+  row.querySelector('[aria-pressed="true"]')?.scrollIntoView({ inline: 'center', block: 'nearest' });
+}
+
+function initMap() {
+  fillMapMetrics();
+  mapSection.hidden = false;
+  const { aspect } = fitProjection(points, 100, 100, 0);
+  const resize = () => {
+    const wrap = mapCanvas.parentElement;
+    const width = wrap.clientWidth;
+    const height = Math.round(width / aspect);
+    const dpr = window.devicePixelRatio || 1;
+    mapCanvas.width = Math.round(width * dpr);
+    mapCanvas.height = Math.round(height * dpr);
+    mapCanvas.style.height = `${height}px`;
+    mapCtx = mapCanvas.getContext('2d');
+    mapCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const projection = fitProjection(points, width, height, 12);
+    mapXY = new Map();
+    for (const [code, [lon, lat]] of Object.entries(points)) {
+      mapXY.set(code, projection.toXY(lon, lat));
+    }
+    drawMap();
+  };
+  resize();
+  new ResizeObserver(() => resize()).observe(mapCanvas.parentElement);
+
+  mapCanvas.addEventListener('click', (event) => {
+    const rect = mapCanvas.getBoundingClientRect();
+    const code = nearestCode(mapXY, event.clientX - rect.left, event.clientY - rect.top, 14);
+    if (code) selectTown(code);
+  });
+  mapCanvas.addEventListener('pointermove', (event) => {
+    if (event.pointerType === 'touch') return;
+    const rect = mapCanvas.getBoundingClientRect();
+    const code = nearestCode(mapXY, event.clientX - rect.left, event.clientY - rect.top, 12);
+    if (!code) { mapTip.hidden = true; mapCanvas.style.cursor = 'default'; return; }
+    const town = index.byCode.get(code);
+    const metric = METRICS.find((m) => m.key === mapMetric);
+    mapTip.textContent = `${town.name} ${formatValue(metric, town[mapMetric])}${metric.unit}`;
+    mapTip.style.left = `${event.clientX - rect.left + 12}px`;
+    mapTip.style.top = `${event.clientY - rect.top - 10}px`;
+    mapTip.hidden = false;
+    mapCanvas.style.cursor = 'pointer';
+  });
+  mapCanvas.addEventListener('pointerleave', () => { mapTip.hidden = true; });
+
+  /* E2Eから点の画面位置を引くためのフック（表示には使わない） */
+  window.__day015Project = (code) => {
+    const at = mapXY?.get(code);
+    if (!at) return null;
+    const rect = mapCanvas.getBoundingClientRect();
+    return [rect.left + at[0], rect.top + at[1]];
+  };
+}
+
+function drawMap() {
+  if (!mapCtx || !mapXY) return;
+  const metric = METRICS.find((m) => m.key === mapMetric);
+  const width = mapCanvas.getBoundingClientRect().width;
+  const height = Number(mapCanvas.style.height.replace('px', ''));
+  const dotR = width >= 700 ? 3 : 2.2;   // PCで点が痩せて見えないように
+  mapCtx.clearRect(0, 0, width, height);
+  for (const [code, [x, y]] of mapXY) {
+    const rank = rankOf(index, mapMetric, code);
+    const color = rank ? rampColor(rankRatio(rank.rank, rank.of)) : MISSING_COLOR;
+    mapCtx.beginPath();
+    mapCtx.arc(x, y, dotR, 0, Math.PI * 2);
+    mapCtx.fillStyle = color;
+    mapCtx.fill();
+  }
+  /* いま見ている街：紙色の下地→インクの輪→点→街名。探さなくても見つかる強さにする（採点指摘） */
+  if (mainCode && mapXY.has(mainCode)) {
+    const [x, y] = mapXY.get(mainCode);
+    const town = index.byCode.get(mainCode);
+    mapCtx.beginPath();
+    mapCtx.arc(x, y, 9, 0, Math.PI * 2);
+    mapCtx.strokeStyle = '#faf7f2';
+    mapCtx.lineWidth = 5;
+    mapCtx.stroke();
+    mapCtx.beginPath();
+    mapCtx.arc(x, y, 9, 0, Math.PI * 2);
+    mapCtx.strokeStyle = '#2b2a26';
+    mapCtx.lineWidth = 2;
+    mapCtx.stroke();
+    const rank = rankOf(index, mapMetric, mainCode);
+    mapCtx.beginPath();
+    mapCtx.arc(x, y, dotR + 1.5, 0, Math.PI * 2);
+    mapCtx.fillStyle = rank ? rampColor(rankRatio(rank.rank, rank.of)) : MISSING_COLOR;
+    mapCtx.fill();
+    mapCtx.font = '700 12px -apple-system, "Hiragino Sans", sans-serif';
+    mapCtx.textBaseline = 'middle';
+    const labelWidth = mapCtx.measureText(town.name).width;
+    const lx = Math.min(Math.max(x + 13, 4), width - labelWidth - 4);
+    const ly = Math.max(y - 13, 10);
+    mapCtx.strokeStyle = '#faf7f2';
+    mapCtx.lineWidth = 4;
+    mapCtx.strokeText(town.name, lx, ly);
+    mapCtx.fillStyle = '#2b2a26';
+    mapCtx.fillText(town.name, lx, ly);
+  }
+  el('legend-caption').textContent = `こいほど「${metric.label}が${metric.dirWord}方」の上位`;
+}
+
 /* ---- 選択と比較 ---- */
 function markChip(code) {
   for (const chip of document.querySelectorAll('#quick-picks .chip')) {
@@ -296,6 +433,7 @@ function selectTown(code) {
   renderCard(town, cardMain);
   compareBox.hidden = false;
   document.title = `${town.name}のステータス | ${BASE_TITLE}`;
+  drawMap();   // 地図の選択リングを更新
   syncUrl();
 }
 
