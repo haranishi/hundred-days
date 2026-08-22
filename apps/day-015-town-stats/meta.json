@@ -14,6 +14,7 @@
     "local-llm"
   ],
   "difficulty": "B",
+  "status": "published",
   "publicUrl": "https://hundred-days.pages.dev/day-015-town-stats/",
   "screenshot": "screenshot.webp",
   "demo": "demo.mp4",
@@ -57,6 +58,10 @@
       "replies": [
         "🤖 規約の一次確認・データ変換・実装・テスト・検証まで\n🙋 題材の指定と「炎上しない作りに」の方針、ローカルLLM実験の発案\n⚠️ 実装をローカルのGemma3 27Bに任せてみたら、ZIP解凍やUI配線で存在しないAPIを2回作話して不合格。バイナリ処理は人間側のAIが巻き取った",
         "数字は全部同梱JSON＝開いたあとの通信ゼロ。国勢調査のExcelをZIPごと自前で解いて1,741市区町村を取り出し、国土地理院の面積調CSVと結合した。順位は競技方式、比べ棒は全国中央値基準。「ワースト」などの価値判断語が画面に出たらE2Eテストが落ちる仕組みも入れてある"
+      ],
+      "hashtags": [
+        "100日チャレンジ",
+        "個人開発"
       ]
     }
   }
