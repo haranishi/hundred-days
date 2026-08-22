@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>あなたの街のステータス</title>
+  <!-- 共通シェアの契約：投稿文にはアプリ名を必ず含める（tests/e2e/shared-share.spec.mjs） -->
+  <meta name="share:text" content="あなたの街のステータス — 国勢調査2020と国土地理院の面積調から、街の人口・年齢・世帯のかたちを全国順位つきのカードで眺められます">
+  <link rel="stylesheet" href="./app.css">
+  <link rel="stylesheet" href="./shared/share.css">
+  <script src="./shared/share.js" defer></script>
+</head>
+<body>
+
+  <header class="site-head">
+    <h1>あなたの街のステータス</h1>
+    <p class="tagline">国勢調査2020と国土地理院の面積調で、街の輪郭を眺める</p>
+  </header>
+
+  <section class="picker" aria-label="街を選ぶ">
+    <div class="search-box">
+      <label class="field-label" for="search-input">街をさがす</label>
+      <input id="search-input" type="search"
+             placeholder="市区町村名で探す（例: 秋田市）" autocomplete="off">
+      <ul id="search-results" role="listbox" aria-label="検索の候補" hidden></ul>
+    </div>
+    <div id="quick-picks" class="chip-row" aria-label="よく見られる街"></div>
+    <p class="picker__or">または一覧から</p>
+    <div class="picker__selects">
+      <select id="pref-select" aria-label="都道府県"><option value="">都道府県</option></select>
+      <select id="town-select" aria-label="市区町村" disabled><option value="">市区町村</option></select>
+    </div>
+  </section>
+
+  <div id="status" role="status" aria-live="polite" hidden></div>
+
+  <p id="cards-legend" hidden>棒グラフの中央の線＝全国の中央値。指標により母数（値のある街の数）は少し異なります。</p>
+
+  <main id="cards" class="cards">
+    <section id="card-main" class="card" hidden></section>
+    <section id="card-vs" class="card card--vs" hidden></section>
+  </main>
+
+  <section id="compare" class="compare" hidden>
+    <h2>べつの街とくらべる</h2>
+    <div class="picker__selects">
+      <select id="vs-pref" aria-label="くらべる街の都道府県"><option value="">都道府県</option></select>
+      <select id="vs-town" aria-label="くらべる街の市区町村" disabled><option value="">市区町村</option></select>
+    </div>
+    <button id="vs-clear" type="button" hidden>くらべるのをやめる</button>
+  </section>
+
+  <div id="share"></div>
+
+  <footer class="site-foot">
+    <p>「令和2年国勢調査」（総務省統計局・2020年10月1日時点）および「全国都道府県市区町村別面積調」（国土地理院・令和8年4月1日時点）を加工して作成。ひとり暮らし世帯の割合は一般世帯数から独自に計算。</p>
+    <p>国の公式サービスではありません。数値の正確性は保証されません。順位は1,741市区町村（政令指定都市は市単位・東京は特別区単位）の中での位置です。</p>
+  </footer>
+
+  <script type="module" src="./app.js"></script>
+</body>
+</html>

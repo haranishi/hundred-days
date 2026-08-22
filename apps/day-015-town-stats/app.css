@@ -1,0 +1,333 @@
+/* Gemma3:27bの下書きを検収側が改修したもの。直した点は主に
+   ①バーの幅が calc(var(--r)*100%) でなく無効値 ②768px未満で比較カードを display:none
+   ③候補リストの基準位置 ④#statusが常にエラー色 ⑤コントラストとタップ寸法。 */
+:root {
+  --paper: #faf7f2;
+  --ink: #2b2a26;
+  --muted: #6a675e;      /* 白地で4.5:1以上 */
+  --line: #e2ddd2;
+  --accent: #2f6f5f;
+  --accent-soft: #e4eeea;
+  --card: #ffffff;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Noto Sans JP", "Yu Gothic UI", sans-serif;
+  background: var(--paper);
+  color: var(--ink);
+  line-height: 1.6;
+}
+
+:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* ヘッダー */
+.site-head {
+  padding: 1.5rem 1rem 0.75rem;
+  text-align: center;
+}
+.site-head h1 { margin: 0; font-size: clamp(1.5rem, 1.1rem + 1.8vw, 2.4rem); letter-spacing: 0.02em; }
+.tagline {
+  margin: 0.25rem auto 0;
+  font-size: clamp(0.85rem, 0.8rem + 0.25vw, 1rem);
+  color: var(--muted);
+  text-wrap: balance;
+  max-width: 24em;
+}
+
+/* 街を選ぶ */
+.picker {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 0.75rem 1rem 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.search-box { position: relative; }
+.field-label { display: block; font-size: 0.8rem; color: var(--muted); margin-bottom: 0.3rem; }
+
+.chip-row { display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: center; }
+.chip {
+  min-height: 44px;
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--card);
+  color: var(--ink);
+  font-size: 0.88rem;
+  cursor: pointer;
+}
+.chip:hover { background: var(--accent-soft); border-color: var(--accent); }
+.chip[aria-current="true"] { border-color: var(--accent); color: var(--accent); font-weight: 600; }
+
+#search-input {
+  width: 100%;
+  min-height: 48px;
+  padding: 0.6rem 0.9rem;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  font-size: 1rem;
+  background: var(--card);
+  color: inherit;
+}
+
+#search-results {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  list-style: none;
+  padding: 0.25rem;
+  margin: 0;
+  z-index: 10;
+  box-shadow: 0 8px 20px rgba(43, 42, 38, 0.12);
+  max-height: 40vh;
+  overflow-y: auto;
+}
+#search-results li {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 0.7rem;
+  border-radius: 8px;
+  cursor: pointer;
+}
+#search-results li small { color: var(--muted); font-size: 0.8rem; }
+#search-results li:hover,
+#search-results li.is-active { background: var(--accent-soft); }
+#search-results li[aria-disabled="true"] { cursor: default; color: var(--muted); }
+#search-results li[aria-disabled="true"]:hover { background: transparent; }
+
+.picker__or { margin: 0; font-size: 0.8rem; color: var(--muted); text-align: center; }
+
+.picker__selects { display: flex; gap: 0.5rem; }
+select {
+  flex: 1;
+  min-height: 48px;
+  padding: 0.5rem 0.7rem;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  font-size: 1rem;
+  background: var(--card);
+  color: inherit;
+}
+select:disabled { color: var(--muted); background: transparent; border-style: dashed; }
+
+/* 状態表示（読込中・空・エラーを同じ場所で出す。既定は落ち着いた案内） */
+#status {
+  max-width: 640px;
+  margin: 0.5rem auto;
+  padding: 1rem;
+  text-align: center;
+  font-size: 0.95rem;
+  color: var(--muted);
+}
+#status .linkish {
+  border: none;
+  background: none;
+  padding: 0.2rem 0.3rem;
+  font-size: inherit;
+  color: var(--accent);
+  text-decoration: underline;
+  cursor: pointer;
+}
+#status #reload-btn {
+  display: block;
+  margin: 0.75rem auto 0;
+  min-height: 44px;
+  padding: 0.5rem 1.4rem;
+  border: 1px solid var(--accent);
+  border-radius: 10px;
+  background: var(--card);
+  color: var(--accent);
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+/* カードの上に1回だけ出す凡例 */
+#cards-legend {
+  max-width: 960px;
+  margin: 0.25rem auto 0;
+  padding: 0 1rem;
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+
+/* カード */
+.cards {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 0.5rem 1rem 1rem;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+.cards.has-vs { grid-template-columns: 1fr 1fr; }
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  box-shadow: 0 2px 10px rgba(43, 42, 38, 0.06);
+  padding: 1.1rem 1.2rem 1.2rem;
+  animation: card-in 0.35s ease-out;
+}
+@keyframes card-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .card { animation: none; }
+  .stat__bar-fill { transition: none; }
+}
+
+.card__head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.35rem 0.6rem; }
+.card__title { margin: 0; font-size: 1.45rem; }
+.card__pref { color: var(--muted); font-size: 0.95rem; }
+.card__en { color: var(--muted); font-size: 0.78rem; width: 100%; }
+.card__vintage {
+  display: inline-block;
+  margin: 0.4rem 0 0;
+  background: #efe9dc;
+  color: #4c463a;
+  padding: 0.15rem 0.55rem;
+  font-size: 0.72rem;
+  border-radius: 999px;
+}
+.card__note { margin: 0.4rem 0 0; font-size: 0.78rem; color: var(--muted); }
+
+/* 指標 */
+.stat-list { list-style: none; padding: 0; margin: 0.9rem 0 0; }
+.stat { padding: 0.65rem 0; border-top: 1px solid var(--line); }
+.stat__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+.stat__label { font-size: 0.85rem; }
+.stat__note { display: block; font-size: 0.72rem; color: var(--muted); }
+.stat__rank {
+  flex-shrink: 0;
+  background: var(--accent-soft);
+  color: #234f44;
+  padding: 0.12rem 0.55rem;
+  font-size: 0.72rem;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+.stat__reading { margin-top: 0.1rem; }
+.stat__value {
+  font-size: 1.3rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.01em;
+}
+.stat__unit { font-size: 0.78rem; color: var(--muted); margin-left: 0.2rem; }
+
+.stat__bar {
+  margin-top: 0.35rem;
+  width: 100%;
+  height: 8px;
+  background: #e7e3d9;
+  border-radius: 999px;
+  position: relative;
+}
+
+.stat__bar-fill {
+  height: 100%;
+  width: calc(var(--r, 0) * 100%);
+  background: var(--accent);
+  border-radius: 999px;
+  transition: width 0.3s ease;
+}
+.stat__bar-mid {
+  position: absolute;
+  top: -2px;
+  bottom: -2px;
+  left: 50%;
+  width: 2px;
+  height: auto;
+  background: var(--paper);
+  box-shadow: 0 0 0 1px rgba(43, 42, 38, 0.45);
+}
+.stat__bar-caption { font-size: 0.7rem; color: var(--muted); }
+
+/* 比較 */
+.compare {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 0.5rem 1rem 1.25rem;
+  text-align: center;
+}
+.compare h2 { margin: 0 0 0.5rem; font-size: 1rem; }
+.compare .picker__selects { max-width: 480px; margin: 0 auto; }
+#vs-clear {
+  margin-top: 0.6rem;
+  min-height: 44px;
+  padding: 0.4rem 1.1rem;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--card);
+  color: var(--muted);
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+/* フッター */
+.site-foot {
+  border-top: 1px solid var(--line);
+  margin-top: 1rem;
+  padding: 1.25rem 1rem 2rem;
+  font-size: 0.78rem;
+  color: #57534a;
+  max-width: 720px;
+  margin-left: auto;
+  margin-right: auto;
+}
+.site-foot p { margin: 0.4rem 0; }
+
+.empty-hint { color: var(--muted); }
+
+/* 狭い画面：カードは縦に積む（比較カードも必ず見せる） */
+@media (max-width: 767px) {
+  .cards.has-vs { grid-template-columns: 1fr; }
+}
+
+/* 共有ブロック（shared/share.css）の据え付け調整。正本は触らずこのアプリ内だけ上書き */
+#share {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 0 1rem;
+  box-sizing: border-box;
+}
+/* ボタンの枠と面は正本（currentColor 90%/10%＝コントラストE2E準拠）をそのまま使う。
+   薄い枠への上書きはE2Eで落ちることを確認済み＝しない */
+
+/* PCでは「さがす」を1行に並べ、カード列と左右を揃える */
+@media (min-width: 768px) {
+  .picker {
+    max-width: 960px;
+    display: grid;
+    grid-template-columns: 2fr auto 1fr 1fr;
+    align-items: end;
+    gap: 0.6rem;
+  }
+  .search-box { grid-row: 1; grid-column: 1; }
+  .picker__or { grid-row: 1; grid-column: 2; margin: 0 0 0.85rem; }
+  .picker__selects { display: contents; }
+  #pref-select { grid-row: 1; grid-column: 3; min-width: 0; }
+  #town-select { grid-row: 1; grid-column: 4; min-width: 0; }
+  #quick-picks { grid-row: 2; grid-column: 1 / -1; justify-content: flex-start; }
+  #status { max-width: 960px; }
+}

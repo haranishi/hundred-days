@@ -29,3 +29,6 @@ blob-report/
 .env
 .env.*
 .dev.vars
+
+# 各Dayのデータ変換の元ファイル置き場（入手先は各アプリのREADMEに明記）
+apps/*/tools/cache/
