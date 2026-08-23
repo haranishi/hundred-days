@@ -92,8 +92,14 @@ test('1回めは「1回では判断できません」と出す（時間帯の判
 });
 
 test('下りだけが遅ければ「宅内の機器は原因になれない」と言い切る', async ({ page }) => {
-  // 下りの本体だけを1.2秒遅らせる＝上りは速いまま。上り≫下りの回線を作る
-  await open(page, { slowDownMs: 1200 });
+  /* 上り≫下りの回線を作る。下りの本体だけを3秒遅らせ、上りは即答させる。
+
+     ⚠️ 実際に測った速さで分岐させる試験なので、機械が遅いと取り違える。
+     最初は1.2秒差（上りが下りの3倍を超える必要があった）で書いてローカルは通ったが、
+     CIでは上りが伸びずに落ちた。節約モードで運ぶ量を1/10にし、遅らせる時間を増やして
+     余裕を10倍に広げてある（下り約3Mbpsに対し、上りは8Mbps出れば足りる）。 */
+  await open(page, { slowDownMs: 3000 });
+  await page.check('#eco');
   await measure(page);
   const dx1 = page.locator('#verdict li[data-id="DX-1"]');
   await expect(dx1).toBeVisible();
