@@ -132,7 +132,9 @@ const WIKIMEDIA_CONNECT = [
 const CONNECT_BY_APP = {
   'day-010-wikipedia-live': WIKIMEDIA_CONNECT,
   'day-013-gov-answers': 'https://kokkai.ndl.go.jp',
-  'day-014-hottest-now': 'https://www.jma.go.jp'
+  'day-014-hottest-now': 'https://www.jma.go.jp',
+  // day-016 は速度測定そのものが目的なので、測定用のエンドポイントにだけ繋ぐ
+  'day-016-line-suspect': 'https://speed.cloudflare.com'
 };
 
 const appCsp = (dir) => [
