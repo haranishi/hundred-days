@@ -3,6 +3,7 @@
 
 import { PLANS, runMeasurement } from './lib/measure.js';
 import { buckets, diagnose, gradeFor } from './lib/diagnose.js';
+import { SCALES, SOURCES, rate, scaleRows } from './lib/scales.js';
 import * as store from './lib/history.js';
 
 const $ = (id) => document.getElementById(id);
@@ -108,6 +109,15 @@ function renderResult(record) {
   el.gradeNote.textContent = Number.isFinite(grade.increase)
     ? `待機中より ${grade.increase}ms 増えました。数字が小さいほど、通信しながらでも反応が変わらないという意味です。`
     : '';
+
+  for (const key of ['dl', 'ul', 'li', 'jit']) {
+    const graded = rate(key, record[key]);
+    const badge = $(`${key}-grade`);
+    badge.textContent = graded.grade;
+    badge.dataset.grade = graded.grade;
+    badge.hidden = graded.grade === '—';
+    $(`${key}-means`).textContent = graded.means ?? '';
+  }
 
   $('dl').textContent = fix(record.dl);
   $('ul').textContent = fix(record.ul);
@@ -235,6 +245,65 @@ el.clearBtn.addEventListener('click', () => {
   renderHistory(false);
 });
 
+/* 目安表。測る前から読めるようにしたいので、結果とは別に起動時から置いておく。
+   画面と文書で数字がずれないよう、素材は lib/scales.js の1か所から取る。 */
+function renderScales() {
+  const box = $('scale-tables');
+  for (const key of Object.keys(SCALES)) {
+    const scale = SCALES[key];
+    const wrap = document.createElement('div');
+    wrap.className = 'scale';
+
+    const heading = document.createElement('h3');
+    heading.className = 'scale__title';
+    heading.textContent = `${scale.label}（${scale.unit}）`;
+    const about = document.createElement('p');
+    about.className = 'sub';
+    about.textContent = scale.about;
+
+    const table = document.createElement('table');
+    table.className = 'scale__table';
+    const head = document.createElement('thead');
+    head.innerHTML = '<tr><th scope="col">評価</th><th scope="col">目安</th><th scope="col">できること</th></tr>';
+    const body = document.createElement('tbody');
+    for (const row of scaleRows(key)) {
+      const tr = document.createElement('tr');
+      const g = document.createElement('th');
+      g.scope = 'row';
+      g.className = 'scale__grade';
+      g.dataset.grade = row.grade;
+      g.textContent = row.grade;
+      const range = document.createElement('td');
+      range.className = 'scale__range';
+      range.textContent = `${row.range} ${row.unit}`;
+      const means = document.createElement('td');
+      means.textContent = row.means;
+      tr.append(g, range, means);
+      body.append(tr);
+    }
+    table.append(head, body);
+
+    const scroller = document.createElement('div');
+    scroller.className = 'table-wrap';
+    scroller.append(table);
+    wrap.append(heading, about, scroller);
+    box.append(wrap);
+  }
+
+  const list = $('scale-sources');
+  for (const source of SOURCES) {
+    const li = document.createElement('li');
+    const a = document.createElement('a');
+    a.href = source.url;
+    a.textContent = source.name;
+    a.rel = 'noopener noreferrer';
+    a.target = '_blank';
+    li.append(a, document.createTextNode(`　${source.note}`));
+    list.append(li);
+  }
+}
+
 syncCost();
 syncOnline();
+renderScales();
 loadHistory();

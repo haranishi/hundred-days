@@ -138,3 +138,63 @@ th { color: var(--sub); font-weight: 600; }
   .numbers { grid-template-columns: 1fr; }
   .grade { font-size: 2.1rem; }
 }
+
+/* ---- 指標の目安（A+〜F） ----
+   letterは要約で、意味を持たせているのは「できること」の文のほう。
+   色は補助でしかないので、評価は必ず記号でも読めるようにしている。 */
+
+.badge {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 1px 9px;
+  border-radius: 999px;
+  font-size: .78rem;
+  font-weight: 700;
+  vertical-align: 3px;
+  border: 1px solid currentColor;
+}
+.badge[data-grade="A+"], .badge[data-grade="A"],
+.scale__grade[data-grade="A+"], .scale__grade[data-grade="A"] { color: var(--ok); }
+.badge[data-grade="B"], .scale__grade[data-grade="B"] { color: var(--warn); }
+.badge[data-grade="C"], .badge[data-grade="D"], .badge[data-grade="F"],
+.scale__grade[data-grade="C"], .scale__grade[data-grade="D"], .scale__grade[data-grade="F"] { color: var(--severe); }
+
+.num__means {
+  display: block;
+  margin-top: 4px;
+  font-size: .72rem;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--sub);
+}
+.num--plain dd { font-weight: 700; }
+
+.scales {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 8px 20px;
+  margin-bottom: 16px;
+}
+.scales summary {
+  cursor: pointer;
+  padding: 12px 0;
+  font-size: .92rem;
+}
+.scales summary:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.scales__lead { margin: 0 0 4px; }
+.scales__note { margin: 14px 0 6px; }
+
+.scale { margin: 18px 0 4px; }
+.scale__title { font-size: .95rem; margin: 0 0 2px; }
+.scale__table { min-width: 420px; margin-top: 8px; font-size: .82rem; }
+.scale__table th[scope="col"] { text-align: left; }
+.scale__table td, .scale__table th { vertical-align: top; }
+.scale__table th:first-child { width: 4.2em; white-space: nowrap; }
+.scale__grade { text-align: left; font-weight: 800; }
+.scale__range { white-space: nowrap; text-align: left; width: 9em; color: var(--sub); }
+.scale__table td:last-child { text-align: left; }
+
+.scales__sources { margin: 6px 0 14px; padding-left: 1.2em; font-size: .74rem; color: var(--sub); }
+.scales__sources li { margin-bottom: 4px; }
+.scales__sources a { color: var(--accent); }

@@ -4,18 +4,9 @@
    「その数字をどう読むか」＝犯人が家の中にいるのか外にいるのかを言い切る部分が本体。
    ネットワークに触らないので、固定入力のテストで全分岐を押さえられる（tests/diagnose.test.mjs）。 */
 
-/** 負荷時遅延の増加量 → グレード。上限msと記号の対応表 */
-const GRADE_TABLE = [
-  [5, 'A+'],
-  [30, 'A'],
-  [60, 'B'],
-  [200, 'C'],
-  [400, 'D'],
-  [Infinity, 'F']
-];
+import { POOR, rate } from './scales.js';
 
-/* C以下＝通話やゲームに影響が出る領域。表の並び順に依存させないよう記号で持つ */
-const BAD_GRADES = new Set(['C', 'D', 'F']);
+/* 採点のしきい値は lib/scales.js に1か所だけ置いてある（画面の目安表と同じものを使う） */
 
 /** 夜とみなす時間帯（18時〜23時台）。混雑が出るならここに出る */
 const NIGHT_FROM = 18;
@@ -28,10 +19,10 @@ export const isNight = (hour) => hour >= NIGHT_FROM;
  */
 export function gradeFor(latencyIdle, latencyDown, latencyUp) {
   const loaded = [latencyDown, latencyUp].filter((v) => Number.isFinite(v));
-  if (!Number.isFinite(latencyIdle) || !loaded.length) return { grade: '—', increase: null, bad: false };
+  if (!Number.isFinite(latencyIdle) || !loaded.length) return { grade: '—', increase: null, bad: false, means: null };
   const increase = Math.max(0, Math.max(...loaded) - latencyIdle);
-  const grade = GRADE_TABLE.find(([limit]) => increase <= limit)[1];
-  return { grade, increase: Math.round(increase), bad: BAD_GRADES.has(grade) };
+  const { grade, means } = rate('bloat', increase);
+  return { grade, means, increase: Math.round(increase), bad: POOR.has(grade) };
 }
 
 const mean = (nums) => (nums.length ? nums.reduce((a, b) => a + b, 0) / nums.length : 0);
@@ -130,7 +121,7 @@ export function diagnose(current, history) {
     else if (ul < 10 && dl > ul * 3) found.push(withId('DX-2', { evidence: `下り ${dl.toFixed(1)} / 上り ${ul.toFixed(1)} Mbps` }));
   }
 
-  if (current.grade && BAD_GRADES.has(current.grade)) {
+  if (current.grade && POOR.has(current.grade)) {
     found.push(withId('DX-3', { evidence: `アイドル時から ${current.increase}ms 増加（グレード ${current.grade}）` }));
   }
 

@@ -61,15 +61,25 @@
       </div>
 
       <dl class="numbers">
-        <div class="num"><dt>下り（受信）</dt><dd><span id="dl">—</span> <span class="unit">Mbps</span></dd></div>
-        <div class="num"><dt>上り（送信）</dt><dd><span id="ul">—</span> <span class="unit">Mbps</span></dd></div>
-        <div class="num"><dt>待機中の反応</dt><dd><span id="li">—</span> <span class="unit">ms</span></dd></div>
-        <div class="num"><dt>下り通信中の反応</dt><dd><span id="ld">—</span> <span class="unit">ms</span></dd></div>
-        <div class="num"><dt>上り通信中の反応</dt><dd><span id="lu">—</span> <span class="unit">ms</span></dd></div>
-        <div class="num"><dt>ゆらぎ（ジッター）</dt><dd><span id="jit">—</span> <span class="unit">ms</span></dd></div>
+        <div class="num"><dt>下り（受信）</dt><dd><span id="dl">—</span> <span class="unit">Mbps</span><span class="badge" id="dl-grade" hidden></span><span class="num__means" id="dl-means"></span></dd></div>
+        <div class="num"><dt>上り（送信）</dt><dd><span id="ul">—</span> <span class="unit">Mbps</span><span class="badge" id="ul-grade" hidden></span><span class="num__means" id="ul-means"></span></dd></div>
+        <div class="num"><dt>待機中の反応</dt><dd><span id="li">—</span> <span class="unit">ms</span><span class="badge" id="li-grade" hidden></span><span class="num__means" id="li-means"></span></dd></div>
+        <div class="num"><dt>ゆらぎ（ジッター）</dt><dd><span id="jit">—</span> <span class="unit">ms</span><span class="badge" id="jit-grade" hidden></span><span class="num__means" id="jit-means"></span></dd></div>
+        <div class="num num--plain"><dt>下り通信中の反応</dt><dd><span id="ld">—</span> <span class="unit">ms</span><span class="num__means">↑の「通信中の反応」で採点しています</span></dd></div>
+        <div class="num num--plain"><dt>上り通信中の反応</dt><dd><span id="lu">—</span> <span class="unit">ms</span><span class="num__means">同上</span></dd></div>
       </dl>
       <p id="conn" class="sub"></p>
       <p id="eco-note" class="sub" hidden>節約モードで測ったため、実際の速度より低く出ている可能性があります。</p>
+    </section>
+
+    <section id="scales" class="scales" aria-label="指標の目安">
+      <details id="scales-details">
+        <summary><strong>指標の目安（A+〜F）</strong>　どの数字がどれくらいなら何ができるか</summary>
+        <p class="sub scales__lead">しきい値は感覚ではなく、<strong>実際の用途が要求する値</strong>から引いています。A+〜Fは要約で、意味を持っているのは右の「できること」のほうです。</p>
+        <div id="scale-tables"></div>
+        <p class="sub scales__note">遅延は<strong>往復時間</strong>で測っています。ITU-T G.114は片道の時間を定めているため、片道150ms＝往復300msとして換算しています。</p>
+        <ul id="scale-sources" class="scales__sources"></ul>
+      </details>
     </section>
 
     <section id="history" class="history" aria-label="これまでの測定" hidden>
