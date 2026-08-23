@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>回線の犯人さがし</title>
+  <!-- 共通シェアの契約：投稿文にはアプリ名を必ず含める（tests/e2e/shared-share.spec.mjs） -->
+  <meta name="share:text" content="回線の犯人さがし — 速度の数字ではなく「その遅さの原因が家の中にあるのか外にあるのか」を判定します">
+  <link rel="stylesheet" href="./app.css">
+  <link rel="stylesheet" href="./shared/share.css">
+  <script src="./shared/share.js" defer></script>
+</head>
+<body>
+
+  <header class="site-head">
+    <h1>回線の犯人さがし</h1>
+    <p class="tagline">速さを測るのではなく、遅さの原因が<strong>家の中にあるのか外にあるのか</strong>を判定します</p>
+  </header>
+
+  <main>
+    <section class="panel" aria-label="測定">
+
+      <div id="state-empty">
+        <p class="lead">ボタンを押すと、下り・上り・待機中の反応・<strong>通信中の反応</strong>の4つを測って、結果から原因の場所を判定します。</p>
+        <p id="offline" class="alert alert--warn" hidden>インターネットに接続されていません。接続してからもう一度お試しください。</p>
+        <div class="cost">
+          <p id="cost-note">1回の測定で <strong id="cost-amount">最大50MB</strong> の通信を使います。</p>
+          <label class="toggle">
+            <input type="checkbox" id="eco">
+            <span>節約モード（最大6MB・精度は落ちます）</span>
+          </label>
+        </div>
+        <button id="start" type="button" class="btn-main">測定する</button>
+      </div>
+
+      <div id="state-running" hidden>
+        <p id="phase" class="phase">準備しています</p>
+        <div class="bar" role="img" aria-label="測定の進み具合"><div id="bar-fill" class="bar__fill"></div></div>
+        <p class="sub"><span id="elapsed">0</span> 秒経過</p>
+        <button id="cancel" type="button" class="btn-sub">中止する</button>
+      </div>
+
+      <div id="state-error" hidden>
+        <p class="alert alert--error">測定できませんでした。</p>
+        <p id="error-reason" class="sub"></p>
+        <button id="retry" type="button" class="btn-main">もう一度測る</button>
+      </div>
+
+      <!-- 測定の進み具合と結果は、目で見ていない人にも伝わるよう読み上げ対象にする -->
+      <div id="live" class="sr-only" role="status" aria-live="polite"></div>
+    </section>
+
+    <section id="result" class="result" aria-label="診断結果" hidden>
+      <h2 class="sr-only">診断結果</h2>
+      <ul id="verdict" class="verdict"></ul>
+
+      <div class="grade-box">
+        <p class="grade-box__label">通信中の反応</p>
+        <p><span id="grade" class="grade">—</span><span id="grade-word" class="grade__word"></span></p>
+        <p id="grade-note" class="sub"></p>
+      </div>
+
+      <dl class="numbers">
+        <div class="num"><dt>下り（受信）</dt><dd><span id="dl">—</span> <span class="unit">Mbps</span></dd></div>
+        <div class="num"><dt>上り（送信）</dt><dd><span id="ul">—</span> <span class="unit">Mbps</span></dd></div>
+        <div class="num"><dt>待機中の反応</dt><dd><span id="li">—</span> <span class="unit">ms</span></dd></div>
+        <div class="num"><dt>下り通信中の反応</dt><dd><span id="ld">—</span> <span class="unit">ms</span></dd></div>
+        <div class="num"><dt>上り通信中の反応</dt><dd><span id="lu">—</span> <span class="unit">ms</span></dd></div>
+        <div class="num"><dt>ゆらぎ（ジッター）</dt><dd><span id="jit">—</span> <span class="unit">ms</span></dd></div>
+      </dl>
+      <p id="conn" class="sub"></p>
+      <p id="eco-note" class="sub" hidden>節約モードで測ったため、実際の速度より低く出ている可能性があります。</p>
+    </section>
+
+    <section id="history" class="history" aria-label="これまでの測定" hidden>
+      <h2>これまでの測定</h2>
+      <p id="history-broken" class="alert alert--warn" hidden>
+        保存されていた履歴を読み取れませんでした。<button id="history-reset" type="button" class="btn-link">履歴を初期化する</button>
+      </p>
+      <div class="table-wrap">
+        <table id="history-table">
+          <caption class="sr-only">3時間ごとの平均</caption>
+          <thead><tr><th scope="col">時間帯</th><th scope="col">回数</th><th scope="col">下り</th><th scope="col">上り</th></tr></thead>
+          <tbody id="history-body"></tbody>
+        </table>
+      </div>
+      <p id="history-count" class="sub"></p>
+      <div class="history__actions">
+        <button id="history-export" type="button" class="btn-sub">CSVで書き出す</button>
+        <button id="history-clear" type="button" class="btn-sub">履歴を全部消す</button>
+      </div>
+    </section>
+  </main>
+
+  <div id="share"></div>
+
+  <footer class="site-foot">
+    <p>測定には Cloudflare の速度測定エンドポイント（speed.cloudflare.com）を使います。<strong>測定結果はこの端末のブラウザにだけ保存され、どこにも送信されません。</strong>IPアドレス・地名・位置情報は取得も保存もしません。</p>
+    <p>ブラウザからはWi-Fiの電波強度・チャンネル・リンク速度を取得できないため、ここで出るのは「Wi-Fi区間と回線を合わせた実効速度」です。回線の契約速度や通信事業者の品質を保証するものではありません。</p>
+  </footer>
+
+  <script type="module" src="./app.js"></script>
+</body>
+</html>
