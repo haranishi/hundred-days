@@ -123,6 +123,44 @@ test('通信が失敗したら、途中の数字を出さずにエラーにす�
   await expect(page.locator('#result')).toBeHidden();
 });
 
+test('測る前から、指標の目安が読める', async ({ page }) => {
+  await open(page);
+  const details = page.locator('#scales-details');
+  await expect(details).toBeVisible();
+  await details.locator('summary').click();
+  // 5つの指標ぶんの表があり、どの行にも記号・範囲・できることが揃っている
+  await expect(page.locator('#scale-tables .scale')).toHaveCount(5);
+  await expect(page.locator('#scale-tables tbody tr')).toHaveCount(30);
+  const first = page.locator('#scale-tables .scale').first();
+  await expect(first).toContainText('下り（受信）');
+  await expect(first).toContainText('300 以上 Mbps');
+  await expect(first).toContainText('家族全員が同時に4Kでも余ります');
+  // しきい値の出典を示している（数字の根拠を隠さない）
+  await expect(page.locator('#scale-sources li')).not.toHaveCount(0);
+  await expect(page.locator('#scale-sources')).toContainText('Netflix');
+});
+
+test('測ったあと、数値ひとつずつに評価と「できること」が付く', async ({ page }) => {
+  await open(page);
+  await measure(page);
+  for (const key of ['dl', 'ul', 'li', 'jit']) {
+    await expect(page.locator(`#${key}-grade`), `${key} の評価が出ていない`).toBeVisible();
+    await expect(page.locator(`#${key}-grade`)).not.toHaveText('—');
+    await expect(page.locator(`#${key}-means`), `${key} の説明が空`).not.toHaveText('');
+  }
+});
+
+test('遅い回線ではその指標の評価も下がる', async ({ page }) => {
+  // 下りだけを詰まらせた回線（下りは数Mbps・上りは速いまま）
+  await open(page, { slowDownMs: 3000 });
+  await page.check('#eco');
+  await measure(page);
+  await expect(page.locator('#dl-grade')).toHaveText('F');
+  await expect(page.locator('#dl-means')).toContainText('HD（720p）が限界');
+  // 同じ測定でも、詰まっていない上りの評価は下がらない
+  await expect(page.locator('#ul-grade')).not.toHaveText('F');
+});
+
 test('測ると履歴が貯まり、3時間ごとの表に出る', async ({ page }) => {
   await open(page);
   await measure(page);

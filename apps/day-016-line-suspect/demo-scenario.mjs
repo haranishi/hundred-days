@@ -101,19 +101,22 @@ export default async function (page, h) {
   await h.pause(150);
   await page.click('#start');
   await page.waitForSelector('#result:not([hidden])', { timeout: 20_000 });
-  await h.pause(2600);          // 診断を読む間
-  await h.scrollTo('#result');
-  await h.pause(2400);
+  await h.pause(2500);          // 診断を読む間
   await h.scrollTo('.numbers');
+  await h.pause(2400);          // 数値ひとつずつに評価と「できること」が付いている
+  await page.click('#scales-details summary');
+  await h.scrollTo('#scale-tables');
+  await h.pause(2800);          // 目安表（どの数字がどれくらいなら何ができるか）
+  await page.evaluate(() => window.scrollBy({ top: 420, behavior: 'smooth' }));
   await h.pause(2000);
   await h.scrollTo('#history');
-  await h.pause(2600);          // 夜だけ落ちている表
+  await h.pause(2200);          // 夜だけ落ちている表
   await h.scrollTop();
-  await h.pause(800);
+  await h.pause(600);
 }
 
 // スクショは「診断が出ている状態」を撮る。開いた直後の空の画面では何のアプリか伝わらない
-export const shotScroll = 150;
+export const shotScroll = 430;
 export async function shotSetup(page) {
   await prepare(page);
   await page.click('#start');
