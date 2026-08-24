@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AIの読みが見えるリバーシ</title>
+  <!-- 共通シェアの契約：投稿文にはアプリ名を必ず含める（tests/e2e/shared-share.spec.mjs） -->
+  <meta name="share:text" content="AIの読みが見えるリバーシ — AIが今どのマスを何点と見ているかが盤に重なって見える。読みを深めるたび数字が書き換わります">
+  <link rel="stylesheet" href="./app.css">
+  <link rel="stylesheet" href="./shared/share.css">
+  <script src="./shared/share.js" defer></script>
+</head>
+<body>
+
+  <header class="site-head">
+    <h1>AIの読みが見えるリバーシ</h1>
+    <p class="tagline">AIが今どのマスを<strong>何点と見ているか</strong>が盤に重なって見えます。読みを深めるたびに数字が書き換わります。</p>
+  </header>
+
+  <main>
+
+    <!-- 状態①：空（対局前） -->
+    <section id="state-empty" class="panel" aria-label="対局前">
+      <p class="lead">あなたが<strong>黒</strong>、AIが<strong>白</strong>です。黒が先手。</p>
+      <ul class="intro">
+        <li><strong>盤の数字</strong>＝AIがそのマスを何点と見ているか。<span class="chip chip--good">赤いほど良い手</span> <span class="chip chip--bad">青いほど悪い手</span></li>
+        <li><strong>太い枠</strong>＝いまの最善手。<strong>同点なら複数に付きます</strong>（初手は盤が対称なので4つとも同点です）</li>
+        <li>AIの番では<strong>1手先→4手先</strong>と読みを深めます。深くなるほど数字が変わり、最善手が入れ替わることもあります</li>
+      </ul>
+      <button id="start" type="button" class="btn-main">対局を始める</button>
+      <p class="sub">通信はしません。すべてブラウザの中で計算しています。</p>
+    </section>
+
+    <!-- 対局中〜終局 -->
+    <section id="game" class="panel" aria-label="対局" hidden>
+
+      <div class="scoreline">
+        <span class="score score--black"><span class="disc disc--black" aria-hidden="true"></span> あなた <b id="score-black">2</b></span>
+        <span class="score score--white"><span class="disc disc--white" aria-hidden="true"></span> AI <b id="score-white">2</b></span>
+      </div>
+
+      <p id="status" class="status" role="status" aria-live="polite">あなたの番です</p>
+
+      <!-- 状態③：不正入力 -->
+      <p id="invalid" class="alert alert--warn" role="alert" hidden></p>
+
+      <div class="board-wrap">
+        <div id="board" class="board" role="grid" aria-label="リバーシの盤面"></div>
+      </div>
+
+      <!-- 状態②：読込中（AIが読んでいる最中） -->
+      <div id="thinking" class="thinking" hidden>
+        <p class="thinking__label">読みの深さ <b id="depth-label">1</b> / 4 手先</p>
+        <div class="bar" role="img" aria-label="読みの深さ"><div id="bar-fill" class="bar__fill"></div></div>
+      </div>
+
+      <div id="explain" class="explain" aria-live="polite"></div>
+
+      <!-- 終局 -->
+      <div id="result" class="result" hidden>
+        <p id="result-head" class="result__head"></p>
+        <p id="result-detail" class="sub"></p>
+      </div>
+
+      <div class="controls">
+        <label class="toggle">
+          <input type="checkbox" id="toggle-mind" checked>
+          <span>AIの読みを盤に表示する</span>
+        </label>
+        <button id="reset" type="button" class="btn-sub">最初から</button>
+      </div>
+
+    </section>
+
+  </main>
+
+  <div id="share"></div>
+
+  <footer class="site-foot">
+    <p><strong>「オセロ」は株式会社メガハウスの登録商標です。</strong>このアプリはその商標を使わず、ルールの一般名である<strong>リバーシ</strong>として実装しています。リバーシは19世紀末のイギリスで考案されたもので、ルールに特許・実用新案はありません。盤の配色も本家に寄せていません。</p>
+    <p>AIは4手先まで読む αβ 探索です。盤に出る数字は「位置の価値 ＋ 相手の打てる場所を減らせた量 ＋ 石数（終盤のみ重視）」で、この3つ以外は見ていません。説明文もこの3つの範囲だけで書いています。</p>
+  </footer>
+
+  <script type="module" src="./app.js"></script>
+</body>
+</html>
