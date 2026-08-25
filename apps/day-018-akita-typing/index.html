@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>秋田の飯は、打てた分だけ</title>
+  <!-- 共通シェアの契約：投稿文にはアプリ名を必ず含める（tests/e2e/shared-share.spec.mjs） -->
+  <meta name="share:text" content="秋田の飯は、打てた分だけ — 流れてくる秋田の郷土料理をローマ字で打つと食べたことになる。60秒でコースの元が取れるか">
+  <link rel="stylesheet" href="./app.css">
+  <link rel="stylesheet" href="./shared/share.css">
+  <script src="./shared/share.js" defer></script>
+  <script src="./app.js" type="module" defer></script>
+</head>
+<body>
+
+  <header class="site-head">
+    <h1>秋田の飯は、打てた分だけ</h1>
+    <p class="tagline">流れてくる<strong>秋田の郷土料理</strong>をローマ字で打つと、食べたことになります。60秒で<strong>コースの元が取れるか</strong>。</p>
+  </header>
+
+  <main>
+
+    <!-- 状態①：空（開始前） -->
+    <section id="state-empty" class="panel" aria-label="コースを選ぶ">
+      <img class="hero" src="./assets/key-visual.webp"
+           alt="白木のレーンに並んだ秋田の郷土料理の小鉢。左からきりたんぽ、いぶりがっこ、じゅんさい、とんぶり"
+           width="1400" height="788" decoding="async">
+
+      <fieldset class="courses">
+        <legend>コースを選ぶ</legend>
+        <div id="course-list" class="courses__list"></div>
+      </fieldset>
+
+      <ul class="intro">
+        <li>打ち方は<strong>ローマ字入力</strong>。<code>し</code>は <code>shi</code> でも <code>si</code> でも、<code>ん</code>は <code>n</code> でも <code>nn</code> でも通ります</li>
+        <li>間違えても<strong>打ち直しは要りません</strong>。そのまま次のキーを押せば進みます</li>
+        <li><strong>打ち始めた料理は取り上げません。</strong>左端まで流れても、打ち終わるまで待ちます</li>
+        <li>まだ1文字も打っていない料理は、左端まで流れると逃したことになります（減点はありません）</li>
+      </ul>
+
+      <button id="start" type="button" class="btn-main">はじめる</button>
+      <p class="sub"><strong>日本語入力はOFF</strong>（半角英数）にしてください。値段はこのゲーム内の目安で、実際の価格ではありません。</p>
+      <p class="sub">スマホでも遊べます（レーンをタップするとキーボードが出ます）。物理キーボードのほうが快適です。</p>
+      <p class="sub">通信はしません。記録も保存しません。すべてブラウザの中だけで動いています。</p>
+    </section>
+
+    <!-- 状態②：開始前カウント（通信が無いので「読込中」は作らない） -->
+    <section id="state-countdown" class="panel panel--center" aria-label="開始前" hidden>
+      <p class="countdown__label">はじまります</p>
+      <p id="countdown" class="countdown" role="status" aria-live="assertive">3</p>
+    </section>
+
+    <!-- 状態③：エラー -->
+    <section id="state-error" class="panel" aria-label="エラー" hidden>
+      <h2 class="error__title">料理のデータを読み込めませんでした</h2>
+      <p id="error-detail" class="error__detail"></p>
+      <button id="reload" type="button" class="btn-main">読み込み直す</button>
+    </section>
+
+    <!-- 対戦中 -->
+    <section id="game" class="game" aria-label="対戦中" hidden>
+
+      <div class="hud">
+        <p class="hud__money">
+          <span class="hud__label">食べた</span>
+          <span class="hud__amount"><b id="eaten">¥0</b><span id="gain" class="hud__gain" aria-hidden="true"></span></span>
+          <span class="hud__target">/ <span id="target-amount">¥3,000</span> の<span id="course-name">おすすめ</span></span>
+          <span id="missed-count" class="hud__missed" hidden>逃した <b id="missed">0</b>皿</span>
+        </p>
+        <div class="timer" role="img" aria-label="残り時間">
+          <div id="timer-fill" class="timer__fill"></div>
+        </div>
+      </div>
+
+      <div class="lane-wrap">
+        <div id="lane" class="lane" aria-hidden="true"></div>
+        <!-- レーンに重ねた透明な入力欄。ここをタップするとスマホでもキーボードが出る。
+             打鍵は window の keydown で拾うので、この欄に文字は入らない -->
+        <input id="keys" class="keys" type="text" inputmode="text"
+               autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
+               aria-label="ここをタップしてキーボードを出す">
+        <p id="tap-hint" class="tap-hint" hidden>ここをタップしてキーボードを出す</p>
+      </div>
+
+      <!-- 状態④：不正入力（日本語入力がON） -->
+      <p id="invalid" class="alert" role="alert" hidden>
+        日本語入力がONになっています。<strong>半角英数</strong>に切り替えてください。
+      </p>
+
+      <div id="target" class="target">
+        <img id="target-img" class="target__img" src="" alt="" width="172" height="172" decoding="async" hidden>
+        <p id="target-name" class="target__name">つぎの皿を待っています</p>
+        <p id="held-badge" class="held-badge" hidden>つかみ中 — 打ち終わるまで待ちます</p>
+        <p id="target-note" class="target__note"></p>
+        <p id="target-reading" class="target__reading"></p>
+        <p class="target__romaji" aria-label="打つローマ字">
+          <span id="romaji-done" class="romaji__done"></span><span id="romaji-next" class="romaji__next"></span><span id="romaji-rest" class="romaji__rest"></span>
+        </p>
+      </div>
+
+      <p class="sub sub--quiet">打てないときは日本語入力がONになっていないか確かめてください。</p>
+    </section>
+
+    <!-- 結果 -->
+    <section id="result" class="panel" aria-label="結果" hidden>
+      <p id="result-course" class="result__course"></p>
+      <p id="verdict" class="verdict"></p>
+      <p id="verdict-detail" class="verdict__detail"></p>
+
+      <dl class="stats">
+        <div class="stat"><dt>食べた</dt><dd id="stat-eaten">—</dd></div>
+        <div class="stat"><dt>打鍵速度</dt><dd id="stat-speed">—</dd></div>
+        <div class="stat"><dt>正確率</dt><dd id="stat-accuracy">—</dd></div>
+        <div class="stat"><dt>逃した皿</dt><dd id="stat-missed">—</dd></div>
+      </dl>
+
+      <div class="stumbles">
+        <h2 class="stumbles__title">打ち損ねたキー</h2>
+        <p class="stumbles__lead">押すはずだったのに間違えたキーです。</p>
+        <ol id="stumble-list" class="stumbles__list"></ol>
+        <p id="stumble-empty" class="stumbles__empty" hidden>1度もミスしませんでした。</p>
+      </div>
+
+      <div class="result__actions">
+        <button id="again" type="button" class="btn-main">もう一度（同じコース）</button>
+        <button id="change-course" type="button" class="btn-sub">コースを変える</button>
+      </div>
+      <p class="sub"><kbd>Enter</kbd> でも同じコースをすぐ始められます。</p>
+    </section>
+
+  </main>
+
+  <footer class="site-foot">
+    <div id="share"></div>
+    <p class="credit">Day 018 / 100日チャレンジ</p>
+  </footer>
+
+</body>
+</html>
