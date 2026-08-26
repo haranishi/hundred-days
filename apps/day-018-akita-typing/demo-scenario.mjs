@@ -57,6 +57,26 @@ async function waitForPlates(page, count) {
   );
 }
 
+/**
+ * いちばん奥（右）の皿の札を押して、そこから打ち始める。
+ * v2で足した「どの皿から始めるか選べる」を見せるための振り付け。
+ * 押せるのは語の1打目だけなので、何も打っていない状態で呼ぶこと。
+ */
+async function pickFarPlate(page) {
+  const key = await page.evaluate(() => {
+    const plates = [...document.querySelectorAll('.plate[data-takeable="true"]')]
+      .map((el) => ({ el, x: el.getBoundingClientRect().left }))
+      .sort((a, b) => a.x - b.x);
+    if (plates.length < 2) return null;
+    const label = plates[plates.length - 1].el.querySelector('.plate__key');
+    const text = label && label.textContent ? label.textContent.trim() : '';
+    return text.length === 1 ? text : null;
+  });
+  if (!key) return false;
+  await page.keyboard.press(key);
+  return true;
+}
+
 /** 開始ボタンを押して、3・2・1 のカウントが明けるまで待つ */
 async function startRound(page) {
   await page.click('#start');
@@ -71,14 +91,20 @@ async function startRound(page) {
 export default async function scenario(page, h) {
   const base = await ensureServer();
   // seed で皿の出る順を固定し、duration で1回を15秒にして結果画面まで見せる
-  await page.goto(`${base}?seed=7&duration=15`, { waitUntil: 'load' });
+  // sound=off で撮る。音はWeb Audioで生成していて録画には乗らないうえ、
+  // 鳴らすと収録機ごとに間が変わるため（音を載せる場合は後付けでミックスする）
+  await page.goto(`${base}?seed=7&duration=15&sound=off`, { waitUntil: 'load' });
   await h.pause(500);
 
   await startRound(page);
 
+  // v2の目玉。奥の皿の札を押して、左端の消えかけではなくそちらから打ち始める
+  await waitForPlates(page, 3);
+  if (await pickFarPlate(page)) await h.pause(460);
+
   // 打てるだけ打つ。1回だけわざと外して、赤く光るところと「つまずいた打鍵」に繋げる
   let missed = false;
-  const until = Date.now() + 14_200;
+  const until = Date.now() + 13_400;
   while (Date.now() < until) {
     if (!missed) {
       const next = await page.locator('#romaji-next').innerText();
@@ -102,7 +128,7 @@ export default async function scenario(page, h) {
 
 export async function shotSetup(page) {
   const base = await ensureServer();
-  await page.goto(`${base}?seed=7`, { waitUntil: 'load' });
+  await page.goto(`${base}?seed=7&sound=off`, { waitUntil: 'load' });
   await page.waitForTimeout(300);
   await startRound(page);
 
