@@ -1,5 +1,9 @@
 /* 木のカウンターを思わせる濃い茶色に、白木のレーン。
-   緑の皿・回転寿司の意匠には寄せない（REQUIREMENTS.md「先に法務」の方針）。 */
+   緑の皿・回転寿司の意匠には寄せない（REQUIREMENTS.md「先に法務」の方針）。
+
+   レーンの中だけは明るい地なので、状態（選択中・消えかけ・つかみ中）は
+   琥珀や赤の「明るい色」では出せない。明るい地に対して3:1を取れるのは暗い色なので、
+   レーン内の合図はすべて濃い茶（--counter）系の縁を軸に組んである。 */
 
 :root {
   --ink: #f6efe4;
@@ -11,6 +15,8 @@
   --accent: #e0a33c;
   --good: #6fd08c;
   --bad: #f0736a;
+  /* レーンの上に置ける警告色。明るい赤（--bad）は白木の上で2:1しか出ないので使わない */
+  --lane-warn: #7a1f16;
   --radius: 12px;
   --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 }
@@ -29,10 +35,21 @@ body {
 
 main { max-width: 46rem; margin: 0 auto; }
 
-.site-head { max-width: 46rem; margin: 0 auto; padding: 2rem 0 1.25rem; }
-.site-head h1 { margin: 0 0 .4rem; font-size: clamp(1.5rem, 6vw, 2.1rem); letter-spacing: .02em; }
+.site-head { max-width: 46rem; margin: 0 auto; padding: 1.2rem 0 .8rem; }
+.site-head h1 { margin: 0 0 .4rem; font-size: clamp(1.5rem, 6vw, 2.1rem); line-height: 1.3; letter-spacing: .02em; }
 .tagline { margin: 0; color: var(--ink-dim); font-size: .95rem; }
 .tagline strong { color: var(--ink); }
+
+/* 対戦中と開始前カウントは、ゲーム以外を畳んで1画面に収める。
+   1440x900 の900pxのうち365pxがゲームの外だった（実測）。DOMは消さずに畳むだけ。 */
+body[data-phase="playing"] .site-head,
+body[data-phase="countdown"] .site-head { padding: .55rem 0 .45rem; }
+body[data-phase="playing"] .site-head h1,
+body[data-phase="countdown"] .site-head h1 { font-size: 1rem; margin: 0; }
+body[data-phase="playing"] .tagline,
+body[data-phase="countdown"] .tagline { display: none; }
+body[data-phase="playing"] .site-foot,
+body[data-phase="countdown"] .site-foot { display: none; }
 
 .panel {
   background: rgba(255, 255, 255, .04);
@@ -43,45 +60,133 @@ main { max-width: 46rem; margin: 0 auto; }
 .panel--center { text-align: center; }
 
 /* 開始画面の頭。文字だけだと「何が流れてくるのか」が読まないと分からないので、
-   実物の絵を先に見せる。文字は焼き込まず、説明は下のHTML側に置く。 */
+   実物の絵を先に見せる。文字は焼き込まず、説明は下のHTML側に置く。
+   高さを 21:9 から詰めてあるのは、主要な操作（はじめる）を折り返しの上に置くため。 */
 .hero {
   display: block;
   width: 100%;
   height: auto;
-  aspect-ratio: 21 / 9;
+  aspect-ratio: 16 / 5;
+  max-height: 14rem;
   object-fit: cover;
   border-radius: 10px;
-  margin: 0 0 1.1rem;
+  margin: 0 0 .9rem;
 }
 
 /* ---- コース選択 ---- */
 
-.courses { border: 0; margin: 0 0 1rem; padding: 0; }
-.courses legend { padding: 0; font-weight: 700; margin-bottom: .5rem; }
-.courses__list { display: grid; grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr)); gap: .6rem; }
+/* 見出しに送るフォーカスの印。ボタンと同じ実線のリングを付けると押せるバッジに見えるので、
+   形（点線・広いオフセット）で「これは読む場所で、押す場所ではない」を分ける。
+   フォーカス自体は消さない（画面が切り替わったときの行き先なので、消すと居場所が分からなくなる） */
+.focus-heading:focus-visible {
+  outline: 2px dashed rgba(246, 239, 228, .55);
+  outline-offset: 6px;
+  border-radius: 4px;
+}
+
+.courses { border: 0; margin: 0 0 .8rem; padding: 0; }
+.courses legend { padding: 0; font-weight: 700; margin-bottom: .4rem; }
+.courses__list { display: grid; grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr)); gap: .6rem; align-items: stretch; }
 
 .course { display: block; cursor: pointer; }
 .course__input { position: absolute; opacity: 0; pointer-events: none; }
 .course__body {
-  display: flex; flex-direction: column; gap: .1rem;
-  padding: .7rem .8rem;
-  border: 2px solid rgba(255, 255, 255, .16);
+  display: flex; flex-direction: column;
+  height: 100%;
+  line-height: 1.35;
+  padding: .55rem .8rem;
+  border: 2px solid rgba(255, 255, 255, .4);
   border-radius: 10px;
   background: rgba(0, 0, 0, .2);
 }
+.course:hover .course__body { border-color: rgba(255, 255, 255, .6); }
 .course__input:checked + .course__body { border-color: var(--accent); background: rgba(224, 163, 60, .14); }
 .course__input:focus-visible + .course__body { outline: 2px solid var(--ink); outline-offset: 2px; }
 .course__label { font-size: 1rem; }
+/* 選択中は琥珀の枠だけでなく形でも分かるようにする。枠の色はむしろ未選択のほうが地に対して
+   コントラストが高い（15.3:1 対 6.9:1）ので、色だけに任せられない。
+   場所は常に取っておく（選び替えでカードの中身が横へずれないように）。
+   visibility なので読み上げには出ない＝選択状態はラジオそのものが伝える */
+.course__label::before {
+  content: '✓';
+  margin-right: .3rem;
+  color: var(--accent);
+  visibility: hidden;
+}
+.course__input:checked + .course__body .course__label::before { visibility: visible; }
 .course__amount { font-family: var(--mono); color: var(--ink-dim); font-size: .9rem; }
-.course__hint { color: var(--ink-dim); font-size: .74rem; opacity: .85; }
+.course__hint { color: var(--ink-dim); font-size: .74rem; }
 
-.intro { margin: 0 0 1rem; padding-left: 1.1rem; color: var(--ink-dim); font-size: .9rem; }
+/* ---- ためし打ち ----
+
+   打鍵はレーンと同じ作りで受ける（実寸の透明な入力欄を重ねる）。
+   1pxに潰すとiOSがソフトキーボードを出さないので、opacityで消している。 */
+
+.tryout { margin: 0 0 .8rem; }
+.tryout__lead { margin: 0 0 .3rem; color: var(--ink-dim); font-size: .82rem; }
+.tryout__lead b { color: var(--ink); }
+.tryout__box {
+  position: relative;
+  display: flex; align-items: baseline; gap: .6rem; flex-wrap: wrap;
+  padding: .35rem .7rem;
+  border: 1px dashed rgba(255, 255, 255, .38);
+  border-radius: 10px;
+  background: rgba(0, 0, 0, .2);
+  cursor: text;
+}
+.tryout__box:focus-within { border-style: solid; border-color: var(--ink); }
+.tryout__name { font-weight: 700; font-size: .95rem; }
+.tryout__romaji { font-family: var(--mono); font-size: 1.05rem; letter-spacing: .04em; }
+.tryout__done { color: var(--accent); }
+.tryout__rest { color: var(--ink-dim); }
+.tryout__input {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  padding: 0; margin: 0; border: 0;
+  background: transparent; color: transparent; caret-color: transparent;
+  font-size: 16px; opacity: 0;
+  cursor: text;
+}
+.tryout__input:focus { outline: none; }
+/* 結果の1行ぶんは先に場所を取る（出た瞬間に「はじめる」が下へずれないように） */
+.tryout__note { margin: .25rem 0 0; min-height: 1.35em; color: var(--good); font-size: .82rem; }
+
+/* 「はじめる」と音の選択を1行に並べる。狭い画面では折り返す */
+.start-row { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
+.soundset { display: flex; align-items: center; gap: .5rem; }
+.soundset__label { color: var(--ink-dim); font-size: .85rem; }
+/* 2つで1つの選択なので、1本のトラックに入れて「切り替えるもの」に見せる。
+   琥珀の面で塗るのは「はじめる」だけにする——押す直前の位置に同じ色のピルが並ぶと、
+   どれが主要な動作なのかが薄まる */
+.switch { display: flex; gap: 0; padding: 3px; border-radius: 999px; background: rgba(0, 0, 0, .28); }
+.switch__item { cursor: pointer; }
+.switch__input { position: absolute; opacity: 0; pointer-events: none; }
+.switch__body {
+  display: inline-block;
+  padding: .22rem .85rem;
+  border-radius: 999px;
+  color: var(--ink-dim);
+  font-size: .85rem;
+}
+.switch__input:checked + .switch__body {
+  background: rgba(246, 239, 228, .16);
+  box-shadow: inset 0 0 0 1px rgba(246, 239, 228, .4);
+  color: var(--ink);
+  font-weight: 700;
+}
+.switch__input:focus-visible + .switch__body { outline: 2px solid var(--ink); outline-offset: 2px; }
+
+.intro { margin: .8rem 0 0; padding-left: 1.1rem; color: var(--ink-dim); font-size: .9rem; }
 .intro li + li { margin-top: .25rem; }
 .intro strong { color: var(--ink); }
 .intro code, .sub code {
   font-family: var(--mono); font-size: .85em;
   background: rgba(0, 0, 0, .35); padding: .05em .35em; border-radius: 4px;
 }
+.more { margin: .5rem 0 0; color: var(--ink-dim); font-size: .9rem; }
+.more summary { cursor: pointer; }
+.more summary:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; border-radius: 4px; }
+.more .intro { margin-top: .3rem; }
 
 .btn-main {
   appearance: none; border: 0; cursor: pointer;
@@ -92,7 +197,8 @@ main { max-width: 46rem; margin: 0 auto; }
 .btn-main:hover { filter: brightness(1.08); }
 .btn-main:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
 
-.result__actions { display: flex; gap: .6rem; flex-wrap: wrap; align-items: center; }
+/* 判定のすぐ下に置く再入口。次の1回へ戻る導線が毎回スクロールの向こう側にならないようにする */
+.result__actions { display: flex; gap: .6rem; flex-wrap: wrap; align-items: center; margin: 0 0 .1rem; }
 .btn-sub {
   appearance: none; cursor: pointer;
   background: transparent; color: var(--ink);
@@ -102,8 +208,19 @@ main { max-width: 46rem; margin: 0 auto; }
 .btn-sub:hover { border-color: var(--ink); }
 .btn-sub:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
 
+/* HUDの端に置く小さなボタン（音の切り替え・中断）。打鍵の邪魔にならない大きさにする */
+.btn-mini {
+  appearance: none; cursor: pointer;
+  background: transparent; color: var(--ink-dim);
+  border: 1px solid rgba(255, 255, 255, .3);
+  font: inherit; font-size: .72rem; line-height: 1.4;
+  padding: .1rem .6rem; border-radius: 999px;
+}
+.btn-mini:hover { color: var(--ink); border-color: var(--ink); }
+.btn-mini:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+
 .sub { margin: .8rem 0 0; color: var(--ink-dim); font-size: .82rem; }
-.sub--quiet { text-align: center; opacity: .75; }
+.sub--tight { margin-top: .3rem; margin-bottom: 1.1rem; }
 .sub strong { color: var(--ink); }
 
 /* ---- 開始前カウント ---- */
@@ -113,18 +230,33 @@ main { max-width: 46rem; margin: 0 auto; }
 
 /* ---- エラー ---- */
 
-.error__title { margin: 0 0 .4rem; font-size: 1.1rem; }
+.error__title { margin: 0 0 .4rem; font-size: 1.1rem; width: fit-content; }
 .error__detail { margin: 0 0 1rem; color: var(--ink-dim); font-family: var(--mono); font-size: .85rem; }
 
 /* ---- 対戦中 ---- */
 
-.hud { margin-bottom: .8rem; }
-.hud__money { margin: 0 0 .45rem; display: flex; align-items: baseline; gap: .5rem; flex-wrap: wrap; position: relative; }
+.hud { margin-bottom: .55rem; }
+.hud__money { margin: 0 0 .3rem; display: flex; align-items: baseline; gap: .5rem; flex-wrap: wrap; position: relative; }
 .hud__label { color: var(--ink-dim); font-size: .85rem; }
-.hud__money b { font-size: clamp(1.6rem, 8vw, 2.4rem); font-family: var(--mono); letter-spacing: -.02em; }
+.hud__money b { font-size: clamp(1.5rem, 7vw, 2.2rem); font-family: var(--mono); letter-spacing: -.02em; line-height: 1.15; }
 .hud__target { color: var(--ink-dim); font-size: .85rem; }
-.hud__missed { margin-left: auto; color: var(--bad); font-size: .82rem; }
-.hud__missed b { font-family: var(--mono); font-size: .95rem; }
+
+/* 残り時間は数字で出す。バーは達成率に使うので、時間と兼ねない（満タンの琥珀色が
+   「もう目標に届いている」に読めてしまうのが元の作りの弱点だった） */
+.hud__time { margin-left: auto; color: var(--ink-dim); font-size: .85rem; white-space: nowrap; }
+.hud__time b { font-size: 1.05rem; font-family: var(--mono); font-variant-numeric: tabular-nums; }
+.hud__time[data-low="true"] { color: var(--bad); }
+
+/* 1行に固定する。折り返すと、その下にある打鍵行のyが試合中に動く（打てなくなる） */
+.hud__foot { margin: .3rem 0 0; display: flex; align-items: center; gap: .5rem; flex-wrap: nowrap; height: 1.5rem; }
+.hud__pacenote { font-size: .8rem; color: var(--ink-dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.hud__pacenote[data-tone="behind"] { color: var(--accent); }
+.hud__pacenote[data-tone="paid"] { color: var(--good); }
+/* 逃した皿は減点なしと書いてあるので、罰の色では出さない */
+.hud__missed { color: var(--ink-dim); font-size: .78rem; white-space: nowrap; flex: none; }
+.hud__missed b { font-family: var(--mono); font-size: .9rem; }
+.hud__foot .btn-mini { flex: none; }
+.hud__foot #sound-toggle { margin-left: auto; }
 
 /* 食べた瞬間に金額が跳ねる。1周目の評価で「完成直後の金額欄が1バイトも変わらない」と出た */
 .hud__money b { display: inline-block; transform-origin: left bottom; }
@@ -144,39 +276,55 @@ main { max-width: 46rem; margin: 0 auto; }
   pointer-events: none; opacity: 0;
 }
 .hud__gain[data-show="true"] { animation: float-up 700ms ease-out; }
+/* 上げすぎると題字の行まで届いて、金額が題字に食われた残像に見える（実測で13.7px食い込んでいた） */
 @keyframes float-up {
   0% { opacity: 0; transform: translateY(0); }
   20% { opacity: 1; }
-  100% { opacity: 0; transform: translateY(-1.6em); }
+  100% { opacity: 0; transform: translateY(-.9em); }
 }
 
-.timer { height: 8px; border-radius: 999px; background: rgba(0, 0, 0, .35); overflow: hidden; }
-.timer__fill { height: 100%; width: 100%; background: var(--accent); transition: width .1s linear; }
-.timer__fill[data-low="true"] { background: var(--bad); }
+/* 目標額に対する達成率。目標を超えた分は緑で伸び、超えたあとも伸びしろが見える */
+.meter { position: relative; height: 10px; border-radius: 999px; background: rgba(0, 0, 0, .35); overflow: hidden; }
+.meter__fill { position: absolute; left: 0; top: 0; bottom: 0; width: 0; background: var(--accent); transition: width .12s linear; }
+.meter__over { position: absolute; top: 0; bottom: 0; width: 0; background: var(--good); transition: width .12s linear, left .12s linear; }
+/* いま必要なペースの目印。これより左に琥珀の先端があれば遅れている。
+   白1本だと琥珀の塗りの上で1.76:1・緑の上で1.54:1しか出ず、追いついた瞬間に読めなくなる。
+   白と濃茶の2色にして、暗い地でも明るい塗りの上でも必ず片方が立つようにする */
+.meter__pace {
+  position: absolute; top: -2px; bottom: -2px; width: 2px;
+  background: linear-gradient(90deg, var(--ink) 0 1px, var(--counter) 1px 2px);
+  transition: left .12s linear;
+}
 
 .lane-wrap { position: relative; }
 
 .lane {
   position: relative;
-  height: 7.4rem;
+  height: 7.5rem;
   border-radius: var(--radius);
   background: linear-gradient(180deg, var(--wood), var(--wood-edge));
   border: 1px solid rgba(0, 0, 0, .3);
   overflow: hidden;
   cursor: text;
 }
+/* 左端＝消えるところ、右端＝出てくるところ。両端の意味を色で分ける。
+   左の暗いマスクは、明るいレーンの中で唯一の「暗い錨」でもある */
+.lane::before, .lane::after { content: ''; position: absolute; top: 0; bottom: 0; width: 2.2rem; pointer-events: none; z-index: 2; }
+.lane::before { left: 0; background: linear-gradient(90deg, rgba(42, 29, 21, .88), rgba(42, 29, 21, .45) 55%, rgba(42, 29, 21, 0)); }
+.lane::after { right: 0; background: linear-gradient(270deg, var(--wood), rgba(232, 217, 190, 0)); }
 
 .plate {
   position: absolute; top: 50%; left: 0;
-  margin-top: -2.7rem;
-  width: clamp(6.5rem, 26vw, 9.5rem); height: 5.4rem;
+  margin-top: -2.9rem;
+  width: clamp(6.5rem, 26vw, 9.5rem); height: 5.8rem;
   display: flex; flex-direction: column; justify-content: center; align-items: center;
   gap: .1rem;
   padding: .3rem 0;
   border-radius: 8px;
   background: #fffaf0;
-  border: 1px solid rgba(0, 0, 0, .18);
-  box-shadow: 0 2px 0 rgba(0, 0, 0, .12);
+  /* 明るい皿と明るいレーンの差は1.34:1しかない。境目は面ではなく、この濃い縁が作る（約15:1） */
+  border: 1.5px solid var(--counter);
+  box-shadow: 0 2px 0 rgba(0, 0, 0, .18);
   color: #2a1d15;
   will-change: transform;
 }
@@ -187,29 +335,67 @@ main { max-width: 46rem; margin: 0 auto; }
   border-radius: 50%; object-fit: cover;
   background: rgba(0, 0, 0, .06);
 }
-.plate__name { font-size: clamp(.7rem, 2.7vw, .9rem); font-weight: 700; white-space: nowrap; }
-.plate__price { font-family: var(--mono); font-size: .72rem; color: #7a6a55; }
-.plate[data-active="true"] { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(224, 163, 60, .55); }
+/* 名前の行は高さを固定する。ふりがな（漢字を含む5品）が乗ったときだけ行が高くなると、
+   その皿だけ絵と値段が上下して（実測で約10px）レーンの並びががたつく。
+   中身は下端に揃えるので、ふりがなの有無で名前そのもののyは動かない。 */
+.plate__name {
+  height: 1.65rem;
+  display: flex; align-items: flex-end; justify-content: center;
+  font-size: clamp(.7rem, 2.7vw, .9rem); font-weight: 700; white-space: nowrap; line-height: 1.2;
+}
+/* 名前は必ずこの内側のspanに入れる。<ruby> を flex 直下に置くと flexアイテムとして
+   block化され、ふりがなが名前の上に乗らなくなる */
+.plate__name-inner { max-width: 100%; }
+/* 375px幅だと .58em は6.5pxまで落ちて読めない。下限を決める */
+.plate__name rt { font-size: max(9px, .58em); font-weight: 400; line-height: 1; }
+.plate__price { font-family: var(--mono); font-size: .72rem; line-height: 1.2; color: #6b5b46; }
+
+/* 取りに行くときに押すキー。皿の内側の左上に置く（外へ絶対配置すると皿からはみ出す）。
+   明るいレーンと明るい皿の上なので、琥珀や赤ではなく濃い茶の縁と文字で出す。 */
+.plate__key {
+  position: absolute; left: .3rem; top: .28rem;
+  display: none;
+  min-width: 1.15rem; padding: 0 .2rem;
+  border: 1.5px solid var(--counter); border-radius: 4px;
+  background: #ecdcbd; color: #2a1d15;
+  font-family: var(--mono); font-size: .76rem; line-height: 1.3; text-align: center;
+}
+.plate[data-takeable="true"] .plate__key { display: block; }
+
 .plate[data-state="missed"] { opacity: .35; filter: grayscale(1); }
 
-/* もうすぐ流れ切る皿。逃す前に知らせる（逃したことに気づけないという指摘への対応） */
-.plate[data-expiring="true"] { animation: warn 620ms ease-in-out infinite; }
-@keyframes warn {
-  0%, 100% { border-color: rgba(0, 0, 0, .18); }
-  50% { border-color: var(--bad); box-shadow: 0 0 0 3px rgba(240, 115, 106, .45); }
+/* もうすぐ流れ切る皿。点滅させず、縁を濃い赤に変えて皿そのものを沈める。
+   点滅だと ① レーンの上で赤は2:1しか出ない ② prefers-reduced-motion で警告ごと消える
+   ③ 減点なしと書いてあるものを罰の色で光らせることになる、の3つに同時に当たる。 */
+.plate[data-expiring="true"] {
+  border-color: var(--lane-warn);
+  background: #e3cfae;
+  box-shadow: inset 0 3px 9px rgba(42, 29, 21, .38);
 }
 
-/* つかんでいる皿（打ちかけ）はレーンから消す。
-   左端に留めると後ろの皿と文字が重なって「ぎじゅばんさい」のように読めなくなる。
-   半透明にしても文字同士は重なるので、レーンからは外し、
-   下の大きな表示と左端の帯で「つかんでいる」を伝える。 */
-.plate[data-held="true"] { opacity: 0; pointer-events: none; }
-
-.lane[data-holding="true"]::after {
-  content: '';
-  position: absolute; left: 0; top: 0; bottom: 0; width: 6px;
-  background: var(--accent);
+/* 選択中。琥珀だけだとレーンに対して1.6:1しか出ないので、暗い縁で挟んで見えるようにする */
+.plate[data-active="true"] {
+  border-color: var(--counter);
+  box-shadow: 0 0 0 3px var(--accent), 0 0 0 5px var(--counter);
 }
+/* 打っている皿がそのまま消えかけになることは多い。どちらの合図も消さずに重ねる
+   （ここを書かないと、いちばん大事な瞬間に「これを打っている」の印だけが消える） */
+.plate[data-active="true"][data-expiring="true"] {
+  border-color: var(--lane-warn);
+  box-shadow: inset 0 3px 9px rgba(42, 29, 21, .38), 0 0 0 3px var(--accent), 0 0 0 5px var(--counter);
+}
+
+/* つかんでいる皿（打ちかけ）はレーンの左端に「つかみ中スロット」として残す。
+   名前を出したままだと後ろの皿と文字が重なって「ぎじゅばんさい」のように読めなくなるので、
+   名前だけ隠して絵と琥珀の太枠にし、幅も詰める。打つ文字は下の打鍵行にフルで出ている。 */
+.plate[data-held="true"] {
+  width: clamp(4.2rem, 17vw, 5.4rem);
+  border-color: var(--counter);
+  box-shadow: 0 0 0 3px var(--accent), 0 0 0 5px var(--counter);
+}
+/* display:none で消すと flex が詰め直され、つかみ中の皿だけ値段が約12px上へずれる
+   （皿の列の下辺が揃わなくなる）。場所は取ったまま見えなくする */
+.plate[data-held="true"] .plate__name { visibility: hidden; }
 
 /* レーンに重ねた透明な入力欄。1px に潰すとiOSがソフトキーボードを出さないので、
    実寸のままopacityで消す。font-size:16px 未満だとiOSが勝手に拡大する */
@@ -223,26 +409,50 @@ main { max-width: 46rem; margin: 0 auto; }
 }
 .keys:focus { outline: none; }
 
-/* タッチ端末で、タップすればキーボードが出ることを知らせる */
+/* タッチ端末で、タップすればキーボードが出ることを知らせる。
+   z-index が無いと皿（1）の下に潜り、375px幅では高さの9割が皿に隠れていた。
+   nowrap なのは、left:50% だけで置くと使える幅がレーンの半分になって2行に折り返し、
+   ピルがレーンを塞ぐため（絶対配置の shrink-to-fit の性質） */
 .tap-hint {
   position: absolute; left: 50%; bottom: .5rem; transform: translateX(-50%);
+  z-index: 4;
   margin: 0; padding: .2rem .7rem;
   border-radius: 999px;
-  background: rgba(42, 29, 21, .82); color: var(--ink);
-  font-size: .78rem; pointer-events: none;
+  background: rgba(42, 29, 21, .92); color: var(--ink);
+  font-size: .74rem; white-space: nowrap; pointer-events: none;
 }
 
+/* 日本語入力の警告。レーンに重ねる＝出ても下の打鍵行の位置が動かない */
 .alert {
-  margin: .7rem 0 0;
-  padding: .6rem .8rem;
+  position: absolute; left: .6rem; right: .6rem; top: .6rem;
+  z-index: 4;
+  margin: 0;
+  padding: .5rem .8rem;
   border-radius: 8px;
-  background: rgba(240, 115, 106, .18);
-  border: 1px solid rgba(240, 115, 106, .5);
-  font-size: .9rem;
+  background: rgba(58, 20, 14, .94);
+  border: 1px solid var(--bad);
+  color: var(--ink);
+  font-size: .88rem; line-height: 1.5;
+  /* レーンに重ねているので、触るとキーボードが出る入力欄を塞がないようにする */
+  pointer-events: none;
 }
+.alert__how { display: block; margin-top: .15rem; color: var(--ink-dim); font-size: .78rem; }
+.alert kbd { font-size: .78em; }
 
-.target { margin-top: 1rem; text-align: center; border-radius: var(--radius); padding: .8rem; }
+/* 打鍵行。60秒のあいだ1文字ごとに見るのはここだけなので、いちばん大きい。
+   高さを固定してあるのは、つかみ中バッジの出入りで打鍵行のyが動かないようにするため。 */
+.target {
+  margin-top: .45rem;
+  text-align: center;
+  border-radius: var(--radius);
+  padding: .5rem .8rem .2rem;
+}
 .target[data-miss="true"] { background: rgba(240, 115, 106, .16); }
+/* 別の皿から打ち始めた合図。ミスの赤ではなく「選んだ」の琥珀で出す。
+   ここが無いと、料理名と打鍵行が一斉に入れ替わったことに気付けない */
+.target[data-switch="true"] { background: rgba(224, 163, 60, .2); }
+/* 残り10秒。周辺視でも気づけるように、視線がある打鍵行そのものを縁取る */
+.target[data-urgent="true"] { box-shadow: inset 0 0 0 2px var(--bad); }
 
 /* 食べた瞬間、視線がある中央でも返す。金額は左上にあり、そこだけ光っても目に入らない */
 .target[data-ate="true"] { animation: ate 300ms ease-out; }
@@ -250,70 +460,159 @@ main { max-width: 46rem; margin: 0 auto; }
   0% { background: rgba(111, 208, 140, .32); transform: scale(1.03); }
   100% { background: transparent; transform: scale(1); }
 }
-/* いま打っている料理を大きく見せる。文字だけだと画面が寂しい */
-.target__img {
-  display: block; margin: 0 auto .5rem;
-  width: clamp(4.5rem, 22vw, 6.5rem); height: clamp(4.5rem, 22vw, 6.5rem);
-  border-radius: 50%; object-fit: cover;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, .35);
+
+/* 料理名。ふりがな（漢字を含む5品だけ）が乗っても行の高さが変わらないよう先に場所を取る */
+.target__name {
+  margin: 0;
+  /* ふりがなが乗る品と乗らない品で行の高さが変わらないよう、先に場所を取っておく
+     （ここが動くと、下の打鍵行のyが皿ごとに上下する） */
+  min-height: 2.6rem;
+  display: flex; align-items: flex-end; justify-content: center;
+  font-size: clamp(1.25rem, 4.5vw, 1.5rem); font-weight: 700; line-height: 1.25;
 }
-.target__img[hidden] { display: none; }
-.target__name { margin: 0; font-size: clamp(1.6rem, 8vw, 2.4rem); font-weight: 700; line-height: 1.25; }
-.target__note { margin: .1rem 0 0; color: var(--ink-dim); font-size: .82rem; }
+.target__name rt { font-size: .5em; font-weight: 400; line-height: 1.1; color: var(--ink-dim); letter-spacing: .08em; }
+
 .held-badge {
-  display: inline-block; margin: .35rem 0 0;
-  padding: .12rem .6rem; border-radius: 999px;
+  display: block; width: fit-content; margin: .25rem auto 0;
+  padding: .1rem .6rem; border-radius: 999px;
   background: rgba(224, 163, 60, .18);
   border: 1px solid rgba(224, 163, 60, .5);
-  color: var(--accent); font-size: .76rem;
+  color: var(--accent); font-size: .76rem; line-height: 1.4;
+  /* hidden属性で消すと高さが詰まって打鍵行が上下する。場所は取ったまま見えなくする */
+  visibility: hidden;
 }
-/* display を指定した要素は hidden 属性が効かなくなる（作者スタイルがUA既定に勝つ）。
-   実際に、まだ何も打っていないのに「つかみ中」が出たままになっていた */
-.held-badge[hidden] { display: none; }
-.target__reading { margin: .3rem 0 0; color: var(--ink-dim); font-size: .95rem; letter-spacing: .12em; }
-.target__romaji { margin: .5rem 0 0; font-family: var(--mono); font-size: clamp(1.1rem, 5.5vw, 1.6rem); letter-spacing: .06em; word-break: break-all; }
+.held-badge[data-show="true"] { visibility: visible; }
+
+.target__romaji {
+  margin: .35rem 0 0;
+  font-family: var(--mono);
+  font-size: clamp(1.75rem, 8vw, 2.4rem);
+  line-height: 1.2; letter-spacing: .06em; word-break: break-all;
+}
 .romaji__done { color: var(--accent); }
 .romaji__next { color: #2a1d15; background: var(--ink); border-radius: 4px; padding: .05em .12em; }
 .romaji__rest { color: var(--ink-dim); }
 
 /* ---- 結果 ---- */
 
-.verdict { margin: 0; font-size: clamp(1.6rem, 8vw, 2.4rem); font-weight: 700; }
+.verdict { margin: 0; width: fit-content; font-size: clamp(1.6rem, 8vw, 2.4rem); font-weight: 700; line-height: 1.25; }
 .verdict[data-verdict="profit"] { color: var(--good); }
 .verdict[data-verdict="loss"] { color: var(--bad); }
-.verdict__detail { margin: .2rem 0 1.2rem; color: var(--ink-dim); font-size: .92rem; }
+.verdict__detail { margin: .2rem 0 .8rem; color: var(--ink-dim); font-size: .92rem; }
 
-.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(7rem, 1fr)); gap: .7rem; margin: 0 0 1.4rem; }
-.stat { background: rgba(0, 0, 0, .22); border-radius: 10px; padding: .6rem .7rem; }
-.stat dt { color: var(--ink-dim); font-size: .78rem; }
-.stat dd { margin: .1rem 0 0; font-family: var(--mono); font-size: 1.05rem; }
+/* 対戦中のバーと同じ形。結果が地続きに見えるようにしてある */
+.tally { position: relative; height: 14px; border-radius: 999px; background: rgba(0, 0, 0, .35); overflow: hidden; }
+.tally__fill { position: absolute; left: 0; top: 0; bottom: 0; width: 0; background: var(--accent); }
+.tally__over { position: absolute; top: 0; bottom: 0; width: 0; background: var(--good); }
+.tally__legend { margin: .3rem 0 1rem; color: var(--ink-dim); font-size: .85rem; }
+
+.session { margin: 0 0 .5rem; font-size: .95rem; }
+.session b { font-family: var(--mono); }
+.session[data-tone="up"] b { color: var(--good); }
+.session[data-tone="down"] b { color: var(--bad); }
+.advice { margin: 0 0 1rem; color: var(--ink-dim); font-size: .9rem; }
+.advice strong { color: var(--ink); }
+
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr)); gap: .7rem; margin: 0 0 .4rem; }
+.stat { background: rgba(0, 0, 0, .22); border-radius: 10px; padding: .6rem .8rem; }
+.stat dt { color: var(--ink-dim); font-size: .8rem; }
+.stat dd { margin: .1rem 0 0; font-family: var(--mono); font-size: 1.4rem; }
+.stats__minor { margin: 0 0 1.3rem; color: var(--ink-dim); font-size: .82rem; }
+.stats__minor b { font-family: var(--mono); color: var(--ink); font-weight: 400; }
 
 .result__course { margin: 0 0 .1rem; color: var(--ink-dim); font-size: .85rem; }
-.stumbles__title { margin: 0 0 .15rem; font-size: 1rem; }
+/* 次にやることに直結する唯一の情報なので、結果画面でいちばん強い見出しにする */
+.stumbles__title { margin: 0 0 .15rem; font-size: 1.2rem; }
 .stumbles__lead { margin: 0 0 .5rem; color: var(--ink-dim); font-size: .8rem; }
 kbd {
   font-family: var(--mono); font-size: .85em;
   background: rgba(0, 0, 0, .35); padding: .1em .4em; border-radius: 4px;
   border: 1px solid rgba(255, 255, 255, .18);
 }
-.stumbles__list { list-style: none; margin: 0 0 1.2rem; padding: 0; display: flex; gap: .6rem; flex-wrap: wrap; }
+.stumbles__list { list-style: none; margin: 0 0 .6rem; padding: 0; display: flex; gap: .6rem; flex-wrap: wrap; }
 .stumble {
-  display: flex; align-items: baseline; gap: .4rem;
-  background: rgba(0, 0, 0, .28); border-radius: 10px; padding: .45rem .8rem;
+  display: flex; align-items: baseline; gap: .45rem;
+  background: rgba(0, 0, 0, .28); border-radius: 10px; padding: .5rem 1rem;
 }
-.stumble__key { font-family: var(--mono); font-size: 1.5rem; color: var(--accent); }
+.stumble__key { font-family: var(--mono); font-size: 2rem; line-height: 1.1; color: var(--accent); letter-spacing: .04em; }
 .stumble__count { color: var(--ink-dim); font-size: .82rem; }
-.stumbles__empty { margin: 0 0 1.2rem; color: var(--ink-dim); font-size: .9rem; }
+.stumbles__empty { margin: 0 0 .6rem; color: var(--ink-dim); font-size: .9rem; }
+.unfinished { margin: 0 0 1.3rem; color: var(--ink-dim); font-size: .85rem; }
+.unfinished b { color: var(--ink); }
+
+/* 1皿につき1度しか読まないものなので畳んでおく（開始画面の「そのほかの決まり」と同じ作法）。
+   「打ち損ねたキー」は畳まない——終わったあとに残す当のものを畳んだら本末転倒になる */
+.ate { margin: 0 0 1.3rem; }
+.ate__title { font-size: 1rem; font-weight: 700; cursor: pointer; }
+.ate__title:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; border-radius: 4px; }
+.ate__list { list-style: none; margin: .4rem 0 0; padding: 0; display: grid; gap: .3rem; }
+.ate__list li { color: var(--ink-dim); font-size: .85rem; }
+.ate__list b { color: var(--ink); font-weight: 700; }
+.ate__empty { margin: .4rem 0 0; color: var(--ink-dim); font-size: .85rem; }
 
 /* ---- 足元 ---- */
 
 .site-foot { max-width: 46rem; margin: 2rem auto 0; }
 .credit { margin: 1rem 0 0; color: var(--ink-dim); font-size: .8rem; text-align: center; }
 
+/* 狭い画面ではコースを1列に落とす。2+1のL字に折れると3択が1セットに見えない。
+   1列に落ちたカードは横に余白ができるので、名前と金額を1行に並べて縦を詰める
+   （3枚を縦に積んだままだと「はじめる」が折り返しの下へ出る。360x640・320x568で実測）。
+
+   境目が24rem（384px）だった頃は、iPhone 12〜16 の実寸390pxがちょうど外側に落ちていた。
+   8remのカード3枚が横に並ぶには約478px要るので、385〜478pxの帯は2+1のL字に折れる。
+   そのぶん縦が伸びて「はじめる」が折り返しの38px下（390x664で bottom=702・実測）＝
+   いちばん台数の多い端末で主要ボタンが画面外にあった。29.9rem（478px）まで1列に倒すと
+   bottom=624（余裕40px）に収まり、L字も同時に消える。480px以上は今までどおり3列。 */
+@media (max-width: 29.9rem) {
+  .courses__list { grid-template-columns: 1fr; gap: .5rem; }
+  .hero { aspect-ratio: 16 / 3; }
+  /* 内側の余白を詰めるぶん、文字が使える横幅が広がる＝折り返しの行数も減る */
+  .panel { padding: 1rem .9rem; }
+  .courses legend { font-size: .9rem; margin-bottom: .25rem; }
+  .course__body { display: grid; grid-template-columns: auto 1fr; gap: 0 .4rem; padding: .4rem .6rem; }
+  .course__amount { text-align: right; }
+  .course__hint { grid-column: 1 / -1; }
+  .site-head { padding: .8rem 0 .6rem; }
+  .tryout__lead { font-size: .78rem; }
+}
+
+/* 320px幅だと題字がちょうど1行に収まらず2行に折れる。ここだけ1段落とす
+   （上の帯と違って、これは横幅そのものが足りない話なので広げない） */
+@media (max-width: 24rem) {
+  .site-head h1 { font-size: 1.25rem; }
+}
+
+/* 縦が短い画面は、主要な操作（はじめる）を折り返しの上に置くことを優先する。
+   開始画面の絵は、この高さでは40px前後の帯にしかならず「何が流れてくるか」を伝えないまま、
+   はじめる を折り返しの下へ押し出していた（360x640で656px・320x568で677px＝実測）。
+   絵の役目は下の説明文とコース札が引き継ぐ。384pxより広い画面では今までどおり出す。 */
+@media (max-height: 40rem) {
+  .hero { display: none; }
+  .tagline { font-size: .85rem; line-height: 1.5; }
+  .site-head { padding: .8rem 0 .5rem; }
+}
+
+/* 対戦中と開始前カウントは、縦にも中央へ寄せる。ヘッダーとフッターを畳んだぶんが
+   そのまま下の空きになっていた（1440x900で、打鍵行の下に534px＝画面の59%が何も無い地）。
+   スマホには効かせない——下の余白はソフトキーボードが埋めるので、寄せると打鍵行が
+   キーボードの裏へ入る。だから幅で切って、狭い画面は今までどおり上詰めのままにする。 */
+@media (min-width: 48rem) and (min-height: 40rem) {
+  body[data-phase="playing"] main,
+  body[data-phase="countdown"] main {
+    display: grid;
+    min-height: calc(100vh - 6.5rem);
+    align-content: center;
+    align-content: safe center;
+  }
+}
+
+/* 装飾だけを止める。レーンの横移動はゲームそのものなので止めない
+   （止めたら遊べない＝「動きを減らす」ではなく「機能を消す」になる） */
 @media (prefers-reduced-motion: reduce) {
-  .timer__fill { transition: none; }
+  .meter__fill, .meter__over, .meter__pace { transition: none; }
   .hud__money b[data-bump="true"], .hud__gain[data-show="true"],
-  .plate[data-expiring="true"], .target[data-ate="true"] { animation: none; }
+  .target[data-ate="true"] { animation: none; }
 }
 
 .plate[data-held="true"] { z-index: 3; }

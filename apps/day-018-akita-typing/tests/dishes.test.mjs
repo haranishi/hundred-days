@@ -4,7 +4,7 @@ import { existsSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { COURSES, DISHES, DURATION_MS, courseById, dishesForCourse } from '../lib/dishes.js';
+import { COURSES, DISHES, DURATION_MS, courseById, dishesForCourse, hasKanji, recommendCourse } from '../lib/dishes.js';
 import { isSupported, primaryRomaji } from '../lib/romaji.js';
 import { priceOfReading } from '../lib/scoring.js';
 /* 難易度そのものは difficulty.test.mjs で「実際にゲームを回して」測る。
@@ -94,4 +94,45 @@ test('料理はすべて絵を持っていて、その絵が実在する', () =>
     const file = join(appDir, 'assets', 'dish', `${dish.image}.webp`);
     assert.ok(existsSync(file), `${dish.name} の絵が見つからない: assets/dish/${dish.image}.webp`);
   }
+});
+
+test('ふりがなを乗せるのは漢字を含む5品だけ（カタカナ語には振らない）', () => {
+  /* 打鍵行から「よみ」の行を落とし、代わりに名前の上へ <ruby> で乗せている。
+     対象を name !== reading で選ぶと ハタハタ／ハタハタずし まで入るが、
+     カタカナにふりがなを振っても情報は増えない。だから判定は「漢字を含むか」。
+     ここが崩れると、ふりがなが要る品に振られない・要らない品に振られるのどちらかが起きる。 */
+  const kanji = DISHES.filter((d) => hasKanji(d.name));
+  assert.equal(kanji.length, 5, `漢字を含む料理は5品のはず: ${kanji.map((d) => d.name).join(',')}`);
+  assert.deepEqual(
+    kanji.map((d) => d.name),
+    ['秋田ふき', '比内地鶏', '稲庭うどん', 'しょっつる鍋', 'きりたんぽ鍋']
+  );
+  for (const dish of kanji) {
+    assert.ok(dish.reading && dish.reading !== dish.name, `${dish.name} のよみが無い`);
+  }
+  // カタカナだけの品は対象外
+  assert.equal(hasKanji('ハタハタ'), false);
+  assert.equal(hasKanji('ハタハタずし'), false);
+});
+
+test('コースは必要な打鍵速度を選ぶ前に書いてある', () => {
+  for (const course of COURSES) {
+    assert.ok(course.hint, `${course.label} に hint が無い`);
+    assert.ok(course.pace, `${course.label} に必要な速さの目安が無い`);
+    assert.equal(typeof course.needsKps, 'number');
+  }
+  // 目標が高いコースほど速さが要る
+  for (let i = 1; i < COURSES.length; i += 1) {
+    assert.ok(COURSES[i].needsKps > COURSES[i - 1].needsKps);
+  }
+});
+
+test('打鍵速度に合うコースを勧める（実測値を境目にする）', () => {
+  assert.equal(recommendCourse(0).id, 'light');
+  assert.equal(recommendCourse(1.1).id, 'light');
+  assert.equal(recommendCourse(2.49).id, 'light');
+  assert.equal(recommendCourse(2.5).id, 'standard');
+  assert.equal(recommendCourse(3.9).id, 'standard');
+  assert.equal(recommendCourse(4).id, 'heavy');
+  assert.equal(recommendCourse(9).id, 'heavy');
 });
