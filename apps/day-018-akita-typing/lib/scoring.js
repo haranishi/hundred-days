@@ -27,6 +27,19 @@ export function scaledTarget(target, durationMs, baseMs) {
   return Math.max(50, Math.round((target * durationMs) / baseMs / 50) * 50);
 }
 
+/**
+ * いまのペースが「元が取れる線」からどれだけ離れているか。
+ * 正なら先行、負なら遅れ。対戦中の1行（元まであと¥X）とバーの目印はこの値で決める。
+ *
+ * 60秒で target に届けばよいので、経過ぶんの取り分は target × 経過比率。
+ * 時間が0のときは要求も0＝まだ誰も遅れていない。
+ */
+export function paceDelta(eaten, target, elapsedMs, durationMs) {
+  if (!durationMs || durationMs <= 0) return eaten;
+  const ratio = Math.min(1, Math.max(0, elapsedMs / durationMs));
+  return eaten - target * ratio;
+}
+
 /** 食べた額とコース料金を突き合わせる */
 export function settle(eaten, target) {
   const diff = eaten - target;

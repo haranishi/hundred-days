@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
-import { accuracy, formatYen, keysPerSecond, priceOfReading, scaledTarget, settle, stumbles } from '../lib/scoring.js';
+import { accuracy, formatYen, keysPerSecond, paceDelta, priceOfReading, scaledTarget, settle, stumbles } from '../lib/scoring.js';
 
 test('値段は打鍵数で決まる（かなの文字数ではない）', () => {
   // はたはた は4かなだが8打、じゅんさい は5かなだが6打。打つ手間の順になっているか
@@ -49,4 +49,21 @@ test('金額の表示', () => {
   assert.equal(formatYen(3000), '¥3,000');
   assert.equal(formatYen(-200), '-¥200');
   assert.equal(formatYen(0), '¥0');
+});
+
+test('元が取れるペースからのずれ', () => {
+  // 始まった瞬間は誰も遅れていない（要求は0円）
+  assert.equal(paceDelta(0, 3000, 0, 60_000), 0);
+  // 半分の時点で半分食べていればちょうど
+  assert.equal(paceDelta(1500, 3000, 30_000, 60_000), 0);
+  assert.equal(paceDelta(1000, 3000, 30_000, 60_000), -500);
+  assert.equal(paceDelta(2000, 3000, 30_000, 60_000), 500);
+  // 終了時は目標との差そのもの
+  assert.equal(paceDelta(2830, 3000, 60_000, 60_000), -170);
+  // すでに目標へ届いていれば、残り時間があっても必ず先行
+  assert.ok(paceDelta(3000, 3000, 1, 60_000) > 0);
+  // 時間を超えて呼ばれても要求は目標額で頭打ち
+  assert.equal(paceDelta(3000, 3000, 90_000, 60_000), 0);
+  // 按分後の目標額でも同じ計算になる（?duration=15 の回）
+  assert.equal(paceDelta(375, scaledTarget(3000, 15_000, 60_000), 7_500, 15_000), 0);
 });

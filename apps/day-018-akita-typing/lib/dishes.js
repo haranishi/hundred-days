@@ -41,9 +41,9 @@ export const DISHES = [
    遅くしても解決しない。だから お手軽 は語そのものを短いものに絞る。
    打鍵8以下だと6品しか残らず同じ皿が繰り返しすぎるので、9以下（10品）で切っている。 */
 export const COURSES = [
-  { id: 'light', label: 'お手軽', target: 700, interval: 2800, maxKeys: 9, hint: 'みじかめの10品・ゆっくり' },
-  { id: 'standard', label: 'おすすめ', target: 3000, interval: 1600, maxKeys: null, hint: '全20品' },
-  { id: 'heavy', label: '大食い', target: 4500, interval: 1200, maxKeys: null, hint: '全20品・速い' }
+  { id: 'light', label: 'お手軽', target: 700, interval: 2800, maxKeys: 9, hint: '10品・ゆっくり', pace: 'どの速さでも', needsKps: 0 },
+  { id: 'standard', label: 'おすすめ', target: 3000, interval: 1600, maxKeys: null, hint: '全20品', pace: '約2.5打/秒から', needsKps: 2.5 },
+  { id: 'heavy', label: '大食い', target: 4500, interval: 1200, maxKeys: null, hint: '全20品・速い', pace: '約4打/秒から', needsKps: 4 }
 ];
 
 export const DURATION_MS = 60_000;
@@ -56,4 +56,20 @@ export function courseById(id) {
 export function dishesForCourse(course) {
   if (!course || !course.maxKeys) return DISHES;
   return DISHES.filter((d) => primaryRomaji(d.reading).length <= course.maxKeys);
+}
+
+/**
+ * 打鍵速度に合うコース。実測（tests/difficulty.test.mjs）で「元が取れる速さ」を測ってあるので、
+ * その値をそのまま境目に使う。速い順に見て、届いている中でいちばん重いコースを返す。
+ */
+export function recommendCourse(kps) {
+  for (let i = COURSES.length - 1; i >= 0; i -= 1) {
+    if (kps >= COURSES[i].needsKps) return COURSES[i];
+  }
+  return COURSES[0];
+}
+
+/** 名前に漢字を含む料理だけ、よみをふりがなとして名前の上に乗せる（カタカナ語はふりがなが情報を持たない） */
+export function hasKanji(name) {
+  return /[\u4e00-\u9fff]/.test(name);
 }

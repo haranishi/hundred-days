@@ -20,6 +20,24 @@ function mulberry32(seed) {
   };
 }
 
+/* QWERTYで隣り合うキー。打ち間違いは「押すはずのキーの隣を叩く」で作る。
+   ここが `z`/`q` 固定だった頃は、20品の先頭キー {a,b,d,g,h,i,j,k,m,s,t} に一度も当たらず、
+   「先頭キーで別の皿から打ち始める」経路がこの梯子の中で構造的に発火しなかった。
+   実プレイでは指ズレが日常的にその経路へ入るので、そこを測らないと線が守れていない。 */
+const NEIGHBORS = {
+  q: 'wa', w: 'qeas', e: 'wrsd', r: 'etdf', t: 'ryfg', y: 'tugh', u: 'yihj', i: 'uojk',
+  o: 'ipkl', p: 'ol', a: 'qwsz', s: 'awedzx', d: 'serfxc', f: 'drtgcv', g: 'ftyhvb',
+  h: 'gyujbn', j: 'huiknm', k: 'jiolm', l: 'kop', z: 'asx', x: 'zsdc', c: 'xdfv',
+  v: 'cfgb', b: 'vghn', n: 'bhjm', m: 'njk'
+};
+
+/** 押すはずだったキーの隣を1つ返す（隣が無い文字は遠いキーで代用する） */
+function slip(key, roll) {
+  const near = NEIGHBORS[key];
+  if (!near) return key === 'z' ? 'q' : 'z';
+  return near[Math.floor(roll * near.length)];
+}
+
 /**
  * 一定の速さで打ち続ける人を再現する。1皿食べ終えたら反応時間ぶん休む。
  * missRate を渡すと、その割合で打ち間違える人になる（間違えた打鍵も時間を食う）。
@@ -48,7 +66,7 @@ function play({ courseId, keysPerSecond, seed = 7, reactionMs = 400, missRate = 
     const key = plate.matcher.remaining()[0];
     if (!key) { nextKeyAt = now + 100; continue; }
     if (missRate > 0 && wrong() < missRate) {
-      game.press(key === 'z' ? 'q' : 'z', now);
+      game.press(slip(key, wrong()), now);
       nextKeyAt = now + stepMs;
       continue;
     }
