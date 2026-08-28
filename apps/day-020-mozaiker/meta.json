@@ -1,0 +1,19 @@
+{
+  "day": 20,
+  "season": 1,
+  "title": "モザイカー",
+  "description": "YouTubeコメント欄の誹謗中傷を端末内で判定し、読む前にモザイクで隠すChrome拡張。クリックで開示でき、外部通信なし・アカウント不要・無料。紹介ページを公開中（ストア提出はこれから）",
+  "tags": [
+    "chrome-extension",
+    "youtube",
+    "privacy",
+    "no-network"
+  ],
+  "status": "external",
+  "externalUrl": "https://rairakku.vercel.app/mozaiker",
+  "publicUrl": "https://rairakku.vercel.app/mozaiker",
+  "screenshot": "screenshot.webp",
+  "aiHandled": [],
+  "humanHandled": [],
+  "failuresAndFixes": []
+}

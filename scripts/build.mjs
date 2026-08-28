@@ -67,6 +67,12 @@ const allApps = dirs.map((dir) => {
     // アプリ本体を公開しないだけの「制作記録のみ」のDayは draft 以外の status を使う
     draft: status === 'draft',
     xPostUrl: typeof meta.xPostUrl === 'string' ? meta.xPostUrl.trim() : '',
+    // Chrome拡張など、このサイトの外で公開しているDayのリンク先（紹介ページ）。
+    // status を published 以外にしたうえで externalUrl を書くと、カードがここへ飛ぶ
+    externalUrl:
+      typeof meta.externalUrl === 'string' && meta.externalUrl.trim().startsWith('https://')
+        ? meta.externalUrl.trim()
+        : '',
     startedAt: isDate(meta.startedAt) ? meta.startedAt : '',
     finishedAt: isDate(meta.finishedAt) ? meta.finishedAt : '',
     aiHandled: toStringArray(meta.aiHandled),
@@ -177,8 +183,11 @@ writeFileSync(join(distDir, '_headers'), headerLines.join('\n'));
 // ---------------------------------------------------------------- 集計（すべて meta.json の実値から）
 
 const publishedCount = apps.filter((a) => a.published).length;
+// 進捗は「公開まで至ったDay」で数える。このサイトで配信するもの（published）に加えて、
+// Chrome拡張のように外部で公開したDay（externalUrlあり）も含める
+const releasedCount = apps.filter((a) => a.published || a.externalUrl).length;
 const totalMinutes = apps.reduce((sum, a) => sum + a.minutes, 0);
-const progress = Math.min(100, Math.round((publishedCount / SITE.goal) * 100));
+const progress = Math.min(100, Math.round((releasedCount / SITE.goal) * 100));
 
 // 制作時間：actualMinutes が未記入(0)のDayがあるうちは「記録できている分だけの合計」であることを明示する。
 // 全Day記入済みになったら普通の「総制作時間」に戻す
@@ -258,12 +267,14 @@ const memoBlock = (label, body) => `<div class="memo__row"><dt class="memo__labe
 
 const cardHtml = (app) => {
   const num = pad3(app.day);
+  // アプリ本体を持たず、外部の紹介ページで公開しているDay（Chrome拡張など）
+  const external = !app.published && Boolean(app.externalUrl);
   const thumbInner =
     `<span class="thumb__label">DAY</span><span class="thumb__num">${num}</span>`;
   const thumb = app.hasShot
     ? `<img class="thumb__img" src="./${esc(app.dir)}/${esc(app.shot)}" alt="${esc(app.title)}の画面" loading="lazy" decoding="async" width="1200" height="750">`
     : thumbInner;
-  const thumbClass = `thumb${app.hasShot ? '' : ' thumb--placeholder'}${app.published ? '' : ' thumb--muted'}`;
+  const thumbClass = `thumb${app.hasShot ? '' : ' thumb--placeholder'}${app.published || external ? '' : ' thumb--muted'}`;
   // 再生ボタンはサムネの外に置く（サムネ自体がアプリへのリンクなので、入れ子のクリック領域を作らない）
   const playBtn = app.hasDemo
     ? `<button class="thumb__play" type="button" data-demo="./${esc(app.dir)}/${esc(app.demo)}"` +
@@ -272,12 +283,16 @@ const cardHtml = (app) => {
     : '';
   const inner = app.published
     ? `<a class="thumb__link" href="./${esc(app.dir)}/" tabindex="-1" aria-hidden="true">${thumb}</a>`
-    : thumb;
+    : external
+      ? `<a class="thumb__link" href="${esc(app.externalUrl)}" target="_blank" rel="noopener" tabindex="-1" aria-hidden="true">${thumb}</a>`
+      : thumb;
   const thumbBox = `<div class="${thumbClass}">${inner}${playBtn}</div>`;
 
   const badge = app.published
     ? '<span class="badge badge--live"><span class="badge__dot"></span>公開中</span>'
-    : '<span class="badge">制作記録のみ</span>';
+    : external
+      ? '<span class="badge badge--live"><span class="badge__dot"></span>外部で公開</span>'
+      : '<span class="badge">制作記録のみ</span>';
 
   const tags = app.tags
     .slice(0, CARD_TAG_LIMIT)
@@ -290,7 +305,9 @@ const cardHtml = (app) => {
 
   const primary = app.published
     ? `<a class="btn btn--primary" href="./${esc(app.dir)}/">アプリを開く</a>`
-    : '<button class="btn btn--disabled" type="button" disabled>アプリ本体なし</button>';
+    : external
+      ? `<a class="btn btn--primary" href="${esc(app.externalUrl)}" target="_blank" rel="noopener">紹介ページを開く<span class="sr-only">（Day ${num}・新しいタブで開く）</span></a>`
+      : '<button class="btn btn--disabled" type="button" disabled>アプリ本体なし</button>';
   const xLink = app.xPostUrl
     ? `<a class="btn btn--ghost" href="${esc(app.xPostUrl)}" target="_blank" rel="noopener">X投稿<span class="sr-only">（Day ${num}・新しいタブで開く）</span></a>`
     : '';
@@ -547,10 +564,10 @@ img{max-width:100%;}
     <p class="hero__sub">${esc(SITE.tagline)}</p>
     <div class="progress">
       <div class="progress__row">
-        <p class="progress__count"><span class="progress__now">${publishedCount}</span> / ${SITE.goal}<span class="progress__label">公開済み</span></p>
+        <p class="progress__count"><span class="progress__now">${releasedCount}</span> / ${SITE.goal}<span class="progress__label">公開済み</span></p>
         <span class="progress__pct" aria-hidden="true">${progress}%</span>
       </div>
-      <div class="progress__track" role="progressbar" aria-valuemin="0" aria-valuemax="${SITE.goal}" aria-valuenow="${publishedCount}" aria-label="100日チャレンジの進捗">
+      <div class="progress__track" role="progressbar" aria-valuemin="0" aria-valuemax="${SITE.goal}" aria-valuenow="${releasedCount}" aria-label="100日チャレンジの進捗">
         <div class="progress__fill" style="width:${progress}%"></div>
       </div>
     </div>
@@ -561,7 +578,7 @@ img{max-width:100%;}
   </header>
 
   <section class="stats" aria-label="記録の集計">
-    <div class="stat"><span class="stat__label">公開アプリ</span><span class="stat__value"><span class="stat__num">${publishedCount}</span><span class="stat__unit">本</span></span></div>
+    <div class="stat"><span class="stat__label">公開アプリ</span><span class="stat__value"><span class="stat__num">${releasedCount}</span><span class="stat__unit">本</span></span></div>
     <div class="stat"><span class="stat__label">${allMinutesRecorded ? '総制作時間' : '制作時間<span class="stat__nb">（記録分）</span>'}</span><span class="stat__value">${recordedCount ? statValue(totalMinutes) : '<span class="stat__num">—</span>'}</span>${allMinutesRecorded ? '' : `<span class="stat__note">記録済み ${recordedCount}/${apps.length} 日</span>`}</div>
     <div class="stat"><span class="stat__label">制作日数</span><span class="stat__value"><span class="stat__num">${workDayCount}</span><span class="stat__unit">日</span></span></div>
   </section>
@@ -739,7 +756,7 @@ ${cards}
 
 writeFileSync(join(distDir, 'index.html'), html);
 console.log(
-  `build: ${apps.length} day(s) / 公開 ${publishedCount} / スクショ ${apps.filter((a) => a.hasShot).length}` +
+  `build: ${apps.length} day(s) / 公開 ${releasedCount}（うち外部 ${releasedCount - publishedCount}） / スクショ ${apps.filter((a) => a.hasShot).length}` +
     ` / 動画 ${apps.filter((a) => a.hasDemo).length} / OGP付与 ${metaInjected} -> dist/` +
     // 除外したものは必ず名前を出す（黙って落とすと「全部載っている」と誤解する）
     (drafts.length ? `\n  draft のため一覧から除外: ${drafts.map((d) => d.dir).join(', ')}` : '')
