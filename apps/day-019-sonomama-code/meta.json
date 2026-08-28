@@ -1,0 +1,19 @@
+{
+  "day": 19,
+  "season": 1,
+  "title": "そのままコード",
+  "description": "開いているページを1クリックで二次元コードに変えるChrome拡張。中身は生のURL全文で、短縮もリダイレクトも外部通信もしない。権限はactiveTabのみ・アカウント不要・無料。Chromeウェブストアで公開中",
+  "tags": [
+    "chrome-extension",
+    "qr-code",
+    "privacy",
+    "no-network"
+  ],
+  "status": "external",
+  "externalUrl": "https://rairakku.vercel.app/sonomama-code",
+  "publicUrl": "https://rairakku.vercel.app/sonomama-code",
+  "screenshot": "screenshot.webp",
+  "aiHandled": [],
+  "humanHandled": [],
+  "failuresAndFixes": []
+}

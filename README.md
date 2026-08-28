@@ -27,6 +27,8 @@ AIと一緒に作りながら、「AIに任せたこと」と「自分で考え�
 | 016 | [回線の犯人さがし](apps/day-016-line-suspect/) | https://hundred-days.pages.dev/day-016-line-suspect/ |
 | 017 | [AIの読みが見えるリバーシ](apps/day-017-reversi-mind/) | https://hundred-days.pages.dev/day-017-reversi-mind/ |
 | 018 | [秋田の飯は、打てた分だけ](apps/day-018-akita-typing/) | https://hundred-days.pages.dev/day-018-akita-typing/ |
+| 019 | [そのままコード](apps/day-019-sonomama-code/)（Chrome拡張） | https://rairakku.vercel.app/sonomama-code |
+| 020 | [モザイカー](apps/day-020-mozaiker/)（Chrome拡張） | https://rairakku.vercel.app/mozaiker |
 
 ## 1日アプリのルール
 
