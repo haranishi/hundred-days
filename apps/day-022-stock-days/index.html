@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>その備蓄、何日もつ？</title>
+  <meta name="description" content="水・食料・簡易トイレの備蓄が何日もつかと、目標までの不足量を端末内だけで計算します。">
+  <meta name="share:text" content="その備蓄、何日もつ？ — 家にある水・食料・簡易トイレを日数にして、次に足すものを確かめよう">
+  <link rel="stylesheet" href="./app.css">
+  <link rel="stylesheet" href="./shared/share.css">
+  <script src="./shared/share.js" defer></script>
+</head>
+<body>
+  <header class="hero">
+    <p class="eyebrow">DAY 022 · 備蓄の現在地</p>
+    <h1>その備蓄、<br>何日もつ？</h1>
+    <p class="lead">家にある量を入れると、何が先に尽きるかと、目標までの不足量が分かります。</p>
+  </header>
+
+  <div class="summary-wrap">
+    <div id="summary" class="summary" role="status" aria-live="polite">
+      <div id="summary-main"></div>
+      <a id="summary-empty-action" class="summary__empty-action button button--quiet" href="#water-stock" hidden>まず飲料水の量を入れる</a>
+    </div>
+  </div>
+
+  <main>
+    <p id="storage-error" class="notice notice--save" hidden>この環境では保存できません。入力は画面を閉じるまで有効です</p>
+
+    <section class="paper household" aria-labelledby="household-title">
+      <div class="section-head">
+        <p class="step">01</p>
+        <div><h2 id="household-title">世帯と目標</h2><p>公式の目安は人数だけで計算します。</p></div>
+      </div>
+      <div class="household-grid">
+        <fieldset class="field-group">
+          <legend>人数</legend>
+          <div class="stepper">
+            <button id="people-minus" type="button" aria-label="人数を1人減らす">−</button>
+            <span class="stepper__value">
+              <label for="people" class="sr-only">人数</label>
+              <input id="people" name="people" type="number" inputmode="numeric" min="1" max="20" step="1">
+              <span>人</span>
+            </span>
+            <button id="people-plus" type="button" aria-label="人数を1人増やす">＋</button>
+          </div>
+          <p id="people-error" class="field-error" hidden>1〜20の整数で入力してください</p>
+        </fieldset>
+        <fieldset class="field-group target-group">
+          <legend>目標日数</legend>
+          <div class="segments">
+            <label><input type="radio" name="target" value="3"><span>3日</span></label>
+            <label><input type="radio" name="target" value="7"><span>7日</span></label>
+          </div>
+        </fieldset>
+      </div>
+      <div class="flags">
+        <label><input id="flag-infant" type="checkbox"><span>乳幼児がいる</span></label>
+        <label><input id="flag-pet" type="checkbox"><span>ペットがいる</span></label>
+      </div>
+      <p class="hint">選ぶと追加の行の候補が増えます。係数は変えません。</p>
+    </section>
+
+    <section class="stock-section" aria-labelledby="stock-title">
+      <div class="section-head section-head--outside">
+        <p class="step">02</p>
+        <div><h2 id="stock-title">いまある量</h2><p>空欄の行は、入力するまで全体日数から外れます。</p></div>
+      </div>
+
+      <article id="row-water" class="stock-card" data-row-id="water">
+        <div class="stock-card__title"><div><p class="kicker">WATER</p><div class="title-line"><h3>飲料水</h3><span id="water-status" class="row-status" hidden></span></div></div><span class="rate">1人1日 3L</span></div>
+        <div class="stock-fields">
+          <label>手持ちの量<span class="input-with-unit"><input id="water-stock" type="number" inputmode="decimal" min="0" max="100000" step="0.1"><span>L</span></span></label>
+          <label>いちばん早い期限<input id="water-expiry" type="date"></label>
+        </div>
+        <p id="water-error" class="field-error" hidden>0〜100000の数値で入力してください</p>
+        <div class="days-line"><strong id="water-days"><span class="days-number">—</span> <span class="days-unit">日</span></strong><span id="water-expiry-badge" class="expiry-badge" hidden></span></div>
+        <div class="tank"><progress id="water-bar" max="7" value="0" aria-label="飲料水の日数 0日"></progress><span class="mark mark--zero">0</span><span class="mark mark--three">3日</span><span class="mark mark--seven">7日</span></div>
+        <p class="row-note">調理用を含む目安。2Lペットボトルなら手持ち本数×2で入力できます。</p>
+      </article>
+
+      <article id="row-food" class="stock-card" data-row-id="food">
+        <div class="stock-card__title"><div><p class="kicker">FOOD</p><div class="title-line"><h3>食料</h3><span id="food-status" class="row-status" hidden></span></div></div><span class="rate">1人1日 3食</span></div>
+        <div class="stock-fields">
+          <label>手持ちの量<span class="input-with-unit"><input id="food-stock" type="number" inputmode="decimal" min="0" max="100000" step="0.1"><span>食</span></span></label>
+          <label>いちばん早い期限<input id="food-expiry" type="date"></label>
+        </div>
+        <p id="food-error" class="field-error" hidden>0〜100000の数値で入力してください</p>
+        <div class="days-line"><strong id="food-days"><span class="days-number">—</span> <span class="days-unit">日</span></strong><span id="food-expiry-badge" class="expiry-badge" hidden></span></div>
+        <div class="tank"><progress id="food-bar" max="7" value="0" aria-label="食料の日数 0日"></progress><span class="mark mark--zero">0</span><span class="mark mark--three">3日</span><span class="mark mark--seven">7日</span></div>
+        <p class="row-note">1日3食として数えます。主食・主菜などを1食分ずつ数えてください。</p>
+      </article>
+
+      <article id="row-toilet" class="stock-card" data-row-id="toilet">
+        <div class="stock-card__title"><div><p class="kicker">TOILET</p><div class="title-line"><h3>簡易トイレ</h3><span id="toilet-status" class="row-status" hidden></span></div></div><span class="rate">1人1日 5回</span></div>
+        <div class="stock-fields">
+          <label>手持ちの量<span class="input-with-unit"><input id="toilet-stock" type="number" inputmode="decimal" min="0" max="100000" step="0.1"><span>回</span></span></label>
+          <label>いちばん早い期限<input id="toilet-expiry" type="date"></label>
+        </div>
+        <p id="toilet-error" class="field-error" hidden>0〜100000の数値で入力してください</p>
+        <div class="days-line"><strong id="toilet-days"><span class="days-number">—</span> <span class="days-unit">日</span></strong><span id="toilet-expiry-badge" class="expiry-badge" hidden></span></div>
+        <div class="tank"><progress id="toilet-bar" max="7" value="0" aria-label="簡易トイレの日数 0日"></progress><span class="mark mark--zero">0</span><span class="mark mark--three">3日</span><span class="mark mark--seven">7日</span></div>
+        <p class="row-note">便袋の回数で入力します。生活用水は含みません。</p>
+      </article>
+
+      <div id="custom-rows" class="custom-rows"></div>
+      <div class="add-box">
+        <p><strong>家ごとの備蓄も足す</strong><span id="custom-count">あと4行</span></p>
+        <div id="custom-chips" class="chips" aria-label="追加の行の候補"></div>
+      </div>
+    </section>
+
+    <section id="result" class="paper result" aria-labelledby="result-title">
+      <div class="section-head"><p class="step">03</p><div><h2 id="result-title">目標までに足す量</h2><p id="result-lead">在庫を入れると、買い足す目安が出ます。</p></div></div>
+      <ul id="shortage-list" class="shortage-list"></ul>
+      <button id="copy-shortage" class="button" type="button" hidden>買い足しリストをコピー</button>
+      <textarea id="copy-shortage-fallback" class="copy-fallback" aria-label="買い足しリスト" readonly hidden></textarea>
+    </section>
+
+    <section class="paper privacy" aria-labelledby="save-title">
+      <h2 id="save-title">端末内だけに保存</h2>
+      <p id="save-note">この端末に保存されています。外には送りません。</p>
+      <button id="clear-button" class="button button--quiet" type="button">入力を消す</button>
+    </section>
+
+    <details class="paper sources">
+      <summary>出典と前提</summary>
+      <div class="sources__body">
+        <ul>
+          <li><a href="https://www.kantei.go.jp/jp/headline/bousai/sonae.html?vm=r">首相官邸「災害が起きる前にできること」</a>：飲料水は1人1日3L、3日分。大規模災害では1週間分が望ましい。</li>
+          <li><a href="https://www.maff.go.jp/j/zyukyu/foodstock/chapter01.html">農林水産省「災害時に備えた食品ストックガイド」</a>：食品は最低3日〜1週間分×人数分。ここでは1日3食として計算。</li>
+          <li><a href="https://www.bousai.go.jp/taisaku/hinanjo/pdf/1605hinanjo_toilet_guideline.pdf">内閣府「避難所におけるトイレの確保・管理ガイドライン」</a>：便袋は1人1日5回を目安に計算。</li>
+        </ul>
+        <p>年齢による係数は付けません。乳幼児・ペット・薬などは、本人が1日の量を決める追加の行で扱います。</p>
+        <p>生活用水、燃料、電源は必要量に含みません。期限は各行のいちばん早い日付1つだけで、品目ごとの在庫台帳ではありません。</p>
+      </div>
+    </details>
+
+    <div id="share"></div>
+  </main>
+  <script type="module" src="./app.js"></script>
+</body>
+</html>
