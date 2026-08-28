@@ -48,6 +48,20 @@ for (const d of EXTERNAL_DAYS) {
       const shot = await page.request.get(`/${d.dir}/screenshot.webp`);
       expect(shot.ok(), `スクショが見つからない: /${d.dir}/screenshot.webp`).toBe(true);
     });
+
+    test('プロモ動画がデモ再生ボタンから見られる', async ({ page }) => {
+      await page.goto('/');
+      const card = page.locator(`.card[data-day="${d.day}"]`);
+      const play = card.locator('.thumb__play');
+      await expect(play).toHaveCount(1);
+      await expect(play).toHaveAttribute('data-demo', `./${d.dir}/demo.mp4`);
+
+      // 動画の実体が配信されている（アプリ本体は公開しないDayでも、スクショと動画だけはコピーされる）
+      const demo = await page.request.get(`/${d.dir}/demo.mp4`);
+      expect(demo.ok(), `動画が見つからない: /${d.dir}/demo.mp4`).toBe(true);
+      // content-length はサーバ実装で欠けることがあるので、実体の大きさで見る
+      expect((await demo.body()).length).toBeGreaterThan(100_000);
+    });
   });
 }
 
