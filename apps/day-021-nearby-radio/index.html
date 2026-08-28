@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#080b10">
+  <meta name="description" content="今いる場所や選んだ街の近くにあるインターネットラジオを、距離順に探してその場で聴くプレイヤー">
+  <title>ちかくのラジオ</title>
+  <meta name="share:text" content="ちかくのラジオ — いまいる場所の近くのネットラジオを距離順に並べて、ワンタップで流せます">
+  <link rel="stylesheet" href="./styles.css">
+  <link rel="stylesheet" href="./shared/share.css">
+  <script src="./shared/share.js" defer></script>
+</head>
+<body>
+  <div class="ambient" aria-hidden="true"></div>
+  <header class="app-header">
+    <div class="brand"><span class="brand-dot" aria-hidden="true"></span>ちかくのラジオ</div>
+    <p id="mode-label" class="mode-label">現在地</p>
+  </header>
+
+  <main>
+    <section class="control-panel" aria-labelledby="control-title">
+      <div class="control-heading">
+        <div>
+          <p class="eyebrow">LOCAL FREQUENCY SCAN</p>
+          <h1 id="control-title">街の空気を、ひろう。</h1>
+        </div>
+        <div class="signal-mark" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+      </div>
+
+      <div class="controls">
+        <div class="location-controls">
+          <button id="locate-button" class="button button-primary" type="button">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Zm0-14v5m0 4h.01"/></svg>
+            現在地で探す
+          </button>
+          <label class="select-wrap" for="prefecture-select">
+            <span class="visually-hidden">都道府県を選択</span>
+            <select id="prefecture-select">
+              <option value="">都道府県から選ぶ</option>
+            </select>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m7 10 5 5 5-5"/></svg>
+          </label>
+          <button id="travel-button" class="button button-secondary" type="button">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Zm0-18c2.2 2.5 3.3 5.5 3.3 9S14.2 18.5 12 21m0-18C9.8 5.5 8.7 8.5 8.7 12s1.1 6.5 3.3 9M3.4 9h17.2M3.4 15h17.2"/></svg>
+            どこかの街
+          </button>
+        </div>
+
+        <fieldset class="radius-control">
+          <legend>SCAN RANGE</legend>
+          <div class="radius-options" id="radius-options">
+            <label><input type="radio" name="radius" value="25"><span>25</span></label>
+            <label><input type="radio" name="radius" value="100"><span>100</span></label>
+            <label><input type="radio" name="radius" value="300"><span>300</span></label>
+            <label><input type="radio" name="radius" value="1000"><span>1000</span></label>
+            <b>km</b>
+          </div>
+        </fieldset>
+      </div>
+      <p id="privacy-note" class="privacy-note">座標は近くの局を探すためにだけ送信され、保存されません。</p>
+    </section>
+
+    <section class="station-section" aria-labelledby="station-title">
+      <div class="section-title-row">
+        <div>
+          <p class="eyebrow">RECEIVABLE STATIONS</p>
+          <h2 id="station-title">受信できる局</h2>
+        </div>
+        <p id="station-count" class="station-count">-- STATIONS</p>
+      </div>
+
+      <div id="status" class="status" role="status" aria-live="polite"></div>
+      <p id="expansion-note" class="expansion-note" hidden></p>
+      <div id="station-list" class="station-list" aria-label="近くのラジオ局"></div>
+    </section>
+
+    <div id="share"></div>
+  </main>
+
+  <footer class="app-footer">
+    <a href="https://www.radio-browser.info/" target="_blank" rel="noreferrer">データ: radio-browser.info</a>
+    <span>位置情報は局の検索にのみ使われ、どこにも保存されません</span>
+  </footer>
+
+  <aside id="player" class="player" aria-label="ラジオプレイヤー">
+    <div class="player-inner">
+      <div class="now-playing">
+        <div id="vu-meter" class="vu-meter" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+        <div class="now-copy">
+          <span id="player-state">STANDBY</span>
+          <strong id="player-name">▶で最寄りの局から再生</strong>
+        </div>
+        <span id="player-distance" class="player-distance">--.- km</span>
+      </div>
+      <div class="player-actions">
+        <button id="previous-button" class="skip-button" type="button" disabled>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 5 8 12l10 7V5ZM5 5h2v14H5V5Z"/></svg>
+          前へ
+        </button>
+        <button id="play-button" class="round-button" type="button" aria-label="再生" disabled>
+          <svg class="icon-play" viewBox="0 0 24 24" aria-hidden="true"><path d="m8 5 11 7-11 7V5Z"/></svg>
+          <svg class="icon-pause" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 5h4v14H7V5Zm6 0h4v14h-4V5Z"/></svg>
+        </button>
+        <button id="next-button" class="skip-button" type="button" disabled>
+          次へ
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 5 10 7L6 19V5Zm11 0h2v14h-2V5Z"/></svg>
+        </button>
+        <label class="volume-control">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4Zm12.5.5a4 4 0 0 1 0 5m2-7a7 7 0 0 1 0 9"/></svg>
+          <span class="visually-hidden">音量</span>
+          <input id="volume" type="range" min="0" max="1" step="0.05" value="0.8" aria-label="音量">
+        </label>
+      </div>
+    </div>
+  </aside>
+
+  <audio id="audio" preload="none"></audio>
+  <script type="module" src="./app.js"></script>
+</body>
+</html>
