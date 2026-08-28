@@ -140,15 +140,27 @@ const CONNECT_BY_APP = {
   'day-013-gov-answers': 'https://kokkai.ndl.go.jp',
   'day-014-hottest-now': 'https://www.jma.go.jp',
   // day-016 は速度測定そのものが目的なので、測定用のエンドポイントにだけ繋ぐ
-  'day-016-line-suspect': 'https://speed.cloudflare.com'
+  'day-016-line-suspect': 'https://speed.cloudflare.com',
+  // day-021 は局データのAPI（ミラー3つ）とクリック報告に繋ぐ
+  'day-021-nearby-radio':
+    'https://de1.api.radio-browser.info https://nl1.api.radio-browser.info https://at1.api.radio-browser.info'
+};
+
+/* day-021 は局のストリーム（audio）とロゴ画像をAPI由来の任意のhttpsホストから読む。
+   ホストを事前に列挙できないため、このDayだけ media / img に https: を足す（httpは許さない）。 */
+const MEDIA_BY_APP = {
+  'day-021-nearby-radio': ' https:'
+};
+const IMG_BY_APP = {
+  'day-021-nearby-radio': ' https:'
 };
 
 const appCsp = (dir) => [
   "default-src 'self'",
   "script-src 'self'",
   "style-src 'self' 'unsafe-inline'",
-  "img-src 'self' data: blob:",
-  "media-src 'self'",
+  `img-src 'self' data: blob:${IMG_BY_APP[dir] || ''}`,
+  `media-src 'self'${MEDIA_BY_APP[dir] || ''}`,
   "font-src 'self'",
   `connect-src 'self'${CONNECT_BY_APP[dir] ? ` ${CONNECT_BY_APP[dir]}` : ''}`,
   "frame-ancestors 'none'",
