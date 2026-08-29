@@ -1,0 +1,45 @@
+{
+  "query": "推し活",
+  "field": "title",
+  "dataset": "zassaku",
+  "mode": "exact",
+  "window": { "from": 1997, "until": 2026, "partialYear": 2026 },
+  "total": 154,
+  "years": [
+    { "year": 1997, "count": 0 }, { "year": 1998, "count": 0 }, { "year": 1999, "count": 0 },
+    { "year": 2000, "count": 0 }, { "year": 2001, "count": 0 }, { "year": 2002, "count": 0 },
+    { "year": 2003, "count": 0 }, { "year": 2004, "count": 0 }, { "year": 2005, "count": 0 },
+    { "year": 2006, "count": 0 }, { "year": 2007, "count": 0 }, { "year": 2008, "count": 0 },
+    { "year": 2009, "count": 0 }, { "year": 2010, "count": 0 }, { "year": 2011, "count": 0 },
+    { "year": 2012, "count": 0 }, { "year": 2013, "count": 0 }, { "year": 2014, "count": 0 },
+    { "year": 2015, "count": 0 }, { "year": 2016, "count": 0 }, { "year": 2017, "count": 0 },
+    { "year": 2018, "count": 0 }, { "year": 2019, "count": 0 }, { "year": 2020, "count": 1 },
+    { "year": 2021, "count": 3 }, { "year": 2022, "count": 10 }, { "year": 2023, "count": 18 },
+    { "year": 2024, "count": 45 }, { "year": 2025, "count": 39 }, { "year": 2026, "count": 38 }
+  ],
+  "partial": false,
+  "analysis": {
+    "first": { "year": 2020, "count": 1 },
+    "peak": { "year": 2024, "count": 45 },
+    "jump": { "year": 2024, "from": 18, "to": 45, "ratio": 2.5 },
+    "trend": "up",
+    "headline": "2024年を境に、掲載数が約2.5倍へ",
+    "finding": {
+      "lead": "「推し活」を題名に含む雑誌記事は、2020年に現れ、2024年に最も多くなりました（45件）。",
+      "support": "2024年には前年の約2.5倍に増えました。直近3年は増えています。"
+    },
+    "clues": [
+      { "year": 2020, "text": "収録範囲で初めて題名に現れた年" },
+      { "year": 2024, "text": "前年18件→45件（約2.5倍）・最多の45件" }
+    ],
+    "turningYears": [2020, 2024]
+  },
+  "records": [
+    { "year": 2020, "title": "推し活を楽しむための小さな工夫", "magazine": "カルチャー通信 1", "creators": ["編集部"], "url": "https://ndlsearch.ndl.go.jp/books/R000000004-I000000001" },
+    { "year": 2020, "title": "暮らしのなかの推し活", "magazine": "生活文化 2", "creators": [], "url": "https://ndlsearch.ndl.go.jp/books/R000000004-I000000002" },
+    { "year": 2024, "title": "日常になった推し活", "magazine": "SC Japan today 590", "creators": ["編集部"], "url": "https://ndlsearch.ndl.go.jp/books/R000000004-I034821114" },
+    { "year": 2024, "title": "推し活を支える場所", "magazine": "地域文化 21", "creators": [], "url": "https://ndlsearch.ndl.go.jp/books/R000000004-I000000006" }
+  ],
+  "source": { "name": "国立国会図書館サーチ（雑誌記事索引）", "provider": "国立国会図書館", "license": "CC BY 4.0", "url": "https://ndlsearch.ndl.go.jp/" },
+  "fetchedAt": "2026-08-29T10:40:00.000Z"
+}

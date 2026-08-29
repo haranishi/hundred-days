@@ -1,0 +1,11 @@
+{
+  "query": "生成AI", "field": "title", "dataset": "zassaku", "mode": "counts",
+  "window": { "from": 1997, "until": 2026, "partialYear": 2026 }, "total": 3862,
+  "years": [
+    { "year": 1997, "count": 0 }, { "year": 1998, "count": 0 }, { "year": 1999, "count": 0 }, { "year": 2000, "count": 0 }, { "year": 2001, "count": 0 }, { "year": 2002, "count": 0 }, { "year": 2003, "count": 0 }, { "year": 2004, "count": 0 }, { "year": 2005, "count": 0 }, { "year": 2006, "count": 0 }, { "year": 2007, "count": 0 }, { "year": 2008, "count": 0 }, { "year": 2009, "count": 0 }, { "year": 2010, "count": 0 }, { "year": 2011, "count": 0 }, { "year": 2012, "count": 0 }, { "year": 2013, "count": 0 }, { "year": 2014, "count": 0 }, { "year": 2015, "count": 0 }, { "year": 2016, "count": 0 }, { "year": 2017, "count": 0 }, { "year": 2018, "count": 2 }, { "year": 2019, "count": 3 }, { "year": 2020, "count": 1 }, { "year": 2021, "count": 0 }, { "year": 2022, "count": 2 }, { "year": 2023, "count": 534 }, { "year": 2024, "count": 1162 }, { "year": 2025, "count": 1217 }, { "year": 2026, "count": 941 }
+  ],
+  "partial": false,
+  "analysis": { "first": { "year": 2018, "count": 2 }, "peak": { "year": 2025, "count": 1217 }, "jump": { "year": 2024, "from": 534, "to": 1162, "ratio": 2.2 }, "trend": "up", "headline": "2024年を境に、掲載数が約2.2倍へ", "finding": { "lead": "「生成AI」を題名に含む雑誌記事は、2018年に現れ、2025年に最も多くなりました（1217件）。", "support": "2024年には前年の約2.2倍に増えました。直近3年は増えています。" }, "clues": [{ "year": 2018, "text": "収録範囲で初めて題名に現れた年" }, { "year": 2024, "text": "前年534件→1162件（約2.2倍）" }, { "year": 2025, "text": "最多の1217件" }], "turningYears": [2018, 2024, 2025] },
+  "records": [{ "year": 2024, "title": "アイディア即プロダクトの経済 : 生成AIは経済をどう変えるか?", "magazine": "Research Bureau論究", "creators": ["井上 智洋"], "url": "https://ndlsearch.ndl.go.jp/books/R000000004-I033254806" }],
+  "source": { "name": "国立国会図書館サーチ（雑誌記事索引）", "provider": "国立国会図書館", "license": "CC BY 4.0", "url": "https://ndlsearch.ndl.go.jp/" }, "fetchedAt": "2026-08-29T10:40:00.000Z"
+}

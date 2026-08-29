@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MAGTRACE</title>
+  <meta name="description" content="気になる言葉を題名に含む雑誌記事を、NDLサーチの収録範囲から30年分たどります。">
+  <meta name="share:text" content="MAGTRACE — 雑誌の見出しから、言葉の30年の流れをたどる">
+  <link rel="stylesheet" href="./app.css">
+  <script type="module" src="./app.js"></script>
+  <link rel="stylesheet" href="./shared/share.css">
+  <script src="./shared/share.js" defer></script>
+</head>
+<body>
+  <header class="brandbar">
+    <a class="brand" href="./" data-home-link><span aria-hidden="true"></span>MAGTRACE</a>
+    <nav class="breadcrumb" id="breadcrumb" aria-label="現在位置" hidden>
+      <a href="./" data-home-link>発見を探す</a><span aria-hidden="true">／</span><span id="breadcrumb-query"></span>
+    </nav>
+  </header>
+
+  <main>
+    <div id="view-home">
+      <section class="hero shell" aria-labelledby="home-title">
+        <div class="hero__copy">
+          <p class="eyebrow">MAGAZINE CULTURE EXPLORER</p>
+          <h1 id="home-title">雑誌の見出しから、<br>社会の空気の変化を読む。</h1>
+          <p class="lead">言葉をひとつ入れるだけで、いつ・どれだけ話題になったかを、雑誌記事の<span class="nowrap">30年の</span>流れから<span class="nowrap">見つけられます。</span></p>
+        </div>
+        <form id="search-form" class="search-card">
+          <label for="q">調べたい言葉</label>
+          <input id="q" name="q" type="search" maxlength="30" placeholder="例：推し活、サウナ、生成AI" required>
+          <button class="button button--primary search-submit" type="submit">雑誌の流れを見る</button>
+          <p class="small-label">例えば</p>
+          <div class="chips" aria-label="検索例">
+            <button type="button" data-search="推し活">推し活</button><button type="button" data-search="タピオカ">タピオカ</button><button type="button" data-search="サウナ">サウナ</button><button type="button" data-search="腸活">腸活</button><button type="button" data-search="生成AI">生成AI</button>
+          </div>
+        </form>
+      </section>
+
+      <section class="today shell section" aria-labelledby="today-title">
+        <div class="section-heading"><div><p class="eyebrow">TODAY'S WORD</p><h2 id="today-title">きょうの一語</h2></div><time id="today-date"></time></div>
+        <a id="today-link" class="today__link" href="#"></a>
+      </section>
+
+      <section class="entrances section">
+        <div class="shell">
+          <div class="section-heading"><h2>気になる入口からたどる</h2><p>言葉を知らなくても、テーマから発見できます</p></div>
+          <div class="theme-grid">
+            <article class="theme-card"><p class="eyebrow">社会</p><div><button data-search="防災">防災</button><button data-search="少子化">少子化</button><button data-search="地方創生">地方創生</button></div></article>
+            <article class="theme-card"><p class="eyebrow">暮らし</p><div><button data-search="腸活">腸活</button><button data-search="睡眠">睡眠</button><button data-search="ミニマリスト">ミニマリスト</button></div></article>
+            <article class="theme-card"><p class="eyebrow">仕事</p><div><button data-search="生成AI">生成AI</button><button data-search="副業">副業</button><button data-search="リスキリング">リスキリング</button></div></article>
+            <article class="theme-card"><p class="eyebrow">カルチャー</p><div><button data-search="推し活">推し活</button><button data-search="サウナ">サウナ</button><button data-search="昭和レトロ">昭和レトロ</button></div></article>
+          </div>
+        </div>
+      </section>
+
+      <section class="data-band"><div class="shell data-band__inner"><div><h2>何をもとにしている？</h2><p>国立国会図書館サーチの雑誌記事索引メタデータを集計しています。本文や表紙は扱わず、記事の題名・掲載誌・発行年・原典リンクだけから傾向を示します。</p></div><a class="button button--light" href="#about-data">データと出典を見る</a></div></section>
+    </div>
+
+    <div id="view-analysis" hidden>
+      <div class="shell analysis-shell">
+        <header class="analysis-header">
+          <div class="tag-row"><span id="query-chip"></span><span>1997–2026</span></div>
+          <h1 id="analysis-title"></h1>
+          <p id="analysis-subtitle" class="lead"></p>
+          <p id="analysis-meta" class="meta-line"><span id="cached-badge" class="cached-badge" hidden>保存済みの結果</span><span id="meta-text"></span></p>
+        </header>
+
+        <section id="analysis-state" class="state-card" aria-live="polite">
+          <p id="state-label" class="state-label">LOADING</p>
+          <h2 id="state-title">雑誌の流れを読み込んでいます</h2>
+          <p id="state-body">30年分を年ごとに数えています。通常は数秒、初めての言葉は10秒ほどかかります。</p>
+          <p id="loading-live" class="sr-only" role="status">検索結果を読み込み中</p>
+          <div id="skeletons" class="skeletons" aria-hidden="true"><span></span><span></span><span></span></div>
+          <div id="state-actions" class="state-actions" hidden></div>
+          <p id="state-code" class="state-code" hidden>エラーコード MT-502</p>
+        </section>
+
+        <div id="analysis-content" hidden>
+          <section class="finding-card" aria-labelledby="finding-label">
+            <p id="finding-label" class="finding-label">今回の発見</p>
+            <p id="finding-lead" class="finding-lead"></p>
+            <p id="finding-support" class="finding-support"></p>
+            <dl class="finding-stats">
+              <div><dt>合計</dt><dd id="stat-total"></dd></div><div><dt>ピーク</dt><dd id="stat-peak"></dd></div><div><dt>転機</dt><dd id="stat-jump"></dd></div>
+            </dl>
+          </section>
+
+          <section class="trend-card" aria-labelledby="trend-title">
+            <div class="trend-card__head"><div class="trend-card__title"><h2 id="trend-title"></h2><p>記事タイトル数 / 年</p></div><button id="chart-toggle" class="button button--quiet" type="button" aria-pressed="false">表で見る</button></div>
+            <p id="partial-note" class="notice" hidden>一部の年を取得できませんでした（—で表示）</p>
+            <div id="chart-wrap" class="chart-wrap"></div>
+            <div id="table-wrap" class="table-wrap" hidden><table><thead><tr><th scope="col">年</th><th scope="col">件数</th><th scope="col">前年比</th></tr></thead><tbody id="years-body"></tbody></table></div>
+            <p id="jump-note" class="jump-note" hidden></p>
+          </section>
+
+          <section class="section clues-section" aria-labelledby="clues-title"><p class="eyebrow">READING THE FLOW</p><h2 id="clues-title">流れを読む手がかり</h2><div id="clues" class="clue-grid"></div></section>
+
+          <section class="section records-section" aria-labelledby="records-title">
+            <p class="eyebrow">転機を読む</p><div class="section-heading"><h2 id="records-title">流れが変わった記事</h2></div>
+            <p class="records-note">掲載数ではなく、転機・ピーク・初出の年の記事を、検索適合順の上位3件ずつ並べています。社会的な代表性を示すものではありません。</p>
+            <div id="records"></div>
+          </section>
+
+          <section id="recent-section" class="recent section" aria-labelledby="recent-title" hidden><div class="section-heading"><h2 id="recent-title">最近調べた言葉</h2><button id="clear-recent" class="button button--quiet recent__clear" type="button">消す</button></div><div id="recent-list" class="chips"></div></section>
+
+          <section class="again-band">
+            <h2>別の言葉でも、社会の空気の変化を探してみる。</h2>
+            <form id="again-form"><label for="q-again">調べたい言葉</label><div class="again-form__row"><input id="q-again" type="search" maxlength="30" required><button class="button button--primary search-submit" type="submit">雑誌の流れを見る</button></div></form>
+            <a class="button button--light" href="./" data-home-link>ホームへ戻る</a>
+          </section>
+        </div>
+      </div>
+    </div>
+
+    <section id="about-data" class="about-data section"><div class="shell"><p class="eyebrow">DATA &amp; SOURCE</p><h2>データと出典</h2><dl><div><dt>出典</dt><dd>国立国会図書館サーチ（雑誌記事索引）</dd></div><div><dt>数え方</dt><dd>検索語を記事タイトルに含む記事だけを数えます。本文・件名・掲載誌名は対象外です。</dd></div><div><dt>期間</dt><dd>1997〜2026年。2026年は集計途中です。</dd></div><div><dt>ライセンス</dt><dd>メタデータは CC BY 4.0</dd></div></dl><p>結果は社会全体ではなく、NDLサーチの収録範囲内の件数です。件数は取得方式により数件ずれることがあります。</p></div></section>
+    <div class="shell share-wrap"><div id="share"></div></div>
+  </main>
+  <footer><div class="shell">MAGTRACE / Day 023</div></footer>
+</body>
+</html>
