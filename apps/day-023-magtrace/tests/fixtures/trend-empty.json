@@ -1,0 +1,10 @@
+{
+  "query": "該当なし", "field": "title", "dataset": "zassaku", "mode": "exact",
+  "window": { "from": 1997, "until": 2026, "partialYear": 2026 }, "total": 0,
+  "years": [
+    { "year": 1997, "count": 0 }, { "year": 1998, "count": 0 }, { "year": 1999, "count": 0 }, { "year": 2000, "count": 0 }, { "year": 2001, "count": 0 }, { "year": 2002, "count": 0 }, { "year": 2003, "count": 0 }, { "year": 2004, "count": 0 }, { "year": 2005, "count": 0 }, { "year": 2006, "count": 0 }, { "year": 2007, "count": 0 }, { "year": 2008, "count": 0 }, { "year": 2009, "count": 0 }, { "year": 2010, "count": 0 }, { "year": 2011, "count": 0 }, { "year": 2012, "count": 0 }, { "year": 2013, "count": 0 }, { "year": 2014, "count": 0 }, { "year": 2015, "count": 0 }, { "year": 2016, "count": 0 }, { "year": 2017, "count": 0 }, { "year": 2018, "count": 0 }, { "year": 2019, "count": 0 }, { "year": 2020, "count": 0 }, { "year": 2021, "count": 0 }, { "year": 2022, "count": 0 }, { "year": 2023, "count": 0 }, { "year": 2024, "count": 0 }, { "year": 2025, "count": 0 }, { "year": 2026, "count": 0 }
+  ],
+  "partial": false,
+  "analysis": { "first": null, "peak": null, "jump": null, "trend": null, "headline": null, "finding": null, "clues": null, "turningYears": null },
+  "records": [], "source": { "name": "国立国会図書館サーチ（雑誌記事索引）", "provider": "国立国会図書館", "license": "CC BY 4.0", "url": "https://ndlsearch.ndl.go.jp/" }, "fetchedAt": "2026-08-29T10:40:00.000Z"
+}

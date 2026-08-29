@@ -1,0 +1,70 @@
+<rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:openSearch="http://a9.com/-/spec/opensearchrss/1.0/" xmlns:dcndl="http://ndl.go.jp/dcndl/terms/" xmlns:dcmitype="http://purl.org/dc/dcmitype/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" version="2.0">
+  <channel>
+    <title>zassaku 生成AI 2023-01-01 2023-12-31 - 国立国会図書館サーチ OpenSearch</title>
+    <link>https://ios-v2-prod-eks-alb.ndlsearch.ndl.go.jp/api/opensearch?dpid=zassaku&amp;title=%E7%94%9F%E6%88%90AI&amp;cnt=3&amp;from=2023-01-01&amp;until=2023-12-31</link>
+    <description>Search results for dpid=zassaku title=生成AI cnt=3 from=2023-01-01 until=2023-12-31</description>
+    <language>ja</language>
+    <openSearch:totalResults>534</openSearch:totalResults>
+    <openSearch:startIndex>1</openSearch:startIndex>
+    <openSearch:itemsPerPage>3</openSearch:itemsPerPage>
+    <item>
+      <title>アイディア即プロダクトの経済 : 生成AIは経済をどう変えるか?</title>
+      <link>https://ndlsearch.ndl.go.jp/books/R000000004-I033254806</link>
+      <description><![CDATA[<p><p><ul><li>タイトル：アイディア即プロダクトの経済 : 生成AIは経済をどう変えるか?</li><li>タイトル（読み）：アイディア ソク プロダクト ノ ケイザイ : セイセイ AI ワ ケイザイ オ ドウ カエル カ?</li><li>責任表示：井上 智洋</li></ul>]]></description>
+      <author>井上 智洋,井上 智洋</author>
+      <category>記事</category>
+      <category>紙</category>
+      <guid isPermaLink="true">https://ndlsearch.ndl.go.jp/books/R000000004-I033254806</guid>
+      <pubDate>Tue, 16 Jan 2024 20:01:45 +0900</pubDate>
+      <dc:title>アイディア即プロダクトの経済 : 生成AIは経済をどう変えるか?</dc:title>
+      <dcndl:titleTranscription>アイディア ソク プロダクト ノ ケイザイ : セイセイ AI ワ ケイザイ オ ドウ カエル カ?</dcndl:titleTranscription>
+      <dc:creator>井上 智洋</dc:creator>
+      <dcndl:publicationPlace>JP</dcndl:publicationPlace>
+      <dc:identifier xsi:type="dcndl:NDLBibID">033254806</dc:identifier>
+      <dc:subject xsi:type="dcndl:NDLC">ZA3</dc:subject>
+      <rdfs:seeAlso rdf:resource="https://ndlsearch.ndl.go.jp/books/R000000004-I033254806"/>
+      <rdfs:seeAlso rdf:resource="https://cir.nii.ac.jp/crid/1520580536000739584"/>
+      <dc:description>掲載誌：Research Bureau論究 : journal of the Research Bureau of the House of Representatives / 衆議院調査局 編 p.49-57</dc:description>
+    </item>
+    <item>
+      <title>明日から議事録はChatGPTで</title>
+      <link>https://ndlsearch.ndl.go.jp/books/R000000004-I033176909</link>
+      <description><![CDATA[<p><p><ul><li>タイトル：明日から議事録はChatGPTで</li><li>タイトル（読み）：アス カラ ギジロク ワ ChatGPT デ</li><li>シリーズ名：特集 始めよう! 生成AI</li><li>シリーズ名（読み）：トクシュウ ハジメヨウ! セイセイ AI</li></ul>]]></description>
+      <author/>
+      <category>記事</category>
+      <category>紙</category>
+      <guid isPermaLink="true">https://ndlsearch.ndl.go.jp/books/R000000004-I033176909</guid>
+      <pubDate>Tue, 28 Nov 2023 00:25:07 +0900</pubDate>
+      <dc:title>明日から議事録はChatGPTで</dc:title>
+      <dcndl:titleTranscription>アス カラ ギジロク ワ ChatGPT デ</dcndl:titleTranscription>
+      <dcndl:seriesTitle>特集 始めよう! 生成AI</dcndl:seriesTitle>
+      <dcndl:seriesTitleTranscription>トクシュウ ハジメヨウ! セイセイ AI</dcndl:seriesTitleTranscription>
+      <dcndl:publicationPlace>JP</dcndl:publicationPlace>
+      <dc:identifier xsi:type="dcndl:NDLBibID">033176909</dc:identifier>
+      <dc:subject xsi:type="dcndl:NDLC">ZN1</dc:subject>
+      <rdfs:seeAlso rdf:resource="https://ndlsearch.ndl.go.jp/books/R000000004-I033176909"/>
+      <rdfs:seeAlso rdf:resource="https://cir.nii.ac.jp/crid/1520016814376078080"/>
+      <dc:description>掲載誌：日経コンストラクション = Nikkei construction 800 p.72-73</dc:description>
+    </item>
+    <item>
+      <title>あなたは何社知っている? 新興勢が爆速成長 生成AIの旗手25選</title>
+      <link>https://ndlsearch.ndl.go.jp/books/R000000004-I033182959</link>
+      <description><![CDATA[<p><p><ul><li>タイトル：あなたは何社知っている? 新興勢が爆速成長 生成AIの旗手25選</li><li>タイトル（読み）：アナタ ワ ナンシャ シッテ イル? シンコウ ゼイ ガ バクソクセイチョウ セイセイ AI ノ キシュ 25セン</li><li>シリーズ名：特集 同僚は生成AI : 破壊者か期待のエースか</li><li>シリーズ名（読み）：トクシュウ ドウリョウ ワ セイセイ AI : ハカイシャ カ キタイ ノ エース カ</li></ul>]]></description>
+      <author/>
+      <category>記事</category>
+      <category>紙</category>
+      <guid isPermaLink="true">https://ndlsearch.ndl.go.jp/books/R000000004-I033182959</guid>
+      <pubDate>Thu, 30 Nov 2023 19:13:20 +0900</pubDate>
+      <dc:title>あなたは何社知っている? 新興勢が爆速成長 生成AIの旗手25選</dc:title>
+      <dcndl:titleTranscription>アナタ ワ ナンシャ シッテ イル? シンコウ ゼイ ガ バクソクセイチョウ セイセイ AI ノ キシュ 25セン</dcndl:titleTranscription>
+      <dcndl:seriesTitle>特集 同僚は生成AI : 破壊者か期待のエースか</dcndl:seriesTitle>
+      <dcndl:seriesTitleTranscription>トクシュウ ドウリョウ ワ セイセイ AI : ハカイシャ カ キタイ ノ エース カ</dcndl:seriesTitleTranscription>
+      <dcndl:publicationPlace>JP</dcndl:publicationPlace>
+      <dc:identifier xsi:type="dcndl:NDLBibID">033182959</dc:identifier>
+      <dc:subject xsi:type="dcndl:NDLC">ZD25</dc:subject>
+      <rdfs:seeAlso rdf:resource="https://ndlsearch.ndl.go.jp/books/R000000004-I033182959"/>
+      <rdfs:seeAlso rdf:resource="https://cir.nii.ac.jp/crid/1520016880915198336"/>
+      <dc:description>掲載誌：日経ビジネス = Nikkei business 2218 p.30-33</dc:description>
+    </item>
+  </channel>
+</rss>

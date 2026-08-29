@@ -1,0 +1,30 @@
+<rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:openSearch="http://a9.com/-/spec/opensearchrss/1.0/" xmlns:dcndl="http://ndl.go.jp/dcndl/terms/" xmlns:dcmitype="http://purl.org/dc/dcmitype/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" version="2.0">
+  <channel>
+    <title>zassaku 生成AI 2023-01-01 2023-12-31 - 国立国会図書館サーチ OpenSearch</title>
+    <link>https://ios-v2-prod-eks-alb.ndlsearch.ndl.go.jp/api/opensearch?dpid=zassaku&amp;title=%E7%94%9F%E6%88%90AI&amp;cnt=1&amp;from=2023-01-01&amp;until=2023-12-31</link>
+    <description>Search results for dpid=zassaku title=生成AI cnt=1 from=2023-01-01 until=2023-12-31</description>
+    <language>ja</language>
+    <openSearch:totalResults>534</openSearch:totalResults>
+    <openSearch:startIndex>1</openSearch:startIndex>
+    <openSearch:itemsPerPage>1</openSearch:itemsPerPage>
+    <item>
+      <title>アイディア即プロダクトの経済 : 生成AIは経済をどう変えるか?</title>
+      <link>https://ndlsearch.ndl.go.jp/books/R000000004-I033254806</link>
+      <description><![CDATA[<p><p><ul><li>タイトル：アイディア即プロダクトの経済 : 生成AIは経済をどう変えるか?</li><li>タイトル（読み）：アイディア ソク プロダクト ノ ケイザイ : セイセイ AI ワ ケイザイ オ ドウ カエル カ?</li><li>責任表示：井上 智洋</li></ul>]]></description>
+      <author>井上 智洋,井上 智洋</author>
+      <category>記事</category>
+      <category>紙</category>
+      <guid isPermaLink="true">https://ndlsearch.ndl.go.jp/books/R000000004-I033254806</guid>
+      <pubDate>Tue, 16 Jan 2024 20:01:45 +0900</pubDate>
+      <dc:title>アイディア即プロダクトの経済 : 生成AIは経済をどう変えるか?</dc:title>
+      <dcndl:titleTranscription>アイディア ソク プロダクト ノ ケイザイ : セイセイ AI ワ ケイザイ オ ドウ カエル カ?</dcndl:titleTranscription>
+      <dc:creator>井上 智洋</dc:creator>
+      <dcndl:publicationPlace>JP</dcndl:publicationPlace>
+      <dc:identifier xsi:type="dcndl:NDLBibID">033254806</dc:identifier>
+      <dc:subject xsi:type="dcndl:NDLC">ZA3</dc:subject>
+      <rdfs:seeAlso rdf:resource="https://ndlsearch.ndl.go.jp/books/R000000004-I033254806"/>
+      <rdfs:seeAlso rdf:resource="https://cir.nii.ac.jp/crid/1520580536000739584"/>
+      <dc:description>掲載誌：Research Bureau論究 : journal of the Research Bureau of the House of Representatives / 衆議院調査局 編 p.49-57</dc:description>
+    </item>
+  </channel>
+</rss>
