@@ -1,0 +1,168 @@
+/* 表層。Day018（暖色・食べ物・皿）と並べても別物に見えるよう、寒色と余白と明朝で組む。
+   地名を素材として扱い、装飾で茶化さない。 */
+
+:root {
+  --ink: #e8eef5;
+  --ink-dim: #93a4b8;
+  --bg: #0d141d;
+  --bg-panel: #141d29;
+  --line: #253243;
+  --accent: #6fb3d2;
+  --warn: #d2856f;
+  --ok: #7fc79a;
+  --serif: "Hiragino Mincho ProN", "Yu Mincho", "YuMincho", serif;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  padding: 0 1rem 3rem;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: "Hiragino Sans", "Noto Sans JP", system-ui, sans-serif;
+  line-height: 1.7;
+}
+
+main, .site-head, .site-foot { max-width: 40rem; margin: 0 auto; }
+
+.site-head { padding: 2rem 0 1rem; }
+.site-head h1 { margin: 0 0 .5rem; font-family: var(--serif); font-size: 1.6rem; letter-spacing: .04em; }
+.tagline { margin: 0; color: var(--ink-dim); font-size: .92rem; }
+.tagline strong { color: var(--ink); font-weight: 600; }
+
+.muted { color: var(--ink-dim); font-size: .85rem; }
+
+.panel {
+  background: var(--bg-panel);
+  border: 1px solid var(--line);
+  border-radius: .6rem;
+  padding: 1.5rem;
+  margin: 1rem 0;
+}
+.panel__title { margin: 0 0 1rem; font-size: 1.05rem; font-weight: 600; }
+
+/* 読込中 */
+.progress { height: .4rem; background: #0a1017; border-radius: .2rem; overflow: hidden; margin-bottom: .75rem; }
+.progress__bar { height: 100%; width: 0; background: var(--accent); transition: width .12s linear; }
+
+/* 地方を選ぶ */
+.blocks { display: grid; grid-template-columns: repeat(auto-fill, minmax(8.5rem, 1fr)); gap: .5rem; margin-bottom: 1rem; }
+.blocks__item {
+  display: flex; flex-direction: column; align-items: flex-start; gap: .15rem;
+  padding: .7rem .8rem; background: #0f1721; color: var(--ink);
+  border: 1px solid var(--line); border-radius: .4rem; cursor: pointer; font: inherit; text-align: left;
+}
+.blocks__item:hover:not(:disabled) { border-color: var(--accent); }
+.blocks__item[data-chosen="true"] { border-color: var(--accent); background: #16283a; }
+.blocks__item:disabled { opacity: .4; cursor: not-allowed; }
+.blocks__name { font-size: .95rem; }
+.blocks__count { font-size: .75rem; color: var(--ink-dim); }
+
+.btn {
+  padding: .6rem 1.2rem; font: inherit; border-radius: .4rem; cursor: pointer;
+  background: #1b2836; color: var(--ink); border: 1px solid var(--line);
+}
+.btn:hover:not(:disabled) { border-color: var(--accent); }
+.btn:disabled { opacity: .4; cursor: not-allowed; }
+.btn--main { background: var(--accent); color: #08121a; border-color: var(--accent); font-weight: 600; }
+.btn--ghost { background: transparent; }
+
+.rules { margin-top: 1.25rem; font-size: .85rem; color: var(--ink-dim); }
+.rules summary { cursor: pointer; }
+.rules ul { margin: .5rem 0 0; padding-left: 1.2rem; }
+.rules li { margin: .25rem 0; }
+.rules b { color: var(--ink); }
+code { background: #0a1017; padding: 0 .25rem; border-radius: .2rem; }
+
+/* ゲーム */
+.panel--play { padding: 1rem 1.25rem 1.5rem; }
+.hud { display: flex; gap: 1rem; font-size: .85rem; color: var(--ink-dim); border-bottom: 1px solid var(--line); padding-bottom: .6rem; }
+.hud b { color: var(--ink); font-weight: 600; }
+.hud__item--right { margin-left: auto; }
+
+/* 奥（小さい・薄い）から手前（大きい・濃い）へ。--depth は 0→1 */
+.field { position: relative; height: 13rem; display: grid; place-items: center; overflow: hidden; }
+.target {
+  --depth: 0;
+  transform: translateY(calc((var(--depth) - .55) * 5rem)) scale(calc(.42 + var(--depth) * .63));
+  opacity: calc(.3 + var(--depth) * .7);
+  transition: none;
+}
+/* 地名は2〜5文字まである。固定サイズだと4文字（南外若林）で画面幅を超え、
+   文字数で割るだけだと今度は枠の半分しか使わず小さくなる。
+   「どの文字数でも枠幅の約8割を占める」を上限3つの min() で作る。
+   ①1〜2文字が大きくなりすぎない上限 ②横幅640pxで頭打ちになる枠に合わせた上限
+   ③それより狭い画面のための実測幅に合わせた上限。--chars は app.js が出題ごとに入れる */
+.target__kanji {
+  display: block;
+  font-family: var(--serif);
+  font-size: min(
+    5rem,
+    calc(24.9rem / var(--chars, 3)),
+    calc((100vw - 4.5rem) * 0.663 / var(--chars, 3))
+  );
+  letter-spacing: .12em;
+  white-space: nowrap;
+  text-shadow: 0 0 calc(var(--depth) * 1.5rem) rgba(111, 179, 210, .35);
+}
+.target[data-phase="burst"] { animation: burst .42s ease-out forwards; }
+.target[data-phase="answer"] { opacity: .35; }
+.target[data-shake="true"] { animation: shake .18s ease-in-out; }
+
+@keyframes burst {
+  0% { transform: scale(1.15); opacity: 1; }
+  100% { transform: scale(2.1); opacity: 0; }
+}
+@keyframes shake {
+  0%, 100% { margin-left: 0; }
+  25% { margin-left: -.4rem; }
+  75% { margin-left: .4rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .target[data-phase="burst"], .target[data-shake="true"] { animation: none; }
+}
+
+.verdict {
+  position: absolute; inset: auto 0 0; text-align: center;
+  background: rgba(13, 20, 29, .92); border-top: 1px solid var(--line); padding: .6rem;
+}
+.verdict__head { margin: 0; font-size: 1.05rem; font-weight: 600; }
+.verdict[data-kind="cleared"] .verdict__head { color: var(--ok); }
+.verdict[data-kind="failed"] .verdict__head { color: var(--warn); }
+.verdict__where { margin: .1rem 0; font-size: .8rem; color: var(--ink-dim); }
+.verdict__why { margin: .3rem 0 0; font-size: .78rem; color: var(--ink-dim); }
+
+.readout { text-align: center; margin-top: .5rem; }
+.reading {
+  font-family: var(--serif); font-size: 1.6rem; letter-spacing: .3em;
+  color: var(--ink-dim); min-height: 2.2rem;
+}
+.reading[data-open="true"] { color: var(--accent); }
+.typed { font-family: ui-monospace, monospace; font-size: .95rem; color: var(--ok); min-height: 1.5rem; letter-spacing: .1em; }
+
+/* 打鍵はこの透明な欄で受ける。触ればスマホでもキーボードが出る */
+.keys {
+  position: absolute; opacity: 0; width: 1px; height: 1px;
+  border: 0; padding: 0; margin: -1px; overflow: hidden;
+}
+.invalid { margin: .25rem 0 0; text-align: center; font-size: .82rem; color: var(--warn); min-height: 1.4rem; }
+
+.actions { display: flex; gap: .5rem; justify-content: center; margin-top: 1rem; }
+
+/* 結果 */
+.result__score { margin: 0; font-family: var(--serif); font-size: 1.2rem; }
+.result__score b { font-size: 2.4rem; color: var(--accent); }
+.result__sub { margin: 1.25rem 0 .4rem; font-size: .9rem; font-weight: 600; }
+.result__list { margin: 0 0 .75rem; padding-left: 1.2rem; font-size: .88rem; }
+.result__list li { margin: .15rem 0; }
+.result__detail { margin-bottom: 1.25rem; }
+
+.site-foot { margin-top: 2rem; }
+.site-foot p { margin: .35rem 0; }
+
+@media (min-width: 40rem) {
+  .site-head h1 { font-size: 2rem; }
+  .target__kanji { font-size: min(6.5rem, calc(24.9rem / var(--chars, 3))); }
+  .field { height: 16rem; }
+}

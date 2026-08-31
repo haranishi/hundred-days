@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>読めない地名が、向かってくる</title>
+  <!-- 共通シェアの契約：投稿文にはアプリ名を必ず含める（tests/e2e/shared-share.spec.mjs） -->
+  <meta name="share:text" content="読めない地名が、向かってくる — 全国の地名が奥から迫ってくる。読みは伏せてある。読めた人だけが先に進める">
+  <link rel="stylesheet" href="./app.css">
+  <link rel="stylesheet" href="./shared/share.css">
+  <script src="./shared/share.js" defer></script>
+  <script src="./app.js" type="module" defer></script>
+</head>
+<body>
+
+  <header class="site-head">
+    <h1>読めない地名が、向かってくる</h1>
+    <p class="tagline">地名が奥から迫ってきます。<strong>読みは伏せてあります</strong>。読みをローマ字で打ち切ると弾けます。近づくほど1文字ずつ開きますが、<strong>開かずに打てた人ほど高得点</strong>。</p>
+  </header>
+
+  <main>
+
+    <!-- 状態①：読込中 -->
+    <section id="state-loading" class="panel" aria-live="polite">
+      <h2 class="panel__title">地名を読み込んでいます</h2>
+      <div class="progress"><div id="progress-bar" class="progress__bar"></div></div>
+      <p id="progress-text" class="muted">全国12万件から選んだ出題データを取り込んでいます</p>
+    </section>
+
+    <!-- 状態②：エラー -->
+    <section id="state-error" class="panel" hidden>
+      <h2 class="panel__title">地名を読み込めませんでした</h2>
+      <p id="error-detail" class="muted"></p>
+      <p class="muted">回線が切れているか、配信側が一時的に応答していません。ページを開き直しても直らないときは、しばらく置いてから試してください。</p>
+      <button id="retry" class="btn btn--main" type="button">もう一度読み込む</button>
+    </section>
+
+    <!-- 状態③：地方を選ぶ（開始前） -->
+    <section id="state-select" class="panel" hidden>
+      <h2 class="panel__title">どこの地名で遊びますか</h2>
+      <div id="blocks" class="blocks"></div>
+      <p id="stock-note" class="muted"></p>
+      <button id="start" class="btn btn--main" type="button" disabled>はじめる</button>
+      <details class="rules">
+        <summary>ルール</summary>
+        <ul>
+          <li>読みをローマ字で打ち切ると、その地名は弾けます</li>
+          <li>読みは伏せてあります。近づくにつれて左から1文字ずつ開きます</li>
+          <li><b>開いた文字が少ないほど高得点。</b>1文字も開かずに打ち切れば満点です</li>
+          <li>読めないときは<b>「わからない」</b>で降参できます。正解と、なぜ読めないのかが出ます</li>
+          <li>手前まで来られるか、降参すると<b>ライフが1つ減ります</b>。3つでおしまい</li>
+          <li>判定はIMEと同じです。<code>し</code>は shi でも si でも、<code>ん</code>は n でも nn でも通ります</li>
+        </ul>
+      </details>
+    </section>
+
+    <!-- 状態④：ゲーム -->
+    <section id="state-play" class="panel panel--play" hidden>
+      <div class="hud">
+        <span class="hud__item">スコア <b id="score">0</b></span>
+        <span class="hud__item">ライフ <b id="lives" aria-label="残りライフ"></b></span>
+        <span class="hud__item hud__item--right" id="where"></span>
+      </div>
+
+      <div class="field">
+        <div id="target" class="target">
+          <span id="kanji" class="target__kanji"></span>
+        </div>
+        <div id="verdict" class="verdict" hidden></div>
+      </div>
+
+      <div class="readout">
+        <div id="reading" class="reading" aria-live="polite"></div>
+        <div id="typed" class="typed" aria-live="off"></div>
+      </div>
+
+      <!-- 打鍵はこの透明な入力欄で受ける。触ればスマホでもキーボードが出る -->
+      <input id="keys" class="keys" type="text" inputmode="text"
+             autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
+             aria-label="読みを入力する欄">
+      <p id="invalid" class="invalid" role="alert" hidden></p>
+
+      <div class="actions">
+        <button id="giveup" class="btn" type="button">わからない</button>
+        <button id="quit" class="btn btn--ghost" type="button">やめる</button>
+      </div>
+    </section>
+
+    <!-- 状態⑤：結果 -->
+    <section id="state-result" class="panel" hidden>
+      <h2 class="panel__title">結果</h2>
+      <p class="result__score"><b id="result-score">0</b> 点</p>
+      <p id="result-line" class="muted"></p>
+      <div id="result-detail" class="result__detail"></div>
+      <button id="again" class="btn btn--main" type="button">もう一度</button>
+      <button id="back" class="btn btn--ghost" type="button">地方を選び直す</button>
+    </section>
+
+  </main>
+
+  <footer class="site-foot">
+    <p id="source-note" class="muted"></p>
+    <p class="muted">難読度は「初見で読めるか」の目安であって、地名の良し悪しではありません。地名はその土地の履歴です。</p>
+  </footer>
+
+</body>
+</html>
