@@ -71,6 +71,8 @@ export function createGame({ places, lives = LIVES, random = Math.random }) {
       phase: 'incoming',   // incoming | burst | answer
       phaseAt: now,
       revealed: 0,
+      /* 打ち間違いはこの地名の持ち点だけを削る。次の地名に移ると0に戻る */
+      misses: 0,
       points: 0
     };
   }
@@ -79,7 +81,7 @@ export function createGame({ places, lives = LIVES, random = Math.random }) {
   function fail(now, reason) {
     livesLeft -= 1;
     totals[reason === 'surrender' ? 'surrendered' : 'hit'] += 1;
-    log.push({ place: current.place, reason, points: 0, revealed: current.revealed });
+    log.push({ place: current.place, reason, points: 0, revealed: current.revealed, misses: current.misses });
     requeue.push({ place: current.place, dueAt: answered + REQUEUE_AFTER });
     current.phase = 'answer';
     current.phaseAt = now;
@@ -115,6 +117,7 @@ export function createGame({ places, lives = LIVES, random = Math.random }) {
         place: current.place,
         phase: current.phase,
         revealed: current.revealed,
+        misses: current.misses,
         points: current.points,
         typed: current.matcher.typed,
         travelMs: current.travelMs,
@@ -149,6 +152,7 @@ export function createGame({ places, lives = LIVES, random = Math.random }) {
       const r = current.matcher.input(key);
       if (!r.ok) {
         totals.misses += 1;
+        current.misses += 1;
         // 押してほしかったキーは記録するだけで、その場では出さない。
         // 読みを伏せている最中に出すと答えが漏れる（Day018はここで出していた）
         const want = r.expected;
@@ -161,7 +165,8 @@ export function createGame({ places, lives = LIVES, random = Math.random }) {
       const points = scoreFor({
         base,
         revealed: current.revealed,
-        kanaLength: current.place.kana.length
+        kanaLength: current.place.kana.length,
+        misses: current.misses
       });
       score += points;
       totals.cleared += 1;
@@ -169,7 +174,7 @@ export function createGame({ places, lives = LIVES, random = Math.random }) {
       current.points = points;
       current.phase = 'burst';
       current.phaseAt = now;
-      log.push({ place: current.place, reason: 'cleared', points, revealed: current.revealed });
+      log.push({ place: current.place, reason: 'cleared', points, revealed: current.revealed, misses: current.misses });
       return { ok: true, done: true, points };
     },
 

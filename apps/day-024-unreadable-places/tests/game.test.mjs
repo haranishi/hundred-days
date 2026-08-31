@@ -5,7 +5,7 @@ import {
   LIVES, BASE_TRAVEL_MS, MIN_TRAVEL_MS, BURST_MS, ANSWER_MS, REQUEUE_AFTER, createGame
 } from '../lib/game.js';
 import { primaryRomaji } from '../lib/romaji.js';
-import { basePoints, revealedCount, tailMs } from '../lib/hint.js';
+import { basePoints, revealedCount, scoreFor, tailMs } from '../lib/hint.js';
 
 const PLACES = [
   { kanji: '及位', kana: 'のぞき', pref: '山形県', city: '真室川町', difficulty: 0.9 },
@@ -212,4 +212,78 @@ test('伏せたまま打てる人と、開示を待つ人の差が点数に出�
   const atFull = BASE_TRAVEL_MS - tailMs(kanaLength);
   assert.equal(revealedCount({ elapsed: 0, travelMs: BASE_TRAVEL_MS, kanaLength }), 0);
   assert.equal(revealedCount({ elapsed: atFull, travelMs: BASE_TRAVEL_MS, kanaLength }), kanaLength);
+});
+
+/* いま出ている地名で確実に弾かれるキーを1つ返す。
+   z や q の決め打ちにすると、たまたま先頭キーに当たったときだけ挙動が変わって
+   テストが構造的に見落とす（Day018で実際に踏んだ）。毎回、実物で試して選ぶ。 */
+function wrongKey(game) {
+  const place = game.active().place;
+  for (const key of 'abcdefghijklmnopqrstuvwxyz') {
+    const probe = createGame({ places: [place], random: fixedRandom });
+    probe.start(0);
+    if (!probe.press(key, 0).ok) return key;
+  }
+  throw new Error(`「${place.kana}」で弾かれるキーが見つからない`);
+}
+
+test('打ち間違えるほど、その地名で入る点が下がる', () => {
+  const one = [PLACES[0]];
+  const clean = createGame({ places: one, random: fixedRandom });
+  clean.start(0);
+  typeActive(clean, 0);
+
+  const sloppy = createGame({ places: one, random: fixedRandom });
+  sloppy.start(0);
+  const bad = wrongKey(sloppy);
+  sloppy.press(bad, 0);
+  sloppy.press(bad, 0);
+  assert.equal(sloppy.active().misses, 2);
+  typeActive(sloppy, 0);
+
+  assert.ok(sloppy.score < clean.score, 'ミスしたのに同じ点が入っている');
+  assert.equal(sloppy.score, scoreFor({
+    base: basePoints(PLACES[0].difficulty),
+    revealed: 0,
+    kanaLength: PLACES[0].kana.length,
+    misses: 2
+  }));
+});
+
+test('打ち間違いは次の地名に持ち越さない', () => {
+  const game = makeGame();
+  game.start(0);
+  game.press(wrongKey(game), 0);
+  assert.equal(game.active().misses, 1);
+  typeActive(game, 0);
+  game.tick(BURST_MS);
+  assert.equal(game.active().misses, 0);
+});
+
+test('打ち間違えても、すでに稼いだ総スコアは削られない', () => {
+  const game = makeGame();
+  game.start(0);
+  typeActive(game, 0);
+  const earned = game.score;
+  game.tick(BURST_MS);
+  const bad = wrongKey(game);
+  for (let i = 0; i < 5; i += 1) game.press(bad, BURST_MS);
+  assert.equal(game.score, earned, '過去に稼いだ点まで削られている');
+  assert.equal(game.lives, LIVES, '打ち間違いでライフが減っている');
+});
+
+test('何回外しても、その地名の点は下限までしか下がらない', () => {
+  const one = [PLACES[0]];
+  const game = createGame({ places: one, random: fixedRandom });
+  game.start(0);
+  const bad = wrongKey(game);
+  for (let i = 0; i < 40; i += 1) game.press(bad, 0);
+  typeActive(game, 0);
+  const floor = scoreFor({
+    base: basePoints(PLACES[0].difficulty),
+    revealed: PLACES[0].kana.length,
+    kanaLength: PLACES[0].kana.length
+  });
+  assert.equal(game.score, floor);
+  assert.ok(game.score > 0, '0点にすると打ち切る理由が消える');
 });
