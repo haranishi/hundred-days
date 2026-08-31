@@ -85,6 +85,35 @@ test('読みを打ち切ると弾けて点が入る', async ({ page }) => {
   await expect(page.locator('#verdict')).toContainText('点');
 });
 
+/* 「合っていれば高く、間違えるほど低く」の後半。同じ地名を、きれいに打った回と
+   打ち間違えてから打った回で比べる。回数は画面に出さない方針なので、点で確かめる。
+   ⚠️ 開示が進んでも点は下がるので、両方の回で「まだ1文字も開いていない」ことを
+   先に固定する。ここを見ないと、混んでいるときに開示ぶんの差と区別がつかなくなる。 */
+test('打ち間違えてから打ち切ると、きれいに打ったときより点が低い', async ({ page }) => {
+  const play = async (misses) => {
+    await page.goto(PAGE);
+    await start(page, 'tohoku');
+    const answer = await activeAnswer(page);
+    await page.click('.field');
+    if (misses > 0) {
+      const wrong = 'qwertyuiop'.split('').find((k) => !answer.romaji.includes(k)) ?? 'q';
+      for (let i = 0; i < misses; i += 1) await page.keyboard.press(wrong);
+    }
+    // まだ何も開いていないうちに打ち切る（開いていたらこの回は比較に使えない）
+    await expect(page.locator('#reading')).toHaveText(/^○+$/);
+    await page.keyboard.type(answer.romaji, { delay: 10 });
+    await expect(page.locator('#verdict')).toContainText('点');
+    return { kana: answer.kana, score: Number(await page.locator('#score').innerText()) };
+  };
+
+  const clean = await play(0);
+  const sloppy = await play(3);
+  // 在庫は毎回同じ順で引くので、1問目は必ず同じ地名になる
+  expect(sloppy.kana, '2回とも同じ地名が出ていない').toBe(clean.kana);
+  expect(sloppy.score).toBeLessThan(clean.score);
+  expect(sloppy.score).toBeGreaterThan(0);
+});
+
 test('わからないで降参すると、ライフが減って正解となぜ読めないかが出る', async ({ page }) => {
   await start(page);
   const answer = await activeAnswer(page);

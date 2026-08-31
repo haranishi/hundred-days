@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 
 import {
-  GRACE_MS, FLOOR_RATIO, tailMs, revealedCount, maskReading, basePoints, scoreFor
+  GRACE_MS, FLOOR_RATIO, MISS_RATIO, tailMs, revealedCount, maskReading, basePoints, scoreFor
 } from '../lib/hint.js';
 
 const TRAVEL = 6000;
@@ -64,4 +64,42 @@ test('満点は難読度で決まり、範囲外を渡しても壊れない', ()
   assert.ok(basePoints(1) > basePoints(0));
   assert.equal(basePoints(-5), basePoints(0));
   assert.equal(basePoints(99), basePoints(1));
+});
+
+test('打ち間違えるほど、その地名で入る点は下がる', () => {
+  const base = 500;
+  const kanaLength = 5;
+  const pts = [0, 1, 2, 3, 5].map((misses) => scoreFor({ base, revealed: 0, kanaLength, misses }));
+  assert.deepEqual(pts, [500, 425, 361, 307, 222]);
+  for (let i = 1; i < pts.length; i += 1) assert.ok(pts[i] < pts[i - 1], `ミス${i}回目で下がっていない`);
+});
+
+test('減点は複利で効く（1回ごとに MISS_RATIO を掛ける）', () => {
+  const base = 400;
+  const kanaLength = 4;
+  const once = scoreFor({ base, revealed: 0, kanaLength, misses: 1 });
+  assert.equal(once, Math.round(base * MISS_RATIO));
+  assert.equal(
+    scoreFor({ base, revealed: 0, kanaLength, misses: 2 }),
+    Math.round(base * MISS_RATIO ** 2)
+  );
+});
+
+test('何回外しても、開き切ったときと同じ下限までしか下がらない', () => {
+  const base = 500;
+  const floor = Math.round(base * FLOOR_RATIO);
+  for (const misses of [10, 50, 1000]) {
+    assert.equal(scoreFor({ base, revealed: 0, kanaLength: 5, misses }), floor);
+  }
+  // すでに開き切って下限にいるなら、そこからは動かない
+  assert.equal(scoreFor({ base, revealed: 5, kanaLength: 5, misses: 3 }), floor);
+});
+
+test('ミスを渡さなければ、これまでどおりの点になる', () => {
+  for (const revealed of [0, 2, 4]) {
+    assert.equal(
+      scoreFor({ base: 300, revealed, kanaLength: 4 }),
+      scoreFor({ base: 300, revealed, kanaLength: 4, misses: 0 })
+    );
+  }
 });

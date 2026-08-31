@@ -18,6 +18,13 @@ export const PER_KANA_TAIL_MS = 220;
 /** 開き切ってもこれだけは点が入る。0にすると開き切ったあと打つ意味が消える */
 export const FLOOR_RATIO = 0.2;
 
+/* 打ち間違い1回ごとに、その地名で残る点の割合。
+   読みを伏せてある以上プレイヤーは当てずっぽうで打つので、
+   1回で急落させると「読めないなら手を出すな」というゲームになってしまう。
+   ここは複利で効かせて、迷って連打するほど静かに損をする形にしてある。
+   下限は開示と同じ FLOOR_RATIO。何回外しても0にはしない（打ち切る理由を残す）。 */
+export const MISS_RATIO = 0.85;
+
 export function tailMs(kanaLength) {
   return kanaLength * PER_KANA_TAIL_MS;
 }
@@ -48,9 +55,14 @@ export function basePoints(difficulty) {
   return Math.round(100 + d * 400);
 }
 
-/** 実際に入る点。開いた文字数が少ないほど高い */
-export function scoreFor({ base, revealed, kanaLength }) {
+/**
+ * 実際に入る点。開いた文字数が少ないほど高く、打ち間違えるほど低い。
+ * 減るのはこの地名の持ち点だけで、総スコアからは引かない（次の地名でリセットされる）。
+ */
+export function scoreFor({ base, revealed, kanaLength, misses = 0 }) {
   if (kanaLength <= 0) return 0;
   const kept = 1 - Math.min(1, revealed / kanaLength);
-  return Math.round(base * (FLOOR_RATIO + (1 - FLOOR_RATIO) * kept));
+  const byReveal = base * (FLOOR_RATIO + (1 - FLOOR_RATIO) * kept);
+  const byMiss = byReveal * MISS_RATIO ** Math.max(0, misses);
+  return Math.round(Math.max(base * FLOOR_RATIO, byMiss));
 }
