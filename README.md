@@ -32,6 +32,7 @@ AIと一緒に作りながら、「AIに任せたこと」と「自分で考え�
 | 021 | [ちかくのラジオ](apps/day-021-nearby-radio/) | https://hundred-days.pages.dev/day-021-nearby-radio/ |
 | 022 | [その備蓄、何日もつ？](apps/day-022-stock-days/) | https://hundred-days.pages.dev/day-022-stock-days/ |
 | 023 | [MAGTRACE](apps/day-023-magtrace/) | https://hundred-days.pages.dev/day-023-magtrace/ |
+| 024 | [読めない地名が、向かってくる](apps/day-024-unreadable-places/) | https://hundred-days.pages.dev/day-024-unreadable-places/ |
 
 ## 1日アプリのルール
 
