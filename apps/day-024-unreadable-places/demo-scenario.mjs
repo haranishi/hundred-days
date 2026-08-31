@@ -84,9 +84,12 @@ export async function shotSetup(page) {
 export const shotScroll = 0;
 
 /* デモ動画（540×960の縦・仕上げで頭を切って15〜20秒）。
-   狙いは4つを順に見せること。①伏せたまま打ち切って弾ける ②開示を待ってから打つ
-   ③読めないので降参して、正解と「なぜ読めないか」が出る ④また打てる（遊びが続く）。
-   1コマ目がXのサムネになるので、頭の読込中と地方選びは tools/trim-demo.mjs で切り落とす。 */
+   狙いは4つを順に見せること。①伏せたまま打ち切って弾ける（満点）
+   ②打ち間違えると地名が揺れて警告が出て、打ち切れても入る点が低い
+   ③開示を待ってから打つ ④読めないので降参して、正解と「なぜ読めないか」が出る。
+   1コマ目がXのサムネになるので、頭は tools/trim-demo.mjs で 1.5 秒切り落とす。
+   1.5秒の位置は「地名が大きく・1文字目が開き・ローマ字が見えている」ところ。振り付けを
+   変えたらここも測り直すこと（0.6秒だと地名が薄くてサムネとして弱かった）。 */
 
 /** いま向かってきているものを、既定の書き方で打ち切る */
 async function typeActive(page) {
@@ -97,6 +100,21 @@ async function typeActive(page) {
     null,
     { timeout: 10000 }
   );
+}
+
+/** 次の地名が向かってくる（弾け・正解表示が終わる）まで待つ */
+async function waitIncoming(page) {
+  await page.waitForFunction(
+    () => document.getElementById("target").dataset.phase === "incoming",
+    null,
+    { timeout: 12000 }
+  );
+}
+
+/** いまの読みに絶対に入っていないキー。押すと地名が揺れて警告が出る */
+async function wrongKeyFor(page) {
+  const romaji = await romajiOfActive(page, "tohoku");
+  return "qwertyuiop".split("").find((k) => !romaji.includes(k)) ?? "q";
 }
 
 /** 次の地名が向かってきて、読みが一部だけ開くまで待つ */
@@ -117,31 +135,32 @@ export default async function (page, h) {
   // 盤面を画面の真ん中に置く。ここを外すと、動画の半分が説明文と共有ボタンになる
   await h.scrollTo(".field", 500);
   await page.click(".field");
-  await h.pause(500);
+  await h.pause(400);
 
   // ① 知っている人の速さ。伏せたまま打ち切って満点
   await typeActive(page);
-  await h.pause(1100);
+  await h.pause(950);
 
-  // ② 読めないので開示を待ってから打つ。点は減るが進める
-  await waitPartlyOpen(page);
-  await h.pause(1800);
+  /* ② 打ち間違い。地名が揺れて「その打鍵はこの読みに入っていません」が出る。
+     押してほしかったキーは出ない（読みが漏れる）。打ち切れても、①より入る点は低い。 */
+  await waitIncoming(page);
+  const wrong = await wrongKeyFor(page);
+  await page.keyboard.press(wrong);
+  await h.pause(800);
+  await page.keyboard.press(wrong);
+  await h.pause(1000);
   await typeActive(page);
-  await h.pause(1100);
+  await h.pause(1300);
 
-  // ③ 降参して、正解となぜ読めないかを見せる。ここがこのアプリの持ち帰り
-  await page.waitForFunction(
-    () => document.getElementById("target").dataset.phase === "incoming",
-    null,
-    { timeout: 10000 }
-  );
-  await h.pause(2600);
+  // ③ 読めないので開示を待ってから打つ。点は減るが進める
+  await waitPartlyOpen(page);
+  await h.pause(1600);
+  await typeActive(page);
+  await h.pause(1000);
+
+  // ④ 降参して、正解となぜ読めないかを見せる。ここがこのアプリの持ち帰り
+  await waitIncoming(page);
+  await h.pause(2100);
   await page.click("#giveup");
-  await h.pause(3000);
-
-  // ④ 遊びは続く。もう1問打って終わる
-  await waitPartlyOpen(page);
-  await h.pause(1500);
-  await typeActive(page);
-  await h.pause(1400);
+  await h.pause(3200);
 }
