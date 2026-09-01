@@ -1,5 +1,5 @@
 import { createServer } from "node:http";
-import { readFile } from "node:fs/promises";
+import { readFile, writeFile } from "node:fs/promises";
 import { dirname, extname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -46,20 +46,24 @@ async function romajiOfActive(page, block) {
   }, { block });
 }
 
-async function startTohoku(page) {
+/* sound: "log" … 鳴らした音を控えさせる（動画に同じ音を重ねるため）
+   sound: "off" … 一覧用スクショでは鳴らす必要がない */
+async function startTohoku(page, soundMode = "off") {
   const base = await ensureServer();
-  await page.goto(base, { waitUntil: "load" });
+  await page.goto(`${base}?sound=${soundMode}`, { waitUntil: "load" });
   await page.waitForSelector("#state-select:not([hidden])", { timeout: 15000 });
   await page.click('.blocks__item[data-id="tohoku"]');
   await page.click("#start");
   await page.waitForSelector("#state-play:not([hidden])");
+  // 音の位置合わせの原点。ここから動画の終わりまでの長さが分かれば、末尾から逆算して重ねられる
+  await page.evaluate(() => { window.__t0 = performance.now(); });
 }
 
 /* 一覧に出す1枚。空の盤面ではなく「遊んでいる最中」を写す。
    1問打ち切って点を乗せてから、次の地名が中ほどまで来て読みが2文字だけ開いた瞬間を狙う。
    ここが伝わらないと、ただの漢字クイズに見える。 */
 export async function shotSetup(page) {
-  await startTohoku(page);
+  await startTohoku(page, "off");
 
   const romaji = await romajiOfActive(page, "tohoku");
   await page.click("#keys");
@@ -131,7 +135,7 @@ async function waitPartlyOpen(page) {
 }
 
 export default async function (page, h) {
-  await startTohoku(page);
+  await startTohoku(page, "log");
   // 盤面を画面の真ん中に置く。ここを外すと、動画の半分が説明文と共有ボタンになる
   await h.scrollTo(".field", 500);
   await page.click("#keys");
@@ -163,4 +167,14 @@ export default async function (page, h) {
   await h.pause(2100);
   await page.click("#giveup");
   await h.pause(3200);
+
+  /* 鳴らした音と、盤面が始まってからここまでの長さを控える。
+     録画は scenario が返った直後に止まるので、動画の末尾から sinceStartMs だけ
+     戻った位置が音の t=0 になる。頭を切っても末尾は動かないので、この取り方なら
+     trim-demo のあとでも位置が合う。 */
+  const captured = await page.evaluate(() => ({
+    sinceStartMs: performance.now() - window.__t0,
+    events: window.__soundLog ?? []
+  }));
+  await writeFile(join(appDir, ".demo-sound.json"), JSON.stringify(captured), "utf8");
 }

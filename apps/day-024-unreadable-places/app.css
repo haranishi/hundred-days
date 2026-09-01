@@ -80,6 +80,15 @@ code { background: #0a1017; padding: 0 .25rem; border-radius: .2rem; }
 .hud { display: flex; gap: 1rem; font-size: .85rem; color: var(--ink-dim); border-bottom: 1px solid var(--line); padding-bottom: .6rem; }
 .hud b { color: var(--ink); font-weight: 600; }
 .hud__item--right { margin-left: auto; }
+/* 音の入切。遊びの邪魔をしないよう、HUDの文字と同じ大きさの地味なボタンにする */
+.hud__sound {
+  margin-left: auto; padding: .1rem .5rem;
+  background: transparent; color: var(--ink-dim);
+  border: 1px solid var(--line); border-radius: 999px;
+  font: inherit; font-size: .8rem; cursor: pointer;
+}
+.hud__sound[aria-pressed="true"] { color: var(--ink); }
+.hud__sound + .hud__item--right { margin-left: .75rem; }
 
 /* 奥（小さい・薄い）から手前（大きい・濃い）へ。--depth は 0→1 */
 .field { position: relative; height: 13rem; display: grid; place-items: center; overflow: hidden; }

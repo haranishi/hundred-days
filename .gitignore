@@ -32,3 +32,6 @@ blob-report/
 
 # 各Dayのデータ変換の元ファイル置き場（入手先は各アプリのREADMEに明記）
 apps/*/tools/cache/
+
+# デモ動画に音を重ねるための中間ファイル（record-demo が書き、render-demo-audio が読む）
+apps/*/.demo-sound.json
