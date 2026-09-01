@@ -14,7 +14,12 @@ const UPSTREAMS = [
   "https://lz4.overpass-api.de/api/interpreter",
 ];
 const USER_AGENT = "hundred-days-day025 (+https://hundred-days.pages.dev/day-025-nearby-parking/)";
-const TIMEOUT_MS = 8_000;
+/* Overpassに「最大10秒まで計算していい」と伝えているので、こちらの打ち切りは必ずそれより長くする。
+   8秒にしていたときは、上流が答えを作り終える前に毎回諦めていた（本番で初回が必ず502・16秒＝8秒×2系統。
+   2回目は上流側が温まって成功するので、ローカルでは気づけなかった）。
+   上流の計算を途中で捨てるのは負荷をかけ損でもある。 */
+const QUERY_TIMEOUT_S = 10;
+export const TIMEOUT_MS = (QUERY_TIMEOUT_S + 5) * 1000;
 const ALLOWED_RADII = [800, 3200];
 const MAX_ELEMENTS = 500;
 const CELL = 1000; // 座標を1/1000度＝約110m四方に丸める
@@ -37,7 +42,7 @@ export function parseParams(searchParams) {
 }
 
 export function buildQuery(lat, lng, radius) {
-  return `[out:json][timeout:10];nwr["amenity"="parking"](around:${radius},${lat},${lng});out tags center ${MAX_ELEMENTS};`;
+  return `[out:json][timeout:${QUERY_TIMEOUT_S}];nwr["amenity"="parking"](around:${radius},${lat},${lng});out tags center ${MAX_ELEMENTS};`;
 }
 
 /** 画面が使う項目だけに削る。座標は node は lat/lon、way/relation は center に入る */
