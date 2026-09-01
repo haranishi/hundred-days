@@ -52,9 +52,10 @@ export function trimElement(element) {
 }
 
 export function trimElements(elements = []) {
-  return elements
-    .filter((e) => e && (e.type === "node" ? Number.isFinite(e.lat) : Number.isFinite(e.center?.lat)))
-    .map(trimElement);
+  const hasCoords = (e) => (e.type === "node"
+    ? Number.isFinite(e.lat) && Number.isFinite(e.lon)
+    : Number.isFinite(e.center?.lat) && Number.isFinite(e.center?.lon));
+  return elements.filter((e) => e && hasCoords(e)).map(trimElement);
 }
 
 class UpstreamLimited extends Error {

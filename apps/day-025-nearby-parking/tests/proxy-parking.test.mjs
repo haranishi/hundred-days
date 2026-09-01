@@ -104,3 +104,13 @@ test('onRequestGet: 上流が落ちているときは502', async () => {
   const response = await onRequestGet(ctx('?lat=39.7&lng=140.1&radius=800'), { fetchImpl: async () => upstream({}, 500) });
   assert.equal(response.status, 502);
 });
+
+test('座標は緯度と経度の両方を必須にする（片方だけNaNの要素も落とす）', () => {
+  const kept = trimElements([
+    { type: 'node', id: 1, lat: 39.7, lon: Number.NaN, tags: {} },
+    { type: 'node', id: 2, lat: Number.NaN, lon: 140.1, tags: {} },
+    { type: 'way', id: 3, center: { lat: 39.7, lon: undefined }, tags: {} },
+    { type: 'node', id: 4, lat: 39.7, lon: 140.1, tags: {} },
+  ]);
+  assert.deepEqual(kept.map((e) => e.id), [4]);
+});

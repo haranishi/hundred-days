@@ -72,7 +72,9 @@ export function createUI(handlers) {
     refs.count.textContent = matched > items.length ? `${matched}件中${items.length}件` : `${items.length}件`;
     if (!items.length) {
       const empty = make('div', 'empty-state');
-      empty.append(make('span', 'empty-icon', 'P'), make('h3', '', total ? '条件に合う候補がありません' : '駐車場が見つかりませんでした'), make('p', '', total ? 'フィルターを変更してみてください。' : '別の場所で検索してみてください。'));
+      const icon = make('span', 'empty-icon', 'P');
+      icon.setAttribute('aria-hidden', 'true'); // 装飾。読み上げると「ピー」とだけ言われる
+      empty.append(icon, make('h3', '', total ? '条件に合う候補がありません' : '駐車場が見つかりませんでした'), make('p', '', total ? 'フィルターを変更してみてください。' : '別の場所で検索してみてください。'));
       refs.list.replaceChildren(empty);
       return;
     }
