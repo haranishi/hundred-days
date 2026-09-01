@@ -7,6 +7,7 @@
 
 import { createGame, LIVES } from './lib/game.js';
 import { maskReading } from './lib/hint.js';
+import { sound, startSoundLog } from './lib/sound.js';
 import { BLOCKS, MIN_STOCK } from './lib/blocks.js';
 
 const el = (id) => document.getElementById(id);
@@ -38,7 +39,8 @@ const ui = {
   again: el('again'),
   back: el('back'),
   sourceNote: el('source-note'),
-  tapHint: el('tap-hint')
+  tapHint: el('tap-hint'),
+  soundToggle: el('sound-toggle')
 };
 
 let data = null;
@@ -49,6 +51,10 @@ let composing = false;
 let invalidTimer = 0;
 /* 1打でも受け取れたか。仮想キーボードが本当に出ているかの、いちばん確かな証拠 */
 let keysTaken = 0;
+/* 音を鳴らす判断のために、前のフレームの様子を覚えておく。
+   revealed は地名が変わると0に戻るので、incoming に入った時点で数え直す。 */
+let prevPhase = null;
+let prevRevealed = 0;
 
 /** タッチで操作している端末か（案内を出すかどうかの判断だけに使う） */
 function isTouch() {
@@ -63,6 +69,36 @@ function updateTapHint() {
   const focused = document.activeElement === ui.keys;
   const needed = keysTaken === 0 || !focused;
   ui.tapHint.hidden = !(game?.state === 'running' && isTouch() && needed);
+}
+
+/* 既定は音あり。?sound=off はデモ収録とE2Eで要る（Day018と同じ約束）。
+   ここでは AudioContext を作らない。作るのは「はじめる」を押したとき（sound.arm）だけ。 */
+function setSound(next) {
+  sound.setEnabled(next);
+  if (ui.soundToggle) {
+    ui.soundToggle.textContent = next ? '音あり' : '音なし';
+    ui.soundToggle.setAttribute('aria-pressed', String(next));
+  }
+}
+
+/* 画面の見た目と耳を合わせる。incoming のあいだは開示と接近を、
+   そこから出た瞬間は結果（弾けた／外した）を鳴らす。 */
+function playFor(t, now) {
+  if (!t) return;
+  if (t.phase === 'incoming') {
+    if (prevPhase !== 'incoming') prevRevealed = 0;   // 新しい地名
+    if (t.revealed > prevRevealed) sound.reveal(t.revealed, t.place.kana.length);
+    prevRevealed = t.revealed;
+    sound.approach(t.depth, now);
+  } else if (prevPhase === 'incoming') {
+    if (t.phase === 'burst') {
+      const len = Math.max(1, t.place.kana.length);
+      sound.burst(1 - Math.min(1, t.revealed / len));
+    } else {
+      sound.fail();
+    }
+  }
+  prevPhase = t.phase;
 }
 
 function show(name) {
@@ -193,6 +229,10 @@ function startGame() {
   show('play');
   ui.keys.value = '';
   keysTaken = 0;
+  prevPhase = null;
+  prevRevealed = 0;
+  if (sound.isEnabled()) sound.arm();
+  sound.beginRound();
   ui.keys.focus();
   updateTapHint();
   cancelAnimationFrame(raf);
@@ -202,6 +242,7 @@ function startGame() {
 function loop(now) {
   if (!game) return;
   game.tick(now);
+  playFor(game.active(), now);
   render();
   if (game.state === 'over') {
     finish();
@@ -334,6 +375,7 @@ function handleKey(raw) {
   if (r.ignored) return;
   if (!r.ok) {
     // 状態：不正入力。押してほしかったキーはここでは出さない（読みが漏れる）
+    sound.miss(performance.now());
     showInvalid('その打鍵はこの読みに入っていません');
     return;
   }
@@ -385,6 +427,19 @@ el('state-play').addEventListener('pointerdown', (e) => {
   e.preventDefault();
   ui.keys.focus();
 });
+
+if (ui.soundToggle) {
+  ui.soundToggle.addEventListener('click', () => {
+    const next = !sound.isEnabled();
+    setSound(next);
+    if (next) sound.arm();
+    ui.keys.focus();
+  });
+}
+const soundParam = new URLSearchParams(location.search).get('sound');
+setSound(soundParam !== 'off');
+/* ?sound=log … 鳴らした音を window.__soundLog に控える。デモ動画に同じ音を重ねるために使う */
+if (soundParam === 'log') window.__soundLog = startSoundLog();
 
 ui.keys.addEventListener('focus', updateTapHint);
 ui.keys.addEventListener('blur', updateTapHint);

@@ -10,6 +10,15 @@ const TITLE = '読めない地名が、向かってくる';
 /* status が draft のあいだは dist に出ないので、そのときは飛ばす。
    serve-dist は無いパスに index.html を200で返すことがあるため、タイトルで見分ける */
 test.beforeEach(async ({ page }) => {
+  // AudioContext が何回作られたかを数える。ページのスクリプトより先に仕込む
+  await page.addInitScript(() => {
+    window.__audioCtxCount = 0;
+    const Real = window.AudioContext;
+    if (!Real) return;
+    window.AudioContext = class extends Real {
+      constructor(...args) { window.__audioCtxCount += 1; super(...args); }
+    };
+  });
   await page.goto(PAGE);
   test.skip((await page.title()) !== TITLE, 'まだ draft で dist に出ていない');
 });
@@ -194,4 +203,43 @@ test.describe('タッチ端末', () => {
     await page.keyboard.press('a');
     await expect(page.locator('#tap-hint')).toBeHidden();
   });
+});
+
+/* 音。鳴っているかどうかはブラウザ越しには確かめられないので、
+   ①設定が画面に出ていること ②?sound=off が効くこと ③AudioContextを
+   「はじめる」まで作らないこと（開いただけの人のタブに音の権利を握らせない）を見る。 */
+
+test('開いただけではAudioContextを作らない', async ({ page }) => {
+  await page.goto(PAGE);
+  await expect(page.locator('#state-select')).toBeVisible({ timeout: 15_000 });
+  const made = await page.evaluate(() => window.__audioCtxCount ?? 0);
+  expect(made).toBe(0);
+});
+
+test('音の入切がHUDにあり、押すと表示が変わる', async ({ page }) => {
+  await start(page);
+  const toggle = page.locator('#sound-toggle');
+  await expect(toggle).toBeVisible();
+  await expect(toggle).toHaveText('音あり');
+  await expect(toggle).toHaveAttribute('aria-pressed', 'true');
+  await toggle.click();
+  await expect(toggle).toHaveText('音なし');
+  await expect(toggle).toHaveAttribute('aria-pressed', 'false');
+  // 切っても遊びは続く
+  await expect(page.locator('#state-play')).toBeVisible();
+});
+
+test('?sound=off で始めると、最初から音なしになっている', async ({ page }) => {
+  await page.goto(`${PAGE}?sound=off`);
+  await expect(page.locator('#state-select')).toBeVisible({ timeout: 15_000 });
+  await page.click('.blocks__item[data-id="tohoku"]');
+  await page.click('#start');
+  await expect(page.locator('#sound-toggle')).toHaveText('音なし');
+  await expect(page.locator('#sound-toggle')).toHaveAttribute('aria-pressed', 'false');
+});
+
+test('音のボタンを押しても、打鍵は入力欄に戻る', async ({ page }) => {
+  await start(page);
+  await page.locator('#sound-toggle').click();
+  await expect(page.locator('#keys')).toBeFocused();
 });
