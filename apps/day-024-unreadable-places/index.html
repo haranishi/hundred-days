@@ -63,22 +63,29 @@
         <span class="hud__item hud__item--right" id="where"></span>
       </div>
 
-      <div class="field">
-        <div id="target" class="target">
-          <span id="kanji" class="target__kanji"></span>
+      <!-- 盤面と読みをまとめて、透明な入力欄をこの上に敷く。
+           入力欄が1pxだった頃は、盤面を触っても入力欄に当たらないので
+           スマホでキーボードが出ず、遊べなかった（Day018と同じ作りに合わせた） -->
+      <div class="play-area">
+        <div class="field">
+          <div id="target" class="target">
+            <span id="kanji" class="target__kanji"></span>
+          </div>
+          <div id="verdict" class="verdict" hidden></div>
         </div>
-        <div id="verdict" class="verdict" hidden></div>
-      </div>
 
-      <div class="readout">
-        <div id="reading" class="reading" aria-live="polite"></div>
-        <div id="typed" class="typed" aria-live="off"></div>
-      </div>
+        <div class="readout">
+          <div id="reading" class="reading" aria-live="polite"></div>
+          <div id="typed" class="typed" aria-live="off"></div>
+        </div>
 
-      <!-- 打鍵はこの透明な入力欄で受ける。触ればスマホでもキーボードが出る -->
-      <input id="keys" class="keys" type="text" inputmode="text"
-             autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
-             aria-label="読みを入力する欄">
+        <!-- 打鍵はこの透明な入力欄で受ける。盤面全体を覆っているので、
+             どこを触ってもスマホのキーボードが出る -->
+        <input id="keys" class="keys" type="text" inputmode="text"
+               autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
+               aria-label="読みを入力する欄">
+        <p id="tap-hint" class="tap-hint" hidden>ここをタップしてキーボードを出す</p>
+      </div>
       <p id="invalid" class="invalid" role="alert" hidden></p>
 
       <div class="actions">

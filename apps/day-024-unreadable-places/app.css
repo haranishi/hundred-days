@@ -142,9 +142,29 @@ code { background: #0a1017; padding: 0 .25rem; border-radius: .2rem; }
 .typed { font-family: ui-monospace, monospace; font-size: .95rem; color: var(--ok); min-height: 1.5rem; letter-spacing: .1em; }
 
 /* 打鍵はこの透明な欄で受ける。触ればスマホでもキーボードが出る */
+/* 打鍵を受ける透明な入力欄。盤面と読みの全面に敷く。
+   ⚠️ 1px の隠し入力にすると、盤面を触っても入力欄に当たらないので
+   スマホでは仮想キーボードが出ず、打つ場所が画面のどこにも無くなる。
+   font-size は 16px 未満にしないこと（iOSがフォーカス時に勝手にズームする）。 */
+.play-area { position: relative; }
 .keys {
-  position: absolute; opacity: 0; width: 1px; height: 1px;
-  border: 0; padding: 0; margin: -1px; overflow: hidden;
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  padding: 0; margin: 0; border: 0;
+  background: transparent; color: transparent; caret-color: transparent;
+  font-size: 16px; opacity: 0; cursor: text;
+  z-index: 2;
+}
+.keys:focus { outline: none; }
+
+/* タッチ端末に、タップすればキーボードが出ることを知らせる。
+   まだ1打も受け取っていないあいだと、フォーカスが外れているあいだ出す。 */
+.tap-hint {
+  position: absolute; left: 50%; bottom: .1rem; transform: translateX(-50%);
+  z-index: 3; margin: 0; padding: .2rem .7rem;
+  border-radius: 999px;
+  background: rgba(13, 20, 29, .92); border: 1px solid var(--line); color: var(--ink);
+  font-size: .74rem; white-space: nowrap; pointer-events: none;
 }
 .invalid { margin: .25rem 0 0; text-align: center; font-size: .82rem; color: var(--warn); min-height: 1.4rem; }
 

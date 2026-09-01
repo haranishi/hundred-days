@@ -37,7 +37,8 @@ const ui = {
   resultDetail: el('result-detail'),
   again: el('again'),
   back: el('back'),
-  sourceNote: el('source-note')
+  sourceNote: el('source-note'),
+  tapHint: el('tap-hint')
 };
 
 let data = null;
@@ -46,6 +47,23 @@ let game = null;
 let raf = 0;
 let composing = false;
 let invalidTimer = 0;
+/* 1打でも受け取れたか。仮想キーボードが本当に出ているかの、いちばん確かな証拠 */
+let keysTaken = 0;
+
+/** タッチで操作している端末か（案内を出すかどうかの判断だけに使う） */
+function isTouch() {
+  return navigator.maxTouchPoints > 0 && !window.matchMedia('(hover: hover)').matches;
+}
+
+/* 案内を出すのは「まだ1打も受け取っていない」か「入力欄からフォーカスが外れている」あいだ。
+   フォーカスだけを見ないのは、focus() を呼んでも仮想キーボードを開かない端末があり、
+   キーボードが出ていないのに案内だけ消えてしまうため（Day018で実測）。 */
+function updateTapHint() {
+  if (!ui.tapHint) return;
+  const focused = document.activeElement === ui.keys;
+  const needed = keysTaken === 0 || !focused;
+  ui.tapHint.hidden = !(game?.state === 'running' && isTouch() && needed);
+}
 
 function show(name) {
   for (const p of PANELS) el(`state-${p}`).hidden = p !== name;
@@ -174,7 +192,9 @@ function startGame() {
   hideInvalid();
   show('play');
   ui.keys.value = '';
+  keysTaken = 0;
   ui.keys.focus();
+  updateTapHint();
   cancelAnimationFrame(raf);
   raf = requestAnimationFrame(loop);
 }
@@ -302,6 +322,8 @@ function hideInvalid() {
 
 function handleKey(raw) {
   if (!game || game.state !== 'running') return;
+  // 何であれキーが届いた＝仮想キーボードは出ている。案内はここで引っ込める
+  if (keysTaken === 0) { keysTaken = 1; updateTapHint(); }
   const key = raw.toLowerCase();
   if (!/^[a-z-]$/.test(key)) {
     // 状態：不正入力。読みに使わない文字
@@ -322,6 +344,14 @@ ui.keys.addEventListener('compositionstart', () => { composing = true; });
 ui.keys.addEventListener('compositionend', () => {
   composing = false;
   ui.keys.value = '';
+});
+
+/* 日本語入力がONだと、変換を確定するまでどのキーもゲームに届かない。
+   ⚠️ 以前は compositionend でしか知らせておらず、確定しないまま打ち続ける人には
+   「打っても何も起きない」だけの画面に見えていた。始めた瞬間に出すこと。
+   入力欄にフォーカスが無いときも拾えるよう window で受ける。 */
+window.addEventListener('compositionstart', () => {
+  if (el('state-play').hidden) return;
   showInvalid('日本語入力がオンになっています。英数に切り替えてください');
 });
 
@@ -345,13 +375,19 @@ ui.keys.addEventListener('beforeinput', (e) => {
 ui.keys.addEventListener('input', () => { ui.keys.value = ''; });
 
 /* 画面のどこを触っても打てる状態に戻す。
-   preventDefault が要るのは、押した既定の動作でフォーカスが盤面へ移り、
-   直後に入力欄から外れてしまうため（実機で打鍵が1つも入らなかった） */
+   ⚠️ 入力欄そのものを触ったときは preventDefault してはいけない。
+   iOS/Android は「入力欄への直接の操作」でしか仮想キーボードを開かないので、
+   既定の動作を止めるとキーボードが二度と出ない。
+   入力欄の外（HUDや余白）を触ったときだけ、フォーカスが盤面へ逃げるのを止める。 */
 el('state-play').addEventListener('pointerdown', (e) => {
   if (e.target.closest('button')) return;
+  if (e.target === ui.keys) return;
   e.preventDefault();
   ui.keys.focus();
 });
+
+ui.keys.addEventListener('focus', updateTapHint);
+ui.keys.addEventListener('blur', updateTapHint);
 
 /* それでも外れたときの受け皿。打ち始めた時点で入力欄へ戻す */
 document.addEventListener('keydown', (e) => {
