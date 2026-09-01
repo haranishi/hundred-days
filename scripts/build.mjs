@@ -622,9 +622,10 @@ ${cards}
     <span class="footer__links">
       <a href="${SITE.repoUrl}" target="_blank" rel="noopener">GitHub</a>
       <a href="${SITE.xUrl}" target="_blank" rel="noopener">X ${esc(SITE.xHandle)}</a>
+      <a href="/privacy.html">プライバシー</a>
     </span>
     ${SITE.analyticsId
-      ? '<p class="footer__note">このトップページだけ、Googleアナリティクスでアクセス数を見ています（閲覧者を特定する設定は使っていません）。各アプリのページには計測を入れていないので、アプリ内での操作は誰にも送られません。</p>'
+      ? '<p class="footer__note">このトップページだけ、Googleアナリティクスでアクセス数を見ています（閲覧者を特定する設定は使っていません）。各アプリのページには計測を入れていないので、アプリ内での操作は誰にも送られません。くわしくは<a href="/privacy.html">プライバシーポリシー</a>をご覧ください。</p>'
       : ''}
   </footer>
 </main>
