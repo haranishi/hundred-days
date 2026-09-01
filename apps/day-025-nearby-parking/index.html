@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23f6b73c'/%3E%3Ctext x='8' y='24' font-size='22' font-family='sans-serif' font-weight='bold' fill='%23102a43'%3EP%3C/text%3E%3C/svg%3E">
+  <title>ちかくの駐車場</title>
+  <link rel="stylesheet" href="./vendor/maplibre-gl.css">
+  <link rel="stylesheet" href="./app.css">
+  <link rel="stylesheet" href="./shared/share.css">
+  <script src="./vendor/maplibre-gl.js" defer></script>
+  <script src="./shared/share.js" defer></script>
+  <script type="module" src="./app.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#results">検索結果へ移動</a>
+  <header class="site-header">
+    <a class="brand" href="./" aria-label="ちかくの駐車場 ホーム">
+      <span class="brand-mark" aria-hidden="true">P</span>
+      <span>ちかくの駐車場</span>
+    </a>
+    <button id="theme-toggle" class="quiet-button" type="button" aria-pressed="false">
+      <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 3v2m0 14v2M3 12h2m14 0h2M5.64 5.64l1.42 1.42m9.88 9.88 1.42 1.42m0-12.72-1.42 1.42M7.06 16.94l-1.42 1.42M16 12a4 4 0 1 1-8 0 4 4 0 0 1 8 0Z"/></svg>
+      <span id="theme-label">ダーク</span>
+    </button>
+  </header>
+
+  <main>
+    <section class="search-panel" aria-labelledby="search-heading">
+      <div class="search-copy">
+        <p class="eyebrow">PARKING FINDER</p>
+        <h1 id="search-heading">停める場所を、すぐ決める。</h1>
+        <p>現在地または行き先から、近い順に駐車場を探します。</p>
+      </div>
+      <form id="place-form" class="search-form" role="search">
+        <label class="sr-only" for="place-input">駅名・施設名・住所</label>
+        <div class="input-wrap">
+          <svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>
+          <input id="place-input" name="place" type="search" placeholder="駅名・施設名・住所" autocomplete="off" required>
+        </div>
+        <button id="place-submit" class="primary-button" type="submit">検索</button>
+        <button id="locate-button" class="secondary-button" type="button">
+          <svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="8"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2"/></svg>
+          現在地
+        </button>
+      </form>
+      <div id="place-candidates" class="candidates" hidden aria-label="地名の候補"></div>
+    </section>
+
+    <div id="banner" class="banner" role="status" aria-live="polite" hidden></div>
+    <section class="workspace" aria-label="駐車場検索">
+      <section id="results" class="results-panel" aria-labelledby="results-heading">
+        <div class="results-head">
+          <div>
+            <p class="eyebrow">NEARBY</p>
+            <h2 id="results-heading">近くの候補</h2>
+          </div>
+          <div class="results-meta" role="status" aria-live="polite">
+            <p id="result-count" class="result-count">検索前</p>
+            <p id="result-note" class="result-note" hidden></p>
+          </div>
+        </div>
+        <div class="filters" aria-label="料金フィルター">
+          <div class="filter-tabs" role="group" aria-label="料金区分">
+            <button type="button" data-filter="all" aria-pressed="true">すべて</button>
+            <button type="button" data-filter="yes" aria-pressed="false">有料</button>
+            <button type="button" data-filter="no" aria-pressed="false">無料</button>
+            <button type="button" data-filter="unknown" aria-pressed="false">料金不明</button>
+          </div>
+          <label class="switch-row"><input id="restricted-toggle" type="checkbox"><span class="switch" aria-hidden="true"></span><span>契約・私用も表示</span></label>
+        </div>
+        <div id="results-list" class="results-list">
+          <div class="empty-state">
+            <span class="empty-icon" aria-hidden="true">P</span>
+            <h3>探す場所を選んでください</h3>
+            <p>「現在地」または地名検索から始められます。</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="map-panel" aria-label="駐車場の地図">
+        <div id="map" aria-label="地図"></div>
+        <div class="map-actions">
+          <button id="return-button" class="map-button" type="button" disabled>
+            <svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="8"/></svg>
+            現在地へ戻る
+          </button>
+          <button id="research-button" class="map-button strong" type="button" hidden>この辺りを再検索</button>
+        </div>
+        <div class="map-legend" aria-label="地図記号">
+          <span><i class="legend-dot paid"></i>有料</span><span><i class="legend-dot free"></i>無料</span><span><i class="legend-dot unknown"></i>不明</span>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <footer>
+    <div>
+      データ © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap contributors</a>
+      （<a href="https://opendatacommons.org/licenses/odbl/" target="_blank" rel="noopener">ODbL</a>）
+      <span>地図タイル: <a href="https://openfreemap.org/" target="_blank" rel="noopener">OpenFreeMap</a>／地名検索: Nominatim</span>
+    </div>
+    <p>現在地や検索地点の座標は、駐車場を探すためこのサイトの中継APIへ送られ、そこから
+      <a href="https://wiki.openstreetmap.org/wiki/Overpass_API" target="_blank" rel="noopener">Overpass API</a>
+      （地名検索は <a href="https://nominatim.openstreetmap.org/" target="_blank" rel="noopener">Nominatim</a>）へ渡されます。
+      座標は約110m四方に丸めてから送られ、結果はキャッシュされますが、誰が検索したかは保存しません。
+      地図の表示中は、地図タイルの取得のため OpenFreeMap にも接続します。</p>
+    <div id="share"></div>
+  </footer>
+</body>
+</html>

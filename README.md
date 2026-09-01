@@ -33,6 +33,7 @@ AIと一緒に作りながら、「AIに任せたこと」と「自分で考え�
 | 022 | [その備蓄、何日もつ？](apps/day-022-stock-days/) | https://hundred-days.pages.dev/day-022-stock-days/ |
 | 023 | [MAGTRACE](apps/day-023-magtrace/) | https://hundred-days.pages.dev/day-023-magtrace/ |
 | 024 | [読めない地名が、向かってくる](apps/day-024-unreadable-places/) | https://hundred-days.pages.dev/day-024-unreadable-places/ |
+| 025 | [ちかくの駐車場](apps/day-025-nearby-parking/) | https://hundred-days.pages.dev/day-025-nearby-parking/ |
 
 ## 1日アプリのルール
 
