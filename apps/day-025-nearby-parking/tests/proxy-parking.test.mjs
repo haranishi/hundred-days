@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  buildQuery, fetchUpstream, onRequestGet, parseParams, roundCoord, trimElements,
+  buildQuery, fetchUpstream, onRequestGet, parseParams, roundCoord, TIMEOUT_MS, trimElements,
 } from '../../../functions/api/day-025/parking.js';
 
 const params = (query) => new URL(`https://x/api/day-025/parking${query}`).searchParams;
@@ -113,4 +113,10 @@ test('座標は緯度と経度の両方を必須にする（片方だけNaNの�
     { type: 'node', id: 4, lat: 39.7, lon: 140.1, tags: {} },
   ]);
   assert.deepEqual(kept.map((e) => e.id), [4]);
+});
+
+test('打ち切りは、上流に許した計算時間より必ず長くする', () => {
+  const seconds = Number(buildQuery(39.7, 140.1, 800).match(/\[timeout:(\d+)\]/)[1]);
+  assert.ok(TIMEOUT_MS > seconds * 1000,
+    `打ち切り${TIMEOUT_MS}msが上流の${seconds}sより短いと、答えが来る前に必ず諦める`);
 });

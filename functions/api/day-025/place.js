@@ -13,7 +13,7 @@
 
 const UPSTREAM = "https://nominatim.openstreetmap.org/search";
 const USER_AGENT = "hundred-days-day025 (+https://hundred-days.pages.dev/day-025-nearby-parking/)";
-const TIMEOUT_MS = 8_000;
+export const TIMEOUT_MS = 15_000; // 上流の応答が遅い日に、答えが来る前に諦めない
 const LIMIT = 5;
 
 const CONTROL_CHARS = /[\u0000-\u001f\u007f]/g;
