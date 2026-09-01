@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>プライバシーポリシー | 100 DAYS / 100 APPS</title>
+  <meta name="description" content="100 DAYS / 100 APPSのアクセス解析、外部通信、端末内保存について説明します。">
+  <style>
+    :root { color-scheme: dark; --bg:#14161c; --panel:#1d212b; --line:#2c3342; --text:#eef1f6; --muted:#aab2bf; --accent:#6cabff; }
+    * { box-sizing:border-box; }
+    body { margin:0; background:var(--bg); color:var(--text); font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic","Noto Sans JP","Segoe UI",sans-serif; line-height:1.8; }
+    main { width:min(820px,calc(100% - 32px)); margin:0 auto; padding:56px 0 72px; }
+    h1 { margin:0; font-size:clamp(1.8rem,5vw,2.7rem); line-height:1.25; }
+    h2 { margin:44px 0 12px; padding-top:24px; border-top:1px solid var(--line); font-size:1.25rem; }
+    p, li { color:var(--muted); }
+    a { color:var(--accent); }
+    .lead { margin-top:18px; font-size:1.05rem; }
+    ul { padding-left:1.4em; }
+    .back { display:inline-block; margin-bottom:28px; text-decoration:none; }
+    .date { margin-top:48px; font-size:.9rem; }
+  </style>
+</head>
+<body>
+  <main>
+    <a class="back" href="/">← 100日チャレンジの一覧へ</a>
+    <h1>プライバシーポリシー</h1>
+    <p class="lead">このページでは、100 DAYS / 100 APPSのトップページと各アプリが扱う情報、外部通信、端末内保存について説明します。</p>
+
+    <h2>トップページのアクセス解析</h2>
+    <p>トップページ（<code>/</code>）だけでGoogleアナリティクス4（GA4）を使用しています。各アプリのページにはGoogleアナリティクスを入れていません。</p>
+    <p>GA4には、ページ表示のほか、アプリを開く操作、デモ動画の再生、タグによる絞り込み、制作メモを開く操作、X・GitHubなどへのリンクを開く操作をイベントとして送ります。イベントには、操作に応じてDay番号、アプリ名、タグ名、リンク先の区分が含まれます。</p>
+    <p>GA4は <code>_ga</code> などのCookieを使います。GoogleにはClient ID、おおまかな地域、ブラウザや端末の情報などが送られます。Googleでの取り扱いは、<a href="https://policies.google.com/privacy?hl=ja">Googleプライバシーポリシー</a>をご確認ください。</p>
+    <p>計測を無効にするには、<a href="https://tools.google.com/dlpage/gaoptout?hl=ja">Googleアナリティクス オプトアウト アドオン</a>を利用するか、ブラウザの設定でCookieを拒否してください。</p>
+
+    <h2>ホスティング</h2>
+    <p>このサイトはCloudflare Pagesで配信しています。通常のWebアクセスと同様に、接続元IPアドレス、リクエストしたURL、ブラウザなどの情報がCloudflareのアクセスログとして処理される場合があります。</p>
+
+    <h2>各アプリの外部通信</h2>
+    <p>外部通信を行うアプリと、その目的は次のとおりです。</p>
+    <ul>
+      <li>Day 009「秋田バスライブ」：同一オリジンの中継APIからバス位置を取得します。</li>
+      <li>Day 010「いま、誰かが書き直している」：Wikimedia EventStreamsと各WikimediaプロジェクトのAction APIから、編集イベントと記事の座標を取得します。</li>
+      <li>Day 013「政府はこう答えてきた」：国会会議録検索システムAPIへ検索語を送ります。</li>
+      <li>Day 014「いま、日本でいちばん暑い場所」：気象庁からアメダスの地点情報と観測値を取得します。</li>
+      <li>Day 016「回線の犯人さがし」：測定のためCloudflareの測定用サーバーと通信します。この通信では接続元IPアドレスがCloudflareに届きます。</li>
+      <li>Day 021「ちかくのラジオ」：Radio Browserへ現在地の座標を送って近隣局を検索します。座標はこのアプリでは保存しません。</li>
+      <li>Day 023「MAGTRACE」：同一オリジンの中継APIを経由して国立国会図書館サーチAPIを検索します。検索語はURLに含まれ、検索語と集計結果はCloudflareのキャッシュに最大24時間保存されます。検索語を含むURLがアクセスログに残る場合もあります。</li>
+    </ul>
+
+    <h2>端末内への保存</h2>
+    <p>各アプリが <code>localStorage</code> を使う場合、入力内容、設定、履歴などを利用者の端末内に保存するためだけに使います。外部通信を行うアプリの通信内容は上の一覧のとおりです。</p>
+
+    <h2>お問い合わせ</h2>
+    <p>このポリシーや各アプリについては、Xの<a href="https://x.com/haranishi_ikki">@haranishi_ikki</a>、またはGitHubリポジトリの<a href="https://github.com/haranishi/hundred-days/issues">Issue</a>からお問い合わせください。</p>
+
+    <p class="date">制定日：2026年8月31日</p>
+  </main>
+</body>
+</html>
