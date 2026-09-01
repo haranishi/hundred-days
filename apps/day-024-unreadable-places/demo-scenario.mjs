@@ -62,7 +62,7 @@ export async function shotSetup(page) {
   await startTohoku(page);
 
   const romaji = await romajiOfActive(page, "tohoku");
-  await page.click(".field");
+  await page.click("#keys");
   for (const ch of romaji) await page.keyboard.press(ch);
   await page.waitForFunction(() => Number(document.getElementById("score").textContent) > 0);
 
@@ -134,7 +134,7 @@ export default async function (page, h) {
   await startTohoku(page);
   // 盤面を画面の真ん中に置く。ここを外すと、動画の半分が説明文と共有ボタンになる
   await h.scrollTo(".field", 500);
-  await page.click(".field");
+  await page.click("#keys");
   await h.pause(400);
 
   // ① 知っている人の速さ。伏せたまま打ち切って満点

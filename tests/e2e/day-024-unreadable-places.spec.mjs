@@ -78,7 +78,7 @@ test('始めた直後、漢字は見えているが読みは伏せてある', as
 
 test('読みを打ち切ると弾けて点が入る', async ({ page }) => {
   await start(page);
-  await page.click('.field');
+  await page.click('#keys');
   const answer = await activeAnswer(page);
   await page.keyboard.type(answer.romaji, { delay: 10 });
   await expect(page.locator('#score')).not.toHaveText('0');
@@ -94,7 +94,7 @@ test('打ち間違えてから打ち切ると、きれいに打ったときよ�
     await page.goto(PAGE);
     await start(page, 'tohoku');
     const answer = await activeAnswer(page);
-    await page.click('.field');
+    await page.click('#keys');
     if (misses > 0) {
       const wrong = 'qwertyuiop'.split('').find((k) => !answer.romaji.includes(k)) ?? 'q';
       for (let i = 0; i < misses; i += 1) await page.keyboard.press(wrong);
@@ -127,7 +127,7 @@ test('わからないで降参すると、ライフが減って正解となぜ�
 test('打ち間違えても、押してほしかったキーは画面に出さない', async ({ page }) => {
   await start(page);
   const answer = await activeAnswer(page);
-  await page.click('.field');
+  await page.click('#keys');
   // 読みに絶対に含まれないキーを選んで打つ
   const wrong = 'qwertyuiop'.split('').find((k) => !answer.romaji.includes(k)) ?? 'q';
   await page.keyboard.press(wrong);
@@ -148,4 +148,50 @@ test('出題データが取れないときはエラーになり、やり直せ�
   await page.unroute('**/assets/places.json');
   await page.click('#retry');
   await expect(page.locator('#state-select')).toBeVisible({ timeout: 15_000 });
+});
+
+/* ここから下は「実機で打てなかった」への回帰テスト。
+   打鍵そのものは自動化だと素通りしてしまう（キーイベントを直接注入するので、
+   仮想キーボードが出ているかもフォーカスがどこかも関係なく届く）。
+   だから「打てたか」ではなく、実機でキーボードが出るための条件を直接見る。 */
+
+test('日本語入力を始めた瞬間に、届いていないことを知らせる', async ({ page }) => {
+  await start(page);
+  await expect(page.locator('#invalid')).toBeHidden();
+  // 変換を始めただけ（確定していない）。ここで黙っていると「打っても無反応」に見える
+  await page.locator('#keys').dispatchEvent('compositionstart');
+  await expect(page.locator('#invalid')).toBeVisible();
+  await expect(page.locator('#invalid')).toContainText('日本語入力');
+});
+
+test('入力欄は盤面と読みの全面を覆っている（1pxだとスマホで触れない）', async ({ page }) => {
+  await start(page);
+  const area = await page.locator('.play-area').boundingBox();
+  const keys = await page.locator('#keys').boundingBox();
+  expect(keys.width).toBeCloseTo(area.width, 0);
+  expect(keys.height).toBeCloseTo(area.height, 0);
+  // iOSはフォーカス時に16px未満の入力欄へ勝手にズームする
+  const size = await page.locator('#keys').evaluate((n) => getComputedStyle(n).fontSize);
+  expect(Number.parseFloat(size)).toBeGreaterThanOrEqual(16);
+});
+
+test.describe('タッチ端末', () => {
+  // devices[...] をそのまま渡すと defaultBrowserType が入り、describe内では使えない。
+  // 判定に効くのはタッチの有無と hover が無いことなので、その2つだけ渡す。
+  test.use({ hasTouch: true, isMobile: true, viewport: { width: 412, height: 915 } });
+
+  test('盤面をタップすると入力欄にフォーカスが入る（キーボードが出る条件）', async ({ page }) => {
+    await start(page);
+    await page.tap('#keys');
+    await expect(page.locator('#keys')).toBeFocused();
+  });
+
+  test('まだ1打も入っていない間は、タップしてキーボードを出す案内を見せる', async ({ page }) => {
+    await start(page);
+    await expect(page.locator('#tap-hint')).toBeVisible();
+    await page.tap('#keys');
+    // 1打でも届けばキーボードは出ている。案内は引っ込める
+    await page.keyboard.press('a');
+    await expect(page.locator('#tap-hint')).toBeHidden();
+  });
 });
