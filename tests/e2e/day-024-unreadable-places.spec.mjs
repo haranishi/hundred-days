@@ -10,14 +10,21 @@ const TITLE = '読めない地名が、向かってくる';
 /* status が draft のあいだは dist に出ないので、そのときは飛ばす。
    serve-dist は無いパスに index.html を200で返すことがあるため、タイトルで見分ける */
 test.beforeEach(async ({ page }) => {
-  // AudioContext が何回作られたかを数える。ページのスクリプトより先に仕込む
+  /* AudioContext が何回作られたかを数える。ページのスクリプトより先に仕込む。
+     webkit 付きも同じものに差し替える（片方だけだと数え漏らす）。
+     数えるのは super() が通ったあと——作るのに失敗したものは「握った」ことにならない。 */
   await page.addInitScript(() => {
     window.__audioCtxCount = 0;
-    const Real = window.AudioContext;
+    const Real = window.AudioContext || window.webkitAudioContext;
     if (!Real) return;
-    window.AudioContext = class extends Real {
-      constructor(...args) { window.__audioCtxCount += 1; super(...args); }
-    };
+    class Counted extends Real {
+      constructor(...args) {
+        super(...args);
+        window.__audioCtxCount += 1;
+      }
+    }
+    window.AudioContext = Counted;
+    window.webkitAudioContext = Counted;
   });
   await page.goto(PAGE);
   test.skip((await page.title()) !== TITLE, 'まだ draft で dist に出ていない');

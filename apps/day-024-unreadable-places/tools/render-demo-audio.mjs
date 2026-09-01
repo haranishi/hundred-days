@@ -47,9 +47,20 @@ if (!Array.isArray(events) || events.length === 0) {
   process.exit(1);
 }
 
+/* ここで弾かないと、NaN が Float32Array の長さやループまで流れて、
+   原因から遠いところで分かりにくい例外になる */
+if (!Number.isFinite(sinceStartMs) || sinceStartMs <= 0) {
+  console.error(`✖ .demo-sound.json の sinceStartMs が不正: ${sinceStartMs}`);
+  process.exit(1);
+}
+
 const duration = Number(execFileSync('ffprobe', [
   '-v', 'error', '-show_entries', 'format=duration', '-of', 'csv=p=0', video
 ]).toString().trim());
+if (!Number.isFinite(duration) || duration <= 0) {
+  console.error(`✖ ${video} の長さを読めない（ffprobe の結果: ${duration}）`);
+  process.exit(1);
+}
 
 /** 音のt=0が動画の何秒目にあたるか。末尾から逆算する */
 const originSec = duration - sinceStartMs / 1000;
