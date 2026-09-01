@@ -143,7 +143,18 @@ const CONNECT_BY_APP = {
   'day-016-line-suspect': 'https://speed.cloudflare.com',
   // day-021 は局データのAPI（ミラー3つ）とクリック報告に繋ぐ
   'day-021-nearby-radio':
-    'https://de1.api.radio-browser.info https://nl1.api.radio-browser.info https://at1.api.radio-browser.info'
+    'https://de1.api.radio-browser.info https://nl1.api.radio-browser.info https://at1.api.radio-browser.info',
+  /* day-025 が外へ出るのは地図タイルだけ。Overpass と Nominatim は
+     functions/api/day-025/ の中継を通すので 'self' で足りる（利用方針がUser-Agentと
+     キャッシュを求めており、ブラウザからは満たせないため） */
+  'day-025-nearby-parking': 'https://tiles.openfreemap.org'
+};
+
+/* day-025 の MapLibre は blob: から Web Worker を起こす。
+   worker-src は child-src → script-src → default-src の順に落ちるので、
+   'self' のままだと地図が黙って出ない。 */
+const WORKER_BY_APP = {
+  'day-025-nearby-parking': "worker-src blob:"
 };
 
 /* day-021 は局のストリーム（audio）とロゴ画像をAPI由来の任意のhttpsホストから読む。
@@ -152,7 +163,9 @@ const MEDIA_BY_APP = {
   'day-021-nearby-radio': ' https:'
 };
 const IMG_BY_APP = {
-  'day-021-nearby-radio': ' https:'
+  'day-021-nearby-radio': ' https:',
+  // スプライト画像をタイル配信元から読む
+  'day-025-nearby-parking': ' https://tiles.openfreemap.org'
 };
 
 const appCsp = (dir) => [
@@ -166,7 +179,8 @@ const appCsp = (dir) => [
   "frame-ancestors 'none'",
   "base-uri 'none'",
   "form-action 'self'",
-  "object-src 'none'"
+  "object-src 'none'",
+  ...(WORKER_BY_APP[dir] ? [WORKER_BY_APP[dir]] : [])
 ].join('; ');
 
 /* 一覧ページ（/）にCSPを入れていないのは、インラインscriptが2本とGA4があり、

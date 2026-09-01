@@ -1,0 +1,198 @@
+/* 色の意味はライト/ダークで反転させない。
+   黄(--accent)＝主CTA「検索」と「無料」だけ／--brand＝ヘッダー／--secondary-*＝副ボタン。
+   地図の上に乗るピンと凡例は --pin-* を共有し、テーマに関わらず同じ色にする
+   （地図タイルは常に明色なので、ここを反転させると凡例と実物がずれる）。
+   例外は --emphasis（枠・選択リング）だけ。地に対して立たせる役なので明暗は地に合わせる。 */
+:root {
+  color-scheme: light;
+  --bg: #f2f5f9;
+  --surface: #ffffff;
+  --sunken: #eaeff6;
+  --text: #1c3350;
+  --muted: #4f6076;
+  --line: #d3dce8;
+  --brand: #102a43;
+  --on-brand: #ffffff;
+  /* 枠・選択リングなど「地に対して立たせる」色。ここだけは地の明暗に合わせて変える */
+  --emphasis: #102a43;
+  --on-emphasis: #ffffff;
+  --secondary-bg: #102a43;
+  --secondary-fg: #ffffff;
+  --accent: #f6b73c;
+  --on-accent: #102a43;
+  --shadow: 16 42 67;
+  --map-fallback: #dfe6ee;
+  --map-filter: none;
+  /* テーマ非依存（地図タイルの上に置くもの） */
+  --pin-paid-bg: #102a43; --pin-paid-fg: #ffffff; --pin-paid-edge: #ffffff;
+  --pin-free-bg: #f6b73c; --pin-free-fg: #102a43; --pin-free-edge: #ffffff;
+  --pin-unknown-bg: #ffffff; --pin-unknown-fg: #102a43; --pin-unknown-edge: #102a43;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans JP", sans-serif;
+}
+
+/* ダークは「トークンの再定義だけ」で作る。個別要素のダーク上書きを書かない＝反転漏れを防ぐ。
+   下の2ブロックは常に同じ中身にすること（手動トグルとOS設定の両方で同じ見た目にするため）。 */
+html[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #0f1b28; --surface: #17263a; --sunken: #101d2c;
+  --text: #e8eff7; --muted: #a8bacf; --line: #2c3e55;
+  --brand: #142338; --on-brand: #eef4fb;
+  --emphasis: #93b4d8; --on-emphasis: #0f1b28;
+  --secondary-bg: #2d4a6b; --secondary-fg: #f2f7fc;
+  --shadow: 0 0 0;
+  --map-fallback: #16222f;
+  --map-filter: invert(.9) hue-rotate(180deg) saturate(.72) brightness(.95);
+}
+
+@media (prefers-color-scheme: dark) {
+  html:not([data-theme]) {
+    color-scheme: dark;
+    --bg: #0f1b28; --surface: #17263a; --sunken: #101d2c;
+    --text: #e8eff7; --muted: #a8bacf; --line: #2c3e55;
+    --brand: #142338; --on-brand: #eef4fb;
+    --emphasis: #93b4d8; --on-emphasis: #0f1b28;
+    --secondary-bg: #2d4a6b; --secondary-fg: #f2f7fc;
+    --shadow: 0 0 0;
+    --map-fallback: #16222f;
+    --map-filter: invert(.9) hue-rotate(180deg) saturate(.72) brightness(.95);
+  }
+}
+
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html, body { margin: 0; min-width: 0; background: var(--bg); color: var(--text); }
+body { min-height: 100vh; font-size: 16px; line-height: 1.55; }
+button, input { font: inherit; }
+button, a { -webkit-tap-highlight-color: transparent; }
+button { cursor: pointer; }
+button:disabled { cursor: wait; opacity: .55; }
+a { color: inherit; }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+.skip-link { position: fixed; z-index: 50; top: 8px; left: 8px; padding: 10px 14px; background: var(--accent); color: var(--on-accent); transform: translateY(-150%); }
+.skip-link:focus { transform: none; }
+.site-header { min-height: 68px; padding: 10px clamp(16px, 4vw, 48px); display: flex; align-items: center; justify-content: space-between; background: var(--brand); color: var(--on-brand); border-bottom: 1px solid var(--line); }
+.brand { display: flex; align-items: center; gap: 10px; font-weight: 800; text-decoration: none; letter-spacing: .02em; }
+.brand-mark, .empty-icon { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 10px 10px 10px 3px; background: var(--accent); color: var(--on-accent); font-weight: 900; }
+.quiet-button, .secondary-button, .primary-button, .map-button { min-height: 44px; border: 0; border-radius: 10px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-weight: 750; transition: background-color .2s, color .2s, border-color .2s; }
+.quiet-button { padding: 0 13px; color: inherit; background: transparent; border: 1px solid currentColor; }
+svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+main { width: min(1500px, 100%); margin: 0 auto; }
+.search-panel { position: relative; padding: clamp(22px, 4vw, 44px) clamp(16px, 4vw, 48px) 24px; background: var(--surface); border-bottom: 1px solid var(--line); }
+.search-copy { max-width: 680px; margin-bottom: 20px; }
+.eyebrow { margin: 0 0 4px; color: var(--muted); font-size: .72rem; font-weight: 850; letter-spacing: .16em; }
+h1, h2, h3, p { margin-top: 0; }
+h1 { margin-bottom: 6px; color: var(--text); font-size: clamp(1.7rem, 4vw, 2.7rem); line-height: 1.2; letter-spacing: -.035em; }
+.search-copy > p:last-child { margin-bottom: 0; color: var(--muted); text-wrap: balance; word-break: auto-phrase; }
+/* 検索後はヒーローを1行に畳む（結果と地図をファーストビューへ入れるため） */
+body.is-compact .search-panel { padding-top: 14px; padding-bottom: 16px; }
+body.is-compact .search-copy { max-width: none; margin-bottom: 12px; display: flex; align-items: baseline; gap: 10px; }
+body.is-compact .search-copy .eyebrow, body.is-compact .search-copy > p:last-child { display: none; }
+body.is-compact h1 { margin-bottom: 0; font-size: 1.12rem; letter-spacing: -.01em; }
+.search-form { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: 10px; max-width: 920px; }
+.input-wrap { position: relative; }
+.input-wrap svg { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--muted); }
+input[type="search"] { width: 100%; min-height: 50px; padding: 0 16px 0 46px; border: 1px solid var(--line); border-radius: 10px; background: var(--sunken); color: var(--text); font-size: 1rem; }
+input[type="search"]::placeholder { color: var(--muted); opacity: 1; }
+.primary-button { min-width: 94px; padding: 0 22px; background: var(--accent); color: var(--on-accent); }
+.secondary-button { padding: 0 18px; background: var(--secondary-bg); color: var(--secondary-fg); }
+.candidates { position: absolute; z-index: 30; left: clamp(16px, 4vw, 48px); top: calc(100% - 20px); width: min(660px, calc(100% - 32px)); padding: 7px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); box-shadow: 0 12px 28px rgb(var(--shadow) / .22); }
+.candidate { display: block; width: 100%; min-height: 44px; padding: 9px 12px; border: 0; border-radius: 8px; background: transparent; color: var(--text); text-align: left; }
+.candidate:hover { background: var(--sunken); }
+.banner { margin: 12px clamp(16px, 4vw, 48px) 0; padding: 10px 14px; border-left: 4px solid var(--emphasis); border-radius: 7px; background: var(--surface); box-shadow: 0 2px 10px rgb(var(--shadow) / .08); }
+.banner[data-tone="error"] { border-left-color: var(--accent); }
+.workspace { display: grid; grid-template-columns: minmax(350px, 42%) 1fr; padding: 18px clamp(16px, 4vw, 48px) 30px; gap: 18px; }
+.results-panel, .map-panel { min-width: 0; overflow: hidden; border: 1px solid var(--line); border-radius: 16px; background: var(--surface); box-shadow: 0 5px 18px rgb(var(--shadow) / .07); }
+.results-panel { display: flex; flex-direction: column; }
+.results-head { padding: 18px 20px 10px; display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; }
+.results-head h2 { margin: 0; color: var(--text); font-size: 1.45rem; }
+.results-meta { text-align: right; }
+.result-count { margin: 0; color: var(--text); font-weight: 800; }
+.result-note { margin: 2px 0 0; color: var(--muted); font-size: .78rem; font-weight: 700; }
+.filters { padding: 5px 14px 14px; border-bottom: 1px solid var(--line); }
+.filter-tabs { display: flex; gap: 4px; overflow-x: auto; padding: 3px; border-radius: 10px; background: var(--sunken); scrollbar-width: none; }
+.filter-tabs button { flex: 1 0 auto; min-height: 44px; padding: 0 10px; border: 0; border-radius: 8px; background: transparent; color: var(--muted); font-size: .88rem; font-weight: 750; }
+.filter-tabs button[aria-pressed="true"] { background: var(--surface); color: var(--text); box-shadow: 0 1px 5px rgb(var(--shadow) / .12); }
+.switch-row { min-height: 44px; margin-top: 6px; display: flex; align-items: center; gap: 9px; cursor: pointer; color: var(--muted); font-size: .9rem; font-weight: 650; }
+.switch-row input { position: absolute; opacity: 0; }
+.switch { width: 38px; height: 22px; padding: 3px; border-radius: 99px; background: var(--line); transition: background .2s; }
+.switch::after { content: ""; display: block; width: 16px; height: 16px; border-radius: 50%; background: var(--surface); box-shadow: 0 1px 4px rgb(var(--shadow) / .45); transition: transform .2s; }
+.switch-row input:checked + .switch { background: var(--emphasis); }
+.switch-row input:checked + .switch::after { transform: translateX(16px); }
+.switch-row input:focus-visible + .switch { outline: 3px solid var(--accent); outline-offset: 3px; }
+.results-list { overflow-y: auto; padding: 10px; }
+.empty-state { min-height: 260px; padding: 30px 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; color: var(--muted); }
+.empty-state h3 { margin: 14px 0 5px; color: var(--text); }
+.empty-state p { margin: 0; }
+.parking-card { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: stretch; margin-bottom: 8px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); overflow: hidden; transition: border-color .2s, box-shadow .2s; }
+.parking-card:hover { border-color: var(--emphasis); }
+.parking-card.is-selected { border-color: var(--emphasis); box-shadow: inset 0 0 0 2px var(--emphasis); }
+.parking-card.is-nearest { border-left: 5px solid var(--emphasis); }
+.card-main { min-width: 0; padding: 13px 14px; cursor: pointer; }
+.title-row { display: flex; gap: 10px; align-items: start; justify-content: space-between; }
+.title-row h3 { margin: 0; overflow: hidden; color: var(--text); font-size: 1rem; line-height: 1.35; text-overflow: ellipsis; white-space: nowrap; }
+.distance { flex: 0 0 auto; color: var(--text); }
+.card-meta { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.badge, .detail { padding: 3px 8px; border-radius: 99px; font-size: .76rem; font-weight: 750; }
+.badge { border: 1px solid currentColor; }
+.badge.paid { background: var(--pin-paid-bg); color: var(--pin-paid-fg); }
+.badge.free { background: var(--pin-free-bg); color: var(--pin-free-fg); }
+.badge.unknown { background: transparent; color: var(--muted); }
+.detail { background: var(--sunken); color: var(--muted); }
+/* 「ルート」は枠付きチップにして押せると分かる形にする（折返し禁止） */
+.route-button { display: grid; place-items: center; min-width: 96px; padding: 10px 12px; border-left: 1px solid var(--line); text-decoration: none; }
+.route-chip { display: inline-flex; align-items: center; justify-content: center; min-height: 36px; padding: 0 12px; border: 1px solid var(--emphasis); border-radius: 9px; background: var(--surface); color: var(--text); font-size: .88rem; font-weight: 800; white-space: nowrap; }
+.route-button:hover .route-chip, .route-button:focus-visible .route-chip { background: var(--emphasis); color: var(--on-emphasis); }
+.skeleton { height: 86px; margin-bottom: 8px; padding: 16px; border: 1px solid var(--line); border-radius: 12px; }
+.skeleton i { display: block; height: 11px; margin-bottom: 9px; border-radius: 10px; background: var(--line); animation: pulse 1.2s ease-in-out infinite alternate; }
+.skeleton i:nth-child(1) { width: 65%; }.skeleton i:nth-child(2) { width: 38%; }.skeleton i:nth-child(3) { width: 48%; }
+@keyframes pulse { to { opacity: .35; } }
+.map-panel { position: relative; min-height: 560px; }
+#map { position: absolute; inset: 0; background: var(--map-fallback); }
+/* 明色タイルのままだとダークで地図だけ光る。タイル面にだけフィルタを掛ける（マーカーは対象外） */
+#map .maplibregl-canvas { filter: var(--map-filter); }
+.map-actions { position: absolute; z-index: 20; top: 12px; left: 12px; right: 12px; display: flex; justify-content: space-between; gap: 8px; pointer-events: none; }
+.map-button { min-height: 44px; padding: 0 13px; border: 1px solid var(--line); background: var(--surface); color: var(--text); box-shadow: 0 3px 10px rgb(var(--shadow) / .15); pointer-events: auto; }
+.map-button.strong { margin-left: auto; border: 2px solid var(--emphasis); font-weight: 800; }
+.map-button:hover:not(:disabled) { background: var(--sunken); }
+.map-legend { position: absolute; z-index: 20; right: 12px; bottom: 12px; display: flex; gap: 10px; padding: 8px 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); box-shadow: 0 2px 8px rgb(var(--shadow) / .16); font-size: .74rem; }
+.legend-dot { display: inline-block; width: 11px; height: 11px; margin-right: 4px; border: 2px solid; border-radius: 50%; vertical-align: -1px; }
+.legend-dot.paid { background: var(--pin-paid-bg); border-color: var(--pin-paid-edge); }
+.legend-dot.free { background: var(--pin-free-bg); border-color: var(--pin-free-edge); }
+.legend-dot.unknown { background: var(--pin-unknown-bg); border-color: var(--pin-unknown-edge); }
+.parking-marker { display: grid; place-items: center; width: 44px; height: 44px; border: 3px solid var(--pin-paid-edge); border-radius: 50% 50% 50% 8px; color: var(--pin-paid-fg); background: var(--pin-paid-bg); box-shadow: 0 3px 9px rgb(16 42 67 / .35); font-weight: 900; }
+.parking-marker.fee-no { background: var(--pin-free-bg); color: var(--pin-free-fg); border-color: var(--pin-free-edge); }
+.parking-marker.fee-unknown { background: var(--pin-unknown-bg); color: var(--pin-unknown-fg); border-color: var(--pin-unknown-edge); }
+.parking-marker.is-selected { box-shadow: 0 0 0 4px #ffffff, 0 0 0 8px #102a43, 0 4px 12px rgb(16 42 67 / .45); }
+.origin-marker { width: 18px; height: 18px; border: 4px solid #ffffff; border-radius: 50%; background: #102a43; box-shadow: 0 0 0 3px rgb(16 42 67 / .45); }
+.map-unavailable { max-width: 300px; margin: 45% auto; padding: 20px; text-align: center; }
+footer { padding: 22px clamp(16px, 4vw, 48px) 28px; border-top: 1px solid var(--line); color: var(--muted); background: var(--surface); font-size: .78rem; }
+footer div { display: flex; flex-wrap: wrap; gap: 4px 10px; } footer p { max-width: 980px; margin: 8px 0 0; word-break: auto-phrase; }
+
+@media (min-width: 900px) {
+  /* 件数が少ない時にカード下へ空洞を作らない（高さは中身で決める） */
+  .results-panel { align-self: start; }
+  /* 460px = ヘッダー+コンパクト検索+リスト見出し+フィルタ+下余白。地図凡例をファーストビューに残す */
+  .results-list { max-height: min(520px, calc(100vh - 460px)); min-height: 120px; }
+}
+
+@media (max-width: 899px) {
+  .workspace { grid-template-columns: 1fr; }
+  .map-panel { grid-row: 1; min-height: 390px; }
+  .results-panel { grid-row: 2; }
+  .results-list { max-height: 620px; }
+}
+
+@media (max-width: 560px) {
+  .site-header { min-height: 60px; }.brand { font-size: .96rem; }.brand-mark { width: 34px; height: 34px; }
+  .quiet-button { padding: 0 10px; }.search-panel { padding-top: 20px; }
+  .search-form { grid-template-columns: 1fr 1fr; }.input-wrap { grid-column: 1 / -1; }.primary-button, .secondary-button { width: 100%; }
+  .workspace { padding-top: 12px; gap: 12px; }.map-panel { min-height: 340px; }
+  .results-head { padding-inline: 14px; }.filters { padding-inline: 9px; }.results-list { padding: 8px; }
+  .parking-card { grid-template-columns: minmax(0, 1fr) 96px; }.route-button { min-width: 96px; padding: 10px 8px; }
+  .map-actions { flex-wrap: wrap; }.map-button { font-size: .78rem; }.map-legend { left: 12px; right: auto; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; transition-duration: .01ms !important; }
+}

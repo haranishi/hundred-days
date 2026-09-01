@@ -1,0 +1,10 @@
+import './normalize.test.mjs';
+import './geo.test.mjs';
+import './radius.test.mjs';
+import './visible.test.mjs';
+import './client-api.test.mjs';
+import './expand.test.mjs';
+import './storage.test.mjs';
+import './route.test.mjs';
+import './proxy-parking.test.mjs';
+import './proxy-place.test.mjs';
