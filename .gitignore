@@ -35,3 +35,9 @@ apps/*/tools/cache/
 
 # デモ動画に音を重ねるための中間ファイル（record-demo が書き、render-demo-audio が読む）
 apps/*/.demo-sound.json
+
+# プロモ動画ツールの生成物（BGMのWAV・プレビュー・本番mp4・1コマ目）。ソースだけを追跡する
+apps/*/tools/promo/promo-audio.wav
+apps/*/tools/promo/promo.mp4
+apps/*/tools/promo/preview-contact.jpg
+apps/*/tools/promo/promo-first-frame.png
