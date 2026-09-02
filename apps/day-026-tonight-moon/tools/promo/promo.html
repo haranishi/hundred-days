@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=1080, initial-scale=1">
+  <title>今夜の月 — プロモーション動画</title>
+  <link rel="stylesheet" href="./promo.css">
+</head>
+<body>
+  <main id="promo" aria-label="今夜の月 プロモーション動画">
+    <div id="stars" aria-hidden="true"></div>
+    <div id="aurora" aria-hidden="true"></div>
+
+    <canvas id="feature-moon" width="1080" height="1920" aria-hidden="true"></canvas>
+
+    <section id="title-scene" class="title-scene" aria-label="タイトル">
+      <p id="challenge-label">DAY 026 · 100日チャレンジ</p>
+      <h1 id="main-title">今夜の月</h1>
+      <p id="main-lead">開いた瞬間、今夜の月が昇る。</p>
+    </section>
+
+    <div id="phone" class="phone" aria-label="今夜の月 アプリ画面">
+      <div class="phone-speaker" aria-hidden="true"></div>
+      <div class="phone-screen">
+        <iframe id="app-frame" title="今夜の月" data-src="/index.html?at=2026-09-02T21:00"></iframe>
+      </div>
+    </div>
+
+    <div id="focus-rings" aria-hidden="true">
+      <div class="focus-ring"></div>
+      <div class="focus-ring"></div>
+    </div>
+    <div id="tap-ripple" aria-hidden="true"></div>
+
+    <section id="promise-scene" class="promise-scene" aria-label="このアプリの約束">
+      <p>計算は、全部ブラウザの中。</p>
+      <p>位置も記録も、外に出ない。</p>
+      <p class="gold">通信ゼロ・登録なし・無料</p>
+    </section>
+
+    <section id="end-scene" class="end-scene" aria-label="今夜の月 URL">
+      <h2>今夜の月</h2>
+      <p class="url">hundred-days.pages.dev/<br>day-026-tonight-moon/</p>
+      <p class="day">100日チャレンジ Day 26</p>
+    </section>
+
+    <div id="caption" class="caption" aria-live="off"></div>
+    <div id="fade-black" aria-hidden="true"></div>
+  </main>
+  <script type="module" src="./promo.js"></script>
+</body>
+</html>
