@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>今夜の月</title>
+  <meta name="description" content="今夜の月の形、月齢、自分の場所での月の出入りと、中秋の名月までの日数を端末内で計算します。">
+  <meta name="share:text" content="今夜の月 — 月の形と、月の出・月の入り、中秋の名月までの日数を見てみよう">
+  <link rel="stylesheet" href="./app.css">
+  <link rel="stylesheet" href="./shared/share.css">
+  <script src="./shared/share.js" defer></script>
+</head>
+<body>
+  <header class="site-head">
+    <p class="eyebrow">DAY 026 · TONIGHT'S MOON</p>
+    <h1>今夜の月</h1>
+    <p>空を見上げる前に、今夜の形と出会える時刻を。</p>
+  </header>
+
+  <main>
+    <p id="storage-error" class="notice" role="status" hidden>この環境では保存できません。計算はそのまま使えます。</p>
+
+    <div class="dashboard">
+      <section class="sky-card" aria-labelledby="date-label">
+        <div class="date-heading">
+          <p id="date-label">9月2日（水）・今夜</p>
+          <p id="place-heading">東京の空</p>
+        </div>
+        <div class="sky-stage">
+          <span class="twinkle twinkle--one" aria-hidden="true"></span>
+          <span class="twinkle twinkle--two" aria-hidden="true"></span>
+          <canvas id="moon-canvas" role="img" aria-label="今夜の月"></canvas>
+          <span class="horizon" aria-hidden="true"></span>
+        </div>
+        <div id="moon-readout" class="moon-readout" aria-live="polite">
+          <p class="moon-age"><span>月齢</span> <strong id="moon-age">—</strong></p>
+          <div>
+            <h2 id="moon-name">—</h2>
+            <p><span id="moon-state">—</span><span class="dot">·</span>輝面 <strong id="illumination">—</strong></p>
+            <p id="hero-rise" class="hero-rise">月の出 —</p>
+          </div>
+        </div>
+      </section>
+
+      <div class="info-column">
+        <section class="card times-card" aria-labelledby="times-title">
+          <div class="card-head place-head">
+            <div><p class="kicker">RISE &amp; SET</p><h2 id="times-title">月に会える時刻</h2></div>
+            <label class="place-select"><span class="sr-only">地点</span><select id="place-select"></select></label>
+          </div>
+          <button id="geo-button" class="geo-button" type="button">現在地を使う</button>
+          <p id="geo-status" class="status-line" role="status" aria-live="polite"></p>
+
+          <dl class="time-list">
+            <div><dt>月の出 <span id="moonrise-direction" class="direction"></span></dt><dd id="moonrise">—</dd></div>
+            <div><dt>月の入り <span id="moonset-direction" class="direction"></span></dt><dd id="moonset">—</dd></div>
+            <div class="sunset-row"><dt>日の入り</dt><dd id="sunset">—</dd></div>
+            <div class="difference-row"><dt>日の入り → 月の出</dt><dd id="sunset-difference">—</dd></div>
+          </dl>
+          <p id="now-status" class="now-status"></p>
+        </section>
+
+        <section class="card harvest-card" aria-labelledby="harvest-title">
+          <p class="kicker">CHŪSHŪ NO MEIGETSU</p>
+          <h2 id="harvest-title"><span id="harvest-lead">—</span></h2>
+          <p id="harvest-date" class="harvest-date"></p>
+          <p id="full-difference" class="full-difference"></p>
+        </section>
+      </div>
+
+      <section class="card date-card" aria-labelledby="date-control-title">
+        <div class="card-head">
+          <div><p class="kicker">DATE</p><h2 id="date-control-title">夜をなぞる</h2></div>
+          <button id="today-button" class="text-button" type="button" hidden>今夜に戻る</button>
+        </div>
+        <div class="date-controls">
+          <button id="date-prev" class="round-button" type="button" aria-label="前の日">‹</button>
+          <div class="range-track">
+            <label for="date-range" class="sr-only">今夜からの日数</label>
+            <input id="date-range" type="range" min="-30" max="30" step="1" value="0">
+            <span class="tonight-mark" aria-hidden="true"></span>
+          </div>
+          <button id="date-next" class="round-button" type="button" aria-label="次の日">›</button>
+        </div>
+        <p id="offset-label" class="range-note">今夜</p>
+      </section>
+
+      <section class="card journal-card" aria-labelledby="journal-title">
+        <div class="card-head">
+          <div><p class="kicker">MOON JOURNAL</p><h2 id="journal-title">見た月帳</h2></div>
+          <button id="clear-journal" class="text-button danger" type="button">帳を消す</button>
+        </div>
+        <button id="seen-button" class="seen-button" type="button">今夜の月を見た</button>
+        <p id="seen-status" class="status-line" role="status" aria-live="polite"></p>
+        <p id="journal-empty" class="empty-note">今夜の月を見たら、ここに残ります</p>
+        <ol id="stamp-list" class="stamp-list" aria-label="見た月の記録"></ol>
+      </section>
+    </div>
+
+    <details class="card notes-card">
+      <summary>計算方法・精度・出典</summary>
+      <div>
+        <p>月と太陽の位置、輝面、朔弦望は Jean Meeus『Astronomical Algorithms』第2版の式で端末内計算しています。出入りは日本時間の0時から24時まで2分刻みで探し、境目を秒単位まで絞りました。</p>
+        <p>出没の定義は国立天文台の暦に合わせています（大気差 35′8″・太陽は上辺・月は中心）。時刻はUTC+9固定で、海外の時差には対応していません。大気の状態や地形により、実際の見え方は暦と1〜2分ずれることがあります。</p>
+        <ul>
+          <li><a href="https://eco.mtk.nao.ac.jp/koyomi/">国立天文台 暦計算室</a></li>
+          <li><a href="https://eco.mtk.nao.ac.jp/koyomi/yoko/2026/rekiyou263.html">令和8年 暦要項</a></li>
+          <li><a href="https://eco.mtk.nao.ac.jp/koyomi/wiki/C3E6BDA9A4CECCBEB7EEA4C8A4CF2FCCBEB7EEC9ACA4BAA4B7A4E2CBFEB7EEA4CAA4E9A4BA.html">暦Wiki「名月必ずしも満月ならず」</a></li>
+          <li><a href="https://www.nao.ac.jp/astro/sky/2026/09-topics03.html">国立天文台「中秋の名月」</a></li>
+        </ul>
+      </div>
+    </details>
+
+    <p class="privacy-note">位置と見た記録はこの端末の中だけに保存します。外部通信はありません。</p>
+    <div id="share"></div>
+  </main>
+  <script type="module" src="./app.js"></script>
+</body>
+</html>
