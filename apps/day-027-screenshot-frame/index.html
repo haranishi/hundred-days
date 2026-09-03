@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>スクショに額縁を</title>
+  <meta name="description" content="スクショに余白・角丸・影・背景を付け、端末内だけでPNGに整えます。">
+  <meta name="share:text" content="スクショに額縁を — 貼るだけで、SNSに出せる1枚に。画像は端末の外に出ません">
+  <link rel="stylesheet" href="./app.css">
+  <link rel="stylesheet" href="./shared/share.css">
+  <script src="./shared/share.js" defer></script>
+</head>
+<body>
+  <header class="site-head">
+    <div>
+      <p class="eyebrow">DAY 027 · SCREENSHOT FRAME</p>
+      <h1>スクショに額縁を</h1>
+      <p class="site-description">貼るだけで、SNSに出せる1枚に。</p>
+    </div>
+  </header>
+
+  <main id="app" data-state="empty">
+    <p id="storage-error" class="notice" role="status" hidden>この環境では設定を保存できません。加工と保存はそのまま使えます</p>
+
+    <div class="workspace">
+      <section id="stage" class="stage-card" aria-label="画像のプレビュー">
+        <div id="dropzone" class="state-panel state-panel--empty">
+          <div class="drop-mark" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="32" height="32"><path d="M12 3v12m0-12 4.5 4.5M12 3 7.5 7.5M5 14v4a3 3 0 0 0 3 3h8a3 3 0 0 0 3-3v-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <h2>スクショをここに置いてください</h2>
+          <p>⌘V / Ctrl+V で貼る・ドロップ・画像を選ぶ</p>
+          <div class="entry-actions">
+            <button id="pick" class="button button--primary" type="button">画像を選ぶ</button>
+            <button id="paste-button" class="button" type="button">クリップボードから貼る</button>
+            <button id="sample" class="text-button" type="button">サンプルで試す</button>
+          </div>
+        </div>
+
+        <div id="loading" class="state-panel state-panel--loading" aria-live="polite">
+          <span class="loader" aria-hidden="true"></span>
+          <p>読み込み中…</p>
+        </div>
+
+        <div class="state-panel state-panel--ready">
+          <div class="canvas-bed"><canvas id="preview" role="img" aria-label="額縁を付けた画像" tabindex="-1"></canvas></div>
+          <div class="result-meta">
+            <strong id="output-size">出力 — × — px</strong>
+            <span id="source-info"></span>
+          </div>
+          <p id="size-note" class="size-note" hidden>元画像が大きいので、長辺を4096pxに縮めて書き出します</p>
+          <div class="output-actions">
+            <button id="download" class="button button--primary" type="button">PNGで保存</button>
+            <button id="copy" class="button" type="button">画像をコピー</button>
+            <button id="again" class="button" type="button">別の画像</button>
+          </div>
+        </div>
+
+        <div class="state-panel state-panel--error">
+          <h2>読み込めませんでした</h2>
+          <p id="error-body"></p>
+          <button id="error-again" class="button" type="button">別の画像</button>
+        </div>
+        <input id="file" class="sr-only" type="file" accept="image/*">
+        <p id="message" class="message" role="status" aria-live="polite"></p>
+      </section>
+
+      <section id="controls" class="controls-card" aria-labelledby="controls-title">
+        <div class="controls-head">
+          <div><p class="kicker">STYLE</p><h2 id="controls-title">見た目を整える</h2></div>
+          <span class="saved-note">設定は端末に保存</span>
+        </div>
+
+        <fieldset>
+          <legend>背景</legend>
+          <div id="backgrounds" class="swatches"></div>
+        </fieldset>
+
+        <fieldset>
+          <legend>比率</legend>
+          <div id="aspects" class="chips"></div>
+        </fieldset>
+
+        <div class="range-list">
+          <label class="range-control" for="padding"><span>余白</span><output id="padding-value">120px</output><input id="padding" type="range" min="0" max="100" step="1"></label>
+          <label class="range-control" for="radius"><span>角丸</span><output id="radius-value">25px</output><input id="radius" type="range" min="0" max="100" step="1"></label>
+          <label class="range-control" for="shadow"><span>影</span><output id="shadow-value">48px</output><input id="shadow" type="range" min="0" max="100" step="1"></label>
+        </div>
+
+        <label class="check-control" for="frame"><input id="frame" type="checkbox"><span aria-hidden="true"></span>ウィンドウ風の枠を付ける</label>
+      </section>
+
+      <section class="about-card" aria-labelledby="about-title">
+        <div><p class="kicker">HOW TO</p><h2 id="about-title">貼る、整える、持ち出す</h2></div>
+        <div class="about-copy">
+          <p>スクショを貼るか落とし、背景と比率を選びます。元画像は切らず、中央に置いて背景を足します。</p>
+          <p class="privacy"><strong>画像は端末の外に出ません。</strong>ブラウザの中だけで処理し、ページを閉じれば消えます。残るのは設定だけです。</p>
+        </div>
+      </section>
+    </div>
+    <div id="share"></div>
+  </main>
+  <script type="module" src="./app.js"></script>
+</body>
+</html>

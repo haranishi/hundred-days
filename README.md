@@ -35,6 +35,7 @@ AIと一緒に作りながら、「AIに任せたこと」と「自分で考え�
 | 024 | [読めない地名が、向かってくる](apps/day-024-unreadable-places/) | https://hundred-days.pages.dev/day-024-unreadable-places/ |
 | 025 | [ちかくの駐車場](apps/day-025-nearby-parking/) | https://hundred-days.pages.dev/day-025-nearby-parking/ |
 | 026 | [今夜の月](apps/day-026-tonight-moon/) | https://hundred-days.pages.dev/day-026-tonight-moon/ |
+| 027 | [スクショに額縁を](apps/day-027-screenshot-frame/) | https://hundred-days.pages.dev/day-027-screenshot-frame/ |
 
 ## 1日アプリのルール
 
