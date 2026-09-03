@@ -1,0 +1,270 @@
+:root {
+  color-scheme: light;
+  --paper: #f7f4ee;
+  --ink: #1f2328;
+  --muted: #596168;
+  --teal: #0f766e;
+  --amber: #f5a524;
+}
+
+* { box-sizing: border-box; }
+html, body { width: 1080px; height: 1920px; margin: 0; overflow: hidden; }
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: "Hiragino Sans", "Yu Gothic UI", system-ui, sans-serif;
+}
+
+#promo {
+  position: relative;
+  width: 1080px;
+  height: 1920px;
+  overflow: hidden;
+  isolation: isolate;
+  /* アプリの body と同じ配色。1080px 幅に合わせて広がりだけ伸ばしている */
+  background: radial-gradient(circle at 12% 0, #e4efea 0, transparent 820px), var(--paper);
+}
+
+#hero {
+  position: absolute;
+  z-index: 4;
+  top: 880px;
+  left: 50%;
+  will-change: transform, opacity;
+}
+#hero-card {
+  position: relative;
+  width: 864px;
+  padding: 0;
+}
+#hero-bg {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  opacity: 0;
+}
+#hero-image {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.title-scene {
+  position: absolute;
+  z-index: 10;
+  inset: 0;
+  text-align: center;
+  pointer-events: none;
+}
+.title-scene p, .title-scene h1 { position: absolute; margin: 0; }
+#challenge-label {
+  top: 1698px;
+  right: 108px;
+  left: 108px;
+  color: var(--teal);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 44px;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-align: center;
+}
+#main-title {
+  top: 655px;
+  right: 108px;
+  left: 108px;
+  font-size: 126px;
+  font-weight: 800;
+  letter-spacing: .02em;
+  line-height: 1.14;
+}
+#main-lead {
+  top: 1012px;
+  right: 108px;
+  left: 108px;
+  color: var(--muted);
+  font-size: 54px;
+  font-weight: 700;
+  letter-spacing: .01em;
+  line-height: 1.36;
+}
+
+.phone {
+  position: absolute;
+  z-index: 20;
+  top: 74px;
+  left: 204px;
+  width: 672px;
+  height: 1398px;
+  padding: 24px;
+  border: 2px solid rgba(31, 35, 40, .35);
+  border-radius: 52px;
+  background: linear-gradient(145deg, #454d54, #23282d 58%);
+  box-shadow: 0 42px 95px rgba(31, 35, 40, .3), 0 0 0 7px rgba(31, 35, 40, .12);
+  will-change: transform, opacity;
+}
+.phone-speaker {
+  position: absolute;
+  z-index: 2;
+  top: 11px;
+  left: 50%;
+  width: 116px;
+  height: 7px;
+  border-radius: 999px;
+  background: rgba(226, 230, 234, .5);
+  transform: translateX(-50%);
+}
+.phone-screen {
+  position: relative;
+  width: 624px;
+  height: 1350px;
+  overflow: hidden;
+  border-radius: 34px;
+  background: var(--paper);
+}
+#app-frame {
+  display: block;
+  width: 390px;
+  height: 844px;
+  border: 0;
+  transform: scale(1.6);
+  transform-origin: 0 0;
+  pointer-events: none;
+}
+
+#keycap {
+  position: absolute;
+  z-index: 26;
+  top: 600px;
+  left: 50%;
+  display: flex;
+  gap: 26px;
+  padding: 24px 28px;
+  border-radius: 34px;
+  background: rgba(247, 244, 238, .95);
+  box-shadow: 0 20px 48px rgba(31, 35, 40, .3);
+  opacity: 0;
+  pointer-events: none;
+}
+.key {
+  display: grid;
+  width: 132px;
+  height: 132px;
+  border: 2px solid #b7b3a9;
+  border-radius: 22px;
+  background: linear-gradient(180deg, #fffdf9, #e6e2d9);
+  box-shadow: 0 10px 0 #c6c1b6, 0 22px 34px rgba(31, 35, 40, .32);
+  color: var(--ink);
+  font-size: 62px;
+  font-weight: 800;
+  line-height: 1;
+  place-items: center;
+}
+
+#focus-rings { position: absolute; z-index: 30; inset: 0; pointer-events: none; }
+.focus-ring {
+  position: absolute;
+  display: none;
+  border: 5px solid var(--amber);
+  border-radius: 18px;
+  box-shadow: 0 0 0 4px rgba(31, 35, 40, .38), 0 0 38px rgba(245, 165, 36, .7);
+}
+#tap-ripple {
+  position: absolute;
+  z-index: 34;
+  display: none;
+  width: 92px;
+  height: 92px;
+  border: 7px solid rgba(245, 165, 36, .95);
+  border-radius: 50%;
+  background: rgba(245, 165, 36, .22);
+  box-shadow: 0 0 30px rgba(245, 165, 36, .5);
+  pointer-events: none;
+}
+
+.caption {
+  position: absolute;
+  z-index: 50;
+  top: 1510px;
+  left: 108px;
+  display: flex;
+  width: 864px;
+  min-height: 238px;
+  align-items: center;
+  justify-content: center;
+  padding: 30px 44px;
+  border: 1px solid rgba(255, 255, 255, .12);
+  border-radius: 34px;
+  background: rgba(31, 35, 40, .88);
+  color: #fffdf6;
+  font-size: 68px;
+  font-weight: 750;
+  letter-spacing: .01em;
+  line-height: 1.42;
+  text-align: center;
+  transform-origin: 50% 60%;
+}
+.caption.hook {
+  top: 1340px;
+  right: 108px;
+  left: 108px;
+  width: auto;
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--ink);
+  font-size: 76px;
+  font-weight: 800;
+  line-height: 1.34;
+}
+
+.promise-scene {
+  position: absolute;
+  z-index: 12;
+  top: 740px;
+  right: 108px;
+  left: 108px;
+  text-align: center;
+}
+.promise-scene p {
+  margin: 0 0 84px;
+  font-size: 62px;
+  font-weight: 750;
+  line-height: 1.45;
+}
+.promise-scene .teal { margin-bottom: 0; color: var(--teal); font-weight: 800; }
+
+.end-scene {
+  position: absolute;
+  z-index: 12;
+  top: 866px;
+  right: 108px;
+  left: 108px;
+  text-align: center;
+}
+.end-scene h2 {
+  margin: 0 0 78px;
+  font-size: 106px;
+  font-weight: 800;
+  letter-spacing: .02em;
+  line-height: 1.14;
+}
+.end-scene .url {
+  margin: 0 0 86px;
+  color: var(--teal);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 44px;
+  font-weight: 700;
+  line-height: 1.5;
+}
+.end-scene .day { margin: 0; color: var(--muted); font-size: 48px; font-weight: 700; letter-spacing: .04em; }
+
+#fade-black {
+  position: absolute;
+  z-index: 100;
+  inset: 0;
+  background: #1f2328;
+  opacity: 0;
+  pointer-events: none;
+}
