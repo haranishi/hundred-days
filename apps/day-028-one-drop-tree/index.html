@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ひとしずくの木</title>
+  <meta name="description" content="1日1回、水をあげた日だけ育つ、端末の中の小さな木です。">
+  <meta name="share:text" content="ひとしずくの木 — 1日1回、水をあげるだけで育つ木。端末の中だけで育ちます">
+  <link rel="stylesheet" href="./app.css">
+  <link rel="stylesheet" href="./shared/share.css">
+  <script src="./shared/share.js" defer></script>
+</head>
+<body>
+  <header class="site-head">
+    <p class="eyebrow">DAY 028 · ONE DROP TREE</p>
+    <h1>ひとしずくの木</h1>
+    <p class="site-description">1日1回、水をあげる。それだけで育つ木。</p>
+  </header>
+
+  <main id="app" data-state="seed" data-can-water="true" data-growing="false" data-replaying="false">
+    <div class="notice-stack">
+      <p id="storage-error" class="notice" role="status" hidden>この環境では木を保存できません。閉じると消えますが、その場では育ちます</p>
+      <p id="data-notice" class="notice" role="status" hidden>保存データが読めなかったので、新しい種から始めます</p>
+    </div>
+
+    <div class="workspace">
+      <div class="column column--main">
+      <section class="plant-card" aria-label="育てている木">
+        <div class="canvas-bed">
+          <canvas id="plant" role="img" tabindex="-1" aria-label="鉢に植えた種"></canvas>
+        </div>
+      </section>
+      </div>
+      <div class="column column--side">
+      <section class="care-card" aria-labelledby="care-title">
+        <p class="kicker">TODAY</p>
+        <h2 id="care-title" class="sr-only">今日のひとしずく</h2>
+        <p id="status" class="status">まだ種です。水をあげると芽が出ます</p>
+        <p id="age" class="age"></p>
+        <p id="message" class="message" role="status" aria-live="polite"></p>
+        <button id="water" class="button button--primary" type="button" data-done="false">水をあげる</button>
+        <div class="secondary-actions">
+          <button id="replay" class="button" type="button" disabled>成長を見る</button>
+          <button id="save" class="button" type="button" disabled>画像で保存</button>
+        </div>
+        <p id="seed-note" class="hint">成長を見る・画像で保存は、芽が出ると使えます</p>
+      </section>
+
+      <section class="about-card" aria-labelledby="about-title">
+        <div>
+          <p class="kicker">HOW TO</p>
+          <h2 id="about-title">水をあげる、育つ、また明日</h2>
+        </div>
+        <p>「水をあげる」を押すと、その日のぶんだけ育ちます。<span class="keep">1日1回</span>まで。忘れた日があってもしおれるだけで、枯れも、やり直しもありません。</p>
+        <p class="privacy"><strong>木は端末の中だけで育ちます。</strong>通信なし・登録なし・通知なし。端末に残るのは、木の種（乱数の番号）と水をあげた日付だけです。</p>
+      </section>
+
+      <section class="reset-card" aria-label="木をやり直す">
+        <button id="reset" class="text-button" type="button">最初からやり直す</button>
+        <div id="reset-confirm" class="reset-confirm" hidden>
+          <p>この木を手放して、新しい種から始めますか？ 水をあげた日の記録も消えます</p>
+          <div>
+            <button id="reset-no" class="button" type="button">やめる</button>
+            <button id="reset-yes" class="button button--danger" type="button">手放す</button>
+          </div>
+        </div>
+      </section>
+      </div>
+    </div>
+    <div id="share"></div>
+  </main>
+  <script type="module" src="./app.js"></script>
+</body>
+</html>

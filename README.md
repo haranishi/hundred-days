@@ -36,6 +36,7 @@ AIと一緒に作りながら、「AIに任せたこと」と「自分で考え�
 | 025 | [ちかくの駐車場](apps/day-025-nearby-parking/) | https://hundred-days.pages.dev/day-025-nearby-parking/ |
 | 026 | [今夜の月](apps/day-026-tonight-moon/) | https://hundred-days.pages.dev/day-026-tonight-moon/ |
 | 027 | [スクショに額縁を](apps/day-027-screenshot-frame/) | https://hundred-days.pages.dev/day-027-screenshot-frame/ |
+| 028 | [ひとしずくの木](apps/day-028-one-drop-tree/) | https://hundred-days.pages.dev/day-028-one-drop-tree/ |
 
 ## 1日アプリのルール
 
