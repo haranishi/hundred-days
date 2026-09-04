@@ -1,0 +1,157 @@
+:root {
+  --paper: #f6f1e7;
+  --surface: #fffaf1;
+  --ink: #2b2a28;
+  --muted: #615e56;
+  --line: #c9c0ae;
+  --primary: #2f7d4f;
+  --primary-dark: #235f3c;
+  --soft-green: #e3ecde;
+  --terracotta: #c9714f;
+  --focus: #175f87;
+  --danger: #8c3f32;
+}
+
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html { min-width: 0; background: var(--paper); color: var(--ink); }
+body {
+  min-width: 0;
+  margin: 0;
+  overflow-x: hidden;
+  background:
+    radial-gradient(circle at 8% 4%, rgba(143, 207, 106, .16), transparent 24rem),
+    linear-gradient(180deg, #faf6ed 0, var(--paper) 32rem) var(--paper);
+  color: var(--ink);
+  font-family: system-ui, -apple-system, "Hiragino Sans", "Noto Sans JP", sans-serif;
+  font-size: 16px;
+  line-height: 1.65;
+}
+button { font: inherit; cursor: pointer; }
+button:focus-visible, a:focus-visible, #plant:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 3px;
+}
+button:disabled { cursor: not-allowed; }
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+h1, h2, p { margin-top: 0; }
+p, .about-card { text-wrap: pretty; }
+.about-card p, .status, .message { word-break: auto-phrase; }
+.keep { white-space: nowrap; }
+
+.site-head, #app { width: min(100% - 32px, 1180px); margin-inline: auto; }
+.site-head { padding: 22px 0 15px; }
+.site-head h1 { margin: 0; font-size: clamp(2rem, 5vw, 3.1rem); letter-spacing: -.045em; line-height: 1.1; }
+.site-description { margin: 7px 0 0; color: var(--muted); }
+.eyebrow, .kicker {
+  margin-bottom: 4px;
+  color: var(--primary-dark);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 12px;
+  font-weight: 750;
+  letter-spacing: .12em;
+}
+#app { margin-bottom: 48px; }
+.notice-stack { display: grid; gap: 8px; margin-bottom: 12px; }
+.notice { margin: 0; padding: 10px 14px; border: 1px solid #a56f32; border-radius: 10px; background: #fff5df; color: #674014; font-weight: 700; }
+.workspace { display: grid; gap: 16px; align-items: start; }
+/* 900px未満は列の入れ物を消して1列に並べる（順：木→TODAY→HOW TO→やり直し）。900px以上で列に戻す */
+.column { display: contents; }
+.plant-card { order: 1; }
+.care-card { order: 2; }
+.about-card { order: 3; }
+.reset-card { order: 4; }
+.plant-card, .care-card, .about-card, .reset-card {
+  min-width: 0;
+  border: 1px solid var(--line);
+  border-radius: 18px 14px 20px 13px;
+  background: rgba(255, 250, 241, .96);
+  box-shadow: 0 14px 35px rgba(76, 59, 39, .08);
+}
+.plant-card { width: min(100%, 584px); margin-inline: auto; padding: 12px; }
+.canvas-bed {
+  display: flex;
+  align-items: flex-end;
+  width: min(100%, 560px);
+  margin: auto;
+  overflow: hidden;
+  border-radius: 13px 17px 12px 19px;
+  background: radial-gradient(circle at 50% 75%, #fffdf6 0, #f0eadc 68%, #ebe2d1 100%);
+  transition: height .5s ease;
+}
+#plant { display: block; flex: none; width: 100%; height: auto; aspect-ratio: 1; }
+.care-card { padding: 20px; }
+.about-card h2 { margin: 0; font-size: 1.25rem; line-height: 1.35; }
+.status { margin: 16px 0 0; color: var(--ink); font-size: 1.35rem; font-weight: 750; font-variant-numeric: tabular-nums; line-height: 1.4; }
+.age { margin: 2px 0 0; color: var(--muted); font-size: .88rem; font-variant-numeric: tabular-nums; }
+.age:empty { display: none; }
+.message { min-height: 1.65em; margin: 8px 0 10px; color: var(--primary-dark); font-size: .92rem; font-weight: 700; }
+.hint { margin: 10px 0 0; color: var(--muted); font-size: .86rem; }
+#app[data-state="ready"] #seed-note { display: none; }
+#app[data-state="seed"] .reset-card { display: none; }
+.button, .text-button {
+  min-width: 44px;
+  border: 1px solid #69665f;
+  border-radius: 11px;
+  background: var(--surface);
+  color: var(--ink);
+  padding: 9px 16px;
+  font-weight: 750;
+  transition: background-color 180ms ease, border-color 180ms ease, color 180ms ease;
+}
+.button { min-height: 48px; }
+.text-button { min-height: 44px; }
+.button:not(.button--primary):disabled, .text-button:disabled {
+  border-color: #c9c0ae;
+  color: #6b6862;
+  opacity: 1;
+}
+.button:hover:not(:disabled) { border-color: var(--primary); background: var(--soft-green); }
+.button--primary { width: 100%; min-height: 54px; border-color: var(--primary-dark); background: var(--primary); color: #fff; font-size: 1.05rem; }
+.button--primary[data-done="true"]:disabled { border-color: var(--primary); background: var(--soft-green); color: var(--primary-dark); opacity: 1; }
+#app[data-growing="true"] .button--primary:disabled { border-color: var(--primary-dark); background: var(--primary); color: #fff; opacity: .8; }
+.button--primary:hover:not(:disabled) { border-color: #19492d; background: var(--primary-dark); }
+.button--danger { border-color: var(--danger); color: var(--danger); }
+.secondary-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-top: 8px; }
+.about-card { display: grid; gap: 10px; padding: 18px 20px; }
+.about-card p { margin: 0; color: var(--muted); }
+.about-card .privacy { padding-top: 10px; border-top: 1px solid var(--line); color: var(--ink); }
+.reset-card { padding: 10px 14px; }
+.text-button { border-color: transparent; background: transparent; color: var(--primary-dark); text-decoration: underline; text-underline-offset: 3px; }
+.text-button:hover:not(:disabled) { background: var(--soft-green); }
+.reset-confirm { padding: 8px 0 4px; border-top: 1px solid var(--line); }
+.reset-confirm p { margin-bottom: 10px; }
+.reset-confirm > div { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+#app[data-growing="true"] .canvas-bed { border-color: var(--primary); }
+
+@media (min-width: 900px) {
+  .workspace { grid-template-columns: minmax(0, 1.25fr) minmax(340px, .9fr); }
+  /* 左列＝木、右列＝TODAY→HOW TO→やり直し */
+  .column { display: grid; min-width: 0; gap: 12px; align-content: start; }
+  .plant-card { justify-self: center; }
+  .care-card { padding: 18px 20px; }
+  .about-card { padding-block: 15px; }
+  .status { margin-top: 12px; }
+}
+
+@media (max-width: 480px) {
+  .site-head, #app { width: min(100% - 24px, 1180px); }
+  .site-head { padding-top: 18px; }
+  .plant-card { width: min(100%, 576px); padding: 8px; }
+  .care-card, .about-card { padding: 16px; }
+  .secondary-actions { grid-template-columns: 1fr; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; animation: none !important; transition: none !important; }
+}
