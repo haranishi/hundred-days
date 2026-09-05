@@ -307,7 +307,8 @@ test('Day 029 › 操作要素は44px以上', async ({ page }) => {
   const sizes = await page.locator('#locate, #search, .filter, .spot-main, .maps, .wifi-marker').evaluateAll((nodes) => nodes.map((node) => {
     const rect = node.getBoundingClientRect(); return { width: rect.width, height: rect.height, name: node.className || node.id };
   }));
-  expect(sizes.every((size) => size.width >= 44 && size.height >= 44), JSON.stringify(sizes)).toBe(true);
+  // MapLibre のピンは transform の丸めで 43.99…px と測れることがある（CI の Linux で実測）。整数に丸めて比べる
+  expect(sizes.every((size) => Math.round(size.width) >= 44 && Math.round(size.height) >= 44), JSON.stringify(sizes)).toBe(true);
 });
 
 test('Day 029 › 通信先は同一オリジンとOpenFreeMapだけでWi-Fi中継を呼ばない', async ({ page }) => {
