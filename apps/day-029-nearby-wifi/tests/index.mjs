@@ -1,0 +1,9 @@
+import './normalize.test.mjs';
+import './geo.test.mjs';
+import './storage.test.mjs';
+import './state.test.mjs';
+import './municipal.test.mjs';
+import './osm.test.mjs';
+import './nominatim.test.mjs';
+import './place.test.mjs';
+import './ui.test.mjs';

@@ -147,14 +147,17 @@ const CONNECT_BY_APP = {
   /* day-025 が外へ出るのは地図タイルだけ。Overpass と Nominatim は
      functions/api/day-025/ の中継を通すので 'self' で足りる（利用方針がUser-Agentと
      キャッシュを求めており、ブラウザからは満たせないため） */
-  'day-025-nearby-parking': 'https://tiles.openfreemap.org'
+  'day-025-nearby-parking': 'https://tiles.openfreemap.org',
+  // day-029 はWi-Fiデータを同梱し、地名検索だけ中継する。ブラウザが外へ出るのは地図タイルだけ
+  'day-029-nearby-wifi': 'https://tiles.openfreemap.org'
 };
 
 /* day-025 の MapLibre は blob: から Web Worker を起こす。
    worker-src は child-src → script-src → default-src の順に落ちるので、
    'self' のままだと地図が黙って出ない。 */
 const WORKER_BY_APP = {
-  'day-025-nearby-parking': "worker-src blob:"
+  'day-025-nearby-parking': "worker-src blob:",
+  'day-029-nearby-wifi': "worker-src blob:"
 };
 
 /* day-021 は局のストリーム（audio）とロゴ画像をAPI由来の任意のhttpsホストから読む。
@@ -165,7 +168,8 @@ const MEDIA_BY_APP = {
 const IMG_BY_APP = {
   'day-021-nearby-radio': ' https:',
   // スプライト画像をタイル配信元から読む
-  'day-025-nearby-parking': ' https://tiles.openfreemap.org'
+  'day-025-nearby-parking': ' https://tiles.openfreemap.org',
+  'day-029-nearby-wifi': ' https://tiles.openfreemap.org'
 };
 
 const appCsp = (dir) => [

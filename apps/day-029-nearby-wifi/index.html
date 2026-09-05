@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="現在地か地名から、自治体公式・OpenStreetMap登録・チェーン推定の3層で近くのWi-Fi候補を探します。">
+  <meta name="share:text" content="ちかくのWi-Fi — いまいる場所から、Wi-Fiが使える場所へ。行き先はGoogleマップで">
+  <title>ちかくのWi-Fi</title>
+  <link rel="stylesheet" href="./vendor/maplibre-gl.css">
+  <link rel="stylesheet" href="./app.css">
+  <link rel="stylesheet" href="./shared/share.css">
+  <script src="./vendor/maplibre-gl.js" defer></script>
+  <script src="./shared/share.js" defer></script>
+  <script type="module" src="./app.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#list">検索結果へ移動</a>
+  <header class="site-head">
+    <p class="eyebrow">DAY 029 · NEARBY WIFI</p>
+    <h1>ちかくのWi-Fi</h1>
+    <p class="site-description">いまいる場所から、Wi-Fiが使える場所へ。</p>
+  </header>
+
+  <main id="app" data-state="empty">
+    <div class="workspace">
+      <section class="search-card" aria-labelledby="search-title">
+        <div>
+          <p class="kicker">FIND</p>
+          <h2 id="search-title">どこで探しますか</h2>
+        </div>
+        <button id="locate" class="button button--primary" type="button">現在地から探す</button>
+        <form id="place-form" class="place-form" role="search" novalidate>
+          <label for="place">地名から探す</label>
+          <div class="place-row">
+            <input id="place" name="place" type="search" minlength="2" placeholder="例：秋田駅" autocomplete="off">
+            <button id="search" class="button" type="submit">探す</button>
+          </div>
+        </form>
+        <p id="message" class="message" role="status" aria-live="polite"></p>
+        <div id="none" hidden>
+          <p id="none-body"></p>
+          <button id="widen" class="button button--ghost" type="button">3.2kmに広げる</button>
+          <button id="layers-on" class="button" type="button" hidden>層を全部つける</button>
+          <button id="free-off" class="button" type="button" hidden>絞り込みを外す</button>
+          <button id="to-place" class="button" type="button" hidden>地名で探す</button>
+        </div>
+        <div id="error" role="alert" hidden>
+          <p id="error-body"></p>
+          <button id="retry" class="button button--ghost" type="button">もう一度探す</button>
+        </div>
+        <div id="place-result" class="place-result" role="status" hidden>
+          <p id="place-result-label"></p>
+          <div id="place-candidates" class="place-candidates" aria-label="地名の候補"></div>
+        </div>
+        <div id="last" class="last-search" hidden>
+          <p id="last-label"></p>
+          <button id="search-last" class="text-button" type="button">もう一度探す</button>
+        </div>
+      </section>
+
+      <section class="map-card" aria-label="Wi-Fiスポットの地図">
+        <div id="map" aria-label="Wi-Fiスポットと検索地点を示す地図"></div>
+        <p id="map-status" role="status">地図を読み込んでいます…</p>
+        <div class="map-legend" aria-label="Wi-Fi利用区分の凡例">
+          <span><i data-layer="municipal"></i>自治体</span>
+          <span><i data-fee="free"></i>OSM登録 無料</span>
+          <span><i data-fee="customers"></i>来店客向け</span>
+          <span><i data-fee="paid"></i>有料</span>
+          <span><i data-fee="unknown"></i>不明</span>
+          <span><i data-layer="chain"></i>推定</span>
+        </div>
+      </section>
+
+      <section class="results-card" aria-labelledby="results-title">
+        <div class="results-head">
+          <div>
+            <p class="kicker">NEARBY</p>
+            <h2 id="results-title">近くの候補</h2>
+          </div>
+          <div class="filters" aria-label="表示するデータの絞り込み">
+            <fieldset class="layer-filters">
+              <legend>表示する層</legend>
+              <label class="filter"><input id="layer-municipal" type="checkbox" checked><span>自治体</span></label>
+              <label class="filter"><input id="layer-osm" type="checkbox" checked><span>OSM登録</span></label>
+              <label class="filter"><input id="layer-chain" type="checkbox" checked><span>推定</span></label>
+            </fieldset>
+            <label class="filter filter--free"><input id="only-free" type="checkbox"><span id="only-free-label">無料と来店客向けだけ</span></label>
+          </div>
+        </div>
+
+        <div class="state-box">
+          <p id="empty">現在地から探すか、地名を入れてください</p>
+          <p id="loading" role="status" aria-live="polite" hidden>探しています…</p>
+          <p id="summary" role="status" aria-live="polite" hidden></p>
+          <p id="state-hint" hidden></p>
+          <button id="radius-toggle" class="button button--ghost" type="button" hidden>3.2kmに広げる</button>
+        </div>
+        <ol id="list" aria-label="距離順のWi-Fiスポット"></ol>
+      </section>
+    </div>
+
+    <section class="about-card" aria-labelledby="about-title">
+      <div>
+        <p class="kicker">ABOUT THE DATA</p>
+        <h2 id="about-title">登録された場所を探す道具です</h2>
+      </div>
+      <p>場所は OpenStreetMap と自治体の公開データに載っているものだけです。載っていない店や施設もたくさんあります。無料・有料の区分も登録どおりで、実際の条件は店で確認してください。</p>
+      <div>
+        <h3>チェーン推定について</h3>
+        <p>色つきの「推定」ピンは、OpenStreetMapに登録されたブランド名から「無料Wi-Fiがありそう」と推定して表示しています。各店舗のWi-Fiの有無を調べたものではありません。ブランドごとの提供状況は<span id="chain-checked-at">読込後</span>に各社公式サイトで確認しました。</p>
+        <ul id="chain-list" class="chain-list"></ul>
+      </div>
+      <p>現在地はどこにも送りません。端末に残すのは、約110mに丸めた前回の地点と絞り込みだけです。地名検索を使うときだけ、入力した地名を中継サーバーへ送ります。</p>
+      <div class="sources">
+        <h3>出典</h3>
+        <ul id="credits">
+          <li><a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">© OpenStreetMap contributors</a></li>
+          <li><a href="https://opendatacommons.org/licenses/odbl/1-0/" target="_blank" rel="noopener noreferrer">Open Database License (ODbL) 1.0</a></li>
+          <li><a href="https://openfreemap.org/" target="_blank" rel="noopener noreferrer">地図タイル: OpenFreeMap © OpenMapTiles Data from OpenStreetMap</a></li>
+          <li>地名検索: Nominatim</li>
+        </ul>
+      </div>
+    </section>
+    <div id="share"></div>
+  </main>
+</body>
+</html>

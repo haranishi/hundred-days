@@ -41,3 +41,6 @@ apps/*/tools/promo/promo-audio.wav
 apps/*/tools/promo/promo.mp4
 apps/*/tools/promo/preview-contact.jpg
 apps/*/tools/promo/promo-first-frame.png
+
+# 用途違いで不採用にした先行試作の退避先（Day 029 の家の中を測る試作）。追跡しない
+.drafts/

@@ -1,0 +1,21 @@
+{
+  "_note": "これは本アプリ独自の推定であり各社の公式情報ではない。ブランド名から「無料Wi-Fiがありそう」と推定するための対応表。各社の提供状況は checkedAt の日に公式サイトで確認したもので、店舗ごとの提供有無は調べていない。表示の主語はブランドにし、確認日を必ず添える。",
+  "checkedAt": "2026-09-04",
+  "chains": [
+    { "id": "gusto", "label": "ガスト", "brandWikidata": ["Q87724117"], "tier": "all", "service": ".Wi2_Free_at_[SK.GROUP]", "access": "none", "condition": "登録不要。1回60分・回数制限なし", "coverage": "全店", "sourceUrl": "https://www.skylark.co.jp/wi-fi/" },
+    { "id": "jonathans", "label": "ジョナサン", "brandWikidata": ["Q11310628"], "tier": "all", "service": ".Wi2_Free_at_[SK.GROUP]", "access": "none", "condition": "登録不要。1回60分・回数制限なし", "coverage": "全店", "sourceUrl": "https://www.skylark.co.jp/wi-fi/" },
+    { "id": "lawson", "label": "ローソン", "brandWikidata": ["Q1557223"], "tier": "all", "service": "LAWSON_Free_Wi-Fi", "access": "email", "condition": "初回のみメール登録。1回60分・1日5回まで", "coverage": "一部店舗を除く全国", "sourceUrl": "https://www.lawson.co.jp/sp/service/others/wifi/index.html" },
+    { "id": "donki", "label": "ドン・キホーテ", "brandWikidata": ["Q1185381"], "tier": "all", "service": "DONKI Free Wi-Fi", "access": "none", "condition": "事前登録不要。時間・回数の制限は非公開", "coverage": "各店舗", "sourceUrl": "https://qa.ppih.co.jp/faq/show/6183?site_domain=donki" },
+    { "id": "kaikatsu", "label": "快活CLUB", "brandWikidata": ["Q88299591"], "tier": "all", "service": "kaikatsu-wifi", "access": "password", "condition": "入店・席の利用が前提。店内掲示のパスワードで接続", "coverage": "店内に完備", "sourceUrl": "https://www.kaikatsu.jp/faq/" },
+    { "id": "starbucks", "label": "スターバックス", "brandWikidata": ["Q37158"], "tier": "all", "service": "at_STARBUCKS_Wi2", "access": "none", "condition": "規約に同意するだけ。1回1時間・繰り返し可", "coverage": "全国の店舗（一部を除く）", "sourceUrl": "https://store.starbucks.co.jp/" },
+    { "id": "mcdonalds", "label": "マクドナルド", "brandWikidata": ["Q38076"], "tier": "partial", "service": "00_MCD-FREE-WIFI", "access": "account", "condition": "会員登録またはログインが必要。1回60分", "coverage": "一部店舗（都市部を中心に）", "sourceUrl": "https://www.mcdonalds.co.jp/shop/mcdwifi/" },
+    { "id": "doutor", "label": "ドトールコーヒーショップ", "brandWikidata": ["Q11322732"], "tier": "partial", "service": "DOUTOR_FREE_Wi-Fi", "access": "none", "condition": "規約に同意。1回60分（再認証で再接続）", "coverage": "一部店舗（約1,000店）", "sourceUrl": "https://www.doutor.co.jp/dcs/service/images/doutor_free_wi-fi.pdf" },
+    { "id": "excelsior", "label": "エクセルシオール カフェ", "brandWikidata": ["Q11289828"], "tier": "partial", "service": "DOUTOR_FREE_Wi-Fi", "access": "none", "condition": "ドトールと共通。規約に同意・1回60分", "coverage": "一部店舗", "sourceUrl": "https://www.doutor.co.jp/news/newsrelease/detail/20191105175734.html" },
+    { "id": "tullys", "label": "タリーズコーヒー", "brandWikidata": ["Q3541983"], "tier": "partial", "service": "tullys_Wi-Fi", "access": "none", "condition": "誰でも利用可。時間・回数は非公開", "coverage": "ステッカー掲出店のみ", "sourceUrl": "https://www.tullys.co.jp/wifi/" },
+    { "id": "komeda", "label": "コメダ珈琲店", "brandWikidata": ["Q11302679"], "tier": "partial", "service": "Komeda_Wi-Fi", "access": "email", "condition": "メール登録またはSNS認証が必要", "coverage": "店舗ごとに異なる", "sourceUrl": "https://www.komeda.co.jp/service/convenient.html" },
+    { "id": "pronto", "label": "プロント", "brandWikidata": ["Q11336224"], "tier": "partial", "service": "PRONTO_FREE_Wi-Fi", "access": "email", "condition": "メールアドレスの入力が必要", "coverage": "サービス欄にアイコンのある店舗", "sourceUrl": "https://www.pronto.co.jp/service/freewifi.html" },
+    { "id": "matsuya", "label": "松屋", "brandWikidata": ["Q848773"], "tier": "partial", "service": "matsuyaguest", "access": "password", "condition": "卓上シールのパスワードが必要", "coverage": "一部店舗（PA店舗・サテライト店は対象外）", "sourceUrl": "https://www.matsuyafoods.co.jp/whatsnew/topics/49934.html" },
+    { "id": "itoyokado", "label": "イトーヨーカドー", "brandWikidata": ["Q3088746"], "tier": "partial", "service": "Ito-Yokado Tourist", "access": "none", "condition": "登録不要。1回30分・1日6回まで", "coverage": "全店か一部かの明記なし", "sourceUrl": "https://www.itoyokado.co.jp/special/global/en/service/" },
+    { "id": "familymart", "label": "ファミリーマート", "brandWikidata": ["Q11247682", "Q1191685"], "tier": "partial", "service": "d Wi-Fi（0001docomo / 0000docomo）", "access": "account", "condition": "ドコモの d Wi-Fi。dアカウントの登録が必要で、ドコモ回線が無くても一定時間無料", "coverage": "不明（自社Wi-Fiは2022年8月に終了）", "sourceUrl": "https://www.family.co.jp/services/other/wi-fi.html" }
+  ]
+}
