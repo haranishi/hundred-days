@@ -1,0 +1,339 @@
+[
+    {
+        "id": "tokyo",
+        "org": "東京都",
+        "title": "公衆無線LANアクセスポイント一覧（FREE Wi-Fi & TOKYO）",
+        "pageUrl": "https://catalog.data.metro.tokyo.lg.jp/dataset/t000029d0000000025",
+        "fileUrl": "https://www.opendata.metro.tokyo.lg.jp/suisyoudataset/130001_public_wireless_lan_20240901.csv",
+        "localName": "東京都.csv",
+        "license": "CC BY 4.0",
+        "licenseUrl": "https://creativecommons.org/licenses/by/4.0/deed.ja",
+        "credit": "このデータベースは、以下の著作物を改変して利用しています。公衆無線LANアクセスポイント一覧（FREE Wi-Fi & TOKYO）、東京都、クリエイティブ・コモンズ・ライセンス 表示4.0国際（https://creativecommons.org/licenses/by/4.0/deed.ja）。",
+        "encoding": "shift_jis",
+        "columns": {
+            "name": "名称",
+            "lat": "緯度",
+            "lng": "経度",
+            "address": "住所",
+            "ssid": "SSID",
+            "operator": "設置者",
+            "area": "提供エリア",
+            "addressParts": [
+                "都道府県名",
+                "市区町村名",
+                "住所"
+            ]
+        },
+        "fixes": {
+            "swapLatLng": "auto"
+        },
+        "notes": "配布ページはUTF-8表記だが、実ファイルはShift_JIS。"
+    },
+    {
+        "id": "osaka",
+        "org": "大阪府",
+        "title": "公衆無線LANアクセスポイント一覧",
+        "pageUrl": "https://data.bodik.jp/dataset/270008_public_wireless_lan",
+        "fileUrl": "https://data.bodik.jp/dataset/d134ce1d-9ff5-4d63-88d4-25ac19b8bc14/resource/4f3a12fc-3618-431e-84b2-5e8d5f5a0eb4/download/270008_public_wireless_lan.csv",
+        "localName": "大阪府.csv",
+        "license": "CC BY 4.0",
+        "licenseUrl": "https://creativecommons.org/licenses/by/4.0/deed.ja",
+        "credit": "「公衆無線LANアクセスポイント一覧」（大阪府）（https://data.bodik.jp/dataset/270008_public_wireless_lan）を加工して作成",
+        "encoding": "utf-8",
+        "columns": {
+            "name": "名称",
+            "lat": "緯度",
+            "lng": "経度",
+            "address": "所在地_連結表記",
+            "ssid": "SSID",
+            "operator": "設置者",
+            "area": "提供エリア",
+            "addressParts": [
+                "所在地_都道府県",
+                "所在地_市区町村",
+                "所在地_町字",
+                "所在地_番地以下"
+            ]
+        },
+        "fixes": {
+            "swapLatLng": "auto"
+        },
+        "notes": "大阪市分を含むため大阪市データは別途収録しない。小数点欠落の経度1件を除外する。"
+    },
+    {
+        "id": "okinawa",
+        "org": "沖縄県",
+        "title": "沖縄県公衆無線LANアクセスポイント一覧（Be.Okinawa Free Wi-Fi）",
+        "pageUrl": "https://data.bodik.jp/dataset/470007_beokinawa",
+        "fileUrl": "https://data.bodik.jp/dataset/d99032ee-bd2c-41af-9fd5-391819dcf7b0/resource/b3e62094-e907-41b9-bff4-803d55e28ce6/download/470007_public-wireless-lan_20251119.csv",
+        "localName": "沖縄県.csv",
+        "license": "CC BY 4.0",
+        "licenseUrl": "https://creativecommons.org/licenses/by/4.0/deed.ja",
+        "credit": "「沖縄県公衆無線LANアクセスポイント一覧（Be.Okinawa Free Wi-Fi）」（沖縄県）（https://data.bodik.jp/dataset/470007_beokinawa）を加工して作成",
+        "encoding": "utf-8",
+        "columns": {
+            "name": "名称",
+            "lat": "緯度",
+            "lng": "経度",
+            "address": "所在地_連結表記",
+            "ssid": "SSID",
+            "operator": "設置者",
+            "area": "提供エリア",
+            "addressParts": [
+                "所在地_都道府県",
+                "所在地_市区町村",
+                "所在地_町字",
+                "所在地_番地以下"
+            ]
+        },
+        "fixes": {
+            "swapLatLng": "auto"
+        },
+        "notes": "一部行の緯度経度が逆のため自動入替する。SSIDは空欄。"
+    },
+    {
+        "id": "kyoto-city",
+        "org": "京都市",
+        "title": "【京都市】公衆無線LANアクセスポイント一覧",
+        "pageUrl": "https://data.bodik.jp/dataset/261009_",
+        "fileUrl": "https://data.bodik.jp/dataset/b41a2794-37fd-4d09-9a68-2893890555a7/resource/a0dad501-39db-4ec4-bad6-8e9f1f916a97/download/261009_public_wireless_lan.csv",
+        "localName": "京都市.csv",
+        "license": "CC BY 4.0",
+        "licenseUrl": "https://creativecommons.org/licenses/by/4.0/deed.ja",
+        "credit": "「【京都市】公衆無線LANアクセスポイント一覧」（京都市）（https://data.bodik.jp/dataset/261009_）を加工して作成",
+        "encoding": "shift_jis",
+        "columns": {
+            "name": "名称",
+            "lat": "緯度",
+            "lng": "経度",
+            "address": "所在地_連結表記",
+            "ssid": "SSID",
+            "operator": "設置者",
+            "area": "提供エリア",
+            "addressParts": [
+                "所在地_都道府県",
+                "所在地_市区町村",
+                "所在地_町字",
+                "所在地_番地以下"
+            ]
+        },
+        "fixes": {
+            "swapLatLng": "auto"
+        },
+        "notes": "SSIDは空欄。"
+    },
+    {
+        "id": "shiga",
+        "org": "滋賀県",
+        "title": "公衆無線LANアクセスポイント一覧（びわ湖 Free Wi-Fi）",
+        "pageUrl": "https://data.bodik.jp/dataset/250007_public_wireless_lan",
+        "fileUrl": "https://biwako-wifi-info.jp/biwakofreewifi_ap.csv",
+        "localName": "滋賀県.csv",
+        "license": "CC BY 4.0",
+        "licenseUrl": "https://creativecommons.org/licenses/by/4.0/deed.ja",
+        "credit": "「公衆無線LANアクセスポイント一覧（びわ湖 Free Wi-Fi）」（滋賀県）（https://data.bodik.jp/dataset/250007_public_wireless_lan）を加工して作成",
+        "encoding": "utf-8",
+        "columns": {
+            "name": "名称",
+            "lat": "緯度",
+            "lng": "経度",
+            "address": "住所",
+            "ssid": "SSID",
+            "operator": "Wi-FIサービス提供事業者",
+            "area": null,
+            "addressParts": [
+                "都道府県",
+                "市区町村",
+                "住所"
+            ]
+        },
+        "fixes": {
+            "swapLatLng": "auto"
+        },
+        "notes": "範囲外の緯度1件を除外する。同一施設の複数APが多い。"
+    },
+    {
+        "id": "kumamoto",
+        "org": "熊本県",
+        "title": "熊本県「くまもとフリーWi-Fi」設置箇所一覧",
+        "pageUrl": "https://data.bodik.jp/dataset/430005_05",
+        "fileUrl": "https://data.bodik.jp/dataset/94e91746-4cd9-4854-b13c-80225ec4342e/resource/07c63115-7a15-4321-9496-28c1566ca045/download/5_wi-ficsv2026.7.1.csv",
+        "localName": "熊本県.csv",
+        "license": "CC BY 4.0",
+        "licenseUrl": "https://creativecommons.org/licenses/by/4.0/deed.ja",
+        "credit": "「熊本県「くまもとフリーWi-Fi」設置箇所一覧」（熊本県）（https://data.bodik.jp/dataset/430005_05）を加工して作成",
+        "encoding": "utf-8",
+        "columns": {
+            "name": "名称",
+            "lat": "緯度",
+            "lng": "経度",
+            "address": "所在地_連結表記",
+            "ssid": "SSID",
+            "operator": "設置者",
+            "area": "提供エリア",
+            "addressParts": [
+                "所在地_都道府県",
+                "所在地_市区町村",
+                "所在地_町字",
+                "所在地_番地以下"
+            ]
+        },
+        "fixes": {
+            "swapLatLng": "auto"
+        },
+        "notes": "新28列形式。熊本市データはこのv1の対象外。"
+    },
+    {
+        "id": "hiroshima-city",
+        "org": "広島市",
+        "title": "広島市_公衆無線ＬＡＮアクセスポイント一覧",
+        "pageUrl": "https://hiroshima-opendata.dataeye.jp/datasets/1248",
+        "fileUrl": "https://hiroshima-opendata.dataeye.jp/datasets/1248",
+        "localName": "広島市.csv",
+        "license": "PDL1.0",
+        "licenseUrl": "https://www.digital.go.jp/resources/open_data/public_data_license_v1.0",
+        "credit": "「広島市_公衆無線ＬＡＮアクセスポイント一覧」（広島広域都市圏・広島県オープンデータポータルサイト）（https://hiroshima-opendata.dataeye.jp/datasets/1248）を加工して作成",
+        "encoding": "utf-8",
+        "columns": {
+            "name": "名称",
+            "lat": "緯度",
+            "lng": "経度",
+            "address": "所在地_連結表記",
+            "ssid": "SSID",
+            "operator": "設置者",
+            "area": "提供エリア",
+            "addressParts": [
+                "所在地_都道府県",
+                "所在地_市区町村",
+                "所在地_町字",
+                "所在地_番地以下"
+            ]
+        },
+        "fixes": {
+            "swapLatLng": "auto"
+        },
+        "notes": "安定したCSV直リンクを確認できないためfileUrlはpageUrlと同じ。無座標3件を除外し、座標前後の空白を除去する。"
+    },
+    {
+        "id": "sendai-city",
+        "org": "仙台市",
+        "title": "SENDAI free Wi-Fi アクセスポイント一覧",
+        "pageUrl": "https://www.city.sendai.jp/kankokikaku/wifi.html",
+        "fileUrl": "https://www.city.sendai.jp/kankokikaku/documents/041009_public_wireless_lan.csv",
+        "localName": "仙台市.csv",
+        "license": "CC BY 4.0",
+        "licenseUrl": "https://creativecommons.org/licenses/by/4.0/deed.ja",
+        "credit": "「SENDAI free Wi-Fi アクセスポイント一覧」（仙台市）（https://www.city.sendai.jp/kankokikaku/wifi.html）を加工して作成",
+        "encoding": "shift_jis",
+        "columns": {
+            "name": "名称",
+            "lat": "緯度",
+            "lng": "経度",
+            "address": "所在地_連結表記",
+            "ssid": "SSID",
+            "operator": "設置者",
+            "area": "提供エリア",
+            "addressParts": [
+                "所在地_都道府県",
+                "所在地_市区町村",
+                "所在地_町字",
+                "所在地_番地以下"
+            ]
+        },
+        "fixes": {
+            "swapLatLng": "auto"
+        },
+        "notes": "建物名列は「建物名等（肩書）」表記。座標999.0の巡回バス7件を除外する。ライセンス画像のパスとalt表記に不整合があるため、ページのalt表記CC BY 4.0を採用。"
+    },
+    {
+        "id": "oita",
+        "org": "大分県",
+        "title": "公衆無線Wi-Fi（おんせんおおいたWi-Fi）設置箇所一覧",
+        "pageUrl": "https://data.bodik.jp/dataset/440001_freewifi",
+        "fileUrl": "https://data.bodik.jp/dataset/582f44a3-8703-495b-b7e8-dc0965b1fffb/resource/3918a825-4f9f-40b2-ad1d-a20f4341335a/download/440001_public_wireless_lan.csv",
+        "localName": "大分県.csv",
+        "license": "CC BY 4.0",
+        "licenseUrl": "https://creativecommons.org/licenses/by/4.0/deed.ja",
+        "credit": "「公衆無線Wi-Fi（おんせんおおいたWi-Fi）設置箇所一覧」（大分県）（https://data.bodik.jp/dataset/440001_freewifi）を加工して作成",
+        "encoding": "utf-8",
+        "columns": {
+            "name": "名称",
+            "lat": "緯度",
+            "lng": "経度",
+            "address": "所在地_連結表記",
+            "ssid": "SSID",
+            "operator": "設置者",
+            "area": "提供エリア",
+            "addressParts": [
+                "所在地_都道府県",
+                "所在地_市区町村",
+                "所在地_町字",
+                "所在地_番地以下"
+            ]
+        },
+        "fixes": {
+            "swapLatLng": "auto"
+        },
+        "notes": "新28列形式。"
+    },
+    {
+        "id": "akita",
+        "org": "秋田県",
+        "title": "【秋田県】県提供公衆Wi-Fiアクセスポイント一覧（令和５年１１月１日現在）",
+        "pageUrl": "https://ckan.pref.akita.lg.jp/dataset/050008_joho_021",
+        "fileUrl": "https://ckan.pref.akita.lg.jp/dataset/1ab5450c-0634-4320-9872-2db8fc09a656/resource/1084370c-db9c-475f-95ee-12ea92b9ae2d/download/050008_public_wireless_lan.csv",
+        "localName": "秋田県.csv",
+        "license": "CC BY 4.0",
+        "licenseUrl": "https://creativecommons.org/licenses/by/4.0/legalcode.ja",
+        "credit": "このデータベースは以下の著作物を改変して利用しています。「【秋田県】県提供公衆Wi-Fiアクセスポイント一覧（令和５年１１月１日現在）」、秋田県、クリエイティブ・コモンズ・ライセンス 表示4.0（https://creativecommons.org/licenses/by/4.0/legalcode.ja）。",
+        "encoding": "utf-8",
+        "columns": {
+            "name": "名称",
+            "lat": "緯度",
+            "lng": "経度",
+            "address": "住所",
+            "ssid": "SSID",
+            "operator": "設置者",
+            "area": null,
+            "addressParts": [
+                "都道府県名",
+                "市区町村名",
+                "住所"
+            ]
+        },
+        "fixes": {
+            "swapLatLng": "auto"
+        },
+        "notes": "秋田県利用規約の改変時指定書式に従う。"
+    },
+    {
+        "id": "akita-city",
+        "org": "秋田市",
+        "title": "秋田市公衆無線LANアクセスポイント一覧",
+        "pageUrl": "https://www.city.akita.lg.jp/kanko/1015784/1015792.html",
+        "fileUrl": "https://www.city.akita.lg.jp/kanko/1015784/1015792.html",
+        "localName": "秋田市.csv",
+        "license": "CC BY 4.0",
+        "licenseUrl": "https://creativecommons.org/licenses/by/4.0/deed.ja",
+        "credit": "「秋田市公衆無線LANアクセスポイント一覧」（秋田市）（https://www.city.akita.lg.jp/kanko/1015784/1015792.html）を加工して作成",
+        "encoding": "utf-8",
+        "columns": {
+            "name": "名称",
+            "lat": "緯度",
+            "lng": "経度",
+            "address": "住所",
+            "ssid": "SSID",
+            "operator": "設置者",
+            "area": null,
+            "addressParts": [
+                "都道府県名",
+                "市区町村名",
+                "住所"
+            ]
+        },
+        "fixes": {
+            "swapLatLng": "auto"
+        },
+        "notes": "配布元はXLSXのみのためfileUrlはpageUrlと同じ。--from-dirでは事前変換済みのUTF-8 CSVを読む。XLSX→CSVの変換は値のみで行う（openpyxlのvalues_only等）。ふりがな（ルビ）を含めて変換すると「西武秋田店セイブアキタテン」のように名称・住所・ヘッダに読みが連結される（2026-09-05に修正）。"
+    }
+]
