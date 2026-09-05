@@ -1,0 +1,208 @@
+:root {
+  color-scheme: light;
+  --paper: #f6f1e7;
+  --surface: #fffaf1;
+  --ink: #2b2a28;
+  --muted: #625f58;
+  --line: #c9c0ae;
+  --blue: #174f78;
+  --blue-dark: #103b5d;
+  --free: #2f7650;
+}
+
+* { box-sizing: border-box; }
+html, body { width: 1080px; height: 1920px; margin: 0; overflow: hidden; }
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: "Hiragino Sans", "Yu Gothic UI", system-ui, sans-serif;
+}
+
+#promo {
+  position: relative;
+  width: 1080px;
+  height: 1920px;
+  overflow: hidden;
+  isolation: isolate;
+  /* アプリの body と同じ配色。1080px 幅に合わせて広がりだけ伸ばしている */
+  background:
+    radial-gradient(circle at 8% 3%, rgba(68, 125, 155, .15), transparent 760px),
+    linear-gradient(180deg, #faf6ed 0, var(--paper) 1100px);
+}
+
+.title-scene {
+  position: absolute;
+  z-index: 10;
+  inset: 0;
+  text-align: center;
+  pointer-events: none;
+}
+.title-scene p, .title-scene h1 { position: absolute; margin: 0; }
+#challenge-label {
+  top: 1698px;
+  right: 108px;
+  left: 108px;
+  color: var(--blue-dark);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 44px;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-align: center;
+}
+#main-title {
+  top: 700px;
+  right: 108px;
+  left: 108px;
+  font-size: 112px;
+  font-weight: 800;
+  letter-spacing: .01em;
+  line-height: 1.14;
+}
+#main-lead {
+  top: 928px;
+  right: 108px;
+  left: 108px;
+  color: var(--muted);
+  font-size: 54px;
+  font-weight: 700;
+  letter-spacing: .01em;
+  line-height: 1.36;
+}
+
+.phone {
+  position: absolute;
+  z-index: 20;
+  top: 68px;
+  left: 204px;
+  width: 672px;
+  height: 1398px;
+  padding: 24px;
+  border: 2px solid rgba(43, 42, 40, .35);
+  border-radius: 52px;
+  background: linear-gradient(145deg, #4b4a45, #26251f 58%);
+  box-shadow: 0 42px 95px rgba(43, 42, 40, .3), 0 0 0 7px rgba(43, 42, 40, .12);
+  transform-origin: 50% 30%;
+  will-change: transform, opacity;
+}
+.phone-speaker {
+  position: absolute;
+  z-index: 2;
+  top: 11px;
+  left: 50%;
+  width: 116px;
+  height: 7px;
+  border-radius: 999px;
+  background: rgba(230, 226, 216, .5);
+  transform: translateX(-50%);
+}
+.phone-screen {
+  position: relative;
+  width: 624px;
+  height: 1350px;
+  overflow: hidden;
+  border-radius: 34px;
+  background: var(--paper);
+}
+#app-frame {
+  display: block;
+  width: 390px;
+  height: 844px;
+  border: 0;
+  transform: scale(1.6);
+  transform-origin: 0 0;
+  pointer-events: none;
+}
+
+#focus-rings { position: absolute; z-index: 30; inset: 0; pointer-events: none; }
+.focus-ring {
+  position: absolute;
+  display: none;
+  border: 5px solid var(--blue);
+  border-radius: 18px;
+  box-shadow: 0 0 0 4px rgba(255, 255, 255, .68), 0 0 38px rgba(23, 79, 120, .55);
+}
+#tap-ripple {
+  position: absolute;
+  z-index: 34;
+  display: none;
+  width: 92px;
+  height: 92px;
+  border: 7px solid var(--blue);
+  border-radius: 50%;
+  background: rgba(23, 79, 120, .2);
+  box-shadow: 0 0 0 4px rgba(255, 255, 255, .6), 0 0 30px rgba(23, 79, 120, .5);
+  pointer-events: none;
+}
+
+.caption {
+  position: absolute;
+  z-index: 50;
+  top: 1494px;
+  left: 108px;
+  display: flex;
+  width: 864px;
+  min-height: 206px;
+  align-items: center;
+  justify-content: center;
+  padding: 22px 44px;
+  border: 1px solid rgba(255, 255, 255, .12);
+  border-radius: 34px;
+  background: rgba(43, 42, 40, .88);
+  color: #fffdf6;
+  font-size: 66px;
+  font-weight: 750;
+  letter-spacing: .01em;
+  line-height: 1.42;
+  text-align: center;
+  transform-origin: 50% 60%;
+}
+
+.promise-scene {
+  position: absolute;
+  z-index: 12;
+  top: 740px;
+  right: 108px;
+  left: 108px;
+  text-align: center;
+}
+.promise-scene p {
+  margin: 0 0 84px;
+  font-size: 62px;
+  font-weight: 750;
+  line-height: 1.45;
+}
+.promise-scene .accent { margin-bottom: 0; color: var(--free); font-weight: 800; }
+
+.end-scene {
+  position: absolute;
+  z-index: 12;
+  top: 900px;
+  right: 108px;
+  left: 108px;
+  text-align: center;
+}
+.end-scene h2 {
+  margin: 0 0 74px;
+  font-size: 106px;
+  font-weight: 800;
+  letter-spacing: .02em;
+  line-height: 1.14;
+}
+.end-scene .url {
+  margin: 0 0 80px;
+  color: var(--blue-dark);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 44px;
+  font-weight: 700;
+  line-height: 1.5;
+}
+.end-scene .day { margin: 0; color: var(--muted); font-size: 48px; font-weight: 700; letter-spacing: .04em; }
+
+#fade-black {
+  position: absolute;
+  z-index: 100;
+  inset: 0;
+  background: #2b2a28;
+  opacity: 0;
+  pointer-events: none;
+}
