@@ -18,7 +18,7 @@
   "demo": "demo.mp4",
   "startedAt": "2026-09-05",
   "finishedAt": "2026-09-06",
-  "actualMinutes": 0,
+  "actualMinutes": 490,
   "sourceOfIdea": "本人が「世界中のライブカメラが見れるマップ」を発案。地図部分は既存の型で作れるので、規約とデータソースの確認（OpenStreetMap・YouTube埋め込み・Windy・OpenFreeMap）を先に行い、実測して見られると分かった地点だけを「見られる」と表示する設計にした",
   "aiHandled": [
     "規約の一次情報を先に確認し、使い方を決めたこと。OpenStreetMap（ODbL・帰属表示）、YouTube の Developer Policies と Required Minimum Functionality（プレーヤーを遮らない・200×200以上・自動再生は操作後だけ・同時に1つ）、Windy Webcams API の無料枠（帰属表示・画像URLは10分で失効し保存不可・広告を遮らない）、OpenFreeMap（帰属表示）を読み、実装の制約表に落とした",
