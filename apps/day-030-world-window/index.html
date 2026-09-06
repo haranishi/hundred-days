@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%2309141f'/%3E%3Ccircle cx='16' cy='16' r='9' fill='none' stroke='%235cc8ff' stroke-width='2'/%3E%3Cpath d='M7 16h18M16 7c4 4 4 14 0 18M16 7c-4 4-4 14 0 18' fill='none' stroke='%23ffd166' stroke-width='1.5'/%3E%3C/svg%3E">
+  <title>せかいのまど</title>
+  <link rel="stylesheet" href="./vendor/maplibre-gl.css">
+  <link rel="stylesheet" href="./app.css">
+  <link rel="stylesheet" href="./shared/share.css">
+  <script src="./vendor/maplibre-gl.js" defer></script>
+  <script src="./shared/share.js" defer></script>
+  <script type="module" src="./app.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#panel">カメラ一覧へ移動</a>
+  <main class="app-shell">
+    <header class="topbar">
+      <div class="brand"><span class="brand-orbit" aria-hidden="true"></span><div><h1>せかいのまど</h1><p>世界の公開ライブカメラを地図で</p></div></div>
+      <div class="search-area">
+        <label class="sr-only" for="camera-search">カメラを検索</label>
+        <div class="search-box"><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 4 4"/></svg><input id="camera-search" type="search" placeholder="名前・国・運営者で検索" autocomplete="off" role="combobox" aria-controls="search-results" aria-expanded="false" aria-autocomplete="list"></div>
+        <div id="search-results" class="search-results" role="listbox" aria-label="検索候補" hidden></div>
+      </div>
+      <button id="theme-toggle" class="icon-button" type="button" aria-label="ライト表示に切り替える" aria-pressed="true"><svg aria-hidden="true" viewBox="0 0 24 24"><path id="theme-icon" d="M12 3v2m0 14v2M3 12h2m14 0h2M5.6 5.6l1.5 1.5m9.8 9.8 1.5 1.5m0-12.8-1.5 1.5M7.1 16.9l-1.5 1.5M16 12a4 4 0 1 1-8 0 4 4 0 0 1 8 0Z"/></svg><span id="theme-label">ダーク</span></button>
+      <div class="filters" aria-label="カメラの種別">
+        <button type="button" data-kind-group="video" aria-pressed="true"><span class="kind-dot video" aria-hidden="true"></span>映像</button>
+        <button type="button" data-kind-group="image" aria-pressed="true"><span class="kind-dot image" aria-hidden="true"></span>画像</button>
+        <button type="button" data-kind-group="page" aria-pressed="true"><span class="kind-dot page" aria-hidden="true"></span>リンク</button>
+        <button id="windy-filter" type="button" aria-pressed="true" hidden><span class="kind-dot windy" aria-hidden="true"></span>Windy <small id="windy-hint"></small></button>
+      </div>
+    </header>
+
+    <section class="map-stage" aria-label="世界のライブカメラ地図">
+      <div id="map" aria-label="地図"></div>
+      <div class="map-actions">
+        <button id="random-button" class="primary-button" type="button"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 7h3c5 0 5 10 10 10h3m-3-3 3 3-3 3M4 17h3c2 0 3-1 4-3m3-6c1-1 2-1 3-1h3m-3-3 3 3-3 3"/></svg>どこかの窓を開く</button>
+        <button id="locate-button" class="secondary-button" type="button"><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="8"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2"/></svg>現在地</button>
+      </div>
+      <div class="legend" aria-label="地図記号"><span><i class="video"></i>映像</span><span><i class="image"></i>画像</span><span><i class="page"></i>リンク</span><span class="legend-windy" data-windy-legend hidden><i class="windy"></i>Windy</span></div>
+      <button id="map-scrim" class="map-scrim" type="button" aria-label="一覧を縮める" hidden></button>
+      <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+    </section>
+
+    <section id="panel" class="panel" aria-labelledby="panel-title">
+      <button id="sheet-handle" class="sheet-handle" type="button" aria-label="パネルを広げる" aria-expanded="false"><span></span></button>
+      <div id="panel-content" class="panel-content">
+        <div class="panel-head"><div><p id="panel-eyebrow" class="eyebrow">AROUND HERE</p><h2 id="panel-title" tabindex="-1">この範囲のカメラ</h2></div><button id="panel-close" class="close-button" type="button" aria-label="詳細を閉じる" hidden>×</button></div>
+        <!-- 副題は数を持たない。件数はチップの効き目を示す #camera-count と一覧のメタの2つに絞る（3つ並ぶとどれが何の数か読めなかった）。 -->
+        <p id="panel-subtitle" class="panel-subtitle">世界の公開ライブカメラを地図で</p>
+        <div class="panel-counts"><p id="panel-count" class="panel-count">読み込み中…</p><p id="camera-count" class="camera-count" aria-live="polite" hidden></p></div>
+        <p id="panel-legend" class="list-legend"><span><i class="video"></i>映像</span><span><i class="image"></i>画像</span><span><i class="page"></i>リンク</span><span class="legend-windy" data-windy-legend hidden><i class="windy"></i>Windy</span></p>
+        <div id="panel-body" class="camera-list" aria-live="polite"><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div></div>
+        <!-- 出典と共有は地図アプリの外に置くと画面全体が縦にスクロールしてしまうので、パネルの中身の末尾に置く。 -->
+        <footer>
+          <p>カメラの位置とURL: © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap contributors</a>（<a href="https://opendatacommons.org/licenses/odbl/" target="_blank" rel="noopener noreferrer">ODbL</a>）／地図: <a href="https://openfreemap.org/" target="_blank" rel="noopener noreferrer">OpenFreeMap</a></p>
+          <p>映像・画像は各提供元から直接読み込み、保存・再配信しません。公開映像を個人の特定には使わないでください。</p>
+          <div id="share"></div>
+        </footer>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

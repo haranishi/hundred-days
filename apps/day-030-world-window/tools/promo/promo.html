@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=1080, initial-scale=1">
+  <title>せかいのまど — プロモーション動画</title>
+  <link rel="stylesheet" href="./promo.css">
+</head>
+<body>
+  <main id="promo" aria-label="せかいのまど プロモーション動画">
+    <div id="map-aura" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
+
+    <div id="phone" class="phone" aria-label="せかいのまど アプリ画面">
+      <div class="phone-speaker" aria-hidden="true"></div>
+      <div class="phone-screen">
+        <iframe id="app-frame" title="せかいのまど" data-src="/index.html"></iframe>
+      </div>
+    </div>
+
+    <div id="count-scene" aria-hidden="true">
+      <strong id="camera-total">0</strong><span>か所</span>
+    </div>
+
+    <section id="title-scene" class="title-scene" aria-label="タイトル">
+      <div class="globe-mark" aria-hidden="true"><i></i></div>
+      <p id="challenge-label">DAY 030 · 100日チャレンジ</p>
+      <h1 id="main-title">せかいのまど</h1>
+      <p id="main-lead">世界の公開ライブカメラを地図で</p>
+    </section>
+
+    <div id="tap-ripple" aria-hidden="true"></div>
+
+    <section id="promise-scene" class="promise-scene" aria-label="このアプリの約束">
+      <p><span class="dot map-dot"></span>位置は OpenStreetMap</p>
+      <p><span class="dot camera-dot"></span>映像は各提供元から直接</p>
+      <p class="accent"><span class="dot free-dot"></span>登録なし・無料</p>
+    </section>
+
+    <section id="end-scene" class="end-scene" aria-label="せかいのまど URL">
+      <div class="globe-mark small" aria-hidden="true"><i></i></div>
+      <h2>せかいのまど</h2>
+      <p class="url">hundred-days.pages.dev/<br>day-030-world-window/</p>
+      <p class="day">100日チャレンジ Day 30</p>
+    </section>
+
+    <div id="caption" class="caption" aria-live="off"></div>
+    <div id="fade-black" aria-hidden="true"></div>
+  </main>
+  <script type="module" src="./promo.js"></script>
+</body>
+</html>
