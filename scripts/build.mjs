@@ -149,7 +149,10 @@ const CONNECT_BY_APP = {
      キャッシュを求めており、ブラウザからは満たせないため） */
   'day-025-nearby-parking': 'https://tiles.openfreemap.org',
   // day-029 はWi-Fiデータを同梱し、地名検索だけ中継する。ブラウザが外へ出るのは地図タイルだけ
-  'day-029-nearby-wifi': 'https://tiles.openfreemap.org'
+  'day-029-nearby-wifi': 'https://tiles.openfreemap.org',
+  /* day-030 はカメラの位置データを同梱し、Windy だけ functions/api/day-030/ の中継を通す。
+     映像・画像は提供元とブラウザの直接通信（img/media/frame 側で許す）なので connect-src はタイルだけ */
+  'day-030-world-window': 'https://tiles.openfreemap.org'
 };
 
 /* day-025 の MapLibre は blob: から Web Worker を起こす。
@@ -157,19 +160,31 @@ const CONNECT_BY_APP = {
    'self' のままだと地図が黙って出ない。 */
 const WORKER_BY_APP = {
   'day-025-nearby-parking': "worker-src blob:",
-  'day-029-nearby-wifi': "worker-src blob:"
+  'day-029-nearby-wifi': "worker-src blob:",
+  'day-030-world-window': "worker-src blob:"
 };
 
 /* day-021 は局のストリーム（audio）とロゴ画像をAPI由来の任意のhttpsホストから読む。
    ホストを事前に列挙できないため、このDayだけ media / img に https: を足す（httpは許さない）。 */
 const MEDIA_BY_APP = {
-  'day-021-nearby-radio': ' https:'
+  'day-021-nearby-radio': ' https:',
+  // day-030 は提供元のHLS配信（.m3u8）を Safari の <video> で直接再生する。ホストは事前に列挙できない
+  'day-030-world-window': ' https:'
 };
 const IMG_BY_APP = {
   'day-021-nearby-radio': ' https:',
   // スプライト画像をタイル配信元から読む
   'day-025-nearby-parking': ' https://tiles.openfreemap.org',
-  'day-029-nearby-wifi': ' https://tiles.openfreemap.org'
+  'day-029-nearby-wifi': ' https://tiles.openfreemap.org',
+  // day-030 はカメラの静止画を提供元の任意の https ホストから読む（http は混在コンテンツになるので許さない）
+  'day-030-world-window': ' https:'
+};
+
+/* iframe を出すのは day-030 だけ（YouTube の埋め込みプレーヤーと Windy のタイムラプスプレーヤー）。
+   frame-src は default-src に落ちるので、'self' のままだと iframe が黙って空になる。
+   youtube-nocookie.com はプライバシー強化モードの埋め込み用ホスト。 */
+const FRAME_BY_APP = {
+  'day-030-world-window': 'frame-src https://www.youtube-nocookie.com https://webcams.windy.com https://www.windy.com'
 };
 
 const appCsp = (dir) => [
@@ -184,7 +199,8 @@ const appCsp = (dir) => [
   "base-uri 'none'",
   "form-action 'self'",
   "object-src 'none'",
-  ...(WORKER_BY_APP[dir] ? [WORKER_BY_APP[dir]] : [])
+  ...(WORKER_BY_APP[dir] ? [WORKER_BY_APP[dir]] : []),
+  ...(FRAME_BY_APP[dir] ? [FRAME_BY_APP[dir]] : [])
 ].join('; ');
 
 /* 一覧ページ（/）にCSPを入れていないのは、インラインscriptが2本とGA4があり、

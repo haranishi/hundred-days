@@ -1,0 +1,75 @@
+{
+  "day": 30,
+  "season": 1,
+  "title": "せかいのまど",
+  "description": "世界中の公開ライブカメラを1枚の地図に。地点をタップすると、その場所の映像や最新の静止画と、国・運営者・向き・現地時刻の推定・昼夜が出る。位置とURLはOpenStreetMapの登録から、映像は各提供元から直接読む",
+  "tags": [
+    "map",
+    "webcam",
+    "openstreetmap",
+    "maplibre",
+    "youtube-embed",
+    "cloudflare-functions",
+    "vanilla-js"
+  ],
+  "status": "published",
+  "publicUrl": "https://hundred-days.pages.dev/day-030-world-window/",
+  "screenshot": "screenshot.webp",
+  "demo": "demo.mp4",
+  "startedAt": "2026-09-05",
+  "finishedAt": "2026-09-06",
+  "actualMinutes": 0,
+  "sourceOfIdea": "本人が「世界中のライブカメラが見れるマップ」を発案。地図部分は既存の型で作れるので、規約とデータソースの確認（OpenStreetMap・YouTube埋め込み・Windy・OpenFreeMap）を先に行い、実測して見られると分かった地点だけを「見られる」と表示する設計にした",
+  "aiHandled": [
+    "規約の一次情報を先に確認し、使い方を決めたこと。OpenStreetMap（ODbL・帰属表示）、YouTube の Developer Policies と Required Minimum Functionality（プレーヤーを遮らない・200×200以上・自動再生は操作後だけ・同時に1つ）、Windy Webcams API の無料枠（帰属表示・画像URLは10分で失効し保存不可・広告を遮らない）、OpenFreeMap（帰属表示）を読み、実装の制約表に落とした",
+    "OpenStreetMap の contact:webcam 9,631件を Overpass から1回だけ取得し、全URLの種別をビルド時に実測したこと（HEAD→GET、YouTube は oEmbed、ホストごとに直列・300ms間隔・24並列で約45分）。到達できない464件と、クエリに鍵らしき値を含むURL等16件を除き、映像141・画像2,665・HLS 84・リンク6,261の9,151地点を同梱した。実行時に Overpass は叩かない",
+    "国名を Natural Earth 1:50m の点内多角形判定でビルド時に付けたこと（沿岸の点は0.5度の範囲で最近傍の国へ）。日本語国名と大陸も同梱",
+    "地図（MapLibre・クラスタ）、種別チップ、検索、「どこかの窓を開く」、詳細パネル（国・運営者・向き・区分・現地時刻の推定・昼夜・座標・Googleマップ・OSM・提供元）、ビューア4種（YouTube 埋め込み・静止画60秒更新・HLS・リンク）、深いリンク、Windy 層（鍵があるときだけ）を実装した",
+    "Windy Webcams API v3 の中継（Cloudflare Pages Functions）を実装した。鍵は環境変数、bbox を格子に丸めてエッジキャッシュ、画像URLは保存しない、429は叩き直さない。ユニットテストで上流を差し替えて検証",
+    "ユニット38件（URL種別・YouTube ID・方位・太陽高度と昼夜・現地時刻・国判定・同梱形式・検索・乱択・中継）と E2E（地図とパネル・ビューア4種・チップ・検索・深いリンク・フォーカス・Windy・通信先・3幅・44px・reduced motion）を作成した",
+    "体験評価（別セッションのOpusが実操作・PC 12/18・スマホ 10/20）の指摘を反映した。スマホの展開シートが閉じられない、初見の一覧がリンクのみ、クラスタが1段しか寄らない、YouTube プレーヤーが右25%欠ける、HLS が無言で止まる、深いリンクで無操作の自動再生（規約違反）を直した",
+    "UI採点ループを3周回した（採点は別セッションのOpusがスクショだけで採点、実装はOpus。12→13→16/20で合格）。チップの押下状態、選択中カメラをパネルの外へ寄せる、固定ヘッダー、件数の整理、ピンのアイコン化、検索候補の一致理由、ライトテーマの調整を直した",
+    "縦型プロモ動画（36秒・1080×1920・BGM付き）の道具を Day 028 方式で用意した。場面の切替はアプリを本当に読み直し、地図とカメラ画像の読み込みを待ってから撮る。hash だけの遷移では load が来ず永久に待つ／前回の地図位置が残って世界図の準備待ちが失敗する、の2点を直した"
+  ],
+  "humanHandled": [
+    "「世界中のライブカメラが見れるマップ」の発案と、規約を確認しながら進める方針の指定",
+    "実機での確認とX投稿"
+  ],
+  "failuresAndFixes": [
+    {
+      "problem": "E2E が全件落ちた。差し替え用の空スタイルで glyphs を空文字にしていたため、MapLibre 5 が「{fontstack}を含むURLでない」と検証で落とし、スタイルが永久に読み込み中になっていた（クラスタの件数ラベルが文字を使う）",
+      "fix": "glyphs を {fontstack}/{range} 付きのURLにし、フォントの要求は空のPBFで返すようにした"
+    },
+    {
+      "problem": "クラスタの件数ラベルが、指定していないフォント（Open Sans）を地図配信元へ要求して404の警告を13件出していた",
+      "fix": "両スタイルに共通する Noto Sans Regular を text-font に指定した"
+    },
+    {
+      "problem": "公開前チェックの個人NGワードに、米国の通り名を含むカメラURLが一致した",
+      "fix": "IDで個別に外す exclude-ids.txt を生成ツールに足し、その1件だけ除外した"
+    },
+    {
+      "problem": "Windy 未設定の判定に hidden 属性を使っていたが、チップの display がそれに勝って表示されていた",
+      "fix": "[hidden] { display:none !important } を置いた"
+    },
+    {
+      "problem": "Chromium は HLS の canPlayType に 'maybe' を返すため <video> が作られ、error イベントも来ず黒い箱のままだった",
+      "fix": "loadedmetadata を5秒待って来なければ案内文に切り替えるようにした"
+    },
+    {
+      "problem": "公開の CI（gitleaks）が、同梱データの中の `?token=` 付き配信URL（提供元が公開しているもの）を秘密情報と判定して落ちた",
+      "fix": "生成ツールでクエリに token・key・secret 等を含むURLを除外し（13件）、コミットを作り直した"
+    }
+  ],
+  "social": {
+    "x": {
+      "summary": "世界中の公開ライブカメラを1枚の地図に。タップすると、その場所のいまが見える",
+      "body": "Day 30 / 100\n\n世界中の公開ライブカメラを地図に置いた「せかいのまど」を作りました。\n\n地点をタップすると、その場所の映像や最新の静止画と、国・運営者・向き・現地時刻の推定が出ます。\n\n位置はOpenStreetMap、映像は各提供元からそのまま。\n\n#100日チャレンジ #個人開発",
+      "replies": [],
+      "hashtags": [
+        "100日チャレンジ",
+        "個人開発"
+      ]
+    }
+  }
+}

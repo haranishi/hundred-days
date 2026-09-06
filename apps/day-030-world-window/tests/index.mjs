@@ -1,0 +1,11 @@
+import './data.test.mjs';
+import './direction.test.mjs';
+import './sun.test.mjs';
+import './localtime.test.mjs';
+import './youtube.test.mjs';
+import './viewer.test.mjs';
+import './links-zones.test.mjs';
+import './labels.test.mjs';
+import './url-kind.test.mjs';
+import './country-lookup.test.mjs';
+import './proxy-windy.test.mjs';
