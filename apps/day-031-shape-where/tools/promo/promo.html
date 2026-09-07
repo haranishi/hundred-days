@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=1080, initial-scale=1">
+  <title>この形、どこ？ — プロモーション動画</title>
+  <link rel="stylesheet" href="./promo.css">
+</head>
+<body>
+  <main id="promo" aria-label="この形、どこ？ プロモーション動画">
+    <div id="backdrop" aria-hidden="true">
+      <svg class="ghost" viewBox="0 0 1000 1000" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d=""></path></svg>
+      <svg class="ghost" viewBox="0 0 1000 1000" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d=""></path></svg>
+      <svg class="ghost" viewBox="0 0 1000 1000" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d=""></path></svg>
+      <svg class="ghost" viewBox="0 0 1000 1000" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d=""></path></svg>
+      <svg class="ghost" viewBox="0 0 1000 1000" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d=""></path></svg>
+    </div>
+
+    <div id="phone" class="phone" aria-label="この形、どこ？ アプリ画面">
+      <div class="phone-speaker" aria-hidden="true"></div>
+      <div class="phone-screen">
+        <iframe id="app-frame" title="この形、どこ？" data-src="/index.html"></iframe>
+      </div>
+    </div>
+
+    <section id="title-scene" class="title-scene" aria-label="タイトル">
+      <div class="app-mark" aria-hidden="true">
+        <svg viewBox="0 0 1000 1000" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d=""></path></svg>
+      </div>
+      <h1 id="main-title">この形、どこ？</h1>
+      <p id="main-lead">都道府県も、市町村も</p>
+      <p id="challenge-label">DAY 031 · 100日チャレンジ</p>
+    </section>
+
+    <div id="choice-ring" aria-hidden="true"></div>
+    <div id="post-ring" aria-hidden="true"></div>
+    <div id="tap-ripple" aria-hidden="true"></div>
+    <div id="finger" aria-hidden="true">
+      <svg viewBox="0 0 120 210" xmlns="http://www.w3.org/2000/svg">
+        <path class="finger-body" d="M60 8c17 0 29 14 29 33l4 111c1 29-14 50-33 50s-34-21-33-50l4-111c0-19 12-33 29-33z"></path>
+        <ellipse class="finger-nail" cx="60" cy="38" rx="15" ry="19"></ellipse>
+      </svg>
+    </div>
+
+    <section id="promise-scene" class="promise-scene" aria-label="このアプリの約束">
+      <p><span class="dot ink-dot"></span>形は同梱。10問は通信なし</p>
+      <p><span class="dot leaf-dot"></span>通信は解説の1行だけ</p>
+      <p class="sources">出典：国土数値情報（国土交通省）<br>解説：Wikipedia（CC BY-SA 4.0）</p>
+    </section>
+
+    <section id="end-scene" class="end-scene" aria-label="この形、どこ？ URL">
+      <div class="app-mark small" aria-hidden="true">
+        <svg viewBox="0 0 1000 1000" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d=""></path></svg>
+      </div>
+      <h2>この形、どこ？</h2>
+      <p class="url">hundred-days.pages.dev/<br>day-031-shape-where/</p>
+      <p class="day">Day 31 / 100</p>
+    </section>
+
+    <div id="caption" class="caption" aria-live="off"></div>
+    <div id="fade-out" aria-hidden="true"></div>
+  </main>
+  <script type="module" src="./promo.js"></script>
+</body>
+</html>
