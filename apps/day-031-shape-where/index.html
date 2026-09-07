@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>この形、どこ？</title>
+  <meta name="description" content="都道府県や市区町村のシルエットを見て、地名を当てる10問クイズ。">
+  <meta name="share:text" content="この形、どこ？ — 都道府県・市区町村のシルエットを見て地名を当てる10問クイズ">
+  <link rel="stylesheet" href="./app.css">
+  <link rel="stylesheet" href="./shared/share.css">
+  <script src="./shared/share.js" defer></script>
+</head>
+<body>
+  <header class="site-head">
+    <div class="site-head__text">
+      <p class="eyebrow">DAY 031 · SHAPE WHERE</p>
+      <h1>この形、どこ？</h1>
+      <p class="site-description">都道府県や市区町村のシルエットを見て、地名を当てる10問</p>
+    </div>
+    <!-- 遊ぶ前に「シルエット」の実物を見せる。形が届くまでは出さない -->
+    <div id="start-samples" class="samples" hidden>
+      <ul id="start-shapes" class="samples__shapes" aria-hidden="true"></ul>
+      <p class="samples__caption">こんな形が出ます</p>
+    </div>
+  </header>
+
+  <main id="app" data-state="start" data-mode="pref" data-hint-used="false">
+
+    <section id="start" class="panel" aria-labelledby="start-title">
+      <h2 id="start-title" class="sr-only">遊び方を選ぶ</h2>
+      <p id="storage-notice" class="notice" role="status" hidden>この環境ではベストを保存できません</p>
+      <ul class="modes">
+        <li class="mode">
+          <p class="mode__sub">47の形から10問</p>
+          <button id="play-pref" class="button button--primary" type="button" disabled>都道府県ではじめる</button>
+          <p id="best-pref" class="mode__best">まだ記録なし</p>
+        </li>
+        <li class="mode">
+          <label class="mode__label" for="pref-select">県を選ぶ</label>
+          <select id="pref-select" disabled></select>
+          <button id="play-town" class="button" type="button" disabled>市町村ではじめる</button>
+          <p id="best-town" class="mode__best">まだ記録なし</p>
+        </li>
+        <li class="mode">
+          <p class="mode__sub">毎問ちがう県から</p>
+          <button id="play-town-all" class="button" type="button" disabled>全国の市区町村ではじめる</button>
+          <p id="best-town-all" class="mode__best">まだ記録なし</p>
+        </li>
+      </ul>
+    </section>
+
+    <section id="loading" class="panel" aria-busy="true" aria-label="読み込み中">
+      <p class="loading__text">形を読み込んでいます</p>
+      <div class="skeleton skeleton--shape"></div>
+      <div class="skeleton-grid">
+        <div class="skeleton skeleton--choice"></div>
+        <div class="skeleton skeleton--choice"></div>
+        <div class="skeleton skeleton--choice"></div>
+        <div class="skeleton skeleton--choice"></div>
+      </div>
+    </section>
+
+    <section id="question" class="panel" aria-labelledby="progress">
+      <div class="play-grid">
+        <div class="play-grid__shape">
+          <div class="play-head">
+            <p id="progress" class="progress" tabindex="-1">1 / 10</p>
+            <p id="score-now" class="progress progress--score">正解 0</p>
+            <button id="quit-button" class="text-button text-button--quiet" type="button">やめる</button>
+          </div>
+          <div class="shape-bed">
+            <svg id="shape" viewBox="0 0 1000 1000" preserveAspectRatio="xMidYMid meet" role="img" aria-label="出題中のシルエット" xmlns="http://www.w3.org/2000/svg">
+              <path id="shape-path" fill-rule="evenodd" d=""></path>
+            </svg>
+            <!-- 県内の位置はシルエットのカードに重ねる。開いても4択も形も動かない -->
+            <div id="hint" class="hint" hidden>
+              <svg id="hint-map" class="mini-map" viewBox="0 0 1000 1000" role="img" aria-label="県の中でのおおよその位置" xmlns="http://www.w3.org/2000/svg">
+                <path id="hint-outline" class="mini-map__pref" fill-rule="evenodd" d=""></path>
+                <path id="hint-town" class="mini-map__town" fill-rule="evenodd" d=""></path>
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <div class="play-grid__answer">
+          <!-- 高さを決め打ちした1行。ボタンとヒントの文字が同じ場所で入れ替わる -->
+          <div class="hint-row">
+            <button id="hint-button" class="text-button" type="button">ヒントを見る（正解の点が半分）</button>
+            <p id="hint-text" class="hint__text" hidden></p>
+          </div>
+
+          <div id="choices" class="choices"></div>
+          <!-- 10問の進み具合。右カラムの下の空きを埋め、あと何問かも分かる -->
+          <ol id="tracker" class="tracker" role="img" aria-label="10問中0問回答、正解0"></ol>
+
+          <div id="reveal" class="reveal">
+            <p id="reveal-progress" class="reveal__progress"></p>
+            <p id="reveal-result" class="reveal__result" role="status"></p>
+            <p id="reveal-name" class="reveal__name"></p>
+            <p id="reveal-sub" class="reveal__sub"></p>
+            <svg id="reveal-map" class="mini-map" viewBox="0 0 1000 1000" role="img" aria-label="県の中での位置" xmlns="http://www.w3.org/2000/svg">
+              <path id="reveal-outline" class="mini-map__pref" fill-rule="evenodd" d=""></path>
+              <path id="reveal-town" class="mini-map__town" fill-rule="evenodd" d=""></path>
+            </svg>
+            <p id="reveal-note" class="reveal__note" hidden></p>
+            <!-- 要約が届く前から出しておく。あとから高さが増えると「次へ」が下へ逃げるため -->
+            <div id="reveal-wiki" class="wiki" data-status="loading" data-thumb="false">
+              <img id="wiki-thumb" class="wiki__thumb" alt="" loading="lazy" decoding="async" referrerpolicy="no-referrer" hidden>
+              <p id="wiki-extract" class="wiki__extract">解説を読み込み中…</p>
+              <p id="wiki-foot" class="wiki__foot" hidden>
+                <a id="wiki-link" class="wiki__link" href="https://ja.wikipedia.org/" target="_blank" rel="noopener">Wikipedia で読む</a>
+                <span class="wiki__license">Wikipedia · CC BY-SA 4.0</span>
+              </p>
+            </div>
+            <button id="next-button" class="button button--primary" type="button">次へ</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="result" class="panel" aria-labelledby="result-title">
+      <div class="result__head">
+        <p class="kicker">RESULT</p>
+        <h2 id="result-title" class="sr-only">結果</h2>
+        <p id="result-score" class="result__score" tabindex="-1">0 / 10</p>
+        <p id="result-mode" class="result__mode"></p>
+        <p id="result-best" class="result__best" role="status"></p>
+      </div>
+      <ol id="result-list" class="result__list"></ol>
+      <div class="result__foot">
+        <div class="result__actions">
+          <a id="post-score" class="button button--primary" href="https://x.com/intent/post" target="_blank" rel="noopener">この結果をXに投稿</a>
+          <button id="copy-score" class="button" type="button">投稿文をコピー</button>
+        </div>
+        <p id="copy-note" class="copy-note" role="status"></p>
+        <div class="result__actions">
+          <button id="again-button" class="button" type="button">同じ設定でもう一度</button>
+          <button id="home-button" class="button" type="button">モードを選び直す</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="load-error" class="panel" role="alert">
+      <p class="error__text">データを読み込めませんでした</p>
+      <div class="result__actions">
+        <button id="retry-button" class="button button--primary" type="button">もう一度読み込む</button>
+        <button id="error-home" class="button" type="button">モードを選び直す</button>
+      </div>
+    </section>
+
+    <div id="share"></div>
+  </main>
+
+  <footer id="sources" class="sources">
+    <p>出典：「国土数値情報（行政区域データ）」（国土交通省）（<a href="https://nlftp.mlit.go.jp/ksj/gml/datalist/KsjTmplt-N03-2025.html" target="_blank" rel="noopener">https://nlftp.mlit.go.jp/ksj/gml/datalist/KsjTmplt-N03-2025.html</a>）を加工して作成。原典は国土地理院「数値地図（国土基本情報）」。形は単純化した概略で、位置や面積の参照には使えません</p>
+    <p>解説と写真：Wikipedia（CC BY-SA 4.0）</p>
+  </footer>
+
+  <script type="module" src="./app.js"></script>
+</body>
+</html>

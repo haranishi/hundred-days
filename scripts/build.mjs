@@ -3,7 +3,7 @@
 'use strict';
 
 import { copyFileSync, cpSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
-import { basename, join } from 'node:path';
+import { basename, join, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = fileURLToPath(new URL('..', import.meta.url));
@@ -99,9 +99,13 @@ mkdirSync(distDir, { recursive: true });
 // リポジトリ直下の static/ の中身（OG画像など）を dist/ 直下へ。無くてもビルドは通す
 if (existsSync(staticDir)) cpSync(staticDir, distDir, { recursive: true });
 
+/* tools/cache/ は素材の置き場（day-031 の行政区域 zip で 890MB）。同梱データは data/ に
+   書き出し済みなので配信には要らない。CI には cache が無いので、消えるのは手元の dist だけ */
+const skipToolsCache = (source) => !source.includes(`${sep}tools${sep}cache`);
+
 for (const app of apps) {
   if (app.published) {
-    cpSync(join(appsDir, app.dir), join(distDir, app.dir), { recursive: true });
+    cpSync(join(appsDir, app.dir), join(distDir, app.dir), { recursive: true, filter: skipToolsCache });
   } else if (app.hasShot || app.hasDemo) {
     // 「制作記録のみ」のDayはアプリ本体を公開しないが、一覧に出すスクショとデモ動画だけはコピーする
     mkdirSync(join(distDir, app.dir), { recursive: true });
@@ -152,7 +156,10 @@ const CONNECT_BY_APP = {
   'day-029-nearby-wifi': 'https://tiles.openfreemap.org',
   /* day-030 はカメラの位置データを同梱し、Windy だけ functions/api/day-030/ の中継を通す。
      映像・画像は提供元とブラウザの直接通信（img/media/frame 側で許す）なので connect-src はタイルだけ */
-  'day-030-world-window': 'https://tiles.openfreemap.org'
+  'day-030-world-window': 'https://tiles.openfreemap.org',
+  /* day-031 は形を同梱していて、正解を出したあとに Wikipedia の要約だけを取りに行く。
+     ここに足さないと画面には何も出ないまま（try/catch に吸われる）本番だけが黙って止まる */
+  'day-031-shape-where': 'https://ja.wikipedia.org'
 };
 
 /* day-025 の MapLibre は blob: から Web Worker を起こす。
@@ -177,7 +184,11 @@ const IMG_BY_APP = {
   'day-025-nearby-parking': ' https://tiles.openfreemap.org',
   'day-029-nearby-wifi': ' https://tiles.openfreemap.org',
   // day-030 はカメラの静止画を提供元の任意の https ホストから読む（http は混在コンテンツになるので許さない）
-  'day-030-world-window': ' https:'
+  'day-030-world-window': ' https:',
+  /* day-031 は Wikipedia の記事写真だけを読む。summary が返す thumbnail は
+     いま thumb.wikimedia.org（元画像は upload.wikimedia.org）。
+     apps/day-031-shape-where/lib/wiki.js の THUMBNAIL_HOSTS と対応させること */
+  'day-031-shape-where': ' https://thumb.wikimedia.org https://upload.wikimedia.org'
 };
 
 /* iframe を出すのは day-030 だけ（YouTube の埋め込みプレーヤーと Windy のタイムラプスプレーヤー）。
