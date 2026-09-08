@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=1080, initial-scale=1">
+  <title>いま干していい？ — プロモーション動画</title>
+  <link rel="stylesheet" href="./promo.css">
+</head>
+<body>
+  <main id="promo" aria-label="いま干していい？ プロモーション動画">
+    <!-- 背景は雫。5つがゆっくり漂う -->
+    <div id="backdrop" aria-hidden="true">
+      <svg class="ghost" viewBox="0 0 100 130" xmlns="http://www.w3.org/2000/svg"><path d="M50 4C50 4 88 58 88 86a38 38 0 1 1-76 0C12 58 50 4 50 4z"></path></svg>
+      <svg class="ghost" viewBox="0 0 100 130" xmlns="http://www.w3.org/2000/svg"><path d="M50 4C50 4 88 58 88 86a38 38 0 1 1-76 0C12 58 50 4 50 4z"></path></svg>
+      <svg class="ghost" viewBox="0 0 100 130" xmlns="http://www.w3.org/2000/svg"><path d="M50 4C50 4 88 58 88 86a38 38 0 1 1-76 0C12 58 50 4 50 4z"></path></svg>
+      <svg class="ghost" viewBox="0 0 100 130" xmlns="http://www.w3.org/2000/svg"><path d="M50 4C50 4 88 58 88 86a38 38 0 1 1-76 0C12 58 50 4 50 4z"></path></svg>
+      <svg class="ghost" viewBox="0 0 100 130" xmlns="http://www.w3.org/2000/svg"><path d="M50 4C50 4 88 58 88 86a38 38 0 1 1-76 0C12 58 50 4 50 4z"></path></svg>
+    </div>
+
+    <div id="phone" class="phone" aria-label="いま干していい？ アプリ画面">
+      <div class="phone-speaker" aria-hidden="true"></div>
+      <div class="phone-screen">
+        <iframe id="app-frame" title="いま干していい？" data-src="/index.html"></iframe>
+      </div>
+    </div>
+
+    <section id="title-scene" class="title-scene" aria-label="タイトル">
+      <!-- 太陽と雫。乾かす力と、洗濯物が持っている水 -->
+      <div class="app-mark" aria-hidden="true">
+        <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+          <circle class="mark-sun" cx="128" cy="72" r="40"></circle>
+          <path class="mark-drop" d="M78 62C78 62 118 118 118 148a40 40 0 1 1-80 0C38 118 78 62 78 62z"></path>
+        </svg>
+      </div>
+      <h1 id="main-title">いま干していい？</h1>
+      <p id="main-lead">洗濯物が乾く時刻を出す</p>
+      <p id="challenge-label">DAY 032 · 100日チャレンジ</p>
+    </section>
+
+    <div id="choice-ring" aria-hidden="true"></div>
+    <div id="post-ring" aria-hidden="true"></div>
+    <div id="tap-ripple" aria-hidden="true"></div>
+    <div id="finger" aria-hidden="true">
+      <svg viewBox="0 0 120 210" xmlns="http://www.w3.org/2000/svg">
+        <path class="finger-body" d="M60 8c17 0 29 14 29 33l4 111c1 29-14 50-33 50s-34-21-33-50l4-111c0-19 12-33 29-33z"></path>
+        <ellipse class="finger-nail" cx="60" cy="38" rx="15" ry="19"></ellipse>
+      </svg>
+    </div>
+
+    <section id="promise-scene" class="promise-scene" aria-label="このアプリの約束">
+      <p><span class="dot sun-dot"></span>答えは「何時に乾くか」だけ</p>
+      <p><span class="dot rain-dot"></span>通信は天気の予報1本だけ</p>
+      <p class="sources">天気：Weather data by Open-Meteo.com（CC BY 4.0）<br>公式の予報ではありません</p>
+    </section>
+
+    <section id="end-scene" class="end-scene" aria-label="いま干していい？ URL">
+      <div class="app-mark small" aria-hidden="true">
+        <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+          <circle class="mark-sun" cx="128" cy="72" r="40"></circle>
+          <path class="mark-drop" d="M78 62C78 62 118 118 118 148a40 40 0 1 1-80 0C38 118 78 62 78 62z"></path>
+        </svg>
+      </div>
+      <h2>いま干していい？</h2>
+      <p class="url">hundred-days.pages.dev/<br>day-032-laundry-dry/</p>
+      <p class="day">Day 32 / 100</p>
+    </section>
+
+    <div id="caption" class="caption" aria-live="off"></div>
+    <div id="fade-out" aria-hidden="true"></div>
+  </main>
+  <script type="module" src="./promo.js"></script>
+</body>
+</html>
