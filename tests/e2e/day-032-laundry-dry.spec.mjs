@@ -234,3 +234,12 @@ test('出典とお断りをいつも出している', async ({ page }) => {
   await expect(foot).toContainText('公式の予報ではありません');
   await expect(foot.getByRole('link', { name: /Open-Meteo/ })).toHaveAttribute('href', 'https://open-meteo.com/');
 });
+
+test('明日の提案が2行重ならない', async ({ page }) => {
+  await stubForecast(page);
+  await openAt(page, NIGHT);
+  await pickAkita(page);
+  // 夜は「いちばん早く乾くのは明日の…」が出る。同じことを言う「明日9時に干すなら」は出さない
+  await expect(page.locator('#best-start')).toContainText('明日の');
+  await expect(page.locator('#tomorrow')).toBeHidden();
+});

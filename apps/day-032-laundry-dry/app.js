@@ -320,10 +320,13 @@ function renderBest(result, now, late) {
     node.hidden = true;
   }
 
-  // 明日の朝9時に干した場合の見通し
+  /* 明日の朝9時に干した場合の見通し。
+     ただし「いちばん早く乾くのは」が既に明日を指しているときは出さない。
+     ほとんど同じことを2行続けて言うことになる（本番の実機で気づいた）。 */
   const tomorrowStart = nextMorning(now);
   const forecastEnd = hours.length ? hours[hours.length - 1].time : null;
-  if (forecastEnd && parseWall(tomorrowStart) <= parseWall(forecastEnd)) {
+  const bestIsTomorrow = !node.hidden && best && best.startAt.slice(0, 10) === tomorrowStart.slice(0, 10);
+  if (!bestIsTomorrow && forecastEnd && parseWall(tomorrowStart) <= parseWall(forecastEnd)) {
     const next = predict({ hours, sunsets, startAt: tomorrowStart, fabric: state.fabric, place: state.placeKind });
     tomorrow.hidden = false;
     tomorrow.textContent = next.driedAt && next.driedToday
