@@ -41,6 +41,7 @@ AIと一緒に作りながら、「AIに任せたこと」と「自分で考え�
 | 030 | [せかいのまど](apps/day-030-world-window/) | https://hundred-days.pages.dev/day-030-world-window/ |
 | 031 | [この形、どこ？](apps/day-031-shape-where/) | https://hundred-days.pages.dev/day-031-shape-where/ |
 | 032 | [いま干していい？](apps/day-032-laundry-dry/) | https://hundred-days.pages.dev/day-032-laundry-dry/ |
+| 033 | [揺れた？](apps/day-033-did-it-shake/) | https://hundred-days.pages.dev/day-033-did-it-shake/ |
 
 ## 1日アプリのルール
 

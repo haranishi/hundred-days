@@ -162,7 +162,10 @@ const CONNECT_BY_APP = {
   'day-031-shape-where': 'https://ja.wikipedia.org',
   /* day-032 は市区町村の代表点を同梱していて、外へ出るのは天気の予報1本だけ。
      地名から座標を引く外部サービスは使わない（解禁されているAPIは1個なので天気に使い切る） */
-  'day-032-laundry-dry': 'https://api.open-meteo.com'
+  'day-032-laundry-dry': 'https://api.open-meteo.com',
+  /* day-033 は市区町村の代表点を同梱していて、外へ出るのは気象庁の地震情報一覧1本だけ。
+     現在地の座標は端末の中で照合し、場所を変えても再取得しない */
+  'day-033-did-it-shake': 'https://www.jma.go.jp'
 };
 
 /* day-025 の MapLibre は blob: から Web Worker を起こす。

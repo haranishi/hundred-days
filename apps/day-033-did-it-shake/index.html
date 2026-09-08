@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>揺れた？</title>
+  <meta name="description" content="いまの揺れは地震だったのか。気象庁の発表から、あなたの街の震度ときょうの回数を出します。">
+  <meta name="share:text" content="揺れた？ — いまの揺れと、きょう日本で揺れた回数を確かめる">
+  <link rel="stylesheet" href="./app.css">
+  <link rel="stylesheet" href="./shared/share.css">
+  <script src="./shared/share.js" defer></script>
+</head>
+<body>
+  <header class="site-head">
+    <p class="eyebrow">DAY 033 · DID IT SHAKE?</p>
+    <h1>揺れた？</h1>
+    <p class="site-description">いまの揺れを、気象庁の発表で確かめる</p>
+  </header>
+  <main id="app" data-state="loading" data-place="none">
+    <section id="loading" class="panel" aria-busy="true" hidden>
+      <p>気象庁の発表を確かめています…</p>
+    </section>
+    <section id="ready" class="panel" hidden>
+      <div id="headline" class="headline" aria-live="polite" aria-atomic="true">
+        <h2 id="answer" data-kind="none"></h2>
+        <p id="answer-sub"></p>
+        <p id="your-intensity" class="badge badge--intensity" hidden></p>
+        <p id="place-hint" class="place-hint" hidden>あなたの街は未設定。場所を選ぶと震度が出ます</p>
+        <p id="fine-print" class="notice" hidden>震度1未満の揺れは発表に載りません</p>
+      </div>
+      <button id="check" class="button button--primary" type="button">いま揺れた？</button>
+      <p id="checked-at" class="notice" role="status"></p>
+      <p id="answer-note" class="answer-note" hidden></p>
+      <div class="place-row">
+        <p id="place-name">場所</p>
+        <div class="actions">
+          <button id="use-location" class="button" type="button">現在地</button>
+          <button id="pick-place" class="button" type="button">市区町村から選ぶ</button>
+          <button id="clear-place" class="button" type="button" hidden>場所を外す</button>
+        </div>
+        <p class="notice">現在地の座標は端末の外に出しません</p>
+        <p id="geo-note" class="notice" role="status" hidden></p>
+        <p id="storage-notice" class="notice" role="status" hidden>この環境では場所を覚えられません</p>
+      </div>
+      <section class="today" aria-labelledby="today-label">
+        <h2 id="today-label">きょう（0時から）、日本で震度1以上の地震</h2>
+        <p class="count"><strong id="today-count">0</strong> 回</p>
+        <div id="strip" role="img" aria-label=""></div>
+        <div id="strip-axis" aria-hidden="true"></div>
+        <p id="strip-peak" class="strip-peak"></p>
+        <p class="notice">左から過去24時間。数字はその時間の最大震度（色は気象庁の震度配色）</p>
+        <p id="legend" class="legend" aria-label="震度の色"><span class="legend__label">震度の色</span></p>
+      </section>
+      <p id="your-town" hidden></p>
+      <details id="recent">
+        <summary>直近の地震（10件）</summary>
+        <table><thead><tr><th scope="col">時刻</th><th scope="col">震源地・M</th><th scope="col">最大震度</th></tr></thead><tbody id="recent-body"></tbody></table>
+      </details>
+      <p class="result-share"><button id="post-result" class="button" type="button">この結果をXに投稿</button></p>
+    </section>
+    <section id="empty" class="panel" role="status" hidden>
+      <div class="headline">
+        <h2 class="error__title">発表の一覧が<wbr>空でした</h2>
+      </div>
+      <button id="empty-retry" class="button button--primary button--wide" type="button">もう一度確かめる</button>
+      <p id="empty-checked" class="notice"></p>
+    </section>
+    <section id="error" class="panel" role="alert" hidden>
+      <div class="headline headline--error">
+        <h2 class="error__title">発表が取れません</h2>
+        <p id="error-text"></p>
+      </div>
+      <button id="retry" class="button button--primary button--wide" type="button">もう一度確かめる</button>
+    </section>
+  </main>
+  <dialog id="place-dialog" class="dialog" aria-labelledby="place-dialog-title">
+    <form method="dialog" class="dialog__form">
+      <h2 id="place-dialog-title" class="dialog__title">市区町村を選ぶ</h2>
+      <label class="dialog__label" for="pref-select">都道府県</label>
+      <select id="pref-select" class="dialog__select"></select>
+      <label class="dialog__label" for="town-select">市区町村</label>
+      <select id="town-select" class="dialog__select"></select>
+      <div class="dialog__actions">
+        <button id="place-cancel" class="button" type="button">やめる</button>
+        <button id="place-confirm" class="button button--primary" type="button">この場所にする</button>
+      </div>
+    </form>
+  </dialog>
+
+  <footer class="site-foot">
+    <p>出典：<a href="https://www.jma.go.jp/bosai/map.html#contents=earthquake_map" target="_blank" rel="noopener">気象庁ホームページ 地震情報</a>を加工して作成</p>
+    <p>市区町村名は<a href="https://www.stat.go.jp/data/kokusei/2020/" target="_blank" rel="noopener">令和2年国勢調査（総務省統計局）</a>、地点は<a href="https://www.e-stat.go.jp/gis" target="_blank" rel="noopener">境界データ（e-Stat統計GIS）</a>の小地域重心から人口加重で独自に計算した代表点です。</p>
+    <p><a href="https://www.digital.go.jp/assets/contents/node/basic_page/field_ref_resources/f7fde41d-ffca-4b2a-9b25-94b8a701a037/24afdf33/20240705_resources_data_outline_05.pdf" target="_blank" rel="noopener">公共データ利用規約（第1.0版）</a></p>
+    <p><strong>気象庁の発表そのものではありません。身の安全にかかわる判断は公式の情報で確認してください。</strong></p>
+    <p>緊急地震速報・津波情報は扱いません。</p>
+  </footer>
+  <script type="module" src="./app.js"></script>
+</body>
+</html>
