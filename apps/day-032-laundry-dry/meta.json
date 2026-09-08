@@ -1,0 +1,36 @@
+{
+  "day": 32,
+  "season": 2,
+  "title": "いま干していい？",
+  "description": "洗濯物をいま外に干したら何時に乾いて、何時までに取り込むかを出す。気温・湿度・風・日射を1つにまとめた「大気の乾かす力」で、洗濯物が持っている水の量を割って時間にする。降水確率ではなく乾く時刻で答えるので、洗濯機の前での迷いがその場で終わる",
+  "tags": [
+    "weather",
+    "laundry",
+    "forecast",
+    "open-meteo",
+    "external-api",
+    "geolocation",
+    "localstorage",
+    "vanilla-js",
+    "no-dependencies"
+  ],
+  "status": "published",
+  "publicUrl": "https://hundred-days.pages.dev/day-032-laundry-dry/",
+  "screenshot": "screenshot.webp",
+  "demo": "demo.mp4",
+  "startedAt": "2026-09-08",
+  "finishedAt": "2026-09-08",
+  "sourceOfIdea": "「需要ベースWebアプリ100案」042「洗濯物の乾き予測」。2026-09-08にAIが出した4案から本人が選定。困りごとは干す作業ではなく『いつ・どこに干すかの判断』",
+  "aiHandled": [
+    "着手前の規約チェック。Open-Meteo の利用条件（無料は非商用のみ・広告や課金のないアプリは該当・1日1万回まで）とデータのライセンス（CC BY 4.0・表示は『Weather data by Open-Meteo.com』）を原文で確認した",
+    "乾きの計算を組んだ。ET0（FAO-56 基準蒸発散量）で洗濯物の水の量を割る式にし、係数は『真夏の薄手は1時間ちょっと』『冬は晴れても厚手は1日では乾かない』などの体感3つに合わせて決めた。実測ではないことを画面とREADMEに明記した",
+    "地名から座標を引く外部サービスを使わずに済むよう、Day 015 の代表点から1,741市区町村の一覧を作って同梱した（解禁されているAPIは1個なので天気に使い切る）",
+    "時刻を『日本時間の壁掛け時計の文字列』で持つようにした。Date に入れて比べると動かす環境のタイムゾーンで結果が変わる（CIはUTC）",
+    "ユニットテストとE2Eを書いた"
+  ],
+  "humanHandled": [
+    "題材の選定（4案から「洗濯物の乾き予測」を選んだ）",
+    "実機での確認とX投稿"
+  ],
+  "failuresAndFixes": []
+}
