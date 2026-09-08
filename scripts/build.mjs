@@ -159,7 +159,10 @@ const CONNECT_BY_APP = {
   'day-030-world-window': 'https://tiles.openfreemap.org',
   /* day-031 は形を同梱していて、正解を出したあとに Wikipedia の要約だけを取りに行く。
      ここに足さないと画面には何も出ないまま（try/catch に吸われる）本番だけが黙って止まる */
-  'day-031-shape-where': 'https://ja.wikipedia.org'
+  'day-031-shape-where': 'https://ja.wikipedia.org',
+  /* day-032 は市区町村の代表点を同梱していて、外へ出るのは天気の予報1本だけ。
+     地名から座標を引く外部サービスは使わない（解禁されているAPIは1個なので天気に使い切る） */
+  'day-032-laundry-dry': 'https://api.open-meteo.com'
 };
 
 /* day-025 の MapLibre は blob: から Web Worker を起こす。

@@ -1,0 +1,249 @@
+/* 晴れた日の物干し。地は空色に寄せた白、文字は紺墨。
+   よく乾く＝晴れ色、五分五分＝曇り、やめておく＝雨色。色だけで意味を伝えず、必ず文字を添える。 */
+
+:root {
+  --bg: #f4f8fb;
+  --card: #ffffff;
+  --ink: #1b2b3a;
+  --muted: #5d7186;
+  --line: #d9e3ec;
+  --sun: #e8a33d;
+  --sun-weak: #f7e2bf;
+  --cloud: #7d8fa1;
+  --rain: #3f7ec4;
+  --rain-weak: #cfe0f2;
+  --night: #c3cdd8;
+  --done: #eef3f7;
+  --radius: 14px;
+  --shadow: 0 1px 2px rgba(27, 43, 58, .06), 0 6px 20px rgba(27, 43, 58, .06);
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  padding: 24px 16px 56px;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Noto Sans JP", system-ui, sans-serif;
+  line-height: 1.7;
+  -webkit-text-size-adjust: 100%;
+}
+
+.sr-only {
+  position: absolute; width: 1px; height: 1px;
+  margin: -1px; padding: 0; overflow: hidden;
+  clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+
+.site-head, main, .site-foot { max-width: 640px; margin-inline: auto; }
+
+.site-head { margin-bottom: 20px; }
+.eyebrow {
+  margin: 0 0 2px; font-size: 12px; letter-spacing: .14em;
+  color: var(--muted); font-weight: 700;
+}
+.site-head h1 { margin: 0; font-size: clamp(26px, 7vw, 34px); letter-spacing: .01em; }
+.site-description { margin: 4px 0 0; color: var(--muted); font-size: 14px; }
+
+.panel {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 20px 18px;
+}
+
+.lead { margin: 0 0 18px; font-size: 15px; color: var(--muted); }
+
+.start__actions { display: flex; flex-wrap: wrap; gap: 10px; }
+
+.button {
+  min-height: 48px;
+  padding: 12px 18px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--card);
+  color: var(--ink);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+.button:hover { background: #f1f6fa; }
+.button--primary { background: var(--ink); border-color: var(--ink); color: #fff; }
+.button--primary:hover { background: #26394b; }
+.button:focus-visible, .option:focus-visible, .linklike:focus-visible, summary:focus-visible {
+  outline: 3px solid var(--rain); outline-offset: 2px;
+}
+
+.linklike {
+  min-height: 44px; padding: 0 4px;
+  border: 0; background: none; color: var(--muted);
+  font: inherit; text-decoration: underline; cursor: pointer;
+}
+
+.notice {
+  margin: 14px 0 0; padding: 10px 12px;
+  background: #f1f6fa; border-radius: 10px;
+  font-size: 13px; color: var(--muted);
+}
+
+/* 読み込み中 */
+.loading__text { margin: 0 0 12px; color: var(--muted); }
+.loading__bar { height: 6px; background: var(--done); border-radius: 999px; overflow: hidden; }
+.loading__bar span {
+  display: block; width: 40%; height: 100%;
+  background: var(--sun); border-radius: 999px;
+  animation: slide 1.1s ease-in-out infinite;
+}
+@keyframes slide { 0% { transform: translateX(-100%); } 100% { transform: translateX(250%); } }
+
+/* 場所 */
+.place-row {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 8px; margin: 0 0 8px;
+}
+.place-row__name { font-weight: 700; }
+
+/* 主役＝乾き上がり時刻 */
+.headline {
+  padding: 14px 0 6px;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 14px;
+}
+.headline__label { margin: 0; color: var(--muted); font-size: 14px; }
+.headline__time {
+  margin: 0; font-size: clamp(48px, 16vw, 76px); line-height: 1.06;
+  font-weight: 800; letter-spacing: -.02em; font-variant-numeric: tabular-nums;
+}
+.headline__time:focus-visible { outline: 3px solid var(--rain); outline-offset: 4px; }
+.headline[data-late="true"] .headline__time { font-size: clamp(26px, 8vw, 38px); line-height: 1.25; }
+.headline__sub { margin: 2px 0 0; color: var(--muted); font-size: 15px; }
+
+.verdict {
+  display: inline-block; margin: 12px 0 0;
+  padding: 6px 14px; border-radius: 999px;
+  font-weight: 700; font-size: 15px;
+  background: var(--sun-weak); color: #7a5210;
+}
+.headline[data-verdict="fair"] .verdict { background: #e7edf2; color: #3f5468; }
+.headline[data-verdict="bad"] .verdict { background: var(--rain-weak); color: #1f4f86; }
+
+.bring-in { margin: 0 0 6px; font-size: 17px; font-weight: 700; }
+.smell {
+  margin: 6px 0 0; padding: 10px 12px;
+  background: #fdf4e6; border-left: 4px solid var(--sun);
+  border-radius: 0 10px 10px 0; font-size: 14px;
+}
+
+/* 24時間バー */
+.timeline { margin: 18px 0 0; }
+.timeline__bar {
+  display: grid; grid-auto-flow: column; grid-auto-columns: 1fr;
+  height: 46px; gap: 2px;
+  border-radius: 10px; overflow: hidden;
+  background: var(--done);
+}
+.timeline__cell { position: relative; background: var(--done); }
+.timeline__cell[data-kind="dry"] { background: var(--sun-weak); }
+.timeline__cell[data-kind="rain"] { background: var(--rain); }
+.timeline__cell[data-kind="night"] { background: var(--night); }
+.timeline__cell[data-kind="done"] { background: var(--done); }
+/* 乾く勢いを高さで見せる（濃さだけに頼らない） */
+.timeline__fill {
+  position: absolute; left: 0; right: 0; bottom: 0;
+  background: var(--sun);
+  transform-origin: bottom;
+  animation: grow .45s ease-out both;
+}
+@keyframes grow { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+.timeline__cell[data-dried="true"]::after {
+  content: ""; position: absolute; inset: 0 auto 0 0;
+  width: 3px; background: var(--ink);
+}
+.timeline__axis {
+  display: grid; grid-auto-flow: column; grid-auto-columns: 1fr;
+  gap: 2px; margin-top: 4px;
+  font-size: 11px; color: var(--muted); font-variant-numeric: tabular-nums;
+}
+.timeline__legend {
+  display: flex; flex-wrap: wrap; gap: 10px;
+  margin: 8px 0 0; font-size: 12px; color: var(--muted);
+}
+.chip::before {
+  content: ""; display: inline-block;
+  width: 10px; height: 10px; margin-right: 4px;
+  border-radius: 3px; vertical-align: -1px;
+}
+.chip--dry::before { background: var(--sun); }
+.chip--rain::before { background: var(--rain); }
+.chip--night::before { background: var(--night); }
+.chip--done::before { background: var(--done); border: 1px solid var(--line); }
+
+/* 切り替え */
+.controls { display: grid; gap: 16px; margin: 20px 0 0; }
+.control { margin: 0; padding: 0; border: 0; }
+.control__legend { padding: 0 0 6px; font-size: 13px; color: var(--muted); font-weight: 700; }
+.control__row { display: flex; gap: 8px; flex-wrap: wrap; }
+.option {
+  flex: 1 1 0; min-width: 88px; min-height: 52px;
+  padding: 8px 10px;
+  border: 1px solid var(--line); border-radius: 12px;
+  background: var(--card); color: var(--ink);
+  font: inherit; font-weight: 700; line-height: 1.3;
+  white-space: nowrap; /* 「日かげ・軒下」が途中で折れると読めない */
+  cursor: pointer;
+}
+.option:hover { background: #f1f6fa; }
+.option[aria-checked="true"] {
+  background: var(--ink); border-color: var(--ink); color: #fff;
+}
+.control__note { margin: 6px 0 0; font-size: 13px; color: var(--muted); }
+
+.hint { margin: 14px 0 0; font-size: 15px; }
+.hint strong { font-weight: 800; }
+
+.why { margin: 18px 0 0; border-top: 1px solid var(--line); padding-top: 12px; }
+.why summary { cursor: pointer; font-size: 14px; color: var(--muted); min-height: 44px; display: flex; align-items: center; }
+.why__body { font-size: 14px; }
+.why__formula {
+  margin: 0 0 10px; padding: 10px 12px;
+  background: #f1f6fa; border-radius: 10px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 13px;
+}
+.why__values { display: grid; grid-template-columns: auto 1fr; gap: 2px 14px; margin: 0 0 10px; }
+.why__values dt { color: var(--muted); }
+.why__values dd { margin: 0; font-variant-numeric: tabular-nums; }
+.why__caveat { margin: 0; color: var(--muted); font-size: 13px; }
+
+.error__text { margin: 0 0 14px; font-weight: 700; }
+
+/* 場所選び */
+.dialog {
+  width: min(420px, calc(100vw - 32px));
+  border: 1px solid var(--line); border-radius: var(--radius);
+  padding: 20px; color: var(--ink); background: var(--card);
+}
+.dialog::backdrop { background: rgba(27, 43, 58, .4); }
+.dialog__title { margin: 0 0 14px; font-size: 18px; }
+.dialog__label { display: block; margin: 10px 0 4px; font-size: 13px; color: var(--muted); }
+.dialog__select {
+  width: 100%; min-height: 48px; padding: 8px 10px;
+  border: 1px solid var(--line); border-radius: 10px;
+  background: var(--card); color: var(--ink); font: inherit;
+}
+.dialog__actions { display: flex; gap: 10px; margin-top: 18px; }
+.dialog__actions .button { flex: 1; }
+
+.site-foot {
+  margin-top: 28px; padding-top: 16px;
+  border-top: 1px solid var(--line);
+  font-size: 12px; color: var(--muted);
+}
+.site-foot p { margin: 0 0 6px; }
+.site-foot a { color: var(--muted); }
+
+@media (prefers-reduced-motion: reduce) {
+  .loading__bar span, .timeline__fill { animation: none; }
+  .timeline__fill { transform: none; }
+}

@@ -40,6 +40,7 @@ AIと一緒に作りながら、「AIに任せたこと」と「自分で考え�
 | 029 | [ちかくのWi-Fi](apps/day-029-nearby-wifi/) | https://hundred-days.pages.dev/day-029-nearby-wifi/ |
 | 030 | [せかいのまど](apps/day-030-world-window/) | https://hundred-days.pages.dev/day-030-world-window/ |
 | 031 | [この形、どこ？](apps/day-031-shape-where/) | https://hundred-days.pages.dev/day-031-shape-where/ |
+| 032 | [いま干していい？](apps/day-032-laundry-dry/) | https://hundred-days.pages.dev/day-032-laundry-dry/ |
 
 ## 1日アプリのルール
 
