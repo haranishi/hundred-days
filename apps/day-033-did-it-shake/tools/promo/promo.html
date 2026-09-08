@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=1080, initial-scale=1">
+  <title>揺れた？ — プロモーション動画</title>
+  <link rel="stylesheet" href="./promo.css">
+</head>
+<body>
+  <main id="promo" aria-label="揺れた？ プロモーション動画">
+    <!-- 背景は角丸の帯。5つがゆっくり漂う -->
+    <div id="backdrop" aria-hidden="true">
+      <svg class="ghost" viewBox="0 0 100 130" xmlns="http://www.w3.org/2000/svg"><path d="M26 20H74Q84 20 84 30V100Q84 110 74 110H26Q16 110 16 100V30Q16 20 26 20Z"></path></svg>
+      <svg class="ghost" viewBox="0 0 100 130" xmlns="http://www.w3.org/2000/svg"><path d="M26 20H74Q84 20 84 30V100Q84 110 74 110H26Q16 110 16 100V30Q16 20 26 20Z"></path></svg>
+      <svg class="ghost" viewBox="0 0 100 130" xmlns="http://www.w3.org/2000/svg"><path d="M26 20H74Q84 20 84 30V100Q84 110 74 110H26Q16 110 16 100V30Q16 20 26 20Z"></path></svg>
+      <svg class="ghost" viewBox="0 0 100 130" xmlns="http://www.w3.org/2000/svg"><path d="M26 20H74Q84 20 84 30V100Q84 110 74 110H26Q16 110 16 100V30Q16 20 26 20Z"></path></svg>
+      <svg class="ghost" viewBox="0 0 100 130" xmlns="http://www.w3.org/2000/svg"><path d="M26 20H74Q84 20 84 30V100Q84 110 74 110H26Q16 110 16 100V30Q16 20 26 20Z"></path></svg>
+    </div>
+
+    <div id="phone" class="phone" aria-label="揺れた？ アプリ画面">
+      <div class="phone-speaker" aria-hidden="true"></div>
+      <div class="phone-screen">
+        <iframe id="app-frame" title="揺れた？" data-src="/index.html"></iframe>
+      </div>
+    </div>
+
+    <section id="title-scene" class="title-scene" aria-label="タイトル">
+      <!-- 答えの1行と震度バッジを図形にしたマーク -->
+      <div class="app-mark" aria-hidden="true">
+        <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+          <rect class="mark-answer" x="20" y="36" width="160" height="62" rx="16"></rect>
+          <rect class="mark-badge" x="48" y="116" width="104" height="48" rx="10"></rect>
+        </svg>
+      </div>
+      <h1 id="main-title">揺れた？</h1>
+      <p id="main-lead">いまの揺れを、<br>気象庁の発表で確かめる</p>
+      <p id="challenge-label">DAY 033 · 100日チャレンジ</p>
+    </section>
+
+    <div id="choice-ring" aria-hidden="true"></div>
+    <div id="post-ring" aria-hidden="true"></div>
+    <div id="tap-ripple" aria-hidden="true"></div>
+    <div id="finger" aria-hidden="true">
+      <svg viewBox="0 0 120 210" xmlns="http://www.w3.org/2000/svg">
+        <path class="finger-body" d="M60 8c17 0 29 14 29 33l4 111c1 29-14 50-33 50s-34-21-33-50l4-111c0-19 12-33 29-33z"></path>
+        <ellipse class="finger-nail" cx="60" cy="38" rx="15" ry="19"></ellipse>
+      </svg>
+    </div>
+
+    <section id="promise-scene" class="promise-scene" aria-label="このアプリの約束">
+      <p><span class="dot answer-dot"></span>地図も警報も出さない</p>
+      <p><span class="dot intensity-dot"></span>気象庁の発表を1行に</p>
+      <p class="sources">出典：気象庁ホームページ<br>地震情報を加工して作成</p>
+    </section>
+
+    <section id="end-scene" class="end-scene" aria-label="揺れた？ URL">
+      <div class="app-mark small" aria-hidden="true">
+        <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+          <rect class="mark-answer" x="20" y="36" width="160" height="62" rx="16"></rect>
+          <rect class="mark-badge" x="48" y="116" width="104" height="48" rx="10"></rect>
+        </svg>
+      </div>
+      <h2>揺れた？</h2>
+      <p class="url">hundred-days.pages.dev/<br>day-033-did-it-shake/</p>
+      <p class="day">Day 033 / 100</p>
+    </section>
+
+    <div id="caption" class="caption" aria-live="off"></div>
+    <div id="fade-out" aria-hidden="true"></div>
+  </main>
+  <script type="module" src="./promo.js"></script>
+</body>
+</html>
