@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=1080, initial-scale=1">
+  <title>潮、いまどっち？ — プロモーション動画</title>
+  <link rel="stylesheet" href="./promo.css">
+</head>
+<body>
+  <main id="promo" aria-label="潮、いまどっち？ プロモーション動画">
+    <!-- 背景は海の波の帯。5つがゆっくり漂う -->
+    <div id="backdrop" aria-hidden="true">
+      <svg class="ghost" viewBox="0 0 200 100" xmlns="http://www.w3.org/2000/svg"><path d="M0 30Q25 5 50 30T100 30T150 30T200 30V75Q175 100 150 75T100 75T50 75T0 75Z"></path></svg>
+      <svg class="ghost" viewBox="0 0 200 100" xmlns="http://www.w3.org/2000/svg"><path d="M0 30Q25 5 50 30T100 30T150 30T200 30V75Q175 100 150 75T100 75T50 75T0 75Z"></path></svg>
+      <svg class="ghost" viewBox="0 0 200 100" xmlns="http://www.w3.org/2000/svg"><path d="M0 30Q25 5 50 30T100 30T150 30T200 30V75Q175 100 150 75T100 75T50 75T0 75Z"></path></svg>
+      <svg class="ghost" viewBox="0 0 200 100" xmlns="http://www.w3.org/2000/svg"><path d="M0 30Q25 5 50 30T100 30T150 30T200 30V75Q175 100 150 75T100 75T50 75T0 75Z"></path></svg>
+      <svg class="ghost" viewBox="0 0 200 100" xmlns="http://www.w3.org/2000/svg"><path d="M0 30Q25 5 50 30T100 30T150 30T200 30V75Q175 100 150 75T100 75T50 75T0 75Z"></path></svg>
+    </div>
+
+    <div id="phone" class="phone" aria-label="潮、いまどっち？ アプリ画面">
+      <div class="phone-speaker" aria-hidden="true"></div>
+      <div class="phone-screen">
+        <iframe id="app-frame" title="潮、いまどっち？" data-src="/index.html"></iframe>
+      </div>
+    </div>
+
+    <section id="title-scene" class="title-scene" aria-label="タイトル">
+      <!-- 海の波と「いま」の縦線を図形にしたマーク -->
+      <div class="app-mark" aria-hidden="true">
+        <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+          <path class="mark-answer" d="M20 80Q60 20 100 80T180 80V155H20Z"></path>
+          <path class="mark-wave" d="M20 80Q60 20 100 80T180 80"></path>
+          <path class="mark-now" d="M126 32V164"></path>
+        </svg>
+      </div>
+      <h1 id="main-title">潮、いまどっち？</h1>
+      <p id="main-lead">いまの潮を、<br>気象庁の潮位表で1行に</p>
+      <p id="challenge-label">DAY 034 · 100日チャレンジ</p>
+    </section>
+
+    <div id="choice-ring" aria-hidden="true"></div>
+    <div id="post-ring" aria-hidden="true"></div>
+    <div id="tap-ripple" aria-hidden="true"></div>
+    <div id="finger" aria-hidden="true">
+      <svg viewBox="0 0 120 210" xmlns="http://www.w3.org/2000/svg">
+        <path class="finger-body" d="M60 8c17 0 29 14 29 33l4 111c1 29-14 50-33 50s-34-21-33-50l4-111c0-19 12-33 29-33z"></path>
+        <ellipse class="finger-nail" cx="60" cy="38" rx="15" ry="19"></ellipse>
+      </svg>
+    </div>
+
+    <section id="promise-scene" class="promise-scene" aria-label="このアプリの約束">
+      <p><span class="dot answer-dot"></span>月間表は出さない</p>
+      <p><span class="dot tide-dot"></span><span>気象庁の潮位表<br>（推算値）を1行に</span></p>
+      <p class="sources">出典：気象庁ホームページ<br>潮位表を加工して作成</p>
+    </section>
+
+    <section id="end-scene" class="end-scene" aria-label="潮、いまどっち？ URL">
+      <div class="app-mark small" aria-hidden="true">
+        <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+          <path class="mark-answer" d="M20 80Q60 20 100 80T180 80V155H20Z"></path>
+          <path class="mark-wave" d="M20 80Q60 20 100 80T180 80"></path>
+          <path class="mark-now" d="M126 32V164"></path>
+        </svg>
+      </div>
+      <h2>潮、いまどっち？</h2>
+      <p class="url">hundred-days.pages.dev/<br>day-034-tide-now/</p>
+      <p class="day">Day 034 / 100</p>
+    </section>
+
+    <div id="caption" class="caption" aria-live="off"></div>
+    <div id="fade-out" aria-hidden="true"></div>
+  </main>
+  <script type="module" src="./promo.js"></script>
+</body>
+</html>

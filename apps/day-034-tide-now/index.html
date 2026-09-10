@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>潮、いまどっち？</title>
+  <meta name="description" content="いま潮は満ちている？ 引いている？ 気象庁の潮位表から、次の満干ときょうの潮をひと目で。">
+  <meta name="share:text" content="潮、いまどっち？ — いまの潮と、次の満潮・干潮を確かめる">
+  <link rel="stylesheet" href="./app.css">
+  <link rel="stylesheet" href="./shared/share.css">
+  <script src="./shared/share.js" defer></script>
+</head>
+<body>
+  <header class="site-head">
+    <p class="eyebrow">DAY 034 · TIDE NOW</p>
+    <h1>潮、いまどっち？</h1>
+    <p class="site-description">海に行く前に、いまの潮をひと目で。</p>
+  </header>
+  <main id="app" data-state="pick" data-place="none" class="panel">
+    <section id="pick"><h2 id="pick-title">どこの潮？</h2></section>
+    <section id="loading" aria-busy="true" role="status" hidden><p>潮位表を読んでいます…</p></section>
+    <section id="ready" hidden>
+      <div id="headline" class="headline" aria-live="polite" aria-atomic="true">
+        <div class="headline-top"><p id="station-name" hidden></p><span id="as-of-sep" class="notice" aria-hidden="true" hidden>·</span><p id="as-of" class="notice"></p></div>
+        <h2 id="answer" data-kind="unknown"></h2>
+        <p id="answer-sub"></p>
+        <p id="remaining" hidden></p>
+        <div class="tide-row"><strong id="tide-name" class="badge"></strong><span class="notice">黄経差から</span></div>
+        <p id="now-level"></p>
+        <p id="now-level-note" class="notice">推定・潮位表基準面から</p>
+      </div>
+      <p id="range"></p>
+      <svg id="curve" viewBox="0 0 656 252" role="img" aria-label="きょうの潮位"></svg>
+    </section>
+    <section id="empty" role="status" hidden><h2>きょうの潮位表が見つかりません</h2></section>
+    <section id="error" role="alert" hidden><h2 id="error-text">潮位表が取れません</h2><p id="error-note"></p></section>
+    <div class="place-row">
+      <div class="actions">
+        <button id="pick-station" type="button">地点を選ぶ</button>
+        <button id="use-location" type="button">現在地でいまの潮を見る</button>
+      </div>
+      <div class="links">
+        <button id="retry" type="button" hidden>もう一度読み込む</button>
+        <button id="clear-station" type="button" hidden>地点を外す</button>
+      </div>
+      <p id="far-note" class="notice" hidden>海から離れています。参考程度に</p>
+      <p id="geo-privacy" class="notice">現在地の座標は端末の外に出しません</p>
+      <p id="geo-note" class="notice" role="status" hidden></p>
+      <p id="storage-notice" class="notice" role="status" hidden>この環境では地点を覚えられません</p>
+    </div>
+    <section id="tables" hidden>
+      <table id="events-today"><caption></caption><thead><tr><th scope="col">種類</th><th scope="col">時刻</th><th scope="col">潮位</th></tr></thead><tbody></tbody></table>
+      <table id="events-tomorrow"><caption></caption><thead><tr><th scope="col">種類</th><th scope="col">時刻</th><th scope="col">潮位</th></tr></thead><tbody></tbody></table>
+      <p class="result-share"><button id="post-result" type="button">いまの潮をXに投稿</button></p>
+    </section>
+  </main>
+  <dialog id="station-dialog" aria-labelledby="station-dialog-title">
+    <form method="dialog">
+      <h2 id="station-dialog-title">地点を選ぶ</h2>
+      <label for="pref-select">都道府県</label><select id="pref-select"></select>
+      <p class="notice">内陸の県はありません。近くの海の県を選んでください</p>
+      <label for="station-select">地点</label><select id="station-select"></select>
+      <div class="actions"><button id="station-cancel" type="button">やめる</button><button id="station-confirm" type="button">この地点にする</button></div>
+    </form>
+  </dialog>
+  <footer class="site-foot">
+    <p>出典：<a href="https://www.data.jma.go.jp/kaiyou/db/tide/suisan/index.php" target="_blank" rel="noopener">気象庁ホームページ 潮位表</a>を加工して作成</p>
+    <p>地点：<a href="https://www.data.jma.go.jp/kaiyou/db/tide/suisan/station.php" target="_blank" rel="noopener">潮位表掲載地点一覧表</a></p>
+    <p><a href="https://www.digital.go.jp/assets/contents/node/basic_page/field_ref_resources/f7fde41d-ffca-4b2a-9b25-94b8a701a037/24afdf33/20240705_resources_data_outline_05.pdf" target="_blank" rel="noopener">公共データ利用規約（第1.0版）</a></p>
+    <p><strong>気象庁の潮位表（推算値）を加工したもので、実測の潮位ではありません。</strong>潮位は気圧・風・波で変わります。海の安全にかかわる判断は公式の情報で確認してください。</p>
+    <p>高潮・津波の情報は扱いません。</p>
+    <p>潮名は月と太陽の黄経差から機械的に付けた区分で、新聞などの潮見表と1日ずれることがあります。</p>
+  </footer>
+  <script type="module" src="./app.js"></script>
+</body>
+</html>
