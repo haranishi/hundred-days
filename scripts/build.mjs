@@ -140,6 +140,7 @@ const WIKIMEDIA_CONNECT = [
 /* 外部へ接続するのはここに挙げたDayだけ。ほかのアプリは同一オリジンに閉じている。
    ⚠️ 新しいDayで外部のAPIを叩くときは、ここに足さないとブラウザ側で接続が止まる（黙って失敗する）。 */
 const CONNECT_BY_APP = {
+  'day-034-tide-now': 'https://www.data.jma.go.jp',
   'day-010-wikipedia-live': WIKIMEDIA_CONNECT,
   'day-013-gov-answers': 'https://kokkai.ndl.go.jp',
   'day-014-hottest-now': 'https://www.jma.go.jp',

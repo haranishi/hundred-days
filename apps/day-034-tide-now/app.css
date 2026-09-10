@@ -1,0 +1,93 @@
+:root { color-scheme: light; --bg: #f4f7f9; --ink: #16303f; --muted: #4c626f; --line: #cfdae0; }
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body { margin: 0; padding: 24px 16px 56px; background: var(--bg); color: var(--ink); font-family: "Hiragino Sans", system-ui, sans-serif; line-height: 1.7; -webkit-text-size-adjust: 100%; }
+.site-head, main, .site-foot { max-width: 720px; margin-inline: auto; }
+.site-head { margin-bottom: 20px; }
+.eyebrow { margin: 0; font-size: 12px; font-weight: 700; letter-spacing: .15em; color: var(--muted); }
+h1 { margin: 0; font-size: 25px; }
+.site-description { margin: 4px 0 0; font-size: 14px; color: var(--muted); }
+.panel { padding: 20px; background: white; border: 1px solid var(--line); border-radius: 12px; box-shadow: 0 8px 28px #16303f06; }
+h2 { font-size: 24px; line-height: 1.4; }
+#pick-title { margin: 0; font-size: 24px; line-height: 1.4; }
+#answer { margin: 0; font-size: clamp(30px, 7.9vw, 40px); line-height: 1.35; overflow-wrap: anywhere; }
+.headline { padding: 24px 20px; border-radius: 12px; background: #eceff2; }
+.headline[data-kind="rising"] { background: #e3f1f8; }
+.headline[data-kind="falling"] { background: #f6ead8; }
+.headline-top { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 7px; margin-bottom: 10px; }
+#station-name { margin: 0; font-size: 16px; font-weight: 700; }
+#as-of, #as-of-sep { margin: 0; }
+#answer-sub { margin: 12px 0 10px; font-size: 15px; }
+#remaining { display: inline-block; margin: 0 0 16px; padding: 4px 18px; border-radius: 999px; background: #16303f; color: white; font-size: 22px; font-weight: 700; }
+.tide-row { display: flex; gap: 10px; align-items: center; }
+.badge { background: rgba(255, 255, 255, .75); border-radius: 12px; padding: 3px 12px; font-size: 16px; font-weight: 700; }
+#now-level { margin: 12px 0 0; font-size: 14px; }
+#now-level-note { margin: 2px 0 0; }
+#range { margin: 22px 0 2px; font-size: 15px; font-weight: 700; }
+#curve { display: block; width: 100%; height: 220px; margin-top: 12px; overflow: visible; }
+#curve text { fill: #3d525f; font-size: 15px; font-variant-numeric: tabular-nums; }
+.grid-line { stroke: #dce5e9; stroke-width: 1; }
+.water-line { fill: none; stroke: #0b6e99; stroke-width: 2.5; }
+.event-dot { fill: white; stroke: #0b6e99; stroke-width: 2; }
+.now-line { stroke: #c2410c; stroke-width: 2; stroke-dasharray: 4 3; }
+.now-dot { fill: #c2410c; stroke: white; stroke-width: 2; }
+#curve .now-label { fill: #a1360a; font-weight: 700; }
+#curve .now-level-label { fill: #a1360a; font-weight: 700; paint-order: stroke; stroke: white; stroke-width: 3px; }
+.notice { font-size: 13px; color: var(--muted); margin: 8px 0 0; }
+/* E: エラーは帯で気づかせ、見出しの下に次の行動を置く */
+#error { margin-bottom: 16px; padding-left: 14px; border-left: 4px solid #c2410c; }
+#error-text { margin: 0; font-size: 22px; }
+#error-note { margin: 8px 0 0; font-size: 15px; }
+/* G: 日本語は文節で折り返す。対応しないブラウザは無視する */
+#answer-sub, #remaining, #now-level, #range, .notice, #error-text, #error-note, caption, .site-foot p, th, td { word-break: auto-phrase; }
+.tide-row .notice { margin: 0; }
+.place-row { padding: 22px 0; }
+/* H: pick・error・empty は下に表が続かないので、カードの下の余白を上より大きくしない */
+#app[data-state="pick"] .place-row, #app[data-state="error"] .place-row, #app[data-state="empty"] .place-row { padding-bottom: 4px; }
+.actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.place-row .actions button { white-space: nowrap; }
+.links { display: flex; flex-wrap: wrap; gap: 0 18px; margin-top: 4px; }
+button, select { min-height: 44px; min-width: 44px; border: 1px solid #7c959f; border-radius: 999px; padding: 10px 16px; background: white; color: var(--ink); font: inherit; cursor: pointer; }
+button { font-weight: 700; }
+button:hover { background: #e3f1f8; }
+button:disabled { opacity: .6; cursor: wait; }
+/* 塗りは「いまの主ボタン」1つだけ。どの画面でも同じ見た目にし、状態ごとに主を入れ替える */
+#app[data-state="pick"] #use-location, #app[data-state="error"] #pick-station, #app[data-state="empty"] #pick-station, #station-confirm { min-height: 56px; border-color: #16303f; background: #16303f; color: white; }
+#app[data-state="pick"] #use-location:hover, #app[data-state="error"] #pick-station:hover, #app[data-state="empty"] #pick-station:hover, #station-confirm:hover { background: #234a5e; }
+/* リンク風は「戻す・やり直す」の段。下線だけで、指で押せる高さは保つ */
+#retry, #clear-station { padding: 10px 2px; border: 0; background: none; color: var(--muted); font-size: 13px; font-weight: 500; text-decoration: underline; }
+#retry:hover, #clear-station:hover { background: none; color: var(--ink); }
+:focus-visible { outline: 3px solid #0b6e99; outline-offset: 3px; }
+/* C: pick は主ボタンを上に、見出しと同じ左端にそろえて縦に積む（PC幅でも中央に寄せない） */
+#app[data-state="pick"] .actions { flex-direction: column; align-items: flex-start; }
+#app[data-state="pick"] .actions button { width: min(100%, 420px); }
+#app[data-state="pick"] #use-location { order: -1; }
+/* H: 座標の断り書きは現在地を押せる画面だけに出す */
+#app[data-place="picked"] #geo-privacy { display: none; }
+table { width: 100%; border-collapse: collapse; table-layout: fixed; margin: 0 0 24px; font-size: 14px; }
+caption { text-align: left; font-weight: 700; padding: 12px 0; border-top: 1px solid var(--line); }
+th, td { padding: 10px 6px; border-bottom: 1px solid var(--line); text-align: left; }
+tbody tr:last-child td { border-bottom: 0; }
+th { color: var(--muted); font-weight: 500; }
+#tables th:last-child, #tables td:last-child { text-align: right; font-variant-numeric: tabular-nums; }
+.result-share { margin-bottom: 0; }
+dialog { width: min(440px, calc(100vw - 32px)); padding: 24px; border: 1px solid var(--line); border-radius: 12px; color: var(--ink); }
+dialog::backdrop { background: rgba(22, 48, 63, .62); }
+dialog h2 { margin: 0 0 16px; font-size: 22px; }
+label { display: block; margin: 12px 0 4px; font-size: 14px; }
+select { width: 100%; border-radius: 12px; }
+dialog .actions { margin-top: 20px; }
+dialog button { flex: 1; }
+.site-foot { margin-top: 28px; border-top: 1px solid var(--line); padding-top: 16px; font-size: 12px; color: var(--muted); }
+.site-foot p { margin: 0 0 8px; }
+.site-foot a { color: inherit; }
+#answer.appear { animation: rise .6s ease-out both; }
+@keyframes rise { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+@media (min-width: 720px) { h1 { font-size: 28px; } #tables { display: grid; grid-template-columns: 1fr 1fr; gap: 0 24px; } .result-share { grid-column: 1 / -1; } }
+@media (max-width: 440px) { .panel { padding: 16px; } .headline { padding: 20px 14px; } }
+@media (prefers-reduced-motion: reduce) { #answer.appear { animation: none; } }
+/* 地点がある画面では「地点を変える」を塗りの主ボタンにそろえる（error/empty と同じ見た目。ready は 44px のまま） */
+#app[data-state="ready"] #pick-station { border-color: #16303f; background: #16303f; color: white; }
+#app[data-state="ready"] #pick-station:hover { background: #234a5e; }
+/* 取得中もカードの高さを確保して、答えが出た瞬間にページが跳ねないようにする */
+#app[data-state="loading"] { min-height: 520px; }
