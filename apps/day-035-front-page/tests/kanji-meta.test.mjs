@@ -34,6 +34,11 @@ test('stripSiteSuffix: 先頭の媒体名も落とす', () => {
   assert.equal(stripSiteSuffix('Zenn｜エンジニアのための情報共有', 'Zenn'), 'エンジニアのための情報共有');
 });
 
+test('stripSiteSuffix: 落としたあとに区切り記号を残さない', () => {
+  assert.equal(stripSiteSuffix('note ――つくる、つながる、とどける。', 'note（ノート）'), 'つくる、つながる、とどける。');
+  assert.equal(stripSiteSuffix('ITmedia NEWS - 速報', 'ITmedia NEWS'), '速報');
+});
+
 test('stripSiteSuffix: 語中のハイフンでは切らない', () => {
   assert.equal(stripSiteSuffix('e-Stat の使い方', 'Zenn'), 'e-Stat の使い方');
   assert.equal(stripSiteSuffix('e-Stat の使い方 - Zenn', 'Zenn'), 'e-Stat の使い方');

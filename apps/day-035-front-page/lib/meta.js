@@ -12,6 +12,10 @@ const EDGE_TAIL = /^(.*\S)\s*[｜|‐–—―−\-:：]\s*([^｜|‐–—―�
 const EDGE_HEAD = /^([^｜|‐–—―−\-:：]{1,40})\s*[｜|‐–—―−\-:：]\s*(\S.*)$/;
 
 const key = (value) => String(value ?? '').replace(/\s+/g, '').toLowerCase();
+/* 媒体名を落としたあとに残る区切り記号を掃除する。
+   note の og:title「note ――つくる、つながる、とどける。」から note を落とすと
+   「―つくる、…」になり、見出しが記号で始まってしまう */
+const trimEdges = (value) => value.replace(/^[｜|‐–—―−\-:：・\s]+/, '').replace(/[｜|‐–—―−\-:：・\s]+$/, '');
 
 function sameBrand(part, site) {
   const a = key(part);
@@ -24,9 +28,9 @@ export function stripSiteSuffix(title, site) {
   const text = String(title ?? '').replace(/\s+/g, ' ').trim();
   if (!text || !site) return text;
   const tail = EDGE_TAIL.exec(text);
-  if (tail && sameBrand(tail[2], site)) return tail[1].trim();
+  if (tail && sameBrand(tail[2], site)) return trimEdges(tail[1]);
   const head = EDGE_HEAD.exec(text);
-  if (head && sameBrand(head[1], site)) return head[2].trim();
+  if (head && sameBrand(head[1], site)) return trimEdges(head[2]);
   return text;
 }
 
