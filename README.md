@@ -43,6 +43,7 @@ AIと一緒に作りながら、「AIに任せたこと」と「自分で考え�
 | 032 | [いま干していい？](apps/day-032-laundry-dry/) | https://hundred-days.pages.dev/day-032-laundry-dry/ |
 | 033 | [揺れた？](apps/day-033-did-it-shake/) | https://hundred-days.pages.dev/day-033-did-it-shake/ |
 | 034 | [潮、いまどっち？](apps/day-034-tide-now/) | https://hundred-days.pages.dev/day-034-tide-now/ |
+| 035 | [きょうの一面](apps/day-035-front-page/) | https://hundred-days.pages.dev/day-035-front-page/ |
 
 ## 1日アプリのルール
 

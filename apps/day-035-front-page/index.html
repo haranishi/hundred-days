@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>きょうの一面</title>
+  <meta name="description" content="記事のリンクを貼ると、見出し・リード・写真が縦書きの新聞の一面に組み上がる。画像で保存して共有できる。">
+  <meta name="share:text" content="きょうの一面 — 貼ったリンクが、新聞の一面になる">
+  <link rel="stylesheet" href="./app.css">
+  <link rel="stylesheet" href="./shared/share.css">
+  <script src="./shared/share.js" defer></script>
+</head>
+<body>
+  <header class="site-head">
+    <p class="eyebrow">DAY 035 · FRONT PAGE</p>
+    <h1>きょうの一面</h1>
+    <p class="site-description">読んだ記事のリンクを貼ると、縦書きの一面になります。</p>
+  </header>
+
+  <main id="app" data-state="empty">
+    <section class="stage">
+      <canvas id="paper" width="1080" height="1528" role="img" aria-label="まだ記事がありません。リンクを貼ると一面が組み上がります"></canvas>
+      <p id="status" class="status" role="status" aria-live="polite" hidden>刷っています…</p>
+    </section>
+
+    <section class="controls">
+      <form id="add-form" novalidate>
+        <label for="url" id="url-label">記事のリンク</label>
+        <div class="input-row">
+          <input id="url" name="url" type="url" inputmode="url" placeholder="https://" autocomplete="off" spellcheck="false" aria-describedby="url-help">
+          <button type="button" id="paste" class="ghost">貼り付け</button>
+        </div>
+        <p id="url-help" class="notice">見出し・リード・写真・媒体名だけを読み取ります。本文は取りません。</p>
+        <button type="submit" id="submit" class="primary">一面にする</button>
+      </form>
+      <p id="error" class="error" role="alert" hidden></p>
+
+      <div id="ready-actions" class="actions" hidden>
+        <button type="button" id="save" class="primary">画像を保存</button>
+        <button type="button" id="more" class="outline">記事を足す</button>
+        <button type="button" id="reset" class="link">作り直す</button>
+      </div>
+
+      <ul id="list" class="list" aria-label="いま載っている記事"></ul>
+      <p id="hint" class="notice" hidden>保存する画像は原寸（1080×1528）です。</p>
+    </section>
+
+    <div id="share"></div>
+  </main>
+
+  <footer class="site-foot">
+    <p>貼られたページからは <strong>OGP（og:title・og:description・og:image・og:site_name）と公開日だけ</strong>を1回読み取ります。本文は取得しません。巡回もしません。</p>
+    <p>題字「一面新聞」は<strong>架空のもの</strong>です。実在の新聞社とは関係がありません。記事の見出し・リード文・写真の権利は各媒体にあります。</p>
+    <p>読み取ったURLと結果はお使いの端末に保存されます（中継サーバーは取得のためだけに通過します）。</p>
+  </footer>
+
+  <script type="module" src="./app.js"></script>
+</body>
+</html>
