@@ -62,6 +62,10 @@ function describe() {
 function render(state) {
   renderPaper(canvas, { articles, date: paperDate(), issue: issueLabel(DAY) });
   canvas.setAttribute('aria-label', describe());
+  const remaining = MAX_ARTICLES - articles.length;
+  const more = el('more');
+  more.disabled = remaining <= 0;
+  more.textContent = remaining > 0 ? `記事を足す（あと${remaining}本）` : '3本そろいました';
   list.innerHTML = '';
   articles.forEach((article, index) => {
     const item = document.createElement('li');

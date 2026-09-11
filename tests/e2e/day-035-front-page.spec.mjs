@@ -87,6 +87,9 @@ test('リンクを貼ると一面になる', async ({ page }) => {
   await stub(page);
   await page.goto(APP);
   await expect(page.locator('#app')).toHaveAttribute('data-state', 'empty');
+  // 何も無いうちは保存も足すも出さない（白紙のPNGを落とさせない）
+  await expect(page.locator('#save')).toBeHidden();
+  await expect(page.locator('#ready-actions')).toBeHidden();
   await add(page, 'https://example.com/tide');
   await expect(page.locator('#app')).toHaveAttribute('data-state', 'ready');
   await expect(page.locator('#list li')).toHaveCount(1);
@@ -126,11 +129,15 @@ test('記事は3本まで足せる', async ({ page }) => {
   for (const url of Object.keys(ARTICLES)) {
     await add(page, url);
     await expect(page.locator('#app')).toHaveAttribute('data-state', 'ready');
-    if (url !== 'https://blog.example.org/note') await page.click('#more');
+    if (url !== 'https://blog.example.org/note') {
+      await expect(page.locator('#more')).toBeEnabled();
+      await page.click('#more');
+    }
   }
   await expect(page.locator('#list li')).toHaveCount(3);
-  await page.click('#more');
-  await expect(page.locator('#error')).toContainText('3本まで');
+  // 上限に達したら押す前に分かる
+  await expect(page.locator('#more')).toBeDisabled();
+  await expect(page.locator('#more')).toHaveText('3本そろいました');
 });
 
 test('同じリンクは二度載せない', async ({ page }) => {
