@@ -10,6 +10,11 @@
 
 * { box-sizing: border-box; }
 
+/* hidden 属性を必ず効かせる。UAの [hidden]{display:none} は
+   .actions{display:flex} のようなあとの指定に負けるので、こちらで押さえる
+   （実際に空の状態で「画像を保存」が出たままになっていた） */
+[hidden] { display: none !important; }
+
 body {
   margin: 0;
   padding: 0 16px 64px;
@@ -111,6 +116,11 @@ input[type="url"]:focus-visible,
 button:focus-visible {
   outline: 3px solid var(--accent);
   outline-offset: 2px;
+}
+
+button:disabled {
+  opacity: .5;
+  cursor: default;
 }
 
 button {

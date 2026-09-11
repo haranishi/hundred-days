@@ -125,6 +125,8 @@ export function flowColumns(cells, columns, { size, charGap = size, ellipsis = f
   }
   const rest = cells.slice(index);
   if (ellipsis && rest.length && glyphs.length) {
+    // 「や（で終わったところに…を足すと括弧が閉じないまま残る。先に落とす
+    while (glyphs.length > 1 && (NO_LINE_END.has(glyphs.at(-1).text) || glyphs.at(-1).kind === 'space')) glyphs.pop();
     const last = glyphs[glyphs.length - 1];
     glyphs[glyphs.length - 1] = { ...last, text: '…', kind: 'rotate', rotate: 90, size };
   }
