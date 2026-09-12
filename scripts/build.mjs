@@ -166,7 +166,10 @@ const CONNECT_BY_APP = {
   'day-032-laundry-dry': 'https://api.open-meteo.com',
   /* day-033 は市区町村の代表点を同梱していて、外へ出るのは気象庁の地震情報一覧1本だけ。
      現在地の座標は端末の中で照合し、場所を変えても再取得しない */
-  'day-033-did-it-shake': 'https://www.jma.go.jp'
+  'day-033-did-it-shake': 'https://www.jma.go.jp',
+  /* day-037 は条文を同梱しない（法律は改正されるので古いものを持ち越さない）。
+     選ばれた条だけを e-Gov 法令API から取りに行く */
+  'day-037-baito-law': 'https://laws.e-gov.go.jp'
 };
 
 /* day-025 の MapLibre は blob: から Web Worker を起こす。

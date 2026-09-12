@@ -1,0 +1,309 @@
+/* 紙と鉛筆の色。官公庁のサイトに似せない（PDL1.0 が「国が作ったかのような態様」を禁じている）。 */
+
+:root {
+  --ground: #f1ede4;
+  --paper: #fffdf8;
+  --ink: #1f1d19;
+  --muted: #5d574b;
+  --line: #d9d2c2;
+  --accent: #7a4a2b;
+  --employer: #8a5a12;
+  --employer-bg: #f6e9d2;
+  --worker: #1f5d6b;
+  --worker-bg: #dcecef;
+  --danger: #8a2b18;
+  --radius: 12px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --ground: #191816;
+    --paper: #23211e;
+    --ink: #efe9dd;
+    --muted: #a49d8e;
+    --line: #3a3733;
+    --accent: #d6a27a;
+    --employer: #e8b878;
+    --employer-bg: #3b3123;
+    --worker: #8fc9d6;
+    --worker-bg: #22343a;
+    --danger: #e08b74;
+  }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  padding: 28px 16px 64px;
+  background: var(--ground);
+  color: var(--ink);
+  font-family: "Hiragino Sans", "Noto Sans JP", system-ui, sans-serif;
+  line-height: 1.8;
+  -webkit-text-size-adjust: 100%;
+}
+
+[hidden] { display: none !important; }
+
+.site-head,
+main,
+.site-foot {
+  margin: 0 auto;
+  max-width: 680px;
+}
+
+.eyebrow {
+  margin: 0;
+  font-size: 12px;
+  letter-spacing: .22em;
+  color: var(--muted);
+}
+
+h1 {
+  margin: 6px 0 8px;
+  font-size: 27px;
+  line-height: 1.35;
+  letter-spacing: .01em;
+}
+
+.site-description {
+  margin: 0 0 24px;
+  color: var(--muted);
+  font-size: 15px;
+  word-break: auto-phrase;
+}
+
+.section-label {
+  margin: 0 0 10px;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  color: var(--muted);
+}
+
+/* ---------- 札 ---------- */
+
+.topics {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.topic {
+  width: 100%;
+  min-height: 56px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--paper);
+  color: var(--ink);
+  font: inherit;
+  font-size: 14px;
+  line-height: 1.45;
+  text-align: left;
+  cursor: pointer;
+  word-break: auto-phrase;
+}
+
+.topic:hover { border-color: var(--accent); }
+.topic:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.topic.is-on {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--paper);
+  font-weight: 700;
+}
+
+.topic:disabled { opacity: .55; cursor: default; }
+
+.status {
+  margin: 18px 2px 0;
+  min-height: 1.7em;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+/* ---------- 条文 ---------- */
+
+.result { margin-top: 4px; }
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 10px;
+  margin: 0 0 12px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.legend__gloss { margin-right: 6px; }
+.legend__gloss--ruby { flex-basis: 100%; margin: 0; }
+
+.who {
+  padding: 1px 5px;
+  border-radius: 5px;
+  font-weight: 700;
+}
+
+.who--employer { color: var(--employer); background: var(--employer-bg); }
+.who--worker { color: var(--worker); background: var(--worker-bg); }
+
+.article {
+  padding: 20px 18px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--paper);
+}
+
+.article__law {
+  margin: 0;
+  font-size: 12px;
+  letter-spacing: .04em;
+  color: var(--muted);
+}
+
+.article__caption {
+  margin: 4px 0 16px;
+  font-size: 20px;
+  line-height: 1.4;
+}
+
+.para + .para { margin-top: 18px; }
+
+.para__num {
+  margin: 0 0 2px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.para__text {
+  margin: 0;
+  font-size: 16px;
+  line-height: 2.1;
+  text-align: justify;
+}
+
+/* ルビは本文の読みを邪魔しない大きさと濃さに。
+   user-select: none が要る。これが無いと条文をコピーしたときに読みが本文へ混ざり
+   （「六箇月6か月」）、「本文は1字も変えない」という約束が貼り付け先で崩れる。 */
+ruby rt {
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--accent);
+  letter-spacing: 0;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.items {
+  margin: 10px 0 0;
+  padding: 0 0 0 2px;
+  list-style: none;
+  font-size: 15px;
+  line-height: 2;
+}
+
+.items li {
+  display: flex;
+  gap: 8px;
+  margin-top: 6px;
+  text-align: justify;
+}
+
+.items__title {
+  flex: 0 0 auto;
+  min-width: 2.2em;
+  color: var(--muted);
+}
+
+/* ---------- 但し書き・出どころ ---------- */
+
+.disclaimer {
+  margin: 14px 0 0;
+  padding: 12px 14px;
+  border-left: 3px solid var(--accent);
+  background: var(--paper);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  font-size: 13px;
+  color: var(--ink);
+  word-break: auto-phrase;
+}
+
+.meta {
+  margin: 10px 2px 0;
+  font-size: 12px;
+  color: var(--muted);
+  word-break: auto-phrase;
+}
+
+a { color: var(--accent); }
+
+/* ---------- しくじったとき ---------- */
+
+.failure {
+  margin-top: 4px;
+  padding: 16px 18px;
+  border: 1px solid var(--danger);
+  border-radius: var(--radius);
+  background: var(--paper);
+}
+
+.failure__text {
+  margin: 0 0 12px;
+  font-size: 14px;
+  color: var(--danger);
+  word-break: auto-phrase;
+}
+
+.primary {
+  min-height: 44px;
+  padding: 0 18px;
+  border: 1px solid var(--accent);
+  border-radius: var(--radius);
+  background: var(--accent);
+  color: var(--paper);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.primary:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+
+/* ---------- 相談先 ---------- */
+
+.consult {
+  margin-top: 32px;
+  padding: 18px;
+  border: 1px dashed var(--line);
+  border-radius: var(--radius);
+}
+
+.consult p {
+  margin: 0;
+  font-size: 14px;
+  word-break: auto-phrase;
+}
+
+/* ---------- 脚注 ---------- */
+
+.site-foot {
+  margin-top: 36px;
+  padding-top: 18px;
+  border-top: 1px solid var(--line);
+  font-size: 12px;
+  line-height: 1.9;
+  color: var(--muted);
+}
+
+.site-foot p { margin: 0 0 8px; word-break: auto-phrase; }
+
+@media (max-width: 430px) {
+  body { padding: 22px 16px 56px; }
+  h1 { font-size: 23px; }
+  .para__text { font-size: 15px; }
+}

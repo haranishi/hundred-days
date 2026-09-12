@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>バイトの法律、原文はこう</title>
+  <meta name="description" content="バイトで気になることを選ぶと、根拠になる条文の原文が出る。漢数字に算用数字のルビを振り、使用者と労働者を色で分けて読めるようにした。判断はしない。">
+  <meta name="share:text" content="バイトの法律、原文はこう — 気になることを選ぶと、根拠の条文がそのまま出る">
+  <link rel="stylesheet" href="./app.css">
+  <link rel="stylesheet" href="./shared/share.css">
+  <script src="./shared/share.js" defer></script>
+</head>
+<body>
+  <header class="site-head">
+    <p class="eyebrow">DAY 037 · BAITO LAW</p>
+    <h1>バイトの法律、原文はこう</h1>
+    <p class="site-description">気になることを選ぶと、根拠になる条文がそのまま出ます。</p>
+  </header>
+
+  <main id="app" data-state="empty">
+    <section class="picker">
+      <h2 class="section-label">こんなとき</h2>
+      <ul id="topics" class="topics"></ul>
+    </section>
+
+    <p id="status" class="status" role="status" aria-live="polite">気になることを選んでください</p>
+
+    <section id="result" class="result" hidden aria-labelledby="article-caption">
+      <p class="legend">
+        <span class="who who--employer">使用者</span><span class="legend__gloss">＝雇う側</span>
+        <span class="who who--worker">労働者</span><span class="legend__gloss">＝働くあなた</span>
+        <span class="legend__gloss legend__gloss--ruby">数字の上の小さな字は、漢数字の読みです</span>
+      </p>
+
+      <article class="article">
+        <p id="article-law" class="article__law"></p>
+        <h3 id="article-caption" class="article__caption"></h3>
+        <div id="article-body" class="article__body"></div>
+      </article>
+
+      <p class="disclaimer">
+        このアプリは条文を並べて見せるだけで、<strong>あなたの場合にどうなるかは判断しません</strong>。
+        実際の扱いは、契約の中身やほかの決まりでも変わります。
+      </p>
+
+      <p id="enforced" class="meta"></p>
+      <p class="meta"><a id="source" href="https://laws.e-gov.go.jp/" target="_blank" rel="noopener noreferrer">e-Gov法令検索で原文を見る</a></p>
+    </section>
+
+    <section id="failure" class="failure" hidden role="alert">
+      <p id="failure-text" class="failure__text"></p>
+      <button type="button" id="retry" class="primary">もう一度ためす</button>
+      <p class="meta"><a id="failure-source" href="https://laws.e-gov.go.jp/" target="_blank" rel="noopener noreferrer">e-Gov法令検索で直接さがす</a></p>
+    </section>
+
+    <section class="consult">
+      <h2 class="section-label">困っているなら、人に相談できます</h2>
+      <p>
+        <strong>総合労働相談コーナー</strong>（厚生労働省）は、全国378か所にあって
+        <strong>無料・予約不要</strong>です。働いている人からも、これから働く人からも相談できます。
+      </p>
+      <p class="meta"><a href="https://www.mhlw.go.jp/general/seido/chihou/kaiketu/soudan.html" target="_blank" rel="noopener noreferrer">総合労働相談コーナーを調べる（厚生労働省）</a></p>
+    </section>
+
+    <div id="share"></div>
+  </main>
+
+  <footer class="site-foot">
+    <p>
+      出典：<a href="https://laws.e-gov.go.jp/" target="_blank" rel="noopener noreferrer">e-Gov法令検索</a>（デジタル庁）、
+      <a href="https://www.digital.go.jp/resources/open_data/public_data_license_v1.0" target="_blank" rel="noopener noreferrer">公共データ利用規約（第1.0版）</a>。
+      条文は e-Gov 法令API から取得したものです。
+    </p>
+    <p>
+      <strong>加工したところ</strong>：条文の文字列は変えていません。漢数字に算用数字のルビを重ね、
+      「使用者」「労働者」に色を付けて表示しています。この加工を行ったのは、このページの作成者（個人）です。
+    </p>
+    <p>
+      このページは<strong>個人が作ったもの</strong>で、国や行政機関が作成・監修したものではありません。
+      法令は改正されます。表示している施行日を確かめ、最後は原典にあたってください。
+    </p>
+  </footer>
+
+  <script type="module" src="./app.js"></script>
+</body>
+</html>
