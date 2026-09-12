@@ -105,6 +105,38 @@ test('漢数字にルビが振られ、使用者と労働者が塗り分けら�
   await expect(page.locator('.article ruby rt').first()).toHaveCSS('user-select', 'none');
 });
 
+test('法令の表は、本文に流し込まず表として組む', async ({ page }) => {
+  await stubEgov(page);
+  await page.goto(APP);
+  await page.click('.topic[data-topic="yukyu"]');
+  await expect(page.locator('#app')).toHaveAttribute('data-state', 'ready');
+  const table = page.locator('.law-table');
+  await expect(table).toHaveCount(1);
+  await expect(table.locator('tr')).toHaveCount(7);
+  await expect(table.locator('th').first()).toContainText('継続勤務年数');
+  await expect(table.locator('tr').nth(1).locator('td').first()).toContainText('一年');
+  /* 表の中の漢数字にもルビが振られる */
+  await expect(table.locator('tr').nth(1).locator('td rt').first()).toHaveText('1年');
+  /* 本文側に「一年一労働日…」という連結が残っていない */
+  const body = await page.locator('.para__text').nth(1).textContent();
+  expect(body).not.toContain('一年一労働日');
+});
+
+test('選んだ質問と「別のことを調べる」が条文のそばにある', async ({ page }) => {
+  await stubEgov(page);
+  await page.goto(APP);
+  await page.click('.topic[data-topic="yukyu"]');
+  await expect(page.locator('#asked')).toHaveText('有給って、もらえる？');
+  await expect(page.locator('#back-to-topics')).toBeVisible();
+  /* 判断しない断りは、条文より前にある（長い条だと後ろでは読まれない） */
+  const order = await page.evaluate(() => {
+    const d = document.querySelector('.disclaimer');
+    const a = document.querySelector('.article');
+    return d.compareDocumentPosition(a) & Node.DOCUMENT_POSITION_FOLLOWING ? 'before' : 'after';
+  });
+  expect(order).toBe('before');
+});
+
 test('別の法令の条文も同じ形で出る', async ({ page }) => {
   await stubEgov(page);
   await page.goto(APP);

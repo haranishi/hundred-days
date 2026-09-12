@@ -37,6 +37,27 @@ test('第39条：号がある項は号を分けて持つ', () => {
   assert.ok(!withItems.text.includes(withItems.items[0].text));
 });
 
+test('第39条2項：表は本文に流し込まず、行と列で持つ', () => {
+  const a = toArticle(fixture('roukikou-39.json'));
+  const p2 = a.paragraphs[1];
+  assert.equal(p2.tables.length, 1);
+  assert.equal(p2.tables[0].length, 7, '継続勤務年数の表は見出し1行＋6行');
+  assert.deepEqual(p2.tables[0][0], ['六箇月経過日から起算した継続勤務年数', '労働日']);
+  assert.deepEqual(p2.tables[0][1], ['一年', '一労働日']);
+  assert.deepEqual(p2.tables[0][6], ['六年以上', '十労働日']);
+  /* 本文に「一年一労働日二年二労働日…」と連結されていないこと（これが読めない塊の正体だった） */
+  assert.ok(!p2.text.includes('一年一労働日'));
+  assert.ok(!p2.text.includes('六年以上十労働日'));
+  assert.match(p2.text, /有給休暇を与えることを要しない。$/);
+});
+
+test('表を持たない項の tables は空', () => {
+  const a = toArticle(fixture('roukikou-34.json'));
+  for (const p of a.paragraphs) assert.deepEqual(p.tables, []);
+  const b = toArticle(fixture('minpou-627.json'));
+  for (const p of b.paragraphs) assert.deepEqual(p.tables, []);
+});
+
 test('第34条：休憩の条文が本文どおりに取れる', () => {
   const a = toArticle(fixture('roukikou-34.json'));
   assert.equal(a.caption, '（休憩）');
