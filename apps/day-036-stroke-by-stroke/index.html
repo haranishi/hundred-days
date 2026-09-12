@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>一画ずつ</title>
+  <meta name="description" content="名前や言葉を入れると、筆順どおりに一画ずつ書かれていく。入りと抜きで太さが変わる筆で、動画とPNGに保存できる。">
+  <meta name="share:text" content="一画ずつ — 名前を入れると、筆順どおりに書かれていく">
+  <link rel="stylesheet" href="./app.css">
+  <link rel="stylesheet" href="./shared/share.css">
+  <script src="./shared/share.js" defer></script>
+</head>
+<body>
+  <header class="site-head">
+    <p class="eyebrow">DAY 036 · STROKE BY STROKE</p>
+    <h1>一画ずつ</h1>
+    <p class="site-description">名前や言葉を入れると、筆順どおりに書かれていきます。</p>
+  </header>
+
+  <main id="app" data-state="empty">
+    <section class="stage">
+      <div id="board-wrap" class="board-wrap">
+        <canvas id="board" role="img" aria-label="まだ何も書いていません。言葉を入れて「書く」を押すと、筆順どおりに書かれます"></canvas>
+      </div>
+      <p id="status" class="status" role="status" aria-live="polite">言葉を入れて「書く」を押してください</p>
+
+      <div id="progress" class="progress" hidden>
+        <p id="progress-text" class="progress-text">1画目 / 全1画</p>
+        <div class="progress-track"><div id="progress-bar" class="progress-bar"></div></div>
+      </div>
+    </section>
+
+    <section class="controls">
+      <form id="write-form" novalidate>
+        <label for="word">書きたい言葉</label>
+        <div class="input-row">
+          <input id="word" name="word" type="text" inputmode="text" placeholder="名前や好きな言葉" autocomplete="off" spellcheck="false" maxlength="16" aria-describedby="word-help">
+          <button type="submit" id="write" class="primary">書く</button>
+        </div>
+        <p id="word-help" class="notice">漢字・ひらがな・カタカナを8字まで。入れた言葉はどこにも送りません。</p>
+      </form>
+
+      <p id="notice" class="notice warn" hidden></p>
+      <p id="error" class="error" role="alert" hidden></p>
+
+      <div id="playback" class="playback">
+        <div class="speed" role="group" aria-label="書く速さ">
+          <button type="button" class="speed-btn" data-speed="slow">ゆっくり</button>
+          <button type="button" class="speed-btn is-on" data-speed="normal" aria-pressed="true">ふつう</button>
+          <button type="button" class="speed-btn" data-speed="fast">はやい</button>
+        </div>
+        <button type="button" id="replay" class="outline" hidden>もう一度</button>
+      </div>
+
+      <div id="ready-actions" class="actions" hidden>
+        <button type="button" id="save-video" class="primary" hidden>動画で保存</button>
+        <button type="button" id="save-png" class="outline">画像で保存</button>
+      </div>
+
+      <fieldset class="options">
+        <legend>見え方</legend>
+        <label><input type="checkbox" id="toggle-guide" checked> これから書く画を薄く出す</label>
+        <label><input type="checkbox" id="toggle-numbers" checked> 画の番号を出す</label>
+        <label><input type="checkbox" id="toggle-sound"> 筆の音を鳴らす</label>
+      </fieldset>
+
+      <div id="recent-wrap" class="recent-wrap" hidden>
+        <p class="recent-label">前に書いた言葉</p>
+        <ul id="recent" class="recent"></ul>
+      </div>
+    </section>
+
+    <div id="share"></div>
+  </main>
+
+  <footer class="site-foot">
+    <p>筆順データは <a href="https://kanjivg.tagaini.net/" rel="noopener noreferrer">KanjiVG</a>（Ulrich Apel ほか）を使っています。ライセンスは <a href="https://creativecommons.org/licenses/by-sa/3.0/" rel="noopener noreferrer">CC BY-SA 3.0</a> で、このアプリが同梱している加工後のデータも同じライセンスです。</p>
+    <p>筆順は学校で習う形にもとづいたもので、書き方が1つに決まっていない字もあります。データの無い字は書けません。</p>
+    <p>入れた言葉は<strong>端末の外に出ません</strong>。通信はこのサイトに置いた筆順データを読むだけです。</p>
+  </footer>
+
+  <script type="module" src="./app.js"></script>
+</body>
+</html>
