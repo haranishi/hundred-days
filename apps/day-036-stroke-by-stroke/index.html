@@ -22,11 +22,13 @@
       <div id="board-wrap" class="board-wrap">
         <canvas id="board" role="img" aria-label="まだ何も書いていません。言葉を入れて「書く」を押すと、筆順どおりに書かれます"></canvas>
       </div>
-      <p id="status" class="status" role="status" aria-live="polite">言葉を入れて「書く」を押してください</p>
+      <div class="stage-foot">
+        <p id="status" class="status" role="status" aria-live="polite">言葉を入れて「書く」を押してください</p>
 
-      <div id="progress" class="progress" hidden>
-        <p id="progress-text" class="progress-text">1画目 / 全1画</p>
-        <div class="progress-track"><div id="progress-bar" class="progress-bar"></div></div>
+        <div id="progress" class="progress" hidden>
+          <p id="progress-text" class="progress-text">1画目 / 全1画</p>
+          <div class="progress-track"><div id="progress-bar" class="progress-bar"></div></div>
+        </div>
       </div>
     </section>
 
@@ -39,6 +41,22 @@
         </div>
         <p id="word-help" class="notice">漢字・ひらがな・カタカナを8字まで。入れた言葉はどこにも送りません。</p>
       </form>
+
+      <!-- 「たとえば」と「前に書いた言葉」は同じ場所で入れ替える。別々の場所に置くと、
+           片方が消えて片方が出るたびに下のボタンの位置が動く -->
+      <div id="recent-wrap" class="recent-wrap" hidden>
+        <p class="recent-label">前に書いた言葉</p>
+        <ul id="recent" class="recent"></ul>
+      </div>
+
+      <div id="examples-wrap" class="recent-wrap">
+        <p class="recent-label">たとえば</p>
+        <ul id="examples" class="recent">
+          <li><button type="button" class="chip" data-word="秋田">秋田</button></li>
+          <li><button type="button" class="chip" data-word="ありがとう">ありがとう</button></li>
+          <li><button type="button" class="chip" data-word="朝">朝</button></li>
+        </ul>
+      </div>
 
       <p id="notice" class="notice warn" hidden></p>
       <p id="error" class="error" role="alert" hidden></p>
@@ -64,10 +82,6 @@
         <label><input type="checkbox" id="toggle-sound"> 筆の音を鳴らす</label>
       </fieldset>
 
-      <div id="recent-wrap" class="recent-wrap" hidden>
-        <p class="recent-label">前に書いた言葉</p>
-        <ul id="recent" class="recent"></ul>
-      </div>
     </section>
 
     <div id="share"></div>
