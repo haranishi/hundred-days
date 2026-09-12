@@ -45,6 +45,7 @@ AIと一緒に作りながら、「AIに任せたこと」と「自分で考え�
 | 034 | [潮、いまどっち？](apps/day-034-tide-now/) | https://hundred-days.pages.dev/day-034-tide-now/ |
 | 035 | [きょうの一面](apps/day-035-front-page/) | https://hundred-days.pages.dev/day-035-front-page/ |
 | 036 | [一画ずつ](apps/day-036-stroke-by-stroke/) | https://hundred-days.pages.dev/day-036-stroke-by-stroke/ |
+| 037 | [バイトの法律、原文はこう](apps/day-037-baito-law/) | https://hundred-days.pages.dev/day-037-baito-law/ |
 
 ## 1日アプリのルール
 
