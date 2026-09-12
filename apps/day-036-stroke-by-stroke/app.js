@@ -62,6 +62,7 @@ function readTheme() {
     grid: pick('--grid', '#9fb0c4'),
     number: pick('--number', '#a8442e'),
     missing: pick('--missing', '#b6b0a4'),
+    muted: pick('--muted', '#5f594d'),
   };
 }
 
@@ -81,14 +82,19 @@ function paint(target, layout, scale, snapshot) {
       drawMissing(target, cell, data.char);
       return;
     }
-    data.prepared.forEach((stroke, indexInChar) => {
+    /* 画を全部描いてから番号を描く。1画ずつ交互に描くと、あとの画が前の番号を
+       塗りつぶす（秋の9画目が4〜6の番号を消していた）。 */
+    data.prepared.forEach((stroke) => {
       const progress = progressOf(stroke, snapshot);
       if (progress <= 0) {
         if (state.guide) drawGuide(target, cell, stroke);
         return;
       }
       drawStroke(target, cell, stroke, progress);
-      if (state.numbers) drawNumber(target, cell, stroke, indexInChar + 1);
+    });
+    if (!state.numbers) return;
+    data.prepared.forEach((stroke, indexInChar) => {
+      if (progressOf(stroke, snapshot) > 0) drawNumber(target, cell, stroke, indexInChar + 1);
     });
   });
   target.restore();
@@ -112,16 +118,31 @@ function drawCell(target, cell) {
   target.restore();
 }
 
+/* 書けなかったマス。字は薄く置き、断り書きは字に重ねず紙の色の帯に載せる。
+   枠を破線にして、色を見分けられなくても「書けなかった」と分かるようにする。 */
 function drawMissing(target, cell, char) {
   target.save();
   target.translate(cell.x, cell.y);
-  target.fillStyle = theme.missing;
   target.textAlign = 'center';
   target.textBaseline = 'middle';
+
+  target.globalAlpha = 0.45;
+  target.fillStyle = theme.missing;
   target.font = '64px "Hiragino Mincho ProN", "Yu Mincho", serif';
-  target.fillText(char, CELL / 2, CELL / 2 - 6);
+  target.fillText(char, CELL / 2, CELL / 2 - 8);
+  target.globalAlpha = 1;
+
+  target.strokeStyle = theme.missing;
+  target.lineWidth = 1.4;
+  target.setLineDash([4, 4]);
+  target.strokeRect(0.7, 0.7, CELL - 1.4, CELL - 1.4);
+  target.setLineDash([]);
+
+  target.fillStyle = theme.paper;
+  target.fillRect(8, CELL - 27, CELL - 16, 19);
+  target.fillStyle = theme.muted;
   target.font = '11px "Hiragino Sans", system-ui, sans-serif';
-  target.fillText('筆順データなし', CELL / 2, CELL - 16);
+  target.fillText('筆順データなし', CELL / 2, CELL - 17);
   target.restore();
 }
 
@@ -163,7 +184,7 @@ function drawNumber(target, cell, stroke, n) {
   const cy = Math.max(5, Math.min(CELL - 5, y));
   /* 番号が画に重なっても読めるよう、紙の色で縁を取る */
   target.strokeStyle = theme.paper;
-  target.lineWidth = 2.4;
+  target.lineWidth = 3.2;
   target.lineJoin = 'round';
   target.strokeText(String(n), cx, cy);
   target.fillText(String(n), cx, cy);
@@ -185,12 +206,17 @@ function layoutFor(count, cssWidth) {
   return board(count, maxCols);
 }
 
+/* 1マスの実寸の上限（CSSピクセル）。これが無いと、広い画面で1〜2字を書いたとき
+   1マスが画面の丈を超えるほど大きくなり、入れる欄と「書く」が画面の外へ落ちる。 */
+const MAX_CELL_PX = 300;
+
 function resize() {
   const wrap = el('board-wrap');
   const cssWidth = Math.max(240, wrap.clientWidth);
   const layout = layoutFor(state.cells.length || 1, cssWidth);
   const dpr = Math.min(2.5, window.devicePixelRatio || 1);
-  const fit = cssWidth / layout.width;
+  const fit = Math.min(cssWidth / layout.width, MAX_CELL_PX / CELL);
+  canvas.style.width = `${Math.round(layout.width * fit)}px`;
   canvas.style.height = `${Math.round(layout.height * fit)}px`;
   canvas.width = Math.round(layout.width * fit * dpr);
   canvas.height = Math.round(layout.height * fit * dpr);
@@ -223,6 +249,8 @@ function setPhase(next, message) {
   /* 速さは書く前から選べる設定なので出したまま。「もう一度」だけ書いたあとに出す */
   el('replay').hidden = !active;
   el('ready-actions').hidden = next !== 'done';
+  /* 例の言葉は最初の一手のためのもの。書き始めたら「前に書いた言葉」に譲る */
+  el('examples-wrap').hidden = next !== 'empty';
   el('write').disabled = next === 'loading' || state.recording;
   canvas.setAttribute(
     'aria-label',
@@ -258,6 +286,8 @@ async function write(raw) {
   }
   const word = chars.join('');
   state.word = word;
+  /* 画面の字と盤面を食い違わせない。8字に切ったら入れる欄も切る */
+  if (trimmed) el('word').value = word;
   stop();
   setPhase('loading');
 
@@ -289,10 +319,12 @@ async function write(raw) {
 
   const missing = state.cells.filter((c) => !c.prepared).map((c) => c.char);
   const notes = [];
-  if (trimmed) notes.push(`${MAX_CHARS}字まで書けます。${MAX_CHARS}字目までを書きました`);
+  if (trimmed) notes.push(`${MAX_CHARS}字までなので、はじめの${MAX_CHARS}字だけ書きました`);
   if (missing.length) notes.push(`「${missing.join('」「')}」の筆順データがありません`);
   el('notice').hidden = notes.length === 0;
   el('notice').textContent = notes.join('。');
+  /* 赤は「書けなかった」ときだけに使う。切り詰めはただのお知らせなので地の色で出す */
+  el('notice').classList.toggle('warn', missing.length > 0);
 
   state.recent = store.remember(word, state.recent);
   store.save(state.recent);
@@ -530,6 +562,12 @@ function bind() {
   el('toggle-sound').addEventListener('change', (event) => {
     state.sound = event.target.checked;
     setSound(state.sound && state.playing);
+  });
+  el('examples').querySelectorAll('.chip').forEach((chip) => {
+    chip.addEventListener('click', () => {
+      el('word').value = chip.dataset.word;
+      write(chip.dataset.word);
+    });
   });
   el('save-png').addEventListener('click', savePng);
   el('save-video').addEventListener('click', saveVideo);

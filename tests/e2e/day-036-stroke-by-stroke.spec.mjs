@@ -69,6 +69,7 @@ test('筆順データが無い字は、その字だけを名指しして残り�
   await done(page);
   await expect(page.locator('#notice')).toBeVisible();
   await expect(page.locator('#notice')).toContainText('﨑');
+  await expect(page.locator('#notice')).toHaveClass(/warn/);
   /* 山の3画は書けている */
   await expect(page.locator('#progress-text')).toHaveText('3画目 / 全3画');
 });
@@ -79,6 +80,10 @@ test('8字を超えたら切って、切ったことを伝える', async ({ page
   await write(page, 'あいうえおかきくけこ');
   await done(page);
   await expect(page.locator('#notice')).toContainText('8字まで');
+  /* 切り詰めはお知らせなので赤くしない（赤は「書けなかった」ときだけ） */
+  await expect(page.locator('#notice')).not.toHaveClass(/warn/);
+  /* 入れる欄の字も、実際に書いた8字へそろえる */
+  await expect(page.locator('#word')).toHaveValue('あいうえおかきく');
 });
 
 test('速さを変えても、いま書いている画のまま続く', async ({ page }) => {
@@ -98,6 +103,20 @@ test('速さを変えても、いま書いている画のまま続く', async ({
   const after = await page.locator('#progress-text').textContent();
   expect(parseInt(after, 10)).toBeGreaterThanOrEqual(parseInt(before, 10));
   await done(page);
+});
+
+test('たとえばの言葉は、押すと書けて、書いたら引っ込む', async ({ page }) => {
+  await page.goto(APP);
+  await page.click('.speed-btn[data-speed="fast"]');
+  const examples = page.locator('#examples .chip');
+  await expect(examples).toHaveCount(3);
+  await expect(page.locator('#examples-wrap')).toBeVisible();
+  await examples.filter({ hasText: '朝' }).click();
+  await done(page);
+  await expect(page.locator('#word')).toHaveValue('朝');
+  await expect(page.locator('#progress-text')).toHaveText('12画目 / 全12画');
+  /* 書いたあとは「前に書いた言葉」に譲る */
+  await expect(page.locator('#examples-wrap')).toBeHidden();
 });
 
 test('前に書いた言葉から書き直せる', async ({ page }) => {

@@ -83,9 +83,13 @@ h1 {
 
 #board {
   display: block;
-  width: 100%;
+  margin: 0 auto;
+  max-width: 100%;
   height: auto;
 }
+
+/* 書く前と書いている最中で丈が変わらないように、進捗のぶんを先に空けておく */
+.stage-foot { min-height: 78px; }
 
 .status {
   margin: 10px 2px 0;
@@ -182,6 +186,11 @@ button:disabled {
   color: var(--muted);
 }
 
+/* 日本語は語の途中で折り返さない。「書かれていきま／す。」のような割れを防ぐ */
+.site-description,
+.notice,
+.site-foot p { word-break: auto-phrase; }
+
 .notice.warn { color: var(--danger); }
 
 .error {
@@ -243,17 +252,25 @@ button:disabled {
   color: var(--muted);
 }
 
+/* 指で押せる高さ（44px）を1行ずつ確保する */
 .options label {
   display: flex;
   align-items: center;
-  gap: 8px;
-  margin: 0 0 6px;
+  gap: 10px;
+  min-height: 44px;
+  margin: 0;
   font-size: 14px;
   color: var(--ink);
   cursor: pointer;
 }
 
-.options label:last-child { margin-bottom: 0; }
+/* 既定のままだとOSの青が出て、画面に別系統の色が1つ増える */
+.options label input[type="checkbox"] {
+  accent-color: var(--accent);
+  width: 18px;
+  height: 18px;
+  margin: 0;
+}
 
 .recent-wrap { margin-top: 20px; }
 
