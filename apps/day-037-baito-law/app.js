@@ -97,6 +97,7 @@ function paintActors(text) {
 
 function renderArticle(article, topic) {
   const law = lawOf(topic);
+  el('asked').textContent = topic.label;
   el('article-law').textContent = `${article.lawTitle} 第${article.articleNum}条`;
   el('article-caption').textContent = article.caption || `第${article.articleNum}条`;
 
@@ -115,6 +116,26 @@ function renderArticle(article, topic) {
     text.className = 'para__text';
     text.append(decorate(paragraph.text));
     block.append(text);
+
+    /* 法令の表は本文と地続きにしない。行と列のまま組む（労基法39条2項がこれ） */
+    for (const rows of paragraph.tables) {
+      const table = document.createElement('table');
+      table.className = 'law-table';
+      const tbody = document.createElement('tbody');
+      rows.forEach((cells, rowIndex) => {
+        const tr = document.createElement('tr');
+        for (const cell of cells) {
+          /* 1行目は見出し。原文の1行目をそのまま見出しとして扱うだけで、文字は足していない */
+          const td = document.createElement(rowIndex === 0 ? 'th' : 'td');
+          if (rowIndex === 0) td.scope = 'col';
+          td.append(decorate(cell));
+          tr.append(td);
+        }
+        tbody.append(tr);
+      });
+      table.append(tbody);
+      block.append(table);
+    }
 
     if (paragraph.items.length) {
       const items = document.createElement('ul');
@@ -177,7 +198,7 @@ async function select(key) {
 
   if (cache.has(key)) {
     renderArticle(cache.get(key), topic);
-    setPhase('ready', `${topic.label}`);
+    setPhase('ready', '条文を出しました');
     return;
   }
 
@@ -187,7 +208,7 @@ async function select(key) {
     if (state.topicKey !== key) return;
     cache.set(key, article);
     renderArticle(article, topic);
-    setPhase('ready', `${topic.label}`);
+    setPhase('ready', '条文を出しました');
   } catch (error) {
     if (state.topicKey !== key) return;
     el('failure-text').textContent = `条文を取ってこられませんでした（${error.message}）。通信を確かめて、もう一度お試しください。`;
@@ -199,6 +220,9 @@ async function select(key) {
 
 function boot() {
   renderTopics();
+  el('back-to-topics').addEventListener('click', () => {
+    el('topics').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
   el('retry').addEventListener('click', () => {
     const key = state.topicKey;
     if (!key) return;

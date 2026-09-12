@@ -31,17 +31,31 @@ function toItem(node) {
   return { title, text: body };
 }
 
-/* 項。本文と、ぶら下がる号。 */
+/* 表。法令の表は TableStruct > Table > TableRow > TableColumn の入れ子。
+   本文へ流し込むと「継続勤務年数労働日一年一労働日二年二労働日…」という読めない塊になるので、
+   行と列のまま取り出す（労基法39条2項がこれ）。 */
+function toTable(node) {
+  const table = firstWithTag(node, 'Table') || node;
+  const rows = childrenWithTag(table, 'TableRow').map((row) =>
+    childrenWithTag(row, 'TableColumn').map((col) => textOf(col).trim())
+  );
+  return rows.filter((row) => row.length);
+}
+
+/* 項。本文と、ぶら下がる号と表。 */
+const NOT_BODY = new Set(['Item', 'ParagraphNum', 'TableStruct']);
+
 function toParagraph(node, index) {
   const attrNum = node?.attr?.Num;
   const num = Number.parseInt(attrNum, 10);
   const items = childrenWithTag(node, 'Item').map(toItem);
+  const tables = childrenWithTag(node, 'TableStruct').map(toTable).filter((rows) => rows.length);
   const text = (node.children || [])
-    .filter((c) => c && typeof c === 'object' && c.tag !== 'Item' && c.tag !== 'ParagraphNum')
+    .filter((c) => c && typeof c === 'object' && !NOT_BODY.has(c.tag))
     .map(textOf)
     .join('')
     .trim();
-  return { num: Number.isFinite(num) ? num : index + 1, text, items };
+  return { num: Number.isFinite(num) ? num : index + 1, text, items, tables };
 }
 
 /* APIのレスポンス1件を、画面が必要とするものだけに絞る。 */
