@@ -117,9 +117,9 @@ async function main() {
       ? { status: 200, contentType: 'application/json', body: JSON.stringify(entry.body) }
       : { status: 502, contentType: 'application/json', body: '{"error":"upstream_unavailable"}' });
   });
-  await page.route('**/api/day-035/image*', async (route) => {
-    const src = new URL(route.request().url()).searchParams.get('src');
-    const entry = [...articles.values()].find((item) => item.body.image === src);
+  // 写真は中継しない（提供元から直接読む）ので、提供元のホストごと差し替える
+  await page.route('https://hundred-days.pages.dev/**', async (route) => {
+    const entry = [...articles.values()].find((item) => item.body.image === route.request().url());
     await route.fulfill(entry?.photo
       ? { status: 200, contentType: 'image/webp', body: await readFile(entry.photo) }
       : { status: 404, body: '' });

@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { PAPER, BODY, SOLO, blocks, photoBox, columnsIn, fitSize, fitHeadline } from '../lib/layout.js';
+import { PAPER, BODY, SOLO, blocks, photoBox, columnsIn, fitSize, fitHeadline, spreadGap } from '../lib/layout.js';
 
 test('blocks: 本数が増えるほど右の記事が大きい', () => {
   for (const count of [2, 3]) {
@@ -70,6 +70,29 @@ test('fitHeadline: 字数が増えるほど小さくなる', () => {
 test('fitHeadline: 上限と下限を守る', () => {
   assert.equal(fitHeadline(1, 620, 3, { min: 44, max: 108 }).size, 108);
   assert.equal(fitHeadline(200, 620, 3, { min: 44, max: 108 }).size, 44);
+});
+
+test('spreadGap: 短い本文ほど列を広げて紙面を埋める', () => {
+  const region = { right: 900, left: 100, top: 236, bottom: 1396 };
+  assert.ok(spreadGap(60, region, 40) > spreadGap(600, region, 40));
+});
+
+test('spreadGap: 広げた列が紙面の左端まで届く', () => {
+  const region = { right: 900, left: 100, top: 236, bottom: 1396 };
+  const size = 46;
+  const columns = columnsIn({ ...region, size, lineGap: spreadGap(120, region, size) });
+  const last = columns.at(-1);
+  assert.ok(last.x - size / 2 < region.left + size, '最後の列が左端まで来ていない');
+});
+
+test('spreadGap: 詰まっているときは既定の送りまでしか詰めない', () => {
+  const region = { right: 900, left: 100, top: 236, bottom: 1396 };
+  assert.equal(spreadGap(100000, region, 26), 26 * 1.62);
+});
+
+test('spreadGap: 広げすぎない（上限で止まる）', () => {
+  const region = { right: 900, left: 100, top: 236, bottom: 1396 };
+  assert.equal(spreadGap(200, region, 30, { maxRatio: 2 }), 60);
 });
 
 test('SOLO: 本文の帯と写真の帯が重ならない', () => {

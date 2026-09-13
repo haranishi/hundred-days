@@ -76,6 +76,19 @@ test('flowColumns: 行末に始め括弧を残さない', () => {
   assert.equal(texts(glyphs.filter((g) => g.x === 100)), 'あい');
 });
 
+test('flowColumns: ラテン文字の連なりを列またぎで割らない', () => {
+  const columns = [{ x: 100, top: 0, height: 100 }, { x: 60, top: 0, height: 400 }];
+  const { glyphs } = flowColumns(toCells('あいうえexample.com'), columns, { size: 20 });
+  assert.equal(texts(inColumn(glyphs, 100)), 'あいうえ');
+  assert.equal(texts(inColumn(glyphs, 60)), 'example.com');
+});
+
+test('flowColumns: 列がまるごとラテン文字なら、割ってでも流す', () => {
+  const columns = [{ x: 100, top: 0, height: 60 }, { x: 60, top: 0, height: 400 }];
+  const { glyphs } = flowColumns(toCells('abcdefghij'), columns, { size: 20 });
+  assert.ok(texts(inColumn(glyphs, 100)).length > 0, '1列目が空になっている');
+});
+
 test('flowColumns: 入り切らないぶんは rest で返し、末尾を…にする', () => {
   const columns = [{ x: 0, top: 0, height: 40 }];
   const { glyphs, rest } = flowColumns(toCells('あいうえお'), columns, { size: 20, ellipsis: true });

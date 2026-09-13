@@ -5,7 +5,8 @@ import { fileURLToPath } from 'node:url';
 
 /* file:// からミニHTTPサーバーへ開き直す。ES モジュールと中継のパスが file:// では動かないため。
    貼るのは自分の過去作3本。中継の戻り値は各 meta.json から組み立てるので、
-   本番で同じURLを貼ったときと同じ見出し・同じリード文になる。 */
+   本番で同じURLを貼ったときと同じ見出し・同じリード文になる。
+   写真（og:image）は提供元から直に読む作りなので、そのホストも差し替える。 */
 
 const appDir = dirname(fileURLToPath(import.meta.url));
 const appsDir = dirname(appDir);
@@ -69,9 +70,10 @@ async function routeRelay(page, articles) {
     }
     await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(entry.body) });
   });
-  await page.route('**/api/day-035/image*', async (route) => {
-    const src = new URL(route.request().url()).searchParams.get('src');
-    const entry = [...articles.values()].find((item) => item.body.image === src);
+  /* 写真は中継しない（提供元から直接読む）ので、提供元のホストごと差し替える。
+     録画中に本番のURLへ取りに行かせないための差し替えで、アプリ側は素の <img> のまま */
+  await page.route('https://hundred-days.pages.dev/**', async (route) => {
+    const entry = [...articles.values()].find((item) => item.body.image === route.request().url());
     if (!entry?.photo) {
       await route.fulfill({ status: 404, body: '' });
       return;
