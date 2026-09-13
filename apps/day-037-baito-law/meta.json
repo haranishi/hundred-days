@@ -21,7 +21,7 @@
   "demo": "demo.mp4",
   "startedAt": "2026-09-13",
   "finishedAt": "2026-09-13",
-  "actualMinutes": 0,
+  "actualMinutes": 110,
   "sourceOfIdea": "AIが4案（その日の天気カード・ISSの位置・バイトの法律・生まれた日の為替）を出し、本人が法律を選んだ。困りごとは、バイトの決まりを調べても解説記事ばかりで根拠の条文にたどり着けず、たどり着いても漢数字と「使用者／労働者」で読めないこと",
   "aiHandled": [
     "着手前の実測。候補4案のAPIをすべて叩いてCORSを確かめ、Wayback Machine（CORSヘッダ0・429）を落とした",
