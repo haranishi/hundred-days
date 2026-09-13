@@ -1,9 +1,13 @@
 /* 紙面をCanvasに刷る。座標はすべて紙面座標（1080×1528）で、
-   倍率は ctx を拡大して掛ける。保存用に2倍で刷り直しても、同じ関数で同じ紙面になる。 */
+   倍率は ctx を拡大して掛ける。保存用に2倍で刷り直しても、同じ関数で同じ紙面になる。
 
-import { PAPER, MASTHEAD, RULE_Y, BODY, FOOTER, SOLO, blocks, photoBox, columnsIn, fitSize, fitHeadline } from './layout.js';
+   ⚠️ ここは写真を1枚も描かない。他媒体の報道写真はその媒体のものなので、こちらでは
+   取得も保存もせず、画面では提供元の <img> を紙面の上に重ねる（app.js）。
+   この関数が返す photos は「写真のために空けた枠」の位置で、重ねる側が使う。
+   canvas が画像に触れないので汚れず、toBlob も落ちない。 */
+
+import { PAPER, MASTHEAD, RULE_Y, BODY, FOOTER, SOLO, blocks, photoBox, columnsIn, fitSize, fitHeadline, spreadGap } from './layout.js';
 import { toCells, totalAdvance, flowColumns, layoutVertical } from './vertical.js';
-import { halftoneDots, coverRect } from './halftone.js';
 
 export const COLORS = {
   paper: '#f4efe4',
@@ -81,32 +85,20 @@ function drawFooter(ctx, hosts) {
   ctx.fillText(DISCLAIMER, PAPER.margin, FOOTER.text + 28);
 }
 
-/* 写真を網点にして置く。元の画像は消して、点だけを紙に刷る */
-function drawPhoto(ctx, image, box, makeCanvas) {
-  const off = makeCanvas(box.width, box.height);
-  const offCtx = off.getContext('2d', { willReadFrequently: true });
-  offCtx.fillStyle = '#ffffff';
-  offCtx.fillRect(0, 0, box.width, box.height);
-  const fit = coverRect({ width: image.naturalWidth || image.width, height: image.naturalHeight || image.height }, box);
-  offCtx.drawImage(image, fit.x, fit.y, fit.width, fit.height);
-  const data = offCtx.getImageData(0, 0, box.width, box.height);
-  const dots = halftoneDots(data, { cell: 4 });
-  ctx.save();
-  ctx.fillStyle = COLORS.ink;
-  ctx.beginPath();
-  for (const dot of dots) {
-    ctx.moveTo(box.left + dot.x + dot.r, box.top + dot.y);
-    ctx.arc(box.left + dot.x, box.top + dot.y, dot.r, 0, Math.PI * 2);
-  }
-  ctx.fill();
-  ctx.restore();
-}
-
-/* 写真の下に横組みで入れる短い行。新聞のキャプションの位置。
-   どこで全文が読めるかを紙の上に残す（画像だけが出回っても出所が消えない） */
+/* どこで全文が読めるかを紙の上に残す（画像だけが出回っても出所が消えない） */
 function captionText(article) {
   const where = article.host ? `全文は ${article.host} で読めます` : '';
   return [where, article.publishedAt].filter(Boolean).join('　');
+}
+
+/* 紙面に流す本文。
+   写真の枠があるときはリードだけ（媒体名と日付は写真の上のキャプションに出る）。
+   枠が無いときは媒体名を末尾に付け、さらに source なら「全文はどこで読めるか」も本文に入れる。
+   保存するPNGには写真もキャプションも無いので、ここに入れないと出所が欄外だけになる */
+function bodyText(article, { photo = false, source = false } = {}) {
+  if (photo) return article.lead;
+  const head = [article.lead, article.site && `（${article.site}）`].filter(Boolean).join('');
+  return source ? [head, captionText(article)].filter(Boolean).join('　') : head;
 }
 
 /* キャプションは写真の上に置く。下に置くと紙面の下端でフッターの罫線と噛み合う */
@@ -121,12 +113,12 @@ function drawCaption(ctx, text, box) {
   ctx.restore();
 }
 
-/* 1本だけの紙面。上の帯に見出しと本文、下の帯に写真を全幅で置く */
-function drawSolo(ctx, article, makeCanvas) {
+/* 1本だけの紙面。写真の枠を空けるときは上の帯に見出しと本文、下の帯が写真。
+   空けないときは本文の帯を紙面の下端まで伸ばし、字を大きく・列を広げて埋める */
+function drawSolo(ctx, article, withPhoto) {
   const right = PAPER.width - PAPER.margin;
   const left = PAPER.margin;
-  const hasPhoto = Boolean(article.imageEl);
-  const bottom = hasPhoto ? SOLO.text.bottom : BODY.bottom;
+  const bottom = withPhoto ? SOLO.text.bottom : BODY.bottom;
   const fit = fitHeadline([...article.headline].length, bottom - BODY.top, 3, { min: 44, max: 108 });
   const headline = layoutVertical(article.headline, {
     right,
@@ -140,15 +132,20 @@ function drawSolo(ctx, article, makeCanvas) {
   drawGlyphs(ctx, headline.glyphs, COLORS.ink, 'bold ');
 
   const region = { right: right - headline.width - GAP_X, left, top: BODY.top, bottom };
-  const text = hasPhoto ? article.lead : [article.lead, article.site && `（${article.site}）`].filter(Boolean).join('');
-  const cells = toCells(text);
-  const size = fitSize(totalAdvance(cells), region, { min: 26, max: 46 });
-  const columns = columnsIn({ ...region, lineGap: size * 1.62, size });
+  const cells = toCells(bodyText(article, { photo: withPhoto, source: !withPhoto }));
+  const units = totalAdvance(cells);
+  const size = fitSize(units, region, { min: 26, max: withPhoto ? 46 : 64 });
+  const lineGap = withPhoto ? size * 1.62 : spreadGap(units, region, size);
+  const columns = columnsIn({ ...region, lineGap, size });
   drawGlyphs(ctx, flowColumns(cells, columns, { size, charGap: size * 1.06, ellipsis: true }).glyphs);
 
-  if (!hasPhoto) return;
-  const box = { left, right, top: SOLO.photo.top, bottom: SOLO.photo.bottom, width: right - left, height: SOLO.photo.bottom - SOLO.photo.top };
-  drawPhoto(ctx, article.imageEl, box, makeCanvas);
+  if (!withPhoto) return null;
+  const box = {
+    left,
+    top: SOLO.photo.top,
+    width: right - left,
+    height: SOLO.photo.bottom - SOLO.photo.top
+  };
   ctx.save();
   ctx.textAlign = 'left';
   ctx.textBaseline = 'alphabetic';
@@ -156,9 +153,10 @@ function drawSolo(ctx, article, makeCanvas) {
   ctx.font = `21px ${FONT}`;
   ctx.fillText(captionText(article), left, SOLO.caption, box.width);
   ctx.restore();
+  return box;
 }
 
-function drawArticle(ctx, article, block, makeCanvas) {
+function drawArticle(ctx, article, block, withPhoto) {
   const headlineHeight = Math.min(block.bottom - block.top, block.headlineSize * (block.index === 0 ? 11 : 14));
   const fit = fitHeadline([...article.headline].length, headlineHeight, block.headlineLines, {
     min: Math.round(block.headlineSize * 0.7),
@@ -175,31 +173,29 @@ function drawArticle(ctx, article, block, makeCanvas) {
   });
   drawGlyphs(ctx, headline.glyphs, COLORS.ink, 'bold ');
 
-  const photo = block.photo && article.imageEl
-    ? photoBox(block, headline.width, block.index === 0 ? 560 : 360)
-    : null;
-  if (photo) drawPhoto(ctx, article.imageEl, photo, makeCanvas);
-
+  const photo = withPhoto ? photoBox(block, headline.width, block.index === 0 ? 560 : 360) : null;
   const region = {
     right: block.right - headline.width - 18,
     left: block.left,
     top: block.top,
-    bottom: photo ? block.bottom : block.bottom,
+    bottom: block.bottom,
     avoid: photo
   };
-  const showCaption = Boolean(photo);
-  const leadText = showCaption
-    ? article.lead
-    : [article.lead, article.site && `（${article.site}）`].filter(Boolean).join('');
-  const cells = toCells(leadText);
-  const size = fitSize(totalAdvance(cells), region, {
+  /* 出所を本文に入れるのは一番手だけ。二番手・三番手は幅が狭く、
+     足すと本文が「…」で切れて、肝心のリードが読めなくなる */
+  const cells = toCells(bodyText(article, { photo: Boolean(photo), source: !photo && block.index === 0 }));
+  const units = totalAdvance(cells);
+  const size = fitSize(units, region, {
     min: block.index === 0 ? 26 : 18,
-    max: block.index === 0 ? 40 : 27
+    // 写真の枠を空けないぶん、字をひとまわり大きく組む（左が白く残らないように）
+    max: block.index === 0 ? (photo ? 40 : 48) : 27
   });
-  const columns = columnsIn({ ...region, lineGap: size * 1.62, size });
+  const lineGap = photo ? size * 1.62 : spreadGap(units, region, size);
+  const columns = columnsIn({ ...region, lineGap, size });
   const lead = flowColumns(cells, columns, { size, charGap: size * 1.06, ellipsis: true });
   drawGlyphs(ctx, lead.glyphs);
   if (photo) drawCaption(ctx, captionText(article), photo);
+  return photo;
 }
 
 function drawEmptyBody(ctx) {
@@ -214,13 +210,9 @@ function drawEmptyBody(ctx) {
   }
 }
 
-export function renderPaper(canvas, model, { scale = 1, makeCanvas } = {}) {
-  const factory = makeCanvas || ((w, h) => {
-    const element = document.createElement('canvas');
-    element.width = Math.max(1, Math.round(w));
-    element.height = Math.max(1, Math.round(h));
-    return element;
-  });
+/* photos: false で刷ると、写真の枠を空けない紙面になる（保存するPNGはこちら）。
+   返す photos は [{ index, left, top, width, height }]（紙面座標） */
+export function renderPaper(canvas, model, { scale = 1, photos = true } = {}) {
   canvas.width = Math.round(PAPER.width * scale);
   canvas.height = Math.round(PAPER.height * scale);
   const ctx = canvas.getContext('2d');
@@ -230,21 +222,25 @@ export function renderPaper(canvas, model, { scale = 1, makeCanvas } = {}) {
   drawMasthead(ctx, model);
 
   const articles = model.articles ?? [];
+  const reserved = [];
+  const wants = (article) => photos && Boolean(article.image);
   if (!articles.length) {
     drawEmptyBody(ctx);
   } else if (articles.length === 1) {
-    drawSolo(ctx, articles[0], factory);
+    const box = drawSolo(ctx, articles[0], wants(articles[0]));
+    if (box) reserved.push({ index: 0, ...box });
   } else {
     const list = blocks(articles.length);
     articles.forEach((article, index) => {
       const block = list[index];
       if (!block) return;
-      drawArticle(ctx, article, block, factory);
+      const box = drawArticle(ctx, article, block, wants(article) && block.photo);
+      if (box) reserved.push({ index, left: box.left, top: box.top, width: box.width, height: box.height });
       if (index < articles.length - 1) {
         line(ctx, block.left - 9, BODY.top, block.left - 9, BODY.bottom, 1, '#b9b0a0');
       }
     });
   }
   drawFooter(ctx, articles.map((a) => a.host).filter(Boolean));
-  return canvas;
+  return { canvas, photos: reserved };
 }

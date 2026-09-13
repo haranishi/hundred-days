@@ -3,6 +3,8 @@ import { readFileSync } from 'node:fs';
 
 const APP = '/day-035-front-page/';
 const PHOTO = readFileSync(new URL('../../apps/day-035-front-page/tests/fixtures/photo.png', import.meta.url));
+// 写真は中継を通さず、提供元から直接読む（保存するPNGには焼かない）
+const PHOTO_URL = 'https://example.com/photo.png';
 
 const ARTICLES = {
   'https://example.com/tide': {
@@ -48,9 +50,13 @@ test.beforeEach(async ({ page }) => {
 });
 
 test.afterEach(async ({ page }) => {
-  // 外へ出ないこと。貼られたページも写真も、同一オリジンの中継しか通らない
+  /* 外へ出るのは写真の <img> だけ。貼られたページのメタは同一オリジンの中継を通る。
+     写真をこちらで取りに行かない（中継しない・保存しない）のが、この Day の線引き */
   const origin = new URL(page.url()).origin;
-  for (const url of requests.get(page)) expect(new URL(url).origin).toBe(origin);
+  for (const url of requests.get(page)) {
+    if (url === PHOTO_URL) continue;
+    expect(new URL(url).origin).toBe(origin);
+  }
   const ignorable = (line) => httpErrors.has(page) && /^Failed to load resource:/.test(line);
   expect(errors.get(page).filter((line) => !ignorable(line))).toEqual([]);
 });
@@ -72,7 +78,8 @@ async function stub(page, { fail = null } = {}) {
     }
     await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(body) });
   });
-  await page.route('**/api/day-035/image*', async (route) => {
+  // 提供元のサーバー。CORSヘッダは付けない＝canvasに描けば汚れて保存が落ちる条件
+  await page.route(PHOTO_URL, async (route) => {
     await route.fulfill({ status: 200, contentType: 'image/png', body: PHOTO });
   });
   return calls;
@@ -120,7 +127,47 @@ test('写真の無いページでも組める', async ({ page }) => {
   await add(page, 'https://news.example.jp/quake');
   await expect(page.locator('#app')).toHaveAttribute('data-state', 'ready');
   expect(calls).toEqual(['https://news.example.jp/quake']);
+  await expect(page.locator('#photos .photo')).toHaveCount(0);
+  // 写真が無い記事では、写真の話そのものを出さない
+  await expect(page.locator('#photo-note')).toBeHidden();
+});
+
+test('写真は中継を通さず、提供元から直接読む', async ({ page }) => {
+  await stub(page);
+  await page.goto(APP);
+  await add(page, 'https://example.com/tide');
+  await expect(page.locator('#photos .photo img')).toBeVisible();
+  expect(requests.get(page)).toContain(PHOTO_URL);
+  // 画像を中継するAPIは無い。呼んでもいない
   expect(requests.get(page).some((url) => url.includes('/api/day-035/image'))).toBe(false);
+});
+
+/* 紙面は幅で決まる画面（スマホ）と高さで決まる画面（PC）で寸法の決まり方が変わる。
+   重ねた写真がどちらでも紙面の枠から外れないことを見る */
+for (const [name, size] of [['スマホ', { width: 390, height: 780 }], ['PC', { width: 1280, height: 800 }]]) {
+  test(`写真は紙面の中の、空けた枠にぴたりと収まる（${name}）`, async ({ page }) => {
+    await stub(page);
+    await page.setViewportSize(size);
+    await page.goto(APP);
+    await add(page, 'https://example.com/tide');
+    const paper = await page.locator('#paper').boundingBox();
+    const photo = await page.locator('#photos .photo').boundingBox();
+    expect(photo.x).toBeGreaterThanOrEqual(paper.x - 1);
+    expect(photo.y).toBeGreaterThanOrEqual(paper.y - 1);
+    expect(photo.x + photo.width).toBeLessThanOrEqual(paper.x + paper.width + 1);
+    expect(photo.y + photo.height).toBeLessThanOrEqual(paper.y + paper.height + 1);
+    // 紙面の下の帯いっぱいに置く（左右の余白ぶんだけ内側）
+    expect(photo.width).toBeGreaterThan(paper.width * 0.85);
+    expect(photo.height).toBeGreaterThan(paper.height * 0.25);
+  });
+}
+
+test('保存する画像に写真が入らないことを、保存する前に伝える', async ({ page }) => {
+  await stub(page);
+  await page.goto(APP);
+  await add(page, 'https://example.com/tide');
+  await expect(page.locator('#photo-note')).toBeVisible();
+  await expect(page.locator('#photo-note')).toContainText('写真は入りません');
 });
 
 test('記事は3本まで足せる', async ({ page }) => {
@@ -186,10 +233,13 @@ test('開き直しても紙面が残っている', async ({ page }) => {
   await expect(page.locator('#list li .headline')).toHaveText('潮、いまどっち？');
 });
 
-test('画像を保存できる', async ({ page }) => {
+/* 写真を紙面に描いていたら canvas が汚れて toBlob が落ち、保存そのものができない。
+   写真が出ている状態で保存が通る＝PNGに写真を焼いていない証拠になる */
+test('写真が出ていても画像を保存できる（＝PNGに写真を焼いていない）', async ({ page }) => {
   await stub(page);
   await page.goto(APP);
   await add(page, 'https://example.com/tide');
+  await expect(page.locator('#photos .photo img')).toBeVisible();
   const download = await Promise.all([page.waitForEvent('download'), page.click('#save')]).then(([d]) => d);
   expect(download.suggestedFilename()).toMatch(/^front-page-\d{4}-\d{2}-\d{2}\.png$/);
 });

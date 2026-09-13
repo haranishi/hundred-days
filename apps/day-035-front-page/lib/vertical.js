@@ -65,6 +65,9 @@ export function toCells(text) {
   return cells;
 }
 
+/* 倒して組むラテン文字（と5桁以上の数字）。送りが全角より狭いことで見分ける */
+const isLatin = (cell) => cell?.kind === 'rotate' && cell.advance === LATIN_ADVANCE;
+
 /* 流し込みに必要なマスの総量。大きさを決めるときに使う */
 export function totalAdvance(cells) {
   return cells.reduce((sum, cell) => sum + (cell.advance ?? 1), 0);
@@ -113,6 +116,14 @@ export function flowColumns(cells, columns, { size, charGap = size, ellipsis = f
       && (NO_LINE_START.has(cells[end].text) || NO_LINE_END.has(cells[end - 1].text))) {
       end -= 1;
       guard += 1;
+    }
+    /* ラテン文字の連なりは列をまたいで割らない。「example.com」が「e／xample.com」に
+       割れると、倒した字が2列に散って読めなくなる（出所のホスト名で実際に起きた）。
+       まるごと送ると列が空になるときだけ、諦めて割る */
+    if (end < cells.length && isLatin(cells[end]) && isLatin(cells[end - 1])) {
+      let start = end;
+      while (start > index && isLatin(cells[start - 1])) start -= 1;
+      if (start > index) end = start;
     }
     if (end === index) continue;
     let offset = 0;

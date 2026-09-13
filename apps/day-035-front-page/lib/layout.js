@@ -10,7 +10,10 @@ export const FOOTER = { rule: 1420, text: 1452 };
 const GAP = 18;
 
 /* 記事が1本のときは、上の帯に見出しと本文、下の帯に写真を大きく置く。
-   列組みだけで1本を組むと、短いリードでは紙面の左半分が白く残る（実測） */
+   列組みだけで1本を組むと、短いリードでは紙面の左半分が白く残る（実測）。
+
+   ⚠️ この写真の帯を使うのは画面だけ。保存するPNGは写真を持たない紙面として
+   組み直す（BODY いっぱいに見出しと本文を流す）。理由は README「何を取ってくるのか」 */
 export const SOLO = {
   text: { top: BODY.top, bottom: 860 },
   caption: 884,
@@ -42,7 +45,7 @@ export function blocks(count) {
   return list;
 }
 
-/* 写真はブロックの左下に接地させる。縦書きは右から読むので、
+/* 写真の枠はブロックの左下に接地させる。縦書きは右から読むので、
    本文は右から流れてきて、最後に写真の上を通る。
    写真を右上に置くと、本文が尽きた左下が白いまま残る（実測で紙面の四分の一が空いた） */
 export function photoBox(block, headlineWidth, maxWidth = 560) {
@@ -74,6 +77,19 @@ export function fitSize(units, region, { min = 22, max = 52, lineRatio = 1.62, c
     if (capacity >= units) return size;
   }
   return min;
+}
+
+/* 写真が無い紙面では、字の大きさはそのままに、列の間だけを広げて紙面いっぱいに散らす。
+   大きさで埋めようとすると、短いリードが見出しより大きくなって新聞に見えなくなる
+   （120字のリードを968pxの紙面に満たすには100px前後まで上げることになる）。
+   返すのは列の送り（lineGap）で、columnsIn にそのまま渡す。 */
+export function spreadGap(units, region, size, { lineRatio = 1.62, charRatio = 1.06, maxRatio = 3.4 } = {}) {
+  const base = size * lineRatio;
+  const perColumn = Math.max(1, Math.floor((region.bottom - region.top) / (size * charRatio)));
+  const needed = Math.max(1, Math.ceil(Math.max(1, units) / perColumn));
+  if (needed <= 1) return base;
+  const gap = (region.right - region.left - size) / (needed - 1);
+  return Math.min(Math.max(gap, base), size * maxRatio);
 }
 
 /* 右から左へ縦の列を作る。写真に重なる列は写真の手前で止める（L字に回り込ませる） */

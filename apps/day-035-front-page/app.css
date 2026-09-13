@@ -56,6 +56,49 @@ main {
 
 .stage { position: relative; }
 
+/* 紙面と写真の層をぴったり重ねるための箱。canvas の実寸に合わせて縮む
+   （幅も高さも canvas 側で決まるので、ここは fit-content で包むだけ） */
+.sheet {
+  position: relative;
+  width: fit-content;
+  max-width: 100%;
+  margin: 0 auto;
+}
+
+/* 写真は canvas に描かない（描くと他媒体の写真をPNGに焼くことになる）。
+   紙面が空けた枠の位置へ、提供元の画像を紙面座標のパーセントで重ねる */
+.photo-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.photo {
+  position: absolute;
+  overflow: hidden;
+}
+
+.photo img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  /* 紙に刷ったインクに寄せる。multiply で紙の色が明るいところに透ける */
+  filter: grayscale(1) contrast(1.16);
+  mix-blend-mode: multiply;
+}
+
+/* 網点の代わり。45度に傾けた点の格子を上から掛けて、新聞の刷り上がりに近づける */
+.photo::after {
+  content: "";
+  position: absolute;
+  inset: -40%;
+  background-image: radial-gradient(rgba(27, 27, 27, 0.42) 30%, transparent 34%);
+  background-size: 4px 4px;
+  transform: rotate(45deg);
+  mix-blend-mode: multiply;
+}
+
 #paper {
   display: block;
   width: 100%;
