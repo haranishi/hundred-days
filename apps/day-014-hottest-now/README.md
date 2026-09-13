@@ -21,7 +21,10 @@ https://hundred-days.pages.dev/day-014-hottest-now/
 ## 作りの要点
 
 - 気象庁が配っている静的ファイル3つ（最新時刻・地点表・観測値）だけを読む。
-  `access-control-allow-origin: *` が付いているので中継サーバーは置いていない
+  `access-control-allow-origin: *` が付いているので中継サーバーは置いていない。
+  ただし **`www.jma.go.jp/bosai/**` は公式に案内されたWebAPIではなくサイト内部のデータ**で、
+  形式も継続も約束されていない。変わったら動かなくなる前提で読むこと（利用は
+  [気象庁ホームページ利用規約](https://www.jma.go.jp/jma/kishou/info/coment.html)＝公共データ利用規約1.0に従う）
 - 現在地は最寄りの観測所を選ぶ計算にだけ使い、どこにも送らない
 - 1時間前の同じファイルも読んで増減を出す。取れなくても画面は成立する
 

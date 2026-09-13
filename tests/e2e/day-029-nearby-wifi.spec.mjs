@@ -100,6 +100,13 @@ test('Day 029 › 現在地から3層の要約・距離順・文字バッジが�
   await expect(page.locator('.spot').first().locator('.badge')).toHaveText(['自治体', '無料']);
   await expect(page.locator('.spot[data-layer="osm"]').first().locator('.badge')).toHaveText(['来店客向け', 'OSM登録']);
   await expect(page.locator('.spot[data-id="chain/all/node/11"] .badge')).toHaveText(['推定']);
+  /* 推定の層は各店舗を調べたものではないので、公式の案内へその場で行けること。
+     自治体・OSM登録の層には出さない（そちらは推定ではない） */
+  const officialLink = page.locator('.spot[data-id="chain/all/node/11"] .official');
+  await expect(officialLink).toHaveAttribute('href', 'https://example.test/all');
+  await expect(officialLink).toHaveText('架空カフェの公式案内で確かめる');
+  await expect(page.locator('.spot[data-layer="municipal"] .official')).toHaveCount(0);
+  await expect(page.locator('.spot[data-layer="osm"] .official')).toHaveCount(0);
 });
 
 test('Day 029 › Googleマップは小数5桁の座標検索を新しいタブで開く設定', async ({ page }) => {

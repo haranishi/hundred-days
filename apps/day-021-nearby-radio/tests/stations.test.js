@@ -25,6 +25,22 @@ test('検索URLにAPI所定のパラメータを設定する', () => {
   assert.equal(url.searchParams.has('order'), false);
 });
 
+test('外へ送る座標は小数3桁に丸める（現在地の精度をそのまま出さない）', () => {
+  const url = new URL(buildSearchUrl('https://example.test', {
+    lat: 39.7186432, lon: 140.1023871, radiusKm: 25,
+  }));
+  assert.equal(url.searchParams.get('geo_lat'), '39.719');
+  assert.equal(url.searchParams.get('geo_long'), '140.102');
+});
+
+test('丸めても負の座標と桁の少ない座標が壊れない', () => {
+  const url = new URL(buildSearchUrl('https://example.test', {
+    lat: -33.8688197, lon: 151.2, radiusKm: 100,
+  }));
+  assert.equal(url.searchParams.get('geo_lat'), '-33.869');
+  assert.equal(url.searchParams.get('geo_long'), '151.2');
+});
+
 test('同名+同URLの重複を除去し、タグを3件に絞る', () => {
   const stations = normalizeStations([
     row(), row({ stationuuid: 'uuid-duplicate', geo_lat: 35.2 }),

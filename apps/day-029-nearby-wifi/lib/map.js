@@ -13,9 +13,10 @@ export class WifiMap {
       center: [137, 37.5],
       zoom: 4.2,
       fadeDuration: 0,
+      // 表示は常時＝ODbLの条件。OpenFreeMapが指定している文言もそのまま載せる
       attributionControl: {
         compact: true,
-        customAttribution: '© OpenStreetMap contributors',
+        customAttribution: '<a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">© OpenStreetMap contributors (ODbL)</a> · <a href="https://openfreemap.org/" target="_blank" rel="noopener noreferrer">OpenFreeMap © OpenMapTiles</a>',
       },
     });
     this.map.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'top-right');

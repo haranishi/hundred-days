@@ -54,6 +54,25 @@ const THUMBNAIL_HOSTS = ['https://thumb.wikimedia.org/', 'https://upload.wikimed
 
 export const isThumbnailHost = (url) => THUMBNAIL_HOSTS.some((host) => String(url ?? '').startsWith(host));
 
+/* 写真のライセンスは記事本文（CC BY-SA 4.0）とは別で、1枚ごとに違う。作者名もライセンス名も
+   summary の応答には入っていないので、ファイルページへのリンクを1本渡して、そこで確かめられる
+   ようにする。配信URLからファイル名とプロジェクトを取り出して組み立てる。
+   例 .../wikipedia/commons/thumb/a/ab/Foo.jpg/320px-Foo.jpg → commons の File:Foo.jpg */
+export function fileUrlFromThumbnail(url) {
+  if (!isThumbnailHost(url)) return '';
+  let path;
+  try { path = new URL(url).pathname; } catch { return ''; }
+  const parts = path.split('/').filter(Boolean);
+  const projectAt = parts.indexOf('wikipedia');
+  if (projectAt < 0 || !parts[projectAt + 1]) return '';
+  const project = parts[projectAt + 1];
+  // /thumb/ 付きは末尾が縮小版のファイル名なので、その1つ前が元のファイル名
+  const name = parts[projectAt + 2] === 'thumb' ? parts.at(-2) : parts.at(-1);
+  if (!name) return '';
+  const host = project === 'commons' ? 'commons.wikimedia.org' : `${project}.wikipedia.org`;
+  return `https://${host}/wiki/File:${name}`;
+}
+
 /** 応答から画面が使う項目だけ取り出す。要約が空の記事は使わない */
 export function pickFields(summary) {
   const extract = trimExtract(summary?.extract, EXTRACT_LIMIT);
@@ -63,6 +82,7 @@ export function pickFields(summary) {
     title: String(summary?.title || '').trim(),
     extract,
     thumbnail: isThumbnailHost(thumb) ? thumb : '',
+    thumbnailPage: fileUrlFromThumbnail(thumb),
     url: String(summary?.content_urls?.desktop?.page || '').trim()
   };
 }

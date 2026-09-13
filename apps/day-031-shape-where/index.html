@@ -105,11 +105,17 @@
             <p id="reveal-note" class="reveal__note" hidden></p>
             <!-- 要約が届く前から出しておく。あとから高さが増えると「次へ」が下へ逃げるため -->
             <div id="reveal-wiki" class="wiki" data-status="loading" data-thumb="false">
-              <img id="wiki-thumb" class="wiki__thumb" alt="" loading="lazy" decoding="async" referrerpolicy="no-referrer" hidden>
+              <!-- 写真のライセンスは記事本文と別で、1枚ごとに違う。作者名もライセンス名も summary の
+                   応答には入っていないので、写真そのものをファイルページへのリンクにして確かめられる
+                   ようにする。ここを枠の外の行にすると、狭い画面でフッターが折り返して枠が伸び、
+                   「次へ」が下へ逃げる（min-height 132px は1px単位で詰めてある） -->
+              <a id="wiki-photo-link" class="wiki__thumb-link" target="_blank" rel="noopener" hidden>
+                <img id="wiki-thumb" class="wiki__thumb" alt="" loading="lazy" decoding="async" referrerpolicy="no-referrer">
+              </a>
               <p id="wiki-extract" class="wiki__extract">解説を読み込み中…</p>
               <p id="wiki-foot" class="wiki__foot" hidden>
                 <a id="wiki-link" class="wiki__link" href="https://ja.wikipedia.org/" target="_blank" rel="noopener">Wikipedia で読む</a>
-                <span class="wiki__license">Wikipedia · CC BY-SA 4.0</span>
+                <span class="wiki__license">解説 CC BY-SA 4.0</span>
               </p>
             </div>
             <button id="next-button" class="button button--primary" type="button">次へ</button>
@@ -153,7 +159,8 @@
 
   <footer id="sources" class="sources">
     <p>出典：「国土数値情報（行政区域データ）」（国土交通省）（<a href="https://nlftp.mlit.go.jp/ksj/gml/datalist/KsjTmplt-N03-2025.html" target="_blank" rel="noopener">https://nlftp.mlit.go.jp/ksj/gml/datalist/KsjTmplt-N03-2025.html</a>）を加工して作成。原典は国土地理院「数値地図（国土基本情報）」。形は単純化した概略で、位置や面積の参照には使えません</p>
-    <p>解説と写真：Wikipedia（CC BY-SA 4.0）</p>
+    <p>加工したのはこのページの作者（個人）で、国や行政機関が作成・監修したものではありません</p>
+    <p>解説：Wikipedia 日本語版（CC BY-SA 4.0）。<strong>写真のライセンスは1枚ごとに異なります</strong>（作者名とライセンスは各写真の「写真の作者とライセンス」から確かめられます）</p>
   </footer>
 
   <script type="module" src="./app.js"></script>
