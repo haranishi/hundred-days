@@ -111,7 +111,9 @@ export class CameraMap {
        パネルに隠れないよう位置は app.css 側で寄せる（表示は常時＝ODbLの条件）。 */
     this.map.addControl(new maplibregl.AttributionControl({
       compact: false,
-      customAttribution: '<a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">© OpenStreetMap contributors (ODbL)</a> · <a href="https://openfreemap.org/" target="_blank" rel="noopener noreferrer">OpenFreeMap</a>',
+      /* OpenFreeMap が求める文言は「OpenFreeMap © OpenMapTiles Data from OpenStreetMap」。
+         カメラの位置も同じ OpenStreetMap（ODbL）なので、繋げて1文にし、末尾で ODbL まで言い切る。 */
+      customAttribution: '<a href="https://openfreemap.org/" target="_blank" rel="noopener noreferrer">OpenFreeMap</a> <a href="https://www.openmaptiles.org/" target="_blank" rel="noopener noreferrer">© OpenMapTiles</a> Data from <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap contributors (ODbL)</a>',
     }), 'bottom-left');
     this.map.on('load', () => { this.installLayers(); options.onReady?.(); });
     this.map.on('moveend', () => options.onMove?.(this.view()));

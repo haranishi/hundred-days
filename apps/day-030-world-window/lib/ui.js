@@ -26,12 +26,19 @@ const badge = (kind) => { const [text,cls]=KIND[kind] || KIND.page; return make(
 const externalLink = (label, href, className='') => {
   const link=make('a',className,label); link.href=href; link.target='_blank'; link.rel='noopener noreferrer'; return link;
 };
+const appendIf = (parent,node) => { if(node) parent.append(node); };
 
 function providerUrl(camera) {
   if (camera.website) return camera.website;
   if (camera.kind === 'yt' && camera.url?.startsWith('v:')) return `https://${YOUTUBE_PAGE_HOST}/watch?v=${encodeURIComponent(camera.url.slice(2))}`;
   if (camera.kind === 'yt' && camera.url?.startsWith('c:')) return `https://${YOUTUBE_PAGE_HOST}/channel/${encodeURIComponent(camera.url.slice(2))}/live`;
   return camera.url;
+}
+
+/* いま読み込んでいる先のホスト名。出典としてそのまま読めることを条件にしている提供元があるので、
+   www. も省かずに出す（foto-webcam.eu の条件は「www.foto-webcam.eu」という表記そのものを指している）。 */
+function mediaHost(url) {
+  try { return new URL(String(url)).hostname; } catch { return ''; }
 }
 
 export function createUI(handlers) {
@@ -206,6 +213,28 @@ export function createUI(handlers) {
   }
   function hideCandidates(){refs.candidates.hidden=true;refs.candidates.replaceChildren();options=[];activeIndex=-1;refs.search.setAttribute('aria-expanded','false');refs.search.removeAttribute('aria-activedescendant');}
 
+  /* 提供元の利用条件には「画像をクリックすると元のページが開くこと」を埋め込みの条件にしているものがある
+     （foto-webcam.eu の Nutzungsbedingungen）。画像そのものを提供元ページへのリンクにする。
+     提供元URLが分からないときは、囲まずに裸のまま返す（行き先の無いリンクを作らない）。 */
+  function linkToProvider(camera,node) {
+    const href=providerUrl(camera);
+    if(!href)return node;
+    const link=externalLink('',href,'media-link');
+    /* website が無い地物では行き先が画像そのものになる。「ページ」と言い切らない。 */
+    link.setAttribute('aria-label',`${label(camera)}の提供元を開く`);
+    link.append(node);return link;
+  }
+  /* 同じ条件が「出典がはっきり読める形で示され、それがクリックできるリンクであること」も求める。
+     詳細の末尾にも「提供元で見る」はあるが、画像から離れていて出典としては読めない。すぐ下に置く。 */
+  function providerCredit(camera,mediaUrl) {
+    const host=mediaHost(mediaUrl);
+    if(!host)return null;
+    const note=make('p','provider-credit','提供元 ');
+    const href=providerUrl(camera);
+    note.append(href?externalLink(host,href):make('span','',host));
+    return note;
+  }
+
   function renderViewer(camera,autoplay) {
     const wrap=make('div','viewer');
     wrap.append(make('p','privacy-note','見ているのは提供元が公開している映像です。個人の特定には使わないでください。'));
@@ -227,11 +256,11 @@ export function createUI(handlers) {
       const refresh=()=>{
         const now=new Date();const image=make('img');image.alt=label(camera);
         image.addEventListener('error',fail);image.src=bustCache(view.src,now.getTime());
-        frame.classList.remove('is-fallback');frame.replaceChildren(image);
+        frame.classList.remove('is-fallback');frame.replaceChildren(linkToProvider(camera,image));
         fetched.textContent=`取得 ${now.toLocaleTimeString('ja-JP',{hour12:false})}`;
       };
       const tools=make('div','viewer-tools');const button=make('button','', '更新');button.type='button';button.addEventListener('click',refresh);
-      tools.append(button,fetched);wrap.append(frame,tools);refresh();
+      tools.append(button,fetched);wrap.append(frame);appendIf(wrap,providerCredit(camera,view.src));wrap.append(tools);refresh();
       viewerTimer=setInterval(()=>{if(!refs.close.hidden && document.visibilityState==='visible')refresh();},60_000);
     } else if(view.mode==='hls') {
       const video=make('video');video.controls=true;video.autoplay=true;video.playsInline=true;video.muted=true;
@@ -242,7 +271,7 @@ export function createUI(handlers) {
       video.addEventListener('error',guide);
       video.addEventListener('loadedmetadata',()=>{clearTimeout(hlsTimer);hlsTimer=null;});
       hlsTimer=setTimeout(guide,HLS_WAIT_MS);
-      video.src=view.src;frame.append(video);wrap.append(frame);
+      video.src=view.src;frame.append(video);wrap.append(frame);appendIf(wrap,providerCredit(camera,view.src));
     }
     else if(camera.kind==='hls'){frame.classList.add('is-fallback');frame.replaceChildren(fallbackBox(HLS_UNSUPPORTED));wrap.append(frame);}
     else { const message=make('div','viewer-fallback');message.append(make('p','', 'このカメラは提供元のページで見られます。'),externalLink('提供元で見る',providerUrl(camera),'large-link'));wrap.append(message); }

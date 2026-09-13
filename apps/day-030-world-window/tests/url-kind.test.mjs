@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { classifyUrl, isExcluded, kindFromContentType, readExcludeHosts, upgradeToHttps } from '../tools/url-kind.mjs';
+import { classifyUrl, demoteInsecureEmbed, isExcluded, kindFromContentType, readExcludeHosts, upgradeToHttps } from '../tools/url-kind.mjs';
 
 test('url-kind: URLの形からYouTube・m3u8・画像拡張子を分類する', () => {
   assert.equal(classifyUrl('https://youtu.be/a').kind, 'youtube');
@@ -21,6 +21,17 @@ test('url-kind: content-typeは画像とhttps映像だけをインライン扱�
   assert.equal(kindFromContentType('application/vnd.apple.mpegurl', 'https://example.test/a'), 'hls');
   assert.equal(kindFromContentType('video/mp4', 'http://example.test/a'), 'page');
   assert.equal(kindFromContentType('text/html', 'https://example.test/a'), 'page');
+});
+
+test('url-kind: httpの直読みはリンクのみへ落とす', () => {
+  // <img>・<video> で読むと混在コンテンツで止まる。リンクなら http でも開ける
+  assert.equal(demoteInsecureEmbed('img', 'http://example.test/a.jpg'), 'page');
+  assert.equal(demoteInsecureEmbed('hls', 'http://example.test/a.m3u8'), 'page');
+  assert.equal(demoteInsecureEmbed('img', 'https://example.test/a.jpg'), 'img');
+  assert.equal(demoteInsecureEmbed('hls', 'https://example.test/a.m3u8'), 'hls');
+  // 直読みでない種別は触らない（yt の url は v:ID 形式でURLですらない）
+  assert.equal(demoteInsecureEmbed('page', 'http://example.test/a'), 'page');
+  assert.equal(demoteInsecureEmbed('yt', 'v:abc'), 'yt');
 });
 
 test('url-kind: 除外ホストはコメントを無視しサブドメインにも一致する', () => {
