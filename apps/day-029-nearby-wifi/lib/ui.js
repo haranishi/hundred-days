@@ -39,6 +39,10 @@ function spotCopy(spot) {
       badges,
       meta: [chainStatus(spot.chain), spot.chain?.condition, directionDistance].filter(Boolean),
       note: chainMessage(spot.chain),
+      /* この層は「そのチェーンが一般に提供しているか」からの推定で、各店舗を調べたものではない。
+         推定のままにせず、各社の公式案内へその場で行けるようにしておく */
+      sourceUrl: spot.chain?.sourceUrl,
+      sourceLabel: `${chainName || 'このチェーン'}の公式案内で確かめる`,
     };
   }
   return {
@@ -129,7 +133,13 @@ export function createUI(handlers) {
       });
       const link = make('a', 'maps', 'Googleマップで開く'); link.href = mapsUrl(spot.lat, spot.lng);
       link.setAttribute('aria-label', `Googleマップで開く: ${spot.name}`);
-      link.target = '_blank'; link.rel = 'noopener noreferrer'; item.append(main, link); return item;
+      link.target = '_blank'; link.rel = 'noopener noreferrer'; item.append(main, link);
+      if (copy.sourceUrl) {
+        const official = make('a', 'official', copy.sourceLabel); official.href = copy.sourceUrl;
+        official.setAttribute('aria-label', `${copy.sourceLabel}（${spot.name}）`);
+        official.target = '_blank'; official.rel = 'noopener noreferrer'; item.append(official);
+      }
+      return item;
     });
     if (allMatched.length > 100) rows.push(make('li', 'list-end', 'ここまで（近い100か所）'));
     refs.list.replaceChildren(...rows); refs.message.textContent = ''; setState('results');

@@ -60,9 +60,15 @@ const rememberDelta = (event) => {
   if (pendingDelta.size > 2000) pendingDelta.delete(pendingDelta.keys().next().value);
 };
 
+/* Wikimedia は「連絡先を含む説明的な User-Agent を送ること。無いと予告なく遮断され得る」と
+   定めている。ブラウザの User-Agent は差し替えられないので、そのために用意されている
+   Api-User-Agent を使う（Day 031 と同じ）。カスタムヘッダなのでプリフライトが1往復増える。
+   https://foundation.wikimedia.org/wiki/Policy:User-Agent_policy */
+const API_AGENT = 'hundred-days-day010 (https://hundred-days.pages.dev/day-010-wikipedia-live/)';
+
 const lookup = createLookup({
   fetchJson: async (url) => {
-    const response = await fetch(url);
+    const response = await fetch(url, { headers: { 'Api-User-Agent': API_AGENT } });
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
     return response.json();
   },

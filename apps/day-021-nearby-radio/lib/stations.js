@@ -8,10 +8,15 @@ export const MIRRORS = [
 
 export const RADII_KM = [25, 100, 300, 1000];
 
+/* 現在地の精度をそのまま外へ出さない。いちばん狭い検索半径でも25kmあるので、
+   小数3桁（約100m）に落としても見つかる局は変わらない。距離順の並べ替えは
+   クライアント側で元の座標を使って計算し直すため、表示の精度も落ちない */
+const round3 = (value) => Math.round(Number(value) * 1000) / 1000;
+
 export function buildSearchUrl(baseUrl, { lat, lon, radiusKm }) {
   const url = new URL('/json/stations/search', baseUrl);
-  url.searchParams.set('geo_lat', String(lat));
-  url.searchParams.set('geo_long', String(lon));
+  url.searchParams.set('geo_lat', String(round3(lat)));
+  url.searchParams.set('geo_long', String(round3(lon)));
   url.searchParams.set('geo_distance', String(radiusKm * 1000));
   url.searchParams.set('hidebroken', 'true');
   // 公開ページはHTTPSなので、http配信の局は混在コンテンツとしてブラウザに止められる。

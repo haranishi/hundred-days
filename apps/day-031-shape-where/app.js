@@ -70,6 +70,7 @@ const ui = {
   wikiExtract: byId('wiki-extract'),
   wikiFoot: byId('wiki-foot'),
   wikiLink: byId('wiki-link'),
+  wikiPhotoLink: byId('wiki-photo-link'),
   nextButton: byId('next-button'),
   resultScore: byId('result-score'),
   resultMode: byId('result-mode'),
@@ -392,10 +393,13 @@ function setWiki(status, text) {
 }
 
 function resetWiki() {
-  setHidden(ui.wikiThumb, true);
+  setHidden(ui.wikiPhotoLink, true);
   ui.wikiThumb.removeAttribute('src');
   ui.wikiThumb.alt = '';
   ui.revealWiki.dataset.thumb = 'false';
+  // 前の問の写真のライセンスリンクが次の問に残らないようにする
+  ui.wikiPhotoLink.removeAttribute('href');
+  ui.wikiPhotoLink.removeAttribute('aria-label');
   setWiki('loading', WIKI_LOADING);
 }
 
@@ -411,8 +415,14 @@ async function loadWiki(question, ticket) {
   if (info.thumbnail) {
     ui.wikiThumb.src = info.thumbnail;
     ui.wikiThumb.alt = info.title;
-    setHidden(ui.wikiThumb, false);
+    setHidden(ui.wikiPhotoLink, false);
     ui.revealWiki.dataset.thumb = 'true';
+    /* 写真のライセンスは1枚ごとに違うので、押せば作者とライセンスに辿り着けるようにする。
+       配信URLからファイルページを組み立てられなかったときは、href を付けずに写真だけ出す */
+    if (info.thumbnailPage) {
+      ui.wikiPhotoLink.href = info.thumbnailPage;
+      ui.wikiPhotoLink.setAttribute('aria-label', `${info.title}の写真の作者とライセンス`);
+    }
   }
   setWiki('ready', info.extract);
 }

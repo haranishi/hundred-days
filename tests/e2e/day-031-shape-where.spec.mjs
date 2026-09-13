@@ -72,7 +72,9 @@ const summaryFor = (title) => ({
   type: 'standard',
   title,
   extract: `${title}（テスト）は、秋田県にある土地。ここは固定応答なので実際の記事ではない。`,
-  thumbnail: { source: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/test.jpg' },
+  // 実際に返ってくる形（/thumb/ 付き・縮小版のファイル名が末尾）に合わせてある。
+  // ここを簡略化すると、写真のファイルページを組み立てる処理が検査できない
+  thumbnail: { source: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/a/ab/Test_photo.jpg/320px-Test_photo.jpg' },
   content_urls: { desktop: { page: `https://ja.wikipedia.org/wiki/${encodeURIComponent(title)}` } }
 });
 
@@ -258,6 +260,28 @@ test.describe('Day 031 この形、どこ？', () => {
     await expect(page.locator('#wiki-thumb')).toBeVisible();
     await expect(page.locator('#wiki-thumb')).toHaveAttribute('alt', question.answer.name);
     await expect(page.locator('#reveal-wiki')).toContainText('CC BY-SA 4.0');
+    /* 写真のライセンスは記事本文（CC BY-SA 4.0）と別で1枚ごとに違う。
+       写真を押せば作者とライセンスに辿り着けること */
+    await expect(page.locator('#wiki-photo-link')).toHaveAttribute(
+      'href',
+      'https://commons.wikimedia.org/wiki/File:Test_photo.jpg'
+    );
+  });
+
+  test('写真のライセンスは記事本文と別扱いで、帰属は写真ごとに辿れる', async ({ page }) => {
+    await installData(page);
+    await installWiki(page);
+    await open(page, '?seed=1&p=05');
+    await page.locator('#play-town').click();
+    await answerQuestion(page, roundFor({ mode: 'town', prefCode: '05', seed: 1 }).questions[0]);
+    await expectWiki(page, 'ready');
+
+    // 本文のライセンス表記が、写真まで CC BY-SA 4.0 だと言っていないこと
+    await expect(page.locator('.wiki__license')).toHaveText('解説 CC BY-SA 4.0');
+    // 欄外の出典では、写真が1枚ごとに違うことを明示している
+    await expect(page.locator('#sources')).toContainText('写真のライセンスは1枚ごとに異なります');
+    // 国土数値情報の「国が作ったものではない」も欄外に出ている
+    await expect(page.locator('#sources')).toContainText('国や行政機関が作成・監修したものではありません');
   });
 
   test('曖昧さ回避に当たったら県名付きの候補で取り直す', async ({ page }) => {

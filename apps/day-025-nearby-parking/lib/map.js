@@ -10,7 +10,11 @@ export class ParkingMap {
       center: [139.7671, 35.6812],
       zoom: 12,
       fadeDuration: 0,
-      attributionControl: false,
+      // 表示は常時＝ODbLの条件。地図を見た人がその場で出典に辿り着ける状態を保つ
+      attributionControl: {
+        compact: true,
+        customAttribution: '<a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">© OpenStreetMap contributors (ODbL)</a> · <a href="https://openfreemap.org/" target="_blank" rel="noopener noreferrer">OpenFreeMap © OpenMapTiles</a>',
+      },
     });
     this.markers = new Map();
     this.originMarker = null;

@@ -12,7 +12,8 @@ import { inflateRawSync } from 'node:zlib';
 const here = dirname(fileURLToPath(import.meta.url));
 const cacheDir = join(here, 'cache/gis');
 const OUT = join(here, '../data/points.json');
-const UA = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36';
+/* ブラウザのふりをせず、誰が取りに来ているか分かる名前を送る（他のDayの取得スクリプトと同じ） */
+const UA = 'hundred-days-day015-fetch (+https://hundred-days.pages.dev/day-015-town-stats/)';
 const url = (pref) => `https://www.e-stat.go.jp/gis/statmap-search/data?dlserveyId=A002005212020&code=${pref}&coordSys=1&format=shape&downloadType=5&datum=2000`;
 
 /* ---- ZIP（build-data.mjsと同じ最小実装） ---- */

@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 
-import { articleUrl, createWikiReader, isThumbnailHost, pickFields, shouldTryNext, summaryUrl, titleCandidates, trimExtract } from '../lib/wiki.js';
+import { articleUrl, createWikiReader, fileUrlFromThumbnail, isThumbnailHost, pickFields, shouldTryNext, summaryUrl, titleCandidates, trimExtract } from '../lib/wiki.js';
 
 const summary = (over = {}) => ({
   type: 'standard',
@@ -44,9 +44,9 @@ test('要約は110字で切って「…」を足す', () => {
   assert.equal(trimExtract('あいうえお', 3), 'あいう…');
 });
 
-test('使うのは題・要約・写真・記事URLだけ', () => {
+test('使うのは題・要約・写真・写真のファイルページ・記事URLだけ', () => {
   const picked = pickFields(summary({ description: '捨てる項目' }));
-  assert.deepEqual(Object.keys(picked).sort(), ['extract', 'thumbnail', 'title', 'url']);
+  assert.deepEqual(Object.keys(picked).sort(), ['extract', 'thumbnail', 'thumbnailPage', 'title', 'url']);
   assert.equal(picked.title, '美郷町');
   assert.equal(picked.url, 'https://ja.wikipedia.org/wiki/%E7%BE%8E%E9%83%B7%E7%94%BA');
   assert.equal(pickFields(summary({ extract: '' })), null);
@@ -150,4 +150,40 @@ test('候補を使い切ったら、県名が出てこない要約でも使う',
 test('最後まで曖昧さ回避なら何も出さない', async () => {
   const reader = createWikiReader({ fetchImpl: async () => jsonResponse(summary({ type: 'disambiguation' })) });
   assert.equal(await reader.read({ name: '美郷町' }, '秋田県'), null);
+});
+
+/* 写真のライセンスは記事本文と別で、1枚ごとに違う。ファイルページへ行けることを固定する */
+test('配信URLから写真のファイルページを組み立てる（thumb付き・commons）', () => {
+  assert.equal(
+    fileUrlFromThumbnail('https://thumb.wikimedia.org/wikipedia/commons/thumb/a/ab/Misato_Akita.jpg/320px-Misato_Akita.jpg'),
+    'https://commons.wikimedia.org/wiki/File:Misato_Akita.jpg'
+  );
+});
+
+test('配信URLから写真のファイルページを組み立てる（元画像・commons）', () => {
+  assert.equal(
+    fileUrlFromThumbnail('https://upload.wikimedia.org/wikipedia/commons/a/ab/Misato_Akita.jpg'),
+    'https://commons.wikimedia.org/wiki/File:Misato_Akita.jpg'
+  );
+});
+
+test('日本語版にアップロードされた写真は ja.wikipedia.org のファイルページになる', () => {
+  assert.equal(
+    fileUrlFromThumbnail('https://thumb.wikimedia.org/wikipedia/ja/thumb/c/cd/Local.png/240px-Local.png'),
+    'https://ja.wikipedia.org/wiki/File:Local.png'
+  );
+});
+
+test('配信元でないURLと形の違うURLからは組み立てない', () => {
+  assert.equal(fileUrlFromThumbnail('https://example.test/photo.jpg'), '');
+  assert.equal(fileUrlFromThumbnail('https://upload.wikimedia.org/other/a/ab/Foo.jpg'), '');
+  assert.equal(fileUrlFromThumbnail(''), '');
+  assert.equal(fileUrlFromThumbnail(undefined), '');
+});
+
+test('pickFields は写真のファイルページも一緒に返す', () => {
+  const info = pickFields(summary({
+    thumbnail: { source: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/a/ab/Foo.jpg/320px-Foo.jpg' },
+  }));
+  assert.equal(info.thumbnailPage, 'https://commons.wikimedia.org/wiki/File:Foo.jpg');
 });
