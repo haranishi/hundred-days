@@ -1,4 +1,4 @@
-/* 最後に選んだ場所と、干し方・干し場所を覚える。
+/* 最後に選んだ場所と、干す場所を覚える。
    位置情報を断った人が毎回市区町村を選び直すのは苦痛なので、そこだけ残す。
    localStorage が使えない環境（プライベートウィンドウ等）でもアプリは動く。 */
 
@@ -24,7 +24,7 @@ function safeStorage() {
   }
 }
 
-export const DEFAULTS = { code: null, fabric: 'normal', place: 'sun' };
+export const DEFAULTS = { code: null, place: 'sun' };
 
 export function load(storage = safeStorage()) {
   if (!storage) return { ...DEFAULTS };
@@ -32,7 +32,6 @@ export function load(storage = safeStorage()) {
     const saved = JSON.parse(storage.getItem(STORAGE_NAME) || '{}');
     return {
       code: typeof saved.code === 'string' && /^\d{5}$/.test(saved.code) ? saved.code : null,
-      fabric: ['thin', 'normal', 'thick'].includes(saved.fabric) ? saved.fabric : DEFAULTS.fabric,
       place: ['sun', 'shade'].includes(saved.place) ? saved.place : DEFAULTS.place
     };
   } catch {

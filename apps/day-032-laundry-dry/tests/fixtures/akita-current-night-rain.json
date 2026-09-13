@@ -1,0 +1,33 @@
+{
+  "latitude": 39.75,
+  "longitude": 140.125,
+  "generationtime_ms": 0.0747,
+  "utc_offset_seconds": 32400,
+  "timezone": "Asia/Tokyo",
+  "timezone_abbreviation": "GMT+9",
+  "elevation": 8.0,
+  "current_units": {
+    "time": "iso8601",
+    "interval": "seconds",
+    "temperature_2m": "°C",
+    "relative_humidity_2m": "%",
+    "precipitation": "mm",
+    "cloud_cover": "%",
+    "wind_speed_10m": "km/h",
+    "shortwave_radiation": "W/m²",
+    "et0_fao_evapotranspiration": "mm",
+    "is_day": ""
+  },
+  "current": {
+    "time": "2026-09-13T22:45",
+    "interval": 900,
+    "temperature_2m": 21.4,
+    "relative_humidity_2m": 95,
+    "precipitation": 0.9,
+    "cloud_cover": 97,
+    "wind_speed_10m": 6.4,
+    "shortwave_radiation": 0.0,
+    "et0_fao_evapotranspiration": 0.0,
+    "is_day": 0
+  }
+}

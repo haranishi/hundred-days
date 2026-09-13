@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>いま干していい？</title>
-  <meta name="description" content="洗濯物をいま外に干したら何時に乾くか、何時までに取り込むかを出します。">
-  <meta name="share:text" content="いま干していい？ — 洗濯物が何時に乾いて、何時までに取り込むかがわかる">
+  <meta name="description" content="いまの空気の乾かす力から、洗濯物が乾くのにどれだけの時間ぶんが要るかを出します。">
+  <meta name="share:text" content="いま干していい？ — いまの空気の乾かす力で、洗濯物に何時間ぶん要るかがわかる">
   <link rel="stylesheet" href="./app.css">
   <link rel="stylesheet" href="./shared/share.css">
   <script src="./shared/share.js" defer></script>
@@ -14,14 +14,14 @@
   <header class="site-head">
     <p class="eyebrow">DAY 032 · LAUNDRY DRY</p>
     <h1>いま干していい？</h1>
-    <p class="site-description">洗濯物が何時に乾いて、何時までに取り込むか</p>
+    <p class="site-description">いまの空気の乾かす力で、洗濯物に何時間ぶん要るか</p>
   </header>
 
-  <main id="app" data-state="start" data-fabric="normal" data-place="sun">
+  <main id="app" data-state="start" data-place="sun">
 
     <section id="start" class="panel">
       <h2 class="sr-only">場所を決める</h2>
-      <p class="lead">気温・湿度・風・日射から「大気の乾かす力」を出し、洗濯物が持っている水の量を割って時間にします。降水確率ではなく、乾く時刻でお答えします。</p>
+      <p class="lead">いまの気温・湿度・風・日射から「大気の乾かす力」を出し、洗濯物が持っている水の量を割って時間にします。<strong>出すのは「いまの時点」だけ</strong>です。この先の天気は見ていないので、「◯時に乾く」は出しません。</p>
       <div class="start__actions">
         <button id="use-location" class="button button--primary" type="button">現在地で調べる</button>
         <button id="pick-place" class="button" type="button">市区町村から選ぶ</button>
@@ -31,7 +31,7 @@
     </section>
 
     <section id="loading" class="panel" aria-busy="true" hidden>
-      <p class="loading__text">天気を読み込んでいます…</p>
+      <p class="loading__text">いまの天気を読み込んでいます…</p>
       <div class="loading__bar" aria-hidden="true"><span></span></div>
     </section>
 
@@ -42,36 +42,21 @@
       </p>
 
       <div id="headline" class="headline" data-verdict="good">
-        <p id="dry-label" class="headline__label">乾くのは</p>
-        <p id="dry-time" class="headline__time" tabindex="-1">--:--</p>
-        <p id="dry-sub" class="headline__sub"></p>
-        <p id="verdict" class="verdict"></p>
+        <p class="headline__label">いま<span id="observed-at" class="headline__at"></span></p>
+        <p id="verdict" class="headline__verdict" tabindex="-1">—</p>
+        <p id="rate-line" class="headline__sub"></p>
       </div>
 
-      <p id="bring-in" class="bring-in"></p>
+      <p id="no-dry" class="no-dry" hidden></p>
       <p id="smell" class="smell" hidden></p>
 
-      <figure id="timeline" class="timeline" role="img" aria-label="">
-        <div id="timeline-bar" class="timeline__bar" aria-hidden="true"></div>
-        <div id="timeline-axis" class="timeline__axis" aria-hidden="true"></div>
-        <figcaption class="timeline__legend" aria-hidden="true">
-          <span class="chip chip--dry">乾いていく</span>
-          <span class="chip chip--rain">雨</span>
-          <span class="chip chip--night">夜</span>
-          <span class="chip chip--done">乾いたあと</span>
-        </figcaption>
-      </figure>
+      <section id="spans" class="spans" aria-labelledby="spans-title">
+        <h2 id="spans-title" class="spans__title">この勢いなら、乾くのに要る時間</h2>
+        <p class="spans__caption">いまの乾かす力がそのまま続くと<strong>仮定して</strong>、水の量を割っただけの値です。この先の天気は見ていないので、乾き上がりの時刻ではありません。</p>
+        <dl id="dry-list" class="spans__list"></dl>
+      </section>
 
       <div class="controls">
-        <fieldset id="fabric" class="control">
-          <legend class="control__legend">干すもの</legend>
-          <div class="control__row" role="radiogroup" aria-label="干すもの">
-            <button class="option" type="button" role="radio" data-fabric="thin" aria-checked="false">薄手</button>
-            <button class="option" type="button" role="radio" data-fabric="normal" aria-checked="true">ふつう</button>
-            <button class="option" type="button" role="radio" data-fabric="thick" aria-checked="false">厚手</button>
-          </div>
-          <p id="fabric-note" class="control__note"></p>
-        </fieldset>
         <fieldset id="place-kind" class="control">
           <legend class="control__legend">干す場所</legend>
           <div class="control__row" role="radiogroup" aria-label="干す場所">
@@ -82,9 +67,6 @@
         </fieldset>
       </div>
 
-      <p id="best-start" class="hint" hidden></p>
-      <p id="tomorrow" class="hint" hidden></p>
-
       <p class="result-share">
         <button id="post-result" class="button" type="button">この結果をXに投稿</button>
       </p>
@@ -94,7 +76,8 @@
         <div class="why__body">
           <p id="why-formula" class="why__formula"></p>
           <dl id="why-values" class="why__values"></dl>
-          <p class="why__caveat">係数（洗濯物が持つ水の量と、干し場所の倍率）は実測値ではありません。ET0は芝生を基準にした値で、物干しに掛かった布の蒸発量そのものではないためです。「真夏の薄手は1時間ちょっと」「冬は晴れても厚手は1日では乾かない」に合うよう決めた目安です。</p>
+          <p class="why__caveat">係数（洗濯物が持つ水の量と、干し場所の倍率）は実測値ではありません。ET0は芝生を基準にした値で、物干しに掛かった布の蒸発量そのものではないためです。「真夏の薄手は1時間ちょっと」「冬は晴れても厚手は1日ぶんでは足りない」に合うよう決めた目安です。</p>
+          <p class="why__caveat">使っているのは <strong>Open-Meteo の「いまの値」1時点だけ</strong>です。この先の時刻の気温・湿度・風・日射・降水は取得していません。</p>
         </div>
       </details>
     </section>
@@ -126,7 +109,7 @@
   <footer class="site-foot">
     <p>天気：<a href="https://open-meteo.com/" target="_blank" rel="noopener">Weather data by Open-Meteo.com</a>（<a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a>）</p>
     <p>市区町村名は「令和2年国勢調査」（総務省統計局）、地点は「境界データ」（総務省統計局・e-Stat統計GIS）の小地域重心から人口加重で独自に計算した代表点です。</p>
-    <p><strong>公式の予報ではありません。</strong>乾く時刻は目安で、洗濯物の量・干し方・風通しで変わります。</p>
+    <p><strong>天気予報ではありません。</strong>出しているのは「いまの時点」の空気の状態と、そこから割り算しただけの所要時間です。この先の天気は予想していません。洗濯物の量・干し方・風通しでも変わります。</p>
   </footer>
 
   <script type="module" src="./app.js"></script>
