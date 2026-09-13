@@ -6,8 +6,8 @@ import { fileURLToPath } from 'node:url';
 /* record-demo.mjs は最初に file:// で開くので fetch も ES モジュールも動かない。
    振り付けの中で、このアプリを配信するミニHTTPサーバーへ開き直す。
 
-   天気は固定応答（E2Eと同じ2026-09-08の秋田）に差し替え、時計も止める。
-   本物の予報のまま撮ると、撮り直すたびに違う映像になって比べられない。 */
+   天気は固定応答（2026-09-13 秋田の昼・実応答）に差し替える。
+   本物の値のまま撮ると、撮り直すたびに違う映像になって比べられない。 */
 
 const appDir = dirname(fileURLToPath(import.meta.url));
 const MIME = {
@@ -16,7 +16,6 @@ const MIME = {
   '.css': 'text/css',
   '.json': 'application/json; charset=utf-8'
 };
-const FIXED_NOW = new Date('2026-09-08T09:30:00+09:00');
 const AKITA_CODE = '05201';
 
 let baseUrl = null;
@@ -39,16 +38,15 @@ async function ensureServer() {
   return baseUrl;
 }
 
-async function openReady(page, { fabric = 'normal' } = {}) {
-  const forecast = JSON.parse(
-    await readFile(join(appDir, 'tests/fixtures/akita-2026-09-08.json'), 'utf8')
+async function openReady(page, { fixture = 'akita-current-day.json' } = {}) {
+  const current = JSON.parse(
+    await readFile(join(appDir, 'tests/fixtures', fixture), 'utf8')
   );
   await page.route('**://api.open-meteo.com/**', (route) =>
-    route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(forecast) }));
-  await page.clock.setFixedTime(FIXED_NOW);
-  await page.addInitScript(([code, kind]) => {
-    localStorage.setItem('day-032-laundry-dry', JSON.stringify({ code, fabric: kind, place: 'sun' }));
-  }, [AKITA_CODE, fabric]);
+    route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(current) }));
+  await page.addInitScript((code) => {
+    localStorage.setItem('day-032-laundry-dry', JSON.stringify({ code, place: 'sun' }));
+  }, AKITA_CODE);
   await page.goto(await ensureServer(), { waitUntil: 'load' });
   await page.waitForSelector('#ready:not([hidden])');
   await page.waitForTimeout(600);
@@ -57,37 +55,28 @@ async function openReady(page, { fabric = 'normal' } = {}) {
 export default async function (page, h) {
   await openReady(page);
 
-  // 頭の2秒はここで捨てる前提（切り出しは tools/trim-demo.mjs）。
-  // 切り出したあとの1コマ目が「バーが伸びている途中」になるよう、ここで描き直しを起こす
-  await h.pause(1400);
-  await page.click('[data-fabric="thick"]');
+  // 頭の2秒はここで捨てる前提（切り出しは tools/trim-demo.mjs）
+  await h.pause(1600);
+  await h.scrollTo('#spans', 700);
   await h.pause(2600);
 
   await page.click('[data-place="shade"]');
-  await h.pause(2400);
+  await h.pause(2800);
 
   await page.click('[data-place="sun"]');
-  await h.pause(1200);
-  await page.click('[data-fabric="thin"]');
-  await h.pause(2600);
-
-  await h.scrollTo('#timeline', 700);
-  await h.pause(1800);
-
-  await h.scrollTo('#best-start', 700);
-  await h.pause(2200);
+  await h.pause(2400);
 
   await page.click('#why > summary');
   await h.pause(600);
   await h.scrollTo('#why-values', 700);
-  await h.pause(2600);
+  await h.pause(2800);
 
   await h.scrollTop(700);
   await h.pause(1200);
 }
 
-/* スクショ（1200×750）は結果の画面。乾く時刻とバーが1枚に入る位置で撮る */
+/* スクショ（1200×750）は結果の画面。判定と3つの所要時間が1枚に入る位置で撮る */
 export async function shotSetup(page) {
-  await openReady(page, { fabric: 'normal' });
+  await openReady(page);
   await page.waitForTimeout(400);
 }

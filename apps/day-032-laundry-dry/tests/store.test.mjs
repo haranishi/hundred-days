@@ -23,17 +23,26 @@ test('store: 何も入っていなければ既定値', () => {
 
 test('store: 保存して読み戻せる', () => {
   const storage = fakeStorage();
-  assert.equal(save({ code: '05201', fabric: 'thick' }, storage), true);
-  assert.deepEqual(load(storage), { code: '05201', fabric: 'thick', place: 'sun' });
+  assert.equal(save({ code: '05201' }, storage), true);
+  assert.deepEqual(load(storage), { code: '05201', place: 'sun' });
   save({ place: 'shade' }, storage);
-  assert.deepEqual(load(storage), { code: '05201', fabric: 'thick', place: 'shade' }, '一部だけ更新できる');
+  assert.deepEqual(load(storage), { code: '05201', place: 'shade' }, '一部だけ更新できる');
 });
 
 test('store: 知らない値は既定値に落とす', () => {
   const storage = fakeStorage({
-    'day-032-laundry-dry': JSON.stringify({ code: 'あきた', fabric: 'silk', place: 'moon' })
+    'day-032-laundry-dry': JSON.stringify({ code: 'あきた', place: 'moon' })
   });
   assert.deepEqual(load(storage), DEFAULTS);
+});
+
+/* 干し方の選択は無くした（薄手・ふつう・厚手を同時に出すようにしたため）。
+   古い端末に残っている値を読み戻して画面に効かせない */
+test('store: 昔の「干し方」は読み捨てる', () => {
+  const storage = fakeStorage({
+    'day-032-laundry-dry': JSON.stringify({ code: '05201', fabric: 'thick', place: 'shade' })
+  });
+  assert.deepEqual(load(storage), { code: '05201', place: 'shade' });
 });
 
 test('store: 壊れた保存データは黙って捨てる', () => {

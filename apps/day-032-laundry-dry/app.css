@@ -1,5 +1,5 @@
 /* 晴れた日の物干し。地は空色に寄せた白、文字は紺墨。
-   よく乾く＝晴れ色、五分五分＝曇り、やめておく＝雨色。色だけで意味を伝えず、必ず文字を添える。 */
+   よく乾く＝そのまま、乾かない＝雨色。色だけで意味を伝えず、必ず文字を添える。 */
 
 :root {
   --bg: #f4f8fb;
@@ -8,11 +8,8 @@
   --muted: #5d7186;
   --line: #d9e3ec;
   --sun: #e8a33d;
-  --sun-weak: #f7e2bf;
-  --cloud: #7d8fa1;
   --rain: #3f7ec4;
   --rain-weak: #cfe0f2;
-  --night: #c3cdd8;
   --done: #eef3f7;
   --radius: 14px;
   --shadow: 0 1px 2px rgba(27, 43, 58, .06), 0 6px 20px rgba(27, 43, 58, .06);
@@ -105,80 +102,64 @@ body {
 }
 .place-row__name { font-weight: 700; }
 
-/* 主役＝乾き上がり時刻 */
+/* 主役＝いまの判定。以前は乾き上がり時刻がここにいた */
 .headline {
   padding: 14px 0 6px;
   border-bottom: 1px solid var(--line);
   margin-bottom: 14px;
 }
 .headline__label { margin: 0; color: var(--muted); font-size: 14px; }
-.headline__time {
-  margin: 0; font-size: clamp(48px, 16vw, 76px); line-height: 1.06;
-  font-weight: 800; letter-spacing: -.02em; font-variant-numeric: tabular-nums;
+.headline__at { margin-left: 6px; font-variant-numeric: tabular-nums; }
+.headline__verdict {
+  margin: 2px 0 0; font-size: clamp(30px, 9vw, 44px); line-height: 1.2;
+  font-weight: 800; letter-spacing: -.01em;
 }
-.headline__time:focus-visible { outline: 3px solid var(--rain); outline-offset: 4px; }
-.headline[data-late="true"] .headline__time { font-size: clamp(26px, 8vw, 38px); line-height: 1.25; }
-.headline__sub { margin: 2px 0 0; color: var(--muted); font-size: 15px; }
-
-.verdict {
-  display: inline-block; margin: 12px 0 0;
-  padding: 6px 14px; border-radius: 999px;
-  font-weight: 700; font-size: 15px;
-  background: var(--sun-weak); color: #7a5210;
+.headline__verdict:focus-visible { outline: 3px solid var(--rain); outline-offset: 4px; }
+.headline[data-verdict="fair"] .headline__verdict { color: #3f5468; }
+.headline[data-verdict="slow"] .headline__verdict,
+.headline[data-verdict="rain"] .headline__verdict,
+.headline[data-verdict="none"] .headline__verdict { color: #1f4f86; }
+.headline__sub {
+  margin: 6px 0 0; color: var(--muted); font-size: 15px;
+  font-variant-numeric: tabular-nums;
 }
-.headline[data-verdict="fair"] .verdict { background: #e7edf2; color: #3f5468; }
-.headline[data-verdict="bad"] .verdict { background: var(--rain-weak); color: #1f4f86; }
 
-.bring-in { margin: 0 0 6px; font-size: 17px; font-weight: 700; }
+.no-dry {
+  margin: 0 0 6px; padding: 10px 12px;
+  background: var(--rain-weak); border-left: 4px solid var(--rain);
+  border-radius: 0 10px 10px 0; font-size: 14px;
+}
 .smell {
   margin: 6px 0 0; padding: 10px 12px;
   background: #fdf4e6; border-left: 4px solid var(--sun);
   border-radius: 0 10px 10px 0; font-size: 14px;
 }
 
-/* 24時間バー */
-.timeline { margin: 18px 0 0; }
-.timeline__bar {
-  display: grid; grid-auto-flow: column; grid-auto-columns: 1fr;
-  height: 46px; gap: 2px;
-  border-radius: 10px; overflow: hidden;
-  background: var(--done);
+/* 薄手・ふつう・厚手を同時に出す。選ばせない（選ぶ意味が無くなったので） */
+.spans { margin: 18px 0 0; }
+.spans__title { margin: 0; font-size: 15px; font-weight: 700; }
+.spans__caption { margin: 4px 0 12px; font-size: 13px; color: var(--muted); }
+.spans__caption strong { font-weight: 800; color: var(--ink); }
+.spans__list {
+  display: grid; grid-template-columns: auto 1fr; align-items: baseline;
+  gap: 0; margin: 0;
+  border-top: 1px solid var(--line);
 }
-.timeline__cell { position: relative; background: var(--done); }
-.timeline__cell[data-kind="dry"] { background: var(--sun-weak); }
-.timeline__cell[data-kind="rain"] { background: var(--rain); }
-.timeline__cell[data-kind="night"] { background: var(--night); }
-.timeline__cell[data-kind="done"] { background: var(--done); }
-/* 乾く勢いを高さで見せる（濃さだけに頼らない） */
-.timeline__fill {
-  position: absolute; left: 0; right: 0; bottom: 0;
-  background: var(--sun);
-  transform-origin: bottom;
-  animation: grow .45s ease-out both;
+.spans__list dt {
+  grid-column: 1; padding: 12px 14px 12px 0;
+  border-bottom: 1px solid var(--line);
+  font-weight: 700; white-space: nowrap;
 }
-@keyframes grow { from { transform: scaleY(0); } to { transform: scaleY(1); } }
-.timeline__cell[data-dried="true"]::after {
-  content: ""; position: absolute; inset: 0 auto 0 0;
-  width: 3px; background: var(--ink);
+.spans__list dd {
+  grid-column: 2; margin: 0; padding: 12px 0;
+  border-bottom: 1px solid var(--line);
+  text-align: right;
+  font-size: clamp(18px, 5vw, 22px); font-weight: 800;
+  font-variant-numeric: tabular-nums;
 }
-.timeline__axis {
-  display: grid; grid-auto-flow: column; grid-auto-columns: 1fr;
-  gap: 2px; margin-top: 4px;
-  font-size: 11px; color: var(--muted); font-variant-numeric: tabular-nums;
-}
-.timeline__legend {
-  display: flex; flex-wrap: wrap; gap: 10px;
-  margin: 8px 0 0; font-size: 12px; color: var(--muted);
-}
-.chip::before {
-  content: ""; display: inline-block;
-  width: 10px; height: 10px; margin-right: 4px;
-  border-radius: 3px; vertical-align: -1px;
-}
-.chip--dry::before { background: var(--sun); }
-.chip--rain::before { background: var(--rain); }
-.chip--night::before { background: var(--night); }
-.chip--done::before { background: var(--done); border: 1px solid var(--line); }
+.spans__eg { display: block; font-size: 12px; font-weight: 400; color: var(--muted); }
+.spans__unit { font-size: 14px; font-weight: 700; color: var(--muted); margin-left: 2px; }
+.spans__list dd[data-empty="true"] { font-size: 16px; font-weight: 700; color: var(--muted); }
 
 /* 切り替え */
 .controls { display: grid; gap: 16px; margin: 20px 0 0; }
@@ -199,9 +180,6 @@ body {
   background: var(--ink); border-color: var(--ink); color: #fff;
 }
 .control__note { margin: 6px 0 0; font-size: 13px; color: var(--muted); }
-
-.hint { margin: 14px 0 0; font-size: 15px; }
-.hint strong { font-weight: 800; }
 
 .why { margin: 18px 0 0; border-top: 1px solid var(--line); padding-top: 12px; }
 .why summary { cursor: pointer; font-size: 14px; color: var(--muted); min-height: 44px; display: flex; align-items: center; }
@@ -244,6 +222,5 @@ body {
 .site-foot a { color: var(--muted); }
 
 @media (prefers-reduced-motion: reduce) {
-  .loading__bar span, .timeline__fill { animation: none; }
-  .timeline__fill { transform: none; }
+  .loading__bar span { animation: none; }
 }

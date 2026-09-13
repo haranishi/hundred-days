@@ -1,21 +1,22 @@
 /* 画面の組み立て。計算は lib/ の純関数に任せ、ここは受け渡しと描画だけ。
 
-   通信は「場所が変わったとき」だけ。干し方や干し場所の切り替えでは
-   取得済みの予報から計算し直すので、外へは出ない（利用条件の上限に対しても誠実に）。 */
+   通信は「場所が変わったとき」だけ。干す場所（日なた／日かげ）の切り替えでは
+   取得済みの「いまの値」から計算し直すので、外へは出ない（利用条件の上限に対しても誠実に）。
 
-import { FABRICS, PLACES, SMELL_HOURS, predict, bestStart, tooLateToday, conditionsAt, VERDICTS } from './lib/dry.js';
-import { fetchForecast } from './lib/weather.js';
+   ⚠️ この画面に将来の時刻を書かない。書ける材料をそもそも取ってきていない（lib/weather.js）。 */
+
+import { FABRICS, PLACES, SMELL_HOURS, MAX_SHOWN_HOURS, estimate, whyNotDrying, VERDICTS } from './lib/dry.js';
+import { fetchCurrent } from './lib/weather.js';
 import { groupByPref, findByCode, nearest, fullName } from './lib/places.js';
 import { load as loadStore, save as saveStore, isAvailable as storageAvailable } from './lib/store.js';
-import { nowWall, clockOf, humanDuration, relativeClock, parseWall } from './lib/time.js';
+import { clockOf, hoursSpan } from './lib/time.js';
 
 const $ = (id) => document.getElementById(id);
 const app = $('app');
 
 const state = {
-  forecast: null,
+  current: null,
   place: null, // { label, lat, lon }
-  fabric: 'normal',
   placeKind: 'sun',
   places: null,
   loadingPlaces: null
@@ -44,7 +45,6 @@ function setState(next) {
 
 function boot() {
   const saved = loadStore();
-  state.fabric = saved.fabric;
   state.placeKind = saved.place;
   syncOptions();
   if (!storageAvailable()) $('storage-notice').hidden = false;
@@ -59,11 +59,8 @@ function boot() {
   $('pref-select').addEventListener('change', fillTowns);
   $('post-result').addEventListener('click', postResult);
 
-  for (const button of document.querySelectorAll('[data-fabric]')) {
-    button.addEventListener('click', () => choose('fabric', button.dataset.fabric));
-  }
   for (const button of document.querySelectorAll('.option[data-place]')) {
-    button.addEventListener('click', () => choose('place', button.dataset.place));
+    button.addEventListener('click', () => choose(button.dataset.place));
   }
   for (const group of document.querySelectorAll('.control__row')) {
     group.addEventListener('keydown', (event) => moveWithArrows(event, group));
@@ -163,7 +160,7 @@ async function loadPlace(place) {
   state.place = place;
   setState('loading');
   try {
-    state.forecast = await fetchForecast({ lat: place.lat, lon: place.lon });
+    state.current = await fetchCurrent({ lat: place.lat, lon: place.lon });
     setState('ready');
     render();
   } catch (error) {
@@ -178,27 +175,18 @@ function showError(message) {
 
 /* ---------- 切り替え ---------- */
 
-function choose(kind, value) {
-  if (kind === 'fabric') { state.fabric = value; saveStore({ fabric: value }); }
-  else { state.placeKind = value; saveStore({ place: value }); }
+function choose(value) {
+  state.placeKind = value;
+  saveStore({ place: value });
   syncOptions();
-  if (state.forecast) render(); // 再通信しない
+  if (state.current) render(); // 再通信しない
 }
 
 function syncOptions() {
-  app.dataset.fabric = state.fabric;
   app.dataset.place = state.placeKind;
-  const fabric = FABRICS[state.fabric];
-  const place = PLACES[state.placeKind];
-  $('fabric-note').textContent = `${fabric.examples}くらい（含む水の量 ${fabric.water}mm）`;
   $('place-note').textContent = state.placeKind === 'sun'
     ? '日が当たる物干し。風も通る前提です'
     : '日射が無いぶん、日なたの6割の速さで見ています';
-  for (const button of document.querySelectorAll('[data-fabric]')) {
-    const on = button.dataset.fabric === state.fabric;
-    button.setAttribute('aria-checked', String(on));
-    button.tabIndex = on ? 0 : -1;
-  }
   for (const button of document.querySelectorAll('.option[data-place]')) {
     const on = button.dataset.place === state.placeKind;
     button.setAttribute('aria-checked', String(on));
@@ -221,145 +209,74 @@ function moveWithArrows(event, group) {
 /* ---------- 描画 ---------- */
 
 function render() {
-  const { hours, sunsets } = state.forecast;
-  const now = nowWall();
-  const result = predict({ hours, sunsets, startAt: now, fabric: state.fabric, place: state.placeKind });
-  const late = tooLateToday({ startAt: now, sunsets });
+  const result = estimate({ current: state.current, place: state.placeKind });
 
   $('place-name').textContent = state.place.label;
   $('headline').dataset.verdict = result.verdict;
-  $('headline').dataset.late = String(late || !result.driedAt);
-
-  if (late) {
-    $('dry-label').textContent = '今から干すと';
-    $('dry-time').textContent = '乾きません';
-    $('dry-sub').textContent = '日が沈むと乾かなくなります。明日の朝にしましょう。';
-  } else if (!result.driedAt) {
-    $('dry-label').textContent = '今から干すと';
-    $('dry-time').textContent = '乾きません';
-    $('dry-sub').textContent = 'この先2日ぶんの予報でも乾き切りませんでした。';
-  } else {
-    $('dry-label').textContent = '乾くのは';
-    $('dry-time').textContent = relativeClock(result.driedAt, now);
-    $('dry-sub').textContent = `あと${humanDuration(result.hoursToDry)}`;
-  }
-
+  $('observed-at').textContent = `（${clockOf(result.observedAt)}時点）`;
   $('verdict').textContent = VERDICTS[result.verdict].label;
+  $('rate-line').textContent =
+    `ET0 ${result.et0PerHour.toFixed(2)} mm/h（${result.placeLabel}）`;
 
-  $('bring-in').textContent = result.bringInBy && result.driedAt
-    ? `取り込みは ${relativeClock(result.bringInBy, now)} までに`
-    : '';
-  $('bring-in').hidden = !$('bring-in').textContent;
+  const noDry = $('no-dry');
+  noDry.hidden = result.rate > 0;
+  if (!noDry.hidden) noDry.textContent = whyNotDrying(result);
 
   const smell = $('smell');
   smell.hidden = !result.smell;
   if (result.smell) {
-    smell.textContent = `乾くまで${SMELL_HOURS}時間を超えます。濡れたままの時間が長いと生乾きのにおいが出やすいので、扇風機を当てるか、乾燥機を使うほうが確実です。`;
+    smell.textContent = `ふつうの洗濯物でも${SMELL_HOURS}時間ぶんを超えます。濡れたままの時間が長いと生乾きのにおいが出やすいので、扇風機を当てるか、乾燥機を使うほうが確実です。`;
   }
 
-  renderTimeline(result, now);
-  renderBest(result, now, late);
-  renderWhy(result, now);
+  renderSpans(result);
+  renderWhy(result);
 }
 
-function renderTimeline(result, now) {
-  const bar = $('timeline-bar');
-  const axis = $('timeline-axis');
-  const cells = result.timeline.slice(0, 24);
-  const peak = Math.max(0.001, ...cells.map((cell) => cell.rate));
+/** 薄手・ふつう・厚手を同時に出す */
+function renderSpans(result) {
+  $('spans').hidden = result.rate <= 0;
+  if (result.rate <= 0) return;
 
-  bar.replaceChildren(...cells.map((cell) => {
-    const node = document.createElement('div');
-    node.className = 'timeline__cell';
-    const kind = cell.raining ? 'rain' : !cell.isDay ? 'night' : cell.dried ? 'done' : 'dry';
-    node.dataset.kind = kind;
-    if (result.driedAt && cell.time === firstDriedHour(result)) node.dataset.dried = 'true';
-    /* 乾いていく時間は「勢い」を高さで見せる。
-       雨はコマ全体を塗る（乾く速さは0なので、高さに比例させると消えてしまう） */
-    if (kind === 'dry') {
-      const fill = document.createElement('span');
-      fill.className = 'timeline__fill';
-      fill.style.height = `${Math.round((cell.rate / peak) * 100)}%`;
-      node.append(fill);
+  $('dry-list').replaceChildren(...result.items.flatMap((item) => {
+    const dt = document.createElement('dt');
+    dt.textContent = item.label;
+    const eg = document.createElement('span');
+    eg.className = 'spans__eg';
+    eg.textContent = item.examples;
+    dt.append(eg);
+
+    const dd = document.createElement('dd');
+    const span = hoursSpan(item.hours, MAX_SHOWN_HOURS);
+    if (span) {
+      dd.textContent = span;
+      const unit = document.createElement('span');
+      unit.className = 'spans__unit';
+      unit.textContent = 'ぶん';
+      dd.append(unit);
+    } else {
+      dd.dataset.empty = 'true';
+      dd.textContent = `${MAX_SHOWN_HOURS}時間ぶんでも足りません`;
     }
-    return node;
+    return [dt, dd];
   }));
-
-  axis.replaceChildren(...cells.map((cell, index) => {
-    const node = document.createElement('span');
-    node.textContent = index % 3 === 0 ? String(Number(cell.time.slice(11, 13))) : '';
-    return node;
-  }));
-
-  const from = clockOf(cells[0]?.time || now);
-  const rain = cells.find((cell) => cell.raining);
-  const rainHours = cells.filter((cell) => cell.raining).length;
-  $('timeline').setAttribute(
-    'aria-label',
-    `${from}から24時間の乾き具合。${result.driedAt ? `${relativeClock(result.driedAt, now)}に乾きます。` : '乾き切りません。'}` +
-    `${rain ? `${relativeClock(rain.time, now)}から雨が降り、合わせて${rainHours}時間続きます。` : 'この24時間に雨はありません。'}`
-  );
 }
 
-/** 乾き上がりを含む1時間（縦線を引く位置） */
-function firstDriedHour(result) {
-  const dried = result.timeline.find((cell) => cell.dried);
-  return dried ? dried.time : null;
-}
-
-function renderBest(result, now, late) {
-  const { hours, sunsets } = state.forecast;
-  const best = bestStart({ hours, sunsets, from: now, fabric: state.fabric, place: state.placeKind });
-  const node = $('best-start');
-  const tomorrow = $('tomorrow');
-
-  if (best && (late || !result.driedAt || best.hoursToDry < result.hoursToDry - 0.5)) {
-    node.hidden = false;
-    node.innerHTML = `いちばん早く乾くのは <strong>${relativeClock(best.startAt, now)}に干したとき</strong>（${humanDuration(best.hoursToDry)}で乾きます）`;
-  } else {
-    node.hidden = true;
-  }
-
-  /* 明日の朝9時に干した場合の見通し。
-     ただし「いちばん早く乾くのは」が既に明日を指しているときは出さない。
-     ほとんど同じことを2行続けて言うことになる（本番の実機で気づいた）。 */
-  const tomorrowStart = nextMorning(now);
-  const forecastEnd = hours.length ? hours[hours.length - 1].time : null;
-  const bestIsTomorrow = !node.hidden && best && best.startAt.slice(0, 10) === tomorrowStart.slice(0, 10);
-  if (!bestIsTomorrow && forecastEnd && parseWall(tomorrowStart) <= parseWall(forecastEnd)) {
-    const next = predict({ hours, sunsets, startAt: tomorrowStart, fabric: state.fabric, place: state.placeKind });
-    tomorrow.hidden = false;
-    tomorrow.textContent = next.driedAt && next.driedToday
-      ? `明日9時に干すなら ${humanDuration(next.hoursToDry)} で乾きます。`
-      : '明日9時に干しても、日が沈むまでには乾かなさそうです。';
-  } else {
-    tomorrow.hidden = true;
-  }
-}
-
-function nextMorning(now) {
-  const date = new Date(Date.UTC(
-    Number(now.slice(0, 4)), Number(now.slice(5, 7)) - 1, Number(now.slice(8, 10)) + 1
-  ));
-  const pad = (n) => String(n).padStart(2, '0');
-  return `${date.getUTCFullYear()}-${pad(date.getUTCMonth() + 1)}-${pad(date.getUTCDate())}T09:00`;
-}
-
-function renderWhy(result, now) {
-  const hour = conditionsAt({ hours: state.forecast.hours, startAt: now });
-  const fabric = FABRICS[state.fabric];
-  const place = PLACES[state.placeKind];
+function renderWhy(result) {
+  const place = PLACES[result.place];
   $('why-formula').textContent =
-    `乾くまでの時間 ＝ 水の量 ${fabric.water}mm ÷（ET0 × ${place.factor}）`;
+    `要る時間 ＝ 水の量(mm) ÷（いまのET0 ${result.et0PerHour.toFixed(2)} mm/h × ${place.label} ${place.factor}）`;
+  const current = state.current;
   const rows = [
-    ['干すもの', `${fabric.label}（水の量 ${fabric.water}mm）`],
+    ['いつの値か', `${clockOf(result.observedAt)}（直前${Math.round(current.intervalSec / 60)}分ぶん）`],
     ['干す場所', `${place.label}（倍率 ${place.factor}）`],
-    ['ET0（大気の乾かす力）', hour ? `${hour.et0} mm/h` : '—'],
-    ['気温', hour?.temp != null ? `${hour.temp} ℃` : '—'],
-    ['湿度', hour?.humidity != null ? `${hour.humidity} %` : '—'],
-    ['風速', hour?.wind != null ? `${hour.wind} km/h` : '—'],
-    ['日射', hour?.radiation != null ? `${hour.radiation} W/m²` : '—'],
-    ['干している間の降水確率', `最大 ${Math.round(result.rainRisk)} %`]
+    ['ET0（大気の乾かす力）', `${result.et0PerHour.toFixed(2)} mm/h`],
+    ['いまの乾く速さ', `${result.rate.toFixed(2)} mm/h`],
+    ['気温', current.temp != null ? `${current.temp} ℃` : '—'],
+    ['湿度', current.humidity != null ? `${current.humidity} %` : '—'],
+    ['風速', current.wind != null ? `${current.wind} km/h` : '—'],
+    ['日射', current.radiation != null ? `${current.radiation} W/m²` : '—'],
+    ['いまの雨', `${result.precipPerHour.toFixed(1)} mm/h`],
+    ['水の量', Object.values(FABRICS).map((f) => `${f.label} ${f.water}mm`).join('・')]
   ];
   $('why-values').replaceChildren(...rows.flatMap(([term, value]) => {
     const dt = document.createElement('dt');
@@ -373,15 +290,13 @@ function renderWhy(result, now) {
 /* ---------- 結果の投稿 ---------- */
 
 function postResult() {
-  const now = nowWall();
-  const result = predict({
-    hours: state.forecast.hours, sunsets: state.forecast.sunsets,
-    startAt: now, fabric: state.fabric, place: state.placeKind
-  });
+  const result = estimate({ current: state.current, place: state.placeKind });
   const where = state.place.label.replace(/^現在地（(.+)あたり）$/, '$1');
-  const text = result.driedAt && !tooLateToday({ startAt: now, sunsets: state.forecast.sunsets })
-    ? `${where}でいま${FABRICS[state.fabric].label}を干すと、${relativeClock(result.driedAt, now)}に乾きます（${VERDICTS[result.verdict].label}）`
-    : `${where}はいま干しても乾きません。明日にします`;
+  const thin = result.items.find((item) => item.key === 'thin');
+  const span = hoursSpan(thin.hours, MAX_SHOWN_HOURS);
+  const text = span
+    ? `${where}はいま「${VERDICTS[result.verdict].label}」。この勢いなら薄手で${span}ぶんです`
+    : `${where}はいま「${VERDICTS[result.verdict].label}」`;
   const url = document.querySelector('link[rel="canonical"]')?.href || location.href;
   window.open(
     `https://x.com/intent/post?text=${encodeURIComponent(`${text}\n\n#いま干していい`)}&url=${encodeURIComponent(url)}`,
