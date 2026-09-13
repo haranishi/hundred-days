@@ -117,8 +117,10 @@ const repoUrl = remote.startsWith(sshGithubPrefix)
   ? `https://github.com/${remote.slice(sshGithubPrefix.length).replace(/\.git$/, '')}`
   : remote.replace(/\.git$/, '');
 
+/* タイトルは鉤括弧で囲む。囲まないと、タイトルの終わり方によって文がつながって読めなくなる
+   （「バイトの法律、原文はこう」→「…原文はこうはこちら」／「潮、いまどっち？」→「…どっち？はこちら」） */
 const reply = [
-  `👇 ${meta.title}はこちら`,
+  `👇 「${meta.title}」はこちら`,
   meta.publicUrl,
   '',
   'コードも公開しています',
