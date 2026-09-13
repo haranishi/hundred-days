@@ -81,3 +81,9 @@ npx wrangler pages deploy dist --project-name=hundred-days
 ```
 
 公開前チェックや投稿準備スクリプトの使い方は [docs/ops.md](docs/ops.md) にあります。
+
+## ライセンス
+
+ソースコードは [MIT](LICENSE) です。**`apps/*/data/` 配下の第三者データは対象外**で、
+ODbL 1.0 や CC BY-SA 3.0（継承あり）など、それぞれ別の条件が付きます。
+使っているデータの出どころ・ライセンス・加工した内容は [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) にまとめてあります。

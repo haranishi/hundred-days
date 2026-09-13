@@ -99,9 +99,21 @@ mkdirSync(distDir, { recursive: true });
 // リポジトリ直下の static/ の中身（OG画像など）を dist/ 直下へ。無くてもビルドは通す
 if (existsSync(staticDir)) cpSync(staticDir, distDir, { recursive: true });
 
-/* tools/cache/ は素材の置き場（day-031 の行政区域 zip で 890MB）。同梱データは data/ に
-   書き出し済みなので配信には要らない。CI には cache が無いので、消えるのは手元の dist だけ */
-const skipToolsCache = (source) => !source.includes(`${sep}tools${sep}cache`);
+/* アプリのフォルダは原則そのまま配信するが、次の2つは外す。
+   - tools/cache/ は素材の置き場（day-031 の行政区域 zip で 890MB）。同梱データは data/ に
+     書き出し済みなので配信には要らない。CI には cache が無いので、消えるのは手元の dist だけ
+   - tests/ は、中の fixtures に第三者の生データが入っている（day-033 の気象庁の実応答、
+     day-034 の潮位表、day-023 のNDLの生レスポンス）。ここに置いたつもりのものが本番URLから
+     落とせる状態になるので外す。E2E は dist ではなく apps/ からフィクスチャを読んでいるので影響しない
+   ⚠️ 除外は名前の列挙なので、新しく「配信したくないフォルダ」を作ったらここに足すこと */
+const EXCLUDED_DIRS = [`tools${sep}cache`, 'tests'];
+const isExcluded = (source) => EXCLUDED_DIRS.some((dir) => {
+  const marker = `${sep}${dir}`;
+  // そのフォルダ自身（末尾一致）と、その中身（区切り文字が続く）だけを外す。
+  // `tests` が `testsuite` のような別名に当たらないようにしている
+  return source.endsWith(marker) || source.includes(`${marker}${sep}`);
+});
+const skipToolsCache = (source) => !isExcluded(source);
 
 for (const app of apps) {
   if (app.published) {
@@ -161,8 +173,9 @@ const CONNECT_BY_APP = {
   /* day-031 は形を同梱していて、正解を出したあとに Wikipedia の要約だけを取りに行く。
      ここに足さないと画面には何も出ないまま（try/catch に吸われる）本番だけが黙って止まる */
   'day-031-shape-where': 'https://ja.wikipedia.org',
-  /* day-032 は市区町村の代表点を同梱していて、外へ出るのは天気の予報1本だけ。
-     地名から座標を引く外部サービスは使わない（解禁されているAPIは1個なので天気に使い切る） */
+  /* day-032 は市区町村の代表点を同梱していて、外へ出るのは天気1本だけ。
+     地名から座標を引く外部サービスは使わない（解禁されているAPIは1個なので天気に使い切る）。
+     取りに行くのは current（いまの1時点）だけ。将来の値は取らない（気象業務法17条・アプリREADME参照） */
   'day-032-laundry-dry': 'https://api.open-meteo.com',
   /* day-033 は市区町村の代表点を同梱していて、外へ出るのは気象庁の地震情報一覧1本だけ。
      現在地の座標は端末の中で照合し、場所を変えても再取得しない */
@@ -198,7 +211,10 @@ const IMG_BY_APP = {
   /* day-031 は Wikipedia の記事写真だけを読む。summary が返す thumbnail は
      いま thumb.wikimedia.org（元画像は upload.wikimedia.org）。
      apps/day-031-shape-where/lib/wiki.js の THUMBNAIL_HOSTS と対応させること */
-  'day-031-shape-where': ' https://thumb.wikimedia.org https://upload.wikimedia.org'
+  'day-031-shape-where': ' https://thumb.wikimedia.org https://upload.wikimedia.org',
+  /* day-035 は貼られた記事の og:image を提供元から直接読む（中継しない＝写真を複製も保存もしない）。
+     貼られるURLは利用者が決めるのでホストを事前に列挙できない。http は混在コンテンツになるので許さない */
+  'day-035-front-page': ' https:'
 };
 
 /* iframe を出すのは day-030 だけ（YouTube の埋め込みプレーヤーと Windy のタイムラプスプレーヤー）。
