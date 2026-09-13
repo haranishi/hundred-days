@@ -39,6 +39,17 @@ export function kindFromContentType(contentType, url) {
   return 'page';
 }
 
+/* 直読み（<img> と <video>）は https でないとブラウザが混在コンテンツとして止める。
+   probe は http を https へ上げてから試すので普段は http のまま img になることは無いが、
+   提供元が https → http へ転送すると finalUrl が http の img になり得る。
+   同梱データを作る側でも落として、画面に「見られる」と書いたまま黒い箱になるのを防ぐ。 */
+const INLINE_KINDS = ['img', 'hls'];
+
+export function demoteInsecureEmbed(kind, url) {
+  if (!INLINE_KINDS.includes(kind)) return kind;
+  return classifyUrl(url).https ? kind : 'page';
+}
+
 export function readExcludeHosts(text) {
   return new Set(String(text).split(/\r?\n/)
     .map((line) => line.replace(/#.*$/, '').trim().toLowerCase().replace(/^\.+|\.+$/g, ''))

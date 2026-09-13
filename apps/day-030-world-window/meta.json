@@ -22,7 +22,7 @@
   "sourceOfIdea": "本人が「世界中のライブカメラが見れるマップ」を発案。地図部分は既存の型で作れるので、規約とデータソースの確認（OpenStreetMap・YouTube埋め込み・Windy・OpenFreeMap）を先に行い、実測して見られると分かった地点だけを「見られる」と表示する設計にした",
   "aiHandled": [
     "規約の一次情報を先に確認し、使い方を決めたこと。OpenStreetMap（ODbL・帰属表示）、YouTube の Developer Policies と Required Minimum Functionality（プレーヤーを遮らない・200×200以上・自動再生は操作後だけ・同時に1つ）、Windy Webcams API の無料枠（帰属表示・画像URLは10分で失効し保存不可・広告を遮らない）、OpenFreeMap（帰属表示）を読み、実装の制約表に落とした",
-    "OpenStreetMap の contact:webcam 9,631件を Overpass から1回だけ取得し、全URLの種別をビルド時に実測したこと（HEAD→GET、YouTube は oEmbed、ホストごとに直列・300ms間隔・24並列で約45分）。到達できない464件と、クエリに鍵らしき値を含むURL等16件を除き、映像141・画像2,665・HLS 84・リンク6,261の9,151地点を同梱した。実行時に Overpass は叩かない",
+    "OpenStreetMap の contact:webcam 9,631件を Overpass から1回だけ取得し、全URLの種別をビルド時に実測したこと（HEAD→GET、YouTube は oEmbed、ホストごとに直列・300ms間隔・24並列で約45分）。到達できない464件と、クエリに鍵らしき値を含むURL等16件を除き、映像141・画像2,665・HLS 84・リンク6,261の9,151地点を同梱した。実行時に Overpass は叩かない（2026-09-13に提供元の利用条件を調べ、埋め込みを許していない4ホスト579件をリンクのみへ落とした。地点数9,151は変わらず、内訳は画像2,086・リンク6,840になった）",
     "国名を Natural Earth 1:50m の点内多角形判定でビルド時に付けたこと（沿岸の点は0.5度の範囲で最近傍の国へ）。日本語国名と大陸も同梱",
     "地図（MapLibre・クラスタ）、種別チップ、検索、「どこかの窓を開く」、詳細パネル（国・運営者・向き・区分・現地時刻の推定・昼夜・座標・Googleマップ・OSM・提供元）、ビューア4種（YouTube 埋め込み・静止画60秒更新・HLS・リンク）、深いリンク、Windy 層（鍵があるときだけ）を実装した",
     "Windy Webcams API v3 の中継（Cloudflare Pages Functions）を実装した。鍵は環境変数、bbox を格子に丸めてエッジキャッシュ、画像URLは保存しない、429は叩き直さない。ユニットテストで上流を差し替えて検証",

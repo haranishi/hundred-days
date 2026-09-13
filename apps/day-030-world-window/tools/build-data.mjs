@@ -3,7 +3,7 @@ import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parseDirection } from '../lib/direction.js';
 import { buildCountryIndex, countryOf, countryTable } from './country-lookup.mjs';
-import { isExcluded, readExcludeHosts } from './url-kind.mjs';
+import { demoteInsecureEmbed, isExcluded, readExcludeHosts } from './url-kind.mjs';
 
 const TOOL_DIR = dirname(fileURLToPath(import.meta.url));
 const APP_DIR = resolve(TOOL_DIR, '..');
@@ -56,6 +56,8 @@ async function main() {
   let invalidCoordinates = 0;
   let privateText = 0;
   let unconfirmed = 0;
+  let insecureEmbeds = 0;
+  let httpUrls = 0;
 
   for (const element of raw.elements || []) {
     const url = firstUrl(element);
@@ -81,6 +83,12 @@ async function main() {
     let kind = result?.kind || 'page';
     if (!result) unconfirmed += 1;
     if (!['yt', 'img', 'hls', 'page'].includes(kind) || isExcluded(url, excludeHosts)) kind = 'page';
+    const mediaUrl = kind === 'yt' ? result.finalUrl : result?.finalUrl || url;
+    /* http のURLを <img>・<video> で読むと混在コンテンツでブラウザが止める（CSP も https しか許していない）。
+       「見られる」と書いたまま黒い箱になるので、リンクのみへ落とす。リンクなら http でも開ける。 */
+    const secured = demoteInsecureEmbed(kind, mediaUrl);
+    if (secured !== kind) insecureEmbeds += 1;
+    kind = secured;
     const tags = element.tags || {};
     const country = countryOf(countryIndex, lat, lon);
     const camera = {
@@ -88,7 +96,7 @@ async function main() {
       a: Number(lat.toFixed(5)),
       o: Number(lon.toFixed(5)),
       k: kind,
-      u: kind === 'yt' ? result.finalUrl : result?.finalUrl || url,
+      u: mediaUrl,
     };
     setIf(camera, 'n', truncate(tags.name, 80));
     setIf(camera, 'c', country);
@@ -101,6 +109,7 @@ async function main() {
     setIf(camera, 't', tags.check_date);
     cameras.push(camera);
     kinds[kind] += 1;
+    if (mediaUrl.startsWith('http://')) httpUrls += 1;
     countryCounts.set(country, (countryCounts.get(country) || 0) + 1);
   }
 
@@ -123,6 +132,7 @@ async function main() {
   console.log(`種別: ${Object.entries(kinds).map(([kind, count]) => `${kind}=${count}`).join(', ')}`);
   console.log(`国別上位10: ${topCountries.map(([country, count]) => `${country || '不明'}=${count}`).join(', ')}`);
   console.log(`除外数: drop=${dropped}, 座標不正=${invalidCoordinates}, メール形式または鍵付きURL=${privateText}`);
+  console.log(`http のURL ${httpUrls}件（すべてリンクのみ。うち直読みから落としたのは ${insecureEmbeds}件）`);
   console.log(`未確認 ${unconfirmed}件`);
 }
 

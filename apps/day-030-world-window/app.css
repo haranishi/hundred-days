@@ -127,6 +127,12 @@ body.has-detail .legend { display:none; }
 .viewer-frame img { max-height:55vh; }
 /* 読めなかったときに黒い箱を残さない。面の色に戻して、文言と提供元ボタンだけを見せる。 */
 .viewer-frame.is-fallback { background:var(--surface-2); }
+/* 画像そのものが提供元ページへのリンク（提供元の条件）。inline のままだと行送りのぶん下にすき間ができる。
+   枠は overflow:hidden なので、焦点の輪は外向きだと切れる。内側へ出す。 */
+.viewer-frame .media-link { display:block; }
+.viewer-frame .media-link:focus-visible { outline-offset:-3px; }
+/* 出典は画像のすぐ下に置く。ホスト名がそのまま読めて、押せば提供元へ行く（提供元の条件）。 */
+.provider-credit { margin:6px 0;font-size:.82rem;line-height:1.6;color:var(--muted); }
 .viewer-note,.fetched { margin:6px 0;color:var(--muted);font-size:.82rem;line-height:1.6; }.viewer-tools { display:flex;align-items:center;justify-content:space-between;gap:10px; }.viewer-tools button { min-height:44px;padding:0 14px;border:1px solid var(--line);border-radius:10px;background:var(--surface-2); }
 .viewer-fallback { padding:24px 14px;text-align:center;background:var(--surface-2);border-radius:12px; }
 .sheet-expand { display:none; }
