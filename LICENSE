@@ -1,8 +1,8 @@
 このリポジトリのソースコードは、以下の MIT ライセンスです。
 
-ただし apps/*/data/ 配下の第三者データは MIT の対象外で、それぞれ別のライセンス
-が適用されます。内訳は THIRD_PARTY_NOTICES.md にあります。とくに次の2つは、
-再配布するときに条件が付きます。
+ただし apps/*/data/ と apps/*/tests/fixtures/ 配下の第三者データは MIT の対象外で、
+それぞれ別のライセンスが適用されます。内訳は THIRD_PARTY_NOTICES.md にあります。
+とくに次の2つは、再配布するときに条件が付きます。
 
   - apps/day-036-stroke-by-stroke/data/ は CC BY-SA 3.0（継承あり）
   - apps/day-008-vending-radar/data/、apps/day-029-nearby-wifi/data/、
