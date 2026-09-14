@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>昔の1000円、いまいくら</title>
+  <meta name="description" content="年を選ぶと、そのころの1,000円がいまのいくらにあたるかが出る。逆に、いまの1,000円が当時いくらだったかも同時に出す。世界銀行が配る日本の消費者物価指数で計算し、賃金も為替も混ぜない。">
+  <meta name="share:text" content="昔の1000円、いまいくら — 年を選ぶと、そのころのお金がいまのいくらかが出る">
+  <link rel="stylesheet" href="./app.css">
+  <link rel="stylesheet" href="./shared/share.css">
+  <script type="module" src="./app.js"></script>
+  <script src="./shared/share.js" defer></script>
+</head>
+<body>
+  <header class="site-head">
+    <p class="eyebrow">DAY 038 · YEN BACK THEN</p>
+    <h1>昔の1000円、いまいくら</h1>
+    <p class="site-description">年を選ぶと、そのころのお金が、いまのいくらにあたるかが出ます。</p>
+  </header>
+
+  <main id="app" data-state="loading">
+    <p id="status" class="status" role="status" aria-live="polite">物価の記録を読み込んでいます…</p>
+
+    <div id="skeleton" class="skeleton" aria-hidden="true">
+      <div class="skeleton__card">
+        <span class="skeleton__bar skeleton__bar--sm"></span>
+        <span class="skeleton__bar skeleton__bar--lg"></span>
+        <span class="skeleton__bar skeleton__bar--md"></span>
+      </div>
+      <div class="skeleton__card skeleton__card--short">
+        <span class="skeleton__bar skeleton__bar--sm"></span>
+        <span class="skeleton__bar skeleton__bar--track"></span>
+      </div>
+    </div>
+
+    <section id="failure" class="failure" hidden role="alert">
+      <p id="failure-text" class="failure__text"></p>
+      <button type="button" id="retry" class="primary">もう一度ためす</button>
+      <p class="meta">
+        <a href="https://data.worldbank.org/indicator/FP.CPI.TOTL?locations=JP" target="_blank" rel="noopener noreferrer">世界銀行のページで直接見る</a>
+      </p>
+    </section>
+
+    <section id="answer" class="answer" hidden aria-labelledby="answer-heading">
+      <h2 id="answer-heading" class="visually-hidden">換算の結果</h2>
+
+      <div class="answer__row">
+        <div class="answer__side">
+          <p class="answer__tag answer__tag--then"><b id="answer-year">1995</b>年の</p>
+          <p class="money money--then"><span id="answer-then">1,000</span><span class="money__unit">円</span></p>
+        </div>
+        <p class="answer__arrow" aria-hidden="true">→</p>
+        <div class="answer__side">
+          <p class="answer__tag answer__tag--now">いまの</p>
+          <p class="money money--now"><span id="answer-now">1,167</span><span class="money__unit">円</span></p>
+        </div>
+      </div>
+      <p class="answer__tail">いまの物価にすると <b id="answer-ratio">1.17倍</b></p>
+
+      <p class="answer__back">逆に、<span class="tag tag--now">いま</span>の<b id="back-amount">1,000円</b>は、<b id="back-year">1995</b>年なら<b id="back-value">857円</b>でした。</p>
+    </section>
+
+    <section id="picker" class="picker" aria-labelledby="picker-heading">
+      <h2 id="picker-heading" class="section-label">年を選ぶ</h2>
+      <p class="picker__value"><output id="year-output" for="year">1995</output><span class="picker__unit">年</span></p>
+      <input type="range" id="year" class="picker__range" min="1960" max="2025" step="1" value="1995"
+             aria-label="くらべたい年" aria-describedby="picker-hint">
+      <p id="picker-hint" class="picker__hint">スライダーか、下のボタンで動かせます</p>
+      <ul id="jumps" class="jumps"></ul>
+    </section>
+
+    <section id="amount" class="amount" aria-labelledby="amount-heading">
+      <h2 id="amount-heading" class="section-label">金額を変える</h2>
+      <ul id="presets" class="presets"></ul>
+      <p class="amount__free">
+        <label for="amount-input">自由に入れる</label>
+        <input type="text" id="amount-input" inputmode="numeric" autocomplete="off" value="1,000" aria-describedby="amount-hint">
+        <span class="amount__unit">円</span>
+      </p>
+      <p id="amount-hint" class="amount__hint">1円から1億円まで。入れた金額はどこにも送りません。</p>
+    </section>
+
+    <section id="coins" class="coins" hidden aria-labelledby="coins-heading">
+      <h2 id="coins-heading" class="section-label">同じ「1,000円」の中身</h2>
+      <div class="coins__card">
+        <div class="coins__row">
+          <figure class="coin">
+            <div class="coin__disc coin__disc--then" id="coin-then"></div>
+            <figcaption>
+              <span class="coin__what"><b id="coin-then-year">1995</b>年の<span id="coin-then-face">1,000円</span></span>
+              <b class="coin__worth coin__worth--then" id="coin-then-label">1,167円ぶん</b>
+            </figcaption>
+          </figure>
+          <figure class="coin">
+            <div class="coin__disc coin__disc--now" id="coin-now"></div>
+            <figcaption>
+              <span class="coin__what"><b>いま</b>の<span id="coin-now-face">1,000円</span></span>
+              <b class="coin__worth coin__worth--now" id="coin-now-label">1,000円ぶん</b>
+            </figcaption>
+          </figure>
+        </div>
+        <p class="coins__note">丸の<b>面積</b>が、買えるものの量にあたります。直径ではありません。どちらも<b>いまのお金</b>に直した大きさです。</p>
+      </div>
+    </section>
+
+    <section id="chart-section" class="chart" hidden aria-labelledby="chart-heading">
+      <h2 id="chart-heading" class="section-label">日本の物価は、こう動いてきた</h2>
+      <div class="chart__frame">
+        <svg id="chart" class="chart__svg" viewBox="0 0 640 240"
+             role="img" aria-labelledby="chart-heading" aria-describedby="chart-caption"></svg>
+      </div>
+      <p id="chart-caption" class="chart__caption"></p>
+    </section>
+
+    <section id="facts" class="facts" hidden aria-labelledby="facts-heading">
+      <h2 id="facts-heading" class="section-label">分かったこと</h2>
+      <p id="fact-flat" class="fact"></p>
+      <p id="fact-world" class="fact" hidden></p>
+    </section>
+
+    <section class="limits" aria-labelledby="limits-heading">
+      <h2 id="limits-heading" class="section-label">この数字が言っていないこと</h2>
+      <ul class="limits__list">
+        <li>使っているのは<b>総合指数の年平均</b>です。食べ物・家賃・通信など、品目ごとの動きは、これとは違います。</li>
+        <li id="limit-wage"><b>給料は含みません。</b>物価が上がっても、収入が同じだけ増えたという話ではありません。</li>
+        <li><b>為替とは関係ありません。</b>国の比較は「物価が何倍になったか」だけで、円をドルに換えた話ではありません。</li>
+        <li>確定しているのは<b id="limit-latest">いちばん新しい年</b>までです。この先の予想はしません。</li>
+      </ul>
+    </section>
+
+    <footer class="source">
+      <p class="meta">
+        出典：世界銀行 World Development Indicators「Consumer price index (2010 = 100)」
+        （原データ：International Monetary Fund, International Financial Statistics）／
+        <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener noreferrer">CC BY 4.0</a>。
+        このアプリは指数の比から金額を計算しています（加工あり）。世界銀行が作ったものではありません。
+      </p>
+      <p class="meta">入れた金額も選んだ年も、どこにも送りません。端末にも保存しません。</p>
+      <div id="share"></div>
+    </footer>
+  </main>
+</body>
+</html>

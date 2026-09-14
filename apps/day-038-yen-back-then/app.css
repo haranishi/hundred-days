@@ -1,0 +1,477 @@
+/* 昔の1000円、いまいくら
+   色は2つだけ。むかし＝真鍮のセピア、いま＝濃い青緑。対比は全部この2色で通す。 */
+
+:root {
+  --ground: #f3efe6;
+  --paper: #fffdf7;
+  --ink: #1e1c18;
+  --muted: #5f584c;
+  --line: #ded6c6;
+  --edge: #8f8578;   /* 押せるものの輪郭。地との比 3.16:1（実測して選んだ値） */
+  --track-rest: #cfc3a6; /* スライダーの、まだ動かせる側。塗りとの比 3.22:1 */
+  --then-strong: #6e4a0a; /* 選んだチップの字。塗りとの比 5.89:1（14px太字は4.5:1が要る） */
+  --then: #8a5f12;
+  --then-bg: #f0dcb2;
+  --then-edge: #c99f4a;
+  --now: #115c66;
+  --now-bg: #c5dee2;
+  --now-edge: #4f98a1;
+  --danger: #8a2b18;
+  --radius: 14px;
+  color-scheme: light dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --ground: #171614;
+    --paper: #22201c;
+    --ink: #efe9dd;
+    --muted: #a79f90;
+    --line: #3a3631;
+    --edge: #6a6459;
+    --track-rest: #605949;
+    --then-strong: #e3b063;
+    --then: #e3b063;
+    --then-bg: #4a3b1e;
+    --then-edge: #8a6a2c;
+    --now: #79c6d0;
+    --now-bg: #1d4249;
+    --now-edge: #3d7d86;
+    --danger: #e08b74;
+  }
+}
+
+/* [hidden] はクラス側の display に負ける。負けると空の状態で答えが出てしまう */
+[hidden] { display: none !important; }
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  padding: 24px 16px 48px;
+  background: var(--ground);
+  color: var(--ink);
+  font-family: "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Noto Sans JP", system-ui, -apple-system, sans-serif;
+  line-height: 1.75;
+  font-size: 16px;
+  -webkit-text-size-adjust: 100%;
+  /* 日本語は text-wrap: pretty では語の途中で折れる。文節で折るのはこれ */
+  word-break: auto-phrase;
+}
+
+.site-head, main { max-width: 640px; margin: 0 auto; }
+
+.eyebrow {
+  margin: 0;
+  font-size: 0.72rem;
+  letter-spacing: 0.16em;
+  color: var(--muted);
+  font-weight: 700;
+}
+
+h1 {
+  margin: 4px 0 6px;
+  font-size: clamp(1.72rem, 7vw, 2.05rem);
+  line-height: 1.35;
+  letter-spacing: 0.01em;
+}
+
+.site-description { margin: 0 0 22px; color: var(--muted); font-size: 0.94rem; }
+
+.section-label {
+  margin: 0 0 12px;
+  font-size: 1.28rem;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+  color: var(--ink);
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px; height: 1px;
+  margin: -1px; padding: 0; border: 0;
+  clip-path: inset(50%);
+  overflow: hidden; white-space: nowrap;
+}
+
+.status { margin: 0 0 18px; color: var(--muted); }
+
+section { margin: 0 0 30px; }
+
+/* ---------------------------------------------------------------- 読み込み中の骨組み */
+
+.skeleton { display: grid; gap: 30px; }
+.skeleton__card {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 20px 18px;
+  display: grid;
+  gap: 14px;
+}
+.skeleton__bar {
+  display: block;
+  height: 18px;
+  border-radius: 6px;
+  background: var(--line);
+  opacity: 0.7;
+}
+.skeleton__bar--sm { width: 30%; }
+.skeleton__bar--md { width: 62%; }
+.skeleton__bar--lg { width: 78%; height: 46px; }
+.skeleton__bar--track { width: 100%; height: 10px; border-radius: 999px; }
+.skeleton__card--short { padding: 20px 18px 24px; }
+
+/* ---------------------------------------------------------------- 答え */
+
+.answer {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 20px 18px 18px;
+  box-shadow: 0 2px 10px rgba(30, 28, 24, 0.07);
+}
+
+/* 上限を3remにすると、PCの2列で1枚のカードに「1,000円 → 1,167円」が収まらず、
+   矢印だけが行末に取り残される。カードの幅で決まる上限に合わせる */
+.answer { --money-size: clamp(1.9rem, 8.6vw, 2.45rem); }
+
+.answer__row {
+  margin: 0 0 10px;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+}
+
+.answer__side { min-width: 0; }
+
+.answer__tag {
+  margin: 0;
+  font-size: 0.86rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+.answer__tag b { font-variant-numeric: tabular-nums; font-size: 1.05em; }
+.answer__tag--then { color: var(--then); }
+.answer__tag--now { color: var(--now); }
+
+.money {
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+  font-weight: 800;
+  font-size: var(--money-size);
+  letter-spacing: -0.01em;
+  line-height: 1.12;
+}
+.money__unit { font-size: 0.46em; font-weight: 700; margin-left: 2px; }
+.money--then { color: var(--then); }
+.money--now { color: var(--now); }
+
+/* 矢印は、両側の「数字の行」と同じ高さの箱に入れて中で中央に置く。
+   flex-end ＋ padding-bottom で下げようとすると、余白のぶん字が上へ逃げて逆に浮く（1周やらかした） */
+.answer__arrow {
+  margin: 0;
+  align-self: flex-end;
+  display: flex;
+  align-items: center;
+  min-height: calc(var(--money-size) * 1.12);
+  color: var(--muted);
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.answer__tail { margin: 0 0 14px; color: var(--ink); font-size: 1rem; }
+.answer__tail b { font-variant-numeric: tabular-nums; }
+
+.answer__back {
+  margin: 0;
+  padding-top: 13px;
+  border-top: 1px dashed var(--line);
+  color: var(--ink);
+  font-size: 0.96rem;
+}
+.answer__back b { font-variant-numeric: tabular-nums; }
+
+.tag {
+  display: inline-block;
+  padding: 1px 7px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  vertical-align: 0.06em;
+}
+.tag--now { background: var(--now-bg); color: var(--now); }
+
+/* ---------------------------------------------------------------- 年を選ぶ */
+
+.picker__value {
+  margin: 0;
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+}
+.picker__value output {
+  font-size: clamp(1.45rem, 5.6vw, 1.8rem);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  color: var(--then);
+  line-height: 1.15;
+}
+.picker__unit { font-size: 0.9rem; font-weight: 700; color: var(--then); }
+
+.picker__range {
+  display: block;
+  width: 100%;
+  margin: 10px 0 10px;
+  height: 44px;
+  border-radius: 999px;
+  background: transparent;
+  -webkit-appearance: none;
+  appearance: none;
+  cursor: pointer;
+}
+/* --pos（いまの位置）は app.js が入れる。ここまでを濃く塗って「どこまで来たか」を出す */
+.picker__range { --pos: 50%; --track: linear-gradient(90deg, var(--then) 0 var(--pos), var(--track-rest) var(--pos) 100%); }
+
+.picker__range::-webkit-slider-runnable-track {
+  height: 12px;
+  border-radius: 999px;
+  background: var(--track);
+  border: 1px solid var(--edge);
+}
+.picker__range::-moz-range-track {
+  height: 12px;
+  border-radius: 999px;
+  background: var(--track);
+  border: 1px solid var(--edge);
+}
+.picker__range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 36px; height: 36px;
+  margin-top: -12px;
+  border-radius: 50%;
+  background: var(--then);
+  border: 4px solid var(--paper);
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.34);
+}
+.picker__range::-moz-range-thumb {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  background: var(--then);
+  border: 4px solid var(--paper);
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.34);
+}
+.picker__range:focus-visible { outline: 3px solid var(--now); outline-offset: 2px; }
+
+.picker__hint { margin: 0 0 14px; color: var(--muted); font-size: 0.84rem; }
+
+.jumps, .presets {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+.jumps li, .presets li { display: flex; }
+/* 狭い画面では4つ並べると字が潰れる。2×2にして、はみ出す1つが孤立しないようにする */
+@media (max-width: 460px) {
+  .presets { grid-template-columns: repeat(2, 1fr); }
+}
+
+.jump, .preset {
+  flex: 1;
+  font: inherit;
+  font-size: 0.88rem;
+  font-variant-numeric: tabular-nums;
+  padding: 10px 14px;
+  min-height: 44px;
+  border-radius: 999px;
+  border: 1.5px solid var(--edge);
+  background: var(--paper);
+  color: var(--ink);
+  cursor: pointer;
+}
+.jump:hover, .preset:hover { border-color: var(--then-edge); }
+/* 選んだ印は、年も金額もセピア1色にそろえる。
+   ティールは「いま」を指す色なので、金額の選択に使うと意味が漏れる */
+.jump[aria-pressed="true"],
+.preset[aria-pressed="true"] { background: var(--then-bg); border: 2.5px solid var(--then); color: var(--then-strong); font-weight: 800; }
+.jump:focus-visible, .preset:focus-visible { outline: 3px solid var(--now); outline-offset: 2px; }
+
+/* ---------------------------------------------------------------- 丸 */
+
+.coins__card {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 16px 14px 14px;
+}
+
+.coins__row {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: clamp(22px, 9vw, 56px);
+  min-height: 178px;
+  padding: 6px 0 0;
+}
+
+.coin { margin: 0; text-align: center; }
+
+.coin__disc {
+  margin: 0 auto 12px;
+  border-radius: 50%;
+  transition: width 140ms ease, height 140ms ease;
+}
+.coin__disc--then {
+  background: var(--then-bg);
+  border: 2px solid var(--then-edge);
+  color: var(--then);
+}
+.coin__disc--now {
+  background: var(--now-bg);
+  border: 2px solid var(--now-edge);
+  color: var(--now);
+}
+.coin figcaption { display: grid; gap: 2px; }
+.coin__what { color: var(--muted); font-size: 0.84rem; }
+.coin__what b { color: var(--ink); font-variant-numeric: tabular-nums; }
+.coin__worth {
+  font-size: 1.02rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+.coin__worth--then { color: var(--then); }
+.coin__worth--now { color: var(--now); }
+
+.coins__note { margin: 12px 0 0; color: var(--muted); font-size: 0.82rem; }
+.coins__note b { color: var(--ink); }
+
+/* ---------------------------------------------------------------- 金額 */
+
+.amount__free {
+  margin: 12px 0 4px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.amount__free label { color: var(--muted); font-size: 0.88rem; }
+#amount-input {
+  font: inherit;
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  width: 9.5em;
+  min-height: 44px;
+  padding: 9px 12px;
+  border-radius: 10px;
+  border: 1.5px solid var(--edge);
+  background: var(--paper);
+  color: var(--ink);
+  text-align: right;
+}
+#amount-input:focus-visible { outline: 3px solid var(--now); outline-offset: 2px; border-color: var(--now-edge); }
+.amount__unit { font-weight: 700; }
+.amount__hint { margin: 0; color: var(--muted); font-size: 0.82rem; }
+
+/* ---------------------------------------------------------------- 折れ線 */
+
+.chart__frame {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 8px 4px 0;
+}
+.chart__svg { display: block; width: 100%; height: auto; }
+.chart__base { stroke: var(--line); stroke-width: 1; }
+.chart__guide { stroke: var(--line); stroke-width: 1; stroke-dasharray: 2 5; }
+.chart__area { fill: var(--now-bg); opacity: 0.55; }
+.chart__line { fill: none; stroke: var(--then); stroke-width: 3; stroke-linejoin: round; stroke-linecap: round; }
+.chart__pin { stroke: var(--now-edge); stroke-width: 1.5; stroke-dasharray: 3 4; }
+.chart__dot { fill: var(--now); stroke: var(--paper); stroke-width: 2.5; }
+.chart__label { fill: var(--now); font-size: 15px; font-weight: 700; }
+.chart__tick { fill: var(--muted); font-size: 13px; }
+.chart__caption { margin: 8px 0 0; color: var(--muted); font-size: 0.84rem; }
+
+/* ---------------------------------------------------------------- 分かったこと・限界 */
+
+.fact {
+  margin: 0 0 10px;
+  padding: 12px 14px;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--now-edge);
+  border-radius: 0 10px 10px 0;
+  font-size: 0.94rem;
+}
+.fact:last-child { margin-bottom: 0; }
+.fact b { color: var(--ink); }
+.fact__note { display: block; margin-top: 6px; color: var(--muted); font-size: 0.84rem; }
+
+.limits__list { margin: 0; padding-left: 1.2em; color: var(--muted); font-size: 0.9rem; }
+.limits__list li { margin-bottom: 6px; }
+.limits__list b { color: var(--ink); }
+
+/* ---------------------------------------------------------------- 失敗 */
+
+.failure {
+  background: var(--paper);
+  border: 1px solid var(--danger);
+  border-radius: var(--radius);
+  padding: 18px;
+}
+.failure__text { margin: 0 0 14px; color: var(--danger); font-weight: 700; }
+/* ボタンと代替リンクが8pxで密着していた。押し間違いを避けるため離す */
+.failure .meta { margin: 16px 0 0; }
+
+.primary {
+  font: inherit;
+  font-weight: 700;
+  padding: 11px 20px;
+  min-height: 44px;
+  border-radius: 10px;
+  border: 1px solid var(--now);
+  background: var(--now);
+  color: #fff;
+  cursor: pointer;
+}
+.primary:focus-visible { outline: 3px solid var(--then); outline-offset: 2px; }
+
+@media (prefers-color-scheme: dark) {
+  .primary { color: #0f2226; }
+}
+
+/* ---------------------------------------------------------------- 出典 */
+
+.source { margin-top: 28px; padding-top: 16px; border-top: 1px solid var(--line); }
+.meta { margin: 0 0 8px; color: var(--muted); font-size: 0.8rem; line-height: 1.7; }
+.meta a { color: inherit; }
+
+/* 広い画面では2列にして、答え・丸と操作を並べる。
+   1カラムのままだと左右が320pxずつ空いて、初見で入る情報が半分になる */
+@media (min-width: 900px) {
+  .site-head, main { max-width: 900px; }
+  main {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 26px 28px;
+    align-items: start;
+  }
+  main > section, main > p, main > footer { margin: 0; }
+  #status, #skeleton, #failure, .chart, .source { grid-column: 1 / -1; }
+  .coins__row { min-height: 200px; }
+  /* 幅いっぱいに1段で流すと1行50字を超える。2列に分けて、1行を30字以内に保つ */
+  .facts { grid-column: 1; }
+  .limits { grid-column: 2; }
+  .source .meta { max-width: 44em; }
+  /* 並びはDOM順（答え→年→金額→丸）だが、画面では 答え｜年 ／ 丸｜金額 に置く */
+  .coins { grid-column: 1; grid-row: 2; }
+  .amount { grid-column: 2; grid-row: 2; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .coin__disc { transition: none; }
+}

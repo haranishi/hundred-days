@@ -182,7 +182,10 @@ const CONNECT_BY_APP = {
   'day-033-did-it-shake': 'https://www.jma.go.jp',
   /* day-037 は条文を同梱しない（法律は改正されるので古いものを持ち越さない）。
      選ばれた条だけを e-Gov 法令API から取りに行く */
-  'day-037-baito-law': 'https://laws.e-gov.go.jp'
+  'day-037-baito-law': 'https://laws.e-gov.go.jp',
+  /* day-038 は消費者物価指数を同梱しない（毎年あとから追加・改定されるので古い数字を焼き付けない）。
+     起動のたびに日本と米国の指数を1リクエストで取りに行く */
+  'day-038-yen-back-then': 'https://api.worldbank.org'
 };
 
 /* day-025 の MapLibre は blob: から Web Worker を起こす。
