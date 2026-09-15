@@ -1,0 +1,403 @@
+{
+  "source": "The Paleobiology Database",
+  "license": "Creative Commons CC0",
+  "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+  "fetchedAt": "Tue 2026-09-15 05:15:38 GMT",
+  "note": "区分と色は国際層序委員会（ICS）の国際年代層序表。PBDB 経由で取得した",
+  "periods": [
+    {
+      "en": "Siderian",
+      "ja": "成鉄紀",
+      "from": 2500,
+      "to": 2300,
+      "color": "#F74F7C"
+    },
+    {
+      "en": "Rhyacian",
+      "ja": "層状紀",
+      "from": 2300,
+      "to": 2050,
+      "color": "#F75B89"
+    },
+    {
+      "en": "Orosirian",
+      "ja": "造山紀",
+      "from": 2050,
+      "to": 1800,
+      "color": "#F76898"
+    },
+    {
+      "en": "Statherian",
+      "ja": "固結紀",
+      "from": 1800,
+      "to": 1600,
+      "color": "#F875A7"
+    },
+    {
+      "en": "Calymmian",
+      "ja": "被覆紀",
+      "from": 1600,
+      "to": 1400,
+      "color": "#FDC07A"
+    },
+    {
+      "en": "Ectasian",
+      "ja": "延伸紀",
+      "from": 1400,
+      "to": 1200,
+      "color": "#F3CC8A"
+    },
+    {
+      "en": "Stenian",
+      "ja": "狭帯紀",
+      "from": 1200,
+      "to": 1000,
+      "color": "#FED99A"
+    },
+    {
+      "en": "Tonian",
+      "ja": "トニア紀",
+      "from": 1000,
+      "to": 720,
+      "color": "#FEBF4E"
+    },
+    {
+      "en": "Cryogenian",
+      "ja": "成氷紀",
+      "from": 720,
+      "to": 635,
+      "color": "#FECC5C"
+    },
+    {
+      "en": "Ediacaran",
+      "ja": "エディアカラ紀",
+      "from": 635,
+      "to": 538.8,
+      "color": "#FED96A"
+    },
+    {
+      "en": "Cambrian",
+      "ja": "カンブリア紀",
+      "from": 538.8,
+      "to": 486.85,
+      "color": "#7FA056"
+    },
+    {
+      "en": "Ordovician",
+      "ja": "オルドビス紀",
+      "from": 486.85,
+      "to": 443.1,
+      "color": "#009270"
+    },
+    {
+      "en": "Silurian",
+      "ja": "シルル紀",
+      "from": 443.1,
+      "to": 419.62,
+      "color": "#B3E1B6"
+    },
+    {
+      "en": "Devonian",
+      "ja": "デボン紀",
+      "from": 419.62,
+      "to": 358.86,
+      "color": "#CB8C37"
+    },
+    {
+      "en": "Carboniferous",
+      "ja": "石炭紀",
+      "from": 358.86,
+      "to": 298.9,
+      "color": "#67A599"
+    },
+    {
+      "en": "Permian",
+      "ja": "ペルム紀",
+      "from": 298.9,
+      "to": 251.902,
+      "color": "#F04028"
+    },
+    {
+      "en": "Triassic",
+      "ja": "三畳紀",
+      "from": 251.902,
+      "to": 201.4,
+      "color": "#812B92"
+    },
+    {
+      "en": "Jurassic",
+      "ja": "ジュラ紀",
+      "from": 201.4,
+      "to": 143.1,
+      "color": "#34B2C9"
+    },
+    {
+      "en": "Cretaceous",
+      "ja": "白亜紀",
+      "from": 143.1,
+      "to": 66,
+      "color": "#7FC64E"
+    },
+    {
+      "en": "Paleogene",
+      "ja": "古第三紀",
+      "from": 66,
+      "to": 23.04,
+      "color": "#FD9A52"
+    },
+    {
+      "en": "Neogene",
+      "ja": "新第三紀",
+      "from": 23.04,
+      "to": 2.58,
+      "color": "#FFE619"
+    },
+    {
+      "en": "Quaternary",
+      "ja": "第四紀",
+      "from": 2.58,
+      "to": 0,
+      "color": "#F9F97F"
+    }
+  ],
+  "epochs": [
+    {
+      "en": "Terreneuvian",
+      "ja": "カンブリア紀 テレヌーブ世",
+      "from": 538.8,
+      "to": 521,
+      "color": "#8CB06C"
+    },
+    {
+      "en": "Series 2",
+      "ja": "カンブリア紀 第2世",
+      "from": 521,
+      "to": 506.5,
+      "color": "#99C078"
+    },
+    {
+      "en": "Miaolingian",
+      "ja": "カンブリア紀 ミャオリンギアン世",
+      "from": 506.5,
+      "to": 497,
+      "color": "#A6CF86"
+    },
+    {
+      "en": "Furongian",
+      "ja": "カンブリア紀 フロンギアン世",
+      "from": 497,
+      "to": 486.85,
+      "color": "#B3E095"
+    },
+    {
+      "en": "Early Ordovician",
+      "ja": "オルドビス紀 前期",
+      "from": 486.85,
+      "to": 471.3,
+      "color": "#1A9D6F"
+    },
+    {
+      "en": "Middle Ordovician",
+      "ja": "オルドビス紀 中期",
+      "from": 471.3,
+      "to": 458.2,
+      "color": "#4DB47E"
+    },
+    {
+      "en": "Late Ordovician",
+      "ja": "オルドビス紀 後期",
+      "from": 458.2,
+      "to": 443.1,
+      "color": "#7FCA93"
+    },
+    {
+      "en": "Llandovery",
+      "ja": "シルル紀 ランドベリ世",
+      "from": 443.1,
+      "to": 432.9,
+      "color": "#99D7B3"
+    },
+    {
+      "en": "Wenlock",
+      "ja": "シルル紀 ウェンロック世",
+      "from": 432.9,
+      "to": 426.7,
+      "color": "#B3E1C2"
+    },
+    {
+      "en": "Ludlow",
+      "ja": "シルル紀 ラドロー世",
+      "from": 426.7,
+      "to": 422.7,
+      "color": "#BFE6CF"
+    },
+    {
+      "en": "Pridoli",
+      "ja": "シルル紀 プリドリ世",
+      "from": 422.7,
+      "to": 419.62,
+      "color": "#E6F5E1"
+    },
+    {
+      "en": "Early Devonian",
+      "ja": "デボン紀 前期",
+      "from": 419.62,
+      "to": 393.47,
+      "color": "#E5AC4D"
+    },
+    {
+      "en": "Middle Devonian",
+      "ja": "デボン紀 中期",
+      "from": 393.47,
+      "to": 382.31,
+      "color": "#F1C868"
+    },
+    {
+      "en": "Late Devonian",
+      "ja": "デボン紀 後期",
+      "from": 382.31,
+      "to": 358.86,
+      "color": "#F1E19D"
+    },
+    {
+      "en": "Mississippian",
+      "ja": "石炭紀 前半（ミシシッピ亜紀）",
+      "from": 358.86,
+      "to": 323.4,
+      "color": "#678F66"
+    },
+    {
+      "en": "Pennsylvanian",
+      "ja": "石炭紀 後半（ペンシルベニア亜紀）",
+      "from": 323.4,
+      "to": 298.9,
+      "color": "#99C2B5"
+    },
+    {
+      "en": "Cisuralian",
+      "ja": "ペルム紀 前期",
+      "from": 298.9,
+      "to": 274.4,
+      "color": "#EF5845"
+    },
+    {
+      "en": "Guadalupian",
+      "ja": "ペルム紀 中期",
+      "from": 274.4,
+      "to": 259.857,
+      "color": "#FB745C"
+    },
+    {
+      "en": "Lopingian",
+      "ja": "ペルム紀 後期",
+      "from": 259.857,
+      "to": 251.902,
+      "color": "#FBA794"
+    },
+    {
+      "en": "Early Triassic",
+      "ja": "三畳紀 前期",
+      "from": 251.902,
+      "to": 247,
+      "color": "#983999"
+    },
+    {
+      "en": "Middle Triassic",
+      "ja": "三畳紀 中期",
+      "from": 247,
+      "to": 237,
+      "color": "#B168B1"
+    },
+    {
+      "en": "Late Triassic",
+      "ja": "三畳紀 後期",
+      "from": 237,
+      "to": 201.4,
+      "color": "#BD8CC3"
+    },
+    {
+      "en": "Early Jurassic",
+      "ja": "ジュラ紀 前期",
+      "from": 201.4,
+      "to": 174.7,
+      "color": "#42AED0"
+    },
+    {
+      "en": "Middle Jurassic",
+      "ja": "ジュラ紀 中期",
+      "from": 174.7,
+      "to": 161.5,
+      "color": "#80CFD8"
+    },
+    {
+      "en": "Late Jurassic",
+      "ja": "ジュラ紀 後期",
+      "from": 161.5,
+      "to": 143.1,
+      "color": "#B3E3EE"
+    },
+    {
+      "en": "Early Cretaceous",
+      "ja": "白亜紀 前期",
+      "from": 143.1,
+      "to": 100.5,
+      "color": "#8CCD57"
+    },
+    {
+      "en": "Late Cretaceous",
+      "ja": "白亜紀 後期",
+      "from": 100.5,
+      "to": 66,
+      "color": "#A6D84A"
+    },
+    {
+      "en": "Paleocene",
+      "ja": "暁新世",
+      "from": 66,
+      "to": 56,
+      "color": "#FDA75F"
+    },
+    {
+      "en": "Eocene",
+      "ja": "始新世",
+      "from": 56,
+      "to": 33.9,
+      "color": "#FDB46C"
+    },
+    {
+      "en": "Oligocene",
+      "ja": "漸新世",
+      "from": 33.9,
+      "to": 23.04,
+      "color": "#FDC07A"
+    },
+    {
+      "en": "Miocene",
+      "ja": "中新世",
+      "from": 23.04,
+      "to": 5.333,
+      "color": "#FFFF00"
+    },
+    {
+      "en": "Pliocene",
+      "ja": "鮮新世",
+      "from": 5.333,
+      "to": 2.58,
+      "color": "#FFFF99"
+    },
+    {
+      "en": "Pleistocene",
+      "ja": "更新世",
+      "from": 2.58,
+      "to": 0.0117,
+      "color": "#FFF2AE"
+    },
+    {
+      "en": "Holocene",
+      "ja": "完新世",
+      "from": 0.0117,
+      "to": 0,
+      "color": "#FEF2E0"
+    }
+  ]
+}

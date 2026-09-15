@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>足もとを掘る</title>
+  <meta name="description" content="場所を選ぶと、近くで見つかった化石の記録が時代ごとの柱になります。産地までの距離と、記録された年代・堆積環境を見てみよう。">
+  <meta name="share:text" content="足もとを掘る — 近くで見つかった化石から、遠い時代をたどる">
+  <link rel="stylesheet" href="./vendor/maplibre-gl.css">
+  <link rel="stylesheet" href="./app.css">
+  <script src="./vendor/maplibre-gl.js" defer></script>
+  <script type="module" src="./app.js"></script>
+  <link rel="stylesheet" href="./shared/share.css">
+  <script src="./shared/share.js" defer></script>
+</head>
+<body>
+  <header class="site-head">
+    <p class="eyebrow">DAY 039 / 化石の記録をたどる</p>
+    <h1>足もとを掘る<span aria-hidden="true"> ↓</span></h1>
+    <p>いつもの場所の近くに、どんな時代が眠っているだろう。</p>
+  </header>
+  <main id="app" data-state="empty">
+    <div class="answer-area" aria-live="polite">
+      <section id="answer" hidden><p class="eyebrow">いちばん近い産地から</p><h2 id="answer-text"></h2></section>
+      <p id="status" role="status" hidden></p>
+      <section id="failure" role="alert" hidden><h2>記録を表示できません</h2><p id="failure-text"></p><button id="retry" type="button">もう一度ためす</button></section>
+      <section id="no-records" hidden><h2>およそ700km四方に記録がありませんでした</h2><p>PBDBに登録された記録の検索結果です。地図で別の場所も選べます。</p></section>
+    </div>
+    <section id="picker" aria-labelledby="picker-title">
+      <div class="picker-head"><h2 id="picker-title">地図を押して、場所を選ぶ</h2><button id="locate" type="button">現在地から探す</button></div>
+      <div id="map" aria-label="場所を選ぶ地図"></div>
+      <div class="map-tail"><p id="map-status" role="status">地図を読み込んでいます。現在地からも探せます。</p><button id="pick-center" type="button">地図の中心で探す</button></div>
+      <p class="privacy">正確な現在地は端末内で扱い、PBDBへは丸めた矩形範囲を送ります。保存はしません。</p>
+    </section>
+    <div id="skeleton" aria-hidden="true" hidden><div></div><div></div><div></div></div>
+    <section id="results" hidden aria-labelledby="column-title">
+      <div class="column-head"><p class="eyebrow">近くで見つかった時代</p><h2 id="column-title">下へ、遠いむかしへ。</h2><p id="column-count"></p><p>層の高さは等間隔です。時代の長さや地層の厚さを表していません。</p></div>
+      <p id="truncated" hidden>化石の応答が取得上限に達したため、生きものと出典は取得できた分だけを表示しています。</p>
+      <p class="now">現在</p><div id="column"></div><p class="old">↓ 古い時代</p>
+    </section>
+    <aside class="notes"><p>ここに出るのは、近くで見つかった記録です。選んだ場所の地層を推定するものではありません。</p><p>採集の案内ではありません。産地には私有地や天然記念物もあり、自治体の条例などで採集が制限される場合があります。</p></aside>
+    <footer class="sources" aria-label="出典">
+      <p>化石の記録：<a href="https://paleobiodb.org/">PBDB（CC0）</a></p>
+      <p>年代区分・公式カラー：<a href="https://stratigraphy.org/">国際層序委員会（ICS）</a></p>
+      <p>地図：<a href="https://openfreemap.org/">OpenFreeMap © OpenMapTiles Data from OpenStreetMap</a></p>
+      <div id="share"></div>
+    </footer>
+  </main>
+</body>
+</html>

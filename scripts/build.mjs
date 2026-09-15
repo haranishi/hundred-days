@@ -152,6 +152,7 @@ const WIKIMEDIA_CONNECT = [
 /* 外部へ接続するのはここに挙げたDayだけ。ほかのアプリは同一オリジンに閉じている。
    ⚠️ 新しいDayで外部のAPIを叩くときは、ここに足さないとブラウザ側で接続が止まる（黙って失敗する）。 */
 const CONNECT_BY_APP = {
+  'day-039-dig-below': 'https://paleobiodb.org https://tiles.openfreemap.org',
   'day-034-tide-now': 'https://www.data.jma.go.jp',
   'day-010-wikipedia-live': WIKIMEDIA_CONNECT,
   'day-013-gov-answers': 'https://kokkai.ndl.go.jp',
@@ -192,6 +193,7 @@ const CONNECT_BY_APP = {
    worker-src は child-src → script-src → default-src の順に落ちるので、
    'self' のままだと地図が黙って出ない。 */
 const WORKER_BY_APP = {
+  'day-039-dig-below': "worker-src blob:",
   'day-025-nearby-parking': "worker-src blob:",
   'day-029-nearby-wifi': "worker-src blob:",
   'day-030-world-window': "worker-src blob:"
@@ -205,6 +207,7 @@ const MEDIA_BY_APP = {
   'day-030-world-window': ' https:'
 };
 const IMG_BY_APP = {
+  'day-039-dig-below': ' https://tiles.openfreemap.org',
   'day-021-nearby-radio': ' https:',
   // スプライト画像をタイル配信元から読む
   'day-025-nearby-parking': ' https://tiles.openfreemap.org',
