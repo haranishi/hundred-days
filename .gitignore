@@ -38,6 +38,8 @@ apps/*/.demo-sound.json
 
 # プロモ動画ツールの生成物（BGMのWAV・プレビュー・本番mp4・1コマ目）。ソースだけを追跡する
 apps/*/tools/promo/promo-audio.wav
+# 聴き比べ用に書き出すA案・B案も生成物（Day 039〜）
+apps/*/tools/promo/promo-audio-?.wav
 apps/*/tools/promo/promo.mp4
 apps/*/tools/promo/preview-contact.jpg
 apps/*/tools/promo/promo-first-frame.png

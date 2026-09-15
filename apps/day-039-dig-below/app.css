@@ -1,0 +1,84 @@
+:root { color-scheme: light; --ink: #171713; --paper: #f6f3eb; --line: #64665c; }
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body { margin: 0; background: var(--paper); color: var(--ink); font-family: -apple-system, BlinkMacSystemFont, "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif; line-height: 1.75; }
+.site-head, main { max-width: 920px; margin: auto; padding: 0 24px; }
+.site-head { padding-top: 48px; padding-bottom: 24px; border-bottom: 1px solid var(--line); }
+.eyebrow { font-size: 12px; font-weight: 700; letter-spacing: .12em; }
+h1, h2, h3, p { margin: 0 0 12px; }
+h1 { font-family: "Yu Mincho", "Hiragino Mincho ProN", serif; font-size: clamp(38px, 7vw, 64px); letter-spacing: .04em; }
+h1 span { font-family: serif; font-weight: 400; }
+h2 { font-size: 22px; line-height: 1.6; }
+button { min-height: 44px; padding: 10px 18px; border: 2px solid var(--line); border-radius: 4px; background: #ffffff; color: var(--ink); font: inherit; font-weight: 600; cursor: pointer; }
+button:hover { background: #e5e5da; }
+a { color: #303c29; text-underline-offset: 3px; }
+:focus-visible { outline: 3px solid #171713; outline-offset: 4px; }
+.answer-area:not(:has(> :not([hidden]))) { display: none; }
+.answer-area { padding: 28px 0; border-bottom: 1px solid var(--line); }
+#answer h2 { font-family: "Yu Mincho", serif; font-size: clamp(22px, 3.5vw, 32px); }
+#failure { border-left: 4px solid #84371f; padding-left: 20px; }
+#picker { padding-top: 28px; }
+.picker-head, .map-tail { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 12px; }
+.picker-head h2 { font-size: 18px; margin: 0; }
+#map { height: 330px; background: #e2e5dc; border: 1px solid var(--line); }
+.map-credit { background: #ffffff; padding: 5px 10px; font-size: 11px; border: 1px solid var(--line); border-top: 0; }
+.map-tail p, .privacy { font-size: 13px; margin: 0; }
+.map-tail button { font-size: 13px; flex-shrink: 0; }
+.privacy { color: #494b42; }
+.maplibregl-ctrl-attrib { color: #171713; background: #ffffff !important; }
+.maplibregl-ctrl-attrib a { color: #171713 !important; }
+.maplibregl-ctrl-group { border: 2px solid var(--line); }
+.maplibregl-ctrl-group button { width: 44px; height: 44px; }
+.column-head { padding: 42px 0 20px; }
+.column-head p:not(.eyebrow) { font-size: 14px; }
+#column { padding-left: 22px; border-left: 1px solid var(--line); }
+.layer { background: var(--stratum); margin: 0; border: 2px solid #171713; }
+.layer + .layer { margin-top: 12px; }
+.layer summary { list-style: none; padding: 0 0 0 20px; cursor: pointer; }
+.layer summary::-webkit-details-marker { display: none; }
+.layer-face { background: var(--surface); height: 280px; padding: 20px 24px; overflow: auto; }
+.layer h3 { font-size: 23px; margin-bottom: 3px; }
+.layer p { margin-bottom: 7px; font-size: 14px; }
+.layer .age { font-variant-numeric: tabular-nums; font-size: 16px; }
+.environments, .groups { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.open-label { display: inline-block; font-size: 13px; text-decoration: underline; text-underline-offset: 4px; }
+.open-label::before { content: '+ '; }
+.layer[open] .open-label::before { content: '− '; }
+.layer summary:hover .open-label { text-decoration-thickness: 2px; }
+.layer-details { background: #ffffff; padding: 12px 24px; margin-left: 20px; overflow-wrap: anywhere; }
+.layer-details section { border-top: 1px solid var(--line); padding: 12px 0; }
+h4 { margin: 12px 0; } h5 { font-size: 14px; margin: 12px 0 4px; }
+.scientific, .reference { color: #494b42; }
+.gap { padding: 18px 0; font-size: 13px; }
+.now, .old { font-size: 13px; padding: 10px 0; }
+#skeleton { padding: 32px 0; }
+#skeleton div { height: 160px; background: #e1dfd4; border-left: 20px solid #cecdc1; margin: 14px 0; animation: pulse 1.5s ease-in-out infinite alternate; }
+@keyframes pulse { to { opacity: .5; } }
+.notes { font-size: 14px; border-top: 1px solid var(--line); margin-top: 32px; padding: 24px 0 12px; }
+.sources { padding: 12px 0 32px; font-size: 12px; }
+.sources p { margin-bottom: 4px; }
+@media (max-width: 600px) {
+  .site-head, main { padding-left: 18px; padding-right: 18px; }
+  .site-head { padding-top: 28px; }
+  .picker-head, .map-tail { align-items: flex-start; flex-direction: column; gap: 10px; }
+  #map { height: 290px; }
+  #column { padding-left: 12px; }
+  .layer-face { height: 304px; padding: 16px 14px; }
+  .layer summary { padding-left: 12px; }
+  .layer-details { margin-left: 12px; padding: 12px 14px; }
+  .layer h3 { font-size: 20px; }
+}
+@media (prefers-reduced-motion: reduce) { #skeleton div { animation: none; } }
+
+/* PCは左に地図、右に柱を置く。1カラムのままだと広い画面で左右が空き、
+   柱を見るために地図がずっと上へ流れていく（Day 038で同じ指摘を2周受けた） */
+@media (min-width: 1000px) {
+  main { max-width: 1180px; display: grid; grid-template-columns: minmax(340px, 420px) 1fr; column-gap: 40px; align-items: start; }
+  .answer-area, .notes, .sources { grid-column: 1 / -1; }
+  #picker { grid-column: 1; position: sticky; top: 24px; padding-top: 32px; }
+  #results, #skeleton { grid-column: 2; }
+  .column-head { padding-top: 32px; }
+  #map { height: 380px; }
+  /* 答えは本文が長い。1行あたりの字数を読める幅に抑える */
+  #answer h2 { max-width: 24em; }
+}
