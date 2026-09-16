@@ -1,0 +1,171 @@
+:root {
+  color-scheme: light;
+  --ink: #171713;
+  --muted: #494b42;
+  --paper: #f6f3eb;
+  --line: #64665c;
+  --card: #ffffff;
+  --usable: #1a4731;
+  --unusable: #8a3a12;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body {
+  margin: 0; background: var(--paper); color: var(--ink); line-height: 1.75;
+  font-family: -apple-system, BlinkMacSystemFont, "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif;
+}
+.site-head, main { max-width: 1000px; margin: auto; padding: 0 24px; }
+.site-head { padding-top: 48px; padding-bottom: 24px; border-bottom: 1px solid var(--line); }
+.eyebrow { font-size: 12px; font-weight: 700; letter-spacing: .12em; }
+h1, h2, h3, p, ol { margin: 0 0 12px; }
+h1 {
+  font-family: "Yu Mincho", "Hiragino Mincho ProN", serif;
+  font-size: clamp(32px, 6.4vw, 56px); letter-spacing: .04em; line-height: 1.3;
+  word-break: keep-all; overflow-wrap: anywhere;
+}
+h2 { font-size: 20px; line-height: 1.6; word-break: keep-all; overflow-wrap: anywhere; }
+.lede { font-size: 15px; margin: 0; }
+button {
+  min-height: 44px; padding: 10px 18px; border: 2px solid var(--line); border-radius: 4px;
+  background: var(--card); color: var(--ink); font: inherit; font-weight: 600; cursor: pointer;
+}
+button:hover { background: #e7e4da; }
+a { color: #26402c; text-underline-offset: 3px; }
+:focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; }
+.measure, .flags, .address, .remarks, .site-name, #answer-text, #data-date, .hazard-count { font-variant-numeric: tabular-nums; }
+
+/* 答えは操作より上。中身が全部隠れているときは枠ごと消す */
+.answer-area:not(:has(> :not([hidden]))) { display: none; }
+.answer-area { padding: 28px 0; border-bottom: 1px solid var(--line); }
+#answer-text { font-family: "Yu Mincho", "Hiragino Mincho ProN", serif; font-size: clamp(20px, 3.2vw, 28px); max-width: 26em; }
+#answer-sub { font-size: 16px; font-weight: 700; max-width: 34em; word-break: keep-all; overflow-wrap: anywhere; }
+#answer[data-warning="1"] #answer-sub { font-size: 19px; border-left: 4px solid var(--unusable); padding: 4px 0 4px 14px; }
+#failure { border-left: 4px solid #84371f; padding-left: 20px; }
+#no-sites { border-left: 4px solid var(--line); padding-left: 20px; }
+#no-sites-sub, #status { font-size: 15px; }
+
+/* 災害の種類 */
+#hazards { border: 1px solid var(--line); border-radius: 4px; padding: 10px 14px 16px; margin: 28px 0 24px; }
+#hazards legend { font-size: 16px; font-weight: 700; padding: 0 6px; }
+.hazard-note { font-size: 13px; color: var(--muted); margin: 0 0 10px; }
+.hazard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 8px; }
+.hazard {
+  display: flex; align-items: center; gap: 10px; min-height: 44px; padding: 6px 12px;
+  border: 2px solid var(--line); border-radius: 4px; background: var(--card); cursor: pointer; font-size: 15px;
+}
+.hazard:hover { background: #eeebe1; }
+.hazard input { width: 22px; height: 22px; flex-shrink: 0; accent-color: var(--usable); margin: 0; }
+.hazard:has(:checked) { border-color: var(--ink); box-shadow: inset 0 0 0 2px var(--ink); font-weight: 700; }
+.hazard-body { word-break: keep-all; overflow-wrap: anywhere; }
+.hazard-count { font-weight: 700; }
+
+/* 場所を決める */
+#picker { padding-top: 4px; }
+#picker h2 { font-size: 16px; }
+#locate { width: 100%; background: var(--usable); color: #ffffff; border-color: var(--usable); }
+#locate:hover { background: #12341f; }
+#intro { padding-top: 28px; }
+#intro h2 { font-size: 19px; }
+.steps { padding-left: 1.4em; margin: 0 0 12px; }
+.steps li { margin-bottom: 6px; }
+.intro-note { font-size: 14px; color: var(--muted); max-width: 40em; }
+.candidate strong { font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
+.address-form { margin: 12px 0 0; }
+.address-label { display: block; font-size: 13px; font-weight: 700; }
+.address-row { display: flex; gap: 8px; margin-top: 4px; }
+#address {
+  flex: 1; min-width: 0; min-height: 44px; padding: 8px 12px; font: inherit;
+  border: 2px solid var(--line); border-radius: 4px; background: var(--card); color: var(--ink);
+}
+#candidates { margin: 10px 0 0; }
+.candidates-head, .candidates-message { font-size: 13px; margin: 0 0 6px; }
+.candidate { display: block; width: 100%; text-align: left; margin-bottom: 6px; font-weight: 400; }
+#place-name { font-size: 14px; font-weight: 700; margin: 12px 0 8px; }
+#map { height: 330px; background: #e4e6e0; border: 1px solid var(--line); }
+.pin-legend { display: flex; flex-wrap: wrap; align-items: center; gap: 2px 12px; font-size: 13px; margin: 8px 0 0; }
+.legend-item { display: inline-flex; align-items: center; gap: 5px; }
+.map-tail { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px 16px; margin-top: 8px; }
+.map-tail p { font-size: 13px; margin: 0; }
+.map-tail button { font-size: 13px; flex-shrink: 0; }
+.privacy { font-size: 13px; color: var(--muted); margin: 12px 0 0; }
+.maplibregl-ctrl-attrib { color: var(--ink); background: var(--card) !important; }
+.maplibregl-ctrl-attrib a { color: var(--ink) !important; }
+.maplibregl-ctrl-group { border: 2px solid var(--line); }
+.maplibregl-ctrl-group button { width: 44px; height: 44px; }
+
+/* 地図のピン。塗りと白抜き、数字の有無で分ける（色だけで区別しない）。
+   当たりは44px。見える丸はその中に置く（丸そのものを44pxにすると地図が埋まる） */
+.pin { width: 44px; height: 44px; display: grid; place-items: center; cursor: default; }
+.pin-face {
+  display: grid; place-items: center; line-height: 1; font-size: 15px; font-weight: 700;
+  font-variant-numeric: tabular-nums; flex-shrink: 0;
+}
+.pin-self { width: 22px; height: 22px; background: var(--ink); border: 3px solid #ffffff; transform: rotate(45deg); }
+.pin-usable { width: 30px; height: 30px; border-radius: 50%; background: var(--usable); color: #ffffff; border: 2px solid #ffffff; }
+.pin-unusable { width: 26px; height: 26px; border-radius: 50%; background: #ffffff; border: 4px solid var(--unusable); }
+
+/* 一覧 */
+.results-area { min-width: 0; }
+#usable, #unusable { padding-top: 28px; }
+#usable h2, #unusable h2 { font-size: 19px; }
+#usable-list, #unusable-list { list-style: none; padding: 0; margin: 0; }
+.site { position: relative; padding: 14px 0 14px 50px; border-top: 1px solid var(--line); }
+#usable-list { counter-reset: site; }
+#usable-list .site { counter-increment: site; }
+#usable-list .site::before {
+  content: counter(site); position: absolute; left: 0; top: 16px; width: 34px; height: 34px;
+  border-radius: 50%; background: var(--usable); color: #ffffff; display: grid; place-items: center;
+  font-weight: 700; font-variant-numeric: tabular-nums;
+}
+#unusable-list .site::before {
+  content: ''; position: absolute; left: 0; top: 16px; width: 30px; height: 30px;
+  border-radius: 50%; background: #ffffff; border: 4px solid var(--unusable);
+}
+.site-name { display: block; font-size: 17px; line-height: 1.6; word-break: keep-all; overflow-wrap: anywhere; }
+.site p { margin: 2px 0 0; font-size: 14px; }
+.measure { font-weight: 700; }
+/* 住所は行動に使う情報なので本文色。備考と災害の列挙は補助（それでも8:1はある） */
+.remarks, .flags { color: var(--muted); }
+.flags, .site p, .answer-action { word-break: keep-all; overflow-wrap: anywhere; }
+.answer-action { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 16px; font-size: 15px; margin: 4px 0 0; }
+.answer-action .map-link { margin-top: 0; }
+.map-link { display: inline-block; margin-top: 8px; font-size: 14px; min-height: 44px; padding: 10px 0; }
+#unusable-none, #unusable-more { font-size: 14px; }
+#unusable-more { padding: 12px 0 0; border-top: 1px solid var(--line); margin: 0; }
+#skeleton { padding: 32px 0; }
+#skeleton div {
+  height: 80px; background: #e6e3d8; border-left: 20px solid #d2cfc2; margin: 12px 0;
+  animation: pulse 1.5s ease-in-out infinite alternate;
+}
+@keyframes pulse { to { opacity: .5; } }
+
+.notes { font-size: 14px; border-top: 1px solid var(--line); margin-top: 32px; padding: 24px 0 12px; }
+#intro + .notes { margin-top: 24px; }
+.notes p { max-width: 46em; }
+.sources { padding: 12px 0 32px; font-size: 12px; }
+.sources p { margin-bottom: 4px; }
+
+@media (max-width: 600px) {
+  .site-head, main { padding-left: 18px; padding-right: 18px; }
+  .site-head { padding-top: 28px; }
+  .map-tail { flex-direction: column; align-items: flex-start; gap: 10px; }
+  #map { height: 290px; }
+}
+
+/* PCは左に操作、右に一覧。1カラムのままだと左右が空き、一覧を見るために
+   操作がずっと上へ流れていく（Day 038で同じ指摘を2周受けた）。
+   答えは横幅いっぱいの上段に置く＝どの幅でも操作より上にある */
+@media (min-width: 900px) {
+  .site-head { max-width: 1180px; }
+  main {
+    max-width: 1180px; display: grid; align-items: start;
+    grid-template-columns: minmax(320px, 400px) minmax(0, 1fr); column-gap: 40px;
+  }
+  .answer-area, .notes, .sources { grid-column: 1 / -1; }
+  .controls { grid-column: 1; }
+  .results-area { grid-column: 2; }
+  #hazards { margin-top: 32px; }
+  #usable { padding-top: 32px; }
+  #map { height: 360px; }
+}
+@media (prefers-reduced-motion: reduce) { #skeleton div { animation: none; } }
