@@ -152,6 +152,8 @@ const WIKIMEDIA_CONNECT = [
 /* 外部へ接続するのはここに挙げたDayだけ。ほかのアプリは同一オリジンに閉じている。
    ⚠️ 新しいDayで外部のAPIを叩くときは、ここに足さないとブラウザ側で接続が止まる（黙って失敗する）。 */
 const CONNECT_BY_APP = {
+  /* day-040 は避難場所タイル・地図タイル・住所検索の3つとも国土地理院。他へは出ない */
+  'day-040-shelter-by-hazard': 'https://cyberjapandata.gsi.go.jp https://msearch.gsi.go.jp',
   'day-039-dig-below': 'https://paleobiodb.org https://tiles.openfreemap.org',
   'day-034-tide-now': 'https://www.data.jma.go.jp',
   'day-010-wikipedia-live': WIKIMEDIA_CONNECT,
@@ -193,6 +195,7 @@ const CONNECT_BY_APP = {
    worker-src は child-src → script-src → default-src の順に落ちるので、
    'self' のままだと地図が黙って出ない。 */
 const WORKER_BY_APP = {
+  'day-040-shelter-by-hazard': "worker-src blob:",
   'day-039-dig-below': "worker-src blob:",
   'day-025-nearby-parking': "worker-src blob:",
   'day-029-nearby-wifi': "worker-src blob:",
@@ -207,6 +210,10 @@ const MEDIA_BY_APP = {
   'day-030-world-window': ' https:'
 };
 const IMG_BY_APP = {
+  /* day-040 の地理院タイルは MapLibre が fetch で取るので connect-src で足りるが、
+     画像として読む経路（ImageBitmap が使えない環境のフォールバック）に落ちたときに
+     地図だけが黙って白くなる。同じホストなので img にも足しておく */
+  'day-040-shelter-by-hazard': ' https://cyberjapandata.gsi.go.jp',
   'day-039-dig-below': ' https://tiles.openfreemap.org',
   'day-021-nearby-radio': ' https:',
   // スプライト画像をタイル配信元から読む

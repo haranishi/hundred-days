@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>その避難場所、洪水でも？</title>
+  <meta name="description" content="場所と災害の種類を決めると、そのとき使える指定緊急避難場所を近い順に出します。もっと近いのに、その災害では使えない場所も名指しで出します。国土地理院の指定緊急避難場所データ。">
+  <meta name="share:text" content="その避難場所、洪水でも？ — 災害の種類で、逃げていい場所は変わる">
+  <link rel="stylesheet" href="./vendor/maplibre-gl.css">
+  <link rel="stylesheet" href="./app.css">
+  <script src="./vendor/maplibre-gl.js" defer></script>
+  <script type="module" src="./app.js"></script>
+  <link rel="stylesheet" href="./shared/share.css">
+  <script src="./shared/share.js" defer></script>
+</head>
+<body>
+  <header class="site-head">
+    <p class="eyebrow">DAY 040 / 指定緊急避難場所</p>
+    <h1>その避難場所、<wbr>洪水でも？</h1>
+    <p class="lede">災害の種類で、逃げていい場所は変わる。</p>
+  </header>
+  <main id="app" data-state="empty">
+    <div class="answer-area" aria-live="polite">
+      <section id="answer" hidden>
+        <h2 id="answer-text"></h2>
+        <p id="answer-sub"></p>
+        <p id="answer-action" class="answer-action"></p>
+      </section>
+      <p id="status" role="status" hidden></p>
+      <section id="failure" role="alert" hidden>
+        <h2>避難場所を表示できません</h2>
+        <p id="failure-text"></p>
+        <button id="retry" type="button">もう一度ためす</button>
+      </section>
+      <section id="no-sites" hidden>
+        <h2 id="no-sites-text"></h2>
+        <p id="no-sites-sub"></p>
+      </section>
+    </div>
+
+    <div class="controls">
+      <fieldset id="hazards">
+        <legend>災害の種類</legend>
+        <p id="hazard-note" class="hazard-note" hidden>名前の横の数字は、選んだ場所の区画（約30km四方）に登録されている場所の数です。</p>
+        <div class="hazard-grid">
+        <label class="hazard"><input type="radio" name="hazard" value="1" checked><span class="hazard-body"><span class="hazard-name">洪水</span><span class="hazard-count" data-hazard-count="1"></span></span></label>
+        <label class="hazard"><input type="radio" name="hazard" value="2"><span class="hazard-body"><span class="hazard-name">崖崩れ、<wbr>土石流及び地滑り</span><span class="hazard-count" data-hazard-count="2"></span></span></label>
+        <label class="hazard"><input type="radio" name="hazard" value="3"><span class="hazard-body"><span class="hazard-name">高潮</span><span class="hazard-count" data-hazard-count="3"></span></span></label>
+        <label class="hazard"><input type="radio" name="hazard" value="4"><span class="hazard-body"><span class="hazard-name">地震</span><span class="hazard-count" data-hazard-count="4"></span></span></label>
+        <label class="hazard"><input type="radio" name="hazard" value="5"><span class="hazard-body"><span class="hazard-name">津波</span><span class="hazard-count" data-hazard-count="5"></span></span></label>
+        <label class="hazard"><input type="radio" name="hazard" value="6"><span class="hazard-body"><span class="hazard-name">大規模な火事</span><span class="hazard-count" data-hazard-count="6"></span></span></label>
+        <label class="hazard"><input type="radio" name="hazard" value="7"><span class="hazard-body"><span class="hazard-name">内水氾濫</span><span class="hazard-count" data-hazard-count="7"></span></span></label>
+        <label class="hazard"><input type="radio" name="hazard" value="8"><span class="hazard-body"><span class="hazard-name">火山現象</span><span class="hazard-count" data-hazard-count="8"></span></span></label>
+        </div>
+      </fieldset>
+
+      <section id="picker" aria-labelledby="picker-title">
+        <h2 id="picker-title">場所を決める</h2>
+        <button id="locate" type="button">現在地から探す</button>
+        <form id="address-form" class="address-form">
+          <label class="address-label" for="address">住所・町名で探す</label>
+          <div class="address-row">
+            <input id="address" name="address" type="search" autocomplete="off" placeholder="住所・町名（例：秋田市山王）">
+            <button id="search-address" type="submit">探す</button>
+          </div>
+        </form>
+        <div id="candidates"></div>
+        <p id="place-name" hidden></p>
+        <div id="map" aria-label="場所を選ぶ地図"></div>
+        <p class="pin-legend">ピンの見方：<span class="legend-item"><span class="pin-face pin-self" aria-hidden="true"></span>選んだ場所</span><span class="legend-item"><span class="pin-face pin-usable" aria-hidden="true">1</span>使える（数字は近い順）</span><span class="legend-item"><span class="pin-face pin-unusable" aria-hidden="true"></span>使えない</span></p>
+        <div class="map-tail">
+          <p id="map-status" role="status">地図を読み込んでいます。</p>
+          <button id="pick-center" type="button">地図の中心で探す</button>
+        </div>
+        <p class="privacy">現在地は端末内で扱います。国土地理院へ送るのは、避難場所データの区画（約30km四方）の番号と、地図を描くためのタイルの番号です。正確な座標は送りません。住所検索の文字列は国土地理院の検索APIへ送ります。</p>
+      </section>
+    </div>
+
+    <div class="results-area">
+      <section id="intro" aria-labelledby="intro-title">
+        <h2 id="intro-title">使い方は3つ</h2>
+        <ol class="steps">
+          <li><strong>災害の種類</strong>を選ぶ。まずは洪水のままでよい</li>
+          <li><strong>場所</strong>を決める。現在地・住所・地図のどれでも</li>
+          <li>その災害で<strong>使える場所</strong>と、<strong>近いのに使えない場所</strong>が出る</li>
+        </ol>
+        <p class="intro-note">近い5か所のうち洪水で使える数は、秋田駅1・仙台駅3・高知駅0・東京駅5・名古屋駅5（2026年9月16日の配信データで数えたもの）。近い順と、使える順は別です。</p>
+      </section>
+      <div id="skeleton" aria-hidden="true" hidden><div></div><div></div><div></div></div>
+      <section id="usable" hidden aria-labelledby="usable-title">
+        <h2 id="usable-title"></h2>
+        <ol id="usable-list"></ol>
+      </section>
+      <section id="unusable" hidden aria-labelledby="unusable-title">
+        <h2 id="unusable-title"></h2>
+        <ol id="unusable-list"></ol>
+        <p id="unusable-none" hidden></p>
+        <p id="unusable-more" hidden></p>
+      </section>
+    <aside class="notes">
+        <p>ここに出るのは「指定緊急避難場所」です。命を守るために緊急に逃げる場所で、危険が去るまで滞在する「指定避難所」とは別です。このアプリは指定避難所を扱いません。</p>
+        <p>市町村が登録し、公開に同意した場所だけが載っています。登録の無い市町村もあります。必ずお住まいの市町村の情報で確かめてください。</p>
+        <p>距離は直線距離、徒歩の目安は80m/分で計算しています。指定されていても、その日に開設されているかは市町村の発表によります。</p>
+      </aside>
+    </div>
+
+
+    <footer class="sources" aria-label="出典">
+      <p>避難場所：<a href="https://www.gsi.go.jp/bousaichiri/hinanbasho.html">国土地理院「指定緊急避難場所データ」</a><span id="data-date"></span></p>
+      <p>利用規約：<a href="https://www.gsi.go.jp/kikakuchousei/kikakuchousei40182.html">国土地理院コンテンツ利用規約</a></p>
+      <p>地図：<a href="https://maps.gsi.go.jp/development/ichiran.html">地理院タイル（淡色地図）</a></p>
+      <p>住所検索：国土地理院 住所検索API</p>
+      <div id="share"></div>
+    </footer>
+  </main>
+</body>
+</html>
