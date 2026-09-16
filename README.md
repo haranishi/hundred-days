@@ -46,6 +46,9 @@ AIと一緒に作りながら、「AIに任せたこと」と「自分で考え�
 | 035 | [きょうの一面](apps/day-035-front-page/) | https://hundred-days.pages.dev/day-035-front-page/ |
 | 036 | [一画ずつ](apps/day-036-stroke-by-stroke/) | https://hundred-days.pages.dev/day-036-stroke-by-stroke/ |
 | 037 | [バイトの法律、原文はこう](apps/day-037-baito-law/) | https://hundred-days.pages.dev/day-037-baito-law/ |
+| 038 | [昔の1000円、いまいくら](apps/day-038-yen-back-then/) | https://hundred-days.pages.dev/day-038-yen-back-then/ |
+| 039 | [足もとを掘る](apps/day-039-dig-below/) | https://hundred-days.pages.dev/day-039-dig-below/ |
+| 040 | [その避難場所、洪水でも？](apps/day-040-shelter-by-hazard/) | https://hundred-days.pages.dev/day-040-shelter-by-hazard/ |
 
 ## 1日アプリのルール
 
@@ -73,6 +76,8 @@ AIと一緒に作りながら、「AIに任せたこと」と「自分で考え�
 - `apps/day-NNN-<name>/` — 各日のアプリ本体と記録（`meta.json`）＋一覧用スクショ（`screenshot.webp`）とデモ動画（`demo.mp4`）。どちらも任意
 - `scripts/build.mjs` — `dist/` に一覧ページと各アプリを生成（依存パッケージなし）
 - `static/` — 一覧ページ用の静的ファイル（OG画像など）。中身がそのまま `dist/` 直下に入る
+- `shared/` — 全アプリ共通のSNSシェア部品。正本はここだけで、`scripts/sync-shared.mjs` が各アプリの `shared/` へ複製する（アプリを1フォルダで完結させるため）
+- `functions/api/day-NNN/` — Cloudflare Pages Functions。ブラウザから直接は呼べない外部APIだけを中継する（CORS・User-Agent の指定・キャッシュ）
 - ホスティング: Cloudflare Pages（1プロジェクトに全アプリをパスでルーティング）
 
 ```bash
