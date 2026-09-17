@@ -49,6 +49,7 @@
 | 038 | [昔の1000円、いまいくら](apps/day-038-yen-back-then/) | https://hundred-days.pages.dev/day-038-yen-back-then/ |
 | 039 | [足もとを掘る](apps/day-039-dig-below/) | https://hundred-days.pages.dev/day-039-dig-below/ |
 | 040 | [その避難場所、洪水でも？](apps/day-040-shelter-by-hazard/) | https://hundred-days.pages.dev/day-040-shelter-by-hazard/ |
+| 041 | [この道、誰がケガしてる？](apps/day-041-who-got-hurt/) | https://hundred-days.pages.dev/day-041-who-got-hurt/ |
 
 ## 1日アプリのルール
 

@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>この道、誰がケガしてる？</title>
+  <meta name="description" content="場所をひとつ決めると、その周りで2019〜2024年に実際に起きた人身事故を地図に出し、歩行者・自転車・65歳以上の別に件数で答えます。警察庁「交通事故統計情報のオープンデータ」を加工して作成しています。">
+  <meta name="share:text" content="この道、誰がケガしてる？ — 通学路の事故を、印象ではなく件数で">
+  <link rel="stylesheet" href="./vendor/maplibre-gl.css">
+  <link rel="stylesheet" href="./app.css">
+  <script src="./vendor/maplibre-gl.js" defer></script>
+  <script type="module" src="./app.js"></script>
+  <link rel="stylesheet" href="./shared/share.css">
+  <script src="./shared/share.js" defer></script>
+</head>
+<body>
+  <header class="site-head">
+    <p class="eyebrow">DAY 041 / 人身事故 2019〜2024年</p>
+    <h1>この道、<wbr>誰がケガしてる？</h1>
+    <p class="lede">毎日通る道の事故を、印象ではなく件数で見る。</p>
+  </header>
+  <main id="app" data-state="empty">
+    <section id="picker" aria-labelledby="picker-title">
+      <h2 id="picker-title">場所を決める</h2>
+      <button id="locate" type="button">現在地から探す</button>
+      <form id="address-form" class="address-form">
+        <label class="address-label" for="address">住所・地名で探す</label>
+        <div class="address-row">
+          <input id="address" name="address" type="search" autocomplete="off" placeholder="住所・地名（例：秋田市山王）">
+          <button id="search-address" type="submit">探す</button>
+        </div>
+      </form>
+      <div id="candidates"></div>
+      <p id="place-name" hidden></p>
+    </section>
+
+    <div class="answer-area" aria-live="polite">
+      <section id="answer" hidden>
+        <h2 id="answer-text"></h2>
+        <p id="answer-sub"></p>
+      </section>
+      <p id="status" role="status" hidden></p>
+      <section id="failure" role="alert" hidden>
+        <h2>事故の記録を表示できません</h2>
+        <p id="failure-text"></p>
+        <button id="retry" type="button">もう一度ためす</button>
+      </section>
+      <section id="none" hidden>
+        <h2 id="none-text"></h2>
+        <p id="none-sub"></p>
+      </section>
+    </div>
+
+    <p class="caveat" id="caveat">件数は交通量で割っていません。多い場所は、危ないのではなく、通る人や車が多いだけかもしれません。</p>
+
+    <section id="intro" aria-labelledby="intro-title">
+      <h2 id="intro-title">使い方は3つ</h2>
+      <ol class="steps">
+        <li><strong>場所</strong>を決める。現在地・住所・地図を押す、のどれでも</li>
+        <li><strong>半径</strong>と<strong>誰が</strong>を切り替えると、答えが書き換わる</li>
+        <li>事故が<strong>集まっている地点</strong>と、<strong>何時に起きているか</strong>が下に出る</li>
+      </ol>
+      <p class="intro-note">2019〜2024年の6年間に、日本で1,884,647件の人身事故が記録されています。うち歩行者が関わったものが233,567件、自転車が425,937件、死亡事故が16,257件です。</p>
+    </section>
+
+    <div class="controls">
+      <fieldset id="radius-set">
+        <legend>半径</legend>
+        <div class="chip-row">
+          <label class="chip"><input type="radio" name="radius" value="300"><span>300m</span></label>
+          <label class="chip"><input type="radio" name="radius" value="500" checked><span>500m</span></label>
+          <label class="chip"><input type="radio" name="radius" value="1000"><span>1km</span></label>
+        </div>
+      </fieldset>
+      <fieldset id="who-set">
+        <legend>誰が</legend>
+        <div class="chip-row">
+          <label class="chip"><input type="radio" name="who" value="all" checked><span>すべて</span></label>
+          <label class="chip"><input type="radio" name="who" value="walker"><span>歩行者</span></label>
+          <label class="chip"><input type="radio" name="who" value="bike"><span>自転車</span></label>
+          <label class="chip"><input type="radio" name="who" value="elder"><span>65歳以上</span></label>
+        </div>
+      </fieldset>
+    </div>
+
+    <section id="map-area" aria-labelledby="map-title">
+      <h2 id="map-title">事故が起きた場所</h2>
+      <div id="map" aria-label="事故の地図。押すとその場所で数え直します" data-pins="0"></div>
+      <p class="pin-legend">ピンの見方：<span class="legend-item"><span class="pin-face pin-walker" aria-hidden="true"></span>歩行者</span><span class="legend-item"><span class="pin-face pin-bike" aria-hidden="true"></span>自転車</span><span class="legend-item"><span class="pin-face pin-other" aria-hidden="true"></span>そのほか</span><span class="legend-item"><span class="pin-face pin-death" aria-hidden="true"></span>死亡事故（縁取り）</span><span class="legend-item"><span class="pin-face pin-self" aria-hidden="true"></span>選んだ場所</span></p>
+      <div class="map-tail">
+        <p id="map-status" role="status">地図を読み込んでいます。</p>
+        <button id="pick-center" type="button">地図の中心で探す</button>
+      </div>
+      <p class="privacy">事故のデータはこのページに同梱していて、現在地との照合は端末の中で終わります。<strong>現在地の座標は外に出しません。</strong>国土地理院へ出るのは、地図を描くタイルの番号と、住所検索を使ったときの入力した語だけです。</p>
+    </section>
+
+    <div id="skeleton" aria-hidden="true" hidden><div></div><div></div></div>
+
+    <div class="readouts">
+      <section id="spots" hidden aria-labelledby="spots-title">
+        <h2 id="spots-title"></h2>
+        <ol id="spots-list"></ol>
+        <p class="note" id="spots-note">およそ40mの近さにあるものを1つの地点にまとめています。交差点の名前はデータに入っていないので、選んだ場所からの方角と直線距離で示しています。</p>
+      </section>
+      <section id="hours" hidden aria-labelledby="hours-title">
+        <h2 id="hours-title"></h2>
+        <ol id="hour-band" class="band"></ol>
+        <div class="band-axis" aria-hidden="true"><span>0時</span><span>6時</span><span>12時</span><span>18時</span><span>24時</span></div>
+        <p id="hours-peak"></p>
+        <p id="hours-unknown" hidden></p>
+      </section>
+    </div>
+
+    <section class="limits" aria-labelledby="limits-title">
+      <h2 id="limits-title">この数字で分からないこと</h2>
+      <ol class="limit-list">
+        <li><strong>人身事故だけ</strong>です。物損事故は含みません</li>
+        <li><strong>警察が把握した事故だけ</strong>です。届け出のない事故は入っていません</li>
+        <li><strong>交通量で割っていません。</strong>件数が多い場所は、危ないのではなく、通る人が多いだけかもしれません</li>
+        <li>座標は警察が記録した地点で、実際に衝突した位置とずれることがあります</li>
+        <li>2019〜2024年の6年ぶんです。2025年ぶんはまだ公開されていません</li>
+        <li><strong>いちばん新しい2024年は、数%少なめに出ます。</strong>警察庁のファイルは事故が確定した年で分かれていて、2024年に起きた事故のうち2025年に確定したぶんは、まだ公開されていないためです（2024年282,376件に対し、2019〜2023年は各30万件台）</li>
+      </ol>
+    </section>
+
+    <footer class="sources" aria-label="出典">
+      <p class="source-line">出典：警察庁「<a href="https://www.npa.go.jp/publications/statistics/koutsuu/opendata/">交通事故統計情報のオープンデータ</a>」（2019〜2024年）</p>
+      <p class="source-line">このページは、同データを<strong>加工して作成</strong>しています（緯度経度の形式変換、月日を落として年だけにする、地域メッシュごとの再編成）。</p>
+      <p class="source-line">この加工と表示を行ったのは<strong>このページの作成者（個人）</strong>で、警察庁や国が作成・監修したものではありません。</p>
+      <p>利用条件：<a href="https://www.npa.go.jp/rules/index.html">公共データ利用規約（第1.0版）</a></p>
+      <p>地図：<a href="https://maps.gsi.go.jp/development/ichiran.html">地理院タイル（淡色地図）</a>／住所検索：国土地理院 住所検索API</p>
+      <div id="share"></div>
+    </footer>
+  </main>
+</body>
+</html>
