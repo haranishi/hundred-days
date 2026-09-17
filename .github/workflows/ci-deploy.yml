@@ -18,7 +18,11 @@ jobs:
   test:
     name: Build and browser test
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    # Dayが増えるとブラウザテストも増える。Day 040 で15分1秒、Day 041 で15分13秒に達し、
+    # 15分の上限に当たって main のデプロイが cancelled になった（2026-09-17）。
+    # 上限に当たったかどうかは run の conclusion が cancelled になるだけで理由が出ないので、
+    # 余裕を持たせておく。40日で15分なので、100日到達時の見込みは35分前後
+    timeout-minutes: 40
     steps:
       - name: Check out repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -76,7 +80,9 @@ jobs:
     if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
     needs: test
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    # 配信するファイル数も増える（Day 041 の同梱データで 1,006 → 1,377 本）。
+    # 初回だけ全部アップロードするので、ここも余裕を持たせる
+    timeout-minutes: 20
     environment:
       name: production
       url: https://hundred-days.pages.dev
