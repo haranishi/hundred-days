@@ -13,7 +13,12 @@ const files = run('git', ['ls-files', '-c', '-o', '--exclude-standard'])
   .split('\n')
   .filter(Boolean);
 
-const BINARY = /\.(png|jpe?g|gif|webp|ico|svg|mp4|mov|webm|mp3|wav|zip|gz|woff2?|ttf|otf|pdf)$/i;
+const BINARY = /\.(png|jpe?g|gif|webp|ico|svg|mp4|mov|webm|mp3|wav|zip|gz|woff2?|ttf|otf|pdf|bin)$/i;
+
+/* 同じフォルダにバイナリが何本も入るときは、1本ずつ出すと本当の指摘が流れる
+   （day-041 の事故データは1フォルダに375本）。10本を超えたらフォルダ単位でまとめる。
+   まとめるのは出力だけで、目視が要るという扱いは変えていない */
+const GROUP_AT = 10;
 
 const FAIL_PATTERNS = [
   ['秘密鍵', /-----BEGIN [A-Z ]*PRIVATE KEY-----/],
@@ -47,10 +52,12 @@ if (existsSync(NG_FILE)) {
   fails++;
 }
 
+const binaryByDir = new Map();
 for (const file of files) {
   if (file === NG_FILE) continue;
   if (BINARY.test(file)) {
-    console.log(`👁 目視確認が必要（画像/動画/バイナリ）: ${file}`);
+    const dir = file.slice(0, file.lastIndexOf('/'));
+    binaryByDir.set(dir, [...(binaryByDir.get(dir) ?? []), file]);
     warns++;
     continue;
   }
@@ -74,6 +81,14 @@ for (const file of files) {
       }
     }
   });
+}
+
+for (const [dir, list] of [...binaryByDir].sort(([a], [b]) => a.localeCompare(b))) {
+  if (list.length > GROUP_AT) {
+    console.log(`👁 目視確認が必要（バイナリ ${list.length}本）: ${dir}/`);
+  } else {
+    for (const file of list) console.log(`👁 目視確認が必要（画像/動画/バイナリ）: ${file}`);
+  }
 }
 
 // 不変条件：非公開ファイルが追跡されていないこと・コミット著者がnoreplyであること
