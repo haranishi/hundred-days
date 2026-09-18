@@ -1,0 +1,207 @@
+:root {
+  color-scheme: light;
+  --ink: #16160f;
+  --muted: #474a41;
+  --paper: #f5f3ec;
+  --line: #62655a;
+  --card: #ffffff;
+  --deep: #1c3f56;
+  --rule: rgba(22, 22, 15, .22);
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body {
+  margin: 0; background: var(--paper); color: var(--ink); line-height: 1.75;
+  font-family: -apple-system, BlinkMacSystemFont, "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif;
+}
+.site-head, main { max-width: 900px; margin: auto; padding: 0 24px; }
+.site-head { padding-top: 48px; padding-bottom: 20px; border-bottom: 1px solid var(--line); }
+.eyebrow { font-size: 12px; font-weight: 700; letter-spacing: .12em; margin: 0 0 6px; }
+h1, h2, h3, p, ol, dl { margin: 0 0 12px; }
+h1 {
+  font-family: "Yu Mincho", "Hiragino Mincho ProN", serif;
+  font-size: clamp(32px, 6.4vw, 54px); letter-spacing: .04em; line-height: 1.3;
+  word-break: keep-all; overflow-wrap: anywhere;
+}
+h2 { font-size: 19px; line-height: 1.6; word-break: keep-all; overflow-wrap: anywhere; }
+.lede { font-size: 16px; margin: 0; }
+button {
+  min-height: 44px; padding: 10px 18px; border: 2px solid var(--line); border-radius: 4px;
+  background: var(--card); color: var(--ink); font: inherit; font-weight: 600; cursor: pointer;
+}
+button:hover { background: #e8e5db; }
+a { color: #1f3f57; text-underline-offset: 3px; }
+:focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; }
+#answer-text, #answer-sub, #answer-meta, #typhoon-facts, #top-list, .band-value, #others { font-variant-numeric: tabular-nums; }
+
+/* 場所を決める */
+#picker { padding-top: 28px; }
+#picker h2 { font-size: 16px; }
+#locate { width: 100%; background: var(--deep); color: #ffffff; border-color: var(--deep); }
+#locate:hover { background: #142e3f; }
+.town-form { margin: 12px 0 0; }
+.town-label { display: block; font-size: 13px; font-weight: 700; }
+.town-row { display: flex; gap: 8px; margin-top: 4px; }
+#town-input {
+  flex: 1; min-width: 0; min-height: 44px; padding: 8px 12px; font: inherit;
+  border: 2px solid var(--line); border-radius: 4px; background: var(--card); color: var(--ink);
+}
+/* 例は欄の外。プレースホルダに入れると狭い画面で「（例：由利本荘」と切れる */
+.town-hint { font-size: 13px; color: var(--muted); margin: 4px 0 0; }
+#candidates { margin: 10px 0 0; }
+.candidates-head, .candidates-message { font-size: 14px; margin: 0 0 6px; }
+.candidate { display: block; width: 100%; text-align: left; margin-bottom: 6px; font-weight: 400; }
+#place-name { font-size: 15px; font-weight: 700; margin: 12px 0 0; }
+#place-note { font-size: 15px; color: var(--muted); margin: 6px 0 0; }
+
+/* 答え。中身が全部隠れているときは枠ごと消す */
+.answer-area:not(:has(> :not([hidden]))) { display: none; }
+.answer-area { padding: 24px 0 4px; }
+#answer-text {
+  font-family: "Yu Mincho", "Hiragino Mincho ProN", serif;
+  font-size: clamp(22px, 3.6vw, 32px); max-width: 24em; margin-bottom: 8px;
+}
+/* この画面でいちばん読ませたい数字。文中の字と同じ大きさだと埋もれる */
+#answer-text .count { font-size: 1.7em; font-weight: 700; letter-spacing: .01em; line-height: 1.2; }
+#answer-sub { font-size: 17px; font-weight: 700; max-width: 34em; word-break: keep-all; overflow-wrap: anywhere; }
+.nowrap { white-space: nowrap; }
+/* 広い画面だけ、%の手前で行を分けて数字を独立させる（狭い画面では続けて読ませる） */
+@media (max-width: 699px) { .answer-break { display: none; } }
+#answer-meta { font-size: 14px; color: var(--muted); margin-bottom: 0; }
+#failure { border-left: 4px solid #8a3a12; padding-left: 20px; }
+#none { border-left: 4px solid var(--line); padding-left: 20px; }
+#none-text { font-family: "Yu Mincho", "Hiragino Mincho ProN", serif; font-size: clamp(20px, 3.2vw, 26px); }
+#none-sub, #status { font-size: 15px; max-width: 40em; }
+
+/* 0%は「入らない」の保証ではない。答えのすぐ下に、たたまずに置く */
+.caveat { font-size: 15px; color: var(--muted); max-width: 44em; padding-top: 12px; margin: 12px 0 0; }
+.answer-area:has(> :not([hidden])) + .caveat { border-top: 1px solid var(--line); }
+
+/* ほかの台風 */
+#others-area { padding-top: 24px; }
+#others { list-style: none; padding: 0; margin: 0; }
+#others li { border-top: 1px solid var(--line); padding: 10px 0; font-size: 16px; }
+
+/* 使い方 */
+#intro { padding-top: 24px; }
+.steps { padding-left: 1.4em; }
+.steps li { margin-bottom: 6px; }
+
+/* 3時間ごとの帯。40本＝5日ぶん。
+   1本あたり8px前後しかないので、日付や数字のラベルは棒からはみ出す。
+   はみ出しを横だけ切る（overflow: clip なら縦は見えたまま残せる）。
+   端の数本はラベルを内側へ寄せて、切られる前に収まるようにする */
+#band-area { padding-top: 28px; overflow-x: clip; }
+/* 目盛りの数字は帯の右の余白へ。--band-h が「0〜100%」の高さそのもの。
+   ほとんどの街は10%前後までしか伸びないので、高さを詰めて目盛り線で位置を読ませる */
+.band-plot { position: relative; --band-h: 140px; padding-right: 34px; }
+.band {
+  list-style: none; display: grid; grid-template-columns: repeat(40, 1fr); gap: 1px;
+  align-items: end; height: var(--band-h); padding: 0; margin: 0 0 4px;
+  border-bottom: 2px solid var(--line);
+  /* 100%・50%・25% の目盛り線。下端が0%なので、上から 0%・50%・75% の位置に引く */
+  background-image:
+    linear-gradient(var(--rule), var(--rule)),
+    linear-gradient(var(--rule), var(--rule)),
+    linear-gradient(var(--rule), var(--rule));
+  background-repeat: no-repeat;
+  background-size: 100% 1px;
+  background-position: 0 0, 0 50%, 0 75%;
+}
+.band-tick {
+  position: absolute; right: 0; width: 30px; text-align: right; transform: translateY(-50%);
+  font-size: 11px; line-height: 1; color: var(--muted); font-variant-numeric: tabular-nums;
+}
+.band-tick-100 { top: 0; }
+.band-tick-50 { top: calc(var(--band-h) * .5); }
+.band-tick-25 { top: calc(var(--band-h) * .75); }
+.band-cell { position: relative; display: flex; align-items: flex-end; height: 100%; }
+.band-cell .bar { position: relative; display: block; width: 100%; background: var(--deep); }
+/* 0%も薄く残して「その時間帯が存在する」ことを示す */
+.band-cell[data-zero="1"] .bar { background: rgba(22, 22, 15, .16); }
+.band-value {
+  position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%);
+  font-size: 11px; font-weight: 700; line-height: 1.4; white-space: nowrap;
+}
+.band-cell[data-daystart="1"] { border-left: 1px solid var(--line); }
+.band-day {
+  position: absolute; top: -20px; left: 2px; font-size: 11px; color: var(--muted); white-space: nowrap;
+}
+/* 「いま」はプロットを貫く縦線。棒1本が8px前後なので、棒の枠だけでは見落とす */
+.band-cell[data-now="1"]::before {
+  content: ''; position: absolute; left: 50%; top: -10px; bottom: 0; z-index: 1;
+  width: 2px; margin-left: -1px; background: #8a3a12;
+}
+.band-now {
+  position: absolute; bottom: -22px; left: 50%; transform: translateX(-50%);
+  font-size: 11px; font-weight: 700; color: #8a3a12; white-space: nowrap;
+}
+.band-cell:nth-child(-n+4) .band-value,
+.band-cell:nth-child(-n+4) .band-now { left: 0; transform: none; }
+.band-cell:nth-last-child(-n+7) .band-value,
+.band-cell:nth-last-child(-n+7) .band-now { left: auto; right: 0; transform: none; }
+.band-cell:nth-last-child(-n+7) .band-day { left: auto; right: 2px; }
+#band-note { margin-top: 26px; }
+
+/* 台風の現況。節の見出しはゴシックで揃える（明朝は h1 と答えの1行目だけ） */
+#typhoon { padding-top: 28px; }
+#typhoon-scale { font-size: 16px; font-weight: 700; }
+#typhoon-facts { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 4px 16px; font-size: 16px; }
+#typhoon-facts dt { color: var(--muted); font-size: 14px; }
+#typhoon-facts dd { margin: 0; }
+
+/* 地図 */
+#map-area { padding-top: 28px; }
+#map { display: block; width: 100%; height: 300px; border: 1px solid var(--line); background: #dfe9ef; }
+.map-legend { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 13px; margin: 8px 0 0; }
+.legend-item { display: inline-flex; align-items: center; gap: 6px; }
+.key { display: inline-block; width: 18px; height: 12px; flex-shrink: 0; }
+.key-track { border-bottom: 2px solid #3d4a52; height: 8px; }
+.key-circle { border: 1.5px dashed var(--deep); border-radius: 50%; width: 14px; height: 14px; }
+.key-storm { background: rgba(28, 63, 86, .18); border: 1px solid rgba(28, 63, 86, .55); }
+.key-home { width: 12px; height: 12px; background: #ffffff; border: 3px solid #8a3a12; }
+
+/* 確率が高い地域 */
+#top-areas { padding-top: 28px; }
+#top-list { list-style: none; padding: 0; margin: 0; counter-reset: rank; }
+#top-list li {
+  position: relative; counter-increment: rank; display: flex; justify-content: space-between;
+  gap: 12px; align-items: baseline; padding: 11px 0 11px 40px;
+  border-top: 1px solid var(--line); font-size: 16px;
+}
+#top-list li::before {
+  content: counter(rank); position: absolute; left: 0; top: 12px; width: 28px; height: 28px;
+  border-radius: 50%; background: var(--deep); color: #ffffff; display: grid; place-items: center;
+  font-weight: 700; font-size: 14px; font-variant-numeric: tabular-nums;
+}
+.top-value { font-weight: 700; white-space: nowrap; }
+
+.note { font-size: 14px; color: var(--muted); max-width: 42em; }
+
+/* 限界と出典 */
+.limits { border-top: 1px solid var(--line); margin-top: 32px; padding-top: 24px; }
+.limit-list { padding-left: 1.4em; font-size: 16px; max-width: 46em; }
+.limit-list li { margin-bottom: 8px; }
+.sources { padding: 8px 0 32px; font-size: 13px; }
+.sources p { margin-bottom: 4px; max-width: 48em; }
+.source-line { font-size: 14px; }
+.privacy { color: var(--muted); margin-top: 10px; }
+
+/* 広い画面では諸元が1列だと右半分が空き、地図までのスクロールが伸びる。
+   dt/dd を4列に流して2カラムにする（並びは左から右） */
+@media (min-width: 700px) {
+  #typhoon-facts { grid-template-columns: max-content minmax(0, 1fr) max-content minmax(0, 1fr); gap: 6px 24px; }
+}
+
+@media (max-width: 600px) {
+  .site-head, main { padding-left: 18px; padding-right: 18px; }
+  .site-head { padding-top: 28px; }
+  .band-plot { --band-h: 120px; }
+  /* 棒1本が9px弱なので、曜日と数字を全部出すと文字どうしが重なる。
+     曜日は日付だけにし、数字は山のコマだけに絞る（山の時刻は答えの2行目にも書いてある） */
+  .band-week { display: none; }
+  .band-value { display: none; font-size: 10px; }
+  .band-cell[data-peak="1"] .band-value { display: block; }
+  #typhoon-facts { grid-template-columns: minmax(0, 1fr); gap: 0 0; }
+  #typhoon-facts dd { margin-bottom: 8px; }
+}

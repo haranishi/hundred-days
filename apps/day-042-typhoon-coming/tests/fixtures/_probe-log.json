@@ -1,0 +1,480 @@
+{
+  "https://www.jma.go.jp/bosai/information/data/typhoon.json": {
+    "url": "https://www.jma.go.jp/bosai/information/data/typhoon.json",
+    "finalUrl": "https://www.jma.go.jp/bosai/information/data/typhoon.json",
+    "status": 200,
+    "fetchedAt": "2026-09-18T11:23:51.787Z",
+    "headers": {
+      "content-type": "application/json",
+      "content-length": "422",
+      "access-control-allow-origin": "*",
+      "cache-control": "max-age=60",
+      "last-modified": "Wed, 27 May 2026 01:25:57 GMT",
+      "etag": "\"66ae032a41b13b5a612d22ba0307f769\"",
+      "server": "AmazonS3",
+      "vary": "Accept-Encoding, Origin"
+    },
+    "bytes": 422,
+    "error": null,
+    "savedAs": "tests/fixtures/bosai-information-typhoon-20260918.json",
+    "head300": "[{\"controlTitle\":\"全般台風情報（定型）\",\"datetime\":\"2026-05-27T01:25:17Z\",\"editorialOffice\":\"気象庁本庁\",\"publishingOffice\":\"気象庁\",\"headTitle\":\"令和８年　台風第６号に関する情報\",\"reportDatetime\":\"2026-05-27T10:30:00+09:00\",\"targetDatetime\":\"2026-05-27T10:30:00+09:00\",\"eventId\":\"TC2606\",\"infoType\":\"発表\",\"serial\":\"\",\"fileName\":\"20260"
+  },
+  "https://www.jma.go.jp/bosai/typhoon/data/targetTimes.json": {
+    "url": "https://www.jma.go.jp/bosai/typhoon/data/targetTimes.json",
+    "finalUrl": "https://www.jma.go.jp/bosai/typhoon/data/targetTimes.json",
+    "status": 404,
+    "fetchedAt": "2026-09-18T11:24:02.057Z",
+    "headers": {
+      "content-type": "text/html",
+      "last-modified": "Wed, 11 Dec 2024 08:27:03 GMT",
+      "etag": "W/\"713849bc8f1a01c61a4341da8aca8199\"",
+      "age": "77316",
+      "server": "AmazonS3",
+      "content-encoding": "gzip",
+      "vary": "Accept-Encoding, Origin"
+    },
+    "bytes": 2203,
+    "error": null,
+    "savedAs": null,
+    "head300": "<!DOCTYPE html>\r\n<html lang=\"ja\">\r\n  <head>\r\n    <meta charset=\"utf-8\" />\r\n    <meta name=\"robots\" content=\"noindex\">\r\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\r\n    <link rel=\"icon\" href=\"/favicon.ico\" type=\"image/x-icon\">\r\n    <meta name=\"Author\" content=\"気象庁 Japan M"
+  },
+  "https://www.jma.go.jp/bosai/typhoon/": {
+    "url": "https://www.jma.go.jp/bosai/typhoon/",
+    "finalUrl": "https://www.jma.go.jp/bosai/typhoon/",
+    "status": 200,
+    "fetchedAt": "2026-09-18T11:24:10.896Z",
+    "headers": {
+      "content-type": "text/html",
+      "access-control-allow-origin": "*",
+      "cache-control": "max-age=600",
+      "last-modified": "Thu, 17 Sep 2026 01:08:38 GMT",
+      "etag": "W/\"9fd87e8509e0313c527aafede011488b\"",
+      "age": "437",
+      "server": "AmazonS3",
+      "content-encoding": "br",
+      "vary": "Accept-Encoding, Origin"
+    },
+    "bytes": 162751,
+    "error": null,
+    "savedAs": "tests/fixtures/bosai-typhoon-index-20260918.html",
+    "head300": "<!doctype html>\n<html lang=\"ja\">\n  <head>\n    <meta charset=\"utf-8\">\n    <meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">\n    <meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\">\n    <title>気象庁｜台風情報</title>\n<style>\n@charset \"UTF-8\";*,*:before,*:after{box-sizing:border-box}html{fo"
+  },
+  "https://www.jma.go.jp/bosai/typhoon/data/targetTc.json": {
+    "url": "https://www.jma.go.jp/bosai/typhoon/data/targetTc.json",
+    "finalUrl": "https://www.jma.go.jp/bosai/typhoon/data/targetTc.json",
+    "status": 200,
+    "fetchedAt": "2026-09-18T11:25:08.547Z",
+    "headers": {
+      "content-type": "application/json",
+      "content-length": "106",
+      "access-control-allow-origin": "*",
+      "cache-control": "max-age=60",
+      "last-modified": "Fri, 18 Sep 2026 09:41:23 GMT",
+      "etag": "\"23816d429a085e6a74f97c61bc4b945d\"",
+      "age": "35",
+      "server": "AmazonS3",
+      "vary": "Accept-Encoding, Origin"
+    },
+    "bytes": 106,
+    "error": null,
+    "savedAs": "tests/fixtures/bosai-typhoon-targetTc-20260918.json",
+    "head300": "[{\"tropicalCyclone\":\"TC2630\",\"typhoonNumber\":\"2625\",\"category\":\"STS\",\"issue\":\"2026-09-18T18:45:00+09:00\"}]"
+  },
+  "https://www.jma.go.jp/bosai/typhoon/data/prob50kt/targetTimes.json": {
+    "url": "https://www.jma.go.jp/bosai/typhoon/data/prob50kt/targetTimes.json",
+    "finalUrl": "https://www.jma.go.jp/bosai/typhoon/data/prob50kt/targetTimes.json",
+    "status": 200,
+    "fetchedAt": "2026-09-18T11:25:10.441Z",
+    "headers": {
+      "content-type": "application/json",
+      "cache-control": "max-age=60",
+      "last-modified": "Fri, 18 Sep 2026 06:46:43 GMT",
+      "etag": "W/\"b7cf49726963b21604928d8c59d1fdf0\"",
+      "age": "7",
+      "server": "AmazonS3",
+      "content-encoding": "br",
+      "vary": "Accept-Encoding, Origin"
+    },
+    "bytes": 4486,
+    "error": null,
+    "savedAs": "tests/fixtures/bosai-typhoon-prob50kt-targetTimes-20260918.json",
+    "head300": "[{\"basetime\":\"20260918060000\",\"member\":\"TC2630\",\"validtime\":\"20260918090000\",\"element\":\"timeseries\"},{\"basetime\":\"20260918060000\",\"member\":\"TC2630\",\"validtime\":\"20260918120000\",\"element\":\"timeseries\"},{\"basetime\":\"20260918060000\",\"member\":\"TC2630\",\"validtime\":\"20260918150000\",\"element\":\"timeseries\"}"
+  },
+  "https://www.jma.go.jp/bosai/typhoon/data/TC2630/probabilityTimeseries.json": {
+    "url": "https://www.jma.go.jp/bosai/typhoon/data/TC2630/probabilityTimeseries.json",
+    "finalUrl": "https://www.jma.go.jp/bosai/typhoon/data/TC2630/probabilityTimeseries.json",
+    "status": 200,
+    "fetchedAt": "2026-09-18T11:25:24.662Z",
+    "headers": {
+      "content-type": "application/json",
+      "access-control-allow-origin": "*",
+      "cache-control": "max-age=60",
+      "last-modified": "Fri, 18 Sep 2026 06:46:44 GMT",
+      "etag": "W/\"f9310dbb4e80c36f373719318181ef87\"",
+      "age": "36",
+      "server": "AmazonS3",
+      "content-encoding": "br",
+      "vary": "Accept-Encoding, Origin"
+    },
+    "bytes": 35591,
+    "error": null,
+    "savedAs": "tests/fixtures/bosai-TC2630-probabilityTimeseries-20260918.json",
+    "head300": "{\"targetDatetime\":\"2026-09-18T15:00:00+09:00\",\"validtime\":[\"2026-09-18T18:00:00+09:00\",\"2026-09-18T21:00:00+09:00\",\"2026-09-19T00:00:00+09:00\",\"2026-09-19T03:00:00+09:00\",\"2026-09-19T06:00:00+09:00\",\"2026-09-19T09:00:00+09:00\",\"2026-09-19T12:00:00+09:00\",\"2026-09-19T15:00:00+09:00\",\"2026-09-19T18:00"
+  },
+  "https://www.jma.go.jp/bosai/typhoon/data/TC2630/probabilityThrough.json": {
+    "url": "https://www.jma.go.jp/bosai/typhoon/data/TC2630/probabilityThrough.json",
+    "finalUrl": "https://www.jma.go.jp/bosai/typhoon/data/TC2630/probabilityThrough.json",
+    "status": 200,
+    "fetchedAt": "2026-09-18T11:25:26.404Z",
+    "headers": {
+      "content-type": "application/json",
+      "access-control-allow-origin": "*",
+      "cache-control": "max-age=60",
+      "last-modified": "Fri, 18 Sep 2026 06:46:44 GMT",
+      "etag": "W/\"46a8f462f6ffefe2f3545fa7b3aecf16\"",
+      "age": "38",
+      "server": "AmazonS3",
+      "content-encoding": "br",
+      "vary": "Accept-Encoding, Origin"
+    },
+    "bytes": 8307,
+    "error": null,
+    "savedAs": "tests/fixtures/bosai-TC2630-probabilityThrough-20260918.json",
+    "head300": "{\"targetDatetime\":\"2026-09-18T15:00:00+09:00\",\"validtime\":[\"2026-09-19T15:00:00+09:00\",\"2026-09-20T15:00:00+09:00\",\"2026-09-21T15:00:00+09:00\",\"2026-09-22T15:00:00+09:00\",\"2026-09-23T15:00:00+09:00\"],\"probability\":{\"011011\":[0,0,0,0,0],\"011012\":[0,0,0,0,0],\"011013\":[0,0,0,0,0],\"012011\":[0,0,0,0,0],\""
+  },
+  "https://www.jma.go.jp/bosai/typhoon/data/TC2630/specifications.json": {
+    "url": "https://www.jma.go.jp/bosai/typhoon/data/TC2630/specifications.json",
+    "finalUrl": "https://www.jma.go.jp/bosai/typhoon/data/TC2630/specifications.json",
+    "status": 200,
+    "fetchedAt": "2026-09-18T11:25:38.690Z",
+    "headers": {
+      "content-type": "application/json",
+      "access-control-allow-origin": "*",
+      "cache-control": "max-age=60",
+      "last-modified": "Fri, 18 Sep 2026 09:41:21 GMT",
+      "etag": "W/\"b5fa6634aa194daac5adb59cbbc56756\"",
+      "age": "50",
+      "server": "AmazonS3",
+      "content-encoding": "br",
+      "vary": "Accept-Encoding, Origin"
+    },
+    "bytes": 3976,
+    "error": null,
+    "savedAs": "tests/fixtures/bosai-TC2630-specifications-20260918.json",
+    "head300": "[{\"part\":\"title\",\"issue\":{\"JST\":\"2026-09-18T18:45:00+09:00\",\"UTC\":\"2026-09-18T09:45:00Z\"},\"typhoonNumber\":\"2625\",\"name\":{\"jp\":\"ドゥージェン\",\"en\":\"Dujuan\"},\"category\":{\"jp\":\"台風\",\"en\":\"STS\"}},{\"part\":{\"jp\":\"実況\",\"en\":\"Analysis\"},\"maximumWind\":{\"sustained\":{\"m/s\":\"30\",\"kt\":\"60\",\"note\":\"中心付近\"},\"gust\":{\"m/s\":\""
+  },
+  "https://www.jma.go.jp/bosai/typhoon/data/TC2630/forecast.json": {
+    "url": "https://www.jma.go.jp/bosai/typhoon/data/TC2630/forecast.json",
+    "finalUrl": "https://www.jma.go.jp/bosai/typhoon/data/TC2630/forecast.json",
+    "status": 200,
+    "fetchedAt": "2026-09-18T11:25:40.280Z",
+    "headers": {
+      "content-type": "application/json",
+      "access-control-allow-origin": "*",
+      "cache-control": "max-age=60",
+      "last-modified": "Fri, 18 Sep 2026 09:41:21 GMT",
+      "etag": "W/\"7886cef3ee4ca730266eb7bc6b31d653\"",
+      "age": "52",
+      "server": "AmazonS3",
+      "content-encoding": "br",
+      "vary": "Accept-Encoding, Origin"
+    },
+    "bytes": 4555,
+    "error": null,
+    "savedAs": "tests/fixtures/bosai-TC2630-forecast-20260918.json",
+    "head300": "[{\"part\":\"title\",\"issue\":{\"JST\":\"2026-09-18T18:45:00+09:00\",\"UTC\":\"2026-09-18T09:45:00Z\"},\"typhoonNumber\":\"2625\",\"name\":{\"jp\":\"ドゥージェン\",\"en\":\"Dujuan\"}},{\"part\":{\"jp\":\"実況\",\"en\":\"Analysis\"},\"advancedHours\":0,\"validtime\":{\"JST\":\"2026-09-18T18:00:00+09:00\",\"UTC\":\"2026-09-18T09:00:00Z\"},\"track\":{\"preTypho"
+  },
+  "https://www.jma.go.jp/bosai/common/const/area.json": {
+    "url": "https://www.jma.go.jp/bosai/common/const/area.json",
+    "finalUrl": "https://www.jma.go.jp/bosai/common/const/area.json",
+    "status": 200,
+    "fetchedAt": "2026-09-18T11:26:28.230Z",
+    "headers": {
+      "content-type": "application/json",
+      "access-control-allow-origin": "*",
+      "cache-control": "max-age=60",
+      "last-modified": "Mon, 14 Sep 2026 04:10:33 GMT",
+      "etag": "W/\"9755207a4fb58dd17e88f4350a71b044\"",
+      "age": "40",
+      "server": "AmazonS3",
+      "content-encoding": "br",
+      "vary": "Accept-Encoding, Origin"
+    },
+    "bytes": 262108,
+    "error": null,
+    "savedAs": "tests/fixtures/area.json",
+    "head300": "{\"centers\":{\"010100\":{\"name\":\"北海道地方\",\"enName\":\"Hokkaido\",\"officeName\":\"札幌管区気象台\",\"children\":[\"011000\",\"012000\",\"013000\",\"014030\",\"014100\",\"015000\",\"016000\",\"017000\"]},\"010200\":{\"name\":\"東北地方\",\"enName\":\"Tohoku\",\"officeName\":\"仙台管区気象台\",\"children\":[\"020000\",\"030000\",\"040000\",\"050000\",\"060000\",\"070000\"]},\""
+  },
+  "https://www.data.jma.go.jp/developer/xml/feed/extra.xml": {
+    "url": "https://www.data.jma.go.jp/developer/xml/feed/extra.xml",
+    "finalUrl": "https://www.data.jma.go.jp/developer/xml/feed/extra.xml",
+    "status": 200,
+    "fetchedAt": "2026-09-18T11:27:09.538Z",
+    "headers": {
+      "content-type": "text/xml",
+      "cache-control": "max-age=60",
+      "last-modified": "Fri, 18 Sep 2026 11:24:16 GMT",
+      "etag": "W/\"ccba72b37742911ebc50847a8d6405b0\"",
+      "age": "3",
+      "server": "AmazonS3",
+      "content-encoding": "br",
+      "vary": "Accept-Encoding, Origin"
+    },
+    "bytes": 192976,
+    "error": null,
+    "savedAs": "tests/fixtures/extra-20260918T2026JST.xml",
+    "head300": "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<feed xmlns=\"http://www.w3.org/2005/Atom\" lang=\"ja\">\n  <title>高頻度（随時）</title>\n  <subtitle>JMAXML publishing feed</subtitle>\n  <updated>2026-09-18T20:23:52+09:00</updated>\n  <id>https://www.data.jma.go.jp/developer/xml/feed/extra.xml#short_1789730632</id>\n  <lin"
+  },
+  "https://www.jma.go.jp/bosai/common/const/class20relm.json": {
+    "url": "https://www.jma.go.jp/bosai/common/const/class20relm.json",
+    "finalUrl": "https://www.jma.go.jp/bosai/common/const/class20relm.json",
+    "status": 200,
+    "fetchedAt": "2026-09-18T11:27:11.388Z",
+    "headers": {
+      "content-type": "application/json",
+      "access-control-allow-origin": "*",
+      "cache-control": "max-age=60",
+      "last-modified": "Thu, 17 Sep 2026 01:08:31 GMT",
+      "etag": "W/\"5b0cab7e89b9d7ca88531ab589ad0c9e\"",
+      "server": "AmazonS3",
+      "content-encoding": "br",
+      "vary": "Accept-Encoding, Origin"
+    },
+    "bytes": 144039,
+    "error": null,
+    "savedAs": "tests/fixtures/class20relm.json",
+    "head300": "{\"0110000\":{\"name\":\"札幌市\",\"ne\":[43.1894,141.5054],\"sw\":[42.7807,140.9905]},\"0120200\":{\"name\":\"函館市\",\"ne\":[42.0094,141.1874],\"sw\":[41.7101,140.6924]},\"0120300\":{\"name\":\"小樽市\",\"ne\":[43.2399,141.2918],\"sw\":[43.0608,140.8448]},\"0120400\":{\"name\":\"旭川市\",\"ne\":[43.9562,142.7415],\"sw\":[43.5443,142.1488]},\"012050"
+  },
+  "https://www.data.jma.go.jp/developer/xml/data/20260918094043_0_VPTW60_010000.xml": {
+    "url": "https://www.data.jma.go.jp/developer/xml/data/20260918094043_0_VPTW60_010000.xml",
+    "finalUrl": "https://www.data.jma.go.jp/developer/xml/data/20260918094043_0_VPTW60_010000.xml",
+    "status": 200,
+    "fetchedAt": "2026-09-18T11:28:51.124Z",
+    "headers": {
+      "content-type": "text/xml",
+      "cache-control": "max-age=86400",
+      "last-modified": "Fri, 18 Sep 2026 09:41:22 GMT",
+      "etag": "W/\"230b29ca6ff6f5bb721ebb68c592cb8e\"",
+      "age": "6411",
+      "server": "AmazonS3",
+      "content-encoding": "gzip",
+      "vary": "Accept-Encoding, Origin"
+    },
+    "bytes": 26361,
+    "error": null,
+    "savedAs": "tests/fixtures/vptw60-20260918-0940Z.xml",
+    "head300": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Report xmlns=\"http://xml.kishou.go.jp/jmaxml1/\" xmlns:jmx=\"http://xml.kishou.go.jp/jmaxml1/\" xmlns:jmx_add=\"http://xml.kishou.go.jp/jmaxml1/addition1/\">\n<Control>\n<Title>台風解析・予報情報（５日予報）（Ｈ３０）</Title>\n<DateTime>2026-09-18T09:40:42Z</DateTime>\n<Status>通常</Status>"
+  },
+  "https://www.data.jma.go.jp/developer/xml/data/20260918064500_0_VPTA50_010000.xml": {
+    "url": "https://www.data.jma.go.jp/developer/xml/data/20260918064500_0_VPTA50_010000.xml",
+    "finalUrl": "https://www.data.jma.go.jp/developer/xml/data/20260918064500_0_VPTA50_010000.xml",
+    "status": 200,
+    "fetchedAt": "2026-09-18T11:28:53.347Z",
+    "headers": {
+      "content-type": "text/xml",
+      "cache-control": "max-age=86400",
+      "last-modified": "Fri, 18 Sep 2026 06:45:26 GMT",
+      "etag": "W/\"55a48dc326c746edd5266229cf6c1e04\"",
+      "age": "16971",
+      "server": "AmazonS3",
+      "content-encoding": "gzip",
+      "vary": "Accept-Encoding, Origin"
+    },
+    "bytes": 1848908,
+    "error": null,
+    "savedAs": "tests/fixtures/vpta50-20260918-0645Z.xml",
+    "head300": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n<Report xmlns=\"http://xml.kishou.go.jp/jmaxml1/\" xmlns:jmx=\"http://xml.kishou.go.jp/jmaxml1/\">\n<Control>\n<Title>台風の暴風域に入る確率</Title>\n<DateTime>2026-09-18T06:43:06Z</DateTime>\n<Status>通常</Status>\n<EditorialOffice>気象庁本庁</EditorialOffice>\n<Publishin"
+  },
+  "https://www.data.jma.go.jp/developer/xml/feed/extra_l.xml": {
+    "url": "https://www.data.jma.go.jp/developer/xml/feed/extra_l.xml",
+    "finalUrl": "https://www.data.jma.go.jp/developer/xml/feed/extra_l.xml",
+    "status": 200,
+    "fetchedAt": "2026-09-18T11:30:43.272Z",
+    "headers": {
+      "content-type": "text/xml",
+      "cache-control": "max-age=60",
+      "last-modified": "Fri, 18 Sep 2026 11:24:16 GMT",
+      "etag": "W/\"4dcc5fe1db60f46fe189f5c103d0aca0\"",
+      "age": "35",
+      "server": "AmazonS3",
+      "content-encoding": "br",
+      "vary": "Accept-Encoding, Origin"
+    },
+    "bytes": 3199159,
+    "error": null,
+    "savedAs": "tests/fixtures/extra_l-20260918T2030JST.xml",
+    "head300": "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<feed xmlns=\"http://www.w3.org/2005/Atom\" lang=\"ja\">\n  <title>長期（随時）</title>\n  <subtitle>JMAXML publishing feed</subtitle>\n  <updated>2026-09-18T20:23:52+09:00</updated>\n  <id>https://www.data.jma.go.jp/developer/xml/feed/extra.xml#long_1789730632</id>\n  <link "
+  },
+  "https://www.jma.go.jp/bosai/typhoon/data/TC2606/specifications.json": {
+    "url": "https://www.jma.go.jp/bosai/typhoon/data/TC2606/specifications.json",
+    "finalUrl": "https://www.jma.go.jp/bosai/typhoon/data/TC2606/specifications.json",
+    "status": 404,
+    "fetchedAt": "2026-09-18T11:31:20.659Z",
+    "headers": {
+      "content-type": "text/html",
+      "last-modified": "Wed, 11 Dec 2024 08:27:03 GMT",
+      "etag": "W/\"713849bc8f1a01c61a4341da8aca8199\"",
+      "age": "77754",
+      "server": "AmazonS3",
+      "content-encoding": "gzip",
+      "vary": "Accept-Encoding, Origin"
+    },
+    "bytes": 2203,
+    "error": null,
+    "savedAs": null,
+    "head300": "<!DOCTYPE html>\r\n<html lang=\"ja\">\r\n  <head>\r\n    <meta charset=\"utf-8\" />\r\n    <meta name=\"robots\" content=\"noindex\">\r\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\r\n    <link rel=\"icon\" href=\"/favicon.ico\" type=\"image/x-icon\">\r\n    <meta name=\"Author\" content=\"気象庁 Japan M"
+  },
+  "https://www.jma.go.jp/bosai/typhoon/data/targetTc.json [Origin付き]": {
+    "url": "https://www.jma.go.jp/bosai/typhoon/data/targetTc.json",
+    "finalUrl": "https://www.jma.go.jp/bosai/typhoon/data/targetTc.json",
+    "status": 200,
+    "fetchedAt": "2026-09-18T11:33:55.165Z",
+    "headers": {
+      "content-type": "application/json",
+      "content-length": "106",
+      "access-control-allow-origin": "*",
+      "cache-control": "max-age=60",
+      "last-modified": "Fri, 18 Sep 2026 09:41:23 GMT",
+      "etag": "\"23816d429a085e6a74f97c61bc4b945d\"",
+      "age": "22",
+      "server": "AmazonS3",
+      "vary": "Accept-Encoding"
+    },
+    "bytes": 106,
+    "error": null,
+    "savedAs": null,
+    "requestOrigin": "https://hundred-days.pages.dev",
+    "head300": "[{\"tropicalCyclone\":\"TC2630\",\"typhoonNumber\":\"2625\",\"category\":\"STS\",\"issue\":\"2026-09-18T18:45:00+09:00\"}]"
+  },
+  "https://www.jma.go.jp/bosai/typhoon/data/prob50kt/targetTimes.json [Origin付き]": {
+    "url": "https://www.jma.go.jp/bosai/typhoon/data/prob50kt/targetTimes.json",
+    "finalUrl": "https://www.jma.go.jp/bosai/typhoon/data/prob50kt/targetTimes.json",
+    "status": 200,
+    "fetchedAt": "2026-09-18T11:33:55.507Z",
+    "headers": {
+      "content-type": "application/json",
+      "access-control-allow-origin": "*",
+      "cache-control": "max-age=60",
+      "last-modified": "Fri, 18 Sep 2026 06:46:43 GMT",
+      "etag": "W/\"b7cf49726963b21604928d8c59d1fdf0\"",
+      "age": "52",
+      "server": "AmazonS3",
+      "content-encoding": "br",
+      "vary": "Accept-Encoding"
+    },
+    "bytes": 4486,
+    "error": null,
+    "savedAs": null,
+    "requestOrigin": "https://hundred-days.pages.dev",
+    "head300": "[{\"basetime\":\"20260918060000\",\"member\":\"TC2630\",\"validtime\":\"20260918090000\",\"element\":\"timeseries\"},{\"basetime\":\"20260918060000\",\"member\":\"TC2630\",\"validtime\":\"20260918120000\",\"element\":\"timeseries\"},{\"basetime\":\"20260918060000\",\"member\":\"TC2630\",\"validtime\":\"20260918150000\",\"element\":\"timeseries\"}"
+  },
+  "https://www.jma.go.jp/bosai/typhoon/data/TC2630/probabilityTimeseries.json [Origin付き]": {
+    "url": "https://www.jma.go.jp/bosai/typhoon/data/TC2630/probabilityTimeseries.json",
+    "finalUrl": "https://www.jma.go.jp/bosai/typhoon/data/TC2630/probabilityTimeseries.json",
+    "status": 200,
+    "fetchedAt": "2026-09-18T11:33:56.037Z",
+    "headers": {
+      "content-type": "application/json",
+      "access-control-allow-origin": "*",
+      "cache-control": "max-age=60",
+      "last-modified": "Fri, 18 Sep 2026 06:46:44 GMT",
+      "etag": "W/\"f9310dbb4e80c36f373719318181ef87\"",
+      "age": "8",
+      "server": "AmazonS3",
+      "content-encoding": "br",
+      "vary": "Accept-Encoding"
+    },
+    "bytes": 35591,
+    "error": null,
+    "savedAs": null,
+    "requestOrigin": "https://hundred-days.pages.dev",
+    "head300": "{\"targetDatetime\":\"2026-09-18T15:00:00+09:00\",\"validtime\":[\"2026-09-18T18:00:00+09:00\",\"2026-09-18T21:00:00+09:00\",\"2026-09-19T00:00:00+09:00\",\"2026-09-19T03:00:00+09:00\",\"2026-09-19T06:00:00+09:00\",\"2026-09-19T09:00:00+09:00\",\"2026-09-19T12:00:00+09:00\",\"2026-09-19T15:00:00+09:00\",\"2026-09-19T18:00"
+  },
+  "https://www.jma.go.jp/bosai/common/const/area.json [Origin付き]": {
+    "url": "https://www.jma.go.jp/bosai/common/const/area.json",
+    "finalUrl": "https://www.jma.go.jp/bosai/common/const/area.json",
+    "status": 200,
+    "fetchedAt": "2026-09-18T11:33:56.481Z",
+    "headers": {
+      "content-type": "application/json",
+      "access-control-allow-origin": "*",
+      "cache-control": "max-age=60",
+      "last-modified": "Mon, 14 Sep 2026 04:10:33 GMT",
+      "etag": "W/\"9755207a4fb58dd17e88f4350a71b044\"",
+      "age": "8",
+      "server": "AmazonS3",
+      "content-encoding": "br",
+      "vary": "Accept-Encoding"
+    },
+    "bytes": 262108,
+    "error": null,
+    "savedAs": null,
+    "requestOrigin": "https://hundred-days.pages.dev",
+    "head300": "{\"centers\":{\"010100\":{\"name\":\"北海道地方\",\"enName\":\"Hokkaido\",\"officeName\":\"札幌管区気象台\",\"children\":[\"011000\",\"012000\",\"013000\",\"014030\",\"014100\",\"015000\",\"016000\",\"017000\"]},\"010200\":{\"name\":\"東北地方\",\"enName\":\"Tohoku\",\"officeName\":\"仙台管区気象台\",\"children\":[\"020000\",\"030000\",\"040000\",\"050000\",\"060000\",\"070000\"]},\""
+  },
+  "https://www.data.jma.go.jp/developer/xml/feed/extra.xml [Origin付き]": {
+    "url": "https://www.data.jma.go.jp/developer/xml/feed/extra.xml",
+    "finalUrl": "https://www.data.jma.go.jp/developer/xml/feed/extra.xml",
+    "status": 200,
+    "fetchedAt": "2026-09-18T11:34:07.288Z",
+    "headers": {
+      "content-type": "text/xml",
+      "access-control-allow-origin": "*",
+      "cache-control": "max-age=60",
+      "last-modified": "Fri, 18 Sep 2026 11:30:39 GMT",
+      "etag": "W/\"f42eccbad6f2c31d60c8ecaecdc71691\"",
+      "age": "1",
+      "server": "AmazonS3",
+      "content-encoding": "br",
+      "vary": "Accept-Encoding"
+    },
+    "bytes": 194530,
+    "error": null,
+    "savedAs": null,
+    "requestOrigin": "https://hundred-days.pages.dev",
+    "head300": "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<feed xmlns=\"http://www.w3.org/2005/Atom\" lang=\"ja\">\n  <title>高頻度（随時）</title>\n  <subtitle>JMAXML publishing feed</subtitle>\n  <updated>2026-09-18T20:30:20+09:00</updated>\n  <id>https://www.data.jma.go.jp/developer/xml/feed/extra.xml#short_1789731020</id>\n  <lin"
+  },
+  "https://www.data.jma.go.jp/developer/xml/data/20260918094043_0_VPTW60_010000.xml [Origin付き]": {
+    "url": "https://www.data.jma.go.jp/developer/xml/data/20260918094043_0_VPTW60_010000.xml",
+    "finalUrl": "https://www.data.jma.go.jp/developer/xml/data/20260918094043_0_VPTW60_010000.xml",
+    "status": 200,
+    "fetchedAt": "2026-09-18T11:34:07.536Z",
+    "headers": {
+      "content-type": "text/xml",
+      "access-control-allow-origin": "*",
+      "cache-control": "max-age=86400",
+      "last-modified": "Fri, 18 Sep 2026 09:41:22 GMT",
+      "etag": "W/\"230b29ca6ff6f5bb721ebb68c592cb8e\"",
+      "age": "6727",
+      "server": "AmazonS3",
+      "content-encoding": "gzip",
+      "vary": "Accept-Encoding"
+    },
+    "bytes": 26361,
+    "error": null,
+    "savedAs": null,
+    "requestOrigin": "https://hundred-days.pages.dev",
+    "head300": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Report xmlns=\"http://xml.kishou.go.jp/jmaxml1/\" xmlns:jmx=\"http://xml.kishou.go.jp/jmaxml1/\" xmlns:jmx_add=\"http://xml.kishou.go.jp/jmaxml1/addition1/\">\n<Control>\n<Title>台風解析・予報情報（５日予報）（Ｈ３０）</Title>\n<DateTime>2026-09-18T09:40:42Z</DateTime>\n<Status>通常</Status>"
+  },
+  "https://www.jma.go.jp/bosai/typhoon/data/TC2606/specifications.json [Origin付き]": {
+    "url": "https://www.jma.go.jp/bosai/typhoon/data/TC2606/specifications.json",
+    "finalUrl": "https://www.jma.go.jp/bosai/typhoon/data/TC2606/specifications.json",
+    "status": 404,
+    "fetchedAt": "2026-09-18T11:34:17.865Z",
+    "headers": {
+      "content-type": "text/html",
+      "access-control-allow-origin": "*",
+      "last-modified": "Wed, 11 Dec 2024 08:27:03 GMT",
+      "etag": "W/\"713849bc8f1a01c61a4341da8aca8199\"",
+      "age": "77931",
+      "server": "AmazonS3",
+      "content-encoding": "br",
+      "vary": "Accept-Encoding"
+    },
+    "bytes": 2203,
+    "error": null,
+    "savedAs": null,
+    "requestOrigin": "https://hundred-days.pages.dev",
+    "head300": "<!DOCTYPE html>\r\n<html lang=\"ja\">\r\n  <head>\r\n    <meta charset=\"utf-8\" />\r\n    <meta name=\"robots\" content=\"noindex\">\r\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\r\n    <link rel=\"icon\" href=\"/favicon.ico\" type=\"image/x-icon\">\r\n    <meta name=\"Author\" content=\"気象庁 Japan M"
+  }
+}

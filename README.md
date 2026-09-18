@@ -50,6 +50,7 @@
 | 039 | [足もとを掘る](apps/day-039-dig-below/) | https://hundred-days.pages.dev/day-039-dig-below/ |
 | 040 | [その避難場所、洪水でも？](apps/day-040-shelter-by-hazard/) | https://hundred-days.pages.dev/day-040-shelter-by-hazard/ |
 | 041 | [この道、誰がケガしてる？](apps/day-041-who-got-hurt/) | https://hundred-days.pages.dev/day-041-who-got-hurt/ |
+| 042 | [台風、うちに来る？](apps/day-042-typhoon-coming/) | https://hundred-days.pages.dev/day-042-typhoon-coming/ |
 
 ## 1日アプリのルール
 

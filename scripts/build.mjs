@@ -152,6 +152,9 @@ const WIKIMEDIA_CONNECT = [
 /* 外部へ接続するのはここに挙げたDayだけ。ほかのアプリは同一オリジンに閉じている。
    ⚠️ 新しいDayで外部のAPIを叩くときは、ここに足さないとブラウザ側で接続が止まる（黙って失敗する）。 */
 const CONNECT_BY_APP = {
+  /* day-042 は気象庁の台風JSON（一覧・確率・実況・予報の幾何）を直接読む。確率は全国ぶんが1本で届くので、
+     現在地や選んだ市区町村は端末の外に出ない。海岸線は同梱 */
+  'day-042-typhoon-coming': 'https://www.jma.go.jp',
   /* day-041 は事故データを同梱していて、外へ出るのは地図タイルと住所検索だけ（どちらも国土地理院）。
      現在地の座標は端末の中で事故データと突き合わせるので、外へは出ない */
   'day-041-who-got-hurt': 'https://cyberjapandata.gsi.go.jp https://msearch.gsi.go.jp',
