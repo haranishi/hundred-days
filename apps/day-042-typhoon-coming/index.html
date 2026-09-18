@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>台風、うちに来る？</title>
+  <meta name="description" content="市区町村をひとつ決めると、その地域が台風の暴風域に入る確率を、気象庁の発表そのままに1行で答えます。3時間ごとの確率の帯と、経路・予報円・暴風警戒域の地図も出します。">
+  <meta name="share:text" content="台風、うちに来る？ — 自分の街が暴風域に入る確率を、気象庁の発表から1行で">
+  <link rel="stylesheet" href="./app.css">
+  <script type="module" src="./app.js"></script>
+  <link rel="stylesheet" href="./shared/share.css">
+  <script src="./shared/share.js" defer></script>
+</head>
+<body>
+  <header class="site-head">
+    <p class="eyebrow">DAY 042 / 台風の暴風域に入る確率</p>
+    <h1>台風、<wbr>うちに来る？</h1>
+    <p class="lede">予報円の絵ではなく、自分の街の数字で読む。</p>
+  </header>
+  <main id="app" data-state="loading" data-town="0">
+    <section id="picker" aria-labelledby="picker-title">
+      <h2 id="picker-title">場所を決める</h2>
+      <button id="locate" type="button">現在地から探す</button>
+      <form id="town-form" class="town-form">
+        <label class="town-label" for="town-input">市区町村名で探す</label>
+        <div class="town-row">
+          <input id="town-input" name="town" type="search" autocomplete="off" placeholder="市区町村名か読み" aria-describedby="town-hint">
+          <button id="search-town" type="submit">探す</button>
+        </div>
+        <!-- 例は欄の中に入れない。狭い画面ではプレースホルダが途中で切れて読めなくなる -->
+        <p id="town-hint" class="town-hint">例：由利本荘、しぶや</p>
+      </form>
+      <div id="candidates"></div>
+      <p id="place-name" hidden></p>
+      <p id="place-note" hidden></p>
+    </section>
+
+    <!-- 読み上げる範囲は入れ子にしない。囲みに aria-live を付けると、
+         中の role="status"（#status）と role="alert"（#failure）が二重に読まれる -->
+    <div class="answer-area">
+      <section id="answer" aria-live="polite" hidden>
+        <h2 id="answer-text"></h2>
+        <p id="answer-sub"></p>
+        <p id="answer-meta"></p>
+      </section>
+      <p id="status" role="status" hidden></p>
+      <section id="failure" role="alert" hidden>
+        <h2>台風の情報を表示できません</h2>
+        <p id="failure-text"></p>
+        <button id="retry" type="button">もう一度ためす</button>
+      </section>
+      <section id="none" aria-live="polite" hidden>
+        <h2 id="none-text">いま、台風はありません。</h2>
+        <p id="none-sub"></p>
+      </section>
+    </div>
+
+    <p class="caveat" id="caveat">0%は「入らない」の保証ではありません。確率は気象庁の地域区分ごとの値で、このサイトの予想ではありません。</p>
+
+    <section id="others-area" hidden aria-labelledby="others-title">
+      <h2 id="others-title">ほかに発表されている台風</h2>
+      <ol id="others"></ol>
+    </section>
+
+    <section id="intro" aria-labelledby="intro-title">
+      <h2 id="intro-title">使い方は3つ</h2>
+      <ol class="steps">
+        <li><strong>場所を決める</strong>。現在地か、市区町村名で探す</li>
+        <li><strong>答えの1行</strong>と、<strong>3時間ごとの帯</strong>を読む</li>
+        <li><strong>地図</strong>で、予報円との位置関係を見る</li>
+      </ol>
+    </section>
+
+    <section id="band-area" hidden aria-labelledby="band-title">
+      <h2 id="band-title">3時間ごとの確率</h2>
+      <!-- 目盛りは帯の外に置く。棒1本が8px前後しかないので、中に入れると数字とぶつかる -->
+      <div class="band-plot">
+        <ol id="band" class="band"></ol>
+        <span class="band-tick band-tick-100" aria-hidden="true">100%</span>
+        <span class="band-tick band-tick-50" aria-hidden="true">50%</span>
+        <span class="band-tick band-tick-25" aria-hidden="true">25%</span>
+      </div>
+      <p class="note" id="band-note">棒1本が3時間、縦は0〜100%です。数字は5%以上のときだけ出しています（画面が狭いときは山だけ）。</p>
+    </section>
+
+    <section id="typhoon" hidden aria-labelledby="typhoon-title">
+      <h2 id="typhoon-title"></h2>
+      <p id="typhoon-scale"></p>
+      <dl id="typhoon-facts"></dl>
+      <p id="typhoon-issue" class="note"></p>
+    </section>
+
+    <section id="map-area" hidden aria-labelledby="map-title">
+      <h2 id="map-title">経路と予報円</h2>
+      <canvas id="map" role="img" aria-label="台風の経路・予報円・暴風警戒域と、選んだ場所の地図"></canvas>
+      <p class="map-legend" aria-hidden="true">
+        <span class="legend-item"><span class="key key-track"></span>これまでの経路</span>
+        <span class="legend-item"><span class="key key-circle"></span>予報円</span>
+        <span class="legend-item"><span class="key key-storm"></span>暴風警戒域</span>
+        <span class="legend-item"><span class="key key-home"></span>選んだ場所</span>
+      </p>
+      <p id="map-status" class="note"></p>
+    </section>
+
+    <section id="top-areas" hidden aria-labelledby="top-title">
+      <h2 id="top-title">5日以内の確率が高い地域</h2>
+      <ol id="top-list"></ol>
+      <p class="note">気象庁が確率を出している375地域のうち、上位5つです。</p>
+    </section>
+
+    <section class="limits" aria-labelledby="limits-title">
+      <h2 id="limits-title">この数字で分からないこと</h2>
+      <ol class="limit-list">
+        <li>確率は<strong>気象庁の発表値そのまま</strong>です。このサイトの予想ではありません。発表は数時間ごとで、その間は前の値が出ます</li>
+        <li>「暴風域に入る確率」は<strong>気象庁の地域区分ごと</strong>の値です。同じ市内でも場所で差はありますが、数字は地域単位です</li>
+        <li>0%は「入らない」の保証ではありません。5日より先の値はありません</li>
+        <li>暴風域は風速25m/s以上の範囲です。雨・高潮・河川・土砂の見込みは別の情報で、ここにはありません</li>
+        <li>台風が温帯低気圧に変わると発表は終わります。風が弱まるとは限りません</li>
+      </ol>
+    </section>
+
+    <footer class="sources" aria-label="出典">
+      <p class="source-line">出典：気象庁「<a href="https://www.jma.go.jp/bosai/map.html#contents=typhoon">台風情報</a>」（台風の暴風域に入る確率・台風解析予報）</p>
+      <p class="source-line">このページは、同データを<strong>加工して作成</strong>しています（市区町村コードから地域コードをたどって確率を引く、時刻の区間表示、地図への描画）。確率・位置・半径の値そのものは変えていません。</p>
+      <p class="source-line">この加工と表示を行ったのは<strong>このページの作成者（個人）</strong>で、気象庁や国が作成・監修したものではありません。</p>
+      <p>利用条件：<a href="https://www.jma.go.jp/jma/kishou/info/coment.html">気象庁ホームページの利用規約</a>／海岸線：<a href="https://www.naturalearthdata.com/">Natural Earth</a>（パブリックドメイン）</p>
+      <p>雨・洪水・土砂の見込みは気象庁「<a href="https://www.jma.go.jp/bosai/risk/">キキクル</a>」、避難場所は「<a href="../day-040-shelter-by-hazard/">その避難場所、洪水でも？</a>」へ。</p>
+      <p class="privacy">市区町村の一覧はこのページに同梱していて、現在地との照合は端末の中で終わります。<strong>入力した語も現在地の座標も外に出しません。</strong>外へ出るのは、気象庁から全国ぶんの発表を取りに行く通信だけです。</p>
+      <div id="share"></div>
+    </footer>
+  </main>
+</body>
+</html>

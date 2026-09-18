@@ -1,0 +1,555 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom" lang="ja">
+  <title>長期（随時）</title>
+  <subtitle>JMAXML publishing feed</subtitle>
+  <updated>2026-09-18T20:23:52+09:00</updated>
+  <id>https://www.data.jma.go.jp/developer/xml/feed/extra.xml#long_1789730632</id>
+  <link rel="related" href="https://www.jma.go.jp/"/>
+  <link rel="self" href="https://www.data.jma.go.jp/developer/xml/feed/extra.xml"/>
+  <link rel="hub" href="http://alert-hub.appspot.com/"/>
+  <rights type="html"><![CDATA[
+<a href="https://www.jma.go.jp/jma/kishou/info/coment.html">利用規約</a>,
+<a href="https://www.jma.go.jp/jma/en/copyright.html">Terms of Use</a>
+]]></rights>
+  <!-- 注記: 元の 5459 entry から title に「台風」を含む 54 件だけを残した抜粋。元ファイルは 3,199,159 bytes。 -->
+  <entry>
+    <title>台風解析・予報情報（５日予報）（Ｈ３０）</title>
+    <id>https://www.data.jma.go.jp/developer/xml/data/20260918094043_0_VPTW60_010000.xml</id>
+    <updated>2026-09-18T09:40:42Z</updated>
+    <author>
+      <name>気象庁</name>
+    </author>
+    <link type="application/xml" href="https://www.data.jma.go.jp/developer/xml/data/20260918094043_0_VPTW60_010000.xml"/>
+    <content type="text">【台風解析・予報情報】</content>
+  </entry>
+  <entry>
+    <title>台風の暴風域に入る確率</title>
+    <id>https://www.data.jma.go.jp/developer/xml/data/20260918064500_0_VPTA50_010000.xml</id>
+    <updated>2026-09-18T06:43:06Z</updated>
+    <author>
+      <name>気象庁</name>
+    </author>
+    <link type="application/xml" href="https://www.data.jma.go.jp/developer/xml/data/20260918064500_0_VPTA50_010000.xml"/>
+    <content type="text">【台風の暴風域に入る確率】</content>
+  </entry>
+  <entry>
+    <title>台風解析・予報情報（５日予報）（Ｈ３０）</title>
+    <id>https://www.data.jma.go.jp/developer/xml/data/20260918064105_0_VPTW60_010000.xml</id>
+    <updated>2026-09-18T06:41:04Z</updated>
+    <author>
+      <name>気象庁</name>
+    </author>
+    <link type="application/xml" href="https://www.data.jma.go.jp/developer/xml/data/20260918064105_0_VPTW60_010000.xml"/>
+    <content type="text">【台風解析・予報情報】</content>
+  </entry>
+  <entry>
+    <title>台風解析・予報情報（５日予報）（Ｈ３０）</title>
+    <id>https://www.data.jma.go.jp/developer/xml/data/20260918034016_0_VPTW60_010000.xml</id>
+    <updated>2026-09-18T03:40:15Z</updated>
+    <author>
+      <name>気象庁</name>
+    </author>
+    <link type="application/xml" href="https://www.data.jma.go.jp/developer/xml/data/20260918034016_0_VPTW60_010000.xml"/>
+    <content type="text">【台風解析・予報情報】</content>
+  </entry>
+  <entry>
+    <title>台風の暴風域に入る確率</title>
+    <id>https://www.data.jma.go.jp/developer/xml/data/20260918005500_0_VPTA50_010000.xml</id>
+    <updated>2026-09-18T00:53:06Z</updated>
+    <author>
+      <name>気象庁</name>
+    </author>
+    <link type="application/xml" href="https://www.data.jma.go.jp/developer/xml/data/20260918005500_0_VPTA50_010000.xml"/>
+    <content type="text">【台風の暴風域に入る確率】</content>
+  </entry>
+  <entry>
+    <title>台風解析・予報情報（５日予報）（Ｈ３０）</title>
+    <id>https://www.data.jma.go.jp/developer/xml/data/20260918004922_0_VPTW60_010000.xml</id>
+    <updated>2026-09-18T00:49:21Z</updated>
+    <author>
+      <name>気象庁</name>
+    </author>
+    <link type="application/xml" href="https://www.data.jma.go.jp/developer/xml/data/20260918004922_0_VPTW60_010000.xml"/>
+    <content type="text">【台風解析・予報情報】</content>
+  </entry>
+  <entry>
+    <title>台風解析・予報情報（５日予報）（Ｈ３０）</title>
+    <id>https://www.data.jma.go.jp/developer/xml/data/20260917214027_0_VPTW60_010000.xml</id>
+    <updated>2026-09-17T21:40:26Z</updated>
+    <author>
+      <name>気象庁</name>
+    </author>
+    <link type="application/xml" href="https://www.data.jma.go.jp/developer/xml/data/20260917214027_0_VPTW60_010000.xml"/>
+    <content type="text">【台風解析・予報情報】</content>
+  </entry>
+  <entry>
+    <title>台風の暴風域に入る確率</title>
+    <id>https://www.data.jma.go.jp/developer/xml/data/20260917184430_0_VPTA50_010000.xml</id>
+    <updated>2026-09-17T18:43:05Z</updated>
+    <author>
+      <name>気象庁</name>
+    </author>
+    <link type="application/xml" href="https://www.data.jma.go.jp/developer/xml/data/20260917184430_0_VPTA50_010000.xml"/>
+    <content type="text">【台風の暴風域に入る確率】</content>
+  </entry>
+  <entry>
+    <title>台風解析・予報情報（５日予報）（Ｈ３０）</title>
+    <id>https://www.data.jma.go.jp/developer/xml/data/20260917184229_0_VPTW60_010000.xml</id>
+    <updated>2026-09-17T18:42:28Z</updated>
+    <author>
+      <name>気象庁</name>
+    </author>
+    <link type="application/xml" href="https://www.data.jma.go.jp/developer/xml/data/20260917184229_0_VPTW60_010000.xml"/>
+    <content type="text">【台風解析・予報情報】</content>
+  </entry>
+  <entry>
+    <title>台風解析・予報情報（５日予報）（Ｈ３０）</title>
+    <id>https://www.data.jma.go.jp/developer/xml/data/20260917154630_0_VPTW60_010000.xml</id>
+    <updated>2026-09-17T15:46:29Z</updated>
+    <author>
+      <name>気象庁</name>
+    </author>
+    <link type="application/xml" href="https://www.data.jma.go.jp/developer/xml/data/20260917154630_0_VPTW60_010000.xml"/>
+    <content type="text">【台風解析・予報情報】</content>
+  </entry>
+  <entry>
+    <title>台風の暴風域に入る確率</title>
+    <id>https://www.data.jma.go.jp/developer/xml/data/20260917124930_0_VPTA50_010000.xml</id>
+    <updated>2026-09-17T12:48:04Z</updated>
+    <author>
+      <name>気象庁</name>
+    </author>
+    <link type="application/xml" href="https://www.data.jma.go.jp/developer/xml/data/20260917124930_0_VPTA50_010000.xml"/>
+    <content type="text">【台風の暴風域に入る確率】</content>
+  </entry>
+  <entry>
+    <title>台風解析・予報情報（５日予報）（Ｈ３０）</title>
+    <id>https://www.data.jma.go.jp/developer/xml/data/20260917124441_0_VPTW60_010000.xml</id>
+    <updated>2026-09-17T12:44:40Z</updated>
+    <author>
+      <name>気象庁</name>
+    </author>
+    <link type="application/xml" href="https://www.data.jma.go.jp/developer/xml/data/20260917124441_0_VPTW60_010000.xml"/>
+    <content type="text">【台風解析・予報情報】</content>
+  </entry>
+  <entry>
+    <title>台風解析・予報情報（５日予報）（Ｈ３０）</title>
+    <id>https://www.data.jma.go.jp/developer/xml/data/20260917094016_0_VPTW60_010000.xml</id>
+    <updated>2026-09-17T09:40:15Z</updated>
+    <author>
+      <name>気象庁</name>
+    </author>
+    <link type="application/xml" href="https://www.data.jma.go.jp/developer/xml/data/20260917094016_0_VPTW60_010000.xml"/>
+    <content type="text">【台風解析・予報情報】</content>
+  </entry>
+  <entry>
+    <title>台風の暴風域に入る確率</title>
+    <id>https://www.data.jma.go.jp/developer/xml/data/20260917064430_0_VPTA50_010000.xml</id>
+    <updated>2026-09-17T06:43:05Z</updated>
+    <author>
+      <name>気象庁</name>
+    </author>
+    <link type="application/xml" href="https://www.data.jma.go.jp/developer/xml/data/20260917064430_0_VPTA50_010000.xml"/>
+    <content type="text">【台風の暴風域に入る確率】</content>
+  </entry>
+  <entry>
+    <title>台風解析・予報情報（５日予報）（Ｈ３０）</title>
+    <id>https://www.data.jma.go.jp/developer/xml/data/20260917064048_0_VPTW60_010000.xml</id>
+    <updated>2026-09-17T06:40:47Z</updated>
+    <author>
+      <name>気象庁</name>
+    </author>
+    <link type="application/xml" href="https://www.data.jma.go.jp/developer/xml/data/20260917064048_0_VPTW60_010000.xml"/>
+    <content type="text">【台風解析・予報情報】</content>
+  </entry>
+  <entry>
+    <title>台風解析・予報情報（５日予報）（Ｈ３０）</title>
+    <id>https://www.data.jma.go.jp/developer/xml/data/20260917034055_0_VPTW60_010000.xml</id>
+    <updated>2026-09-17T03:40:54Z</updated>
+    <author>
+      <name>気象庁</name>
+    </author>
+    <link type="application/xml" href="https://www.data.jma.go.jp/developer/xml/data/20260917034055_0_VPTW60_010000.xml"/>
+    <content type="text">【台風解析・予報情報】</content>
+  </entry>
+  <entry>
+    <title>台風の暴風域に入る確率</title>
+    <id>https://www.data.jma.go.jp/developer/xml/data/20260917004430_0_VPTA50_010000.xml</id>
+    <updated>2026-09-17T00:43:05Z</updated>
+    <author>
+      <name>気象庁</name>
+    </author>
+    <link type="application/xml" href="https://www.data.jma.go.jp/developer/xml/data/20260917004430_0_VPTA50_010000.xml"/>
+    <content type="text">【台風の暴風域に入る確率】</content>
+  </entry>
+  <entry>
+    <title>台風解析・予報情報（５日予報）（Ｈ３０）</title>
+    <id>https://www.data.jma.go.jp/developer/xml/data/20260917004054_0_VPTW60_010000.xml</id>
+    <updated>2026-09-17T00:40:53Z</updated>
+    <author>
+      <name>気象庁</name>
+    </author>
+    <link type="application/xml" href="https://www.data.jma.go.jp/developer/xml/data/20260917004054_0_VPTW60_010000.xml"/>
+    <content type="text">【台風解析・予報情報】</content>
+  </entry>
+  <entry>
+    <title>台風解析・予報情報（５日予報）（Ｈ３０）</title>
+    <id>https://www.data.jma.go.jp/developer/xml/data/20260916214108_0_VPTW60_010000.xml</id>
+    <updated>2026-09-16T21:41:07Z</updated>
+    <author>
+      <name>気象庁</name>
+    </author>
+    <link type="application/xml" href="https://www.data.jma.go.jp/developer/xml/data/20260916214108_0_VPTW60_010000.xml"/>
+    <content type="text">【台風解析・予報情報】</content>
+  </entry>
+  <entry>
+    <title>台風の暴風域に入る確率</title>
+    <id>https://www.data.jma.go.jp/developer/xml/data/20260916185001_0_VPTA50_010000.xml</id>
+    <updated>2026-09-16T18:48:07Z</updated>
+    <author>
+      <name>気象庁</name>
+    </author>
+    <link type="application/xml" href="https://www.data.jma.go.jp/developer/xml/data/20260916185001_0_VPTA50_010000.xml"/>
+    <content type="text">【台風の暴風域に入る確率】</content>
+  </entry>
+  <entry>
+    <title>台風解析・予報情報（５日予報）（Ｈ３０）</title>
+    <id>https://www.data.jma.go.jp/developer/xml/data/20260916184619_0_VPTW60_010000.xml</id>
+    <updated>2026-09-16T18:46:18Z</updated>
+    <author>
+      <name>気象庁</name>
+    </author>
+    <link type="application/xml" href="https://www.data.jma.go.jp/developer/xml/data/20260916184619_0_VPTW60_010000.xml"/>
+    <content type="text">【台風解析・予報情報】</content>
+  </entry>
+  <entry>
+    <title>台風解析・予報情報（５日予報）（Ｈ３０）</title>
+    <id>https://www.data.jma.go.jp/developer/xml/data/20260916154626_0_VPTW60_010000.xml</id>
+    <updated>2026-09-16T15:46:25Z</updated>
+    <author>
+      <name>気象庁</name>
+    </author>
+    <link type="application/xml" href="https://www.data.jma.go.jp/developer/xml/data/20260916154626_0_VPTW60_010000.xml"/>
+    <content type="text">【台風解析・予報情報】</content>
+  </entry>
+  <entry>
+    <title>台風の暴風域に入る確率</title>
+    <id>https://www.data.jma.go.jp/developer/xml/data/20260916131500_0_VPTA50_010000.xml</id>
+    <updated>2026-09-16T13:13:05Z</updated>
+    <author>
+      <name>気象庁</name>
+    </author>
+    <link type="application/xml" href="https://www.data.jma.go.jp/developer/xml/data/20260916131500_0_VPTA50_010000.xml"/>
+    <content type="text">【台風の暴風域に入る確率】</content>
+  </entry>
+  <entry>
+    <title>台風解析・予報情報（５日予報）（Ｈ３０）</title>
+    <id>https://www.data.jma.go.jp/developer/xml/data/20260916130812_0_VPTW60_010000.xml</id>
+    <updated>2026-09-16T13:08:12Z</updated>
+    <author>
+      <name>気象庁</name>
+    </author>
+    <link type="application/xml" href="https://www.data.jma.go.jp/developer/xml/data/20260916130812_0_VPTW60_010000.xml"/>
+    <content type="text">【台風解析・予報情報】</content>
+  </entry>
+  <entry>
+    <title>台風解析・予報情報（５日予報）（Ｈ３０）</title>
+    <id>https://www.data.jma.go.jp/developer/xml/data/20260916100728_0_VPTW60_010000.xml</id>
+    <updated>2026-09-16T10:07:27Z</updated>
+    <author>
+      <name>気象庁</name>
+    </author>
+    <link type="application/xml" href="https://www.data.jma.go.jp/developer/xml/data/20260916100728_0_VPTW60_010000.xml"/>
+    <content type="text">【台風解析・予報情報】</content>
+  </entry>
+  <entry>
+    <title>台風の暴風域に入る確率</title>
+    <id>https://www.data.jma.go.jp/developer/xml/data/20260916071500_0_VPTA50_010000.xml</id>
+    <updated>2026-09-16T07:13:05Z</updated>
+    <author>
+      <name>気象庁</name>
+    </author>
+    <link type="application/xml" href="https://www.data.jma.go.jp/developer/xml/data/20260916071500_0_VPTA50_010000.xml"/>
+    <content type="text">【台風の暴風域に入る確率】</content>
+  </entry>
+  <entry>
+    <title>台風解析・予報情報（５日予報）（Ｈ３０）</title>
+    <id>https://www.data.jma.go.jp/developer/xml/data/20260916071020_0_VPTW60_010000.xml</id>
+    <updated>2026-09-16T07:10:19Z</updated>
+    <author>
+      <name>気象庁</name>
+    </author>
+    <link type="application/xml" href="https://www.data.jma.go.jp/developer/xml/data/20260916071020_0_VPTW60_010000.xml"/>
+    <content type="text">【台風解析・予報情報】</content>
+  </entry>
+  <entry>
+    <title>台風解析・予報情報（５日予報）（Ｈ３０）</title>
+    <id>https://www.data.jma.go.jp/developer/xml/data/20260916041041_0_VPTW60_010000.xml</id>
+    <updated>2026-09-16T04:10:40Z</updated>
+    <author>
+      <name>気象庁</name>
+    </author>
+    <link type="application/xml" href="https://www.data.jma.go.jp/developer/xml/data/20260916041041_0_VPTW60_010000.xml"/>
+    <content type="text">【台風解析・予報情報】</content>
+  </entry>
+  <entry>
+    <title>台風の暴風域に入る確率</title>
+    <id>https://www.data.jma.go.jp/developer/xml/data/20260916011500_0_VPTA50_010000.xml</id>
+    <updated>2026-09-16T01:13:05Z</updated>
+    <author>
+      <name>気象庁</name>
+    </author>
+    <link type="application/xml" href="https://www.data.jma.go.jp/developer/xml/data/20260916011500_0_VPTA50_010000.xml"/>
+    <content type="text">【台風の暴風域に入る確率】</content>
+  </entry>
+  <entry>
+    <title>台風解析・予報情報（５日予報）（Ｈ３０）</title>
+    <id>https://www.data.jma.go.jp/developer/xml/data/20260916011027_0_VPTW60_010000.xml</id>
+    <updated>2026-09-16T01:10:26Z</updated>
+    <author>
+      <name>気象庁</name>
+    </author>
+    <link type="application/xml" href="https://www.data.jma.go.jp/developer/xml/data/20260916011027_0_VPTW60_010000.xml"/>
+    <content type="text">【台風解析・予報情報】</content>
+  </entry>
+  <entry>
+    <title>台風解析・予報情報（５日予報）（Ｈ３０）</title>
+    <id>https://www.data.jma.go.jp/developer/xml/data/20260915221109_0_VPTW60_010000.xml</id>
+    <updated>2026-09-15T22:11:08Z</updated>
+    <author>
+      <name>気象庁</name>
+    </author>
+    <link type="application/xml" href="https://www.data.jma.go.jp/developer/xml/data/20260915221109_0_VPTW60_010000.xml"/>
+    <content type="text">【台風解析・予報情報】</content>
+  </entry>
+  <entry>
+    <title>台風の暴風域に入る確率</title>
+    <id>https://www.data.jma.go.jp/developer/xml/data/20260915191501_0_VPTA50_010000.xml</id>
+    <updated>2026-09-15T19:13:04Z</updated>
+    <author>
+      <name>気象庁</name>
+    </author>
+    <link type="application/xml" href="https://www.data.jma.go.jp/developer/xml/data/20260915191501_0_VPTA50_010000.xml"/>
+    <content type="text">【台風の暴風域に入る確率】</content>
+  </entry>
+  <entry>
+    <title>台風解析・予報情報（５日予報）（Ｈ３０）</title>
+    <id>https://www.data.jma.go.jp/developer/xml/data/20260915191043_0_VPTW60_010000.xml</id>
+    <updated>2026-09-15T19:10:42Z</updated>
+    <author>
+      <name>気象庁</name>
+    </author>
+    <link type="application/xml" href="https://www.data.jma.go.jp/developer/xml/data/20260915191043_0_VPTW60_010000.xml"/>
+    <content type="text">【台風解析・予報情報】</content>
+  </entry>
+  <entry>
+    <title>台風解析・予報情報（５日予報）（Ｈ３０）</title>
+    <id>https://www.data.jma.go.jp/developer/xml/data/20260915162251_0_VPTW60_010000.xml</id>
+    <updated>2026-09-15T16:22:50Z</updated>
+    <author>
+      <name>気象庁</name>
+    </author>
+    <link type="application/xml" href="https://www.data.jma.go.jp/developer/xml/data/20260915162251_0_VPTW60_010000.xml"/>
+    <content type="text">【台風解析・予報情報】</content>
+  </entry>
+  <entry>
+    <title>台風の暴風域に入る確率</title>
+    <id>https://www.data.jma.go.jp/developer/xml/data/20260915132030_0_VPTA50_010000.xml</id>
+    <updated>2026-09-15T13:18:05Z</updated>
+    <author>
+      <name>気象庁</name>
+    </author>
+    <link type="application/xml" href="https://www.data.jma.go.jp/developer/xml/data/20260915132030_0_VPTA50_010000.xml"/>
+    <content type="text">【台風の暴風域に入る確率】</content>
+  </entry>
+  <entry>
+    <title>台風解析・予報情報（５日予報）（Ｈ３０）</title>
+    <id>https://www.data.jma.go.jp/developer/xml/data/20260915131514_0_VPTW60_010000.xml</id>
+    <updated>2026-09-15T13:15:13Z</updated>
+    <author>
+      <name>気象庁</name>
+    </author>
+    <link type="application/xml" href="https://www.data.jma.go.jp/developer/xml/data/20260915131514_0_VPTW60_010000.xml"/>
+    <content type="text">【台風解析・予報情報】</content>
+  </entry>
+  <entry>
+    <title>台風解析・予報情報（５日予報）（Ｈ３０）</title>
+    <id>https://www.data.jma.go.jp/developer/xml/data/20260915101015_0_VPTW60_010000.xml</id>
+    <updated>2026-09-15T10:10:15Z</updated>
+    <author>
+      <name>気象庁</name>
+    </author>
+    <link type="application/xml" href="https://www.data.jma.go.jp/developer/xml/data/20260915101015_0_VPTW60_010000.xml"/>
+    <content type="text">【台風解析・予報情報】</content>
+  </entry>
+  <entry>
+    <title>台風の暴風域に入る確率</title>
+    <id>https://www.data.jma.go.jp/developer/xml/data/20260915072030_0_VPTA50_010000.xml</id>
+    <updated>2026-09-15T07:18:07Z</updated>
+    <author>
+      <name>気象庁</name>
+    </author>
+    <link type="application/xml" href="https://www.data.jma.go.jp/developer/xml/data/20260915072030_0_VPTA50_010000.xml"/>
+    <content type="text">【台風の暴風域に入る確率】</content>
+  </entry>
+  <entry>
+    <title>台風解析・予報情報（５日予報）（Ｈ３０）</title>
+    <id>https://www.data.jma.go.jp/developer/xml/data/20260915071317_0_VPTW60_010000.xml</id>
+    <updated>2026-09-15T07:13:16Z</updated>
+    <author>
+      <name>気象庁</name>
+    </author>
+    <link type="application/xml" href="https://www.data.jma.go.jp/developer/xml/data/20260915071317_0_VPTW60_010000.xml"/>
+    <content type="text">【台風解析・予報情報】</content>
+  </entry>
+  <entry>
+    <title>台風解析・予報情報（５日予報）（Ｈ３０）</title>
+    <id>https://www.data.jma.go.jp/developer/xml/data/20260915041418_0_VPTW60_010000.xml</id>
+    <updated>2026-09-15T04:14:17Z</updated>
+    <author>
+      <name>気象庁</name>
+    </author>
+    <link type="application/xml" href="https://www.data.jma.go.jp/developer/xml/data/20260915041418_0_VPTW60_010000.xml"/>
+    <content type="text">【台風解析・予報情報】</content>
+  </entry>
+  <entry>
+    <title>台風の暴風域に入る確率</title>
+    <id>https://www.data.jma.go.jp/developer/xml/data/20260915012001_0_VPTA50_010000.xml</id>
+    <updated>2026-09-15T01:18:05Z</updated>
+    <author>
+      <name>気象庁</name>
+    </author>
+    <link type="application/xml" href="https://www.data.jma.go.jp/developer/xml/data/20260915012001_0_VPTA50_010000.xml"/>
+    <content type="text">【台風の暴風域に入る確率】</content>
+  </entry>
+  <entry>
+    <title>台風解析・予報情報（５日予報）（Ｈ３０）</title>
+    <id>https://www.data.jma.go.jp/developer/xml/data/20260915011529_0_VPTW60_010000.xml</id>
+    <updated>2026-09-15T01:15:28Z</updated>
+    <author>
+      <name>気象庁</name>
+    </author>
+    <link type="application/xml" href="https://www.data.jma.go.jp/developer/xml/data/20260915011529_0_VPTW60_010000.xml"/>
+    <content type="text">【台風解析・予報情報】</content>
+  </entry>
+  <entry>
+    <title>台風解析・予報情報（５日予報）（Ｈ３０）</title>
+    <id>https://www.data.jma.go.jp/developer/xml/data/20260914220016_0_VPTW60_010000.xml</id>
+    <updated>2026-09-14T22:00:16Z</updated>
+    <author>
+      <name>気象庁</name>
+    </author>
+    <link type="application/xml" href="https://www.data.jma.go.jp/developer/xml/data/20260914220016_0_VPTW60_010000.xml"/>
+    <content type="text">【台風解析・予報情報】</content>
+  </entry>
+  <entry>
+    <title>台風の暴風域に入る確率</title>
+    <id>https://www.data.jma.go.jp/developer/xml/data/20260914190500_0_VPTA50_010000.xml</id>
+    <updated>2026-09-14T19:03:04Z</updated>
+    <author>
+      <name>気象庁</name>
+    </author>
+    <link type="application/xml" href="https://www.data.jma.go.jp/developer/xml/data/20260914190500_0_VPTA50_010000.xml"/>
+    <content type="text">【台風の暴風域に入る確率】</content>
+  </entry>
+  <entry>
+    <title>台風解析・予報情報（５日予報）（Ｈ３０）</title>
+    <id>https://www.data.jma.go.jp/developer/xml/data/20260914190050_0_VPTW60_010000.xml</id>
+    <updated>2026-09-14T19:00:49Z</updated>
+    <author>
+      <name>気象庁</name>
+    </author>
+    <link type="application/xml" href="https://www.data.jma.go.jp/developer/xml/data/20260914190050_0_VPTW60_010000.xml"/>
+    <content type="text">【台風解析・予報情報】</content>
+  </entry>
+  <entry>
+    <title>台風解析・予報情報（５日予報）（Ｈ３０）</title>
+    <id>https://www.data.jma.go.jp/developer/xml/data/20260914161050_0_VPTW60_010000.xml</id>
+    <updated>2026-09-14T16:10:49Z</updated>
+    <author>
+      <name>気象庁</name>
+    </author>
+    <link type="application/xml" href="https://www.data.jma.go.jp/developer/xml/data/20260914161050_0_VPTW60_010000.xml"/>
+    <content type="text">【台風解析・予報情報】</content>
+  </entry>
+  <entry>
+    <title>台風の暴風域に入る確率</title>
+    <id>https://www.data.jma.go.jp/developer/xml/data/20260914130500_0_VPTA50_010000.xml</id>
+    <updated>2026-09-14T13:03:05Z</updated>
+    <author>
+      <name>気象庁</name>
+    </author>
+    <link type="application/xml" href="https://www.data.jma.go.jp/developer/xml/data/20260914130500_0_VPTA50_010000.xml"/>
+    <content type="text">【台風の暴風域に入る確率】</content>
+  </entry>
+  <entry>
+    <title>台風解析・予報情報（５日予報）（Ｈ３０）</title>
+    <id>https://www.data.jma.go.jp/developer/xml/data/20260914130022_0_VPTW60_010000.xml</id>
+    <updated>2026-09-14T13:00:21Z</updated>
+    <author>
+      <name>気象庁</name>
+    </author>
+    <link type="application/xml" href="https://www.data.jma.go.jp/developer/xml/data/20260914130022_0_VPTW60_010000.xml"/>
+    <content type="text">【台風解析・予報情報】</content>
+  </entry>
+  <entry>
+    <title>台風解析・予報情報（５日予報）（Ｈ３０）</title>
+    <id>https://www.data.jma.go.jp/developer/xml/data/20260914100042_0_VPTW60_010000.xml</id>
+    <updated>2026-09-14T10:00:42Z</updated>
+    <author>
+      <name>気象庁</name>
+    </author>
+    <link type="application/xml" href="https://www.data.jma.go.jp/developer/xml/data/20260914100042_0_VPTW60_010000.xml"/>
+    <content type="text">【台風解析・予報情報】</content>
+  </entry>
+  <entry>
+    <title>台風の暴風域に入る確率</title>
+    <id>https://www.data.jma.go.jp/developer/xml/data/20260914072000_0_VPTA50_010000.xml</id>
+    <updated>2026-09-14T07:18:06Z</updated>
+    <author>
+      <name>気象庁</name>
+    </author>
+    <link type="application/xml" href="https://www.data.jma.go.jp/developer/xml/data/20260914072000_0_VPTA50_010000.xml"/>
+    <content type="text">【台風の暴風域に入る確率】</content>
+  </entry>
+  <entry>
+    <title>台風解析・予報情報（５日予報）（Ｈ３０）</title>
+    <id>https://www.data.jma.go.jp/developer/xml/data/20260914071634_0_VPTW60_010000.xml</id>
+    <updated>2026-09-14T07:16:33Z</updated>
+    <author>
+      <name>気象庁</name>
+    </author>
+    <link type="application/xml" href="https://www.data.jma.go.jp/developer/xml/data/20260914071634_0_VPTW60_010000.xml"/>
+    <content type="text">【台風解析・予報情報】</content>
+  </entry>
+  <entry>
+    <title>台風解析・予報情報（５日予報）（Ｈ３０）</title>
+    <id>https://www.data.jma.go.jp/developer/xml/data/20260914041636_0_VPTW60_010000.xml</id>
+    <updated>2026-09-14T04:16:35Z</updated>
+    <author>
+      <name>気象庁</name>
+    </author>
+    <link type="application/xml" href="https://www.data.jma.go.jp/developer/xml/data/20260914041636_0_VPTW60_010000.xml"/>
+    <content type="text">【台風解析・予報情報】</content>
+  </entry>
+  <entry>
+    <title>台風の暴風域に入る確率</title>
+    <id>https://www.data.jma.go.jp/developer/xml/data/20260914013500_0_VPTA50_010000.xml</id>
+    <updated>2026-09-14T01:33:06Z</updated>
+    <author>
+      <name>気象庁</name>
+    </author>
+    <link type="application/xml" href="https://www.data.jma.go.jp/developer/xml/data/20260914013500_0_VPTA50_010000.xml"/>
+    <content type="text">【台風の暴風域に入る確率】</content>
+  </entry>
+  <entry>
+    <title>台風解析・予報情報（５日予報）（Ｈ３０）</title>
+    <id>https://www.data.jma.go.jp/developer/xml/data/20260914012911_0_VPTW60_010000.xml</id>
+    <updated>2026-09-14T01:29:10Z</updated>
+    <author>
+      <name>気象庁</name>
+    </author>
+    <link type="application/xml" href="https://www.data.jma.go.jp/developer/xml/data/20260914012911_0_VPTW60_010000.xml"/>
+    <content type="text">【台風解析・予報情報】</content>
+  </entry>
+</feed>
