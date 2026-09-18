@@ -156,6 +156,9 @@ a { color: #1f3f57; text-underline-offset: 3px; }
 .map-legend { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 13px; margin: 8px 0 0; }
 .legend-item { display: inline-flex; align-items: center; gap: 6px; }
 .key { display: inline-block; width: 18px; height: 12px; flex-shrink: 0; }
+/* 地図の × は台風のいまの中心（lib/map.js の drawNow）。凡例に無いと何の印か分からない */
+.key-now { width: 14px; height: 14px; line-height: 14px; text-align: center;
+  color: var(--ink); font-size: 15px; font-weight: 700; }
 .key-track { border-bottom: 2px solid #3d4a52; height: 8px; }
 .key-circle { border: 1.5px dashed var(--deep); border-radius: 50%; width: 14px; height: 14px; }
 .key-storm { background: rgba(28, 63, 86, .18); border: 1px solid rgba(28, 63, 86, .55); }
