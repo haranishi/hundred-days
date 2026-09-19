@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="退去費用の請求内容、気になること、手元の資料を整理して、相談に持っていけるメモを作れます。登録不要。入力は端末の外へ送りません。">
+  <meta name="share:text" content="退去費用、相談の準備 — わかることだけ整理して、相談に持っていけるメモに。">
+  <meta name="theme-color" content="#205749">
+  <title>退去費用、相談の準備 | 100日チャレンジ</title>
+  <link rel="stylesheet" href="shared/share.css">
+  <link rel="stylesheet" href="app.css">
+  <script type="module" src="app.js"></script>
+  <script src="shared/share.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#editor">入力へ進む</a>
+  <header class="site-header wrap">
+    <a class="brand" href="../"><span class="brand-mark" aria-hidden="true">↗</span> 暮らしの小さな道具 <span class="day">DAY 043</span></a>
+    <a class="header-help" href="#consultation">相談先を見る <span aria-hidden="true">↗</span></a>
+  </header>
+  <main class="wrap">
+    <section class="intro" aria-labelledby="app-title">
+      <div>
+        <p class="eyebrow"><span aria-hidden="true"></span> ひとりで判断する、その前に。</p>
+        <h1 id="app-title">退去費用、<br class="mobile-break">相談の準備</h1>
+        <p class="lead">請求内容と気になることを、相談できる形に。<br>わかることだけ選んで、持っていけるメモを作ります。</p>
+      </div>
+      <div class="intro-note"><span class="note-icon" aria-hidden="true">✓</span><div><strong>名前も、住所もいりません。</strong><p>登録不要・書類のアップロード不要<br>入力内容は端末の外へ送りません。</p></div></div>
+    </section>
+    <p class="scope-note">請求の妥当性や支払義務は判断しません。相談に必要な事実を整理するための道具です。</p>
+    <noscript><p class="notice">メモを作るにはJavaScriptを有効にしてください。下の相談先の案内は、そのまま利用できます。</p></noscript>
+
+    <div class="workspace">
+      <section class="editor panel" id="editor" aria-labelledby="step-title">
+        <nav class="steps" aria-label="入力の手順">
+          <button type="button" data-step="0" aria-current="step"><span>1</span>状況</button>
+          <button type="button" data-step="1"><span>2</span>内訳</button>
+          <button type="button" data-step="2"><span>3</span>資料</button>
+        </nav>
+        <form id="consult-form" novalidate autocomplete="off">
+          <div class="form-body">
+            <div class="step-heading"><p class="eyebrow" id="step-counter">STEP 01 / 03</p><h2 id="step-title" tabindex="-1">いま、どんな状況ですか？</h2><p id="step-description" class="muted">空欄のままでも大丈夫。わかるところから。</p></div>
+            <p id="form-error" class="error-message" role="alert" hidden></p>
+            <div class="step-panel" data-panel="0">
+              <div class="two-fields">
+                <div class="field"><label for="stage">退去の状況</label><select id="stage" name="stage"></select></div>
+                <div class="field"><label for="tenure">入居していた期間</label><select id="tenure" name="tenure"></select></div>
+              </div>
+              <div class="field"><label for="payment">今回の請求への支払い</label><select id="payment" name="payment"></select></div>
+              <div class="field"><label for="invoice">請求書に書かれた金額 <span class="optional">任意</span></label><div class="money-input"><input id="invoice" name="invoice" type="text" inputmode="numeric" maxlength="20" placeholder="例：120000" aria-describedby="invoice-help invoice-error"><span>円</span></div><p id="invoice-help" class="field-help">書類に記載された金額をそのまま。敷金は差し引きません。</p><p id="invoice-error" class="field-error" hidden></p></div>
+              <div class="field"><label for="deposit">預けた敷金 <span class="optional">任意</span></label><div class="money-input"><input id="deposit" name="deposit" type="text" inputmode="numeric" maxlength="20" placeholder="わからなければ空欄で" aria-describedby="deposit-help deposit-error"><span>円</span></div><p id="deposit-help" class="field-help">敷金なしとわかっている場合は「0」。礼金は含めません。</p><p id="deposit-error" class="field-error" hidden></p></div>
+            </div>
+            <div class="step-panel" data-panel="1" hidden>
+              <fieldset><legend>請求に含まれている項目 <span class="optional">複数選択可</span></legend><p class="field-help">金額が不明でも選べます。同じ費目が複数ある場合は、その費目の合計を入力してください。</p><div id="charge-fields" class="charge-fields"></div></fieldset>
+              <div class="subtotal"><span id="form-subtotal">内訳は未入力です</span><p>敷金は差し引かず、入力した金額だけを足しています。</p></div>
+              <fieldset class="concerns"><legend>気になっていること <span class="optional">複数選択可</span></legend><div id="concern-fields"></div></fieldset>
+            </div>
+            <div class="step-panel" data-panel="2" hidden>
+              <p class="soft-note">書類や写真を送る必要はありません。手元にあるかだけ確認しましょう。</p>
+              <div id="document-fields"></div>
+              <p class="field-help">全部揃わなくても、まず窓口へ相談できます。見つからない資料は、そのことも伝えてください。</p>
+            </div>
+            <div class="form-actions"><button class="button secondary" type="button" id="back" hidden>戻る</button><button class="button primary" type="button" id="next">次へ：請求の内訳 <span aria-hidden="true">→</span></button></div>
+            <button class="text-button" type="button" id="preview">途中でもメモを見る <span aria-hidden="true">↗</span></button>
+          </div>
+        </form>
+        <div class="draft-area">
+          <label class="check-label"><input type="checkbox" id="remember"><span>この端末に下書きを残す</span></label>
+          <p class="field-help">共有の端末ではオフのままお使いください。</p>
+          <p id="storage-status" class="storage-status" role="status">オフの場合、ページを閉じると入力は消えます。</p>
+          <button type="button" class="text-button reset" id="reset">入力・下書きをすべて消す</button>
+        </div>
+      </section>
+
+      <section class="memo-area" id="memo-area" aria-labelledby="memo-heading">
+        <div class="preview-label"><span class="eyebrow">YOUR CONSULTATION NOTE</span><span class="live-label"><i aria-hidden="true"></i> 入力にあわせて更新</span></div>
+        <article class="paper" id="memo">
+          <header class="paper-header"><div><p class="paper-kicker">相談するときに、手元に。</p><h2 id="memo-heading" tabindex="-1">退去費用の相談メモ</h2></div><span class="paper-mark" aria-hidden="true">NOTE<br>01</span></header>
+          <p class="paper-intro">本人の入力を整理したメモです。<br>請求の妥当性・支払義務を判定するものではありません。</p>
+          <section class="memo-section"><h3><span>01</span>いまの状況</h3><dl id="memo-situation" class="memo-facts"></dl><div class="memo-amounts"><div><span>請求書に書かれた金額</span><strong id="memo-invoice">不明・未入力</strong></div><div><span>預けた敷金</span><strong id="memo-deposit">不明・未入力</strong></div></div><p class="paper-small">敷金は請求書の金額から差し引いていません。</p></section>
+          <section class="memo-section"><h3><span>02</span>請求の内訳</h3><dl id="memo-charges" class="memo-facts"></dl><p id="memo-subtotal" class="memo-subtotal">内訳は未入力です</p><p id="comparison" class="comparison" hidden></p></section>
+          <section class="memo-section"><h3><span>03</span>相談で確認したいこと</h3><ul id="memo-questions" class="question-list"></ul></section>
+          <section class="memo-section"><h3><span>04</span>手元の資料</h3><div id="memo-documents"></div><p class="paper-small">資料がすべて揃っていなくても、まず窓口へ相談してください。</p></section>
+          <div class="paper-bottom"><strong>相談先：消費者ホットライン 188</strong><p>相談は無料・通話料がかかります。受付時間・休業日は窓口ごとに異なります。</p><a href="https://www.kokusen.go.jp/map/" target="_blank" rel="noopener noreferrer">全国の相談窓口の案内 ↗</a></div>
+          <div class="print-sources"><p>個人制作の整理ツールです。公的機関が提供する申込書ではありません。</p><p>参考情報の確認日：2026-09-19</p><div id="print-sources"></div></div>
+        </article>
+        <div class="export-area">
+          <p class="export-heading">このメモを、相談の手元に。</p>
+          <div class="export-buttons"><button type="button" class="button primary" id="copy-memo">メモをコピー</button><button type="button" class="button secondary" id="print-memo">印刷・PDF保存</button><button type="button" class="button secondary" id="download-memo">テキスト保存</button></div>
+          <p class="field-help">PDFは印刷画面の保存先で選べます。相談窓口には自動送信されません。</p>
+          <p id="export-status" class="export-status" role="status"></p>
+          <button type="button" class="text-button" id="edit-again">入力に戻って直す ↑</button>
+        </div>
+      </section>
+    </div>
+
+    <section class="consultation" id="consultation" aria-labelledby="consultation-heading">
+      <div><p class="eyebrow">メモが途中でも、相談できます。</p><h2 id="consultation-heading">ひとりで抱えこまないで。</h2><p>消費者ホットラインから、地域の消費生活相談窓口へ。</p><p class="field-help">相談は無料・通話料がかかります。受付時間・休業日は窓口ごとに異なります。<br>一部のIP電話などでつながらない場合は、地域の窓口に直接連絡してください。</p></div>
+      <div class="contact-actions"><a href="tel:188" class="phone-link"><span>消費者ホットライン</span><strong>188 <span aria-hidden="true">↗</span></strong><small>タップして電話をかける</small></a><a class="directory-link" href="https://www.kokusen.go.jp/map/" target="_blank" rel="noopener noreferrer">地域の相談窓口・受付案内 ↗</a></div>
+    </section>
+    <details class="about"><summary>このアプリについて・参考にした公式情報</summary><p>個人制作の相談準備ツールです。公的機関や弁護士が提供・監修するサービスではありません。請求の法的な判断や減額の保証は行いません。質問文とチェックリストは、このアプリ独自のものです。</p><ul id="source-links"><li><a href="https://www.kokusen.go.jp/news/data/n-20260217_1.html" target="_blank" rel="noopener noreferrer">国民生活センター：原状回復トラブルの案内</a></li><li><a href="https://www.caa.go.jp/policies/policy/local_cooperation/local_consumer_administration/hotline/" target="_blank" rel="noopener noreferrer">消費者庁：消費者ホットラインの案内</a></li></ul><p>参考情報の確認日：2026-09-19。窓口の受付状況など、最新の情報はリンク先でご確認ください。</p></details>
+    <section class="app-sharing" aria-label="アプリの紹介"><p>困っている人に、この道具を。<span>入力した内容は共有されません。</span></p><div id="share"></div></section>
+  </main>
+  <footer class="site-footer wrap"><span>DAY 043 / 100 — 暮らしの小さな道具</span><a href="../privacy.html">プライバシーポリシー</a></footer>
+  <dialog id="reset-dialog" aria-labelledby="reset-title" aria-describedby="reset-description"><h2 id="reset-title">入力と下書きを消しますか？</h2><p id="reset-description">このアプリで入力した内容と、端末内の下書きを消します。この操作は元に戻せません。保存済みのテキスト・PDFは残ります。</p><div class="dialog-actions"><button type="button" class="button secondary" id="cancel-reset" autofocus>消さずに戻る</button><button type="button" class="button danger" id="confirm-reset">すべて消す</button></div></dialog>
+</body>
+</html>
