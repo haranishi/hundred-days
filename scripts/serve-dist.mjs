@@ -3,7 +3,7 @@ import { createServer } from 'node:http';
 import { extname, resolve, sep } from 'node:path';
 
 const host = '127.0.0.1';
-const port = 4173;
+const port = Number(process.env.PLAYWRIGHT_PORT || 4173);
 const root = resolve('dist');
 const types = {
   '.css': 'text/css; charset=utf-8',
