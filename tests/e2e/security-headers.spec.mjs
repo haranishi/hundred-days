@@ -80,7 +80,10 @@ const allows = (sources, host) =>
   });
 
 const codeFiles = (directory) => {
-  const skip = new Set(['tests', 'tools', 'shared']);
+  /* node_modules は自分で書いたコードではない。Day 044 は vendor/three.js を組むために
+     アプリ直下に依存を入れるので、入れたままだと esbuild の registry.npmjs.org を拾う
+     （CIは npm ci をリポジトリ直下でしか走らせないので、ローカルだけ落ちる）。 */
+  const skip = new Set(['tests', 'tools', 'shared', 'node_modules']);
   const walk = (place) =>
     readdirSync(place, { withFileTypes: true }).flatMap((entry) => {
       if (entry.isDirectory()) return skip.has(entry.name) ? [] : walk(join(place, entry.name));

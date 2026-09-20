@@ -49,6 +49,8 @@ $('zoom-out').addEventListener('click', () => { state.view = null; world.zoom(-1
 $('rotate-left').addEventListener('click', () => { state.view = null; world.rotate(.35); cameraUI(); });
 $('toggle-labels').addEventListener('click', () => { state.labels = !state.labels; world.labels(state.labels); $('toggle-labels').setAttribute('aria-pressed', String(state.labels)); });
 $('info-button').addEventListener('click', () => $('info-dialog').showModal());
+$('share-button').addEventListener('click', () => { $('info-dialog').showModal(); $('share').scrollIntoView({ block: 'center' }); });
+$('share-button').disabled = false;
 $('close-info').addEventListener('click', () => $('info-dialog').close());
 $('info-dialog').addEventListener('click', event => { if (event.target === $('info-dialog')) { const r = event.target.getBoundingClientRect(); if (event.clientX < r.left || event.clientX > r.right || event.clientY < r.top || event.clientY > r.bottom) event.target.close(); } });
 reducedMotion.addEventListener('change', event => { if (event.matches) { state.paused = true; renderUI(); } });

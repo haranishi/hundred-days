@@ -16,6 +16,13 @@ test('公開しているアプリが1つ以上ある', () => {
   expect(published.length).toBeGreaterThan(0);
 });
 
+async function openShare(page, dir) {
+  await page.goto(`/${dir}/`);
+  // 全画面ビューでは共有欄をダイアログに置く。利用者と同じ入口を操作して検証する。
+  const opener = page.getByRole('button', { name: 'このアプリを共有する', exact: true });
+  if (await opener.count()) await opener.click();
+}
+
 for (const { dir, meta } of published) {
   test.describe(`Day ${String(meta.day).padStart(3, '0')} ${meta.title}`, () => {
     const url = `https://hundred-days.pages.dev/${dir}/`;
@@ -35,7 +42,7 @@ for (const { dir, meta } of published) {
     });
 
     test('シェア欄が据え付けられている', async ({ page }) => {
-      await page.goto(`/${dir}/`);
+      await openShare(page, dir);
       const share = page.locator('.share');
       await expect(share).toHaveCount(1, '二重に据え付けていないこと');
       await expect(share).toBeVisible();
@@ -62,7 +69,7 @@ for (const { dir, meta } of published) {
     });
 
     test('ボタンが枠で見分けられる（地色に対して3:1以上）', async ({ page }) => {
-      await page.goto(`/${dir}/`);
+      await openShare(page, dir);
 
       /* 枠は currentColor から作った半透明なので、指定値だけ読んでも見え方は分からない。
          地色に混ぜてから測る（文字側で opacity を見ていなかったのと同じ穴を、枠でも作らない）。 */
@@ -117,7 +124,7 @@ for (const { dir, meta } of published) {
 
     test('シェアのボタンが押せる大きさで、スマホ幅でも崩れない', async ({ page }) => {
       await page.setViewportSize({ width: 390, height: 844 });
-      await page.goto(`/${dir}/`);
+      await openShare(page, dir);
 
       const heights = await page
         .locator('.share__button')
@@ -137,7 +144,7 @@ test('コピーボタンは公開URLをそのまま渡す', async ({ page, conte
   await context.grantPermissions(['clipboard-read', 'clipboard-write']);
 
   const { dir } = published[published.length - 1];
-  await page.goto(`/${dir}/`);
+  await openShare(page, dir);
   await page.getByRole('button', { name: 'リンクをコピー' }).click();
 
   await expect(page.locator('.share__said')).toHaveText('コピーしました');
