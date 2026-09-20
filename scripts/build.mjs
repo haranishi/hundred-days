@@ -99,14 +99,15 @@ mkdirSync(distDir, { recursive: true });
 // リポジトリ直下の static/ の中身（OG画像など）を dist/ 直下へ。無くてもビルドは通す
 if (existsSync(staticDir)) cpSync(staticDir, distDir, { recursive: true });
 
-/* アプリのフォルダは原則そのまま配信するが、次の2つは外す。
+/* アプリのフォルダは原則そのまま配信するが、次の開発用ディレクトリは外す。
    - tools/cache/ は素材の置き場（day-031 の行政区域 zip で 890MB）。同梱データは data/ に
      書き出し済みなので配信には要らない。CI には cache が無いので、消えるのは手元の dist だけ
    - tests/ は、中の fixtures に第三者の生データが入っている（day-033 の気象庁の実応答、
      day-034 の潮位表、day-023 のNDLの生レスポンス）。ここに置いたつもりのものが本番URLから
      落とせる状態になるので外す。E2E は dist ではなく各Dayのソースからフィクスチャを読んでいるので影響しない
+   - node_modules/ はビルド用の依存。必要なブラウザコードだけ vendor/ にまとめる。
    ⚠️ 除外は名前の列挙なので、新しく「配信したくないフォルダ」を作ったらここに足すこと */
-const EXCLUDED_DIRS = [`tools${sep}cache`, 'tests'];
+const EXCLUDED_DIRS = [`tools${sep}cache`, 'tests', 'node_modules'];
 const isExcluded = (source) => EXCLUDED_DIRS.some((dir) => {
   const marker = `${sep}${dir}`;
   // そのフォルダ自身（末尾一致）と、その中身（区切り文字が続く）だけを外す。
@@ -117,7 +118,8 @@ const skipToolsCache = (source) => !isExcluded(source);
 
 for (const app of apps) {
   if (app.published) {
-    cpSync(join(appsDir, app.dir), join(distDir, app.dir), { recursive: true, filter: skipToolsCache });
+    const filter = source => skipToolsCache(source) && !(app.dir === 'day-044-train-here' && source.includes(`${sep}tools`));
+    cpSync(join(appsDir, app.dir), join(distDir, app.dir), { recursive: true, filter });
   } else if (app.hasShot || app.hasDemo) {
     // 「制作記録のみ」のDayはアプリ本体を公開しないが、一覧に出すスクショとデモ動画だけはコピーする
     mkdirSync(join(distDir, app.dir), { recursive: true });

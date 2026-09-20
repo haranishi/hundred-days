@@ -1,0 +1,17 @@
+{
+  "day": 44,
+  "season": 2,
+  "title": "Tokyo Railscape — 東京の電車を、眺める。",
+  "description": "東京の5路線をイメージした3Dミニチュア。架空の48編成を追いかけ、前方の風景を眺められます。実際の運行・ダイヤとは連動しません。",
+  "tags": ["交通", "3D", "Three.js", "東京"],
+  "status": "published",
+  "screenshot": "screenshot.webp",
+  "publicUrl": "https://hundred-days.pages.dev/day-044-train-here/",
+  "startedAt": "2026-09-20",
+  "finishedAt": "2026-09-20",
+  "actualMinutes": null,
+  "sourceOfIdea": "東京周辺の電車が走る風景を、動く3Dモデルで眺めたいという提案。",
+  "aiHandled": ["設計と実装、検証"],
+  "humanHandled": ["電車位置の可視化というテーマと制作の依頼"],
+  "failuresAndFixes": [{"problem":"最初の案を2Dの乗車案内と解釈した。","fix":"補足を受け、街・線路・車両を主役にした3Dビューへ変更。"}]
+}
