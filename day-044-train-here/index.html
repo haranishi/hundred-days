@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="東京の5路線をイメージした3Dミニチュア。架空の48編成を追いかけ、前方の風景を眺めるデモです。実運行・実ダイヤとは連動しません。">
+  <meta name="share:text" content="東京の電車を、風景として眺める。Tokyo Railscape — 5路線の3D架空デモ。実際の運行とは連動しません。">
+  <meta name="theme-color" content="#ecf1e9">
+  <title>Tokyo Railscape — 東京の電車を、眺める。</title>
+  <link rel="stylesheet" href="app.css">
+  <link rel="stylesheet" href="shared/share.css">
+  <script type="module" src="boot.js"></script>
+  <script src="shared/share.js" defer></script>
+</head>
+<body>
+  <a href="#scene-canvas" class="skip-link">3Dビューの操作へ</a>
+  <header class="topbar">
+    <a href="../" class="brand" aria-label="100日チャレンジの一覧へ"><span class="brand-icon" aria-hidden="true">▰</span><span>TOKYO <b>RAILSCAPE</b></span><span class="brand-tag">3D</span></a>
+    <div class="topbar-right"><span class="edition">DAY 044 <i></i> A LITTLE TOKYO</span><button id="info-button" class="icon-button" aria-label="データと操作の説明を開く" title="データと操作の説明">?</button></div>
+  </header>
+  <main class="viewer" id="viewer" aria-label="東京の電車の3Dビュー">
+    <canvas id="scene-canvas" tabindex="0" aria-label="東京の街・線路・電車の立体モデル。ドラッグで回転、ホイールで拡大。列車は一覧からも選べます。"></canvas>
+    <div id="city-labels" aria-hidden="true"></div>
+    <section class="intro-panel">
+      <p class="eyebrow">A CITY IN MOTION</p>
+      <h1>東京の電車を、<br>風景として眺める。</h1>
+      <p class="intro-copy">線路をたどる、小さな東京。</p>
+      <div id="data-status" class="data-status" data-state="demo" role="status"><span class="status-dot" aria-hidden="true"></span><span id="mode-label">3Dデモ · 架空の運行</span></div>
+      <button id="mode-button" class="primary-button" disabled>デモを最初から <span aria-hidden="true">↗</span></button>
+    </section>
+    <details class="routes-panel glass" id="routes-panel" open>
+      <summary><span>表示する路線</span><span id="route-total">5 ROUTES</span><span class="chevron" aria-hidden="true">⌄</span></summary>
+      <div id="route-toggles" class="route-toggles"></div>
+      <div class="route-panel-foot"><label for="train-picker">電車を選んで、近くで見る</label><select id="train-picker" disabled><option value="">電車を準備しています</option></select><button id="next-train" type="button" disabled>次の電車を見る →</button></div>
+    </details>
+    <div class="scene-badges"><span class="scene-badge"><span aria-hidden="true">◇</span> 3D MINIATURE</span><span id="scene-mode" class="scene-badge mode-badge demo">DEMO · 架空の運行</span></div>
+    <div class="camera-tools glass" aria-label="カメラ操作">
+      <button id="zoom-in" aria-label="街に近づく" title="街に近づく">＋</button>
+      <button id="zoom-out" aria-label="街から離れる" title="街から離れる">−</button>
+      <span class="tool-rule"></span>
+      <button id="rotate-left" aria-label="視点を左へ回転" title="視点を左へ回転">↶</button>
+      <button id="reset-camera" aria-label="都心の全景に戻す" title="都心の全景">⌂</button>
+      <span class="tool-rule"></span>
+      <button id="toggle-labels" aria-label="駅名を表示" aria-pressed="true" title="駅名の表示切替">Aa</button>
+    </div>
+    <div class="selected-panel glass" id="train-detail" hidden>
+      <div class="selection-top"><span class="selection-dot" id="selected-color"></span><p class="eyebrow" id="detail-kind">架空の列車</p><button id="clear-selection" class="close-button" aria-label="列車の選択を解除">×</button></div>
+      <h2 id="detail-title"></h2>
+      <p id="detail-location" class="detail-location"></p>
+      <div class="follow-actions"><button id="follow-train" aria-pressed="false">電車を追いかける <span aria-hidden="true">↗</span></button><button id="ride-train" aria-pressed="false">前方の風景</button></div>
+      <p id="detail-note" class="detail-note"></p>
+    </div>
+    <div class="empty-routes glass" id="empty-routes" hidden>路線を選ぶと、線路と電車が表示されます。</div>
+    <div class="playback glass" id="playback" hidden aria-label="架空デモの再生">
+      <button id="play-pause" aria-label="架空デモを一時停止" aria-pressed="false"><span id="play-symbol" aria-hidden="true">Ⅱ</span></button>
+      <div class="playback-label"><span>DEMO TIME</span><output id="demo-clock">00:00</output></div>
+      <div class="speed-options" aria-label="デモの再生速度"><button data-speed="1" aria-pressed="true">1×</button><button data-speed="3" aria-pressed="false">3×</button><button data-speed="6" aria-pressed="false">6×</button></div>
+      <span class="train-count"><b id="visible-count">0</b> 編成</span>
+    </div>
+    <nav class="view-presets glass" id="view-presets" aria-label="眺める場所"><span class="preset-caption">VIEW</span></nav>
+    <div class="scene-caption"><span id="camera-caption">ドラッグで回転 · スクロールで拡大</span><span>街並み・線形・高さは概略モデル</span></div>
+    <p class="demo-disclaimer" id="demo-disclaimer">架空の動作サンプル · 実際の運行・ダイヤではありません</p>
+    <div class="loading-screen" id="loading-screen"><span class="loading-mark" aria-hidden="true">▰</span><strong>小さな東京を、組み立てています。</strong><span>街・線路・電車の3Dモデルを準備中</span></div>
+    <div class="fatal-screen" id="fatal-screen" hidden role="alert"><strong>3Dの街を表示できませんでした</strong><p id="fatal-message">WebGLに対応したブラウザで、もう一度お試しください。</p><button id="reload-page" class="primary-button">再読み込み</button></div>
+    <noscript><div class="fatal-screen"><strong>3D表示にはJavaScriptが必要です。</strong></div></noscript>
+  </main>
+  <dialog id="info-dialog">
+    <div class="dialog-heading"><p class="eyebrow">ABOUT THIS LITTLE TOKYO</p><button id="close-info" class="close-button" aria-label="説明を閉じる">×</button></div>
+    <h2>電車が走る風景を、手のひらに。</h2>
+    <p>このアプリは、東京の街と電車を眺める3Dビューです。乗換・到着時刻の案内ではありません。</p>
+    <h3>眺め方</h3>
+    <p>ドラッグで回転、ホイールまたは2本指で拡大・縮小。右ドラッグまたは2本指の移動で街を動かせます。キーボードでは3Dビューにフォーカスして矢印キーで移動できます。</p>
+    <p>電車をクリックするか路線パネルの一覧から選び、「電車を追いかける」「前方の風景」を試してください。カメラを自分で操作すると追跡を終了します。</p>
+    <h3>実際の運行とは分けて表示しています</h3>
+    <p>この公開版は架空デモ専用です。48編成の動き、再生時間、速度は実際の運行・ダイヤと無関係で、実データの取得や配信はしません。乗車判断には鉄道会社の公式情報をご確認ください。</p>
+    <h3>3Dモデルについて</h3>
+    <p>駅の代表位置をもとにした独自の概略モデルです。建物、軌道の曲線、高さ、4両で表した編成は簡略化しています。東京の街並みや実際の車両を精密に復元したものではありません。中央線などは都心側の一部区間を表示しています。</p>
+    <p>駅の代表座標：<a href="https://www.wikidata.org/wiki/Wikidata:Licensing" target="_blank" rel="noopener noreferrer">Wikidata（CC0）</a>の構造化データを小数4桁に丸めています。取得日と各駅の出典は<a href="data/SOURCES.md">出典一覧</a>を参照してください。</p>
+    <p>描画：<a href="https://threejs.org/" target="_blank" rel="noopener noreferrer">Three.js</a>（<a href="vendor/LICENSE-three.txt">MIT License</a>）。モデルはこのアプリで生成しています。Blender用のファイルや外部の3D建物データを読み込む方式ではありません。</p>
+    <p>現在地や個人情報を取得しません。設定は保存せず、アプリの共有URLにも操作内容を含めません。個人制作の試作で、鉄道会社の公式サービスではありません。</p>
+    <div id="share"></div>
+    <a href="../privacy.html" class="privacy-link">プライバシーポリシー</a>
+  </dialog>
+</body>
+</html>

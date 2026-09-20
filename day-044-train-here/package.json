@@ -1,0 +1,9 @@
+{
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "connect": "node tools/connect.mjs",
+    "vendor": "esbuild tools/vendor-entry.js --bundle --minify --format=esm --legal-comments=eof --outfile=vendor/three.js"
+  },
+  "dependencies": { "esbuild": "0.25.12", "three": "0.186.0" }
+}
