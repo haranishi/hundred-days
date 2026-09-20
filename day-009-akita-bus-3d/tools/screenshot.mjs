@@ -14,7 +14,7 @@ import { dirname, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
 const appDir = resolve(dirname(fileURLToPath(import.meta.url)), "..");
-const repoRoot = resolve(appDir, "../..");
+const repoRoot = resolve(appDir, "..");
 const PAGE_PATH = "/day-009-akita-bus-3d/";
 const API_PATTERN = "**/api/day-009/vehicles";
 
