@@ -1,11 +1,11 @@
-// apps/day-NNN-*/demo.mp4（720×1280・縦型）と screenshot.webp（1200×750）を作る。
+// day-NNN-*/demo.mp4（720×1280・縦型）と screenshot.webp（1200×750）を作る。
 //
 // このリポジトリは依存パッケージゼロを保つため、Playwright は依存に入れない。
 // 別プロジェクトの Playwright を借りて実行する：
 //
 //   PLAYWRIGHT=/path/to/playwright/index.js node scripts/record-demo.mjs --day 4
 //
-// 各Dayの操作の振り付けは apps/day-NNN-*/demo-scenario.mjs に置く。
+// 各Dayの操作の振り付けは day-NNN-*/demo-scenario.mjs に置く。
 //   export default async function (page, h) { ... }
 //   h.pause(ms) / h.slide(sel, from, to, stepMs) / h.scrollTo(sel)
 //
@@ -38,13 +38,13 @@ const videoOnly = args.includes('--video-only');
 const shotOnly = args.includes('--shot-only');
 
 const padded = String(day).padStart(3, '0');
-const dir = readdirSync(join(root, 'apps')).find((d) => d.startsWith(`day-${padded}-`));
+const dir = readdirSync(root).find((d) => d.startsWith(`day-${padded}-`));
 if (!dir) {
-  console.error(`apps/day-${padded}-* が見つかりません`);
+  console.error(`day-${padded}-* が見つかりません`);
   process.exit(1);
 }
 
-const appDir = join(root, 'apps', dir);
+const appDir = join(root, dir);
 const indexUrl = pathToFileURL(join(appDir, 'index.html')).href;
 const scenarioPath = join(appDir, 'demo-scenario.mjs');
 

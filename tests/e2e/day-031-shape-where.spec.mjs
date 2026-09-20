@@ -2,12 +2,12 @@ import { expect, test } from '@playwright/test';
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
-import { buildRound, formatScore } from '../../apps/day-031-shape-where/lib/quiz.js';
-import { mulberry32 } from '../../apps/day-031-shape-where/lib/rng.js';
+import { buildRound, formatScore } from '../../day-031-shape-where/lib/quiz.js';
+import { mulberry32 } from '../../day-031-shape-where/lib/rng.js';
 
 const APP = '/day-031-shape-where/';
 const STORAGE_NAME = 'day031.best.v1';
-const appDir = fileURLToPath(new URL('../../apps/day-031-shape-where/', import.meta.url));
+const appDir = fileURLToPath(new URL('../../day-031-shape-where/', import.meta.url));
 const fixture = (name) => JSON.parse(readFileSync(`${appDir}tests/fixtures/${name}`, 'utf8'));
 const PREFS = fixture('prefectures.json');
 /* 全国モードは10県を重複なく引くので、固定データも10県ぶん置いてある（05・06 だけ町が12〜13件） */

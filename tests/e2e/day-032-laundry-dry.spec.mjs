@@ -3,7 +3,7 @@ import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
 const APP = '/day-032-laundry-dry/';
-const appDir = fileURLToPath(new URL('../../apps/day-032-laundry-dry/', import.meta.url));
+const appDir = fileURLToPath(new URL('../../day-032-laundry-dry/', import.meta.url));
 const fixture = (name) => JSON.parse(readFileSync(`${appDir}tests/fixtures/${name}`, 'utf8'));
 
 /* 固定応答は「いまの1時点」だけ。実際に Open-Meteo が返したものをそのまま置いてある。

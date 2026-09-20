@@ -3,7 +3,7 @@ import { readFileSync } from 'node:fs';
 
 // draftはbuildの対象外。実行前にDay 033をローカルのdistへコピーする（README参照）。
 const APP = '/day-033-did-it-shake/';
-const LIST = JSON.parse(readFileSync(new URL('../../apps/day-033-did-it-shake/tests/fixtures/jma-list-2026-09-08.json', import.meta.url)));
+const LIST = JSON.parse(readFileSync(new URL('../../day-033-did-it-shake/tests/fixtures/jma-list-2026-09-08.json', import.meta.url)));
 const ENDPOINT = 'https://www.jma.go.jp/bosai/quake/data/list.json';
 const PATTERN = '**://www.jma.go.jp/bosai/quake/data/list.json';
 const NIGHT = new Date('2026-09-08T23:50:00+09:00');

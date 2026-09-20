@@ -2,9 +2,9 @@ import { expect, test } from '@playwright/test';
 import { readFileSync } from 'node:fs';
 
 /* 上流のGTFS-RTには一切つながない。実データは深夜0台・日中25台前後と変動するので、
-   同梱の固定データ（apps/day-009-akita-bus-3d/tests/fixtures/）を page.route で流し込む。 */
+   同梱の固定データ（day-009-akita-bus-3d/tests/fixtures/）を page.route で流し込む。 */
 const fixture = (name) =>
-  JSON.parse(readFileSync(new URL(`../../apps/day-009-akita-bus-3d/tests/fixtures/${name}`, import.meta.url), 'utf8'));
+  JSON.parse(readFileSync(new URL(`../../day-009-akita-bus-3d/tests/fixtures/${name}`, import.meta.url), 'utf8'));
 
 const RUNNING = fixture('vehicles-running.json');
 const EMPTY = fixture('vehicles-empty.json');

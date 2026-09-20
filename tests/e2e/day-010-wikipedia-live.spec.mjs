@@ -6,8 +6,8 @@ import {
   SAMPLE_WORLD,
   manyJa,
   toSse,
-} from '../../apps/day-010-wikipedia-live/tests/fixtures/stream.mjs';
-import { COORDS } from '../../apps/day-010-wikipedia-live/tests/fixtures/coordinates.mjs';
+} from '../../day-010-wikipedia-live/tests/fixtures/stream.mjs';
+import { COORDS } from '../../day-010-wikipedia-live/tests/fixtures/coordinates.mjs';
 
 /* 上流には一切つながない。編集のストリームも座標APIも、同梱の固定データを page.route で流し込む。
    本物は毎秒13件前後・中身も毎回違うので、そのままでは何も固定できない。 */

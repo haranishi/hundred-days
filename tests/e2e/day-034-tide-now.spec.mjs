@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test';
 import { readFileSync } from 'node:fs';
 const APP = '/day-034-tide-now/';
 const PATTERN = '**://www.data.jma.go.jp/kaiyou/data/db/tide/suisan/txt/*/*.txt';
-const FIXTURES = new Map(['TK-2025', 'TK-2026', 'TK-2027', 'S1-2026'].map((name) => [name, readFileSync(new URL(`../../apps/day-034-tide-now/tests/fixtures/${name}.txt`, import.meta.url), 'utf8')]));
+const FIXTURES = new Map(['TK-2025', 'TK-2026', 'TK-2027', 'S1-2026'].map((name) => [name, readFileSync(new URL(`../../day-034-tide-now/tests/fixtures/${name}.txt`, import.meta.url), 'utf8')]));
 const errors = new WeakMap(), requests = new WeakMap(), httpErrors = new WeakSet();
 test.beforeEach(async ({ page }) => {
   errors.set(page, []); requests.set(page, []);

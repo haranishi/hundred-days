@@ -4,7 +4,7 @@
 
 ## Dayを1本追加する
 
-1. `apps/day-NNN-<name>/` にアプリ本体と `meta.json` を置く
+1. リポジトリ直下の `day-NNN-<name>/` にアプリ本体・`README.md`・`meta.json` を置き、`npm run index:sync` でREADMEのDay一覧を更新する
 2. **一覧用のスクショとデモ動画を作る**（下記「デモ動画とスクショを作る」）
    - `meta.json` に `"screenshot": "screenshot.webp"` と `"demo": "demo.mp4"` を書く（フォルダ内のファイル名だけ。パスは書かない）
    - 省略しても壊れない。スクショが無い場合はトップページで夜空グラデーション＋Day番号のプレースホルダになる
@@ -13,6 +13,7 @@
 5. X投稿後に `meta.json` の `xPostUrl` を追記して再デプロイすると、カードに「X投稿」リンクが出る
 
 トップページ（`dist/index.html`）は `scripts/build.mjs` が `meta.json` から自動生成する。
+GitHubのREADME一覧も `npm run index:sync` が同じメタデータから生成する。Day追加時やアプリ名・公開URL変更時に実行する。`npm run build` は更新漏れを検出すると停止する。
 公開アプリ数・制作時間・制作日数・タグフィルタ・制作メモは、すべて `meta.json` の実値から作られるので、
 一覧ページ側を手で書き換える作業は無い。
 
@@ -37,7 +38,7 @@ PLAYWRIGHT=/path/to/playwright/index.js \
 
 `--video-only` / `--shot-only` で片方だけ作り直せる。webm→mp4の変換に ffmpeg、WebP化に cwebp（無ければ ffmpeg）を使う。
 
-**操作の振り付けは `apps/day-NNN-<name>/demo-scenario.mjs` に置く。**
+**操作の振り付けは `day-NNN-<name>/demo-scenario.mjs` に置く。**
 
 ```js
 export default async function (page, h) {

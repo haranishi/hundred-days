@@ -1,6 +1,6 @@
 # Day043 ローカル実装・検証記録
 
-2026-09-19。対象は `apps/day-043-moveout-consult/`。公開・commit・pushは未実施。
+2026-09-19。対象は `day-043-moveout-consult/`。公開・commit・pushは未実施。
 
 ## 結果
 

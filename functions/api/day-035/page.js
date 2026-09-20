@@ -2,7 +2,7 @@
    ブラウザからは他オリジンのHTMLを読めないので、ここが代わりに1回だけ取りに行く。
    巡回はしない。ユーザーが貼った1本を、その場で1回。SNSのリンク展開と同じ範囲。 */
 
-import { validateTarget, fetchGuarded } from '../../../apps/day-035-front-page/lib/target.js';
+import { validateTarget, fetchGuarded } from '../../../day-035-front-page/lib/target.js';
 
 const USER_AGENT = 'hundred-days-day035 (+https://hundred-days.pages.dev/day-035-front-page/)';
 export const TIMEOUT_MS = 15_000;

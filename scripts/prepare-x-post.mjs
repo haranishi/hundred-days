@@ -7,7 +7,7 @@ import { basename, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = fileURLToPath(new URL('..', import.meta.url));
-const appsDir = join(root, 'apps');
+const appsDir = root;
 const args = process.argv.slice(2);
 
 const option = (name) => {

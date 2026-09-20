@@ -4,9 +4,10 @@
   "private": true,
   "description": "1日1個Webアプリを作って公開する100日チャレンジ",
   "scripts": {
-    "build": "node scripts/sync-shared.mjs --check && node scripts/build.mjs",
+    "build": "node scripts/sync-day-index.mjs --check && node scripts/sync-shared.mjs --check && node scripts/build.mjs",
+    "index:sync": "node scripts/sync-day-index.mjs",
     "precheck": "node scripts/precheck.mjs",
-    "test:unit": "node --test apps/*/tests/",
+    "test:unit": "node --test day-*/tests/",
     "test:e2e": "playwright test",
     "x:prepare": "node scripts/prepare-x-post.mjs",
     "shared:sync": "node scripts/sync-shared.mjs"

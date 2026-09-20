@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { HOUR_AGO, OBSERVATIONS, TABLE } from '../../apps/day-014-hottest-now/tests/fixtures/amedas.mjs';
+import { HOUR_AGO, OBSERVATIONS, TABLE } from '../../day-014-hottest-now/tests/fixtures/amedas.mjs';
 
 /* 上流（気象庁）には繋がない。本物は10分ごとに中身が変わるので、そのままでは何も固定できない。
    配信されている3種類のファイルを、同じ形の標本で置き換える。 */

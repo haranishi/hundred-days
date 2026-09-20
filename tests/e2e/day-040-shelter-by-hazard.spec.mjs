@@ -3,7 +3,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
 const APP = '/day-040-shelter-by-hazard/';
-const file = (name) => fileURLToPath(new URL(`../../apps/day-040-shelter-by-hazard/tests/fixtures/${name}`, import.meta.url));
+const file = (name) => fileURLToPath(new URL(`../../day-040-shelter-by-hazard/tests/fixtures/${name}`, import.meta.url));
 const blankTile = readFileSync(file('blank-tile.png'));
 const ISSUED = new Date('2026-09-14T03:00:00Z').toUTCString();
 

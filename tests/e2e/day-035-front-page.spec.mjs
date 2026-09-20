@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test';
 import { readFileSync } from 'node:fs';
 
 const APP = '/day-035-front-page/';
-const PHOTO = readFileSync(new URL('../../apps/day-035-front-page/tests/fixtures/photo.png', import.meta.url));
+const PHOTO = readFileSync(new URL('../../day-035-front-page/tests/fixtures/photo.png', import.meta.url));
 // 写真は中継を通さず、提供元から直接読む（保存するPNGには焼かない）
 const PHOTO_URL = 'https://example.com/photo.png';
 
