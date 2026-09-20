@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url';
 
 const APP = '/day-037-baito-law/';
 const here = dirname(fileURLToPath(import.meta.url));
-const fixtures = join(here, '..', '..', 'apps', 'day-037-baito-law', 'tests', 'fixtures');
+const fixtures = join(here, '..', '..', 'day-037-baito-law', 'tests', 'fixtures');
 const fixture = (name) => readFileSync(join(fixtures, name), 'utf8');
 
 /* 条文はe-Govから取るが、テストで本物を叩くと落ちやすいうえ相手にも迷惑なので、

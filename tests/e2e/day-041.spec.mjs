@@ -3,7 +3,7 @@ import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
 const APP = '/day-041-who-got-hurt/';
-const file = (name) => fileURLToPath(new URL(`../../apps/day-041-who-got-hurt/tests/fixtures/${name}`, import.meta.url));
+const file = (name) => fileURLToPath(new URL(`../../day-041-who-got-hurt/tests/fixtures/${name}`, import.meta.url));
 const blankTile = readFileSync(file('blank-tile.png'));
 
 const TOKYO = { lat: 35.6812, lng: 139.7671 };

@@ -67,7 +67,7 @@ for (const d of EXTERNAL_DAYS) {
 
 test('外部で公開したDayも進捗（公開済み N/100）に数えられる', async ({ page }) => {
   // 期待値は meta.json の実値から動的に組み立てる（Dayが増えるたびにこのテストを書き換えない）
-  const appsDir = fileURLToPath(new URL('../../apps/', import.meta.url));
+  const appsDir = fileURLToPath(new URL('../../', import.meta.url));
   const released = readdirSync(appsDir)
     .filter((name) => name.startsWith('day-'))
     .map((dir) => JSON.parse(readFileSync(`${appsDir}${dir}/meta.json`, 'utf8')))

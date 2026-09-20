@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { readFileSync } from 'node:fs';
 const APP = '/day-039-dig-below/';
-const fixture = (name) => JSON.parse(readFileSync(new URL(`../../apps/day-039-dig-below/tests/fixtures/${name}.json`, import.meta.url)));
+const fixture = (name) => JSON.parse(readFileSync(new URL(`../../day-039-dig-below/tests/fixtures/${name}.json`, import.meta.url)));
 const tokyo = fixture('colls-tokyo'), occs = fixture('occs-tokyo');
 const failures = new WeakMap();
 test.beforeEach(async ({ page, context }) => {

@@ -3,7 +3,7 @@ import { readFileSync } from "node:fs";
 
 const APP = "/day-023-magtrace/";
 const API = "**/api/day-023/trend*";
-const fixture = (name) => JSON.parse(readFileSync(new URL(`../../apps/day-023-magtrace/tests/fixtures/${name}`, import.meta.url), "utf8"));
+const fixture = (name) => JSON.parse(readFileSync(new URL(`../../day-023-magtrace/tests/fixtures/${name}`, import.meta.url), "utf8"));
 const EXACT = fixture("trend-exact.json");
 const COUNTS = fixture("trend-counts.json");
 const EMPTY = fixture("trend-empty.json");

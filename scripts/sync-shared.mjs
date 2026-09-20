@@ -11,7 +11,7 @@ import { fileURLToPath } from 'node:url';
 
 const root = fileURLToPath(new URL('..', import.meta.url));
 const sourceDir = join(root, 'shared');
-const appsDir = join(root, 'apps');
+const appsDir = root;
 const check = process.argv.includes('--check');
 
 const files = readdirSync(sourceDir).filter((name) => /\.(js|css)$/.test(name));

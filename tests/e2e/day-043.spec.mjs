@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { emptyData, encodeDraft, STORAGE_KEY } from '../../apps/day-043-moveout-consult/lib/model.js';
+import { emptyData, encodeDraft, STORAGE_KEY } from '../../day-043-moveout-consult/lib/model.js';
 
 const APP = '/day-043-moveout-consult/';
 const ready = async (page) => {

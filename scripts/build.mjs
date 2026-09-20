@@ -1,4 +1,4 @@
-/* dist/ を組み立てる：apps/day-* をコピーし、各 meta.json からポートフォリオ一覧ページを生成する。
+/* dist/ を組み立てる：day-* をコピーし、各 meta.json からポートフォリオ一覧ページを生成する。
    依存パッケージなし（node:fs / node:path / node:url のみ）。CSS・JSはindex.htmlにインライン。 */
 'use strict';
 
@@ -7,7 +7,7 @@ import { basename, join, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = fileURLToPath(new URL('..', import.meta.url));
-const appsDir = join(root, 'apps');
+const appsDir = root;
 const staticDir = join(root, 'static');
 const distDir = join(root, 'dist');
 
@@ -104,7 +104,7 @@ if (existsSync(staticDir)) cpSync(staticDir, distDir, { recursive: true });
      書き出し済みなので配信には要らない。CI には cache が無いので、消えるのは手元の dist だけ
    - tests/ は、中の fixtures に第三者の生データが入っている（day-033 の気象庁の実応答、
      day-034 の潮位表、day-023 のNDLの生レスポンス）。ここに置いたつもりのものが本番URLから
-     落とせる状態になるので外す。E2E は dist ではなく apps/ からフィクスチャを読んでいるので影響しない
+     落とせる状態になるので外す。E2E は dist ではなく各Dayのソースからフィクスチャを読んでいるので影響しない
    ⚠️ 除外は名前の列挙なので、新しく「配信したくないフォルダ」を作ったらここに足すこと */
 const EXCLUDED_DIRS = [`tools${sep}cache`, 'tests'];
 const isExcluded = (source) => EXCLUDED_DIRS.some((dir) => {
@@ -143,7 +143,7 @@ for (const app of apps) {
      style-src   : day-004 に style 属性があるので 'unsafe-inline' が要る（属性を消せば外せる）
      img-src     : canvasの書き出しとインラインSVGで data:/blob: を使う
      connect-src : day-009 は同一オリジンのAPI、day-010 はウィキメディアの各プロジェクト
-                   （apps/day-010-wikipedia-live/lib/coords.js が通すホストと対応させること） */
+                   （day-010-wikipedia-live/lib/coords.js が通すホストと対応させること） */
 const WIKIMEDIA_CONNECT = [
   'wikipedia', 'wikibooks', 'wikinews', 'wikiquote', 'wikisource', 'wikiversity',
   'wikivoyage', 'wiktionary', 'wikimedia', 'wikidata', 'wikifunctions', 'mediawiki'
@@ -231,7 +231,7 @@ const IMG_BY_APP = {
   'day-030-world-window': ' https:',
   /* day-031 は Wikipedia の記事写真だけを読む。summary が返す thumbnail は
      いま thumb.wikimedia.org（元画像は upload.wikimedia.org）。
-     apps/day-031-shape-where/lib/wiki.js の THUMBNAIL_HOSTS と対応させること */
+     day-031-shape-where/lib/wiki.js の THUMBNAIL_HOSTS と対応させること */
   'day-031-shape-where': ' https://thumb.wikimedia.org https://upload.wikimedia.org',
   /* day-035 は貼られた記事の og:image を提供元から直接読む（中継しない＝写真を複製も保存もしない）。
      貼られるURLは利用者が決めるのでホストを事前に列挙できない。http は混在コンテンツになるので許さない */

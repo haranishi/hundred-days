@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url';
 /* シェア機能は全アプリ共通のルール（2026-08-17 本人指示）なので、Dayごとではなくここで横断的に見る。
    新しいDayを足したら、このspecが自動でその1件も見にいく。 */
 
-const appsDir = fileURLToPath(new URL('../../apps/', import.meta.url));
+const appsDir = fileURLToPath(new URL('../../', import.meta.url));
 const published = readdirSync(appsDir)
   .filter((name) => name.startsWith('day-'))
   .map((dir) => ({ dir, meta: JSON.parse(readFileSync(`${appsDir}${dir}/meta.json`, 'utf8')) }))

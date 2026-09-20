@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url';
    「いま」は 2026-09-18 21:00 JST に固定するので、帯の印も毎日同じ位置に出る。 */
 
 const APP = '/day-042-typhoon-coming/';
-const file = (name) => fileURLToPath(new URL(`../../apps/day-042-typhoon-coming/tests/fixtures/${name}`, import.meta.url));
+const file = (name) => fileURLToPath(new URL(`../../day-042-typhoon-coming/tests/fixtures/${name}`, import.meta.url));
 const DATA = 'https://www.jma.go.jp/bosai/typhoon/data/';
 const FIXTURES = {
   [`${DATA}targetTc.json`]: 'bosai-typhoon-targetTc-20260918.json',

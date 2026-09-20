@@ -160,7 +160,7 @@ const finiteOrNull = (value) => (Number.isFinite(value) ? value : null);
    ⚠️ この時刻の判定だけでは足りない。同じ秋田市のフィードが翌未明には
    「座標は固定のまま送信時刻だけ現在時刻に更新する」挙動に変わり、ここは素通りする。
    運行時間帯による除外は時刻表（data/network.json の service）を持つアプリ側にある
-   （apps/day-009-akita-bus-3d/lib/service.js の isOffService）。 */
+   （day-009-akita-bus-3d/lib/service.js の isOffService）。 */
 export function normalizeVehicles(rawVehicles, op, nowSeconds, staleLimitSeconds = STALE_LIMIT_SECONDS) {
   const vehicles = [];
   let staleDropped = 0;

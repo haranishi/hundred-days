@@ -90,7 +90,7 @@ const codeFiles = (directory) => {
 };
 
 test('コードに書いてある接続先が、そのDayのCSPで許されている', () => {
-  const appsDir = fileURLToPath(new URL('../../apps/', import.meta.url));
+  const appsDir = fileURLToPath(new URL('../../', import.meta.url));
   let checked = 0;
   for (const dir of publishedApps) {
     const sources = connectSources(dir);

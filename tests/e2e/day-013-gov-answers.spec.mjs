@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { GOVERNMENT, MIXED, envelope } from '../../apps/day-013-gov-answers/tests/fixtures/speech.mjs';
+import { GOVERNMENT, MIXED, envelope } from '../../day-013-gov-answers/tests/fixtures/speech.mjs';
 
 /* 上流（国会会議録API）には繋がない。件数だけ聞く1回目と本体を返す2回目を page.route で作る。
    本物は中身も件数も日々変わるので、そのままでは何も固定できない。 */

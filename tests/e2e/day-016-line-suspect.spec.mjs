@@ -3,7 +3,7 @@ import { expect, test } from '@playwright/test';
 /* 上流（speed.cloudflare.com）には繋がない。実回線の速度は日によって何倍も振れるので、
    本物を使うと「何Mbpsだったか」を固定できず、テストが天気になる。
    応答を返す速さだけをこちらで決めて、画面の出し分けと診断の表示を見る。
-   速度の計算と診断の分岐そのものは apps/day-016-line-suspect/tests/ のユニットテスト側。 */
+   速度の計算と診断の分岐そのものは day-016-line-suspect/tests/ のユニットテスト側。 */
 
 const PAGE = '/day-016-line-suspect/';
 

@@ -3,7 +3,7 @@ import { readFile } from 'node:fs/promises';
 import { createServer } from 'node:http';
 import { extname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { readSegments, segmentBody } from '../../apps/day-011-photo-metadata/lib/jpeg.js';
+import { readSegments, segmentBody } from '../../day-011-photo-metadata/lib/jpeg.js';
 import {
   app0Jfif,
   app1BrokenExif,
@@ -15,13 +15,13 @@ import {
   comment,
   concat,
   toDms
-} from '../../apps/day-011-photo-metadata/tests/fixtures/jpeg-builder.mjs';
+} from '../../day-011-photo-metadata/tests/fixtures/jpeg-builder.mjs';
 
 /* このDayは meta.json が draft なので dist/ に入らない（build が公開前のDayを除くため）。
    一覧ページに出さないまま実物を検査したいので、アプリのフォルダだけを配る小さなサーバーを立てる。
    公開に切り替えたら、baseURL の /day-011-photo-metadata/ をそのまま使える。 */
 
-const appDir = fileURLToPath(new URL('../../apps/day-011-photo-metadata/', import.meta.url));
+const appDir = fileURLToPath(new URL('../../day-011-photo-metadata/', import.meta.url));
 const MIME = {
   '.html': 'text/html; charset=utf-8',
   '.js': 'text/javascript; charset=utf-8',

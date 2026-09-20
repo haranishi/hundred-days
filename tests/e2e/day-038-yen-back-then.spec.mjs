@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url';
 const APP = '/day-038-yen-back-then/';
 const here = dirname(fileURLToPath(import.meta.url));
 const fixture = readFileSync(
-  join(here, '..', '..', 'apps', 'day-038-yen-back-then', 'tests', 'fixtures', 'worldbank-cpi.json'),
+  join(here, '..', '..', 'day-038-yen-back-then', 'tests', 'fixtures', 'worldbank-cpi.json'),
   'utf8'
 );
 
