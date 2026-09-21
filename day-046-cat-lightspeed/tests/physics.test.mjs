@@ -1,0 +1,11 @@
+import { test } from 'node:test';
+import assert from 'node:assert/strict';
+import { LIGHT_SPEED } from '../lib/milestones.js';
+import { lorentzFactor,advanceSpeed,MAX_SPEED } from '../lib/physics.js';
+for(const [ratio,expected] of [[.99,7.1],[.999,22.4],[.9999,70.7],[.99999,223.6]])test(`光速比${ratio}のローレンツ因子`,()=>assert.equal(lorentzFactor(LIGHT_SPEED*ratio).toFixed(1),expected.toFixed(1)));
+test('99%は小数2桁で7.09',()=>assert.equal(lorentzFactor(LIGHT_SPEED*.99).toFixed(2),'7.09'));
+test('光速ちょうど・超過・異常入力も有限',()=>{for(const v of [LIGHT_SPEED,LIGHT_SPEED*2,Infinity,NaN,-1]){assert.ok(Number.isFinite(lorentzFactor(v)));assert.ok(lorentzFactor(v)>=1);}assert.equal(lorentzFactor(0),1);});
+test('10万ステップ押しても単調で光速を超えない',()=>{let v=0;for(let i=0;i<100000;i++){const next=advanceSpeed(v,true,1/60);assert.ok(next>=v);assert.ok(next<LIGHT_SPEED);v=next;}assert.equal(v,MAX_SPEED);});
+test('離すと減速し0で止まる',()=>{let v=MAX_SPEED;for(let i=0;i<10000;i++){const next=advanceSpeed(v,false,.05);assert.ok(next<=v&&next>=0);v=next;}assert.equal(v,0);});
+test('時間分割しても加速と遷移の結果は変わらない',()=>{let v=0;for(let i=0;i<5000;i++)v=advanceSpeed(v,true,.016);const once=advanceSpeed(0,true,80);assert.ok(Math.abs(v-once)/once<1e-10);});
+test('長時間・不正時間でオーバーフローしない',()=>{assert.equal(advanceSpeed(0,true,1e10),MAX_SPEED);assert.equal(advanceSpeed(2,true,NaN),2);assert.equal(advanceSpeed(2,false,-1),2);});
