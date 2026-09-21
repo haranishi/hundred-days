@@ -9,7 +9,7 @@ export const SAMPLE_RATE = 48000;
 export const PEAK_CEILING = 10 ** (-1 / 20);
 export const AUDIO_FROM = 0.3; // 弾が飛んでいる画から開始。映像と音を同じだけ切る。
 export function noteFor(name, march = 0) {
-  const notes = { fire: [720, 320, .08], hit: [390, 780, .12], hurt: [150, 45, .3], flinch: [260, 530, .09], wave: [440, 880, .4], march: [[130, 195, 165][march % 3], 110, .055] };
+  const notes = { fire: [720, 320, .08], hit: [390, 780, .12], hurt: [150, 45, .3], flinch: [260, 530, .09], wave: [440, 880, .4], pickup: [880, 1320, .1], levelup: [520, 1560, .45], march: [[130, 195, 165][march % 3], 110, .055] };
   if (!Object.hasOwn(notes, name)) throw new Error(`未知のイベント: ${name}`);
   const [from, to, duration] = notes[name];
   return { from, to, duration, type: name === 'hurt' ? 'sawtooth' : 'triangle', gain: name === 'march' ? .5 : 1 };

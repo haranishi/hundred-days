@@ -49,7 +49,7 @@ test('ブラウザの実合成パラメータと一致し、marchのみ半音量
   }
   try {
     globalThis.AudioContext = Audio; const audio = createAudio(); audio.unlock();
-    const names = ['fire', 'hit', 'hurt', 'flinch', 'wave', 'march', 'march', 'march', 'march'];
+    const names = ['fire', 'hit', 'hurt', 'flinch', 'wave', 'pickup', 'levelup', 'march', 'march', 'march', 'march'];
     names.forEach(name => audio.play(name));
     let march = 0;
     names.forEach((name, i) => { const { gain, ...note } = noteFor(name, march); if (name === 'march') march++; assert.deepEqual(captured[i], note); assert.equal(gain, name === 'march' ? .5 : 1); });

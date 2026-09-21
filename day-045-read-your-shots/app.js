@@ -1,3 +1,4 @@
+import { loadout } from './lib/upgrades.js';
 import { mulberry32 } from './lib/rng.js';
 import { createGame, step, snapshot, autoInput } from './lib/game.js';
 import { review, clamp, readBand } from './lib/lanes.js';
@@ -26,7 +27,7 @@ export function boot() {
   function clearInput() { input = {}; pointer = null; }
   // 公開URLはビルドが <link rel="canonical"> に入れる。手元で開いたときは今いるURL。
   const shareUrl = () => document.querySelector('link[rel="canonical"]')?.href || location.href;
-  const shareText = () => `その撃ち方、読まれてる — ${s.score}点・ウェーブ${s.wave}まで到達。${review(s.shotHeat, s.positions)}`;
+  const shareText = () => `その撃ち方、読まれてる — ${s.score}点・ウェーブ${s.wave}・LV${s.level}まで到達。${review(s.shotHeat, s.positions)}`;
   function start() {
     if (!ready) { wantsStart = true; return; }
     wantsStart = false; s = createGame('playing'); rng = mulberry32(seed); clearInput(); accumulated = 0;
@@ -36,7 +37,7 @@ export function boot() {
   }
   function sync() {
     app.dataset.state = s.status;
-    for (const key of ['score', 'lives', 'wave', 'readLevel']) $(key === 'readLevel' ? 'read-level' : key).textContent = s[key];
+    for (const key of ['score', 'lives', 'wave', 'level', 'readLevel']) $(key === 'readLevel' ? 'read-level' : key).textContent = s[key];
     $('remaining').textContent = s.fleet.enemies.filter(e => e.alive).length;
     $('read-meter').value = s.readLevel;
     document.querySelector('.reading').dataset.level = readBand(s.readLevel);
@@ -50,7 +51,7 @@ export function boot() {
     $('save-note').hidden = available;
     if (s.status === 'over') {
       $('final-score').textContent = s.score; $('final-wave').textContent = s.wave; $('final-best').textContent = best?.score ?? s.score;
-      $('final-kills').textContent = s.kills; $('final-bonus').textContent = s.bonusKills;
+      $('final-level').textContent = s.level; $('final-kills').textContent = s.kills; $('final-bonus').textContent = s.bonusKills;
       $('review').textContent = review(s.shotHeat, s.positions); $('reason').textContent = s.reason;
       $('result-x').href = `https://x.com/intent/post?text=${encodeURIComponent(shareText())}&url=${encodeURIComponent(shareUrl())}`;
     }
@@ -99,6 +100,11 @@ export function boot() {
       if (s.fleet.offset && !reduced.matches) { ctx.globalAlpha = 0.25; sprites.draw(ctx, e.type, x, y, e.w, e.h); ctx.globalAlpha = 1; }
       sprites.draw(ctx, e.type, x + s.fleet.offset, y, e.w, e.h);
     }
+    for (const item of s.items) {
+      ctx.save(); ctx.translate(item.x + item.w / 2, item.y + item.h / 2); ctx.rotate(reduced.matches ? 0 : s.time * 0.6);
+      ctx.fillStyle = '#ffe27a'; ctx.beginPath(); ctx.moveTo(0, -10); ctx.lineTo(10, 0); ctx.lineTo(0, 10); ctx.lineTo(-10, 0); ctx.closePath(); ctx.fill();
+      ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 2; ctx.stroke(); ctx.restore();
+    }
     ctx.fillStyle = '#9cffe1'; for (const b of s.bullets) ctx.fillRect(b.x, b.y, b.w, b.h);
     ctx.fillStyle = '#ffbd8f'; for (const b of s.enemyBullets) ctx.fillRect(b.x, b.y, b.w, b.h);
     ctx.fillStyle = '#ffcf9a'; ctx.textAlign = 'center'; ctx.font = font(20); ctx.fillText('▽', s.predictedX, 555);
@@ -109,8 +115,11 @@ export function boot() {
     }
     ctx.fillStyle = '#31445d'; ctx.fillRect(s.player.x - 15, s.player.y + 23, 30, 3);
     ctx.fillStyle = '#9cffe1';
-    const reload = s.bullets.length >= 2 || s.invincible > 0 || s.waveTransition > 0 ? 0 : 1 - s.shotCooldown / 0.25;
-    ctx.fillRect(s.player.x - 15, s.player.y + 23, 30 * clamp(reload, 0, 1), 3);
+    const equipment = loadout(s.level);
+    if (equipment.cooldown >= 0.16) {
+      const reload = s.bullets.length + equipment.columns > equipment.volleys * equipment.columns || s.invincible > 0 || s.waveTransition > 0 ? 0 : 1 - s.shotCooldown / equipment.cooldown;
+      ctx.fillRect(s.player.x - 15, s.player.y + 23, 30 * clamp(reload, 0, 1), 3);
+    }
     if (s.waveTransition > 0) { ctx.font = `bold ${font(42)}`; ctx.fillStyle = '#9cffe1'; ctx.fillText(`WAVE ${s.wave}`, 240, 330); }
     ctx.font = `bold ${font(18)}`; ctx.fillStyle = '#fff1bd';
     for (const f of s.floats) { const half = ctx.measureText(f.text).width / 2 + 8; ctx.fillText(f.text, clamp(f.x, half, 480 - half), f.y); }
@@ -138,32 +147,32 @@ export function boot() {
     // コピーできない環境では、その場で選んで貼れるURLを出す。
     said.textContent = copied ? 'コピーしました' : url; said.hidden = false;
   };
-  const keys = { ArrowLeft: 'left', a: 'left', ArrowRight: 'right', d: 'right', ' ': 'fire', ArrowUp: 'fire', z: 'fire' };
+  const keys = { ArrowLeft: 'left', a: 'left', ArrowRight: 'right', d: 'right' };
   window.addEventListener('keydown', e => {
     if (e.ctrlKey || e.metaKey || e.altKey) return;
     const key = e.key.length === 1 ? e.key.toLowerCase() : e.key;
     if (e.target.closest?.('button, a') && (key === 'Enter' || key === ' ')) return;
     if (keys[key]) { e.preventDefault(); input[keys[key]] = true; audio.unlock(); }
-    else if (!e.repeat && ['Enter', 'p', 'Escape', 'm'].includes(key)) {
+    else if (!e.repeat && ['Enter', ' ', 'p', 'Escape', 'm'].includes(key)) {
       e.preventDefault(); audio.unlock();
-      if (key === 'Enter' && ['empty', 'over', 'loading'].includes(s.status)) start();
+      if (['Enter', ' '].includes(key) && ['empty', 'over', 'loading'].includes(s.status)) start();
       if (key === 'p' || key === 'Escape') pause(); if (key === 'm') toggleMute();
     }
   });
   window.addEventListener('keyup', e => { const key = e.key.length === 1 ? e.key.toLowerCase() : e.key; if (keys[key]) { e.preventDefault(); input[keys[key]] = false; } });
-  const point = e => { const r = canvas.getBoundingClientRect(); input.targetX = (e.clientX - r.left) / r.width * 480; input.fire = true; };
+  const point = e => { const r = canvas.getBoundingClientRect(); input.targetX = (e.clientX - r.left) / r.width * 480; };
   canvas.addEventListener('pointerdown', e => { if (s.status !== 'playing' || pointer !== null) return; audio.unlock(); pointer = e.pointerId; canvas.setPointerCapture(pointer); canvas.focus({ preventScroll: true }); point(e); });
   canvas.addEventListener('pointermove', e => { if (e.pointerId === pointer) point(e); });
   for (const name of ['pointerup', 'pointercancel', 'lostpointercapture']) canvas.addEventListener(name, e => { if (e.pointerId === pointer) clearInput(); });
   window.addEventListener('blur', () => { clearInput(); if (s.status === 'playing') pause(); });
   document.addEventListener('visibilitychange', () => { if (document.hidden && s.status === 'playing') pause(); });
   window.__day045 = {
-    debug: { clearFleet: () => { if (manual && s.status === 'playing') { s.fleet.enemies.forEach(e => { e.alive = false; }); sync(); draw(); } } },
+    debug: { dropItem: () => { if (manual && s.status === 'playing' && s.items.length < 6) { s.items.push({ x: s.player.x - 10, y: 574, w: 20, h: 20, vy: 120 }); draw(); } }, clearFleet: () => { if (manual && s.status === 'playing') { s.fleet.enemies.forEach(e => { e.alive = false; }); sync(); draw(); } } },
     recordEvents: on => { recording = Boolean(on); if (recording) recordedEvents = []; },
     events: () => recordedEvents.map(event => ({ ...event })), seconds: () => s.time,
     state: () => s.status, snapshot: () => snapshot(s), input: value => { input = { ...value }; },
     moveTo: x => { if (Number.isFinite(x)) s.player.x = clamp(x, 24, 456); draw(); },
-    fire: () => { input.fire = true; tick(1 / 60); input.fire = false; draw(); },
+    fire: () => { tick(1 / 60); draw(); },
     setManual: value => { manual = Boolean(value); cancelAnimationFrame(raf); last = 0; accumulated = 0; if (!manual) raf = requestAnimationFrame(frame); },
     advance: ms => { if (!manual || !Number.isFinite(ms) || ms < 0) return; accumulated += ms / 1000; while (accumulated + 1e-10 >= 1 / 60) { tick(1 / 60); accumulated -= 1 / 60; } draw(); },
     autopilot: value => { auto = Boolean(value); }, start, retry: start

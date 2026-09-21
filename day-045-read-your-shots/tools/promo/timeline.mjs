@@ -7,7 +7,7 @@ export const STORYBOARD = Object.freeze([
   { id: 'S1', start: 4, end: 9, name: '同じ場所から連射、赤い帯が濃くなる', focus: 'heat', fixedFire: true },
   { id: 'S2', start: 9, end: 14, name: '艦隊がひるむ', gameFrom: 8.9, focus: 'fleet' },
   { id: 'S3', start: 14, end: 19, name: '▽が居場所を狙う', gameFrom: 14.3, focus: 'aim' },
-  { id: 'S4', start: 19, end: 24, name: '低い熱から得点2倍', gameFrom: 18.3, focus: 'bonus' },
+  { id: 'S4', start: 19, end: 24, name: '低い熱から得点2倍', gameFrom: 3, focus: 'bonus' },
   { id: 'S5', start: RESULT_START, end: END_START, name: '実ゲームの結果と講評', focus: 'result' },
   { id: 'S6', start: END_START, end: DURATION_SECONDS, name: 'アプリ名とURL', focus: 'end' },
 ]);
