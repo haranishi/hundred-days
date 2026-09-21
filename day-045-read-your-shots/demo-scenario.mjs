@@ -37,4 +37,10 @@ export default async function demo(page, h) {
   await writeFile(join(tmpdir(), 'day-045-demo-cues.json'), JSON.stringify(cues));
 }
 export const shotScroll = 0;
-export async function shotSetup(page) { await start(page); await page.waitForTimeout(3000); }
+// スクショは「育ったあと」を写す。開始直後だとレベルもアイテムも出ておらず、いまの遊びが伝わらない。
+export async function shotSetup(page) {
+  await start(page);
+  await page.waitForFunction(() => window.__day045.snapshot().level >= 8, null, { timeout: 90000 });
+  // アイテムが落ちている瞬間を待つ。出なければレベルだけで撮る。
+  await page.waitForFunction(() => window.__day045.snapshot().items.length > 0, null, { timeout: 20000 }).catch(() => {});
+}

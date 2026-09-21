@@ -115,9 +115,11 @@ export async function main(args = process.argv.slice(2)) {
         if (scene.gameFrom !== undefined) await game.evaluate(seconds => {
           const api = window.__day045; api.setManual(true); api.start(); api.advance(seconds * 1000);
         }, scene.gameFrom);
-        if (scene.fixedFire) await game.evaluate(() => { window.__day045.autopilot(false); window.__day045.input({ fire: true }); });
+        if (scene.fixedFire) await game.evaluate(() => { window.__day045.autopilot(false); window.__day045.input({}); });
+        // 自動操縦は動き続けるので寿命が読めない。止めて「読まれて落とされる」まで待つ（主題どおりの終わり方）。
         if (scene.start === RESULT_START) await game.evaluate(() => {
-          const api = window.__day045; api.advance(180000);
+          const api = window.__day045; api.autopilot(false); api.input({});
+          for (let i = 0; i < 24 && api.state() !== 'over'; i++) api.advance(10000);
           if (api.state() !== 'over') throw new Error('結果に到達しませんでした');
         });
       }

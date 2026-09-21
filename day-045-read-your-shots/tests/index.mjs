@@ -7,3 +7,7 @@ import './store.test.mjs';
 import './demo-audio.test.mjs';
 import './promo.test.mjs';
 import './record-events.test.mjs';
+import './upgrades.test.mjs';
+
+import './visibility.test.mjs';
+import './balance.test.mjs';

@@ -12,7 +12,7 @@ p { margin: 10px 0; }
 .lead { color: #c3cee1; margin-bottom: 24px; }
 .hud { background: #1a2840; padding: 14px 16px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px 6px; border: 1px solid #40516b; border-radius: 14px 14px 0 0; font-size: 14px; }
 .hud strong { display: block; font-size: 22px; color: #fff; font-variant-numeric: tabular-nums; }
-.reading { grid-column: 1 / -1; display: flex; align-items: center; gap: 16px; }
+.reading { grid-column: 1 / -1; display: flex; align-items: center; gap: 8px; white-space: nowrap; }
 .reading strong { display: inline; font-size: 16px; }
 meter { flex: 1; min-width: 50px; height: 14px; accent-color: #ffa58f; }
 meter::-webkit-meter-optimum-value { background: #ffa58f; }

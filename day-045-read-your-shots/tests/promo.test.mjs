@@ -21,14 +21,15 @@ test('30秒の絵コンテと字幕境界が一致し、字幕は16字×2行以�
 test('決定的なカットで1コマ目から発射、回避・2倍・結果が出る', () => {
   let s, rng, previous, fixed = false, fixedStartHeat = 0, fixedMaxHeat = 0;
   const observed = { flinch: false, bonus: false, heat: false, aim: false };
-  const advance = ms => { for (let i = 0; i < Math.round(ms / 1000 * 60); i++) s = step(s, 1 / 60, fixed ? { fire: true } : autoInput(s), rng); };
+  const advance = ms => { for (let i = 0; i < Math.round(ms / 1000 * 60); i++) s = step(s, 1 / 60, fixed ? {} : autoInput(s), rng); };
   for (let frame = 0; frame < 30 * DEFAULT_FPS; frame++) {
     const scene = sceneAt(frame / DEFAULT_FPS);
     if (scene.id !== previous) {
       previous = scene.id;
       if (scene.gameFrom !== undefined) { fixed = false; s = createGame('playing'); rng = mulberry32(20260921); advance(scene.gameFrom * 1000); }
       if (scene.fixedFire) { fixed = true; fixedStartHeat = Math.max(...s.heat); }
-      if (scene.focus === 'result') advance(180000);
+      // 自動操縦を止めて、読まれて落とされるまで待つ。render-promo.mjs と同じ運び。
+      if (scene.focus === 'result') { fixed = true; for (let i = 0; i < 24 && s.status !== 'over'; i++) advance(10000); }
     }
     advance(1000 / DEFAULT_FPS);
     if (!frame) { assert.equal(s.status, 'playing'); assert.ok(s.bullets.length); const { player } = snapshot(s); assert.ok(player.y - 18 >= 0 && player.y + 26 <= 640); assert.ok(137 + player.y + 26 < 793); }

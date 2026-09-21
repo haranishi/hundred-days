@@ -38,6 +38,11 @@ test('検証窓口はplayingの実イベントだけを記録し、停止・コ�
     assert.deepEqual(api.events(), expected);
     api.recordEvents(true); assert.deepEqual(api.events(), []);
     api.advance(180000); assert.equal(api.state(), 'over');
+    assert.equal(element('final-level').textContent, api.snapshot().level);
+    const shared = new URL(element('result-x').href).searchParams.get('text');
+    assert.ok(shared.includes(`LV${api.snapshot().level}まで到達`));
+    assert.ok(shared.includes(element('review').textContent));
+    assert.ok([...shared].length * 2 + 24 <= 280);
     const endEvents = api.events(), endTime = api.seconds(); api.advance(1000);
     assert.deepEqual(api.events(), endEvents); assert.equal(api.seconds(), endTime);
   } finally {
