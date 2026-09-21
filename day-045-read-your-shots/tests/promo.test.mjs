@@ -20,7 +20,7 @@ test('30秒の絵コンテと字幕境界が一致し、字幕は16字×2行以�
 });
 test('決定的なカットで1コマ目から発射、回避・2倍・結果が出る', () => {
   let s, rng, previous, fixed = false, fixedStartHeat = 0, fixedMaxHeat = 0;
-  const observed = { flinch: false, bonus: false, heat: false, aim: false };
+  const observed = { flinch: false, bonus: false, heat: false, level: false };
   const advance = ms => { for (let i = 0; i < Math.round(ms / 1000 * 60); i++) s = step(s, 1 / 60, fixed ? {} : autoInput(s), rng); };
   for (let frame = 0; frame < 30 * DEFAULT_FPS; frame++) {
     const scene = sceneAt(frame / DEFAULT_FPS);
@@ -35,7 +35,7 @@ test('決定的なカットで1コマ目から発射、回避・2倍・結果が
     if (!frame) { assert.equal(s.status, 'playing'); assert.ok(s.bullets.length); const { player } = snapshot(s); assert.ok(player.y - 18 >= 0 && player.y + 26 <= 640); assert.ok(137 + player.y + 26 < 793); }
     if (scene.focus === 'heat') { fixedMaxHeat = Math.max(fixedMaxHeat, ...s.heat); observed.heat ||= Math.max(...s.heat) >= .8; }
     if (scene.id === 'S2') observed.flinch ||= Boolean(s.fleet.offset);
-    if (scene.focus === 'aim') observed.aim ||= Math.abs(s.predictedX - 264) > 10;
+    if (scene.focus === 'level') observed.level ||= s.floats.some(f => f.kind === 'level');
     if (scene.focus === 'bonus') observed.bonus ||= s.floats.some(f => f.text === '裏をかいた ×2');
     if (scene.focus === 'result') assert.equal(s.status, 'over');
   }
