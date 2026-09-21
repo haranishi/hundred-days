@@ -1,0 +1,68 @@
+* { box-sizing: border-box; }
+:root { color-scheme: dark; font-family: system-ui, -apple-system, sans-serif; color: #edf3ff; background: #10192b; }
+body { margin: 0; background: radial-gradient(ellipse at 50% 12%, #26345480, transparent 55%), #10192b; font-size: 16px; line-height: 1.65; }
+header, main, footer { width: min(520px, calc(100% - 32px)); margin-inline: auto; }
+header { display: flex; justify-content: space-between; gap: 12px; padding-block: 24px; font-size: 14px; }
+a { color: #bad5f5; text-underline-offset: 4px; }
+header span, .eyebrow { color: #a3f4db; font-weight: 700; letter-spacing: .1em; }
+h1 { font-size: clamp(30px, 7vw, 42px); line-height: 1.25; letter-spacing: .02em; margin: 8px 0 16px; }
+h2 { font-size: 22px; line-height: 1.5; margin: 8px 0; }
+p { margin: 10px 0; }
+.eyebrow, .note { font-size: 14px; }
+.lead { color: #c3cee1; margin-bottom: 24px; }
+.hud { background: #1a2840; padding: 14px 16px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px 6px; border: 1px solid #40516b; border-radius: 14px 14px 0 0; font-size: 14px; }
+.hud strong { display: block; font-size: 22px; color: #fff; font-variant-numeric: tabular-nums; }
+.reading { grid-column: 1 / -1; display: flex; align-items: center; gap: 16px; }
+.reading strong { display: inline; font-size: 16px; }
+meter { flex: 1; min-width: 50px; height: 14px; accent-color: #ffa58f; }
+meter::-webkit-meter-optimum-value { background: #ffa58f; }
+meter::-moz-meter-bar { background: #ffa58f; }
+.reading[data-level="warm"] meter::-webkit-meter-optimum-value { background: #ffb347; }
+.reading[data-level="warm"] meter::-moz-meter-bar { background: #ffb347; }
+.reading[data-level="hot"] meter::-webkit-meter-optimum-value { background: #ff5a5a; }
+.reading[data-level="hot"] meter::-moz-meter-bar { background: #ff5a5a; }
+.reading[data-level="critical"] meter::-webkit-meter-optimum-value { background: #ff3b3b; }
+.reading[data-level="critical"] meter::-moz-meter-bar { background: #ff3b3b; }
+/* 危険域は数値も同じ色にして、色覚特性で帯の色が読めなくても点滅で気づけるようにする。 */
+.reading[data-level="critical"] #read-level { color: #ff3b3b; animation: read-alert 1s infinite; }
+@keyframes read-alert { 0%, 49% { opacity: 1; } 50%, 100% { opacity: .4; } }
+.stage { position: relative; overflow: hidden; border: 1px solid #40516b; background: #091426; }
+canvas { display: block; width: min(100%, calc((100vh - 220px) * 0.75)); width: min(100%, calc((100svh - 220px) * 0.75)); height: auto; margin-inline: auto; aspect-ratio: 3 / 4; touch-action: none; }
+.overlay { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow-y: auto; padding: 18px; text-align: center; background: #0d192bed; }
+/* 中身がはみ出すときだけ上端を優先する（未対応ブラウザは center のまま）。 */
+#result { justify-content: safe center; }
+.overlay p { font-size: 14px; margin: 6px 0; }
+.overlay h2 { font-size: clamp(24px, 6vw, 32px); }
+.overlay .result-score { font-size: 20px; }
+.result-score strong { font-size: 38px; color: #a3f4db; }
+[hidden] { display: none !important; }
+button { font: inherit; font-size: 16px; font-weight: 700; color: #ecf3ff; background: #24364f; border: 1px solid #6b7d98; border-radius: 9px; min-height: 46px; padding: 10px 20px; cursor: pointer; }
+button:disabled { opacity: .5; cursor: default; }
+button:hover:not(:disabled) { background: #3a4c66; }
+button.primary { background: #a3f4db; color: #101f2c; border-color: #a3f4db; min-width: 200px; margin-top: 16px; }
+button.primary:hover { background: #ccffef; }
+:focus-visible { outline: 3px solid #ffda91; outline-offset: 3px; }
+/* 数字の途中で改行させない。狭い画面では項目ごとに折り返す。 */
+.result-stats { display: flex; flex-wrap: wrap; justify-content: center; gap: 2px 14px; }
+.result-stats .stat { white-space: nowrap; }
+.result-share { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 10px; }
+.result-share__button { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 16px; font-size: 14px; font-weight: 700; color: #ecf3ff; background: #24364f; border: 1px solid #6b7d98; border-radius: 9px; text-decoration: none; cursor: pointer; }
+.result-share__button:hover { background: #3a4c66; }
+.result-share__said { font-size: 14px; color: #c3cee1; user-select: all; overflow-wrap: anywhere; }
+.toolbar { display: flex; gap: 12px; margin-top: 14px; }
+.toolbar button { flex: 1; }
+.instructions { border-top: 1px solid #40516b; margin-top: 24px; padding-top: 14px; }
+.instructions h2 { font-size: 18px; }
+.instructions p, .note { color: #c3cee1; }
+.instructions p { font-size: 14px; }
+.legend { color: #ffac99; }
+footer { padding: 20px 0 36px; font-size: 14px; }
+/* 指で押す的を44pxにする。行の見た目の高さは変えない。 */
+header > a, footer > a { display: inline-flex; align-items: center; min-height: 44px; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden; clip-path: inset(50%); }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; } }
+/* 共通欄も本文と同じ最小文字サイズにする。 */
+.share, .share__label, .share__button, .share__note, .share__said { font-size: 14px; }
+.share { min-width: 0; max-width: 100%; }
+/* 初期スクロールなしでも開始ボタンを見つけられる位置に置く。 */
+#intro { justify-content: flex-start; }

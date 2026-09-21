@@ -77,6 +77,7 @@ Day 019・020は外部で公開するChrome拡張です。このリポジトリ�
 | 042 | 台風、うちに来る？ | [day-042-typhoon-coming/](day-042-typhoon-coming/) | [アプリを開く](https://hundred-days.pages.dev/day-042-typhoon-coming/) |
 | 043 | 退去費用、相談の準備 | [day-043-moveout-consult/](day-043-moveout-consult/) | [アプリを開く](https://hundred-days.pages.dev/day-043-moveout-consult/) |
 | 044 | Tokyo Railscape — 東京の電車を、眺める。 | [day-044-train-here/](day-044-train-here/) | [アプリを開く](https://hundred-days.pages.dev/day-044-train-here/) |
+| 045 | その撃ち方、読まれてる | [day-045-read-your-shots/](day-045-read-your-shots/) | [アプリを開く](https://hundred-days.pages.dev/day-045-read-your-shots/) |
 <!-- day-index:end -->
 
 ## 1日アプリのルール
