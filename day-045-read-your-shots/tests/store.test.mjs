@@ -1,0 +1,12 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { load, saveBest, saveMute, BEST_STORAGE_NAME, MUTE_STORAGE_NAME } from '../lib/store.js';
+const memory=()=>{const m=new Map();return {getItem:k=>m.get(k)??null,setItem:(k,v)=>m.set(k,v),m};};
+test('未保存の初期値',()=>assert.deepEqual(load(memory()),{best:null,mute:false,available:true}));
+test('ベスト点・波・日付を読み書き',()=>{const st=memory();saveBest(st,null,120,2,'2026-09-21');assert.deepEqual(load(st).best,{score:120,wave:2,date:'2026-09-21'});assert.deepEqual([...st.m.keys()],[BEST_STORAGE_NAME]);});
+test('低得点ではベストを下げない',()=>{const st=memory(),b={score:100,wave:1,date:'2026-09-21'};assert.equal(saveBest(st,b,50,2).improved,false);});
+test('同点でも高ウェーブなら更新',()=>assert.equal(saveBest(memory(),{score:100,wave:1},100,2).improved,true));
+test('ミュートだけ別キーに保存',()=>{const st=memory();assert.equal(saveMute(st,true),true);assert.equal(load(st).mute,true);assert.deepEqual([...st.m.keys()],[MUTE_STORAGE_NAME]);});
+test('壊れたJSONを初期化',()=>{const st=memory();st.setItem(BEST_STORAGE_NAME,'{');assert.equal(load(st).best,null);});
+test('不正なベストを採用しない',()=>{const st=memory();st.setItem(BEST_STORAGE_NAME,JSON.stringify({score:-3,wave:0,date:12}));assert.equal(load(st).best,null);});
+test('保存拒否でも値で返す',()=>{const st={getItem(){throw Error();},setItem(){throw Error();}};assert.equal(load(st).available,false);assert.equal(saveBest(st,null,10,1).saved,false);assert.equal(saveMute(st,true),false);assert.equal(load(undefined).available,false);});

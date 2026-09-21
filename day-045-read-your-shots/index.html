@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="敵艦隊が撃ち癖と居場所癖を覚える宇宙船シューティング。動いて、狙いを外して、裏をかこう。">
+  <meta name="share:text" content="その撃ち方、読まれてる — 撃ち癖を覚える敵艦隊の裏をかこう。">
+  <meta name="theme-color" content="#10192b">
+  <title>その撃ち方、読まれてる | 100日チャレンジ</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="shared/share.css">
+  <link rel="stylesheet" href="app.css">
+  <script src="shared/share.js" defer></script>
+  <script type="module" src="app.js"></script>
+</head>
+<body>
+  <header><a href="../">← 100 DAYS / 100 APPS</a><span>DAY 045</span></header>
+  <main id="app" data-state="empty">
+    <p class="eyebrow">敵は、あなたを覚えている。</p>
+    <h1>その撃ち方、<br>読まれてる</h1>
+    <p class="lead">同じ場所は、もう安全じゃない。<br>動いて撃って、艦隊の裏をかこう。</p>
+    <section class="hud" aria-label="戦況">
+      <div>点数<strong id="score">0</strong></div><div>ライフ<strong id="lives">3</strong></div><div>ウェーブ<strong id="wave">1</strong></div><div>ベスト<strong id="best">—</strong></div>
+      <div class="reading"><label for="read-meter">読まれ度 <strong id="read-level">0</strong> / 100</label><span>残り <b id="remaining">28</b></span><meter id="read-meter" min="0" max="100" value="0">0</meter></div>
+    </section>
+    <div class="stage">
+      <canvas id="game" width="480" height="640" tabindex="0" aria-label="宇宙船の戦場。左右キーで移動、スペースで発射" aria-describedby="controls">このゲームにはCanvas対応ブラウザが必要です。</canvas>
+      <section id="intro" class="overlay"><p class="eyebrow">撃つ場所を、変えてみよう。</p><h2>押したまま、<br>指で左右へ。</h2><p>自動で移動して、撃ち続ける。<br>赤い帯は覚えられた撃ち場所。</p><button id="start" class="primary">はじめる</button><p>キーボードなら Enter<br>キーボード：← → で移動、Space で発射</p></section>
+      <section id="paused-panel" class="overlay" hidden><h2>ひと休み。</h2><p>P / Esc または下の再開ボタン</p></section>
+      <section id="result" class="overlay" hidden aria-labelledby="result-title"><p id="reason"></p><h2 id="result-title">次は、裏をかこう。</h2><p class="result-score"><strong id="final-score">0</strong> 点</p><p class="result-stats"><span class="stat">到達ウェーブ <span id="final-wave">1</span></span><span class="stat">撃破 <span id="final-kills">0</span></span><span class="stat">裏をかいた <span id="final-bonus">0</span></span><span class="stat">ベスト <span id="final-best">0</span></span></p><p id="review"></p><button id="retry" class="primary">もう一度</button><p>Enterでも再挑戦</p><p class="result-share"><a id="result-x" class="result-share__button" href="https://x.com/intent/post" target="_blank" rel="noopener noreferrer">Xで結果を投稿</a><button id="result-copy" type="button" class="result-share__button">リンクをコピー</button></p><p id="result-said" class="result-share__said" role="status" hidden></p></section>
+    </div>
+    <div class="toolbar"><button id="pause" disabled>一時停止</button><button id="mute" aria-pressed="false">音：オン</button></div>
+    <p id="art-note" class="note" role="status" hidden>画像を読めないため、図形で表示しています。</p>
+    <p id="save-note" class="note" role="status" hidden>端末に保存できません。この画面では記録を保持します。</p>
+    <p id="status" class="sr-only" aria-live="polite"></p>
+    <section id="controls" class="instructions"><h2>動いて、読ませない。</h2><p>指：戦場を押したまま左右へ<br>キー：← → / A D で移動、Space / ↑ / Z で発射<br>P / Esc：一時停止　M：音の切替</p><p><span class="legend">赤い帯</span> 撃ち癖の熱 ／ ▽ 敵が狙う場所<br>熱の低い場所から当てると、得点2倍。</p></section>
+    <p class="note">保存はこの端末のベストと音設定だけ。外部通信なし。</p>
+    <noscript>遊ぶにはJavaScriptを有効にしてください。</noscript>
+  </main>
+  <footer><div id="share"></div><a href="../privacy.html">プライバシー</a></footer>
+</body>
+</html>

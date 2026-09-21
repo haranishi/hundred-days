@@ -1,0 +1,16 @@
+* { box-sizing: border-box; }
+html, body { margin: 0; width: 540px; height: 960px; overflow: hidden; background: #091426; color: #edf3ff; font-family: system-ui, sans-serif; }
+#composition { position: relative; width: 540px; height: 960px; background: radial-gradient(ellipse at 50% 0, #2c4366, #091426 70%); }
+.mark { position: absolute; top: 96px; left: 54px; margin: 0; font-size: 15px; letter-spacing: .18em; color: #a3f4db; }
+#game-frame { position: absolute; left: 30px; top: 137px; width: 480px; height: 640px; border: 0; pointer-events: none; }
+#caption { position: absolute; left: 54px; top: 793px; width: 432px; height: 66px; padding: 13px 6px; margin: 0; background: #14253e; border-radius: 12px; text-align: center; }
+#caption-lines { display: block; font-size: 23px; font-weight: 750; line-height: 40px; white-space: nowrap; }
+#focus { display: none; position: absolute; pointer-events: none; border: 2px solid #ffcf9a; border-radius: 8px; }
+[data-focus="heat"] #focus { display: block; left: 34px; top: 141px; width: 472px; height: 30px; box-shadow: 0 0 18px #ff646477; }
+[data-focus="aim"] #focus { display: block; left: 40px; top: 668px; width: 460px; height: 81px; }
+#end { position: absolute; inset: 0; padding: 96px 54px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 24px; background: #10192b; text-align: center; }
+#end h1 { font-size: 46px; line-height: 1.45; margin: 0; }
+#end span { color: #a3f4db; letter-spacing: .16em; font-size: 18px; }
+#end p { margin: 0; font-size: 24px; }
+#end small { font-size: 22px; color: #ffcf9a; }
+[hidden] { display: none !important; }
