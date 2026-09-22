@@ -97,7 +97,7 @@ export async function main(args = process.argv.slice(2)) {
   const chromium = mod.chromium ?? mod.default?.chromium;
   if (!chromium) throw new Error('Playwright chromium がありません');
 
-  const work = mkdtempSync(join(tmpdir(), 'day047-promo-'));
+  const work = mkdtempSync(join(tmpdir(), 'day046-promo-'));
   let browser, server;
   try {
     const served = await serve(); server = served.server;
@@ -115,11 +115,11 @@ export async function main(args = process.argv.slice(2)) {
     await page.waitForFunction(() => Boolean(window.__promo));
     const gameURL = new URL('../../index.html', new URL('tools/promo/promo.html', served.base)).href;
     await page.evaluate(url => window.__promo.load(url), gameURL);
-    await page.waitForFunction(() => document.querySelector('iframe').contentWindow?.__day047);
+    await page.waitForFunction(() => document.querySelector('iframe').contentWindow?.__day046);
     const game = page.frames().find(frame => frame.url() === gameURL);
     if (!game) throw new Error('ゲームiframeがありません');
     await game.addStyleTag({ content: GAME_CSS });
-    await game.evaluate(() => { window.__day047.unlockAll(); window.__day047.setManual(true); });
+    await game.evaluate(() => { window.__day046.unlockAll(); window.__day046.setManual(true); });
     await game.evaluate(() => document.fonts.ready);
     await page.evaluate(() => document.fonts.ready);
 
@@ -131,7 +131,7 @@ export async function main(args = process.argv.slice(2)) {
         lastScene = scene.id;
         if (scene.level) {
           await game.evaluate(({ level, from }) => {
-            const api = window.__day047;
+            const api = window.__day046;
             api.setManual(true);
             api.begin(level);
             api.autopilot(true);
@@ -139,10 +139,10 @@ export async function main(args = process.argv.slice(2)) {
           }, { level: scene.level, from: scene.gameFrom });
         }
       }
-      await game.evaluate(ms => window.__day047.advance(ms), 1000 / DEFAULT_FPS);
+      await game.evaluate(ms => window.__day046.advance(ms), 1000 / DEFAULT_FPS);
       await page.evaluate(seconds => window.__promo.render(seconds), t);
       if (frame === 0) {
-        const first = await game.evaluate(() => window.__day047.snapshot());
+        const first = await game.evaluate(() => window.__day046.snapshot());
         if (first.status !== 'playing') throw new Error('1コマ目が遊んでいる画面ではありません');
         rect = await page.locator('#caption-lines').evaluate(el => {
           const r = el.getBoundingClientRect();

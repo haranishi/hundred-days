@@ -506,7 +506,7 @@ paint();
 requestAnimationFrame(frame);
 
 // E2Eとデモ録画から使う操作・観測の窓口。
-window.__day047 = {
+window.__day046 = {
   mode: () => mode,
   snapshot: () => ({
     id: state.id,

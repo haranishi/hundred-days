@@ -1,5 +1,5 @@
-# Day047 v2 2周目契約（物理・自動操作・観測＝Codex）
-前提: 1周目の採点 `（評価用の作業フォルダ）/score-round1.md` を読む（TOP5 の 1・2・5 があなたの担当）。境界 day047-v2-boundary.md は据え置き。所有ファイルも1周目と同じ。
+# Day046 v2 2周目契約（物理・自動操作・観測＝Codex）
+前提: 1周目の採点 `（評価用の作業フォルダ）/score-round1.md` を読む（TOP5 の 1・2・5 があなたの担当）。境界 day046-v2-boundary.md は据え置き。所有ファイルも1周目と同じ。
 やること:
 1. **観測ログの契約を固定する**（画面担当と評価が読む）。`state.telemetry` の各要素は
    `{ type: 'stomp'|'hit'|'miss'|'collect'|'ability'|'clear'|'visible', tick, entityId?, kind?, cause? }`。
@@ -11,5 +11,5 @@
 4. `tests/helpers.mjs` の「app.js の import 行を正規表現で剥がして差し替える」方式をやめ、`app.js` を素直に読み込める形（DOM と localStorage の最小スタブ＋ `import()`）にする。app.js の中身は変えない（画面担当の所有）。
 5. 決定性: 入力列の固定再生で全tick・全状態（`telemetry` を含む）が一致することを、`tests/physics.test.mjs` で20面ぶん確かめる（走行1で入力を記録→走行2で再生→毎tick `JSON.stringify` 比較）。
 6. 「能力なし主路」: `F S` を `.` に置き換えた20面で safe が到達することをテストに加える（既存の敵込み到達テストは残す）。
-検証: `node --test day-047-namahage-night/tests/` と `node --test day-*/tests/`。git・ブラウザ・E2E・build・precheck はしない。
+検証: `node --test day-046-namahage-night/tests/` と `node --test day-*/tests/`。git・ブラウザ・E2E・build・precheck はしない。
 報告: 変更ファイル、テスト件数、1-1で踏んだtick、collect の面別回収表、決定性の結果。

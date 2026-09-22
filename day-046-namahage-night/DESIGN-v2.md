@@ -254,7 +254,7 @@ Sの初登場は3-2のまま、Bは3-3のまま。2-2で未実装の説明を出
 | Codex：物理・敵・検証核 | `lib/physics.js`, `lib/entities.js`, `lib/levels.js`, `lib/autopilot.js`, `tests/physics.test.mjs`, `tests/entities.test.mjs`, `tests/levels.test.mjs`, `tests/helpers.mjs` | tick状態、R/B/F/S/J/%、共通接触、得点とミス巻戻し、telemetry、敵込み自動操作、主路と能力のテスト、設計者として最終採点 |
 | Claude Opus：面・描画・画面 | `lib/level-data.js`, `lib/sprites/props.js`, `lib/render.js`, `lib/store.js`, `app.js`, `index.html`, `app.css`, `tests/sprites.test.mjs`, `tests/store.test.mjs`, `tests/app.test.mjs`, `tests/index.mjs` | 20面の再配置、人の原画転記、実座標描画、HUD・お札・結果・保存、テスト登録、実操作と採点用の証拠収集 |
 
-`lib/sprites/hero.js`、`lib/audio.js`、共有コード、紹介動画ツールは変更不要。E2Eを追加する場合は既存のリポジトリ側 `tests/e2e/day-047.spec.mjs` をClaude Opusの専有とし、実装開始時に対象へ含める。仕様文書を実装に同期する場合の `REQUIREMENTS.md` とREADMEもClaude Opusだけが更新する。今回はこれら全て編集しない。
+`lib/sprites/hero.js`、`lib/audio.js`、共有コード、紹介動画ツールは変更不要。E2Eを追加する場合は既存のリポジトリ側 `tests/e2e/day-046.spec.mjs` をClaude Opusの専有とし、実装開始時に対象へ含める。仕様文書を実装に同期する場合の `REQUIREMENTS.md` とREADMEもClaude Opusだけが更新する。今回はこれら全て編集しない。
 
 最初の30分で、次の受渡しを確定する。
 

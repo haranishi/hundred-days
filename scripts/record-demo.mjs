@@ -75,7 +75,7 @@ const has = (cmd) => {
 
 const VIDEO = { width: 720, height: 1280 }; // 最終出力（ffmpegで拡大）
 // 録画時のビューポート。9:16を保ったまま、DEMO_WIDTH/DEMO_HEIGHT で狭くできる
-// （画面幅に合わせて整数倍で拡大するアプリは、狭いほど中身が大きく写る。day-047が該当）。
+// （画面幅に合わせて整数倍で拡大するアプリは、狭いほど中身が大きく写る。day-046が該当）。
 const VIEW = {
   width: Number(process.env.DEMO_WIDTH) || 540,
   height: Number(process.env.DEMO_HEIGHT) || 960,

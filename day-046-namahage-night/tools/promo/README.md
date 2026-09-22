@@ -1,4 +1,4 @@
-# Day 047 紹介動画
+# Day 046 紹介動画
 
 30秒・1080×1920・30fps。実物のゲームを iframe に入れ、手動の時計で進めながら900枚のPNGを撮り、ffmpegで動画にする。字幕・エンド画面・コード合成のBGM付き。依存パッケージは増やさない。
 
@@ -6,7 +6,7 @@
 
 ```sh
 export PLAYWRIGHT='<playwright index.js>'
-cd day-047-namahage-night
+cd day-046-namahage-night
 node tools/promo/render-promo.mjs --preview   # 下見（540×960で撮って拡大）
 node tools/promo/render-promo.mjs             # 本番（1080×1920で撮影）
 ```
@@ -24,7 +24,7 @@ BGMだけ試聴するなら `node tools/promo/promo-audio.mjs`（`promo-audio.wa
 | 13–18 | 3-2 の0.5秒から。吹雪と氷 | 吹雪の尾根をこえて |
 | 18–22 | 4-1 の1.0秒から。里の屋根を渡る | 里の、家々へ |
 | 22–27 | 4-1 の4.2秒から。戸口に着き、クリア画面まで | 泣ぐ子は、いねがぁ |
-| 27–30 | タイトル・DAY 047・hundred-days.pages.dev | エンド画面 |
+| 27–30 | タイトル・DAY 046・hundred-days.pages.dev | エンド画面 |
 
 1回の通しプレイではなく、面ごとに撮り直す構成。各場面の頭で `begin(面)` → `setManual(true)` → `autopilot(true)` → `advance(gameFrom×1000)` を呼び、以後は毎コマ `advance(1000/30)` だけで進める。実時間や通知を待たない。
 
