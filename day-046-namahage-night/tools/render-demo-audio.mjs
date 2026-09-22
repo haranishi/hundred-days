@@ -1,6 +1,6 @@
 // demo.mp4 に、アプリと同じ合成音と静かなBGMを後から付けて demo-with-audio.mp4 を書き出す。
 //
-//   cd day-047-namahage-night && node tools/render-demo-audio.mjs
+//   cd day-046-namahage-night && node tools/render-demo-audio.mjs
 //
 // 必要なもの: ffmpeg / ffprobe。映像は再エンコードしない（-c:v copy）ので demo.mp4 は触らない。
 //
@@ -327,8 +327,8 @@ export function main(args = process.argv.slice(2)) {
   const full = mixdown(cues, { duration: sync.audioFrom + sync.duration });
   const from = Math.round(sync.audioFrom * SAMPLE_RATE);
   const clip = full.slice(from, from + Math.round(sync.duration * SAMPLE_RATE));
-  const raw = join(tmpdir(), 'day-047-demo-raw.wav');
-  const wav = join(tmpdir(), 'day-047-demo.wav');
+  const raw = join(tmpdir(), 'day-046-demo-raw.wav');
+  const wav = join(tmpdir(), 'day-046-demo.wav');
   writeFileSync(raw, encodeWav(clip));
   applyLoudnorm(raw, wav, measureLoudness(raw));
   const loudness = Number(measureLoudness(wav).input_i);

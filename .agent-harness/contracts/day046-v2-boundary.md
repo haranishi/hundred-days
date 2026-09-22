@@ -1,6 +1,6 @@
-# Day047 v2 共通境界（物理担当と画面担当の受け渡し）
+# Day046 v2 共通境界（物理担当と画面担当の受け渡し）
 
-正本は `day-047-namahage-night/DESIGN-v2.md`（§2〜§8）。ここは2人が同時に作業するために、§8の受け渡しを先に確定したもの。**どちらもこの境界を変えない。**変えたくなったら自分の側で吸収し、報告に書く。
+正本は `day-046-namahage-night/DESIGN-v2.md`（§2〜§8）。ここは2人が同時に作業するために、§8の受け渡しを先に確定したもの。**どちらもこの境界を変えない。**変えたくなったら自分の側で吸収し、報告に書く。
 
 ## 1周目の範囲（§8のとおり）
 入れる: 雪うさぎ `R`・雪かきイノシシ `B`／風呂敷 `F`・駆け鈴 `S`／雪台 `J`・崩れる枝 `%`／全20面に米俵6・餅2（うち任意餅1）／連続踏み倍率／3お札（早駆け・福集め・無傷）と面内得点・ミス巻戻し／保存v2／HUD・結果画面／4-5の安全終端16列と締め文／縦床・つららの表示位置修正。
@@ -50,5 +50,5 @@
 
 ## 所有ファイル（同じファイルを2人で触らない）
 - **物理担当（Codex）**: `lib/physics.js`, `lib/entities.js`, `lib/levels.js`, `lib/autopilot.js`, `tests/physics.test.mjs`, `tests/entities.test.mjs`, `tests/levels.test.mjs`, `tests/helpers.mjs`
-- **画面担当（Claude Opus）**: `lib/level-data.js`, `lib/sprites/props.js`, `lib/render.js`, `lib/store.js`, `app.js`, `index.html`, `app.css`, `tests/sprites.test.mjs`, `tests/store.test.mjs`, `tests/app.test.mjs`, `tests/index.mjs`, `tests/e2e/day-047.spec.mjs`（リポジトリ直下）, `REQUIREMENTS.md`, `README.md`
+- **画面担当（Claude Opus）**: `lib/level-data.js`, `lib/sprites/props.js`, `lib/render.js`, `lib/store.js`, `app.js`, `index.html`, `app.css`, `tests/sprites.test.mjs`, `tests/store.test.mjs`, `tests/app.test.mjs`, `tests/index.mjs`, `tests/e2e/day-046.spec.mjs`（リポジトリ直下）, `REQUIREMENTS.md`, `README.md`
 - 触らない: `lib/sprites/hero.js`, `lib/audio.js`, `shared/`, `tools/`, `demo-scenario.mjs`, `DESIGN-v2.md`, 他のDay

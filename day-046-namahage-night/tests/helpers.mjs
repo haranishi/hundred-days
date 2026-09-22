@@ -87,7 +87,7 @@ async function prepareApp() {
     requestAnimationFrame: callback => { frame = callback; },
   });
   await import(`../app.js?test=${appSerial++}`);
-  return { api: window.__day047, handlers, stored, frame: now => frame(now),
+  return { api: window.__day046, handlers, stored, frame: now => frame(now),
     dispose: () => { for (const timer of timers) clearTimeout(timer); },
   };
 }

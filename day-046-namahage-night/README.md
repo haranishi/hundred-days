@@ -1,4 +1,4 @@
-# Day 047 — 泣ぐ子は、いねがぁ
+# Day 046 — 泣ぐ子は、いねがぁ
 
 大晦日の夜、なまはげが山を下りて里の家々を回る横スクロールアクション。4ワールド20面。
 
@@ -71,8 +71,8 @@ R：やり直し　Esc：面えらび　スマホは画面下端の3ボタン
 ## 検証
 
 ```sh
-node --test day-047-namahage-night/tests/     # 単体
-npx playwright test tests/e2e/day-047.spec.mjs # E2E（リポジトリ直下）
+node --test day-046-namahage-night/tests/     # 単体
+npx playwright test tests/e2e/day-046.spec.mjs # E2E（リポジトリ直下）
 ```
 
 20面すべてについて、**敵・つらら・崩れる枝を全部有効にしたまま**自動操作で走らせ、ミスなく戸口へ届くことを確かめている。

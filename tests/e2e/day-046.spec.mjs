@@ -1,5 +1,5 @@
 import { test,expect } from '@playwright/test';
-const PATH='/day-047-namahage-night/';
+const PATH='/day-046-namahage-night/';
 const errors=new WeakMap(),external=new WeakMap();
 test.beforeEach(async({page})=>{
  errors.set(page,[]);external.set(page,[]);
@@ -11,7 +11,7 @@ test.afterEach(async({page})=>{expect(errors.get(page)).toEqual([]);expect(exter
 async function begin(page,id='1-1'){await page.goto(PATH);await page.locator('#start').click();await page.locator(`[data-level="${id}"]`).click();await expect(page.locator('#app')).toHaveAttribute('data-state','playing');}
 // 自動操作で戸口まで進める。手動の時計なので実時間に依存しない。
 async function autoClear(page){
- await page.evaluate(async()=>{const g=window.__day047;g.setManual(true);g.autopilot(true);
+ await page.evaluate(async()=>{const g=window.__day046;g.setManual(true);g.autopilot(true);
   for(let i=0;i<12000&&g.mode()==='playing';i++)g.advance(1000/120);
   g.autopilot(false);return g.mode();});
  await expect(page.locator('#clear')).toBeVisible();
@@ -35,10 +35,10 @@ test('実キーボード入力で進み、上端1行のHUDが状態を映す',as
  await expect(page.locator('#lives')).toHaveText('残 3');
  await expect(page.locator('#seals b')).toHaveCount(3);
  await expect(page.locator('#lesson')).toBeVisible();
- const before=await page.evaluate(()=>window.__day047.snapshot().x);
+ const before=await page.evaluate(()=>window.__day046.snapshot().x);
  // 最初のうさぎ（列8）に触れる手前まで。餅は列4にある。
  await page.keyboard.down('ArrowRight');await page.clock.runFor(800);await page.keyboard.up('ArrowRight');
- const after=await page.evaluate(()=>window.__day047.snapshot());
+ const after=await page.evaluate(()=>window.__day046.snapshot());
  expect(after.x).toBeGreaterThan(before+40);
  expect(after.stage).toBe(1); // 開始から10タイル以内の餅で、なまはげになる
  await expect(page.locator('#form')).toHaveText('◆ なまはげ');
@@ -61,7 +61,7 @@ test('1-1をクリアすると、3条件の実数と記録が出る',async({page
  await page.locator('#next').click();await expect(page.locator('#level-label')).toHaveText('1-2');
 });
 test('最後の面は締めの1行を出し、少し待ってから操作できる',async({page})=>{
- await page.goto(PATH);await page.evaluate(()=>window.__day047.unlockAll());
+ await page.goto(PATH);await page.evaluate(()=>window.__day046.unlockAll());
  await page.locator('#start').click();await page.locator('[data-level="4-5"]').click();
  await autoClear(page);
  await expect(page.locator('#clear-title')).toHaveText('戸口は、ここまで。');
@@ -88,7 +88,7 @@ test('共通共有欄とビルドで注入されるOGP',async({page})=>{
  await page.goto(PATH);await expect(page.locator('#share .share')).toHaveCount(1);await expect(page.locator('#share .share__button').first()).toBeVisible();
  await expect(page.locator('meta[property="og:title"]')).toHaveAttribute('content',/泣ぐ子は、いねがぁ/);
  await expect(page.locator('meta[property="og:image"]')).toHaveAttribute('content',/^https?:\/\//);
- await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href',/\/day-047-namahage-night\//);
+ await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href',/\/day-046-namahage-night\//);
 });
 
 test('1-1は右キーを押し続けるだけで雪うさぎを踏み、面の頭の説明にその手段が書いてある',async({page})=>{
@@ -100,12 +100,12 @@ test('1-1は右キーを押し続けるだけで雪うさぎを踏み、面の�
  await expect(page.locator('#lesson')).toContainText('上の棚');
  await page.clock.runFor(600); // 2.1秒までに踏みが成立する（実測240tick）。
  await page.keyboard.up('ArrowRight');
- const snapshot=await page.evaluate(()=>window.__day047.snapshot());
+ const snapshot=await page.evaluate(()=>window.__day046.snapshot());
  expect(snapshot.attemptScore).toBeGreaterThanOrEqual(100); // 雪うさぎ100点ぶん
  expect(snapshot.lives).toBe(3);
 });
 test('戸口に着いた結果画面には、得点の浮き文字が残らない',async({page})=>{
  await begin(page);await autoClear(page);
- expect(await page.evaluate(()=>window.__day047.snapshot().pops)).toBe(0);
+ expect(await page.evaluate(()=>window.__day046.snapshot().pops)).toBe(0);
  await expect(page.locator('#clear-score')).toContainText('この挑戦');
 });

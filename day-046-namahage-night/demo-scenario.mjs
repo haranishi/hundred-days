@@ -50,7 +50,7 @@ export const SEGMENTS = [
 ];
 
 // 録画で鳴った音の書き出し先。tools/render-demo-audio.mjs がここを読む。
-export const CUES_FILE = join(tmpdir(), 'day-047-demo-cues.json');
+export const CUES_FILE = join(tmpdir(), 'day-046-demo-cues.json');
 
 // 遊びの画だけを写す。説明文や共有欄は録画中だけ畳む。
 const FOCUS = `
@@ -59,27 +59,27 @@ const FOCUS = `
 `;
 
 async function play(page, id) {
-  await page.evaluate(level => window.__day047.begin(level), id);
-  await page.evaluate(() => window.__day047.autopilot(true));
+  await page.evaluate(level => window.__day046.begin(level), id);
+  await page.evaluate(() => window.__day046.autopilot(true));
 }
 
 async function open(page) {
   await page.goto(`${await server()}`, { waitUntil: 'load' });
   await page.addStyleTag({ content: FOCUS });
-  await page.evaluate(() => window.__day047.unlockAll());
+  await page.evaluate(() => window.__day046.unlockAll());
 }
 
 export default async function demo(page, h) {
   await open(page);
   // 1面目が始まる直前から記録する。以後 at は「この瞬間からの秒」になる。
-  await page.evaluate(() => window.__day047.recordEvents(true));
+  await page.evaluate(() => window.__day046.recordEvents(true));
   for (const { id, ms } of SEGMENTS) {
     await play(page, id);
     await h.pause(ms);
   }
   const cues = await page.evaluate(() => ({
-    secondsAtEnd: window.__day047.recordedSeconds(),
-    events: window.__day047.events(),
+    secondsAtEnd: window.__day046.recordedSeconds(),
+    events: window.__day046.events(),
   }));
   await writeFile(CUES_FILE, JSON.stringify(cues));
 }
@@ -90,8 +90,8 @@ export const shotScroll = 0;
 export async function shotSetup(page) {
   await open(page);
   await play(page, '4-1');
-  await page.waitForFunction(() => window.__day047.snapshot().x > 300, null, { timeout: 20000 });
-  await page.evaluate(() => window.__day047.autopilot(false));
-  await page.evaluate(() => window.__day047.setInput({ left: false, right: false, jump: false }));
+  await page.waitForFunction(() => window.__day046.snapshot().x > 300, null, { timeout: 20000 });
+  await page.evaluate(() => window.__day046.autopilot(false));
+  await page.evaluate(() => window.__day046.setInput({ left: false, right: false, jump: false }));
   await page.waitForTimeout(400);
 }
