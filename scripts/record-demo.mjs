@@ -74,7 +74,16 @@ const has = (cmd) => {
 // ---------------------------------------------------------------- 動画
 
 const VIDEO = { width: 720, height: 1280 }; // 最終出力（ffmpegで拡大）
-const VIEW = { width: 540, height: 960 }; // 録画時のビューポート。9:16
+// 録画時のビューポート。9:16を保ったまま、DEMO_WIDTH/DEMO_HEIGHT で狭くできる
+// （画面幅に合わせて整数倍で拡大するアプリは、狭いほど中身が大きく写る。day-047が該当）。
+const VIEW = {
+  width: Number(process.env.DEMO_WIDTH) || 540,
+  height: Number(process.env.DEMO_HEIGHT) || 960,
+};
+if (VIEW.width * 16 !== VIEW.height * 9) {
+  console.error(`ビューポートが9:16ではありません: ${VIEW.width}×${VIEW.height}`);
+  process.exit(1);
+}
 
 // ⚠️ recordVideo.size は必ず VIEW と一致させる。
 // Playwrightはページ映像を**拡大しない**。録画サイズの方が大きいと、原寸のまま左上に置いて
