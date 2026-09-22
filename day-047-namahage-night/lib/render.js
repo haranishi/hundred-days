@@ -1,21 +1,51 @@
 import { PALETTE, HERO } from './sprites/hero.js';
 import { PROPS } from './sprites/props.js';
 const forms = ['chibi', 'namahage', 'arakioni'];
-export function drawSprite(ctx, sprite, x, y, frame = 'idle', flip = false) {
+// 記号 → 原画。R/B/F/S/J/% は v2 で足したもの。
+const SPRITE_OF = {
+  C: 'crow',
+  D: 'dog',
+  R: 'rabbit',
+  B: 'boar',
+  O: 'owl',
+  o: 'mochi',
+  '*': 'rice',
+  '^': 'icicle',
+  G: 'door',
+  M: 'platform',
+  F: 'furoshiki',
+  S: 'bell',
+  J: 'snowpad',
+  '%': 'branch',
+};
+const ABILITY_SPRITE = { F: 'furoshiki', S: 'bell' };
+// 原画の一部の行だけをずらして描けるようにする（予告の姿を追加の絵なしで作るため）。
+export function drawSprite(
+  ctx,
+  sprite,
+  x,
+  y,
+  frame = 'idle',
+  flip = false,
+  parts = null,
+) {
   const rows = sprite.frames[frame] ?? sprite.frames.idle;
-  for (let yy = 0; yy < sprite.h; yy++) {
-    for (let xx = 0; xx < sprite.w; xx++) {
-      const color = parseInt(rows[yy][xx], 36);
-      if (!color) {
-        continue;
+  const ranges = parts ?? [{ from: 0, to: sprite.h - 1, dx: 0, dy: 0 }];
+  for (const range of ranges) {
+    for (let yy = range.from; yy <= range.to; yy++) {
+      for (let xx = 0; xx < sprite.w; xx++) {
+        const color = parseInt(rows[yy][xx], 36);
+        if (!color) {
+          continue;
+        }
+        ctx.fillStyle = PALETTE[color];
+        ctx.fillRect(
+          Math.round(x) + (range.dx ?? 0) + (flip ? sprite.w - 1 - xx : xx),
+          Math.round(y) + (range.dy ?? 0) + yy,
+          1,
+          1,
+        );
       }
-      ctx.fillStyle = PALETTE[color];
-      ctx.fillRect(
-        Math.round(x) + (flip ? sprite.w - 1 - xx : xx),
-        Math.round(y) + yy,
-        1,
-        1,
-      );
     }
   }
 }
@@ -121,9 +151,80 @@ function drawBackdrop(ctx, s, camera) {
   }
 }
 
+// 「!」を1画素ずつ置く。色だけに頼らず、予告を形でも示す。
+function bang(ctx, x, y) {
+  ctx.fillStyle = PALETTE[2];
+  ctx.fillRect(x, y, 2, 5);
+  ctx.fillRect(x, y + 6, 2, 2);
+}
+
+// 予告・退場・振動を、追加の絵ではなく座標のずらしで表す。
+function entityPose(e, tick) {
+  const phase = e.phase ?? 'ready';
+  const pose = { dx: 0, dy: 0, parts: null, warn: false };
+  if (!e.alive) {
+    // 退場は24tickかけて16px上へ。
+    const left = Math.max(0, Math.min(24, e.retireTicks ?? 0));
+    pose.dy = -Math.round((16 * (24 - left)) / 24);
+    return pose;
+  }
+  if (e.type === 'R' && phase === 'warning') {
+    // 耳を2px下げる（跳ぶ直前）。
+    pose.parts = [
+      { from: 0, to: 6, dx: 0, dy: 2 },
+      { from: 7, to: 15, dx: 0, dy: 0 },
+    ];
+    pose.warn = true;
+  }
+  if (e.type === 'B' && phase === 'warning') {
+    pose.warn = true;
+  }
+  if (e.type === '%' && phase === 'cracking') {
+    pose.dx = tick % 4 < 2 ? 1 : -1;
+  }
+  return pose;
+}
+
+// 主人公が持っている能力を足元に出す。残り2秒は点滅させる。
+function abilityMark(ctx, s, camera) {
+  const name = ABILITY_SPRITE[s.ability ?? ''];
+  if (!name) {
+    return;
+  }
+  const ticks = s.abilityTicks ?? 0;
+  if (ticks > 0 && ticks <= 240 && Math.floor(s.tick / 6) % 2 === 0) {
+    return;
+  }
+  const p = s.player;
+  drawSprite(
+    ctx,
+    PROPS[name],
+    p.x + p.w / 2 - 8 - camera,
+    p.y + p.h - 6,
+    'idle',
+    false,
+    [{ from: 0, to: 11, dx: 0, dy: 0 }],
+  );
+}
+
+// HUD の16×16アイコン。ゲーム画面と同じ原画を使う。
+function paintIcon(iconCtx, ability) {
+  if (!iconCtx) {
+    return;
+  }
+  iconCtx.clearRect(0, 0, 16, 16);
+  const name = ABILITY_SPRITE[ability ?? ''];
+  if (name) {
+    drawSprite(iconCtx, PROPS[name], 0, 0);
+  }
+}
+
 // 面幅に合わせてカメラを動かし、背景から順に描く。
-export function render(ctx, state) {
+// overlay.pops = [{ x, y, text, ticks }]（得点の浮き文字。ticks は60から減る）
+// overlay.iconCtx = HUD の能力アイコン用 2D コンテキスト
+export function render(ctx, state, overlay = {}) {
   ctx.imageSmoothingEnabled = false;
+  paintIcon(overlay.iconCtx, state.ability ?? null);
   const s = state,
     p = s.player,
     camera = Math.max(
@@ -140,31 +241,49 @@ export function render(ctx, state) {
     }),
   );
   for (const e of s.entities) {
-    if (!e.alive) {
+    const name = SPRITE_OF[e.type];
+    if (!name || (e.phase ?? 'ready') === 'absent') {
       continue;
     }
-    const name = {
-      C: 'crow',
-      D: 'dog',
-      o: 'mochi',
-      '*': 'rice',
-      '^': 'icicle',
-      G: 'door',
-      M: 'platform',
-    }[e.type];
-    drawSprite(
-      ctx,
-      PROPS[name],
-      e.x - camera,
-      e.drawY ?? e.y,
+    // 倒れた敵は退場の24tickだけ描き続ける。
+    if (!e.alive && !(e.retireTicks > 0)) {
+      continue;
+    }
+    const pose = entityPose(e, s.tick);
+    // 実座標で描く。戸口だけは当たりが縦いっぱいなので drawY を使う。
+    const drawX = e.x - camera + pose.dx;
+    const drawY = (e.type === 'G' ? (e.drawY ?? e.y) : e.y) + pose.dy;
+    if (drawX < -32 || drawX > 336) {
+      continue;
+    }
+    const frame =
       e.type === 'C' || e.type === 'D'
         ? Math.floor(s.tick / 16) % 2
           ? 'walk1'
           : 'walk2'
-        : 'idle',
+        : 'idle';
+    drawSprite(
+      ctx,
+      PROPS[name],
+      drawX,
+      drawY,
+      frame,
+      (e.direction ?? 1) < 0 && (e.type === 'B' || e.type === 'D'),
+      pose.parts,
     );
     if (e.type === 'M') {
-      drawSprite(ctx, PROPS.platform, e.x + 16 - camera, e.y);
+      drawSprite(ctx, PROPS.platform, drawX + 16, drawY);
+    }
+    if (e.type === 'B' && pose.warn) {
+      // 前脚の下に雪煙を3つ。
+      ctx.fillStyle = PALETTE[12];
+      const foot = (e.direction ?? 1) < 0 ? drawX + 2 : drawX + 10;
+      for (let i = 0; i < 3; i++) {
+        ctx.fillRect(foot + i * 2, drawY + 16, 1, 1);
+      }
+    }
+    if (pose.warn) {
+      bang(ctx, drawX + 7, drawY - 10);
     }
   }
   const frame =
@@ -187,6 +306,21 @@ export function render(ctx, state) {
       p.facing < 0,
     );
   }
+  abilityMark(ctx, s, camera);
+  // 得点の浮き文字。対象の少し上に60tickだけ出す。
+  ctx.font = '10px monospace';
+  ctx.textAlign = 'center';
+  for (const pop of overlay.pops ?? []) {
+    const x = Math.round(pop.x - camera);
+    if (x < -24 || x > 344) {
+      continue;
+    }
+    const rise = Math.round(((60 - pop.ticks) / 60) * 8);
+    ctx.fillStyle = '#1a1220';
+    ctx.fillText(pop.text, x + 1, pop.y - rise + 1);
+    ctx.fillStyle = pop.text.startsWith('×') ? '#edb65d' : '#f7e8c3';
+    ctx.fillText(pop.text, x, pop.y - rise);
+  }
   if (s.status === 'dying') {
     ctx.fillStyle = '#1a1220dc';
     ctx.fillRect(40, 64, 240, 48);
@@ -195,4 +329,5 @@ export function render(ctx, state) {
     ctx.textAlign = 'center';
     ctx.fillText('ひと息ついて、もう一度。', 160, 92);
   }
+  ctx.textAlign = 'left';
 }

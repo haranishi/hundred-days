@@ -1,5 +1,5 @@
 import { getLevel, markers, tileAt } from './levels.js';
-import { createEntities, updateEntities, overlap } from './entities.js';
+import { createEntities, updateEntities, overlap, isPlatform } from './entities.js';
 export const DT = 1 / 120;
 export const SIZES = [
   { w: 10, h: 14 },
@@ -26,7 +26,7 @@ export function createState(id = '1-1', options = {}) {
   const level = options.level ?? getLevel(id),
     start = markers(level, 'P')[0],
     stage = options.stage ?? 0;
-  return {
+  const s = {
     id,
     level,
     tick: 0,
@@ -37,6 +37,20 @@ export function createState(id = '1-1', options = {}) {
     score: options.score ?? 0,
     rice: options.rice ?? 0,
     mochi: 0,
+    ability: null,
+    abilityTicks: 0,
+    pendingStage: null,
+    collectedRice: 0,
+    secretCollected: false,
+    runHits: 0,
+    runMisses: 0,
+    attemptScore: 0,
+    entryScore: options.score ?? 0,
+    entryRice: options.rice ?? 0,
+    entryLives: options.lives ?? 3,
+    combo: 0,
+    clearResult: null,
+    telemetry: [],
     deathTicks: 0,
     jumpHeld: false,
     events: [],
@@ -56,6 +70,8 @@ export function createState(id = '1-1', options = {}) {
       facing: 1,
     },
   };
+  observeVisible(s);
+  return s;
 }
 // 固定地形は面ごとに一度だけ展開する。
 const terrainCache = new WeakMap();
@@ -75,21 +91,68 @@ function resize(s, stage) {
   Object.assign(s.player, SIZES[stage]);
   s.player.y = bottom - s.player.h;
 }
-function miss(s) {
-  if (s.status !== 'playing') {
-    return;
+// 共通観測: type/tick/entityId/kind/cause。描画用のscore・座標などは互換用に併記する。
+// ability.kind は acquire/refresh/replace/expired/hit/miss。collect.kind は米俵・餅・任意餅を区別する。
+function emit(s, type, data = {}) {
+  s.telemetry.push({ type, tick: s.tick, elapsedTicks: s.elapsedTicks, ...data });
+}
+// カメラの窓に初めて入った刻みを、開始時も含めて記録する。
+function observeVisible(s) {
+  for (const e of s.entities) {
+    if (e.alive && 'CDRB'.includes(e.type) && !e.visible &&
+        e.x + e.w > s.player.x - 110 && e.x < s.player.x + 210) {
+      e.visible = true;
+      emit(s, 'visible', { entityId: e.id, kind: e.type });
+    }
   }
-  s.lives--;
+}
+function award(s, points, source) {
+  s.score += points;
+  s.attemptScore += points;
+  emit(s, 'score', { points, x: source.x, y: source.y });
+}
+function grow(s, stage) {
+  const p = s.player;
+  const candidate = { ...p, ...SIZES[stage], y: p.y + p.h - SIZES[stage].h };
+  if (solids(s.level).some(b => b.type !== '=' && overlap(candidate, b))) {
+    s.pendingStage = stage;
+  } else {
+    resize(s, stage);
+    s.pendingStage = null;
+  }
+}
+function loseAbility(s, reason) {
+  if (s.ability) emit(s, 'ability', { kind: reason, ability: s.ability });
+  s.ability = null;
+  s.abilityTicks = 0;
+}
+function miss(s, cause = 'fall', entityId) {
+  if (s.status !== 'playing') return;
+  s.runMisses++;
+  s.lives = s.entryLives - s.runMisses;
+  s.score = s.entryScore;
+  s.rice = s.entryRice;
+  s.attemptScore = 0;
+  s.collectedRice = 0;
+  s.secretCollected = false;
+  s.combo = 0;
+  s.pendingStage = null;
+  loseAbility(s, 'miss');
   s.status = 'dying';
   s.deathTicks = 96;
   s.events.push('hurt');
+  emit(s, 'miss', { cause, ...(entityId === undefined ? {} : { entityId }), x: s.player.x, y: s.player.y });
 }
-function hurt(s) {
-  if (s.player.invincible > 0) {
-    return;
-  }
+const CAUSES = { D: 'ground', C: 'air', '^': 'icicle', B: 'boar', R: 'rabbit' };
+function hurt(s, enemy) {
+  if (s.status !== 'playing' || s.player.invincible > 0 || s.telemetry.some(e => e.type === 'hit')) return;
+  s.runHits++;
+  s.combo = 0;
+  s.pendingStage = null;
+  loseAbility(s, 'hit');
+  emit(s, 'hit', { cause: CAUSES[enemy.type], entityId: enemy.id, x: s.player.x, y: s.player.y });
   if (s.stage === 0) {
-    miss(s);
+    miss(s, CAUSES[enemy.type], enemy.id);
   } else {
     resize(s, s.stage - 1);
     s.player.invincible = RULES.invincible;
@@ -106,6 +169,7 @@ export function step(state, input = {}) {
     player: { ...state.player },
     entities: state.entities.map(e => ({ ...e })),
     events: [],
+    telemetry: [],
   };
   s.elapsedTicks++;
   s.tick++;
@@ -116,19 +180,30 @@ export function step(state, input = {}) {
         : {
             ...createState(s.id, {
               level: s.level,
-              lives: s.lives,
-              score: s.score,
-              rice: s.rice,
+              lives: s.entryLives,
+              score: s.entryScore,
+              rice: s.entryRice,
             }),
+            lives: s.lives,
+            runHits: s.runHits,
+            runMisses: s.runMisses,
             elapsedTicks: s.elapsedTicks,
           };
     }
     return s;
   }
+  const abilityAtStart = s.ability;
   const p = s.player,
     wasBottom = p.y + p.h;
+  if (s.ability && s.abilityTicks === 0) loseAbility(s, 'expired');
   p.invincible = Math.max(0, p.invincible - DT);
   s.entities = updateEntities(s.entities, s.level, p, s.tick * DT, DT);
+  for (const e of s.entities) {
+    const previous = state.entities.find(old => old.id === e.id);
+    if (previous.phase !== e.phase && ['warning', 'moving'].includes(e.phase)) {
+      emit(s, e.phase, { entityId: e.id, kind: e.type });
+    }
+  }
   const support = s.entities.find(
     e => e.id === p.support && e.alive && e.type === 'M',
   );
@@ -157,19 +232,20 @@ export function step(state, input = {}) {
   }
   const move = (input.right ? 1 : 0) - (input.left ? 1 : 0);
   if (move) {
-    p.vx += move * RULES.acceleration * DT;
+    p.vx += move * (s.ability === 'S' ? 1000 : RULES.acceleration) * DT;
     p.facing = move;
   } else {
     const ice =
       p.grounded && tileAt(s.level, p.x + p.w / 2, p.y + p.h + 1) === '~';
     p.vx = approach(
       p.vx,
-      (p.grounded ? RULES.friction * (ice ? 0.25 : 1) : RULES.airFriction) * DT,
+      (p.grounded ? (s.ability === 'S' ? 1200 : RULES.friction) * (ice ? 0.25 : 1) : RULES.airFriction) * DT,
     );
   }
+  const speed = s.ability === 'S' ? 150 : RULES.speed;
   p.vx = Math.max(
-    -RULES.speed,
-    Math.min(RULES.speed, p.vx + s.level.wind * DT),
+    -speed,
+    Math.min(speed, p.vx + s.level.wind * DT),
   );
   const blocks = solids(s.level);
   p.x += p.vx * DT;
@@ -181,18 +257,19 @@ export function step(state, input = {}) {
   }
   p.x = Math.max(0, Math.min(s.level.rows[0].length * 16 - p.w, p.x));
   const bottom = p.y + p.h;
-  p.vy = Math.min(RULES.fall, p.vy + RULES.gravity * DT);
+  const glide = s.ability === 'F' && !p.grounded && p.vy >= 0 && input.jump;
+  p.vy = Math.min(glide ? 70 : RULES.fall, p.vy + (glide ? 240 : RULES.gravity) * DT);
   p.y += p.vy * DT;
   p.grounded = false;
   p.support = null;
-  const platforms = s.entities.filter(e => e.type === 'M' && e.alive);
+  const platforms = s.entities.filter(isPlatform);
   for (const b of [...blocks, ...platforms]) {
     if (!overlap(p, b)) {
       continue;
     }
     const previousTop = b.y - (b.id === support?.id ? 0 : (b.dy ?? 0));
     if (
-      (b.type === '=' || b.type === 'M') &&
+      (b.type === '=' || isPlatform(b)) &&
       (p.vy < 0 || bottom > previousTop + 0.01)
     ) {
       continue;
@@ -202,8 +279,25 @@ export function step(state, input = {}) {
       p.vy = 0;
       p.grounded = true;
       p.jumps = 0;
-      p.support = b.type === 'M' ? b.id : null;
-    } else if (p.vy < 0 && b.type !== '=' && b.type !== 'M') {
+      p.support = isPlatform(b) ? b.id : null;
+      s.combo = 0;
+      if (b.type === '%' && !b.triggered) {
+        b.triggered = true;
+        b.phaseTicks = 0;
+        emit(s, 'branch', { entityId: b.id });
+      }
+      if (b.type === 'J') {
+        p.vy = -380;
+        p.grounded = false;
+        p.jumps = 1;
+        p.coyote = 0;
+        p.buffer = 0;
+        p.support = null;
+        s.events.push('jump');
+        emit(s, 'snowpad', { entityId: b.id });
+        break;
+      }
+    } else if (p.vy < 0 && b.type !== '=' && !isPlatform(b)) {
       p.y = b.y + b.h;
       p.vy = 0;
     }
@@ -217,49 +311,79 @@ export function step(state, input = {}) {
     p.coyote = 0;
     s.events.push('jump');
   }
+  if (s.pendingStage !== null) grow(s, s.pendingStage);
+  // 収集を確定してから敵接触、最後に戸口を判定する。
   for (const e of s.entities) {
-    if (!e.alive || !overlap(p, e)) {
-      continue;
-    }
+    if (!e.alive || !'o*FS'.includes(e.type) || !overlap(p, e)) continue;
+    e.alive = false;
+    const secret = s.level.secretMochi;
+    const optional = e.type === 'o' && secret && e.x === secret.col * 16 && e.y === secret.row * 16;
+    emit(s, 'collect', { entityId: e.id, kind: e.type === '*' ? 'rice' : e.type === 'o' ? (optional ? 'secret' : 'mochi') : e.type, x: e.x, y: e.y });
     if (e.type === 'o') {
-      e.alive = false;
       s.mochi++;
-      if (s.stage < 2) {
-        resize(s, s.stage + 1);
-      } else {
-        s.score += 100;
-      }
+      s.secretCollected ||= !!optional;
+      award(s, optional ? 300 : 100, e);
+      grow(s, Math.min(2, (s.pendingStage ?? s.stage) + 1));
+      s.events.push('mochi');
+    } else if (e.type === '*') {
+      award(s, 50, e);
+      s.rice++;
+      s.collectedRice++;
+      if (s.rice % 20 === 0) s.lives++;
+    } else {
+      const kind = s.ability === e.type ? 'refresh' : s.ability ? 'replace' : 'acquire';
+      s.ability = e.type;
+      s.abilityTicks = e.type === 'F' ? 1440 : 960;
+      emit(s, 'ability', { kind, entityId: e.id, ability: e.type, ticks: s.abilityTicks });
       s.events.push('mochi');
     }
-    if (e.type === '*') {
+  }
+  for (const e of s.entities) {
+    if (s.status !== 'playing' || !e.alive || !'CDRB^'.includes(e.type) || !overlap(p, e)) continue;
+    const relativeDescent = p.y + p.h - wasBottom - e.dy;
+    if (e.type !== '^' && p.vy > 0 && relativeDescent > 0 && wasBottom <= e.y - e.dy + 2) {
       e.alive = false;
-      s.score += 50;
-      s.rice++;
-      if (s.rice % 20 === 0) {
-        s.lives++;
-      }
-    }
-    if (e.type === 'C' || e.type === 'D') {
-      if (p.vy > 0 && wasBottom <= e.y - (e.dy ?? 0) + 2) {
-        e.alive = false;
-        p.y = e.y - p.h;
-        p.vy = RULES.bounce;
-        p.jumps = 0;
-        s.events.push('stomp');
-      } else {
-        hurt(s);
-      }
-    }
-    if (e.type === '^') {
-      hurt(s);
-    }
-    if (e.type === 'G' && s.status === 'playing') {
-      s.status = 'clear';
-      s.events.push('door');
+      e.phase = 'retired';
+      e.retireTicks = 24;
+      s.combo++;
+      const multiplier = Math.min(3, s.combo);
+      award(s, (e.type === 'B' ? 150 : 100) * multiplier, e);
+      emit(s, 'stomp', { entityId: e.id, kind: e.type, enemy: e.type, multiplier, x: e.x, y: e.y });
+      p.y = e.y - p.h;
+      p.vy = RULES.bounce;
+      p.jumps = 0;
+      p.grounded = false;
+      p.support = null;
+      s.events.push('stomp');
+    } else {
+      hurt(s, e);
     }
   }
-  if (p.y > 208) {
-    miss(s);
+  if (p.y > 208) miss(s);
+  if (s.status === 'playing' && s.entities.some(e => e.type === 'G' && overlap(p, e))) {
+    const par = s.level.parTicks ?? 2400;
+    const fast = s.elapsedTicks <= par;
+    const fortune = s.collectedRice === 6 && s.secretCollected;
+    const unharmed = s.runHits === 0 && s.runMisses === 0;
+    award(s, 500 + 10 * Math.floor(Math.max(0, par - s.elapsedTicks) / 120) +
+      (fortune ? 300 : 0) + (unharmed ? 300 : 0), p);
+    s.clearResult = {
+      ticks: s.elapsedTicks,
+      score: s.attemptScore,
+      rice: s.collectedRice,
+      secret: s.secretCollected,
+      hits: s.runHits,
+      misses: s.runMisses,
+      seals: (fast ? 1 : 0) + (fortune ? 2 : 0) + (unharmed ? 4 : 0),
+    };
+    s.status = 'clear';
+    s.events.push('door');
+    emit(s, 'clear', { ...s.clearResult });
+  }
+  observeVisible(s);
+  // 取得tickは減らさず、残り0の次の物理計算から通常値に戻す。
+  if (s.ability && s.ability === abilityAtStart && !s.telemetry.some(e => e.type === 'ability')) {
+    s.abilityTicks = Math.max(0, s.abilityTicks - 1);
   }
   return s;
 }

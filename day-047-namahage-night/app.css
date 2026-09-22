@@ -23,11 +23,36 @@ button.primary { background: #edb65d; border-color: #edb65d; color: #1a1220; }
 .world-buttons { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
 .world-buttons button { padding: 8px 4px; font-size: 14px; }
 .world-buttons small { display: block; font-size: 12px; }
-.hud { display: flex; justify-content: space-between; align-items: center; white-space: nowrap; gap: 6px; background: #263449; padding: 8px; font-size: 12px; font-variant-numeric: tabular-nums; }
+/* HUD は画面の上端1行。順番は 面番号・姿・残機・米俵・能力・時間・お札。 */
+.hud { display: flex; align-items: center; white-space: nowrap; gap: 4px; background: #263449; padding: 4px 8px; font-size: 12px; line-height: 1.4; font-variant-numeric: tabular-nums; }
+.hud > * { flex: 0 0 auto; }
+.hud-level { min-width: 32px; font-weight: 700; color: #edb65d; }
+.hud-form { min-width: 62px; }
+.hud-lives { min-width: 40px; }
+.hud-rice { min-width: 52px; }
+.hud-time { min-width: 52px; margin-left: auto; }
+.hud-ability { display: inline-flex; align-items: center; gap: 4px; min-width: 96px; padding: 1px 3px; border: 1px solid transparent; border-radius: 4px; }
+.hud-ability[data-blink="on"] { animation: hud-blink .1s steps(1) infinite alternate; }
+@keyframes hud-blink { from { border-color: #edb65d; } to { border-color: transparent; } }
+#ability-icon { width: 16px; height: 16px; image-rendering: pixelated; }
+.hud-seals { display: inline-flex; gap: 4px; }
+.hud-seals b { display: inline-grid; place-items: center; width: 14px; height: 14px; border: 1px solid #7294a7; border-radius: 3px; font-size: 10px; font-weight: 700; }
+.hud-seals b[data-on="maybe"] { color: #c6d2df; border-style: dashed; }
+.hud-seals b[data-on="on"] { background: #edb65d; border-color: #edb65d; color: #1a1220; }
+.hud-seals b[data-on="off"] { opacity: .45; text-decoration: line-through; }
 .stage { position: relative; width: max-content; max-width: 100%; margin-inline: auto; background: #111827; }
+.screen { position: relative; }
+/* 面の頭に出す1行。地面を隠さないよう、空のある上端に重ねる。 */
+.lesson { position: absolute; left: 0; right: 0; top: 0; margin: 0; padding: 6px 10px; background: #1a1220e0; border-bottom: 1px solid #7294a7; font-size: 14px; line-height: 1.5; text-align: center; }
+.seal-list { list-style: none; margin: 10px 0; padding: 0; font-size: 14px; line-height: 1.7; text-align: left; }
+.seal-list li { margin: 2px 0; }
+.seal-list li[data-on="off"] { color: #c6d2df; }
+.seal-row { letter-spacing: .12em; color: #edb65d; }
 canvas { display: block; image-rendering: pixelated; touch-action: none; }
-.overlay { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #111827dc; text-align: center; overflow: auto; padding: 12px; }
+.overlay { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; background: #111827ee; text-align: center; overflow: auto; padding: 12px; line-height: 1.6; }
+.overlay > p { margin: 2px 0; }
 .overlay h2 { font-size: 20px; }
+.overlay .toolbar { flex-wrap: wrap; justify-content: center; }
 .toolbar { display: flex; gap: 12px; margin-top: 12px; }
 .instructions { border-top: 1px solid #38475d; margin-top: 24px; padding-top: 12px; font-size: 14px; }
 .instructions h2 { font-size: 18px; }
@@ -40,6 +65,7 @@ header a, footer > a { display: inline-flex; align-items: center; min-height: 44
 .share, .share__label, .share__button, .share__note, .share__said { font-size: 14px; }
 @media (pointer: fine) { #touch { max-width: 640px; margin-inline: auto; } }
 @media (max-width: 343px) { header, main, footer { width: 320px; } }
-@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
+@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } .hud-ability[data-blink="on"] { animation: none; border-color: #edb65d; } }
+@media (max-width: 420px) { .hud { font-size: 11px; gap: 3px; } .hud-form { min-width: 52px; } .hud-ability { min-width: 84px; } }
 
 .hero-art { display: block; width: 100%; max-width: 420px; height: auto; margin-inline: auto; }
