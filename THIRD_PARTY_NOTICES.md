@@ -71,3 +71,4 @@
 | 044 | 59駅の代表位置（緯度経度・項目ID・取得した版番号。同梱 [`lib/station-coordinates.js`](day-044-train-here/lib/station-coordinates.js)） | [Wikidata](https://www.wikidata.org/)（構造化データ P625・2026-09-20取得） | [CC0](https://www.wikidata.org/wiki/Wikidata:Licensing) | 座標を小数4桁に丸めて同梱し、そこから街・線路・駅の**独自の概略モデル**を組み立てる。記事本文・画像・地図タイルは取得していない。線形・高さ・建物・車両は実測ではない（詳細は[`day-044-train-here/data/SOURCES.md`](day-044-train-here/data/SOURCES.md)） |
 | 044 | 駅名と路線の並び順という事実関係 | [JR東日本 路線図](https://www.jreast.co.jp/multi/route_maps/) | 事実の確認に参照しただけ。路線図画像・公式ロゴ・車両デザインは転載していない | 5路線の停車駅の並びに使った。**48編成の動きは架空のサンプル**で、実際の運行・ダイヤとは無関係。鉄道会社の公式・監修サービスではない |
 | 045 | 同梱の宇宙船・背景の画像 | 本作のためにAI画像生成で作成（OpenAIの画像生成モデル） | 生成物は利用規約により利用者に帰属。第三者データは使用していない | 透過処理・縮小 |
+| 047 | 同梱のキャラクター原画（`day-047-namahage-night/assets/hero-art.webp`）と、そこから起こしたドット絵（`lib/sprites/`） | 本作のためにAI画像生成で作成（OpenAIの画像生成モデル） | 生成物は利用規約により利用者に帰属。第三者データは使用していない | 背景の透過・縮小。ドット絵は原画を見ながら人が描き起こしたもので、生成画像をそのままゲームに貼ってはいない |

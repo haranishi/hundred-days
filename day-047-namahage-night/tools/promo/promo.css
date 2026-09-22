@@ -1,0 +1,16 @@
+* { box-sizing: border-box; }
+html, body { margin: 0; width: 540px; height: 960px; overflow: hidden; background: #0d1322; color: #f6efdd; font-family: system-ui, sans-serif; }
+#composition { position: relative; width: 540px; height: 960px; background: radial-gradient(ellipse at 50% 12%, #23304d, #0d1322 68%); }
+.mark { position: absolute; top: 120px; left: 0; width: 540px; margin: 0; text-align: center; font-size: 16px; letter-spacing: .2em; color: #ffd27a; }
+.lede { position: absolute; top: 158px; left: 0; width: 540px; margin: 0; text-align: center; font-size: 42px; font-weight: 800; letter-spacing: .02em; color: #f6efdd; }
+/* ゲームは 320×192 を 480×288（CSS 1.5倍）で置く。撮影は2倍・書き出しで2倍なので、
+   1画素はちょうど3×3の正方形になり、拡大しても滲まない。 */
+#game-frame { position: absolute; left: 30px; top: 290px; width: 480px; height: 288px; border: 0; border-radius: 4px; pointer-events: none; }
+#caption { position: absolute; left: 54px; top: 640px; width: 432px; height: 72px; padding: 16px 6px; margin: 0; background: #1a2338; border-radius: 12px; text-align: center; }
+#caption-lines { display: block; font-size: 25px; font-weight: 750; line-height: 40px; white-space: nowrap; }
+#end { position: absolute; inset: 0; padding: 96px 54px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 26px; background: #0d1322; text-align: center; }
+#end h1 { font-size: 50px; line-height: 1.4; margin: 0; }
+#end span { color: #ffd27a; letter-spacing: .18em; font-size: 18px; }
+#end p { margin: 0; font-size: 23px; }
+#end small { font-size: 22px; color: #ffd27a; }
+[hidden] { display: none !important; }
