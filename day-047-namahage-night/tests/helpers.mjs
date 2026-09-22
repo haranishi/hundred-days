@@ -1,9 +1,7 @@
-import { readFileSync } from 'node:fs';
-import { runInNewContext } from 'node:vm';
-import { LEVELS, getLevel, levelId } from '../lib/levels.js';
+import { beforeEach, afterEach } from 'node:test';
+import { getLevel } from '../lib/levels.js';
 import { createAutopilot } from '../lib/autopilot.js';
-import { createState, step, DT } from '../lib/physics.js';
-import { readStore, writeStore, recordClear } from '../lib/store.js';
+import { createState, step } from '../lib/physics.js';
 export function fixture(tiles = [], options = {}) {
   const rows = Array.from({ length: 12 }, (_, y) =>
     Array(24).fill(y === 11 ? '#' : '.'),
@@ -14,6 +12,9 @@ export function fixture(tiles = [], options = {}) {
   return createState('1-1', {
     ...options,
     level: {
+      parTicks: 2400,
+      secretMochi: options.secretMochi ?? null,
+      entityOptions: options.entityOptions ?? {},
       name: '試験',
       world: 1,
       sky: 1,
@@ -26,23 +27,21 @@ export function run(s, count, input = {}) {
   for (let i = 0; i < count; i++) s = step(s, input);
   return s;
 }
-// 敵とつららだけを除き、地形・床・収集物は元の配置で試す。
-export function walkToDoor(id) {
-  const original = getLevel(id);
-  const level = {
-    ...original,
-    rows: original.rows.map(row => row.replace(/[CD^]/g, '.')),
-  };
+// 実データの敵を残し、通常入力だけで到達を確認する。
+export function walkToDoor(id, options = {}) {
+  const level = getLevel(id);
   let s = createState(id, { level });
-  const decide = createAutopilot(level);
-  for (let t = 0; t < 7200 && s.status === 'playing'; t++) s = step(s, decide(s));
+  const decide = createAutopilot(level, options);
+  for (let t = 0; t < 10800 && s.status === 'playing'; t++) s = step(s, decide(s));
   return s;
 }
 
 // ブラウザを起動せず、操作窓口を実際の物理・保存処理につなぐ。
 // frame(now) を呼ぶたびに1コマ進む。now はミリ秒で、記録窓口の時計もこれを見ている。
-export function loadApp() {
+async function prepareApp() {
   const nodes = new Map();
+  const timers = new Set();
+  const schedule = globalThis.setTimeout;
   const node = () => ({
     dataset: {},
     style: {},
@@ -53,7 +52,7 @@ export function loadApp() {
     focus() {},
     scrollIntoView() {},
     setAttribute() {},
-    getContext: () => ({}),
+    getContext: () => ({ fillRect() {}, fillText() {}, clearRect() {}, drawImage() {} }),
   });
   const document = {
     getElementById(id) {
@@ -76,30 +75,40 @@ export function loadApp() {
     addEventListener: (type, listener) => handlers.set(type, listener),
   };
   let frame;
-  const source = readFileSync(new URL('../app.js', import.meta.url), 'utf8');
-  runInNewContext(source.replace(/^import .*;\n/gm, ''), {
+  Object.assign(globalThis, {
     window,
     document,
     innerHeight: 800,
-    requestAnimationFrame: callback => {
-      frame = callback;
+    setTimeout: (callback, ms) => {
+      const timer = schedule(callback, ms);
+      timers.add(timer);
+      return timer;
     },
-    LEVELS,
-    levelId,
-    createState,
-    step,
-    DT,
-    createAutopilot,
-    readStore,
-    writeStore,
-    recordClear,
-    render() {},
-    createAudio: () => ({
-      unlock() {},
-      effect() {},
-      setPlaying() {},
-      setMuted() {},
-    }),
+    requestAnimationFrame: callback => { frame = callback; },
   });
-  return { api: window.__day047, handlers, stored, frame: now => frame(now) };
+  await import(`../app.js?test=${appSerial++}`);
+  return { api: window.__day047, handlers, stored, frame: now => frame(now),
+    dispose: () => { for (const timer of timers) clearTimeout(timer); },
+  };
+}
+
+// 呼出側の同期APIを保ち、各テストの前に本物のESモジュールを別インスタンスで読み込む。
+// テスト終了時にはグローバルを戻し、他の試験へDOMを持ち越さない。
+let appSerial = 0;
+let app;
+let globals;
+const globalKeys = ['window', 'document', 'innerHeight', 'requestAnimationFrame', 'setTimeout'];
+beforeEach(async () => {
+  globals = globalKeys.map(key => [key, Object.getOwnPropertyDescriptor(globalThis, key)]);
+  app = await prepareApp();
+});
+afterEach(() => {
+  app?.dispose();
+  for (const [key, descriptor] of globals) {
+    if (descriptor) Object.defineProperty(globalThis, key, descriptor);
+    else delete globalThis[key];
+  }
+});
+export function loadApp() {
+  return app;
 }

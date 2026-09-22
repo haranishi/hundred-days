@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="大晦日の夜、なまはげが山から里へ。移動とジャンプで家々を巡る20面のドット絵アクション。">
-  <meta name="share:text" content="泣ぐ子は、いねがぁ — 大晦日の雪道を越え、里の戸口へ。">
+  <meta name="description" content="大晦日の夜、なまはげが山から里へ。予兆を読んで跳び、米俵と隠し餅を集めて戸口へ着く20面のドット絵アクション。">
+  <meta name="share:text" content="泣ぐ子は、いねがぁ — 予兆を読んで跳び、米俵と隠し餅を持って里の戸口へ。">
   <meta name="theme-color" content="#111827">
   <title>泣ぐ子は、いねがぁ | 100日チャレンジ</title>
   <link rel="icon" href="data:,">
@@ -18,19 +18,40 @@
   <main id="app" data-state="title">
     <p class="eyebrow">大晦日、山から里へ。</p>
     <h1>泣ぐ子は、いねがぁ</h1>
-    <section id="title"><img class="hero-art" src="assets/hero-art.webp" width="720" height="415" alt="ちび・なまはげ・荒鬼の3段階"><p class="lead">雪道を跳んで、家々の戸口へ。<br>餅を食べたら、ひとまわり大きく。</p><button id="start" class="primary">里へ出かける</button><p class="note">移動とジャンプだけで遊ぶ、全20面。</p></section>
-    <section id="select" hidden aria-labelledby="select-title"><h2 id="select-title">今夜は、どの道へ。</h2><p id="selection-note" role="status">各地の5面目を終えると、次の土地へ。</p><div id="levels"></div></section>
+    <section id="title"><img class="hero-art" src="assets/hero-art.webp" width="720" height="415" alt="ちび・なまはげ・荒鬼の3段階"><p class="lead">雪道を跳んで、家々の戸口へ。<br>餅を食べたら、ひとまわり大きく。</p><button id="start" class="primary">里へ出かける</button><p class="note">移動とジャンプだけで遊ぶ、全20面。面ごとにお札が3枚。</p></section>
+    <section id="select" hidden aria-labelledby="select-title"><h2 id="select-title">今夜は、どの道へ。</h2><p id="selection-note" role="status">各地の5面目を終えると、次の土地へ。</p><p class="note">札は ●早駆け ●福集め ●無傷 の順。別々の挑戦で取ったぶんも積み上がる。</p><div id="levels"></div></section>
     <section id="play" hidden>
-      <div class="hud" aria-label="道中の様子"><span id="level-label"></span><span>餅 <b id="mochi">0</b></span><span id="form"></span><span>残 <b id="lives">3</b></span><span id="time">0.0秒</span></div>
-      <div class="stage"><canvas id="game" width="320" height="192" tabindex="0" aria-label="雪道。左右で移動、スペースでジャンプ" aria-describedby="controls">Canvas対応ブラウザで遊べます。</canvas>
-        <section id="clear" class="overlay" hidden><h2>よい年を、迎えれよ。</h2><p id="clear-time"></p><button id="next" class="primary">次へ</button></section>
+      <div class="stage">
+        <div class="hud" aria-label="道中の様子">
+          <span id="level-label" class="hud-level">1-1</span>
+          <span id="form" class="hud-form">● ちび</span>
+          <span id="lives" class="hud-lives">残 3</span>
+          <span id="rice" class="hud-rice">米 0/6</span>
+          <span id="ability" class="hud-ability" data-blink="off"><canvas id="ability-icon" width="16" height="16" aria-hidden="true"></canvas><span id="ability-text">能力なし</span></span>
+          <span id="time" class="hud-time">0.0秒</span>
+          <span id="seals" class="hud-seals" aria-label="お札"><b id="seal-dash" data-on="maybe" title="早駆け">早</b><b id="seal-fortune" data-on="maybe" title="福集め">福</b><b id="seal-unhurt" data-on="maybe" title="無傷">無</b></span>
+        </div>
+        <div class="screen">
+        <canvas id="game" width="320" height="192" tabindex="0" aria-label="雪道。左右で移動、スペースでジャンプ" aria-describedby="controls">Canvas対応ブラウザで遊べます。</canvas>
+        <p id="lesson" class="lesson" role="status" hidden></p>
+        <section id="clear" class="overlay" hidden aria-labelledby="clear-title">
+          <h2 id="clear-title">よい年を、迎えれよ。</h2>
+          <p id="clear-score"></p>
+          <p id="clear-best"></p>
+          <ul id="clear-seals" class="seal-list"></ul>
+          <p id="clear-note" class="note"></p>
+          <div class="toolbar"><button id="next" class="primary">次へ</button><button id="again">もう一度</button><button id="to-select">面えらび</button></div>
+        </section>
+        </div>
       </div>
       <div class="toolbar"><button id="back">面えらび</button><button id="retry">やり直す</button></div>
     </section>
     <div class="toolbar"><button id="mute" aria-pressed="false">音：オン</button></div>
     <p id="save-note" class="note" role="status" hidden>端末に保存できません。この画面では記録を保持します。</p>
     <p id="status" class="sr-only" aria-live="polite"></p>
-    <section id="controls" class="instructions"><h2>跳んで、戸口へ。</h2><p>← → / A D：移動　Space / ↑ / W / Z：ジャンプ<br>短く押すと低く、長く押すと高く。<br>R：やり直し　Esc：面えらび</p><p>餅で ちび → なまはげ → 荒鬼。荒鬼は二段ジャンプ。<br>カラスと野犬は上から踏める。米俵20個で残機がひとつ増える。</p></section>
+    <section id="controls" class="instructions"><h2>跳んで、戸口へ。</h2><p>← → / A D：移動　Space / ↑ / W / Z：ジャンプ<br>短く押すと低く、長く押すと高く。<br>R：やり直し　Esc：面えらび</p>
+      <p>餅で ちび → なまはげ → 荒鬼。荒鬼は二段ジャンプ。<br>カラス・野犬・雪うさぎ・雪かきイノシシは上から踏める。続けて踏むと点が倍になる。<br>風呂敷（滑空）と駆け鈴（速く走る）は持てるのはひとつだけ。被弾すると失う。</p>
+      <p>面ごとの目標は3つ。<b>早駆け</b>（目標時間内）・<b>福集め</b>（米俵6個と隠し餅）・<b>無傷</b>（被弾もミスもなし）。<br>戸口に触れればクリア。米俵20個で残機がひとつ増える。</p></section>
     <p class="note">記録と音設定はこの端末だけに保存します。</p>
     <noscript>遊ぶにはJavaScriptを有効にしてください。</noscript>
   </main>

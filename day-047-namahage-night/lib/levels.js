@@ -1,7 +1,13 @@
-import { LEVELS } from './level-data.js';
+import { LEVELS as DATA } from './level-data.js';
 
-// 手設計の面を加工せず、そのまま共有する。
-export { LEVELS };
+// 元データを変えず、省略可能な受け渡し項目を補う。
+export const LEVELS = Object.freeze(DATA.map(level => Object.freeze({
+  ...level,
+  parTicks: level.parTicks ?? 2400,
+  secretMochi: level.secretMochi ?? null,
+  entityOptions: level.entityOptions ?? {},
+  routes: { safe: [], reward: [], ...level.routes },
+})));
 
 export const levelId = index =>
   `${Math.floor(index / 5) + 1}-${(index % 5) + 1}`;
