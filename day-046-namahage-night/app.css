@@ -66,6 +66,10 @@ header a, footer > a { display: inline-flex; align-items: center; min-height: 44
 @media (pointer: fine) { #touch { max-width: 640px; margin-inline: auto; } }
 @media (max-width: 343px) { header, main, footer { width: 320px; } }
 @media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } .hud-ability[data-blink="on"] { animation: none; border-color: #edb65d; } }
-@media (max-width: 420px) { .hud { font-size: 11px; gap: 3px; } .hud-form { min-width: 52px; } .hud-ability { min-width: 84px; } }
+/* 狭い画面ではHUDを2段に折る。1段目＝面番号・姿・残機・米俵、2段目＝能力・時間・お札（右寄せ）。右端で見切れないように */
+@media (max-width: 420px) { .hud { font-size: 11px; gap: 3px; row-gap: 2px; flex-wrap: wrap; } .hud-form { min-width: 52px; } .hud-rice { flex: 1 0 52px; } .hud-ability { min-width: 84px; order: 1; } .hud-time { order: 2; margin-left: 0; } .hud-seals { order: 3; margin-left: auto; } }
+/* 指で操作する端末にはキーボードの説明を出さず、下の3ボタンの説明に置き換える */
+@media (hover: none) and (pointer: coarse) { .only-keys { display: none; } }
+@media not ((hover: none) and (pointer: coarse)) { .only-touch { display: none; } }
 
 .hero-art { display: block; width: 100%; max-width: 420px; height: auto; margin-inline: auto; }
