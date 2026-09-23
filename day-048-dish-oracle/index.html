@@ -1,0 +1,348 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="占い師の質問に答えると、水晶玉があなたの心にある料理を当てる。まだ決めていない人には、いま食べたいものを1つに決める。答えも覚えたことも、端末の外へは送りません。">
+  <meta name="share:text" content="いま食べたいもの、当てます — 質問に答えると、水晶玉があなたの心にある一皿を当てる。">
+  <meta name="theme-color" content="#0f0b24">
+  <title>いま食べたいもの、当てます | 100日チャレンジ</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="shared/share.css">
+  <link rel="stylesheet" href="app.css">
+  <script src="shared/share.js" defer></script>
+  <script type="module" src="app.js"></script>
+</head>
+<body>
+  <header class="site-header">
+    <a href="../">← 100日チャレンジ</a>
+    <span class="day">DAY 048</span>
+  </header>
+
+  <main id="app" data-state="intro">
+    <div class="theater">
+      <!-- 舞台は飾り。まぼろしを読み上げると答えが先に漏れるので、丸ごと読み上げから外す -->
+      <div class="stage" id="stage" data-mood="idle" aria-hidden="true">
+        <div class="scene">
+          <svg class="scene__back" viewBox="0 0 400 320" focusable="false">
+            <defs>
+              <linearGradient id="g-robe" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0" stop-color="#4c2b82"/>
+                <stop offset=".55" stop-color="#351a62"/>
+                <stop offset="1" stop-color="#1e0f3c"/>
+              </linearGradient>
+              <radialGradient id="g-hood" cx=".42" cy=".26" r=".78">
+                <stop offset="0" stop-color="#6d45ab"/>
+                <stop offset=".6" stop-color="#44247c"/>
+                <stop offset="1" stop-color="#2a1552"/>
+              </radialGradient>
+              <radialGradient id="g-face" cx=".5" cy=".58" r=".62">
+                <stop offset="0" stop-color="#030208"/>
+                <stop offset=".72" stop-color="#0a0617"/>
+                <stop offset="1" stop-color="#1b1036"/>
+              </radialGradient>
+              <radialGradient id="g-eyeglow">
+                <stop offset="0" stop-color="#ffe3a0" stop-opacity=".5"/>
+                <stop offset="1" stop-color="#ffe3a0" stop-opacity="0"/>
+              </radialGradient>
+              <radialGradient id="g-aura" cx="200" cy="200" r="104" gradientUnits="userSpaceOnUse">
+                <stop offset=".45" stop-color="#b8a6ff" stop-opacity=".42"/>
+                <stop offset=".7" stop-color="#8a78ee" stop-opacity=".16"/>
+                <stop offset="1" stop-color="#8a78ee" stop-opacity="0"/>
+              </radialGradient>
+              <radialGradient id="g-aura-gold" cx="200" cy="200" r="104" gradientUnits="userSpaceOnUse">
+                <stop offset=".45" stop-color="#ffe29a" stop-opacity=".6"/>
+                <stop offset=".72" stop-color="#e8c56a" stop-opacity=".2"/>
+                <stop offset="1" stop-color="#e8c56a" stop-opacity="0"/>
+              </radialGradient>
+              <radialGradient id="g-ball" cx=".36" cy=".3" r=".8">
+                <stop offset="0" stop-color="#effbff"/>
+                <stop offset=".22" stop-color="#bfe4fb"/>
+                <stop offset=".5" stop-color="#8ba1ea"/>
+                <stop offset=".76" stop-color="#5c44b6"/>
+                <stop offset="1" stop-color="#1b1250"/>
+              </radialGradient>
+              <linearGradient id="g-cloth" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0" stop-color="#6c3aa0"/>
+                <stop offset=".3" stop-color="#522880"/>
+                <stop offset="1" stop-color="#2d1550"/>
+              </linearGradient>
+              <linearGradient id="g-top" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0" stop-color="#7d4ab4"/>
+                <stop offset="1" stop-color="#5b2f8c"/>
+              </linearGradient>
+            </defs>
+
+            <g class="teller">
+              <path class="robe" d="M84 200C66 218 54 256 48 320H352C346 256 334 218 316 200Z" fill="url(#g-robe)"/>
+              <path d="M188 204C184 232 180 262 176 320M212 204C216 232 220 262 224 320" stroke="#e8c56a" stroke-opacity=".55" stroke-width="1.4" fill="none"/>
+              <path class="hood" d="M200 20C152 24 120 66 118 126C117 158 106 182 84 202C120 215 280 215 316 202C294 182 283 158 282 126C280 66 248 24 200 20Z" fill="url(#g-hood)"/>
+              <path d="M84 202C120 215 280 215 316 202" stroke="#e8c56a" stroke-opacity=".7" stroke-width="1.3" fill="none"/>
+              <path d="M200 21C199 34 199 46 200 58" stroke="#e8c56a" stroke-opacity=".45" stroke-width="1.1" fill="none"/>
+              <path d="M200 58C166 60 148 92 148 126C148 160 172 182 200 184C228 182 252 160 252 126C252 92 234 60 200 58Z" fill="#1d0f3d"/>
+              <path class="face" d="M200 66C171 68 156 97 156 126C156 154 176 174 200 176C224 174 244 154 244 126C244 97 229 68 200 66Z" fill="url(#g-face)"/>
+              <path d="M200 58C166 60 148 92 148 126C148 160 172 182 200 184C228 182 252 160 252 126C252 92 234 60 200 58Z" stroke="#e8c56a" stroke-width="1.6" stroke-opacity=".9" fill="none"/>
+              <g class="eyes">
+                <ellipse class="eye-glow" cx="200" cy="121" rx="40" ry="16" fill="url(#g-eyeglow)"/>
+                <g class="eyes__set eyes--idle" fill="#ffe9ad">
+                  <ellipse cx="184" cy="120" rx="6.2" ry="4"/><ellipse cx="216" cy="120" rx="6.2" ry="4"/>
+                </g>
+                <g class="eyes__set eyes--thinking" fill="#ffe9ad">
+                  <rect x="177" y="119" width="14" height="2.6" rx="1.3"/><rect x="209" y="119" width="14" height="2.6" rx="1.3"/>
+                </g>
+                <g class="eyes__set eyes--confident" fill="none" stroke="#ffe9ad" stroke-width="2.8" stroke-linecap="round">
+                  <path d="M177 123Q184 114 191 123"/><path d="M209 123Q216 114 223 123"/>
+                </g>
+                <g class="eyes__set eyes--reveal" fill="#fff4d2">
+                  <ellipse cx="184" cy="120" rx="8.4" ry="7"/><ellipse cx="216" cy="120" rx="8.4" ry="7"/>
+                </g>
+                <!-- 驚いた顔は、推測を見せる顔（大きな光る目）と見分けが付くよう、眉を上げて瞳を小さくする -->
+                <g class="eyes__set eyes--surprised">
+                  <path d="M174 105Q184 98 194 104M206 104Q216 98 226 105" stroke="#ffe9ad" stroke-width="2.2" stroke-linecap="round" fill="none"/>
+                  <circle cx="184" cy="119" r="7.8" fill="#fff4d2"/><circle cx="216" cy="119" r="7.8" fill="#fff4d2"/>
+                  <circle cx="184" cy="119.5" r="2.5" fill="#1d0f3d"/><circle cx="216" cy="119.5" r="2.5" fill="#1d0f3d"/>
+                </g>
+                <g class="eyes__set eyes--defeated" fill="none" stroke="#ffe9ad" stroke-width="2.6" stroke-linecap="round">
+                  <path d="M176 119Q183 127 190 122"/><path d="M210 122Q217 127 224 119"/>
+                </g>
+              </g>
+            </g>
+
+            <g class="table">
+              <path d="M40 262C40 250 360 250 360 262L368 320H32Z" fill="url(#g-cloth)"/>
+              <path d="M92 266C89 286 93 302 88 320M150 270C148 290 152 306 149 320M252 270C254 290 250 306 253 320M310 266C313 286 309 302 314 320" stroke="#231040" stroke-opacity=".55" stroke-width="3" fill="none"/>
+              <path d="M34 306C80 313 120 302 160 308C200 314 240 302 280 308C320 314 350 304 366 306" stroke="#e8c56a" stroke-opacity=".8" stroke-width="1.6" fill="none"/>
+              <ellipse cx="200" cy="258" rx="160" ry="14" fill="url(#g-top)"/>
+              <path d="M44 262C90 272 310 272 356 262" stroke="#b58ae0" stroke-opacity=".35" stroke-width="1.2" fill="none"/>
+            </g>
+
+            <circle class="aura" cx="200" cy="200" r="104" fill="url(#g-aura)"/>
+            <circle class="aura aura--gold" cx="200" cy="200" r="104" fill="url(#g-aura-gold)"/>
+            <ellipse cx="200" cy="263" rx="52" ry="7" fill="#0d0620" fill-opacity=".55"/>
+            <circle class="ball" cx="200" cy="200" r="60" fill="url(#g-ball)"/>
+          </svg>
+
+          <div class="vision"><span class="vision__layer"></span><span class="vision__layer"></span></div>
+
+          <svg class="scene__front" viewBox="0 0 400 320" focusable="false">
+            <defs>
+              <clipPath id="c-ball"><circle cx="200" cy="200" r="59.5"/></clipPath>
+              <radialGradient id="g-mist">
+                <stop offset="0" stop-color="#ffffff" stop-opacity=".62"/>
+                <stop offset=".55" stop-color="#eef0ff" stop-opacity=".26"/>
+                <stop offset="1" stop-color="#eef0ff" stop-opacity="0"/>
+              </radialGradient>
+              <radialGradient id="g-mist-violet">
+                <stop offset="0" stop-color="#d9ccff" stop-opacity=".55"/>
+                <stop offset=".6" stop-color="#b9a6f5" stop-opacity=".2"/>
+                <stop offset="1" stop-color="#b9a6f5" stop-opacity="0"/>
+              </radialGradient>
+              <linearGradient id="g-stand" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0" stop-color="#f3d892"/>
+                <stop offset=".5" stop-color="#c49a45"/>
+                <stop offset="1" stop-color="#7a5620"/>
+              </linearGradient>
+              <linearGradient id="g-hand" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0" stop-color="#7f6a9c"/>
+                <stop offset=".55" stop-color="#bfaed6"/>
+                <stop offset="1" stop-color="#efe6f7"/>
+              </linearGradient>
+              <linearGradient id="g-sleeve" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0" stop-color="#2c1653"/>
+                <stop offset="1" stop-color="#4f2c88"/>
+              </linearGradient>
+            </defs>
+
+            <g class="mist" clip-path="url(#c-ball)">
+              <g class="mist__layer mist__layer--a">
+                <ellipse cx="168" cy="186" rx="54" ry="20" transform="rotate(-18 168 186)" fill="url(#g-mist)"/>
+                <ellipse cx="234" cy="214" rx="44" ry="16" transform="rotate(12 234 214)" fill="url(#g-mist)"/>
+                <ellipse cx="204" cy="240" rx="42" ry="12" fill="url(#g-mist)"/>
+              </g>
+              <g class="mist__layer mist__layer--b">
+                <ellipse cx="222" cy="176" rx="48" ry="16" transform="rotate(20 222 176)" fill="url(#g-mist-violet)"/>
+                <ellipse cx="172" cy="226" rx="50" ry="18" transform="rotate(-8 172 226)" fill="url(#g-mist-violet)"/>
+                <ellipse cx="200" cy="200" rx="30" ry="10" fill="url(#g-mist-violet)"/>
+              </g>
+            </g>
+
+            <path d="M158 236A56 56 0 0 0 242 236" stroke="#dcd0ff" stroke-opacity=".28" stroke-width="2" fill="none"/>
+            <ellipse cx="179" cy="168" rx="17" ry="8.5" transform="rotate(-35 179 168)" fill="#ffffff" fill-opacity=".58"/>
+            <circle cx="170" cy="180" r="3" fill="#ffffff" fill-opacity=".7"/>
+            <circle cx="200" cy="200" r="60" stroke="#efe8ff" stroke-opacity=".38" stroke-width="1.2" fill="none"/>
+
+            <g class="sparkles" fill="#fff1c4">
+              <path d="M128 150L131 158L139 161L131 164L128 172L125 164L117 161L125 158Z"/>
+              <path d="M276 142L278 148L284 150L278 152L276 158L274 152L268 150L274 148Z"/>
+              <path d="M268 238L270 243L275 245L270 247L268 252L266 247L261 245L266 243Z"/>
+            </g>
+
+            <path d="M166 250C174 262 226 262 234 250L242 266C232 277 168 277 158 266Z" fill="url(#g-stand)"/>
+            <path d="M160 266C170 274 230 274 240 266" stroke="#fff0c2" stroke-opacity=".55" stroke-width="1.2" fill="none"/>
+
+            <g class="hand">
+              <path d="M64 252C72 228 94 210 118 208L131 212C126 226 126 241 131 253L118 259C100 263 80 263 64 252Z" fill="url(#g-sleeve)"/>
+              <path d="M123 210C116 224 116 242 123 257" stroke="#e8c56a" stroke-width="2" stroke-opacity=".85" fill="none"/>
+              <path d="M124 222C130 208 140 196 150 192C156 190 158 196 154 201C150 206 148 212 148 220C152 222 152 228 148 230C150 236 150 242 146 246C140 252 130 252 126 246Z" fill="url(#g-hand)"/>
+              <path d="M146 206C142 208 140 212 139 216M147 225C143 227 141 230 140 233" stroke="#6f5b8e" stroke-opacity=".6" stroke-width="1.1" fill="none"/>
+            </g>
+            <g class="hand" transform="matrix(-1 0 0 1 400 0)">
+              <path d="M64 252C72 228 94 210 118 208L131 212C126 226 126 241 131 253L118 259C100 263 80 263 64 252Z" fill="url(#g-sleeve)"/>
+              <path d="M123 210C116 224 116 242 123 257" stroke="#e8c56a" stroke-width="2" stroke-opacity=".85" fill="none"/>
+              <path d="M124 222C130 208 140 196 150 192C156 190 158 196 154 201C150 206 148 212 148 220C152 222 152 228 148 230C150 236 150 242 146 246C140 252 130 252 126 246Z" fill="url(#g-hand)"/>
+              <path d="M146 206C142 208 140 212 139 216M147 225C143 227 141 230 140 233" stroke="#6f5b8e" stroke-opacity=".6" stroke-width="1.1" fill="none"/>
+            </g>
+          </svg>
+
+          <!-- 読みの輪。手と台座より手前に描く（奥に置くと、30〜70%のあいだで輪の先端が手に隠れる）。
+               pathLength=100 にして、輪の長さをそのまま%で指定する。12時から時計回りに満ちる -->
+          <svg class="scene__ring" id="ring" viewBox="0 0 400 320" focusable="false">
+            <g transform="rotate(-90 200 200)">
+              <circle class="ring__track" cx="200" cy="200" r="66" pathLength="100"/>
+              <circle class="ring__loss" id="ring-loss" cx="200" cy="200" r="66" pathLength="100"/>
+              <circle class="ring__fill" id="ring-fill" cx="200" cy="200" r="66" pathLength="100"/>
+              <circle class="ring__glint" cx="200" cy="200" r="66" pathLength="100"/>
+            </g>
+          </svg>
+        </div>
+      </div>
+
+      <!-- 推測・結果の画面で玉から浮かび上がる料理の絵。舞台の外に置いて、そのときだけ料理名を代替テキストで伝える -->
+      <div class="reveal" id="reveal" aria-hidden="true"><span class="art reveal__art" id="reveal-art"></span></div>
+      <!-- 読みの値と前回との差。読み上げは下の aria-live の行が受け持つので、ここは外す -->
+      <p class="reading" id="reading" aria-hidden="true"><span class="reading__label">読み <b class="reading__value" id="reading-value">0%</b></span><span class="reading__delta" id="delta"></span></p>
+      <p class="ring-hint" id="ring-hint" aria-hidden="true" hidden><span class="ring-hint__line"><span class="chunk">水晶玉の</span><span class="chunk">まわりの輪が、</span><span class="chunk">いまの読みです。</span></span><span class="ring-hint__line"><span class="chunk">100%で</span><span class="chunk">答えが見えます</span></span></p>
+    </div>
+
+    <section class="panel panel--intro" data-panel="intro" aria-labelledby="title">
+      <h1 id="title"><span class="phrase">いま食べたいもの、</span><span class="phrase">当てます</span></h1>
+      <p class="lead"><span class="phrase">料理をひとつ、思い浮かべてください。</span><span class="phrase">まだ決まっていなければ、いまの気分のままで。</span><span class="phrase">水晶玉が、あなたの心にある一皿を読みます。</span></p>
+      <button type="button" id="start" class="button button--primary">占ってもらう</button>
+      <p class="note"><span class="phrase">質問に答えるだけ。</span><span class="phrase">たいてい10問前後で見えます。</span><span class="phrase">答えも覚えたことも、この端末の外へは出しません。</span></p>
+      <div class="memory" id="memory" hidden>
+        <p><span class="phrase">この水晶玉は、</span><span class="phrase">この端末で<strong id="learned">0品</strong>の</span><span class="phrase">答え方を覚えています</span></p>
+        <button type="button" id="forget" class="text-button">覚えたことを忘れさせる</button>
+      </div>
+      <p id="memory-said" class="note" role="status"></p>
+      <p id="storage-off" class="note" hidden>この端末では覚えられない設定になっています。占いはそのまま遊べます。</p>
+      <p id="storage-repaired" class="note" role="status" hidden></p>
+    </section>
+
+    <section class="panel panel--asking" data-panel="asking" hidden>
+      <div class="progress">
+        <p class="counter"><span id="counter">1問目／25</span><span class="counter__sep" aria-hidden="true">・</span><span id="guesses-left">推測 あと3回</span></p>
+        <!-- 読みの軌跡。1問ごとの読みの折れ線で、下がった点は赤、最有力の料理が入れ替わった点には輪を付ける -->
+        <svg class="trail" id="trail" viewBox="0 0 120 20" focusable="false" aria-hidden="true">
+          <line class="trail__guide" x1="3" y1="3" x2="117" y2="3"/>
+          <line class="trail__base" x1="3" y1="17" x2="117" y2="17"/>
+          <polyline class="trail__line" id="trail-line" points=""/>
+          <g id="trail-points"></g>
+        </svg>
+      </div>
+      <div class="card">
+        <h2 class="question" id="question" tabindex="-1"><span class="question__lead">それは、</span><span id="question-text"></span></h2>
+      </div>
+      <div class="answers" id="answers" role="group" aria-labelledby="question">
+        <button type="button" class="answer" data-answer="yes"><kbd aria-hidden="true">1</kbd>はい</button>
+        <button type="button" class="answer" data-answer="probably"><kbd aria-hidden="true">2</kbd>たぶんそう</button>
+        <button type="button" class="answer" data-answer="unknown"><kbd aria-hidden="true">3</kbd>わからない</button>
+        <button type="button" class="answer" data-answer="probablyNot"><kbd aria-hidden="true">4</kbd>たぶん違う</button>
+        <button type="button" class="answer" data-answer="no"><kbd aria-hidden="true">5</kbd>いいえ</button>
+      </div>
+    </section>
+
+    <section class="panel panel--guessing" data-panel="guessing" hidden>
+      <p class="guess__note" id="guess-note" hidden></p>
+      <h2 class="guess" id="guess-title" tabindex="-1">
+        <span class="guess__lead" id="guess-lead">あなたの心にあるのは……</span>
+        <span class="guess__name" id="guess-name"></span>
+        <span class="guess__tail">ですね？</span>
+      </h2>
+      <p class="guess__mist" id="guess-mist" hidden>……まだ霧が晴れません。<br>もう少し聞かせてください。</p>
+      <div class="guess__buttons">
+        <button type="button" id="guess-yes" class="button button--primary">当たり！</button>
+        <button type="button" id="guess-no" class="button">ちがう</button>
+      </div>
+    </section>
+
+    <section class="panel panel--won" data-panel="won" hidden>
+      <h2 class="result-title" id="won-title" tabindex="-1"></h2>
+      <p class="result-suggest" id="won-suggest" hidden>迷っていたなら、今夜はこれで。</p>
+      <p class="result-count" id="won-count"></p>
+      <section class="deciders" id="deciders" aria-labelledby="deciders-title">
+        <h3 id="deciders-title">決め手になった答え</h3>
+        <ul id="decider-list"></ul>
+      </section>
+      <p class="note result-memory" id="won-memory"></p>
+    </section>
+
+    <section class="panel panel--teaching" data-panel="teaching" hidden>
+      <h2 class="result-title" id="teach-title" tabindex="-1"><span class="phrase">参りました。</span><span class="phrase">あなたの心にあったのは、</span><span class="phrase">何ですか？</span></h2>
+      <form class="teach" id="teach-form" novalidate autocomplete="off">
+        <label for="teach-input">料理の名前</label>
+        <input id="teach-input" type="text" maxlength="60" enterkeyhint="done" spellcheck="false" placeholder="例：ナシゴレン" aria-describedby="teach-error">
+        <p class="teach__error" id="teach-error" role="status"></p>
+        <p class="teach__hint" id="candidates-label" hidden>一覧にある料理なら、押すだけで教えられます</p>
+        <ul class="candidates" id="candidates" aria-labelledby="candidates-label"></ul>
+        <button type="submit" id="teach-new" class="button button--primary" disabled>この名前で教える</button>
+      </form>
+      <button type="button" id="teach-skip" class="text-button">教えずに終える</button>
+    </section>
+
+    <section class="panel panel--taught" data-panel="taught" hidden>
+      <h2 class="result-title" id="taught-title" tabindex="-1"></h2>
+      <p class="note result-memory" id="taught-memory" hidden>この端末では覚えられませんでした。</p>
+    </section>
+
+    <section class="panel panel--ended" data-panel="ended" hidden>
+      <h2 class="result-title" id="ended-title" tabindex="-1"><span class="phrase">また占わせて</span><span class="phrase">ください</span></h2>
+      <p class="result-count" id="ended-count"></p>
+    </section>
+
+    <div class="finale" id="finale" hidden>
+      <button type="button" id="again" class="button button--primary">もう一度占う</button>
+      <p class="result-share">
+        <a id="result-x" class="result-share__button" href="https://x.com/intent/post" target="_blank" rel="noopener noreferrer">Xで結果を投稿</a>
+        <button type="button" id="result-copy" class="result-share__button">結果をコピー</button>
+      </p>
+      <p class="result-share__said" id="result-said" role="status"></p>
+    </div>
+
+    <div class="aux" id="aux" hidden>
+      <button type="button" id="back" class="text-button">ひとつ戻る</button>
+      <!-- 見た目は舞台の右上に置く（答えのすぐ下だと「いいえ」と押し間違える）。読む順は「ひとつ戻る」の次のまま -->
+      <button type="button" id="restart" class="text-button restart">最初から</button>
+    </div>
+    <p class="key-hint key-hint--intro"><span class="phrase">キーボード：<kbd>Enter</kbd>か<kbd>1</kbd>で始める</span></p>
+    <p class="key-hint key-hint--asking"><span class="phrase">キーボード：<kbd>1</kbd>〜<kbd>5</kbd>で答える・</span><span class="phrase"><kbd>Backspace</kbd>でひとつ戻る</span></p>
+    <p class="key-hint key-hint--guessing"><span class="phrase">キーボード：<kbd>Y</kbd>か<kbd>Enter</kbd>で当たり・</span><span class="phrase"><kbd>N</kbd>でちがう</span></p>
+    <p class="key-hint key-hint--finale"><span class="phrase">キーボード：<kbd>Enter</kbd>でもう一度占う</span></p>
+
+    <p class="sr-only" id="live" aria-live="polite"></p>
+    <noscript><p class="note">占うにはJavaScriptを有効にしてください。</p></noscript>
+  </main>
+
+  <footer class="site-footer">
+    <div id="share"></div>
+    <a href="../privacy.html">プライバシー</a>
+  </footer>
+
+  <dialog id="forget-dialog" aria-labelledby="forget-title" aria-describedby="forget-description">
+    <h2 id="forget-title">覚えたことを忘れさせますか？</h2>
+    <p id="forget-description">教えた料理と答え方をこの端末から消します。元に戻せません。</p>
+    <div class="dialog-actions">
+      <button type="button" id="forget-cancel" class="button" autofocus>消さずに戻る</button>
+      <button type="button" id="forget-confirm" class="button button--danger">忘れさせる</button>
+    </div>
+  </dialog>
+
+  <dialog id="restart-dialog" aria-labelledby="restart-title" aria-describedby="restart-description">
+    <h2 id="restart-title">最初からにしますか？</h2>
+    <p id="restart-description">ここまでの答えは消えます。</p>
+    <div class="dialog-actions">
+      <button type="button" id="restart-cancel" class="button" autofocus>続ける</button>
+      <button type="button" id="restart-confirm" class="button button--danger">最初から</button>
+    </div>
+  </dialog>
+</body>
+</html>

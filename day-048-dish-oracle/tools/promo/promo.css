@@ -1,0 +1,31 @@
+* { box-sizing: border-box; }
+/* iframe と同じ color-scheme にしておくと、iframe の背景を透かせる（違うと不透明な下地が入る） */
+:root { color-scheme: dark; --gold: #e8c56a; --gold-soft: #f4dc9c; --text: #f5efe2; --card: #1c1638; --card-edge: #463a7c;
+  --mincho: "Hiragino Mincho ProN", "Yu Mincho", "YuMincho", "Noto Serif JP", serif;
+  --gothic: system-ui, -apple-system, "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif; }
+html, body { margin: 0; width: 540px; height: 960px; overflow: hidden; background: #0f0b24; color: var(--text); font-family: var(--gothic); }
+/* 背景はアプリの夜空（グラデーションと星）を画面全体に広げたもの。iframe の中は透明にして、この上に重ねる */
+#composition, #end { background: radial-gradient(ellipse 90% 460px at 50% 40px, #2b1f5e 0, transparent 100%), linear-gradient(180deg, #0f0b24 0, #1d1440 820px, #1d1440 100%); }
+#composition { position: relative; width: 540px; height: 960px; }
+#composition::before, #end::before { content: ""; position: absolute; inset: 0 0 auto; height: 760px; pointer-events: none;
+  background:
+    radial-gradient(circle at 13% 37%, rgba(255, 255, 255, .95) 0 1.3px, transparent 2px) 0 0 / 293px 241px,
+    radial-gradient(circle at 71% 64%, rgba(255, 244, 214, .75) 0 1px, transparent 1.6px) 0 0 / 173px 151px,
+    radial-gradient(circle at 86% 81%, rgba(233, 228, 255, .6) 0 .9px, transparent 1.5px) 0 0 / 229px 199px,
+    radial-gradient(circle at 42% 12%, rgba(214, 206, 255, .45) 0 .7px, transparent 1.3px) 0 0 / 113px 97px;
+  mask-image: linear-gradient(#000 45%, transparent); opacity: .8; }
+.mark { position: absolute; top: 96px; left: 0; right: 0; margin: 0; text-align: center; font-size: 15px; font-weight: 700; letter-spacing: .22em; color: var(--gold); }
+/* 上下の縁はぼかして、スクロールで札が切れる線を見せない */
+#game-frame { position: absolute; left: 0; top: 120px; width: 540px; height: 672px; border: 0; pointer-events: none; background: transparent;
+  mask-image: linear-gradient(transparent, #000 14px, #000 calc(100% - 24px), transparent); }
+/* 字幕は不透明な札。後ろでアプリが動いても、字幕の切り替え検査に差分が出ない */
+#caption { position: absolute; left: 54px; top: 798px; width: 432px; height: 64px; margin: 0; padding: 10px 8px; border: 1px solid var(--card-edge); border-radius: 14px; background: var(--card); text-align: center; }
+#caption::before { content: ""; position: absolute; top: -1px; right: 18%; left: 18%; height: 1px; background: linear-gradient(90deg, transparent, var(--gold), transparent); }
+#caption-lines { display: block; font-size: 30px; font-weight: 800; line-height: 42px; letter-spacing: .02em; white-space: nowrap; }
+#end { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding: 176px 54px 0; text-align: center; }
+.end__ball { position: relative; width: 300px; height: auto; margin-bottom: 26px; overflow: visible; }
+.end__ring { filter: drop-shadow(0 0 3px rgba(255, 239, 190, .85)) drop-shadow(0 0 10px rgba(232, 197, 106, .55)); }
+#end h1 { position: relative; margin: 0; font-family: var(--mincho); font-size: 46px; font-weight: 600; line-height: 1.42; letter-spacing: .03em; }
+.end__day { position: relative; margin-top: 30px; font-size: 18px; font-weight: 700; letter-spacing: .22em; color: var(--gold); }
+#end small { position: relative; margin-top: 14px; font-size: 24px; font-weight: 700; letter-spacing: .02em; color: var(--gold-soft); }
+[hidden] { display: none !important; }
