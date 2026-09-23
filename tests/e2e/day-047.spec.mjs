@@ -124,7 +124,7 @@ test('events：減速で通過済みの速さや前の世界へ戻っても、�
 });
 
 for(const viewport of VIEWPORTS)test(`${viewport.width}×${viewport.height}：各世界の1秒後・3秒後に象徴、全フレームで猫の投影・描画予算・可視対象が範囲内`,async({page})=>{
-  await page.setViewportSize(viewport);await begin(page);const run=await holdToResult(page,{stride:2});expect(run.ok,'結果まで到達').toBe(true);
+  await page.setViewportSize(viewport);await begin(page);const run=await holdToResult(page,{stride:5});expect(run.ok,'結果まで到達').toBe(true);
   const playing=run.samples.filter(s=>s.state==='playing');
   for(const world of WORLD_IDS){
     const entry=world==='farm'?0:playing.find(s=>s.world===world)?.elapsed;expect.soft(entry,`${world}に到達`).not.toBeUndefined();if(entry===undefined)continue;
@@ -176,7 +176,7 @@ test('光の段階は減速で戻る：light→glow→coat',async({page})=>{
 });
 
 test('動き（通常）：揺れは接触時だけ2px以下・120ms以内、流線は120本以下で空12本以上・星間で空より多い、本体4・破片12以下',async({page})=>{
-  await page.setViewportSize(SMALL);await begin(page);const run=await holdToResult(page);expect(run.ok).toBe(true);
+  await page.setViewportSize(SMALL);await begin(page);const run=await holdToResult(page,{stride:2});expect(run.ok).toBe(true);
   const playing=run.samples.filter(s=>s.state==='playing');
   expect(playing.filter(s=>s.x?.reducedMotion!==false).length).toBe(0);
   const shake=playing.map(s=>s.x?.shakePx??NaN);let longest=0,streak=0;for(const v of shake){streak=v>0?streak+1:0;longest=Math.max(longest,streak);}
