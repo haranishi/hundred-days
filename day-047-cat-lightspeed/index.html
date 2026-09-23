@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="画面を上下にこすると猫が加速する3Dゲーム。実在の20の速さを追い越して、最後は光速の壁と時間の遅れへ。">
+<meta name="share:text" content="ねこ、光になる。猫をこすって、光速の壁まで。">
+<meta name="theme-color" content="#0d171b">
+<title>ねこ、光になる</title>
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="app.css">
+<script type="module" src="boot.js"></script>
+<link rel="stylesheet" href="shared/share.css">
+<script src="shared/share.js" defer></script>
+</head>
+<body>
+<main id="app" data-state="loading">
+<header class="masthead"><a class="day" href="../" aria-label="100日チャレンジの一覧へ">100 DAYS <span>/ 047</span></a><h1>ねこ、光になる<span>。</span></h1><button id="mute" type="button" aria-pressed="false">音：オン</button></header>
+<section class="instrument" aria-label="速度と次の相手">
+<div class="speed-row"><strong id="speed">0</strong><span class="unit">km/h</span><span id="world-name">01 牧場</span></div>
+<div class="milestone-row"><span id="next"><i>次</i>カタツムリ</span><span id="count">0 / 20</span></div>
+<div class="progress-track"><div id="progress"></div></div>
+<p id="passed" class="sr-only" aria-live="polite">最初の相手は、カタツムリ。</p>
+</section>
+<div class="scene-shell">
+<canvas id="scene" tabindex="0" role="button" aria-label="猫の画面。上下にこすると加速。PCは長押し・Space・Enter・ホイール" aria-describedby="hold-hint"></canvas>
+<div id="input-surface" aria-hidden="true"></div>
+<div id="page-strip" aria-label="ページ移動帯"><span>↕</span></div>
+<div id="toast" aria-hidden="true"></div>
+<div id="relativity" hidden><strong id="ratio"></strong><div class="clocks"><span data-testid="cat-clock">猫の時計<b id="cat-clock">0.0</b>秒</span><span data-testid="earth-clock">地球の時計<b id="earth-clock">0.0</b>秒</span></div><p>猫の1秒のあいだに、地球では <b id="gamma">1.0</b> 秒</p></div>
+<div id="meow" aria-hidden="true"></div>
+<div class="scene-bottom"><span id="sound-note"></span><p id="hold-hint" data-testid="hint"><span class="for-touch">猫の画面を上下にこすって加速</span><span class="for-pointer">長押し・Space・Enter・ホイールで加速</span></p><i id="thrust-bar" aria-hidden="true"></i></div>
+<section id="loading-screen" class="overlay"><p>猫が準備運動をしています…</p></section>
+<section id="start-screen" class="overlay" hidden><div class="eyebrow">FROM A SNAIL TO THE SPEED OF LIGHT</div><h2>その先に、<br>どんな世界がある？</h2><p><span class="for-touch">猫の画面を指で上下にこすると加速。</span><span class="for-pointer">猫の画面を長押し、またはSpaceで加速。</span><br>離すと減速。20の速さを追い越して、光速の壁へ。</p><button id="start" class="primary">はじめる <span aria-hidden="true">▶</span></button><small>約50秒の旅。Spaceでもスタート。</small></section>
+<section id="result-screen" class="overlay result" tabindex="-1" aria-labelledby="result-title" hidden><canvas id="result-photo" data-testid="result-light-cat" width="240" height="160" aria-label="光になった猫" role="img"></canvas><span class="eyebrow">YOU BECAME LIGHT · 光速の 99.999%</span><h2 id="result-title">ねこ、光になる。</h2><p class="final-dilation">あなたの1秒のあいだに、地球では <b id="final-gamma"></b> 秒</p><p class="final-line"><span><b id="final-time"></b> 秒で</span><span>追い越したもの <b id="final-count"></b> / 20</span></p><p id="best"></p><button id="retry" class="primary">もう一度 <span aria-hidden="true">↻</span></button><div class="result-share" role="group" aria-labelledby="result-share-title"><h3 id="result-share-title">この記録を共有</h3><a id="result-x" target="_blank" rel="noopener noreferrer">Xで共有</a><button id="result-copy">リンクをコピー</button></div><span id="copy-status" role="status"></span><p class="note">時間の遅れは簡略モデル、猫が光になる姿は演出です。</p><details class="result-detail"><summary>くわしい記録</summary><dl><div><dt>到達速度</dt><dd><span id="final-speed"></span> <small>km/h</small></dd></div><div><dt>旅のあいだ、地球では</dt><dd><span id="final-earth"></span> 秒</dd></div></dl><p id="review">光は追い越せなかった。時間を、置いてきた。</p></details></section>
+<section id="fatal-screen" class="overlay" hidden><h2>猫が立ち止まりました</h2><p id="fatal-message"></p><button id="reload-page" class="primary">読み込み直す</button></section>
+</div>
+<div class="bulletin"><span>猫速報<small>フィクション</small></span><p id="news">県道を北上中、近隣住民は注意を</p></div>
+</main>
+<footer><div id="share"></div><p class="footnote">速さは比較値。速報はフィクション。光速は超えられません。</p><details><summary>速さの出典と、この実験について</summary><p>生物や乗り物の速度は条件によって変わる代表値・概数です。指定値のうちゾウガメ1.4km/hの計測出典は未確認です。車の60km/hは中央線等がある一般道路などの例で、生活道路すべてに適用される値ではありません。光速は定義値をkm/hに換算し四捨五入しています。</p><p>世界の切り替え・加速・ワープ・猫が光になる姿はフィクションです。速度だけで宇宙に出るわけではありません。音速を超えた鳴き声の遅延は、音を後ろへ残すイメージの演出です。移動する音源が自分の過去の音を聞く現象の厳密な再現ではありません。</p><p>真空では音は伝わりません。このゲームでは軌道速度以降を真空として無音にします。時間の遅れは地球に対する瞬間速度から求めた特殊相対論の簡略モデルです。猫の1秒をプレイの1秒とみなし、地球で過ぎる時間を積算しています。重力や加速による時計の比較、実際の往復旅行は再現していません。</p><p><a href="data/SOURCES.md">21の速さ・出典と精度を見る</a> · <a href="vendor/LICENSE-three.txt">3Dライブラリのライセンス</a></p><p>猫の3Dモデル：<a href="https://sketchfab.com/3d-models/lowpoly-cat-rig-run-animation-c36df576c9ae4ed28e89069b1a2f427a">Lowpoly Cat Rig + Run Animation</a> — Daily Lowpoly (@dailyfree3d)、<a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>。FBXをBlenderでglTF(GLB)へ変換。テクスチャは元から無く、色はアプリ側で付けています。向き・縮尺・再生速度・伸長・発光も調整しています。</p><p>猫の鳴き声：<a href="https://bigsoundbank.com/">BigSoundBank</a>（CC0）。木・岩・柵など：<a href="https://kenney.nl/assets/nature-kit">Kenney Nature Kit</a>（CC0）。建物・石畳：<a href="https://kenney.nl/assets/city-kit-suburban">Kenney City Kit Suburban</a>（CC0）。同梱モデルは縮尺調整・頂点色への統合、街の欠落テクスチャは独自色で置換しています。録音は再生速度と音量を変えています。空から先の雲・地球・太陽・惑星・星はコードで描いています。</p><p>ベスト記録とミュート設定だけを端末に保存します。外部通信はありません（共有先や外部リンクを自分で開く操作を除きます）。</p></details><a class="privacy" href="../privacy.html">プライバシー</a></footer>
+</body>
+</html>
