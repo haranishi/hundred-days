@@ -1,0 +1,83 @@
+{
+  "method": "Production geometry + instance compaction + Three Frustum; CPU submission count, not renderer.info measured on a GPU",
+  "modelTriangles": {
+    "tree": 132,
+    "pine": 204,
+    "log": 96,
+    "stump": 120,
+    "fence": 64,
+    "rock": 44,
+    "grass": 36,
+    "flower": 76,
+    "crops": 50,
+    "building": 1067,
+    "buildingA": 1174,
+    "buildingC": 1196,
+    "buildingE": 1731,
+    "stone": 48,
+    "cityFence": 252
+  },
+  "backgroundGeometry": {
+    "farm": 1236,
+    "city": 624
+  },
+  "impactCaps": [
+    {
+      "world": "farm",
+      "body": 1728,
+      "fragments": 144,
+      "flashes": 8,
+      "total": 1880
+    },
+    {
+      "world": "city",
+      "body": 864,
+      "fragments": 144,
+      "flashes": 8,
+      "total": 1016
+    },
+    {
+      "world": "sky",
+      "body": 2376,
+      "fragments": 144,
+      "flashes": 8,
+      "total": 2528
+    },
+    {
+      "world": "orbit",
+      "body": 1476,
+      "fragments": 144,
+      "flashes": 8,
+      "total": 1628
+    },
+    {
+      "world": "solar",
+      "body": 360,
+      "fragments": 144,
+      "flashes": 8,
+      "total": 512
+    },
+    {
+      "world": "interstellar",
+      "body": 144,
+      "fragments": 144,
+      "flashes": 8,
+      "total": 296
+    }
+  ],
+  "peak": {
+    "viewport": {
+      "width": 1080,
+      "height": 450
+    },
+    "reduced": false,
+    "speed": 0,
+    "world": "farm",
+    "mode": "saturated-type-0",
+    "calls": 20,
+    "triangles": 16682,
+    "lines": 0
+  },
+  "maxCalls": 21,
+  "samples": 858
+}

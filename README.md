@@ -79,6 +79,7 @@ Day 019・020は外部で公開するChrome拡張です。このリポジトリ�
 | 044 | Tokyo Railscape — 東京の電車を、眺める。 | [day-044-train-here/](day-044-train-here/) | [アプリを開く](https://hundred-days.pages.dev/day-044-train-here/) |
 | 045 | その撃ち方、読まれてる | [day-045-read-your-shots/](day-045-read-your-shots/) | [アプリを開く](https://hundred-days.pages.dev/day-045-read-your-shots/) |
 | 046 | 泣ぐ子は、いねがぁ | [day-046-namahage-night/](day-046-namahage-night/) | [アプリを開く](https://hundred-days.pages.dev/day-046-namahage-night/) |
+| 047 | ねこ、光になる | [day-047-cat-lightspeed/](day-047-cat-lightspeed/) | [アプリを開く](https://hundred-days.pages.dev/day-047-cat-lightspeed/) |
 <!-- day-index:end -->
 
 ## 1日アプリのルール
