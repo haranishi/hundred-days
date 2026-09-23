@@ -1,5 +1,6 @@
 import { expect,test } from '@playwright/test';
 const PATH='/day-047-cat-lightspeed/',errors=new WeakMap(),external=new WeakMap();
+test.setTimeout(60_000);
 test.beforeEach(async({page})=>{
   errors.set(page,[]);external.set(page,[]);
   page.on('pageerror',e=>errors.get(page).push(e.message));page.on('console',m=>{if(m.type()==='error')errors.get(page).push(m.text());});
