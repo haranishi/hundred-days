@@ -72,7 +72,12 @@ const connectSources = (dir) => {
   return (found ?? '').trim().split(/\s+/).slice(1);
 };
 
+/* 自分のサイト（本番の 'self'）のURLは接続先として数えない。Day 049 は共有リンクを作るために
+   公開URLを定数に持つ（lib/site.js）が、同じオリジンなので connect-src の 'self' で許されている */
+const SELF_HOST = 'hundred-days.pages.dev';
+
 const allows = (sources, host) =>
+  (host === SELF_HOST && sources.includes("'self'")) ||
   sources.some((source) => {
     const pattern = source.replace(/^https:\/\//, '');
     if (pattern === host) return true;
