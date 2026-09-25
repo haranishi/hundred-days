@@ -81,6 +81,7 @@ Day 019・020は外部で公開するChrome拡張です。このリポジトリ�
 | 046 | 泣ぐ子は、いねがぁ | [day-046-namahage-night/](day-046-namahage-night/) | [アプリを開く](https://hundred-days.pages.dev/day-046-namahage-night/) |
 | 047 | ねこ、光になる | [day-047-cat-lightspeed/](day-047-cat-lightspeed/) | [アプリを開く](https://hundred-days.pages.dev/day-047-cat-lightspeed/) |
 | 048 | いま食べたいもの、当てます | [day-048-dish-oracle/](day-048-dish-oracle/) | [アプリを開く](https://hundred-days.pages.dev/day-048-dish-oracle/) |
+| 049 | ぱたにゃん | [day-049-patanyan/](day-049-patanyan/) | [アプリを開く](https://hundred-days.pages.dev/day-049-patanyan/) |
 <!-- day-index:end -->
 
 ## 1日アプリのルール

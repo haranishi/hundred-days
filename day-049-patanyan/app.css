@@ -1,0 +1,701 @@
+:root {
+  --ink: #3f2a27;
+  --line: #4b2e2a;
+  --paper: #fff7ea;
+  --paper-2: #ffe9c7;
+  --accent: #c24f37;
+  --accent-deep: #6d2a1d;
+  --night: rgba(38, 26, 68, 0.62);
+  --focus: #ffd95a;
+  --u: 1;
+  --cat-y: 50%;
+  --cat-clear: 50px;
+  --gap-w: 240px;
+  --font: "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Noto Sans JP", "Yu Gothic", "YuGothic", Meiryo, system-ui, sans-serif;
+  --font-round: "Hiragino Maru Gothic ProN", "Hiragino Sans", "Noto Sans JP", "Yu Gothic", Meiryo, sans-serif;
+  /* 文字の縁取り。paint-order はHTMLの文字に効かない端末があるので影を重ねて作る */
+  --outline: 0 2px 0 var(--line), 2px 0 0 var(--line), -2px 0 0 var(--line), 0 -2px 0 var(--line),
+    1.5px 1.5px 0 var(--line), -1.5px 1.5px 0 var(--line), 1.5px -1.5px 0 var(--line), -1.5px -1.5px 0 var(--line);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+  background: #3b3576;
+}
+
+/* 拡大・スクロール・長押しメニュー・文字選択を止める。連打するゲームでは全部が誤操作になる */
+body {
+  font-family: var(--font);
+  color: var(--ink);
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior: none;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+#game {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+#stage {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.screen {
+  position: absolute;
+  inset: 0;
+}
+
+p {
+  margin: 0;
+}
+
+
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  min-width: 44px;
+  padding: 0 18px;
+  border: 2px solid var(--line);
+  border-radius: 12px;
+  background: var(--paper);
+  color: var(--ink);
+  font: 700 16px/1.2 var(--font);
+  text-decoration: none;
+  box-shadow: 0 3px 0 var(--line);
+  cursor: pointer;
+}
+
+.btn:active {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 var(--line);
+}
+
+.btn:disabled,
+.btn[aria-disabled="true"] {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.btn--primary {
+  width: min(100%, 300px);
+  min-height: 60px;
+  background: var(--accent);
+  color: #fff;
+  font-size: 22px;
+  letter-spacing: 0.08em;
+  box-shadow: 0 4px 0 var(--accent-deep);
+  border-color: var(--accent-deep);
+}
+
+.corner {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 5;
+  min-width: 76px;
+  min-height: 44px;
+  padding: 0 12px;
+  border: 2px solid rgba(255, 246, 232, 0.85);
+  border-radius: 999px;
+  background: var(--night);
+  color: #fff6e8;
+  font: 700 14px/1 var(--font);
+  cursor: pointer;
+}
+
+.corner[data-muted="true"] {
+  background: rgba(255, 246, 232, 0.92);
+  color: var(--ink);
+  border-color: var(--line);
+}
+
+/* ---- タイトル左上：100日チャレンジの一覧へ戻る・このゲームを共有する（右上の「音」と同じ形） ---- */
+.title__nav {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  z-index: 5;
+  display: flex;
+  gap: 8px;
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 0 14px;
+  border: 2px solid rgba(255, 246, 232, 0.85);
+  border-radius: 999px;
+  background: var(--night);
+  color: #fff6e8;
+  font: 700 14px/1 var(--font);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+/* 共通の共有欄（shared/share.css）は本文に置く前提で最小幅を持つ。ダイアログの中では幅に収める */
+#share .share {
+  min-width: 0;
+  max-width: 100%;
+  margin-top: 4px;
+}
+
+/* ダイアログの見出し「このゲームを共有」と同じことを言うので、共通の欄の見出しは出さない */
+#share .share__label {
+  display: none;
+}
+
+/* ---- タイトル：猫の上下を空けて、待機している猫そのものを見せる ---- */
+.title__top {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: calc(100% - var(--cat-y) + var(--cat-clear));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 0 16px;
+}
+
+.logo {
+  margin: 0;
+  font-family: var(--font-round);
+  font-weight: 800;
+  font-size: clamp(38px, calc(var(--u) * 40px), 72px);
+  line-height: 1.1;
+  letter-spacing: 0.03em;
+  color: #fff4df;
+  text-shadow: 0 3px 0 var(--line), 3px 0 0 var(--line), -3px 0 0 var(--line), 0 -3px 0 var(--line),
+    2.2px 2.2px 0 var(--line), -2.2px 2.2px 0 var(--line), 2.2px -2.2px 0 var(--line), -2.2px -2.2px 0 var(--line),
+    0 7px 0 rgba(40, 20, 50, 0.4);
+}
+
+.title__now,
+.title__how,
+.result__hint {
+  text-wrap: balance;
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: var(--night);
+  color: #fff6e8;
+  font-size: 13px;
+  line-height: 1.5;
+  text-align: center;
+}
+
+.title__bottom {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(var(--cat-y) + var(--cat-clear));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(14px, calc(var(--u) * 14px), 22px);
+  padding: 0 16px;
+}
+
+.title__start {
+  font-family: var(--font-round);
+  font-size: 24px;
+  font-weight: 800;
+  color: #fff6e8;
+  text-shadow: var(--outline), 0 5px 0 rgba(40, 20, 50, 0.35);
+  animation: breathe 1.6s ease-in-out infinite;
+}
+
+@keyframes breathe {
+  50% {
+    transform: scale(1.06);
+  }
+}
+
+.mode {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  max-width: 100%;
+  gap: 4px;
+  padding: 4px;
+  border-radius: 14px;
+  background: var(--night);
+}
+
+.mode__btn {
+  min-height: 44px;
+  min-width: 44px;
+  padding: 0 10px;
+  border: 2px solid transparent;
+  border-radius: 10px;
+  background: transparent;
+  color: #fff6e8;
+  font: 700 14px/1.2 var(--font);
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+/* 選ばれている方は面の色だけでなく印でも示す */
+.mode__btn[aria-pressed="true"] {
+  background: var(--paper);
+  color: var(--ink);
+  border-color: var(--line);
+}
+
+.mode__btn[aria-pressed="true"]::before {
+  content: "✓ ";
+}
+
+/* ---- 結果：スコアを一番大きく、主ボタンは親指の届く下半分 ---- */
+/* 隅の音ボタン（高さ44＋余白）の下から始めて、カードの角をボタンで隠さない */
+.result__card {
+  position: absolute;
+  top: 58px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(calc(100% - 24px), 420px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 8px 12px 10px;
+  border: 2px solid var(--line);
+  border-radius: 18px;
+  background: rgba(255, 247, 234, 0.95);
+  box-shadow: 0 4px 0 rgba(40, 20, 50, 0.35);
+  overflow: hidden;
+}
+
+.result__mode {
+  padding: 2px 12px;
+  border-radius: 999px;
+  background: #4a3f7a;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.result__score {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.result__num {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.result__unit {
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.result__best {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.badge-new {
+  padding: 1px 8px;
+  border: 2px solid var(--line);
+  border-radius: 999px;
+  background: #ffd95a;
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+}
+
+.result__fish,
+.result__next,
+.result__unlock {
+  font-size: 14px;
+  line-height: 1.45;
+  text-align: center;
+}
+
+.result__unlock {
+  font-size: 13px;
+  font-weight: 800;
+  color: #8a2f47;
+}
+
+.result__actions {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(50% + 10px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 0 16px;
+}
+
+.result__subs {
+  display: flex;
+  gap: 10px;
+}
+
+.result__subs .btn {
+  min-width: 110px;
+}
+
+/* ---- 一時停止 ---- */
+.screen--pause {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(24, 16, 44, 0.5);
+}
+
+.pause__box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 18px 22px;
+  border: 2px solid var(--line);
+  border-radius: 18px;
+  background: var(--paper);
+}
+
+.pause__title {
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.pause__tap,
+.pause__ready {
+  font-family: var(--font-round);
+  font-size: 24px;
+  font-weight: 800;
+}
+
+/* ---- ダイアログ（シェア・ねこえらび） ---- */
+.dialog {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px;
+  background: rgba(20, 14, 40, 0.6);
+}
+
+.dialog__panel {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: min(100%, 440px);
+  max-height: 100%;
+  overflow: auto;
+  padding: 12px 14px 14px;
+  border: 2px solid var(--line);
+  border-radius: 18px;
+  background: var(--paper);
+  box-shadow: 0 5px 0 rgba(20, 10, 30, 0.45);
+}
+
+.dialog__title {
+  margin: 0;
+  font-size: 18px;
+  text-align: center;
+}
+
+.dialog__close {
+  align-self: center;
+  min-width: 140px;
+}
+
+.cshare__body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.cshare__preview {
+  display: block;
+  height: min(34vh, 300px);
+  width: auto;
+  max-width: 100%;
+  aspect-ratio: 4 / 5;
+  margin: 0 auto;
+  border: 2px solid var(--line);
+  border-radius: 10px;
+  background: #7a5ea6;
+  object-fit: contain;
+}
+
+.cshare__controls {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.cshare__row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.cshare__btn {
+  padding: 0 8px;
+  font-size: 15px;
+}
+
+.cshare__btn--main {
+  grid-column: 1 / -1;
+  background: #4a3f7a;
+  color: #fff;
+}
+
+.cshare__said {
+  min-height: 1.4em;
+  font-size: 13px;
+  text-align: center;
+}
+
+.cshare__note {
+  font-size: 12.5px;
+  line-height: 1.6;
+  /* 文節で折り返し、最後の行が短くなりすぎないよう整える（どちらも効かないブラウザでは普通に折り返す） */
+  word-break: auto-phrase;
+  text-wrap: pretty;
+}
+
+/* 最後の句を途中で折らない（行末の1〜2文字だけが次の行に落ちるのを防ぐ。pretty の効かないブラウザ向けの下支え） */
+.cshare__note .keep {
+  white-space: nowrap;
+}
+
+.cats__total {
+  font-size: 14px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.cats__grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cat-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  width: 100%;
+  min-height: 44px;
+  padding: 6px 4px 8px;
+  border: 2px solid #c0a58f;
+  border-radius: 12px;
+  background: #fffdf8;
+  color: var(--ink);
+  font: 700 14px/1.3 var(--font);
+  cursor: pointer;
+}
+
+.cat-tile canvas {
+  width: 72px;
+  height: 72px;
+}
+
+.cat-tile__state {
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.cat-tile[aria-pressed="true"] {
+  border-color: var(--line);
+  background: var(--paper-2);
+  box-shadow: inset 0 0 0 2px var(--line);
+}
+
+.cat-tile[aria-disabled="true"] {
+  background: #efe7ef;
+  color: #4f4054;
+  cursor: default;
+}
+
+/* ---- 横持ちのスマホ：遊び場の左右に文字とボタンを振り分ける ---- */
+.layout-side .screen--title,
+.layout-side .screen--result {
+  display: grid;
+  grid-template-columns: 1fr var(--gap-w) 1fr;
+  align-items: center;
+}
+
+.layout-side .title__top,
+.layout-side .title__bottom,
+.layout-side .result__card,
+.layout-side .result__actions {
+  position: static;
+  grid-row: 1;
+  width: auto;
+  max-height: calc(100vh - 16px);
+  margin: 0 10px;
+  transform: none;
+}
+
+.layout-side .title__top,
+.layout-side .result__card {
+  grid-column: 1;
+}
+
+.layout-side .title__bottom,
+.layout-side .result__actions {
+  grid-column: 3;
+}
+
+.layout-side .result__actions {
+  align-self: end;
+  margin-bottom: 18px;
+}
+
+.layout-side .title__bottom {
+  gap: 8px;
+}
+
+@media (max-height: 520px) and (orientation: landscape) {
+  .cshare__body {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-items: start;
+    gap: 12px;
+  }
+
+  .cshare__preview {
+    height: min(72vh, 270px);
+  }
+
+  .dialog__panel--share {
+    width: min(100%, 660px);
+  }
+
+  .dialog__panel--cats {
+    width: min(100%, 720px);
+  }
+
+  .cats__grid {
+    grid-template-columns: repeat(6, 1fr);
+  }
+
+  .cat-tile canvas {
+    width: 56px;
+    height: 56px;
+  }
+
+  .cshare__note {
+    font-size: 12px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .title__start {
+    animation: none;
+  }
+
+  .btn:active {
+    transform: none;
+  }
+}
+
+/* 淡いパネルと暗い背景のどちらでも枠を見分けられるよう、明暗を重ねる */
+:is(.btn, .corner, .pill, .mode__btn, .cat-tile):focus-visible {
+  outline: 3px solid var(--ink);
+  outline-offset: 3px;
+  box-shadow: 0 0 0 3px var(--focus);
+}
+
+/* 待ち時間を入力判定と同じ時計で示し、タブ復帰や手動検証でも解除と揃える */
+#retry {
+  position: relative;
+}
+
+#retry:disabled {
+  opacity: 0.55;
+  box-shadow: none;
+}
+
+#retry:disabled::after {
+  content: "";
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  bottom: 5px;
+  height: 3px;
+  border-radius: 2px;
+  background: #fff6c4;
+  transform-origin: left;
+  transform: scaleX(var(--retry-progress, 0));
+}
+
+.title__goal {
+  color: #fff6e8;
+  background: var(--night);
+  border-radius: 999px;
+  padding: 2px 12px;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.result__reason,
+.result__goal {
+  font-size: 13px;
+  line-height: 1.5;
+  text-align: center;
+}
+
+.result__goal {
+  font-weight: 800;
+}

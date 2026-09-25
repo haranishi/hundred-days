@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ぱたにゃん | 100日チャレンジ</title>
+<meta name="description" content="タップで猫が前足をぱたぱたさせて羽ばたき、爪とぎポールのすき間をくぐるワンタップゲーム。ダウンロードも登録も広告もなし。">
+<meta name="share:text" content="ぱたにゃん — タップで猫がぱたぱた羽ばたいて、爪とぎポールのすき間をくぐるワンタップゲーム。">
+<link rel="canonical" href="https://hundred-days.pages.dev/day-049-patanyan/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="100 DAYS / 100 APPS">
+<meta property="og:title" content="ぱたにゃん">
+<meta property="og:description" content="タップで猫がぱたぱた羽ばたいて、爪とぎポールのすき間をくぐる。失敗してもかわいい、きょうのコースで遊ぶワンタップゲーム。">
+<meta property="og:url" content="https://hundred-days.pages.dev/day-049-patanyan/">
+<meta property="og:image" content="https://hundred-days.pages.dev/day-049-patanyan/assets/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="夕方の屋根の上を羽ばたく猫と「ぱたにゃん」のロゴ">
+<meta property="og:locale" content="ja_JP">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#3b3576">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath d='M12 30 L14 8 L28 20 Z M52 30 L50 8 L36 20 Z' fill='%23f4a55b' stroke='%234b2f26' stroke-width='3' stroke-linejoin='round'/%3E%3Cellipse cx='32' cy='36' rx='24' ry='21' fill='%23f4a55b' stroke='%234b2f26' stroke-width='3'/%3E%3Cellipse cx='23' cy='35' rx='3.5' ry='4.5' fill='%232a1c19'/%3E%3Cellipse cx='41' cy='35' rx='3.5' ry='4.5' fill='%232a1c19'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="shared/share.css">
+<link rel="stylesheet" href="app.css">
+<script src="shared/share.js" defer></script>
+<script type="module" src="app.js"></script>
+</head>
+<body data-screen="title">
+<canvas id="game" aria-hidden="true"></canvas>
+
+<div id="stage">
+  <button type="button" id="sound" class="corner" data-action="sound">音：あり</button>
+
+  <section id="title" class="screen screen--title" aria-labelledby="logo">
+    <nav class="title__nav" aria-label="一覧へ戻る・共有">
+      <a class="pill" href="../" aria-label="100日チャレンジの一覧へ">← 100日</a>
+      <button type="button" class="pill" data-action="app-share" aria-label="このアプリを共有する">共有</button>
+    </nav>
+    <div class="title__top">
+      <h1 id="logo" class="logo">ぱたにゃん</h1>
+      <p class="title__now" id="title-mode">きょうのコース</p>
+      <p class="title__goal" id="title-goal"></p>
+    </div>
+    <div class="title__bottom">
+      <p class="title__start">タップでスタート</p>
+      <p class="title__how">タップ・クリック・スペースで羽ばたく</p>
+      <div class="mode" role="group" aria-label="モード">
+        <button type="button" class="mode__btn" data-action="mode" data-mode="daily" aria-pressed="true">きょうのコース</button>
+        <button type="button" class="mode__btn" data-action="mode" data-mode="any" aria-pressed="false">いつでもモード</button>
+      </div>
+      <button type="button" class="btn btn--sub" data-action="cats" id="title-cat">ねこ：茶トラ</button>
+    </div>
+  </section>
+
+  <section id="result" class="screen screen--result" hidden aria-labelledby="result-heading">
+    <div class="result__card">
+      <h2 id="result-heading" class="sr-only">結果</h2>
+      <p class="result__mode" id="result-mode"></p>
+      <div class="result__score">
+        <canvas id="result-cat" class="result__cat" aria-hidden="true"></canvas>
+        <div class="result__num">
+          <canvas id="result-digits" class="result__digits" role="img" aria-label=""></canvas>
+          <span class="result__unit">本くぐった</span>
+        </div>
+      </div>
+      <p class="result__reason" id="result-reason"></p>
+      <p class="result__best"><span id="result-best"></span><span class="badge-new" id="result-new" hidden>NEW</span></p>
+      <canvas id="result-stamps" class="result__stamps" role="img" aria-label=""></canvas>
+      <p class="result__goal" id="result-goal"></p>
+      <p class="result__fish" id="result-fish"></p>
+      <p class="result__next" id="result-next"></p>
+      <p class="result__unlock" id="result-unlock" hidden></p>
+    </div>
+    <div class="result__actions">
+      <button type="button" class="btn btn--primary" data-action="retry" id="retry">もう一回</button>
+      <div class="result__subs">
+        <button type="button" class="btn btn--sub" data-action="share">シェア</button>
+        <button type="button" class="btn btn--sub" data-action="cats">ねこ</button>
+      </div>
+      <p class="result__hint">ボタン以外のタップやスペースでも、もう一回</p>
+    </div>
+  </section>
+
+  <section id="pause" class="screen screen--pause" hidden aria-live="polite">
+    <div class="pause__box">
+      <p class="pause__title">ひとやすみ中</p>
+      <p class="pause__tap" id="pause-tap">タップで再開</p>
+      <p class="pause__ready" id="pause-ready" hidden>じゅんび…</p>
+    </div>
+  </section>
+</div>
+
+<div id="share-dialog" class="dialog" role="dialog" aria-modal="true" aria-labelledby="share-title" hidden>
+  <div class="dialog__panel dialog__panel--share">
+    <h2 id="share-title" class="dialog__title">シェア</h2>
+    <div class="cshare__body">
+      <img id="share-preview" class="cshare__preview" alt="" width="1080" height="1350">
+      <div class="cshare__controls">
+        <div class="cshare__row">
+          <button type="button" class="btn cshare__btn cshare__btn--main" data-action="share-files" id="share-files" hidden>画像つきで共有</button>
+          <a class="btn cshare__btn cshare__btn--main" data-action="save" id="share-save" hidden>画像を保存</a>
+          <button type="button" class="btn cshare__btn" data-action="share-sheet" id="share-sheet" hidden>共有…</button>
+          <a class="btn cshare__btn" data-action="x" id="share-x" target="_blank" rel="noopener noreferrer">Xで投稿</a>
+          <a class="btn cshare__btn" data-action="line" id="share-line" target="_blank" rel="noopener noreferrer">LINEで送る</a>
+          <button type="button" class="btn cshare__btn" data-action="copy" id="share-copy">リンクをコピー</button>
+        </div>
+        <p class="cshare__said" id="share-said" role="status" aria-live="polite"></p>
+        <p class="cshare__note" id="share-note">InstagramとYouTubeはWebから投稿画面を開けないので、共有シートかリンクのコピーで<span class="keep">渡してください。</span></p>
+        <button type="button" class="btn btn--sub dialog__close" data-action="close">とじる</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="app-share-dialog" class="dialog" role="dialog" aria-modal="true" aria-labelledby="app-share-title" hidden>
+  <div class="dialog__panel dialog__panel--app">
+    <h2 id="app-share-title" class="dialog__title">このゲームを共有</h2>
+    <div id="share"></div>
+    <button type="button" class="btn btn--sub dialog__close" data-action="close">とじる</button>
+  </div>
+</div>
+
+<div id="cats-dialog" class="dialog" role="dialog" aria-modal="true" aria-labelledby="cats-title" hidden>
+  <div class="dialog__panel dialog__panel--cats">
+    <h2 id="cats-title" class="dialog__title">ねこえらび</h2>
+    <p class="cats__total" id="cats-total"></p>
+    <ul class="cats__grid" id="cats-grid"></ul>
+    <button type="button" class="btn btn--sub dialog__close" data-action="close">もどる</button>
+  </div>
+</div>
+
+<p id="live" class="sr-only" aria-live="polite"></p>
+</body>
+</html>
