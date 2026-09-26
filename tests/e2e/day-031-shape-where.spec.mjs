@@ -684,16 +684,19 @@ test.describe('Day 031 この形、どこ？', () => {
     await page.locator('#play-town').click();
     const round = roundFor({ mode: 'town', prefCode: '05', seed: 5 });
     const row = page.locator('.hint-row');
+    await expect(row).toBeVisible();
     const before = await row.boundingBox();
+    expect(before, 'ヒント行が描画されていない').not.toBeNull();
 
     await answerQuestion(page, round.questions[0]);
     await expect(page.locator('#hint-text')).toHaveText('ヒントなしで回答');
     await expect(page.locator('#hint-text')).toHaveAttribute('data-tone', 'quiet');
     await expect(page.locator('#hint-button')).toBeHidden();
     // 行の高さは変えない。ここが伸び縮みすると4択とシルエットが動く
-    expect(Math.round((await row.boundingBox()).height), 'ヒント行の高さが変わる').toBe(
-      Math.round(before.height)
-    );
+    await expect(row).toBeVisible();
+    const after = await row.boundingBox();
+    expect(after, '回答後のヒント行が描画されていない').not.toBeNull();
+    expect(Math.round(after.height), 'ヒント行の高さが変わる').toBe(Math.round(before.height));
 
     // ヒントを使った問は、使ったヒントの文字がそのまま残る
     await page.locator('#next-button').click();
