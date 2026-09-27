@@ -82,3 +82,11 @@
 | 050 | 制作背景・表現の意図の解説 | [Art Institute of Chicago API](https://api.artic.edu/docs/) の作品別 description | [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) | 日本語で要約・編集。原著者・ライセンス・元作品URLを画面に表示。鑑賞の問いかけは本アプリで追加 |
 | 050 | 展示室の家具GLB3点 | [Kenney Furniture Kit](https://kenney.nl/assets/furniture-kit) | CC0 1.0 | benchCushionLow、pottedPlant、lampRoundFloorを未改変で同梱し、配置・縮尺だけ実行時に調整 |
 | 050 | Three.js 0.186.0 / GLTFLoader | [Three.js](https://threejs.org/) | [MIT](day-050-art-uncovered/vendor/LICENSE-three.txt) | Day047の配布バンドルを複製。未改変 |
+
+## Day51「ハコニワ」のスクリーンショット
+
+`day-051-hakoniwa/screenshot.png` はハコニワの実画面を撮影したものです。
+地図の出典は OpenFreeMap / OpenMapTiles / © OpenStreetMap contributors。
+画像内のクレジットを保持しています。3Dミニチュアは自作です。
+施設データや使用ソフトウェアの条件は[アプリの出典ページ](https://hakoniwa-map.haranishi.workers.dev/licenses/)を参照してください。
+アプリ本体・施設カタログはこのリポジトリには同梱しません。
