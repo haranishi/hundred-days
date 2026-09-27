@@ -78,3 +78,11 @@
 | 047 | 木・岩・丸太・切り株・柵・草・花・畑の同梱GLB | [Kenney Nature Kit](https://kenney.nl/assets/nature-kit) | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) | GLBファイル自体は未改変。実行時に座標・縮尺を正規化し、元のbaseColorFactorと材質グループを保持してInstancedMeshで配置・飛散。全9種を使用 |
 | 047 | 建物4種・柵・石畳の同梱GLB | [Kenney City Kit Suburban](https://kenney.nl/assets/city-kit-suburban) | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) | GLBファイル自体は未改変。同キットのTextures/colormap.pngを追加。元の形状・UV・材質・KHR_texture_transformを保持し、座標・縮尺を正規化してインスタンス化。建物4種・柵・石畳の全6種を使用 |
 | 047 | Lowpoly Cat Rig + Run Animation（`assets/models/cat-run.glb`） | Daily Lowpoly (@dailyfree3d)・[Sketchfab](https://sketchfab.com/3d-models/lowpoly-cat-rig-run-animation-c36df576c9ae4ed28e89069b1a2f427a) | [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) | FBXをBlenderでglTF(GLB)へ変換。テクスチャは元から無く、色はアプリ側で付けている。実行時に向き・縮尺・再生速度・伸長・発光を調整 |
+
+## Day51「ハコニワ」のスクリーンショット
+
+`day-051-hakoniwa/screenshot.png` はハコニワの実画面を撮影したものです。
+地図の出典は OpenFreeMap / OpenMapTiles / © OpenStreetMap contributors。
+画像内のクレジットを保持しています。3Dミニチュアは自作です。
+施設データや使用ソフトウェアの条件は[アプリの出典ページ](https://hakoniwa-map.haranishi.workers.dev/licenses/)を参照してください。
+アプリ本体・施設カタログはこのリポジトリには同梱しません。

@@ -27,6 +27,7 @@ hundred-days/
 サーバー側APIが必要なDayは、[APIとDayの対応表](functions/README.md)から関連コードも探せます。
 
 Day 019・020は外部で公開するChrome拡張です。このリポジトリには制作記録と紹介素材を置いており、拡張のソースコードは含みません。
+Day 051「ハコニワ」も外部公開アプリです。本体は独立リポジトリで管理し、ここには紹介情報と画面を登録しています。
 
 ## アプリ一覧
 
@@ -82,6 +83,7 @@ Day 019・020は外部で公開するChrome拡張です。このリポジトリ�
 | 047 | ねこ、光になる | [day-047-cat-lightspeed/](day-047-cat-lightspeed/) | [アプリを開く](https://hundred-days.pages.dev/day-047-cat-lightspeed/) |
 | 048 | いま食べたいもの、当てます | [day-048-dish-oracle/](day-048-dish-oracle/) | [アプリを開く](https://hundred-days.pages.dev/day-048-dish-oracle/) |
 | 049 | ぱたにゃん | [day-049-patanyan/](day-049-patanyan/) | [アプリを開く](https://hundred-days.pages.dev/day-049-patanyan/) |
+| 051 | ハコニワ — 全国3Dミニチュアマップ | [制作記録のみ](day-051-hakoniwa/) | [紹介ページ](https://hakoniwa-map.haranishi.workers.dev/japan/) |
 <!-- day-index:end -->
 
 ## 1日アプリのルール

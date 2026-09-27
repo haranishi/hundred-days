@@ -1,0 +1,19 @@
+{
+  "day": 51,
+  "season": 2,
+  "title": "ハコニワ — 全国3Dミニチュアマップ",
+  "description": "全国1,741市区町村・309,253施設から、気になる街と行き先を探す地図。施設の種類を自作の3Dミニチュアで表示します。実物の建物を精密に再現したものではありません。",
+  "tags": ["地図", "3D", "旅行", "オープンデータ"],
+  "status": "external",
+  "externalUrl": "https://hakoniwa-map.haranishi.workers.dev/japan/",
+  "publicUrl": "https://hakoniwa-map.haranishi.workers.dev/japan/",
+  "screenshot": "screenshot.png",
+  "startedAt": "2026-09-26",
+  "finishedAt": "2026-09-27",
+  "aiHandled": ["全国施設データの整備、地図・3D表示・地域検索の実装、出典整備と動作検証"],
+  "humanHandled": ["全国への拡充方針、上部表示を全国に統一する指定、Day51としての公開判断"],
+  "failuresAndFixes": [
+    {"problem": "代表的な観光地だけでは全国の市区町村を十分に探せなかった", "fix": "公開データから自治体別カタログを作り、公開対象を309,253施設へ拡充。収録数が少ない地域も実数を表示"},
+    {"problem": "公開に必要な出典表示とデータ・ソフトウェアの利用条件が不足していた", "fix": "常時表示のクレジット、出典ページ、加工済みデータのダウンロード、ライセンス原文を追加"}
+  ]
+}
