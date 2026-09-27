@@ -1,6 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, existsSync } from 'node:fs';
+import { createHash } from 'node:crypto';
+import { filterWorks } from '../lib/catalog.js';
 import { ARTWORKS } from '../data/artworks.js';
 import { createGame, revealMore, answer, next, score, cropAt, dayStamp, readProgress, saveProgress } from '../lib/game.js';
 
@@ -55,6 +57,9 @@ test('broken or unavailable browser storage does not break play',()=>{
   assert.deepEqual(readProgress({getItem:()=>JSON.stringify({seen:[1,1,'bad',2],best:99999})}),{seen:[1,2],best:5000});
 });
 test('all artworks have specific, attributed background and intent content',()=>{
+  assert.equal(ARTWORKS.length,30);
+  assert.equal(new Set(ARTWORKS.map(w=>w.id)).size,30);
+  assert.equal(new Set(ARTWORKS.map(w=>w.title)).size,30);
   for(const work of ARTWORKS){
     assert.match(work.source,new RegExp(`/artworks/${work.id}$`));
     for(const field of ['background','intent','intentLabel','look','alt'])assert.ok(work[field].length>3,`${work.id} ${field}`);
@@ -62,5 +67,27 @@ test('all artworks have specific, attributed background and intent content',()=>
   }
   const manifest=JSON.parse(readFileSync(new URL('../data/image-manifest.json',import.meta.url)));
   assert.equal(manifest.length,ARTWORKS.length);
-  for(const asset of manifest){assert.match(asset.license,/public domain|cc0/i);assert.ok(asset.copyrighted==='False'||asset.license==='CC0');}
+  for(const asset of manifest){
+    assert.match(asset.license,/public domain|cc0/i);assert.ok(asset.copyrighted==='False'||asset.license==='CC0');
+    const work=ARTWORKS.find(w=>w.id===asset.id);assert.ok(work);
+    const bytes=readFileSync(new URL('../'+work.image,import.meta.url));
+    assert.equal(bytes.length,asset.bytes);assert.equal(createHash('sha256').update(bytes).digest('hex'),asset.sha256);
+  }
+});
+test('catalog search supports title, artist, era, normalized English and multiple words',()=>{
+  assert.equal(filterWorks(ARTWORKS,'').length,30);
+  assert.equal(filterWorks(ARTWORKS,' モネ ').length,2);
+  assert.deepEqual(filterWorks(ARTWORKS,'ＢＥＤＲＯＯＭ').map(w=>w.id),[28560]);
+  assert.deepEqual(filterWorks(ARTWORKS,'レンブラント 老人').map(w=>w.id),[95998]);
+  assert.ok(filterWorks(ARTWORKS,'風景画').length>1);
+  assert.deepEqual(filterWorks(ARTWORKS,'存在しない作品'),[]);
+});
+test('expanded collection is reachable while each round stays at five unique questions',()=>{
+  const seen=new Set();
+  for(let seed=0;seed<100;seed++){
+    const game=createGame(ARTWORKS,`expansion-${seed}`);assert.equal(game.rounds.length,5);
+    assert.equal(new Set(game.rounds.map(r=>r.id)).size,5);
+    for(const round of game.rounds){seen.add(round.id);assert.equal(new Set(round.options).size,4);assert.ok(round.options.every(id=>ARTWORKS.some(w=>w.id===id)));}
+  }
+  assert.equal(seen.size,30);
 });

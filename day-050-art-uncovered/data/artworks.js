@@ -1,4 +1,5 @@
 // 解説は所蔵館の作品解説を参照した日本語の要約。意図の断定と鑑賞上の提案を区別する。
+import { ADDITIONAL_ARTWORKS } from './additional-artworks.js';
 export const ARTWORKS = [
   {
     id: 24645, title: '神奈川沖浪裏', artist: '葛飾北斎', year: '1830〜1833年頃',
@@ -108,6 +109,7 @@ export const ARTWORKS = [
     look: '草の短い筆の跡から、女性の服、海面へ目を動かしてみましょう。絵の中を風が渡るように見えませんか。',
     hint: '高い場所から海を眺める、ふたりの散歩。',
   },
+  ...ADDITIONAL_ARTWORKS,
 ].map(work => ({ ...work, image: `assets/art/${work.id}.${work.id === 24645 ? 'png' : 'jpg'}`, source: `https://www.artic.edu/artworks/${work.id}`, museum: 'シカゴ美術館', credit: 'Art Institute of Chicago · Public domain' }));
 
 export const ART_BY_ID = new Map(ARTWORKS.map(work => [work.id, work]));

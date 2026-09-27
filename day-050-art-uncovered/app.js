@@ -1,12 +1,13 @@
 import { ARTWORKS, ART_BY_ID } from './data/artworks.js';
 import { createGame, revealMore, answer, next, score, POINTS, REVEAL, dayStamp, readProgress, saveProgress } from './lib/game.js';
 import { Gallery } from './lib/gallery.js';
+import { filterWorks } from './lib/catalog.js';
 
 const $=id=>document.getElementById(id);
 const gallery=new Gallery($('gallery'));
 let storage;try{storage=window.localStorage;}catch{storage=null;}
 let progress=readProgress(storage),game=null,screen='home',busy=false,request=0;
-let currentWork=ARTWORKS[0],browseReturn=null;
+let currentWork=ARTWORKS[0],browseReturn=null,collectionScroll=0;
 const number=value=>value.toLocaleString('ja-JP');
 const reduced=matchMedia('(prefers-reduced-motion: reduce)');
 gallery.setEnabled(gallery.enabled);
@@ -36,7 +37,7 @@ function setCaption(work,question=false){
   $('art-caption').append(document.createTextNode(question?'どこまで見れば、わかる？':work.title));
   const year=document.createElement('span');year.textContent=question?'気になった色や形を、手がかりに。':work.year;
   $('art-caption').append(year);
-  $('stage-badge').textContent=question?`DETAIL ${game.step+1} / 4`:`COLLECTION ${String(ARTWORKS.findIndex(w=>w.id===work.id)+1).padStart(2,'0')} / 09`;
+  $('stage-badge').textContent=question?`DETAIL ${game.step+1} / 4`:`COLLECTION ${String(ARTWORKS.findIndex(w=>w.id===work.id)+1).padStart(2,'0')} / ${String(ARTWORKS.length).padStart(2,'0')}`;
 }
 
 function lockQuestion(lock){
@@ -126,14 +127,23 @@ function showResult(){
   setScreen('result','result-title');showArt(ART_BY_ID.get(game.answers.at(-1).id),1);
 }
 
-function openCollection(){
-  $('collection-grid').replaceChildren(...ARTWORKS.map(work=>{
+function renderCollection(){
+  const works=filterWorks(ARTWORKS,$('collection-search').value);
+  $('collection-count').textContent=`${works.length} / ${ARTWORKS.length} 作品`;
+  $('collection-empty').hidden=works.length>0;
+  $('collection-grid').replaceChildren(...works.map(work=>{
     const button=document.createElement('button');button.className='collection-item';
+    button.dataset.id=work.id;
     const image=document.createElement('img');image.src=work.image;image.alt='';image.loading='lazy';
     const title=document.createElement('h3');title.textContent=work.title;const artist=document.createElement('p');artist.textContent=work.artist;const seen=document.createElement('small');seen.textContent=progress.seen.includes(work.id)?'出会った作品':'これから出会う作品';
-    button.append(image,title,artist,seen);button.addEventListener('click',()=>{$('collection-dialog').close();browseReturn='collection';renderAnswer(work,true);});return button;
+    button.append(image,title,artist,seen);button.addEventListener('click',()=>{collectionScroll=$('collection-dialog').scrollTop;$('collection-dialog').close();browseReturn='collection';renderAnswer(work,true);});return button;
   }));
+}
+
+function openCollection(){
+  renderCollection();
   $('collection-dialog').showModal();
+  $('collection-dialog').scrollTop=collectionScroll;
 }
 
 function home(){
@@ -178,6 +188,8 @@ $('next-question').addEventListener('click',()=>{
 $('view-toggle').addEventListener('click',()=>{gallery.setEnabled(!gallery.enabled);if(!gallery.renderer)$('live').textContent='この端末では平面展示で作品を楽しめます。';});
 $('image-retry').addEventListener('click',()=>showArt(currentWork,screen==='question'?REVEAL[game.step]:1,screen==='question'));
 $('collection-open').addEventListener('click',openCollection);
+$('collection-search').addEventListener('input',()=>{collectionScroll=0;renderCollection();});
+$('collection-clear').addEventListener('click',()=>{collectionScroll=0;$('collection-search').value='';renderCollection();$('collection-search').focus();});
 $('share-open').addEventListener('click',()=>share(false));
 $('result-share').addEventListener('click',()=>share(true));
 for(const dialog of document.querySelectorAll('dialog')){
@@ -189,4 +201,5 @@ document.addEventListener('keydown',event=>{
   if(/^[1-4]$/.test(event.key)){event.preventDefault();const option=game.rounds[game.index].options[Number(event.key)-1];submitAnswer(option);}
 });
 document.addEventListener('visibilitychange',()=>gallery.render());
+$('collection-total').textContent=ARTWORKS.length;
 updateProgress();showArt(ARTWORKS[0],1);

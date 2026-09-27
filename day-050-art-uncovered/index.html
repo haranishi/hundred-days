@@ -24,7 +24,7 @@
   <a class="skip" href="#panel">内容へ進む</a>
   <header class="site-header">
     <a href="../" class="brand" aria-label="100日チャレンジの一覧へ"><span class="brand-icon" aria-hidden="true">◩</span><span>100 DAYS<span class="brand-small">A LITTLE DISCOVERY, EVERY DAY.</span></span></a>
-    <div class="header-actions"><span class="day-label">DAY <b>050</b> / 100</span><button id="collection-open" class="text-button">図録 <span id="seen-count">0 / 9</span></button><button id="share-open" class="icon-button" aria-label="このアプリを共有する"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V3m-5 5 5-5 5 5M5 13v7h14v-7"/></svg></button></div>
+    <div class="header-actions"><span class="day-label">DAY <b>050</b> / 100</span><button id="collection-open" class="text-button">図録 <span id="seen-count">0 / 30</span></button><button id="share-open" class="icon-button" aria-label="このアプリを共有する"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V3m-5 5 5-5 5 5M5 13v7h14v-7"/></svg></button></div>
   </header>
   <main class="layout">
     <section class="exhibition" aria-label="作品の展示">
@@ -34,7 +34,7 @@
       </div>
       <div id="art-loading" class="art-loading" role="status" hidden>作品を準備しています…</div>
       <div id="art-error" class="art-error" hidden><p>作品を読み込めませんでした。</p><button id="image-retry" class="button">もう一度読み込む</button><button id="error-home" class="text-button">入口へ戻る</button></div>
-      <div class="exhibition-bottom"><div><span id="art-label" class="art-label">葛飾北斎</span><p id="art-caption">神奈川沖浪裏 <span>1830〜1833年頃</span></p></div><span id="stage-badge" class="stage-badge">COLLECTION 01 / 09</span></div>
+      <div class="exhibition-bottom"><div><span id="art-label" class="art-label">葛飾北斎</span><p id="art-caption">神奈川沖浪裏 <span>1830〜1833年頃</span></p></div><span id="stage-badge" class="stage-badge">COLLECTION 01 / 30</span></div>
     </section>
     <div id="panel" class="panel" tabindex="-1">
       <section id="home-screen" class="screen">
@@ -46,7 +46,7 @@
         <button id="start-daily" class="button primary start-button">今日の5作品へ <span aria-hidden="true">↗</span></button>
         <button id="start-random" class="text-button random-button">ランダムな5作品で遊ぶ <span aria-hidden="true">→</span></button>
         <p class="home-note">作品名を知らなくても大丈夫。<br>少しずつ全体を見て、選んでみてください。</p>
-        <div class="home-bottom"><span class="mini-line"></span><p>本物の絵と、確かな出典。<br><small>シカゴ美術館の公開作品 9点を収録</small></p></div>
+        <div class="home-bottom"><span class="mini-line"></span><p>本物の絵と、確かな出典。<br><small>シカゴ美術館の公開作品 <span id="collection-total">30</span>点を収録</small></p></div>
       </section>
       <section id="question-screen" class="screen" hidden aria-labelledby="question-title">
         <div class="round-top"><span id="round-count" class="eyebrow"></span><span id="total-score" class="total-score"></span></div>
@@ -87,7 +87,7 @@
   </main>
   <footer class="site-footer"><span>LOOK CLOSER. THERE IS ALWAYS A STORY.</span><p>画像：シカゴ美術館所蔵作品 / Wikimedia Commons（Public domain・CC0）<br>3D家具：<a href="https://kenney.nl/assets/furniture-kit" target="_blank" rel="noopener noreferrer">Kenney（CC0）</a> · <a href="data/SOURCES.md">素材と出典</a><br>画像と素材は同梱。鑑賞履歴と最高得点は、この端末に保存します。</p></footer>
   <p id="live" class="sr-only" role="status" aria-live="polite"></p>
-  <dialog id="collection-dialog" class="collection-dialog"><div class="dialog-heading"><div><p class="eyebrow">THE COLLECTION</p><h2>小さな図録</h2></div><button class="icon-button close-dialog" aria-label="図録を閉じる">×</button></div><p class="collection-intro">気になる一枚から、物語をひらく。</p><div id="collection-grid" class="collection-grid"></div><p class="collection-foot">「出会った作品」の記録は、この端末だけに残ります。</p></dialog>
+  <dialog id="collection-dialog" class="collection-dialog"><div class="dialog-heading"><div><p class="eyebrow">THE COLLECTION</p><h2>小さな図録</h2></div><button class="icon-button close-dialog" aria-label="図録を閉じる">×</button></div><p class="collection-intro">気になる一枚から、物語をひらく。</p><label class="collection-search-label" for="collection-search">作品名・作者名で探す</label><input id="collection-search" class="collection-search" type="search" placeholder="例：モネ、風景、Bedroom" autocomplete="off"><p id="collection-count" class="collection-count" role="status"></p><div id="collection-empty" class="collection-empty" hidden><p>見つかりませんでした。短い言葉でも探せます。</p><button id="collection-clear" class="text-button">すべての作品に戻る</button></div><div id="collection-grid" class="collection-grid"></div><p class="collection-foot">「出会った作品」の記録は、この端末だけに残ります。</p></dialog>
   <dialog id="share-dialog"><div class="dialog-heading"><h2>美術館をおすそわけ</h2><button class="icon-button close-dialog" aria-label="共有を閉じる">×</button></div><p id="share-result-text" hidden></p><div id="result-share-controls" class="result-share-controls" hidden><a id="result-x" target="_blank" rel="noopener noreferrer">Xで結果を共有</a><a id="result-line" target="_blank" rel="noopener noreferrer">LINEで結果を共有</a><button id="copy-result" class="button">結果をコピー</button><button id="native-result" class="button" hidden>端末の共有シート</button><p id="copy-status" role="status"></p><textarea id="copy-fallback" class="copy-fallback" aria-label="手動コピー用の結果とリンク" readonly hidden></textarea></div><div id="share"></div></dialog>
   <noscript><p class="noscript">このゲームにはJavaScriptが必要です。ブラウザの設定を確認してください。</p></noscript>
 </body>
