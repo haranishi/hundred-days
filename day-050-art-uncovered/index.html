@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>名画の、その先。 | 100日チャレンジ</title>
+  <meta name="description" content="名画の一部から作品を当てる、5問の小さな美術館。本物の作品と、その背景にある物語に出会おう。">
+  <meta name="share:text" content="名画の、その先。 — 絵の一部分から当てる5問の小さな美術館。答えの後には、制作背景と作品の物語も。">
+  <link rel="canonical" href="https://hundred-days.pages.dev/day-050-art-uncovered/">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="名画の、その先。">
+  <meta property="og:description" content="近づいて、気づいて、好きになる。名画と出会う5問の小さな美術館。">
+  <meta property="og:url" content="https://hundred-days.pages.dev/day-050-art-uncovered/">
+  <meta property="og:image" content="https://hundred-days.pages.dev/day-050-art-uncovered/screenshot.webp">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="theme-color" content="#f5f3ed">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="shared/share.css">
+  <link rel="stylesheet" href="app.css">
+  <script src="shared/share.js" defer></script>
+  <script type="module" src="app.js"></script>
+</head>
+<body data-screen="home">
+  <a class="skip" href="#panel">内容へ進む</a>
+  <header class="site-header">
+    <a href="../" class="brand" aria-label="100日チャレンジの一覧へ"><span class="brand-icon" aria-hidden="true">◩</span><span>100 DAYS<span class="brand-small">A LITTLE DISCOVERY, EVERY DAY.</span></span></a>
+    <div class="header-actions"><span class="day-label">DAY <b>050</b> / 100</span><button id="collection-open" class="text-button">図録 <span id="seen-count">0 / 9</span></button><button id="share-open" class="icon-button" aria-label="このアプリを共有する"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V3m-5 5 5-5 5 5M5 13v7h14v-7"/></svg></button></div>
+  </header>
+  <main class="layout">
+    <section class="exhibition" aria-label="作品の展示">
+      <div class="exhibition-top"><span><i aria-hidden="true"></i> THE SMALL GALLERY</span><button id="view-toggle" class="view-toggle" aria-pressed="true">立体展示</button></div>
+      <div id="gallery" class="gallery" role="img" aria-label="北斎の作品を展示した小さな美術館">
+        <div id="flat-view" class="flat-view"><div id="flat-frame" class="flat-frame"><div id="flat-crop" class="flat-crop"><img id="flat-image" alt="" src="assets/art/24645.png"></div></div></div>
+      </div>
+      <div id="art-loading" class="art-loading" role="status" hidden>作品を準備しています…</div>
+      <div id="art-error" class="art-error" hidden><p>作品を読み込めませんでした。</p><button id="image-retry" class="button">もう一度読み込む</button><button id="error-home" class="text-button">入口へ戻る</button></div>
+      <div class="exhibition-bottom"><div><span id="art-label" class="art-label">葛飾北斎</span><p id="art-caption">神奈川沖浪裏 <span>1830〜1833年頃</span></p></div><span id="stage-badge" class="stage-badge">COLLECTION 01 / 09</span></div>
+    </section>
+    <div id="panel" class="panel" tabindex="-1">
+      <section id="home-screen" class="screen">
+        <p class="eyebrow">A CLOSER LOOK AT ART</p>
+        <h1>名画の、<br>その先<span class="title-dot">。</span></h1>
+        <p class="intro">近づいて、気づいて、好きになる。</p>
+        <p class="home-description">絵の一部分から、作品を当てる。<br>答えの先には、画家の想いや<br class="desktop-break">生まれた時代の物語が待っています。</p>
+        <div class="home-rule"><span class="rule-number">5</span><span>問の小さな美術館<br><small>4択クイズ · 時間制限なし</small></span><span class="rule-art" aria-hidden="true">✳</span></div>
+        <button id="start-daily" class="button primary start-button">今日の5作品へ <span aria-hidden="true">↗</span></button>
+        <button id="start-random" class="text-button random-button">ランダムな5作品で遊ぶ <span aria-hidden="true">→</span></button>
+        <p class="home-note">作品名を知らなくても大丈夫。<br>少しずつ全体を見て、選んでみてください。</p>
+        <div class="home-bottom"><span class="mini-line"></span><p>本物の絵と、確かな出典。<br><small>シカゴ美術館の公開作品 9点を収録</small></p></div>
+      </section>
+      <section id="question-screen" class="screen" hidden aria-labelledby="question-title">
+        <div class="round-top"><span id="round-count" class="eyebrow"></span><span id="total-score" class="total-score"></span></div>
+        <div id="round-progress" class="round-progress" aria-label="出題の進み具合"></div>
+        <h2 id="question-title" tabindex="-1">この名画、<br>わかりますか？</h2>
+        <p class="question-description">作品名を選んでください。</p>
+        <div id="choices" class="choices" role="group" aria-label="作品の選択肢"></div>
+        <div class="reveal-controls"><div class="reveal-label"><span id="reveal-status"></span><span>正解で <b id="available-points"></b> pt</span></div><button id="reveal-more" class="button reveal-button"><span aria-hidden="true">⊕</span> もう少し全体を見る</button></div>
+        <p id="question-hint" class="question-hint" hidden></p>
+        <button id="skip-question" class="text-button skip-question">わからないので、答えを見る</button>
+      </section>
+      <section id="answer-screen" class="screen" hidden aria-labelledby="answer-title">
+        <div class="answer-top"><span id="answer-verdict" class="verdict"></span><span id="answer-points" class="answer-points"></span></div>
+        <p id="answer-artist" class="answer-artist"></p>
+        <h2 id="answer-title" class="art-title" tabindex="-1"></h2>
+        <p id="answer-year" class="answer-year"></p>
+        <p id="answer-choice" class="answer-choice" hidden></p>
+        <p id="story-hook" class="story-hook"></p>
+        <div class="story-section"><h3>生まれた背景</h3><p id="story-background"></p></div>
+        <div class="story-section"><h3 id="story-intent-label"></h3><p id="story-intent"></p></div>
+        <div class="look-note"><span aria-hidden="true">↖</span><div><h3>もう一度、絵を見てみよう</h3><p id="story-look"></p></div></div>
+        <a id="source-link" class="source-link" target="_blank" rel="noopener noreferrer">所蔵館の解説を読む（英語） ↗</a>
+        <p class="source-note">解説：Art Institute of Chicago（<a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener noreferrer">CC BY 4.0</a>）を日本語で要約・編集。鑑賞の問いかけは本アプリで追加。</p>
+        <button id="next-question" class="button primary next-button">次の作品へ <span aria-hidden="true">→</span></button>
+      </section>
+      <section id="result-screen" class="screen" hidden aria-labelledby="result-title">
+        <p class="eyebrow">THANK YOU FOR LOOKING CLOSER</p>
+        <h2 id="result-title" tabindex="-1">今日は、どの絵が<br>心に残りましたか。</h2>
+        <div class="result-score"><span id="final-score"></span><small>/ 5,000 pt</small></div>
+        <p id="result-detail" class="result-detail"></p>
+        <div id="result-works" class="result-works"></div>
+        <p class="result-hint">作品を押すと、絵と物語を見返せます。</p>
+        <button id="replay" class="button primary">別の5作品へ <span aria-hidden="true">↗</span></button>
+        <button id="result-share" class="button secondary">今日の結果を共有する</button>
+        <button id="back-home" class="text-button">美術館の入口へ戻る</button>
+      </section>
+    </div>
+  </main>
+  <footer class="site-footer"><span>LOOK CLOSER. THERE IS ALWAYS A STORY.</span><p>画像：シカゴ美術館所蔵作品 / Wikimedia Commons（Public domain・CC0）<br>3D家具：<a href="https://kenney.nl/assets/furniture-kit" target="_blank" rel="noopener noreferrer">Kenney（CC0）</a> · <a href="data/SOURCES.md">素材と出典</a><br>画像と素材は同梱。鑑賞履歴と最高得点は、この端末に保存します。</p></footer>
+  <p id="live" class="sr-only" role="status" aria-live="polite"></p>
+  <dialog id="collection-dialog" class="collection-dialog"><div class="dialog-heading"><div><p class="eyebrow">THE COLLECTION</p><h2>小さな図録</h2></div><button class="icon-button close-dialog" aria-label="図録を閉じる">×</button></div><p class="collection-intro">気になる一枚から、物語をひらく。</p><div id="collection-grid" class="collection-grid"></div><p class="collection-foot">「出会った作品」の記録は、この端末だけに残ります。</p></dialog>
+  <dialog id="share-dialog"><div class="dialog-heading"><h2>美術館をおすそわけ</h2><button class="icon-button close-dialog" aria-label="共有を閉じる">×</button></div><p id="share-result-text" hidden></p><div id="result-share-controls" class="result-share-controls" hidden><a id="result-x" target="_blank" rel="noopener noreferrer">Xで結果を共有</a><a id="result-line" target="_blank" rel="noopener noreferrer">LINEで結果を共有</a><button id="copy-result" class="button">結果をコピー</button><button id="native-result" class="button" hidden>端末の共有シート</button><p id="copy-status" role="status"></p><textarea id="copy-fallback" class="copy-fallback" aria-label="手動コピー用の結果とリンク" readonly hidden></textarea></div><div id="share"></div></dialog>
+  <noscript><p class="noscript">このゲームにはJavaScriptが必要です。ブラウザの設定を確認してください。</p></noscript>
+</body>
+</html>

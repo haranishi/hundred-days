@@ -1,0 +1,19 @@
+{
+  "day": 50,
+  "season": 2,
+  "title": "名画の、その先。",
+  "description": "名画の一部から作品を当てる、5問の小さな美術館。実際の作品画像と3D展示を楽しみ、答えの後には制作背景や表現の意図を出典つきで読めます。",
+  "tags": ["アート", "クイズ", "3D", "美術館"],
+  "status": "published",
+  "publicUrl": "https://hundred-days.pages.dev/day-050-art-uncovered/",
+  "screenshot": "screenshot.webp",
+  "startedAt": "2026-09-27",
+  "finishedAt": "2026-09-27",
+  "sourceOfIdea": "名画を拡大した一部分から当てる案を選び、実際の作品画像・3Dモデルの利用と答え合わせ後の制作背景・意図の解説を希望。",
+  "aiHandled": ["所蔵館の資料・素材の確認、ゲームと3D展示の実装、検証"],
+  "humanHandled": ["名画クイズの選択、実作品・3D素材と制作背景の解説を入れる方針"],
+  "failuresAndFixes": [
+    {"problem": "所蔵館の画像配信が403で取得できなかった", "fix": "作品ID・所蔵番号・権利を照合したWikimedia Commonsの公開画像を同梱"},
+    {"problem": "タブレットで額縁が切れ、スマホの共有欄がはみ出した", "fix": "展示カメラと平面表示のサイズ、共有欄の最小幅を調整し3画面幅で再検証"}
+  ]
+}

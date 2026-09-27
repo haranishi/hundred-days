@@ -82,6 +82,7 @@ Day 019・020は外部で公開するChrome拡張です。このリポジトリ�
 | 047 | ねこ、光になる | [day-047-cat-lightspeed/](day-047-cat-lightspeed/) | [アプリを開く](https://hundred-days.pages.dev/day-047-cat-lightspeed/) |
 | 048 | いま食べたいもの、当てます | [day-048-dish-oracle/](day-048-dish-oracle/) | [アプリを開く](https://hundred-days.pages.dev/day-048-dish-oracle/) |
 | 049 | ぱたにゃん | [day-049-patanyan/](day-049-patanyan/) | [アプリを開く](https://hundred-days.pages.dev/day-049-patanyan/) |
+| 050 | 名画の、その先。 | [day-050-art-uncovered/](day-050-art-uncovered/) | [アプリを開く](https://hundred-days.pages.dev/day-050-art-uncovered/) |
 <!-- day-index:end -->
 
 ## 1日アプリのルール
