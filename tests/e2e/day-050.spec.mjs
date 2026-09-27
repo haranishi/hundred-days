@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { ART_BY_ID } from '../../day-050-art-uncovered/data/artworks.js';
+import { ARTWORKS, ART_BY_ID } from '../../day-050-art-uncovered/data/artworks.js';
 
 let base;
 test.beforeAll(async({baseURL})=>{base=new URL('/day-050-art-uncovered/',baseURL).href;});
@@ -53,11 +53,40 @@ test('five questions, review, result sharing and replay form a complete loop',as
   await expect(page.locator('#result-x')).toHaveAttribute('href',/5%2C000/);await page.getByRole('button',{name:'共有を閉じる'}).click();
   await page.locator('#replay').click();await expect(page.locator('#round-count')).toContainText('01');await expect(page.locator('#total-score')).toContainText('0');
 });
-test('catalog offers all nine stories and persists viewed works',async({page})=>{
-  await open(page);await page.locator('#collection-open').click();await expect(page.locator('.collection-item')).toHaveCount(9);
-  await page.locator('.collection-item').last().click();await expect(page.locator('#answer-title')).toHaveText('プールヴィルの断崖の散歩');
+test('catalog offers all thirty stories and persists viewed works',async({page})=>{
+  await open(page);await page.locator('#collection-open').click();await expect(page.locator('.collection-item')).toHaveCount(30);
+  await page.locator('.collection-item').last().click();await expect(page.locator('#answer-title')).toHaveText('聖母子と天使');
   await page.locator('#next-question').click();await expect(page.locator('#collection-dialog')).toBeVisible();
-  await page.reload();await expect(page.locator('#seen-count')).toHaveText('1 / 9');
+  await page.reload();await expect(page.locator('#seen-count')).toHaveText('1 / 30');
+});
+test('catalog search narrows, preserves query on return, and recovers from no matches',async({page})=>{
+  await page.setViewportSize({width:390,height:844});await open(page);await page.locator('#collection-open').click();
+  await page.getByLabel('作品名・作者名で探す').fill('モネ');await expect(page.locator('.collection-item')).toHaveCount(2);
+  await page.locator('.collection-item').first().click();await page.locator('#next-question').click();
+  await expect(page.locator('#collection-search')).toHaveValue('モネ');await expect(page.locator('.collection-item')).toHaveCount(2);
+  await page.locator('#collection-search').fill('存在しない作品');await expect(page.locator('#collection-empty')).toBeVisible();
+  await expect(page.locator('#collection-count')).toHaveText('0 / 30 作品');
+  await page.locator('#collection-clear').click();await expect(page.locator('.collection-item')).toHaveCount(30);
+  expect(await page.locator('#collection-dialog').evaluate(el=>el.scrollWidth<=el.clientWidth)).toBe(true);
+});
+test('catalog keeps its scroll position and close button when browsing the last artwork',async({page})=>{
+  await page.setViewportSize({width:390,height:844});await open(page);await page.locator('#collection-open').click();
+  await page.locator('.collection-item').last().scrollIntoViewIfNeeded();
+  const before=await page.locator('#collection-dialog').evaluate(el=>el.scrollTop);expect(before).toBeGreaterThan(1000);
+  const close=await page.getByRole('button',{name:'図録を閉じる'}).boundingBox();expect(close.y).toBeGreaterThanOrEqual(0);expect(close.y+close.height).toBeLessThan(844);
+  await page.locator('.collection-item').last().click();await page.locator('#next-question').click();
+  expect(Math.abs(await page.locator('#collection-dialog').evaluate(el=>el.scrollTop)-before)).toBeLessThan(3);
+});
+test('all thirty bundled images decode and each catalog story opens with the matching source',async({page})=>{
+  test.setTimeout(90000);await open(page);await page.locator('#collection-open').click();
+  for(const work of ARTWORKS){
+    await page.locator(`.collection-item[data-id="${work.id}"]`).click();
+    await expect(page.locator('#art-loading')).toBeHidden();await expect(page.locator('#art-error')).toBeHidden();
+    await expect(page.locator('#answer-title')).toHaveText(work.title);await expect(page.locator('#source-link')).toHaveAttribute('href',work.source);
+    expect(await page.locator('#flat-image').evaluate(img=>img.complete&&img.naturalWidth>100)).toBe(true);
+    await page.locator('#next-question').click();
+  }
+  await expect(page.locator('#seen-count')).toHaveText('30 / 30');
 });
 test('clipboard denial offers selectable result text without losing the result',async({page})=>{
   await page.setViewportSize({width:390,height:844});
