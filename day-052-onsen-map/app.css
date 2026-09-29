@@ -178,6 +178,9 @@ a { color: #d9e1ec; }
   background-repeat: no-repeat; filter: invert(1) brightness(1.1);
 }
 .maplibregl-ctrl-attrib.maplibregl-compact-show { padding: 6px 48px 6px 12px; background: rgba(12, 15, 20, .94); }
+/* 開いた直後に広がる帰属表示が、左下の「沖縄県 ↙」（左端から約95px）に重ならないよう、右下の枠の幅を抑える。
+   スマホでは2行に折り返す。PC・タブレットの幅では1行のまま */
+.maplibregl-ctrl-bottom-right { max-width: calc(100% - 113px); }
 .maplibregl-canvas:focus-visible { outline: 3px solid var(--focus); outline-offset: -3px; }
 
 /* ---------------------------------------------------------------- シート */
@@ -315,7 +318,8 @@ a { color: #d9e1ec; }
 /* スマホでは出典の帯を1行に縮め、「詳しく」から出典と注意の節へ移る */
 .strip-long { display: none; }
 .strip-short { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
-.strip-short a { font-weight: 700; }
+/* 出典のリンク（OpenStreetMap・OpenMapTiles）は地の太さのまま、「詳しく」だけ太くする。太いと1行に収まらない */
+.strip-short .about-link { font-weight: 700; }
 
 /* ---------------------------------------------------------------- スマホ：絞り込みは1行で横に送る（一覧の上の方を最初の画面に入れるため）。
    768px以上は折り返して、チップの文字を途中で切らない */
