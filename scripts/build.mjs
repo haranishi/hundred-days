@@ -178,6 +178,9 @@ const CONNECT_BY_APP = {
   'day-025-nearby-parking': 'https://tiles.openfreemap.org',
   // day-029 はWi-Fiデータを同梱し、地名検索だけ中継する。ブラウザが外へ出るのは地図タイルだけ
   'day-029-nearby-wifi': 'https://tiles.openfreemap.org',
+  /* day-052 は温泉・銭湯の統計とお風呂の位置（OSM）を同梱している。ブラウザが外へ出るのは地図タイルだけ。
+     現在地は端末の中で距離を測るのに使うだけで、外へは送らない */
+  'day-052-onsen-map': 'https://tiles.openfreemap.org',
   /* day-030 はカメラの位置データを同梱し、Windy だけ functions/api/day-030/ の中継を通す。
      映像・画像は提供元とブラウザの直接通信（img/media/frame 側で許す）なので connect-src はタイルだけ */
   'day-030-world-window': 'https://tiles.openfreemap.org',
@@ -208,7 +211,8 @@ const WORKER_BY_APP = {
   'day-039-dig-below': "worker-src blob:",
   'day-025-nearby-parking': "worker-src blob:",
   'day-029-nearby-wifi': "worker-src blob:",
-  'day-030-world-window': "worker-src blob:"
+  'day-030-world-window': "worker-src blob:",
+  'day-052-onsen-map': "worker-src blob:"
 };
 
 /* day-021 は局のストリーム（audio）とロゴ画像をAPI由来の任意のhttpsホストから読む。
@@ -229,6 +233,8 @@ const IMG_BY_APP = {
   // スプライト画像をタイル配信元から読む
   'day-025-nearby-parking': ' https://tiles.openfreemap.org',
   'day-029-nearby-wifi': ' https://tiles.openfreemap.org',
+  // day-052 もスプライト画像をタイル配信元から読む
+  'day-052-onsen-map': ' https://tiles.openfreemap.org',
   // day-030 はカメラの静止画を提供元の任意の https ホストから読む（http は混在コンテンツになるので許さない）
   'day-030-world-window': ' https:',
   /* day-031 は Wikipedia の記事写真だけを読む。summary が返す thumbnail は

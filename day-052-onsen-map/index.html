@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>湯けむり日本地図</title>
+  <meta name="description" content="日本地図に都道府県ごとの柱を立て、源泉の数・温泉地の数・湧き出る量・銭湯の数を比べます。県を押すと、その県の温泉・銭湯の点が出て、Googleマップで開けます。">
+  <meta name="share:text" content="湯けむり日本地図 — 源泉の数も銭湯の数も、日本地図の柱で比べる">
+  <meta name="theme-color" content="#11151c">
+  <link rel="stylesheet" href="./vendor/maplibre-gl.css">
+  <link rel="stylesheet" href="./app.css">
+  <script src="./vendor/maplibre-gl.js" defer></script>
+  <script type="module" src="./app.js"></script>
+  <link rel="stylesheet" href="./shared/share.css">
+  <script src="./shared/share.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#sheet-body">順位の一覧へ移動</a>
+  <div id="app" class="shell" data-state="loading" data-level="nation" data-map="loading" data-sheet="closed">
+    <header class="band">
+      <div class="band-row">
+        <h1 class="title"><span class="title-day">DAY 052</span>湯けむり日本地図</h1>
+        <button id="visited-open" class="visit-pill visit-pill--small" type="button" hidden>行った記録（0）</button>
+      </div>
+      <p id="headline" class="headline" aria-live="polite">データを読み込んでいます…</p>
+      <p id="trend" class="trend" hidden></p>
+      <p id="hint" class="hint">柱か順位を押すと、その県のお風呂が出ます</p>
+      <div class="metrics" role="group" aria-label="柱の高さにする数">
+        <button type="button" class="metric" data-metric="sources" aria-pressed="true">源泉の数</button>
+        <button type="button" class="metric" data-metric="areas" aria-pressed="false">温泉地の数</button>
+        <button type="button" class="metric" data-metric="flow" aria-pressed="false">湧き出る量</button>
+        <button type="button" class="metric" data-metric="sento" aria-pressed="false">銭湯の数</button>
+      </div>
+      <p id="notice" class="notice" role="status" hidden></p>
+    </header>
+
+    <section class="stage" aria-label="地図">
+      <div id="map" class="map"></div>
+      <p id="map-status" class="map-status" role="status">地図を読み込んでいます…</p>
+      <button id="near" class="near" type="button" aria-label="近くを見る"><span class="near-icon" aria-hidden="true"></span><span class="near-short" aria-hidden="true">近く</span><span class="near-full" aria-hidden="true">近くを見る</span></button>
+      <p id="tip" class="tip" aria-hidden="true" hidden></p>
+      <button id="okinawa" class="okinawa" type="button" hidden>沖縄県 <span aria-hidden="true">↙</span></button>
+    </section>
+
+    <section id="sheet" class="sheet" aria-label="順位とカード">
+      <button id="sheet-toggle" class="sheet-toggle" type="button" aria-expanded="false" aria-controls="sheet-body">
+        <span class="grip" aria-hidden="true"></span><span id="sheet-toggle-label">一覧を広げる</span>
+      </button>
+      <div id="sheet-body" class="sheet-body" tabindex="-1">
+        <div id="loading" class="state-box" role="status">データを読み込んでいます…</div>
+        <div id="failure" class="state-box state-box--error" role="alert" hidden>
+          <p>データを読み込めませんでした。通信を確かめて、もう一度お試しください。</p>
+          <button id="retry" class="button" type="button">もう一度読み込む</button>
+        </div>
+
+        <section id="nation" class="panel" aria-labelledby="ranking-title" hidden>
+          <div class="panel-head">
+            <h2 id="ranking-title" class="panel-title" tabindex="-1">源泉の数の順位</h2>
+            <select id="pref-select" class="pref-select" aria-label="県を選ぶ">
+              <option value="">県を選ぶ</option>
+            </select>
+          </div>
+          <p id="pillar-note" class="note"></p>
+          <ol id="rank-list" class="rank-list"></ol>
+        </section>
+
+        <section id="pref-card" class="panel" aria-labelledby="pref-title" hidden>
+          <h2 id="pref-title" class="sr-only" tabindex="-1"></h2>
+          <button id="pref-back" class="back" type="button">← 全国の順位へ</button>
+          <p id="pref-metrics" class="metric-compact"></p>
+          <div class="pref-baths">
+            <div class="count-row">
+              <h3 id="pref-summary-title" class="count-title">地図に載っているお風呂</h3>
+              <span id="sort-note" class="sort-note" hidden>名前順</span>
+            </div>
+            <p id="pref-status" class="note" role="status" hidden></p>
+            <div id="type-filter" class="type-filter" role="group" aria-label="お風呂の種類で絞り込む" hidden></div>
+            <button id="sento-note" class="note-link" type="button" hidden>銭湯の多くは「<span class="nowrap">種類の登録なし</span>」に入っています</button>
+            <div id="pref-empty" class="empty" hidden>
+              <p id="pref-empty-text" class="empty-text"></p>
+              <p id="pref-empty-hint" class="note"></p>
+            </div>
+            <ol id="bath-list" class="bath-list"></ol>
+            <button id="bath-more" class="button button--ghost" type="button" hidden></button>
+            <p id="pref-legend-note" class="note" hidden>点の色が種類を表します。地図の点はOpenStreetMapに登録されたお風呂だけで、全部ではありません。</p>
+            <div id="baths-failure" class="state-box state-box--error" role="alert" hidden>
+              <p>お風呂の位置データを読み込めませんでした。</p>
+              <button id="baths-retry" class="button" type="button">もう一度読み込む</button>
+            </div>
+          </div>
+        </section>
+
+        <section id="bath-card" class="panel" aria-labelledby="bath-title" hidden>
+          <button id="bath-back" class="back" type="button">← 一覧へ</button>
+          <p id="bath-where" class="eyebrow"></p>
+          <h2 id="bath-title" class="bath-title" tabindex="-1"></h2>
+          <p id="bath-type" class="type-line"></p>
+          <div class="actions">
+            <a id="bath-maps" class="button button--primary" href="#" target="_blank" rel="noopener noreferrer">Googleマップで開く</a>
+            <button id="bath-visit" class="visit-pill" type="button" aria-pressed="false"><span class="visit-mark" aria-hidden="true"></span>行った</button>
+          </div>
+          <p id="bath-visit-note" class="note" role="status"></p>
+          <dl id="bath-facts" class="facts"></dl>
+          <p class="osm-line"><a id="bath-osm" class="text-link" href="#" target="_blank" rel="noopener noreferrer">OpenStreetMapで見る</a></p>
+          <p class="caution">営業時間や料金は変わることがあります。<span class="nowrap">出かける前に</span>、必ず施設に確かめてください。</p>
+        </section>
+
+        <section id="near-card" class="panel" aria-labelledby="near-title" hidden>
+          <button id="near-back" class="back" type="button">← 全国の順位へ</button>
+          <h2 id="near-title" class="panel-title" tabindex="-1">現在地の近く</h2>
+          <p id="near-lead" class="lead"></p>
+          <ol id="near-list" class="bath-list"></ol>
+          <p class="note">現在地は、この端末の中で距離を測るのに使うだけで、どこにも送りません。</p>
+        </section>
+
+        <section id="visited-card" class="panel" aria-labelledby="visited-title" hidden>
+          <button id="visited-back" class="back" type="button">← 戻る</button>
+          <h2 id="visited-title" class="panel-title" tabindex="-1">行ったお風呂</h2>
+          <p id="visited-lead" class="lead"></p>
+          <ul id="visited-list" class="visited-list"></ul>
+          <p id="visited-storage" class="note"></p>
+        </section>
+
+        <section id="about" class="about" aria-labelledby="about-title">
+          <h2 id="about-title" class="about-title" tabindex="-1">出典と注意</h2>
+          <h3 class="sub-title">気をつけてほしいこと</h3>
+          <ul class="about-list">
+            <li>地図の点は、OpenStreetMapに登録されたお風呂だけです。全部ではありません。</li>
+            <li>種類は、地図データの記載と名前から判断しています。名前だけで銭湯とは決めないので、銭湯の多くは「<span class="nowrap">種類の登録なし</span>」に入ります。</li>
+            <li>温泉地の数は、宿泊施設のある場所を数えたものです（環境省の表の注）。</li>
+            <li>営業時間と料金は、地図データに書かれたままです。<span class="nowrap">出かける前に</span>、必ず施設に確かめてください。</li>
+            <li>柱の位置は<span class="nowrap">県庁所在地</span>（人口の重心）です。県の中でどこに多いかは表していません。</li>
+          </ul>
+          <h3 class="sub-title">数字の出どころ</h3>
+          <p class="note credits-line">出典：© OpenStreetMap contributors（ODbL）・OpenFreeMap・環境省『令和6年度温泉利用状況』（2025年3月末時点）・厚生労働省『令和6年度衛生行政報告例』（2025年3月末時点）</p>
+          <ul class="about-list">
+            <li>源泉の数・温泉地の数・湧き出る量：<a href="https://www.env.go.jp/nature/onsen/data/index.html" target="_blank" rel="noopener noreferrer">環境省「令和6年度温泉利用状況」</a>（2025年3月末時点・<a href="https://www.env.go.jp/nature/onsen/pdf/6-7_p_1.pdf" target="_blank" rel="noopener noreferrer">都道府県別の表</a>）を加工して作成</li>
+            <li>銭湯の数：厚生労働省「令和6年度衛生行政報告例」第9表 公衆浴場数（2025年3月末時点・<a href="https://www.e-stat.go.jp/stat-search/files?toukei=00450027" target="_blank" rel="noopener noreferrer">e-Stat</a>）の一般公衆浴場（公営と私営の計）を加工して作成。個室付浴場などを含む公衆浴場の総数とは別の数です</li>
+            <li>銭湯の推移：<a href="https://www.mhlw.go.jp/toukei/saikin/hw/eisei_houkoku/24/index.html" target="_blank" rel="noopener noreferrer">厚生労働省「令和6（2024）年度衛生行政報告例の概況」</a>表4（2020年度3,231軒・2024年度2,730軒）</li>
+            <li>お風呂の点：<a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">© OpenStreetMap contributors</a>（<a href="https://opendatacommons.org/licenses/odbl/1-0/" target="_blank" rel="noopener noreferrer">ODbL 1.0</a>）。2026年9月29日に取得した公衆浴場（amenity=public_bath）5,208件。重複・私用・閉業を除き、同じ県・同じ名前で100m以内のもの（点と建物の輪郭の二重登録）は1件にまとめた</li>
+            <li>地図：<a href="https://openfreemap.org/" target="_blank" rel="noopener noreferrer">OpenFreeMap</a> © OpenMapTiles Data from OpenStreetMap。描画は MapLibre GL JS</li>
+            <li>柱の位置：県庁所在地の人口の重心（令和2年国勢調査の小地域データから計算した点。東京都は新宿区）</li>
+          </ul>
+          <p class="note">行った記録は、この端末（ブラウザ）の中だけに保存します。地図を表示している間は、地図タイルを取るために OpenFreeMap へ接続します。</p>
+        </section>
+        <div id="share"></div>
+      </div>
+    </section>
+
+    <footer class="strip">
+      <p class="strip-short">出典：環境省・厚労省・OpenStreetMap ほか（<a id="about-link-short" class="about-link" href="#about">詳しく</a>）</p>
+      <p class="strip-long">出典：<a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">© OpenStreetMap contributors（ODbL）</a>・<a href="https://openfreemap.org/" target="_blank" rel="noopener noreferrer">OpenFreeMap</a>・<a href="https://www.env.go.jp/nature/onsen/data/index.html" target="_blank" rel="noopener noreferrer">環境省『令和6年度温泉利用状況』（2025年3月末時点）</a>・<a href="https://www.mhlw.go.jp/toukei/list/36-19.html" target="_blank" rel="noopener noreferrer">厚生労働省『令和6年度衛生行政報告例』（2025年3月末時点）</a> <a id="about-link" class="strip-more about-link" href="#about">注意と詳しい出典</a></p>
+    </footer>
+  </div>
+</body>
+</html>

@@ -1,0 +1,10 @@
+import './classify.test.mjs';
+import './build-stats.test.mjs';
+import './build-baths.test.mjs';
+import './metrics.test.mjs';
+import './baths.test.mjs';
+import './geo.test.mjs';
+import './url.test.mjs';
+import './visited.test.mjs';
+import './data.test.mjs';
+import './labels.test.mjs';
