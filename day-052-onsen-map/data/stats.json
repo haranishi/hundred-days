@@ -1,0 +1,765 @@
+{
+ "generatedAt": "2026-09-29",
+ "national": {
+  "areas": 2839,
+  "sources": 27899,
+  "flow": 2477713,
+  "lodgings": 13425,
+  "onsenBaths": 7721,
+  "sento": 2730,
+  "sentoSeries": [
+   {
+    "fy": 2020,
+    "count": 3231
+   },
+   {
+    "fy": 2021,
+    "count": 3120
+   },
+   {
+    "fy": 2022,
+    "count": 3000
+   },
+   {
+    "fy": 2023,
+    "count": 2847
+   },
+   {
+    "fy": 2024,
+    "count": 2730
+   }
+  ]
+ },
+ "prefectures": [
+  {
+   "code": "01",
+   "name": "北海道",
+   "capital": {
+    "name": "札幌市",
+    "lng": 141.359,
+    "lat": 43.0648
+   },
+   "areas": 226,
+   "sources": 2249,
+   "flow": 189888,
+   "lodgings": 740,
+   "onsenBaths": 437,
+   "sento": 188
+  },
+  {
+   "code": "02",
+   "name": "青森県",
+   "capital": {
+    "name": "青森市",
+    "lng": 140.7359,
+    "lat": 40.811
+   },
+   "areas": 120,
+   "sources": 1089,
+   "flow": 139808,
+   "lodgings": 216,
+   "onsenBaths": 249,
+   "sento": 261
+  },
+  {
+   "code": "03",
+   "name": "岩手県",
+   "capital": {
+    "name": "盛岡市",
+    "lng": 141.1455,
+    "lat": 39.708
+   },
+   "areas": 81,
+   "sources": 393,
+   "flow": 111915,
+   "lodgings": 227,
+   "onsenBaths": 104,
+   "sento": 6
+  },
+  {
+   "code": "04",
+   "name": "宮城県",
+   "capital": {
+    "name": "仙台市",
+    "lng": 140.8771,
+    "lat": 38.2689
+   },
+   "areas": 39,
+   "sources": 740,
+   "flow": 28178,
+   "lodgings": 252,
+   "onsenBaths": 172,
+   "sento": 6
+  },
+  {
+   "code": "05",
+   "name": "秋田県",
+   "capital": {
+    "name": "秋田市",
+    "lng": 140.1156,
+    "lat": 39.7166
+   },
+   "areas": 104,
+   "sources": 616,
+   "flow": 79766,
+   "lodgings": 203,
+   "onsenBaths": 215,
+   "sento": 12
+  },
+  {
+   "code": "06",
+   "name": "山形県",
+   "capital": {
+    "name": "山形市",
+    "lng": 140.33,
+    "lat": 38.2522
+   },
+   "areas": 67,
+   "sources": 412,
+   "flow": 44887,
+   "lodgings": 252,
+   "onsenBaths": 131,
+   "sento": 0
+  },
+  {
+   "code": "07",
+   "name": "福島県",
+   "capital": {
+    "name": "福島市",
+    "lng": 140.4521,
+    "lat": 37.7569
+   },
+   "areas": 122,
+   "sources": 799,
+   "flow": 76291,
+   "lodgings": 474,
+   "onsenBaths": 187,
+   "sento": 9
+  },
+  {
+   "code": "08",
+   "name": "茨城県",
+   "capital": {
+    "name": "水戸市",
+    "lng": 140.4461,
+    "lat": 36.367
+   },
+   "areas": 39,
+   "sources": 157,
+   "flow": 22704,
+   "lodgings": 74,
+   "onsenBaths": 74,
+   "sento": 1
+  },
+  {
+   "code": "09",
+   "name": "栃木県",
+   "capital": {
+    "name": "宇都宮市",
+    "lng": 139.8907,
+    "lat": 36.5604
+   },
+   "areas": 66,
+   "sources": 633,
+   "flow": 61243,
+   "lodgings": 414,
+   "onsenBaths": 273,
+   "sento": 8
+  },
+  {
+   "code": "10",
+   "name": "群馬県",
+   "capital": {
+    "name": "前橋市",
+    "lng": 139.0928,
+    "lat": 36.3947
+   },
+   "areas": 98,
+   "sources": 459,
+   "flow": 53904,
+   "lodgings": 631,
+   "onsenBaths": 250,
+   "sento": 12
+  },
+  {
+   "code": "11",
+   "name": "埼玉県",
+   "capital": {
+    "name": "さいたま市",
+    "lng": 139.6461,
+    "lat": 35.8959
+   },
+   "areas": 31,
+   "sources": 117,
+   "flow": 15530,
+   "lodgings": 53,
+   "onsenBaths": 80,
+   "sento": 30
+  },
+  {
+   "code": "12",
+   "name": "千葉県",
+   "capital": {
+    "name": "千葉市",
+    "lng": 140.1233,
+    "lat": 35.6207
+   },
+   "areas": 95,
+   "sources": 144,
+   "flow": 10606,
+   "lodgings": 188,
+   "onsenBaths": 150,
+   "sento": 32
+  },
+  {
+   "code": "13",
+   "name": "東京都",
+   "capital": {
+    "name": "新宿区",
+    "lng": 139.7088,
+    "lat": 35.7033
+   },
+   "areas": 22,
+   "sources": 168,
+   "flow": 30966,
+   "lodgings": 41,
+   "onsenBaths": 142,
+   "sento": 429
+  },
+  {
+   "code": "14",
+   "name": "神奈川県",
+   "capital": {
+    "name": "横浜市",
+    "lng": 139.5828,
+    "lat": 35.4652
+   },
+   "areas": 36,
+   "sources": 602,
+   "flow": 33306,
+   "lodgings": 586,
+   "onsenBaths": 199,
+   "sento": 109
+  },
+  {
+   "code": "15",
+   "name": "新潟県",
+   "capital": {
+    "name": "新潟市",
+    "lng": 139.0536,
+    "lat": 37.8728
+   },
+   "areas": 135,
+   "sources": 536,
+   "flow": 64634,
+   "lodgings": 490,
+   "onsenBaths": 176,
+   "sento": 24
+  },
+  {
+   "code": "16",
+   "name": "富山県",
+   "capital": {
+    "name": "富山市",
+    "lng": 137.2171,
+    "lat": 36.6789
+   },
+   "areas": 61,
+   "sources": 169,
+   "flow": 29181,
+   "lodgings": 115,
+   "onsenBaths": 66,
+   "sento": 65
+  },
+  {
+   "code": "17",
+   "name": "石川県",
+   "capital": {
+    "name": "金沢市",
+    "lng": 136.6463,
+    "lat": 36.5665
+   },
+   "areas": 48,
+   "sources": 330,
+   "flow": 30972,
+   "lodgings": 191,
+   "onsenBaths": 112,
+   "sento": 59
+  },
+  {
+   "code": "18",
+   "name": "福井県",
+   "capital": {
+    "name": "福井市",
+    "lng": 136.214,
+    "lat": 36.0641
+   },
+   "areas": 38,
+   "sources": 158,
+   "flow": 7347,
+   "lodgings": 125,
+   "onsenBaths": 59,
+   "sento": 14
+  },
+  {
+   "code": "19",
+   "name": "山梨県",
+   "capital": {
+    "name": "甲府市",
+    "lng": 138.5687,
+    "lat": 35.6533
+   },
+   "areas": 29,
+   "sources": 304,
+   "flow": 35946,
+   "lodgings": 208,
+   "onsenBaths": 84,
+   "sento": 22
+  },
+  {
+   "code": "20",
+   "name": "長野県",
+   "capital": {
+    "name": "長野市",
+    "lng": 138.1926,
+    "lat": 36.6331
+   },
+   "areas": 193,
+   "sources": 955,
+   "flow": 106110,
+   "lodgings": 998,
+   "onsenBaths": 718,
+   "sento": 30
+  },
+  {
+   "code": "21",
+   "name": "岐阜県",
+   "capital": {
+    "name": "岐阜市",
+    "lng": 136.7598,
+    "lat": 35.4263
+   },
+   "areas": 55,
+   "sources": 506,
+   "flow": 68270,
+   "lodgings": 331,
+   "onsenBaths": 59,
+   "sento": 17
+  },
+  {
+   "code": "22",
+   "name": "静岡県",
+   "capital": {
+    "name": "静岡市",
+    "lng": 138.4205,
+    "lat": 34.997
+   },
+   "areas": 118,
+   "sources": 2185,
+   "flow": 109955,
+   "lodgings": 2397,
+   "onsenBaths": 535,
+   "sento": 9
+  },
+  {
+   "code": "23",
+   "name": "愛知県",
+   "capital": {
+    "name": "名古屋市",
+    "lng": 136.9286,
+    "lat": 35.1497
+   },
+   "areas": 35,
+   "sources": 133,
+   "flow": 15539,
+   "lodgings": 90,
+   "onsenBaths": 80,
+   "sento": 59
+  },
+  {
+   "code": "24",
+   "name": "三重県",
+   "capital": {
+    "name": "津市",
+    "lng": 136.479,
+    "lat": 34.7156
+   },
+   "areas": 74,
+   "sources": 214,
+   "flow": 47520,
+   "lodgings": 363,
+   "onsenBaths": 137,
+   "sento": 18
+  },
+  {
+   "code": "25",
+   "name": "滋賀県",
+   "capital": {
+    "name": "大津市",
+    "lng": 135.898,
+    "lat": 35.027
+   },
+   "areas": 27,
+   "sources": 86,
+   "flow": 11126,
+   "lodgings": 56,
+   "onsenBaths": 18,
+   "sento": 22
+  },
+  {
+   "code": "26",
+   "name": "京都府",
+   "capital": {
+    "name": "京都市",
+    "lng": 135.7497,
+    "lat": 34.9954
+   },
+   "areas": 37,
+   "sources": 146,
+   "flow": 16713,
+   "lodgings": 182,
+   "onsenBaths": 71,
+   "sento": 132
+  },
+  {
+   "code": "27",
+   "name": "大阪府",
+   "capital": {
+    "name": "大阪市",
+    "lng": 135.5132,
+    "lat": 34.6736
+   },
+   "areas": 17,
+   "sources": 173,
+   "flow": 35121,
+   "lodgings": 42,
+   "onsenBaths": 77,
+   "sento": 354
+  },
+  {
+   "code": "28",
+   "name": "兵庫県",
+   "capital": {
+    "name": "神戸市",
+    "lng": 135.1442,
+    "lat": 34.6988
+   },
+   "areas": 78,
+   "sources": 443,
+   "flow": 46371,
+   "lodgings": 322,
+   "onsenBaths": 229,
+   "sento": 138
+  },
+  {
+   "code": "29",
+   "name": "奈良県",
+   "capital": {
+    "name": "奈良市",
+    "lng": 135.7894,
+    "lat": 34.6883
+   },
+   "areas": 34,
+   "sources": 77,
+   "flow": 6864,
+   "lodgings": 73,
+   "onsenBaths": 57,
+   "sento": 15
+  },
+  {
+   "code": "30",
+   "name": "和歌山県",
+   "capital": {
+    "name": "和歌山市",
+    "lng": 135.1841,
+    "lat": 34.2343
+   },
+   "areas": 50,
+   "sources": 506,
+   "flow": 58206,
+   "lodgings": 364,
+   "onsenBaths": 148,
+   "sento": 27
+  },
+  {
+   "code": "31",
+   "name": "鳥取県",
+   "capital": {
+    "name": "鳥取市",
+    "lng": 134.2009,
+    "lat": 35.4886
+   },
+   "areas": 15,
+   "sources": 363,
+   "flow": 17664,
+   "lodgings": 100,
+   "onsenBaths": 47,
+   "sento": 16
+  },
+  {
+   "code": "32",
+   "name": "島根県",
+   "capital": {
+    "name": "松江市",
+    "lng": 133.0669,
+    "lat": 35.4619
+   },
+   "areas": 41,
+   "sources": 267,
+   "flow": 33320,
+   "lodgings": 106,
+   "onsenBaths": 98,
+   "sento": 1
+  },
+  {
+   "code": "33",
+   "name": "岡山県",
+   "capital": {
+    "name": "岡山市",
+    "lng": 133.9292,
+    "lat": 34.6571
+   },
+   "areas": 32,
+   "sources": 221,
+   "flow": 21830,
+   "lodgings": 81,
+   "onsenBaths": 94,
+   "sento": 11
+  },
+  {
+   "code": "34",
+   "name": "広島県",
+   "capital": {
+    "name": "広島市",
+    "lng": 132.4575,
+    "lat": 34.4172
+   },
+   "areas": 56,
+   "sources": 374,
+   "flow": 33282,
+   "lodgings": 75,
+   "onsenBaths": 96,
+   "sento": 42
+  },
+  {
+   "code": "35",
+   "name": "山口県",
+   "capital": {
+    "name": "山口市",
+    "lng": 131.46,
+    "lat": 34.1417
+   },
+   "areas": 40,
+   "sources": 404,
+   "flow": 21739,
+   "lodgings": 131,
+   "onsenBaths": 107,
+   "sento": 15
+  },
+  {
+   "code": "36",
+   "name": "徳島県",
+   "capital": {
+    "name": "徳島市",
+    "lng": 134.5399,
+    "lat": 34.0667
+   },
+   "areas": 25,
+   "sources": 82,
+   "flow": 7313,
+   "lodgings": 29,
+   "onsenBaths": 39,
+   "sento": 23
+  },
+  {
+   "code": "37",
+   "name": "香川県",
+   "capital": {
+    "name": "高松市",
+    "lng": 134.0515,
+    "lat": 34.3114
+   },
+   "areas": 28,
+   "sources": 200,
+   "flow": 9962,
+   "lodgings": 55,
+   "onsenBaths": 64,
+   "sento": 14
+  },
+  {
+   "code": "38",
+   "name": "愛媛県",
+   "capital": {
+    "name": "松山市",
+    "lng": 132.7636,
+    "lat": 33.8433
+   },
+   "areas": 37,
+   "sources": 192,
+   "flow": 18019,
+   "lodgings": 97,
+   "onsenBaths": 115,
+   "sento": 23
+  },
+  {
+   "code": "39",
+   "name": "高知県",
+   "capital": {
+    "name": "高知市",
+    "lng": 133.5369,
+    "lat": 33.5536
+   },
+   "areas": 37,
+   "sources": 96,
+   "flow": 2595,
+   "lodgings": 73,
+   "onsenBaths": 47,
+   "sento": 7
+  },
+  {
+   "code": "40",
+   "name": "福岡県",
+   "capital": {
+    "name": "福岡市",
+    "lng": 130.39,
+    "lat": 33.5851
+   },
+   "areas": 46,
+   "sources": 422,
+   "flow": 53956,
+   "lodgings": 97,
+   "onsenBaths": 147,
+   "sento": 23
+  },
+  {
+   "code": "41",
+   "name": "佐賀県",
+   "capital": {
+    "name": "佐賀市",
+    "lng": 130.2942,
+    "lat": 33.2617
+   },
+   "areas": 21,
+   "sources": 187,
+   "flow": 21529,
+   "lodgings": 86,
+   "onsenBaths": 122,
+   "sento": 1
+  },
+  {
+   "code": "42",
+   "name": "長崎県",
+   "capital": {
+    "name": "長崎市",
+    "lng": 129.8626,
+    "lat": 32.7638
+   },
+   "areas": 37,
+   "sources": 203,
+   "flow": 26481,
+   "lodgings": 94,
+   "onsenBaths": 118,
+   "sento": 12
+  },
+  {
+   "code": "43",
+   "name": "熊本県",
+   "capital": {
+    "name": "熊本市",
+    "lng": 130.7238,
+    "lat": 32.8014
+   },
+   "areas": 55,
+   "sources": 1339,
+   "flow": 129598,
+   "lodgings": 392,
+   "onsenBaths": 337,
+   "sento": 57
+  },
+  {
+   "code": "44",
+   "name": "大分県",
+   "capital": {
+    "name": "大分市",
+    "lng": 131.6374,
+    "lat": 33.2164
+   },
+   "areas": 63,
+   "sources": 5094,
+   "flow": 293610,
+   "lodgings": 914,
+   "onsenBaths": 392,
+   "sento": 125
+  },
+  {
+   "code": "45",
+   "name": "宮崎県",
+   "capital": {
+    "name": "宮崎市",
+    "lng": 131.4157,
+    "lat": 31.918
+   },
+   "areas": 29,
+   "sources": 199,
+   "flow": 25387,
+   "lodgings": 67,
+   "onsenBaths": 94,
+   "sento": 9
+  },
+  {
+   "code": "46",
+   "name": "鹿児島県",
+   "capital": {
+    "name": "鹿児島市",
+    "lng": 130.5302,
+    "lat": 31.5764
+   },
+   "areas": 87,
+   "sources": 2735,
+   "flow": 167150,
+   "lodgings": 311,
+   "onsenBaths": 485,
+   "sento": 242
+  },
+  {
+   "code": "47",
+   "name": "沖縄県",
+   "capital": {
+    "name": "那覇市",
+    "lng": 127.6944,
+    "lat": 26.2123
+   },
+   "areas": 15,
+   "sources": 22,
+   "flow": 5411,
+   "lodgings": 19,
+   "onsenBaths": 30,
+   "sento": 1
+  }
+ ],
+ "sources": {
+  "onsen": {
+   "title": "令和６年度温泉利用状況",
+   "publisher": "環境省",
+   "asOf": "2025-03-31",
+   "url": "https://www.env.go.jp/nature/onsen/pdf/6-7_p_1.pdf",
+   "note": "温泉地数は宿泊施設のある場所を計上（原表の注）"
+  },
+  "sento": {
+   "title": "令和6年度衛生行政報告例 第9表 公衆浴場数",
+   "publisher": "厚生労働省",
+   "asOf": "2025-03-31",
+   "url": "https://www.e-stat.go.jp/stat-search/file-download?statInfId=000040359177&fileKind=1",
+   "note": "一般公衆浴場（いわゆる銭湯）＝公営＋私営の一般公衆浴場"
+  },
+  "sentoSeries": {
+   "title": "令和６（2024）年度衛生行政報告例の概況 表4",
+   "publisher": "厚生労働省",
+   "url": "https://www.mhlw.go.jp/toukei/saikin/hw/eisei_houkoku/24/dl/kekka3.pdf"
+  },
+  "capitals": {
+   "title": "柱の位置は県庁所在地の人口加重重心（Day 015 が国勢調査2020の境界データから作成）",
+   "url": "https://www.e-stat.go.jp/gis"
+  }
+ }
+}

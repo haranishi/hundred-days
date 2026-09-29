@@ -85,6 +85,7 @@ Day 051「ハコニワ」も外部公開アプリです。本体は独立リポ�
 | 049 | ぱたにゃん | [day-049-patanyan/](day-049-patanyan/) | [アプリを開く](https://hundred-days.pages.dev/day-049-patanyan/) |
 | 050 | 名画の、その先。 | [day-050-art-uncovered/](day-050-art-uncovered/) | [アプリを開く](https://hundred-days.pages.dev/day-050-art-uncovered/) |
 | 051 | ハコニワ — 全国3Dミニチュアマップ | [制作記録のみ](day-051-hakoniwa/) | [紹介ページ](https://hakoniwa-map.haranishi.workers.dev/japan/) |
+| 052 | 湯けむり日本地図 | [day-052-onsen-map/](day-052-onsen-map/) | [アプリを開く](https://hundred-days.pages.dev/day-052-onsen-map/) |
 <!-- day-index:end -->
 
 ## 1日アプリのルール
