@@ -439,6 +439,18 @@ test('スマホでは出典の帯を1行にし、「詳しく」から出典と�
   expect(lineHeight.height, '1行に収まる').toBeLessThanOrEqual(lineHeight.line + 1);
   // 省略記号で「詳しく」が切れていない
   expect(await short.evaluate((node) => node.scrollWidth <= node.clientWidth), '帯の文字が切れない').toBe(true);
+  // 390px未満では2行に折り返し、出典も「詳しく」も切らない
+  for (const width of [375, 360, 320]) {
+    await page.setViewportSize({ width, height: 844 });
+    const fit = await short.evaluate((node) => ({
+      over: node.scrollWidth > node.clientWidth,
+      lines: Math.round(node.getBoundingClientRect().height / parseFloat(getComputedStyle(node).lineHeight)),
+    }));
+    expect(fit.over, `${width}px で帯の文字が切れない`).toBe(false);
+    expect(fit.lines, `${width}px で2行まで`).toBeLessThanOrEqual(2);
+    await expect(page.locator('#about-link-short')).toBeInViewport();
+  }
+  await page.setViewportSize({ width: 390, height: 844 });
   await page.locator('#about-link-short').click();
   await expect(page.locator('#about-title')).toBeFocused();
   await expect(page.locator('#app')).toHaveAttribute('data-sheet', 'open');

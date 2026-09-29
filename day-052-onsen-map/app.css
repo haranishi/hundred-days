@@ -315,9 +315,9 @@ a { color: #d9e1ec; }
 .strip p { margin: 0; }
 .strip a { color: #d2dae6; }
 .strip-more { margin-left: 4px; font-weight: 700; white-space: nowrap; }
-/* スマホでは出典の帯を1行に縮め、「詳しく」から出典と注意の節へ移る */
+/* スマホでは出典の帯を短い1行に縮め、「詳しく」から出典と注意の節へ移る。390px未満の幅では2行に折り返す
+   （省略記号で切ると、375pxで末尾の「）」、360pxで「詳しく」が切れて、出典の一部と節への入口が読めなくなる） */
 .strip-long { display: none; }
-.strip-short { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
 /* 出典のリンク（OpenStreetMap・OpenMapTiles）は地の太さのまま、「詳しく」だけ太くする。太いと1行に収まらない */
 .strip-short .about-link { font-weight: 700; }
 
