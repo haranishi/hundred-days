@@ -228,6 +228,13 @@ const OVERLAY_CSS = `
   }
   .promo-end em { font-style: normal; font-size: 26px; font-weight: 700; color: #ffc25e; letter-spacing: .06em; }
   .promo-end span { margin-top: 6px; font-size: 22px; color: #aab3c1; letter-spacing: .08em; }
+  /* 地図と統計の出典。動画の地図は OpenFreeMap のタイルなので、OpenFreeMap の条件（動画には「OpenFreeMap © OpenMapTiles
+     Data from OpenStreetMap」）と、OSMF の帰属ガイドライン（エンドクレジットなら openstreetmap.org/copyright を書く）に合わせる。
+     下の安全域（10%）の内側に置き、題名のまとまりとは離す */
+  .promo-end .promo-credit {
+    position: absolute; left: 10%; right: 10%; bottom: 11%; margin: 0;
+    font-size: 17px; font-weight: 500; line-height: 1.5; letter-spacing: .01em; color: #9aa3b2;
+  }
   .promo-flash { position: fixed; inset: 0; background: #ff00ff; z-index: 2147483647; display: none; pointer-events: none; }
   .promo-flash[data-on="1"] { display: block; }
 `;
@@ -244,7 +251,8 @@ const END_HTML = `
   </svg>
   <strong>湯けむり日本地図</strong>
   <em>無料・登録不要</em>
-  <span>Day 52 / 100</span>`;
+  <span>Day 52 / 100</span>
+  <p class="promo-credit">地図：OpenFreeMap © OpenMapTiles<br>Data from © OpenStreetMap contributors<br>openstreetmap.org/copyright<br>統計：環境省・厚労省（2025年3月末時点）を加工</p>`;
 
 function installOverlay(endHtml) {
   const make = (className) => { const node = document.createElement('div'); node.className = className; return node; };

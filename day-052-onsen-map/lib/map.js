@@ -42,7 +42,12 @@ export const NATION_VIEWS = {
   landscape: { bearing: -10, pitch: 40 }, // 横長で縦横比1.3未満（PC 1440×900 の地図は 1040×871）
   wide: { bearing: -15, pitch: 40 }, // 縦横比1.3以上（タブレット 768×1024 の地図は 768×562）
 };
-// 地図の下の帰属表示は、最初は（i）のボタンだけに畳む（出典は画面の下の帯にも常に出している）
+/* 地図の右下の帰属表示（OpenFreeMap © OpenMapTiles Data from OpenStreetMap）は、開いた直後は出したままにする。
+   OSMF の帰属ガイドラインで畳んでよいのは「利用者が地図を操作したとき」か「表示から5秒後」だけで、
+   OpenMapTiles（CC BY 4.0）も見える形での表記を求めている。畳んだあとも（i）から開ける */
+export const ATTRIBUTION_VISIBLE_MS = 5000;
+// 畳んだ（i）の枠の高さ（app.css の 44px＋上下2px）に、MapLibre の上下の余白10pxずつを足したもの。E2E で実測と突き合わせる
+export const COLLAPSED_ATTRIBUTION_HEIGHT = 68;
 const collapseAttribution = (container) => {
   const box = container.querySelector('.maplibregl-ctrl-attrib.maplibregl-compact');
   if (!box) return false;
@@ -98,11 +103,10 @@ export function createOnsenMap(container, handlers = {}, { nearButton = null } =
   });
   // 視野角を狭めて透視を弱める（既定の36.87°だと、画面の端の柱が消失点へ向かって大きく斜めに倒れて見える）
   map.setVerticalFieldOfView(FIELD_OF_VIEW);
-  // 帰属は地図の上に常時出す（ODbL）。タイルの帰属（OpenFreeMap © OpenMapTiles …）はスタイルが持つ文がそのまま並ぶ
-  map.addControl(new maplibregl.AttributionControl({
-    compact: true,
-    customAttribution: '<a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">© OpenStreetMap contributors（ODbL）</a>',
-  }), 'bottom-right');
+  /* 帰属の文は、タイルの TileJSON が持つ「OpenFreeMap © OpenMapTiles Data from OpenStreetMap」をそのまま出す
+     （OpenMapTiles は openmaptiles.org、OpenStreetMap は /copyright へのリンク付き）。customAttribution で
+     OpenStreetMap を足すと同じ出典が2つ並び、スマホでは4行になって地図を覆う（Day 040 と同じ判断） */
+  map.addControl(new maplibregl.AttributionControl({ compact: true }), 'bottom-right');
   map.addControl(new maplibregl.NavigationControl({ visualizePitch: true }), 'top-right');
   if (nearButton) map.addControl(new NearControl(nearButton), 'top-right');
   // 方位のボタン（北を上にして傾きを戻す）にも読み上げの名前と見出しを付ける
@@ -111,11 +115,27 @@ export function createOnsenMap(container, handlers = {}, { nearButton = null } =
     compass.setAttribute('aria-label', '北を上にして傾きを戻す');
     compass.title = '北を上にして傾きを戻す';
   }
-  // 帰属表示は文字がそろった最初の描画のあとで畳む。あとで利用者が開いたら、そのまま開いておく
+  /* 帰属表示は、全国の地図のタイルが描けて柱が伸び始めたところから5秒出してから畳む。最初の idle はタイルを
+     描く前に来るので、そこから数えると地図の見えている間に出典がほとんど映らない（デモの撮り直しで気づいた）。
+     それより前に利用者が地図を動かす・押す・拡大縮小したら、その時点で畳む（アプリが自分で動かすカメラでは畳まない）。
+     畳むのは1回だけで、あとで利用者が（i）から開いたら、そのまま開いておく */
   let attributionCollapsed = false;
-  const collapseOnce = () => { if (!attributionCollapsed) attributionCollapsed = collapseAttribution(container); };
-  map.on('styledata', collapseOnce);
-  map.on('idle', collapseOnce);
+  let attributionTimer = 0;
+  const collapseOnce = () => {
+    if (attributionCollapsed) return;
+    attributionCollapsed = collapseAttribution(container);
+    if (attributionCollapsed) clearTimeout(attributionTimer);
+  };
+  const startAttributionClock = () => {
+    if (attributionTimer || attributionCollapsed || !tilesShown) return;
+    const text = container.querySelector('.maplibregl-ctrl-attrib-inner')?.textContent ?? '';
+    if (!text.includes('OpenStreetMap')) return;
+    attributionTimer = setTimeout(collapseOnce, ATTRIBUTION_VISIBLE_MS);
+  };
+  const collapseOnUserMove = (event) => { if (event?.originalEvent) collapseOnce(); };
+  map.on('idle', startAttributionClock);
+  for (const type of ['dragstart', 'zoomstart', 'rotatestart', 'pitchstart']) map.on(type, collapseOnUserMove);
+  map.on('click', collapseOnce);
 
   let styleReady = false;
   let failed = false;
@@ -131,12 +151,15 @@ export function createOnsenMap(container, handlers = {}, { nearButton = null } =
   // その後の idle は新しい範囲の描画が済んだ合図になる。sourcedata で確かめると、新しい範囲のタイルを
   // まだ頼んでいない瞬間に「未着なし」と判定して早く伸びてしまう（撮り直しで確かめた）
   let tilesShown = false;
-  const whenTilesShown = () => new Promise((resolve) => {
+  let tilesShownWait = null;
+  // 待ちは1本にまとめる（柱を伸ばすときと、帰属表示の5秒を数え始めるときの両方が使う）
+  const whenTilesShown = () => tilesShownWait ??= new Promise((resolve) => {
     if (tilesShown) { resolve(); return; }
     const finish = () => {
       tilesShown = true;
       clearTimeout(limit);
       map.off('idle', check);
+      startAttributionClock();
       resolve();
     };
     const check = () => { if (map.areTilesLoaded()) finish(); };
@@ -148,6 +171,7 @@ export function createOnsenMap(container, handlers = {}, { nearButton = null } =
     if (failed) return;
     failed = true;
     clearTimeout(timer);
+    clearTimeout(attributionTimer);
     cancelAnimationFrame(growFrame);
     try { map.remove(); } catch { /* 途中まで作った地図の片付けに失敗しても、画面は順位の表で続ける */ }
     handlers.onFail?.(reason);
@@ -255,6 +279,8 @@ export function createOnsenMap(container, handlers = {}, { nearButton = null } =
     if (pending.selected) api.selectBath(...pending.selected);
     if (pending.top) api.setTopLabels(...pending.top);
     if (pending.here) api.showHere(...pending.here);
+    // 動きを減らす設定などで柱を伸ばさないときも、タイルが描けたら帰属表示の5秒を数え始める（カメラを動かす直前に待ち始める）
+    whenTilesShown();
     if (pending.camera) {
       const [kind, ...args] = pending.camera;
       ({ nation: api.flyNation, pref: api.flyPref, bath: api.flyBath, near: api.flyNear })[kind](...args);
@@ -272,8 +298,10 @@ export function createOnsenMap(container, handlers = {}, { nearButton = null } =
     const height = container.clientHeight || 400;
     const side = Math.round(Math.min(40, width * 0.05));
     const right = Math.max(side, CONTROL_COLUMN);
-    // 右下の帰属表示（スマホでは2行になる）の上に収める。帰属表示は隠さない
-    const attribution = container.querySelector('.maplibregl-ctrl-bottom-right')?.offsetHeight ?? 0;
+    /* 右下の帰属表示の上に収める。帰属表示は隠さない。開いた直後に広がっている間（数秒で（i）に畳む）は、
+       畳んだ（i）の高さで測る。広がった高さで測ると、スタイルの帰属が届いたかどうかで全国の構図が変わってしまう */
+    const corner = container.querySelector('.maplibregl-ctrl-bottom-right');
+    const attribution = attributionCollapsed ? corner?.offsetHeight ?? 0 : COLLAPSED_ATTRIBUTION_HEIGHT;
     // 全国：柱は上へ伸びるので上を広く空ける。下は、根元の少し下に置く上位3県の文字と、左下の「沖縄県 ↙」の分を空ける
     if (kind === 'nation') return { top: Math.round(height * 0.2), bottom: Math.max(Math.round(height * 0.04), attribution + 6, 60), left: side, right };
     return { top: Math.round(height * 0.12), bottom: Math.max(Math.round(height * 0.1), attribution + 6), left: side + 6, right };

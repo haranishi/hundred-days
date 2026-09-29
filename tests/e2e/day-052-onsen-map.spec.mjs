@@ -13,10 +13,12 @@ const EMPTY_STYLE = {
     openfreemap: {
       type: 'geojson',
       data: { type: 'FeatureCollection', features: [] },
-      attribution: '<a href="https://openfreemap.org/">OpenFreeMap</a> © OpenMapTiles Data from OpenStreetMap',
+      // 本物の TileJSON（https://tiles.openfreemap.org/planet）と同じ文とリンク
+      attribution: '<a href="https://openfreemap.org" target="_blank">OpenFreeMap</a> <a href="https://www.openmaptiles.org/" target="_blank">&copy; OpenMapTiles</a> Data from <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a>',
     },
   },
-  layers: [],
+  // MapLibre は層から参照されているソースの帰属しか出さない。透明な層でタイルのソースを参照し、本番と同じく帰属を出す
+  layers: [{ id: 'stub-openfreemap', type: 'fill', source: 'openfreemap', paint: { 'fill-opacity': 0 } }],
 };
 
 const failures = new WeakMap();
@@ -403,15 +405,18 @@ test('地図の柱を押すとその県を開き、柱の上では県名と数�
   await expect(page).toHaveURL(/\?pref=44$/);
 });
 
-const CREDITS = ['© OpenStreetMap contributors（ODbL）', 'OpenFreeMap', '環境省『令和6年度温泉利用状況』（2025年3月末時点）', '厚生労働省『令和6年度衛生行政報告例』（2025年3月末時点）'];
+const CREDITS = ['© OpenStreetMap contributors（ODbL）', 'OpenFreeMap', '© OpenMapTiles', '環境省『令和6年度温泉利用状況』（2025年3月末時点）', '厚生労働省『令和6年度衛生行政報告例』（2025年3月末時点）'];
+// OSMF の帰属ガイドライン（OpenStreetMap は /copyright へのリンク）と、OpenMapTiles の CC BY 4.0（openmaptiles.org へのリンク）
+const CREDIT_LINKS = ['https://www.openstreetmap.org/copyright', 'https://openmaptiles.org/'];
 
-test('PCでは画面下の帯に4つの出典を並べる', async ({ page }) => {
+test('PCでは画面下の帯に出典を並べ、OpenStreetMap と OpenMapTiles はリンクにする', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await open(page);
   const long = page.locator('.strip-long');
   await expect(long).toBeVisible();
   await expect(page.locator('.strip-short')).toBeHidden();
   for (const text of CREDITS) await expect(long).toContainText(text);
+  for (const href of CREDIT_LINKS) await expect(long.locator(`a[href="${href}"]`)).toHaveCount(1);
   await expect(long).toBeInViewport();
   await page.locator('#about-link').click();
   await expect(page.locator('#about-title')).toBeFocused();
@@ -420,15 +425,20 @@ test('PCでは画面下の帯に4つの出典を並べる', async ({ page }) => 
 test('スマホでは出典の帯を1行にし、「詳しく」から出典と注意の節へ移れる', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await open(page, '?pref=05');
-  // 地図の中の OpenStreetMap の帰属表示はそのまま残す
-  await expect(page.locator('.maplibregl-ctrl-attrib')).toContainText('© OpenStreetMap contributors（ODbL）');
+  // 地図の中の帰属表示は、タイルの帰属（OpenMapTiles と OpenStreetMap へのリンク）をそのまま出す
+  const attribution = page.locator('.maplibregl-ctrl-attrib');
+  await expect(attribution).toContainText('OpenFreeMap © OpenMapTiles Data from OpenStreetMap');
+  await expect(attribution.locator('a[href="https://www.openstreetmap.org/copyright"]')).toHaveCount(1);
   const short = page.locator('.strip-short');
   await expect(short).toBeVisible();
-  await expect(short).toHaveText('出典：環境省・厚労省・OpenStreetMap ほか（詳しく）');
+  await expect(short).toHaveText('出典：OpenStreetMap・OpenMapTiles・環境省・厚労省（詳しく）');
+  for (const href of CREDIT_LINKS) await expect(short.locator(`a[href="${href}"]`)).toHaveCount(1);
   await expect(page.locator('.strip-long')).toBeHidden();
   await expect(short).toBeInViewport();
   const lineHeight = await short.evaluate((node) => ({ height: node.getBoundingClientRect().height, line: parseFloat(getComputedStyle(node).lineHeight) }));
   expect(lineHeight.height, '1行に収まる').toBeLessThanOrEqual(lineHeight.line + 1);
+  // 省略記号で「詳しく」が切れていない
+  expect(await short.evaluate((node) => node.scrollWidth <= node.clientWidth), '帯の文字が切れない').toBe(true);
   await page.locator('#about-link-short').click();
   await expect(page.locator('#about-title')).toBeFocused();
   await expect(page.locator('#app')).toHaveAttribute('data-sheet', 'open');
@@ -443,7 +453,11 @@ test('スマホでは出典の帯を1行にし、「詳しく」から出典と�
     '柱の位置は県庁所在地（人口の重心）です',
     '「令和6年度温泉利用状況」（2025年3月末時点・都道府県別の表）を加工して作成',
     '5,208件。重複・私用・閉業を除き、同じ県・同じ名前で100m以内のもの（点と建物の輪郭の二重登録）は1件にまとめた',
+    '表4（2020年度3,231軒・2024年度2,730軒）を加工して作成',
+    // 環境省の利用ルールは、加工したことに加えて加工した主体を書くよう求めている
+    'このサイト（100 DAYS / 100 APPS）が上の資料を加工して作ったもので、国が公表した表そのままではありません',
   ]) await expect(page.locator('#about')).toContainText(text);
+  for (const href of CREDIT_LINKS) await expect(page.locator(`#about a[href="${href}"]`).first()).toBeVisible();
   // 出典の時点は温泉も銭湯も「2025年3月末時点」にそろえる
   expect(await page.locator('#about').textContent()).not.toMatch(/2024年度末|3月末現在|3月末）/);
   // 出典の表記は数字を半角にそろえる
@@ -867,12 +881,28 @@ test('小さな崩れ：「近く」のアイコンと文字が重ならず、�
   expect(stray).toEqual([]);
 });
 
-test('地図の中の帰属表示は最初は（i）に畳まれていて、押すと開く', async ({ page }) => {
+test('地図の中の帰属表示は、開いた直後は出たままで、5秒たつと（i）に畳まれ、押すと開く', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await open(page);
   const attribution = page.locator('.maplibregl-ctrl-attrib');
-  await expect.poll(() => attribution.evaluate((node) => node.classList.contains('maplibregl-compact') && !node.classList.contains('maplibregl-compact-show'))).toBe(true);
+  const shown = () => attribution.evaluate((node) => node.classList.contains('maplibregl-compact-show'));
+  const collapsed = () => attribution.evaluate((node) => node.classList.contains('maplibregl-compact') && !node.classList.contains('maplibregl-compact-show'));
+  // OSMF の帰属ガイドライン：畳んでよいのは地図の操作か表示から5秒後だけ。開いた直後は読める状態で出す
+  await expect.poll(shown).toBe(true);
+  await expect(attribution.locator('.maplibregl-ctrl-attrib-inner')).toBeVisible();
+  await expect(attribution).toContainText('OpenFreeMap © OpenMapTiles Data from OpenStreetMap');
+  // 広がっている間も、左下の「沖縄県 ↙」と上位の県名のラベルには重ならない
+  const box = await attribution.boundingBox();
+  for (const selector of ['#okinawa', '.top-label']) {
+    for (const other of await page.locator(selector).evaluateAll((nodes) => nodes.map((node) => node.getBoundingClientRect().toJSON()))) {
+      const apart = other.right <= box.x || box.x + box.width <= other.left || other.bottom <= box.y || box.y + box.height <= other.top;
+      expect(apart, `${selector} と帰属表示が重ならない`).toBe(true);
+    }
+  }
+  // 構図は畳んだ（i）の高さで決める（lib/map.js の COLLAPSED_ATTRIBUTION_HEIGHT）
+  await expect.poll(collapsed, { timeout: 12_000 }).toBe(true);
   await expect(attribution.locator('.maplibregl-ctrl-attrib-inner')).toBeHidden();
+  expect(await page.locator('.maplibregl-ctrl-bottom-right').evaluate((node) => node.offsetHeight)).toBe(68);
   // ＋・−・「近く」と同じ暗い角丸・影なしのボタン
   const look = await attribution.evaluate((node) => {
     const style = getComputedStyle(node);
@@ -885,11 +915,28 @@ test('地図の中の帰属表示は最初は（i）に畳まれていて、押�
   });
   expect(look).toEqual({ ...group, width: 44, height: 44 });
   expect(group.shadow).toMatch(/0px 0px 0px 1px$/);
+  // 畳んだあとに利用者が開いたら、開いたままにする
   await attribution.locator('.maplibregl-ctrl-attrib-button').click();
   await expect(attribution.locator('.maplibregl-ctrl-attrib-inner')).toBeVisible();
-  await expect(attribution).toContainText('© OpenStreetMap contributors（ODbL）');
-  // 下の帯にも OpenStreetMap の表記がある
-  await expect(page.locator('.strip-short')).toContainText('OpenStreetMap');
+  await page.waitForTimeout(1500);
+  await expect(attribution.locator('.maplibregl-ctrl-attrib-inner')).toBeVisible();
+  // 下の帯にも OpenStreetMap と OpenMapTiles の表記がある
+  await expect(page.locator('.strip-short')).toContainText('OpenStreetMap・OpenMapTiles');
+});
+
+test('5秒より前でも、利用者が地図を動かしたら帰属表示を畳む', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await open(page);
+  const attribution = page.locator('.maplibregl-ctrl-attrib');
+  await expect.poll(() => attribution.evaluate((node) => node.classList.contains('maplibregl-compact-show'))).toBe(true);
+  const canvas = await page.locator('#map canvas').boundingBox();
+  const x = canvas.x + canvas.width * 0.55;
+  const y = canvas.y + canvas.height * 0.25;
+  await page.mouse.move(x, y);
+  await page.mouse.down();
+  await page.mouse.move(x - 80, y + 30, { steps: 8 });
+  await page.mouse.up();
+  await expect.poll(() => attribution.evaluate((node) => !node.classList.contains('maplibregl-compact-show')), { timeout: 2_000 }).toBe(true);
 });
 
 test('根元のラベルは、390では1位の1本だけ・768以上は上位3本で、どれも「沖縄県」の案内から8px以上離れる', async ({ page }) => {

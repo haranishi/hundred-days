@@ -48,6 +48,14 @@
 
 ## 画面での出典の出し方
 
-地図の右下に MapLibre の帰属表示を置く。中身は「© OpenStreetMap contributors（ODbL）」と、地図タイルのスタイルが持つ「OpenFreeMap © OpenMapTiles Data from OpenStreetMap」。最初は（i）のボタンに畳み、押すと開く（画面の下の帯にも OpenStreetMap の出典を常に出しているため）。
+地図の右下に MapLibre の帰属表示を置く。中身は、地図タイルの TileJSON が持つ「OpenFreeMap © OpenMapTiles Data from OpenStreetMap」（OpenMapTiles は openmaptiles.org、OpenStreetMap は openstreetmap.org/copyright へのリンク）。開いた直後は出したままにし、利用者が地図を動かす・押す・拡大縮小したときか、表示から5秒後に（i）のボタンへ畳む。畳んでも（i）から開ける。
+
+この出し方は次の条件に合わせた（2026年9月29日に原文を確認）。
+
+- [OSMF の帰属ガイドライン](https://osmfoundation.org/wiki/Licence/Attribution_Guidelines)：地図の隅か地図のすぐそばに出す。畳んでよいのは、閉じる操作・地図の操作・5秒経過のいずれか。畳んだあとも（i）などから出典をたどれること
+- [OpenMapTiles のデザインのライセンス](https://github.com/openmaptiles/openmaptiles/blob/master/LICENSE.md)（CC BY 4.0）：「OpenMapTiles」を、openmaptiles.org へのリンク付きで見える形で出す
+- [OpenFreeMap](https://openfreemap.org/)：帰属は必須。印刷物や動画に使うときは「OpenFreeMap © OpenMapTiles Data from OpenStreetMap」を入れる（OpenFreeMap の部分は任意）
+
+当初は読み込み直後に（i）へ畳んでいて、OpenMapTiles の表記が操作なしでは見えなかった。公開の前に上の形に直した。
 画面の下の帯にも出典を常に出す。PC では4つ（OpenStreetMap・OpenFreeMap・環境省・厚生労働省）を並べ、スマホでは「出典：環境省・厚労省・OpenStreetMap ほか（詳しく）」の1行に縮めて、「詳しく」から「出典と注意」の節へ移れるようにした。その節には4つの出典を同じ文で出している。
 統計を加工したことも、「出典と注意」の節に「〜を加工して作成」と書いている。
