@@ -67,6 +67,12 @@ try {
   process.exit(1);
 }
 
+/* 3Dのアプリはソフトウェア描画だと1秒に数枚しか描けず、動画がコマ送りになる。
+   DEMO_GPU=1 で実GPU（macOSのMetal）を使って録る（day-054 で追加。既定は従来どおり） */
+const launchOptions = process.env.DEMO_GPU === '1'
+  ? { args: ['--use-angle=metal', '--enable-gpu', '--ignore-gpu-blocklist'] }
+  : {};
+
 const has = (cmd) => {
   try { execFileSync('which', [cmd], { stdio: 'ignore' }); return true; } catch { return false; }
 };
@@ -133,7 +139,7 @@ async function recordVideo() {
 
   const scenario = (await import(pathToFileURL(scenarioPath).href)).default;
   const work = mkdtempSync(join(tmpdir(), 'day-demo-'));
-  const browser = await chromium.launch();
+  const browser = await chromium.launch(launchOptions);
   const context = await browser.newContext({
     viewport: VIEW,
     locale: 'ja-JP',
@@ -209,7 +215,7 @@ async function shoot() {
     shotSetup = typeof mod.shotSetup === 'function' ? mod.shotSetup : null;
   }
 
-  const browser = await chromium.launch();
+  const browser = await chromium.launch(launchOptions);
   const page = await browser.newPage({ viewport: { width: 1200, height: 750 }, deviceScaleFactor: 1, locale: 'ja-JP' });
   await page.goto(indexUrl, { waitUntil: 'load' });
   await page.waitForTimeout(300);

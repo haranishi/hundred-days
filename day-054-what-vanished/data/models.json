@@ -1,0 +1,1759 @@
+{
+  "models": {
+    "sofa": {
+      "id": "sofa",
+      "ph": "Sofa_01",
+      "name": "Sofa 01",
+      "authors": [
+        "Kirill Sannikov"
+      ],
+      "trisBefore": 4101,
+      "tris": 4101,
+      "bytes": 141324,
+      "tex": 1024,
+      "size": [
+        1.571,
+        0.797,
+        0.658
+      ],
+      "min": [
+        -0.778,
+        -0.001,
+        -0.361
+      ],
+      "max": [
+        0.793,
+        0.796,
+        0.297
+      ]
+    },
+    "coffee-table": {
+      "id": "coffee-table",
+      "ph": "modern_coffee_table_01",
+      "name": "Modern Coffee Table 01",
+      "authors": [
+        "Amin"
+      ],
+      "trisBefore": 4504,
+      "tris": 4504,
+      "bytes": 118072,
+      "tex": 512,
+      "size": [
+        0.6,
+        0.39,
+        1.202
+      ],
+      "min": [
+        -0.3,
+        0,
+        -0.601
+      ],
+      "max": [
+        0.3,
+        0.39,
+        0.601
+      ]
+    },
+    "tv-cabinet": {
+      "id": "tv-cabinet",
+      "ph": "modern_wooden_cabinet",
+      "name": "Modern Wooden Cabinet",
+      "authors": [
+        "Patrik Pangerl"
+      ],
+      "trisBefore": 24976,
+      "tris": 16800,
+      "bytes": 671072,
+      "tex": 1024,
+      "size": [
+        2.44,
+        0.68,
+        0.52
+      ],
+      "min": [
+        -1.22,
+        0,
+        -0.27
+      ],
+      "max": [
+        1.22,
+        0.68,
+        0.25
+      ]
+    },
+    "cube-shelf": {
+      "id": "cube-shelf",
+      "ph": "wooden_display_shelves_01",
+      "name": "Wooden Display Shelves 01",
+      "authors": [
+        "James Ray Cock"
+      ],
+      "trisBefore": 3174,
+      "tris": 3174,
+      "bytes": 81288,
+      "tex": 512,
+      "size": [
+        0.371,
+        1.556,
+        1.078
+      ],
+      "min": [
+        -0.186,
+        0,
+        -0.539
+      ],
+      "max": [
+        0.186,
+        1.557,
+        0.539
+      ]
+    },
+    "side-table": {
+      "id": "side-table",
+      "ph": "side_table_01",
+      "name": "Side Table 01",
+      "authors": [
+        "James Ray Cock"
+      ],
+      "trisBefore": 2756,
+      "tris": 2756,
+      "bytes": 99948,
+      "tex": 512,
+      "size": [
+        0.55,
+        0.551,
+        0.45
+      ],
+      "min": [
+        -0.275,
+        -0.002,
+        -0.225
+      ],
+      "max": [
+        0.275,
+        0.548,
+        0.225
+      ]
+    },
+    "dining-table": {
+      "id": "dining-table",
+      "ph": "dining_table",
+      "name": "Dining Table",
+      "authors": [
+        "Aron Łyczek"
+      ],
+      "trisBefore": 1048,
+      "tris": 1048,
+      "bytes": 116560,
+      "tex": 1024,
+      "size": [
+        2.256,
+        0.877,
+        1.39
+      ],
+      "min": [
+        -1.133,
+        -0.004,
+        -0.678
+      ],
+      "max": [
+        1.123,
+        0.873,
+        0.712
+      ]
+    },
+    "dining-chair": {
+      "id": "dining-chair",
+      "ph": "dining_chair_02",
+      "name": "Dining Chair 02",
+      "authors": [
+        "James Ray Cock"
+      ],
+      "trisBefore": 22013,
+      "tris": 8999,
+      "bytes": 193412,
+      "tex": 512,
+      "size": [
+        0.434,
+        0.973,
+        0.576
+      ],
+      "min": [
+        -0.217,
+        0.001,
+        -0.331
+      ],
+      "max": [
+        0.217,
+        0.975,
+        0.245
+      ]
+    },
+    "stove": {
+      "id": "stove",
+      "ph": "electric_stove",
+      "name": "Electric Stove",
+      "authors": [
+        "Kuutti Siitonen"
+      ],
+      "trisBefore": 13914,
+      "tris": 9512,
+      "bytes": 260916,
+      "tex": 512,
+      "size": [
+        0.503,
+        0.859,
+        0.648
+      ],
+      "min": [
+        -0.251,
+        0,
+        -0.3
+      ],
+      "max": [
+        0.251,
+        0.859,
+        0.348
+      ]
+    },
+    "kitchen-cabinet": {
+      "id": "kitchen-cabinet",
+      "ph": "painted_wooden_cabinet",
+      "name": "Painted Wooden Cabinet",
+      "authors": [
+        "Kirill Sannikov"
+      ],
+      "trisBefore": 2227,
+      "tris": 2227,
+      "bytes": 86576,
+      "tex": 512,
+      "size": [
+        1.195,
+        1.182,
+        0.617
+      ],
+      "min": [
+        -0.595,
+        0,
+        -0.282
+      ],
+      "max": [
+        0.6,
+        1.181,
+        0.334
+      ]
+    },
+    "kitchen-rack": {
+      "id": "kitchen-rack",
+      "ph": "drawer_cabinet",
+      "name": "Drawer Cabinet",
+      "authors": [
+        "Ulan Cabanilla"
+      ],
+      "trisBefore": 26406,
+      "tris": 8994,
+      "bytes": 262060,
+      "tex": 512,
+      "size": [
+        1.141,
+        1.881,
+        0.488
+      ],
+      "min": [
+        -0.571,
+        0,
+        -0.248
+      ],
+      "max": [
+        0.571,
+        1.881,
+        0.24
+      ]
+    },
+    "bed": {
+      "id": "bed",
+      "ph": "GothicBed_01",
+      "name": "Gothic Bed 01",
+      "authors": [
+        "Kirill Sannikov"
+      ],
+      "trisBefore": 18745,
+      "tris": 13999,
+      "bytes": 428716,
+      "tex": 1024,
+      "size": [
+        1.494,
+        1.534,
+        2.04
+      ],
+      "min": [
+        -0.711,
+        0,
+        -1.053
+      ],
+      "max": [
+        0.782,
+        1.534,
+        0.987
+      ]
+    },
+    "nightstand": {
+      "id": "nightstand",
+      "ph": "ClassicNightstand_01",
+      "name": "Classic Nightstand 01",
+      "authors": [
+        "Kirill Sannikov"
+      ],
+      "trisBefore": 2002,
+      "tris": 2002,
+      "bytes": 64468,
+      "tex": 512,
+      "size": [
+        0.568,
+        0.7,
+        0.424
+      ],
+      "min": [
+        -0.284,
+        0,
+        -0.212
+      ],
+      "max": [
+        0.284,
+        0.7,
+        0.212
+      ]
+    },
+    "dresser": {
+      "id": "dresser",
+      "ph": "WoodenTable_03",
+      "name": "Wooden Table 03",
+      "authors": [
+        "Gabriel Radić"
+      ],
+      "trisBefore": 2298,
+      "tris": 2298,
+      "bytes": 106376,
+      "tex": 512,
+      "size": [
+        1.327,
+        0.83,
+        0.575
+      ],
+      "min": [
+        -0.659,
+        0,
+        -0.281
+      ],
+      "max": [
+        0.668,
+        0.83,
+        0.294
+      ]
+    },
+    "desk": {
+      "id": "desk",
+      "ph": "SchoolDesk_01",
+      "name": "School Desk 01",
+      "authors": [
+        "Ethan Place"
+      ],
+      "trisBefore": 4162,
+      "tris": 4162,
+      "bytes": 105328,
+      "tex": 512,
+      "size": [
+        0.712,
+        0.883,
+        0.546
+      ],
+      "min": [
+        -0.356,
+        0,
+        -0.278
+      ],
+      "max": [
+        0.356,
+        0.882,
+        0.268
+      ]
+    },
+    "bookshelf": {
+      "id": "bookshelf",
+      "ph": "wooden_bookshelf_worn",
+      "name": "Wooden Bookshelf Worn",
+      "authors": [
+        "Ulan Cabanilla"
+      ],
+      "trisBefore": 10106,
+      "tris": 9000,
+      "bytes": 206316,
+      "tex": 512,
+      "size": [
+        1.374,
+        2.063,
+        0.581
+      ],
+      "min": [
+        -0.687,
+        0,
+        -0.291
+      ],
+      "max": [
+        0.687,
+        2.063,
+        0.291
+      ]
+    },
+    "bench": {
+      "id": "bench",
+      "ph": "painted_wooden_bench",
+      "name": "Painted Wooden Bench",
+      "authors": [
+        "Kirill Sannikov"
+      ],
+      "trisBefore": 630,
+      "tris": 630,
+      "bytes": 36524,
+      "tex": 512,
+      "size": [
+        1.165,
+        0.889,
+        0.496
+      ],
+      "min": [
+        -0.576,
+        -0.001,
+        -0.254
+      ],
+      "max": [
+        0.589,
+        0.889,
+        0.243
+      ]
+    },
+    "chandelier": {
+      "id": "chandelier",
+      "ph": "Chandelier_01",
+      "name": "Chandelier 01",
+      "authors": [
+        "Kirill Sannikov"
+      ],
+      "trisBefore": 26860,
+      "tris": 13462,
+      "bytes": 398140,
+      "tex": 512,
+      "size": [
+        0.746,
+        0.798,
+        0.816
+      ],
+      "min": [
+        -0.373,
+        -0.798,
+        -0.402
+      ],
+      "max": [
+        0.373,
+        0,
+        0.413
+      ]
+    },
+    "ceiling-lamp": {
+      "id": "ceiling-lamp",
+      "ph": "modern_ceiling_lamp_01",
+      "name": "Modern Ceiling Lamp 01",
+      "authors": [
+        "James Ray Cock"
+      ],
+      "trisBefore": 5602,
+      "tris": 5044,
+      "bytes": 109720,
+      "tex": 256,
+      "size": [
+        0.432,
+        0.951,
+        0.432
+      ],
+      "min": [
+        -0.216,
+        0.221,
+        -0.214
+      ],
+      "max": [
+        0.216,
+        1.173,
+        0.217
+      ]
+    },
+    "armchair": {
+      "id": "armchair",
+      "ph": "ArmChair_01",
+      "name": "Arm Chair 01",
+      "authors": [
+        "Kirill Sannikov"
+      ],
+      "trisBefore": 5626,
+      "tris": 5626,
+      "bytes": 152912,
+      "tex": 512,
+      "size": [
+        0.848,
+        1.065,
+        0.766
+      ],
+      "min": [
+        -0.424,
+        0,
+        -0.417
+      ],
+      "max": [
+        0.424,
+        1.065,
+        0.348
+      ]
+    },
+    "rocking-chair": {
+      "id": "rocking-chair",
+      "ph": "Rockingchair_01",
+      "name": "Rockingchair 01",
+      "authors": [
+        "Jorge Camacho"
+      ],
+      "trisBefore": 11866,
+      "tris": 9000,
+      "bytes": 241128,
+      "tex": 512,
+      "size": [
+        0.708,
+        0.995,
+        0.834
+      ],
+      "min": [
+        -0.354,
+        0.102,
+        -0.354
+      ],
+      "max": [
+        0.354,
+        1.097,
+        0.479
+      ]
+    },
+    "tall-plant": {
+      "id": "tall-plant",
+      "ph": "potted_plant_01",
+      "name": "Potted Plant 01",
+      "authors": [
+        "Rico Cilliers"
+      ],
+      "trisBefore": 176226,
+      "tris": 15848,
+      "bytes": 461652,
+      "tex": 512,
+      "size": [
+        0.587,
+        1.335,
+        0.634
+      ],
+      "min": [
+        -0.338,
+        0.001,
+        -0.364
+      ],
+      "max": [
+        0.249,
+        1.336,
+        0.27
+      ]
+    },
+    "leafy-plant": {
+      "id": "leafy-plant",
+      "ph": "potted_plant_02",
+      "name": "Potted Plant 02",
+      "authors": [
+        "Rico Cilliers"
+      ],
+      "trisBefore": 69806,
+      "tris": 11986,
+      "bytes": 323384,
+      "tex": 512,
+      "size": [
+        0.701,
+        0.84,
+        0.656
+      ],
+      "min": [
+        -0.396,
+        0,
+        -0.42
+      ],
+      "max": [
+        0.304,
+        0.84,
+        0.236
+      ]
+    },
+    "grandfather-clock": {
+      "id": "grandfather-clock",
+      "ph": "vintage_grandfather_clock_01",
+      "name": "Vintage Grandfather Clock 01",
+      "authors": [
+        "Yann Kervran",
+        "James Ray Cock"
+      ],
+      "trisBefore": 8582,
+      "tris": 8582,
+      "bytes": 271308,
+      "tex": 512,
+      "size": [
+        0.626,
+        2.191,
+        0.427
+      ],
+      "min": [
+        -0.25,
+        0,
+        -0.251
+      ],
+      "max": [
+        0.376,
+        2.191,
+        0.176
+      ]
+    },
+    "tv": {
+      "id": "tv",
+      "ph": "television_02",
+      "name": "Television 02",
+      "authors": [
+        "Benny Weimer"
+      ],
+      "trisBefore": 2310,
+      "tris": 2310,
+      "bytes": 75092,
+      "tex": 512,
+      "size": [
+        0.4,
+        0.411,
+        0.35
+      ],
+      "min": [
+        -0.202,
+        0,
+        -0.228
+      ],
+      "max": [
+        0.198,
+        0.411,
+        0.122
+      ]
+    },
+    "desk-lamp": {
+      "id": "desk-lamp",
+      "ph": "desk_lamp_arm_01",
+      "name": "Desk Lamp Arm 01",
+      "authors": [
+        "Yann Kervran",
+        "Kuutti Siitonen"
+      ],
+      "trisBefore": 24102,
+      "tris": 6784,
+      "bytes": 210508,
+      "tex": 512,
+      "size": [
+        0.202,
+        0.893,
+        0.614
+      ],
+      "min": [
+        -0.118,
+        -0.088,
+        -0.297
+      ],
+      "max": [
+        0.083,
+        0.805,
+        0.317
+      ]
+    },
+    "school-chair": {
+      "id": "school-chair",
+      "ph": "SchoolChair_01",
+      "name": "School Chair 01",
+      "authors": [
+        "Ethan Place"
+      ],
+      "trisBefore": 5072,
+      "tris": 5072,
+      "bytes": 114008,
+      "tex": 512,
+      "size": [
+        0.566,
+        1.006,
+        0.675
+      ],
+      "min": [
+        -0.283,
+        -0.002,
+        -0.338
+      ],
+      "max": [
+        0.283,
+        1.004,
+        0.338
+      ]
+    },
+    "suitcase": {
+      "id": "suitcase",
+      "ph": "vintage_suitcase",
+      "name": "Vintage Suitcase",
+      "authors": [
+        "Maximilian Schuster"
+      ],
+      "trisBefore": 16474,
+      "tris": 7346,
+      "bytes": 135992,
+      "tex": 512,
+      "size": [
+        1.607,
+        0.568,
+        0.239
+      ],
+      "min": [
+        -0.803,
+        0,
+        -0.129
+      ],
+      "max": [
+        0.804,
+        0.568,
+        0.11
+      ]
+    },
+    "wall-clock": {
+      "id": "wall-clock",
+      "ph": "wall_clock",
+      "name": "Wall Clock",
+      "authors": [
+        "PierreB3D"
+      ],
+      "trisBefore": 3658,
+      "tris": 3658,
+      "bytes": 125748,
+      "tex": 512,
+      "size": [
+        0.32,
+        0.32,
+        0.047
+      ],
+      "min": [
+        -0.16,
+        -0.16,
+        0
+      ],
+      "max": [
+        0.16,
+        0.16,
+        0.047
+      ]
+    },
+    "microwave": {
+      "id": "microwave",
+      "ph": "vintage_microwave",
+      "name": "Vintage Microwave",
+      "authors": [
+        "Adam Nekola"
+      ],
+      "trisBefore": 8120,
+      "tris": 5998,
+      "bytes": 148540,
+      "tex": 512,
+      "size": [
+        1.074,
+        0.526,
+        0.746
+      ],
+      "min": [
+        -0.504,
+        0,
+        -0.359
+      ],
+      "max": [
+        0.57,
+        0.526,
+        0.386
+      ]
+    },
+    "pillows": {
+      "id": "pillows",
+      "ph": "throw_pillows_01",
+      "name": "Throw Pillows 01",
+      "authors": [
+        "Serhii Khromov"
+      ],
+      "trisBefore": 6362,
+      "tris": 5998,
+      "bytes": 147888,
+      "tex": 512,
+      "size": [
+        0.94,
+        0.45,
+        0.452
+      ],
+      "min": [
+        -0.464,
+        -0.002,
+        -0.176
+      ],
+      "max": [
+        0.477,
+        0.448,
+        0.276
+      ]
+    },
+    "boombox": {
+      "id": "boombox",
+      "ph": "boombox",
+      "name": "Boombox",
+      "authors": [
+        "Thomas Paul Mouilleron"
+      ],
+      "trisBefore": 10168,
+      "tris": 6058,
+      "bytes": 197184,
+      "tex": 512,
+      "size": [
+        0.724,
+        0.47,
+        0.186
+      ],
+      "min": [
+        -0.362,
+        0,
+        -0.073
+      ],
+      "max": [
+        0.362,
+        0.47,
+        0.113
+      ]
+    },
+    "painting": {
+      "id": "painting",
+      "ph": "hanging_picture_frame_02",
+      "name": "Hanging Picture Frame 02",
+      "authors": [
+        "James Ray Cock"
+      ],
+      "trisBefore": 3678,
+      "tris": 3678,
+      "bytes": 105064,
+      "tex": 512,
+      "size": [
+        0.752,
+        0.5,
+        0.033
+      ],
+      "min": [
+        -0.376,
+        -0.279,
+        0.002
+      ],
+      "max": [
+        0.376,
+        0.221,
+        0.035
+      ]
+    },
+    "kettle": {
+      "id": "kettle",
+      "ph": "vintage_electric_kettle",
+      "name": "Vintage Electric Kettle",
+      "authors": [
+        "SV Garip"
+      ],
+      "trisBefore": 14838,
+      "tris": 6762,
+      "bytes": 178380,
+      "tex": 512,
+      "size": [
+        0.321,
+        0.304,
+        0.248
+      ],
+      "min": [
+        -0.165,
+        0,
+        -0.124
+      ],
+      "max": [
+        0.156,
+        0.304,
+        0.124
+      ]
+    },
+    "tea-set": {
+      "id": "tea-set",
+      "ph": "tea_set_01",
+      "name": "Tea Set 01",
+      "authors": [
+        "James Ray Cock",
+        "Rico Cilliers",
+        "Jurita Burger"
+      ],
+      "trisBefore": 40296,
+      "tris": 8988,
+      "bytes": 166904,
+      "tex": 512,
+      "size": [
+        0.918,
+        0.165,
+        0.484
+      ],
+      "min": [
+        -0.441,
+        -0.001,
+        -0.284
+      ],
+      "max": [
+        0.478,
+        0.164,
+        0.2
+      ]
+    },
+    "blue-vase": {
+      "id": "blue-vase",
+      "ph": "antique_ceramic_vase_01",
+      "name": "Antique Ceramic Vase 01",
+      "authors": [
+        "James Ray Cock"
+      ],
+      "trisBefore": 9408,
+      "tris": 6000,
+      "bytes": 119104,
+      "tex": 512,
+      "size": [
+        0.255,
+        0.44,
+        0.255
+      ],
+      "min": [
+        -0.128,
+        0,
+        -0.128
+      ],
+      "max": [
+        0.128,
+        0.439,
+        0.128
+      ]
+    },
+    "laptop": {
+      "id": "laptop",
+      "ph": "classic_laptop",
+      "name": "Classic Laptop",
+      "authors": [
+        "Arrangemonk"
+      ],
+      "trisBefore": 14450,
+      "tris": 6074,
+      "bytes": 225176,
+      "tex": 512,
+      "size": [
+        0.652,
+        0.543,
+        0.486
+      ],
+      "min": [
+        -0.326,
+        -0.001,
+        -0.242
+      ],
+      "max": [
+        0.326,
+        0.542,
+        0.244
+      ]
+    },
+    "wine-bottles": {
+      "id": "wine-bottles",
+      "ph": "wine_bottles_01",
+      "name": "Wine Bottles 01",
+      "authors": [
+        "Rico Cilliers",
+        "Jurita Burger"
+      ],
+      "trisBefore": 28848,
+      "tris": 6050,
+      "bytes": 164776,
+      "tex": 512,
+      "size": [
+        0.676,
+        0.331,
+        0.081
+      ],
+      "min": [
+        -0.036,
+        0,
+        -0.04
+      ],
+      "max": [
+        0.64,
+        0.331,
+        0.04
+      ]
+    },
+    "mantel-clock": {
+      "id": "mantel-clock",
+      "ph": "mantel_clock_01",
+      "name": "Mantel Clock 01",
+      "authors": [
+        "Yann Kervran",
+        "Rico Cilliers"
+      ],
+      "trisBefore": 25721,
+      "tris": 5997,
+      "bytes": 155684,
+      "tex": 512,
+      "size": [
+        0.342,
+        0.16,
+        0.126
+      ],
+      "min": [
+        -0.171,
+        0,
+        -0.063
+      ],
+      "max": [
+        0.171,
+        0.161,
+        0.063
+      ]
+    },
+    "oil-lamp": {
+      "id": "oil-lamp",
+      "ph": "vintage_oil_lamp",
+      "name": "Vintage Oil Lamp",
+      "authors": [
+        "Monsta3D"
+      ],
+      "trisBefore": 7208,
+      "tris": 6000,
+      "bytes": 149312,
+      "tex": 512,
+      "size": [
+        0.22,
+        0.802,
+        0.22
+      ],
+      "min": [
+        -0.11,
+        0,
+        -0.11
+      ],
+      "max": [
+        0.11,
+        0.802,
+        0.11
+      ]
+    },
+    "chess": {
+      "id": "chess",
+      "ph": "chess_set",
+      "name": "Chess Set",
+      "authors": [
+        "Riley Queen"
+      ],
+      "trisBefore": 76920,
+      "tris": 6487,
+      "bytes": 258820,
+      "tex": 512,
+      "size": [
+        0.551,
+        0.11,
+        0.548
+      ],
+      "min": [
+        -0.274,
+        0.002,
+        -0.274
+      ],
+      "max": [
+        0.277,
+        0.112,
+        0.274
+      ]
+    },
+    "cat-statue": {
+      "id": "cat-statue",
+      "ph": "concrete_cat_statue",
+      "name": "Concrete Cat Statue",
+      "authors": [
+        "Rico Cilliers",
+        "Riley Queen"
+      ],
+      "trisBefore": 11950,
+      "tris": 6000,
+      "bytes": 153276,
+      "tex": 512,
+      "size": [
+        0.153,
+        0.283,
+        0.25
+      ],
+      "min": [
+        -0.078,
+        0,
+        -0.15
+      ],
+      "max": [
+        0.075,
+        0.283,
+        0.1
+      ]
+    },
+    "lantern": {
+      "id": "lantern",
+      "ph": "wooden_lantern_01",
+      "name": "Wooden Lantern 01",
+      "authors": [
+        "James Ray Cock"
+      ],
+      "trisBefore": 8321,
+      "tris": 6011,
+      "bytes": 182640,
+      "tex": 512,
+      "size": [
+        0.221,
+        0.53,
+        0.235
+      ],
+      "min": [
+        -0.111,
+        -0.011,
+        -0.111
+      ],
+      "max": [
+        0.111,
+        0.519,
+        0.124
+      ]
+    },
+    "watering-can": {
+      "id": "watering-can",
+      "ph": "watering_can_metal_01",
+      "name": "Watering Can Metal 01",
+      "authors": [
+        "Charles Nderitu"
+      ],
+      "trisBefore": 11837,
+      "tris": 5999,
+      "bytes": 162576,
+      "tex": 512,
+      "size": [
+        0.191,
+        0.197,
+        0.452
+      ],
+      "min": [
+        -0.095,
+        -0.001,
+        -0.175
+      ],
+      "max": [
+        0.096,
+        0.196,
+        0.278
+      ]
+    },
+    "cake": {
+      "id": "cake",
+      "ph": "strawberry_chocolate_cake",
+      "name": "Strawberry Chocolate Cake",
+      "authors": [
+        "Kuutti Siitonen"
+      ],
+      "trisBefore": 27054,
+      "tris": 5996,
+      "bytes": 175280,
+      "tex": 512,
+      "size": [
+        0.244,
+        0.078,
+        0.24
+      ],
+      "min": [
+        -0.124,
+        0,
+        -0.127
+      ],
+      "max": [
+        0.12,
+        0.078,
+        0.113
+      ]
+    },
+    "ukulele": {
+      "id": "ukulele",
+      "ph": "Ukulele_01",
+      "name": "Ukulele 01",
+      "authors": [
+        "Joseph Burgan"
+      ],
+      "trisBefore": 8912,
+      "tris": 6000,
+      "bytes": 192384,
+      "tex": 512,
+      "size": [
+        0.178,
+        0.527,
+        0.051
+      ],
+      "min": [
+        -0.089,
+        0,
+        -0.022
+      ],
+      "max": [
+        0.089,
+        0.527,
+        0.029
+      ]
+    },
+    "basket": {
+      "id": "basket",
+      "ph": "wicker_basket_01",
+      "name": "Wicker Basket 01",
+      "authors": [
+        "Kuutti Siitonen"
+      ],
+      "trisBefore": 22276,
+      "tris": 5998,
+      "bytes": 170832,
+      "tex": 512,
+      "size": [
+        0.383,
+        0.117,
+        0.294
+      ],
+      "min": [
+        -0.192,
+        -0.001,
+        -0.147
+      ],
+      "max": [
+        0.191,
+        0.117,
+        0.147
+      ]
+    },
+    "alarm-clock": {
+      "id": "alarm-clock",
+      "ph": "alarm_clock_01",
+      "name": "Alarm Clock 01",
+      "authors": [
+        "Yann Kervran",
+        "James Ray Cock"
+      ],
+      "trisBefore": 8985,
+      "tris": 6119,
+      "bytes": 172868,
+      "tex": 256,
+      "size": [
+        0.132,
+        0.174,
+        0.066
+      ],
+      "min": [
+        -0.066,
+        -0.001,
+        -0.024
+      ],
+      "max": [
+        0.066,
+        0.173,
+        0.042
+      ]
+    },
+    "duck": {
+      "id": "duck",
+      "ph": "rubber_duck_toy",
+      "name": "Rubber Duck Toy",
+      "authors": [
+        "Plat251"
+      ],
+      "trisBefore": 4288,
+      "tris": 4288,
+      "bytes": 86500,
+      "tex": 256,
+      "size": [
+        0.213,
+        0.286,
+        0.3
+      ],
+      "min": [
+        -0.107,
+        0,
+        -0.146
+      ],
+      "max": [
+        0.107,
+        0.285,
+        0.154
+      ]
+    },
+    "camera": {
+      "id": "camera",
+      "ph": "Camera_01",
+      "name": "Camera 01",
+      "authors": [
+        "Rajil Jose Macatangay"
+      ],
+      "trisBefore": 26987,
+      "tris": 5340,
+      "bytes": 212600,
+      "tex": 256,
+      "size": [
+        0.214,
+        0.078,
+        0.263
+      ],
+      "min": [
+        -0.136,
+        0,
+        -0.061
+      ],
+      "max": [
+        0.078,
+        0.078,
+        0.202
+      ]
+    },
+    "cassette": {
+      "id": "cassette",
+      "ph": "cassette_player",
+      "name": "Cassette Player",
+      "authors": [
+        "Oday Abuzaeed"
+      ],
+      "trisBefore": 4830,
+      "tris": 4830,
+      "bytes": 150260,
+      "tex": 256,
+      "size": [
+        0.129,
+        0.237,
+        0.049
+      ],
+      "min": [
+        -0.065,
+        -0.111,
+        0
+      ],
+      "max": [
+        0.064,
+        0.126,
+        0.049
+      ]
+    },
+    "binoculars": {
+      "id": "binoculars",
+      "ph": "vintage_binocular",
+      "name": "Vintage Binoculars",
+      "authors": [
+        "Luke"
+      ],
+      "trisBefore": 19362,
+      "tris": 5447,
+      "bytes": 183424,
+      "tex": 256,
+      "size": [
+        0.194,
+        0.068,
+        0.199
+      ],
+      "min": [
+        -0.097,
+        -0.027,
+        -0.098
+      ],
+      "max": [
+        0.097,
+        0.041,
+        0.101
+      ]
+    },
+    "apple": {
+      "id": "apple",
+      "ph": "food_apple_01",
+      "name": "Food Apple 01",
+      "authors": [
+        "Oliver Harries"
+      ],
+      "trisBefore": 7012,
+      "tris": 5000,
+      "bytes": 108768,
+      "tex": 256,
+      "size": [
+        0.098,
+        0.085,
+        0.096
+      ],
+      "min": [
+        -0.048,
+        0,
+        -0.046
+      ],
+      "max": [
+        0.049,
+        0.085,
+        0.05
+      ]
+    },
+    "lemon": {
+      "id": "lemon",
+      "ph": "lemon",
+      "name": "Lemon",
+      "authors": [
+        "Kuutti Siitonen"
+      ],
+      "trisBefore": 4012,
+      "tris": 4012,
+      "bytes": 95484,
+      "tex": 256,
+      "size": [
+        0.069,
+        0.095,
+        0.068
+      ],
+      "min": [
+        -0.036,
+        -0.052,
+        -0.035
+      ],
+      "max": [
+        0.033,
+        0.043,
+        0.034
+      ]
+    },
+    "horse": {
+      "id": "horse",
+      "ph": "horse_statue_01",
+      "name": "Horse Statue 01",
+      "authors": [
+        "Rico Cilliers"
+      ],
+      "trisBefore": 22388,
+      "tris": 5430,
+      "bytes": 183696,
+      "tex": 256,
+      "size": [
+        0.163,
+        0.22,
+        0.108
+      ],
+      "min": [
+        -0.085,
+        0,
+        -0.054
+      ],
+      "max": [
+        0.078,
+        0.22,
+        0.054
+      ]
+    },
+    "elephant": {
+      "id": "elephant",
+      "ph": "carved_wooden_elephant",
+      "name": "Carved Wooden Elephant",
+      "authors": [
+        "Greg Zaal"
+      ],
+      "trisBefore": 2752,
+      "tris": 2752,
+      "bytes": 75908,
+      "tex": 256,
+      "size": [
+        0.109,
+        0.096,
+        0.058
+      ],
+      "min": [
+        -0.062,
+        -0.001,
+        -0.025
+      ],
+      "max": [
+        0.048,
+        0.096,
+        0.033
+      ]
+    },
+    "jug": {
+      "id": "jug",
+      "ph": "jug_01",
+      "name": "Jug 01",
+      "authors": [
+        "Kuutti Siitonen"
+      ],
+      "trisBefore": 5770,
+      "tris": 5000,
+      "bytes": 97632,
+      "tex": 256,
+      "size": [
+        0.275,
+        0.211,
+        0.168
+      ],
+      "min": [
+        -0.152,
+        0,
+        -0.084
+      ],
+      "max": [
+        0.123,
+        0.212,
+        0.084
+      ]
+    },
+    "photo-frame": {
+      "id": "photo-frame",
+      "ph": "standing_picture_frame_01",
+      "name": "Standing Picture Frame 01",
+      "authors": [
+        "James Ray Cock"
+      ],
+      "trisBefore": 1634,
+      "tris": 1634,
+      "bytes": 54940,
+      "tex": 256,
+      "size": [
+        0.1,
+        0.25,
+        0.201
+      ],
+      "min": [
+        -0.062,
+        0,
+        -0.1
+      ],
+      "max": [
+        0.039,
+        0.249,
+        0.1
+      ]
+    },
+    "succulent": {
+      "id": "succulent",
+      "ph": "potted_plant_04",
+      "name": "Potted Plant 04",
+      "authors": [
+        "James Ray Cock"
+      ],
+      "trisBefore": 8929,
+      "tris": 7105,
+      "bytes": 175900,
+      "tex": 256,
+      "size": [
+        0.168,
+        0.267,
+        0.185
+      ],
+      "min": [
+        -0.084,
+        0,
+        -0.084
+      ],
+      "max": [
+        0.084,
+        0.268,
+        0.101
+      ]
+    },
+    "bananas": {
+      "id": "bananas",
+      "ph": "bananas",
+      "name": "Bananas",
+      "authors": [
+        "Alexander Shulha"
+      ],
+      "trisBefore": 46868,
+      "tris": 7842,
+      "bytes": 166288,
+      "tex": 256,
+      "size": [
+        0.6,
+        0.179,
+        0.244
+      ],
+      "min": [
+        -0.245,
+        -0.038,
+        -0.114
+      ],
+      "max": [
+        0.355,
+        0.141,
+        0.13
+      ]
+    },
+    "enamel-pot": {
+      "id": "enamel-pot",
+      "ph": "pot_enamel_01",
+      "name": "Pot Enamel 01",
+      "authors": [
+        "Kuutti Siitonen"
+      ],
+      "trisBefore": 11416,
+      "tris": 5012,
+      "bytes": 105460,
+      "tex": 256,
+      "size": [
+        0.263,
+        0.178,
+        0.18
+      ],
+      "min": [
+        -0.131,
+        0,
+        -0.09
+      ],
+      "max": [
+        0.131,
+        0.178,
+        0.09
+      ]
+    },
+    "oil-painting": {
+      "id": "oil-painting",
+      "ph": "fancy_picture_frame_01",
+      "name": "Fancy Picture Frame 01",
+      "authors": [
+        "Rob Tuytel",
+        "Rico Cilliers"
+      ],
+      "trisBefore": 938,
+      "tris": 938,
+      "bytes": 48460,
+      "tex": 512,
+      "size": [
+        0.603,
+        0.464,
+        0.02
+      ],
+      "min": [
+        -0.302,
+        -0.232,
+        0.002
+      ],
+      "max": [
+        0.302,
+        0.232,
+        0.022
+      ]
+    }
+  },
+  "textures": {
+    "parquet": {
+      "id": "parquet",
+      "ph": "herringbone_parquet",
+      "name": "Herringbone Parquet",
+      "authors": [
+        "Jenelle van Heerden",
+        "Sergej Majboroda"
+      ],
+      "bytes": {
+        "diff": 146104,
+        "nor": 1700,
+        "arm": 3918
+      },
+      "size": 1024
+    },
+    "oak-floor": {
+      "id": "oak-floor",
+      "ph": "laminate_floor_02",
+      "name": "Laminate Floor 02",
+      "authors": [
+        "Dario Barresi",
+        "Charlotte Baglioni"
+      ],
+      "bytes": {
+        "diff": 128326,
+        "nor": 2084,
+        "arm": 4184
+      },
+      "size": 1024
+    },
+    "checker-tile": {
+      "id": "checker-tile",
+      "ph": "floor_tiles_06",
+      "name": "Floor Tiles 06",
+      "authors": [
+        "Rob Tuytel"
+      ],
+      "bytes": {
+        "diff": 63744,
+        "nor": 1370,
+        "arm": 4322
+      },
+      "size": 1024
+    },
+    "stone-tile": {
+      "id": "stone-tile",
+      "ph": "floor_tiles_08",
+      "name": "Floor Tiles 08",
+      "authors": [
+        "Rob Tuytel"
+      ],
+      "bytes": {
+        "diff": 18212,
+        "nor": 5678,
+        "arm": 6848
+      },
+      "size": 512
+    },
+    "plaster": {
+      "id": "plaster",
+      "ph": "beige_wall_001",
+      "name": "Beige Wall 001",
+      "authors": [
+        "Dimitrios Savva",
+        "Rico Cilliers"
+      ],
+      "bytes": {
+        "nor": 2512
+      },
+      "size": 512
+    },
+    "rug": {
+      "id": "rug",
+      "ph": "fabric_pattern_05",
+      "name": "Fabric Pattern 05",
+      "authors": [
+        "Rob Tuytel"
+      ],
+      "bytes": {
+        "diff": 97310,
+        "nor": 57996
+      },
+      "size": 512
+    },
+    "garden": {
+      "id": "garden",
+      "ph": "charolettenbrunn_park",
+      "name": "Charolettenbrunn Park",
+      "authors": [
+        "Grzegorz Wronkowski"
+      ],
+      "bytes": {
+        "sky": 375678
+      },
+      "size": 2048
+    }
+  },
+  "generatedBy": "scripts/fetch-assets.mjs"
+}

@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="3Dの家を1分歩いて覚え、目を閉じているあいだに消えた物を1つ、みんなで当てる間違い探し。家具は本物そっくりの3Dモデル。">
+<meta name="share:text" content="消えたのは、どれ？ 3Dの家を1分歩いて覚えて、消えた物をみんなで当てる間違い探し。">
+<meta name="theme-color" content="#1f1a16">
+<title>消えたのは、どれ？</title>
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="app.css">
+<script type="module" src="app.js"></script>
+<link rel="stylesheet" href="shared/share.css">
+<script src="shared/share.js" defer></script>
+</head>
+<body>
+<main id="app" data-phase="title" data-loaded="false">
+  <canvas id="scene" aria-label="3Dの家の中の眺め"></canvas>
+
+  <header class="hud hud-top" aria-label="いまの問題">
+    <p class="hud-round"><span id="round-no">1問目</span><b id="phase-name">覚える</b></p>
+    <p class="hud-timer" role="timer"><strong id="timer">60</strong><span>秒</span></p>
+    <div class="hud-buttons">
+      <button id="mute" type="button" class="icon-button" aria-pressed="false" aria-label="音を消す"><span aria-hidden="true">♪</span></button>
+      <button id="pause" type="button" class="icon-button" aria-label="一時停止"><span aria-hidden="true">Ⅱ</span></button>
+    </div>
+  </header>
+  <!-- 目標の帯と操作の案内は1つの箱に縦に積む。別々に置くと、目標が2行に折れたときに案内の帯が重なった -->
+  <div class="hud hud-guide">
+    <p id="hud-message" class="hud-message" role="status" aria-live="polite"></p>
+    <p id="controls-hint" class="controls-hint"><span class="for-pointer">床をクリックでそこへ歩く・ドラッグで見回す・WASDキーでも歩ける<br>左下の見取り図の部屋を押すと、その部屋へ行く</span><span class="for-touch">床をタップでそこへ歩く・ドラッグで見回す<br>左下の見取り図の部屋を押すと、その部屋へ行く</span></p>
+  </div>
+  <div class="hud hud-bottom">
+    <canvas id="minimap" width="200" height="150" role="img" aria-label="見取り図。部屋を押すとそこへ歩く"></canvas>
+    <div class="hud-actions">
+      <button id="hint" type="button" class="secondary hint-button" hidden>ヒント：部屋を見る</button>
+      <button id="primary" type="button" class="primary">覚えた！</button>
+    </div>
+    <div id="joystick" class="joystick" aria-hidden="true"><i></i></div>
+  </div>
+
+  <section id="title-screen" class="screen title-screen" aria-labelledby="title-heading">
+    <div class="title-card">
+      <p class="eyebrow"><a href="../" class="day-link" aria-label="100日チャレンジの一覧へ">100 DAYS / 054</a></p>
+      <h1 id="title-heading">消えたのは、<br>どれ？</h1>
+      <p id="challenge-badge" class="challenge-badge" hidden></p>
+      <ol class="how-to">
+        <li><span><b>60秒</b>で家の中を歩いて覚える</span></li>
+        <li><span>目を閉じているあいだに、<b>1つ消える</b></span></li>
+        <li><span>みんなで話して、<b>消えた物</b>を当てる</span></li>
+      </ol>
+      <fieldset class="levels">
+        <legend>むずかしさ</legend>
+        <label><input type="radio" name="level" value="easy"><span><b>かんたん</b><small>大きな物</small></span></label>
+        <label><input type="radio" name="level" value="normal" checked><span><b>ふつう</b><small>中くらい</small></span></label>
+        <label><input type="radio" name="level" value="hard"><span><b>むずかしい</b><small>小さな物</small></span></label>
+      </fieldset>
+      <button id="start" type="button" class="primary start" disabled>家具を運び込んでいます…</button>
+      <div class="load-bar" aria-hidden="true"><i id="load-fill"></i></div>
+      <p class="title-links"><button id="share-open" type="button" class="link-button" aria-label="このアプリを共有する" aria-controls="share-dialog">共有する</button><button id="about-open" type="button" class="link-button" aria-controls="about-dialog">遊び方と素材の出典</button></p>
+    </div>
+  </section>
+
+  <section id="ready-screen" class="banner" hidden aria-live="polite">
+    <p id="ready-round" class="banner-round">1問目</p>
+    <p id="ready-text" class="banner-text">60秒で、家の中を覚えよう</p>
+  </section>
+
+  <div id="fade" class="fade" aria-hidden="true"></div>
+  <div id="eyelids" class="eyelids" aria-hidden="true"><i class="lid lid-top"></i><i class="lid lid-bottom"></i><p id="lid-text">目を閉じて…</p></div>
+
+  <section id="pause-screen" class="screen" hidden aria-labelledby="pause-heading">
+    <div class="card">
+      <h2 id="pause-heading">一時停止中</h2>
+      <p>時間は止まっています。相談が終わったら続けましょう。</p>
+      <button id="resume" type="button" class="primary">続ける</button>
+      <button id="quit" type="button" class="secondary">最初の画面に戻る</button>
+    </div>
+  </section>
+
+  <section id="answer-screen" class="screen answer-screen" hidden aria-labelledby="answer-heading">
+    <div class="answer-card">
+      <h2 id="answer-heading">消えたのは、どれ？</h2>
+      <p class="answer-lead">みんなで相談して、1つ選んでください</p>
+      <div id="choices" class="choices" role="radiogroup" aria-labelledby="answer-heading"></div>
+      <div class="answer-actions">
+        <button id="confirm" type="button" class="primary" disabled>これにする</button>
+      </div>
+    </div>
+  </section>
+
+  <p id="spot" class="spot" hidden aria-hidden="true"><span id="spot-text"></span></p>
+  <section id="reveal-panel" class="reveal-panel" hidden aria-live="polite" aria-labelledby="reveal-verdict">
+    <p id="reveal-verdict" class="reveal-verdict">正解！</p>
+    <p id="reveal-text" class="reveal-text"></p>
+    <p id="reveal-choice" class="reveal-choice" hidden></p>
+    <div class="reveal-actions">
+      <button id="look-choice" type="button" class="secondary" hidden>えらんだ物を見に行く</button>
+      <button id="next" type="button" class="primary">次の問題へ</button>
+    </div>
+  </section>
+
+  <section id="result-screen" class="screen" hidden aria-labelledby="result-heading" tabindex="-1">
+    <div class="card result-card">
+      <p class="eyebrow" id="result-level">ふつう</p>
+      <h2 id="result-heading"><span id="result-score">2</span><small> / 3問 正解</small></h2>
+      <p id="result-title" class="result-title">するどい目</p>
+      <ol id="result-list" class="result-list"></ol>
+      <div class="result-share" role="group" aria-labelledby="result-share-title">
+        <h3 id="result-share-title">同じ家で、友だちに挑戦してもらう</h3>
+        <div class="result-share-row">
+          <a id="result-x" class="share-chip" target="_blank" rel="noopener noreferrer">Xで送る</a>
+          <a id="result-line" class="share-chip" target="_blank" rel="noopener noreferrer">LINEで送る</a>
+          <button id="result-copy" type="button" class="share-chip">リンクをコピー</button>
+        </div>
+        <p id="result-copied" class="copied" role="status"></p>
+      </div>
+      <button id="again" type="button" class="primary">次の家で遊ぶ</button>
+      <button id="to-title" type="button" class="secondary">むずかしさを変える</button>
+    </div>
+  </section>
+
+  <section id="fatal-screen" class="screen" hidden aria-labelledby="fatal-heading">
+    <div class="card">
+      <h2 id="fatal-heading">家を開けられませんでした</h2>
+      <p id="fatal-message">この端末では3Dの表示ができないようです。</p>
+      <button id="reload" type="button" class="primary">読み込み直す</button>
+    </div>
+  </section>
+
+  <dialog id="share-dialog" class="sheet" aria-label="このアプリを共有する">
+    <div id="share"></div>
+    <div class="sheet-foot"><button type="button" class="secondary" data-close>閉じる</button></div>
+  </dialog>
+
+  <dialog id="about-dialog" class="sheet about" aria-labelledby="about-title">
+    <h2 id="about-title">遊び方と素材の出典</h2>
+    <h3>遊び方</h3>
+    <p>1人が操作して、みんなで画面を見ます。3問で1ゲームです。</p>
+    <ol class="about-steps">
+      <li>60秒で、家の中を歩いて覚える</li>
+      <li>目を閉じているあいだに、物が1つ消える</li>
+      <li>次の60秒で歩いて探す</li>
+      <li>候補から、消えた物をみんなで選ぶ</li>
+    </ol>
+    <h3>歩き方</h3>
+    <p>見たい床を押すと、そこまで歩きます。ドラッグで見回せます。パソコンは<span class="nowrap">WASDキー</span>と矢印キー、スマホは右下のスティックでも歩けます。左下の見取り図の部屋を押すと、その部屋へ行きます。</p>
+    <h3>素材</h3>
+    <p>家具と小物は <a href="https://polyhaven.com/" target="_blank" rel="noopener noreferrer" class="nowrap">Poly Haven</a> の3Dモデル（CC0）です。床・敷物の質感と、窓の外の庭の写真（実写のパノラマ）も同じく <span class="nowrap">Poly Haven</span>（CC0）です。ブラウザ向けに面の数と画像の大きさを減らし、一部は大きさを実物に合わせて縮めています。壁・窓・扉・日差し・効果音はコードで作っています。詳しくは <a href="data/SOURCES.md">素材の一覧</a> と <a href="vendor/LICENSE-three.txt">3Dライブラリのライセンス</a>。</p>
+    <h3>保存するもの</h3>
+    <p>音のオン・オフと、選んだむずかしさだけをこの端末に保存します。外部との通信はありません（共有先や外部リンクを自分で開く操作を除きます）。挑戦リンクに入るのは、むずかしさと家の番号だけです。</p>
+    <p><a href="../privacy.html">プライバシー</a></p>
+    <div class="sheet-foot"><button type="button" class="secondary" data-close>閉じる</button></div>
+  </dialog>
+</main>
+</body>
+</html>

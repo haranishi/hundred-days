@@ -87,6 +87,7 @@ Day 051「ハコニワ」も外部公開アプリです。本体は独立リポ�
 | 051 | ハコニワ — 全国3Dミニチュアマップ | [制作記録のみ](day-051-hakoniwa/) | [紹介ページ](https://hakoniwa-map.haranishi.workers.dev/japan/) |
 | 052 | 湯けむり日本地図 | [day-052-onsen-map/](day-052-onsen-map/) | [アプリを開く](https://hundred-days.pages.dev/day-052-onsen-map/) |
 | 053 | ことば辻 | [day-053-kotoba-tsuji/](day-053-kotoba-tsuji/) | [アプリを開く](https://hundred-days.pages.dev/day-053-kotoba-tsuji/) |
+| 054 | 消えたのは、どれ？ | [day-054-what-vanished/](day-054-what-vanished/) | [アプリを開く](https://hundred-days.pages.dev/day-054-what-vanished/) |
 <!-- day-index:end -->
 
 ## 1日アプリのルール
