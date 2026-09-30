@@ -7,6 +7,8 @@ import { planGame } from '../../day-054-what-vanished/lib/rules.js';
 /* Day 054 消えたのは、どれ？
    3Dの描画はCIではソフトウェア描画で遅いので、時間はテスト用の窓口 window.__day054.advance() で早送りする。
    ?pace=fast は覚える・探す時間を4秒にする録画・テスト用の進行、?clock=manual は時間を advance() だけで進める。
+   ?gfx=test は描画を軽くする（細かさ半分・影なし・描き直しは1秒に1回）。CI では1コマに数秒かかり、
+   操作のたびにそのコマを待たされて、1本150秒の上限に2本続けて届いた（2026-10-01 の PR #126）。
    外への通信はすべて塞いで数える。 */
 
 const APP = '/day-054-what-vanished/';
@@ -27,7 +29,7 @@ async function openApp(browser, { viewport = { width: 960, height: 600 }, hash =
   const page = await context.newPage();
   page.on('console', (m) => { if (m.type() === 'error') problems.console.push(m.text()); });
   page.on('pageerror', (e) => problems.console.push(String(e)));
-  await page.goto(`${APP}?pace=fast&clock=manual${hash}`);
+  await page.goto(`${APP}?pace=fast&clock=manual&gfx=test${hash}`);
   await page.waitForFunction(() => document.documentElement.dataset.ready === 'true', null, { timeout: 120_000 });
   return {
     page,

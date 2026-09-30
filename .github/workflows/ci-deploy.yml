@@ -21,8 +21,10 @@ jobs:
     # Dayが増えるとブラウザテストも増える。Day 040 で15分1秒、Day 041 で15分13秒に達し、
     # 15分の上限に当たって main のデプロイが cancelled になった（2026-09-17）。
     # 上限に当たったかどうかは run の conclusion が cancelled になるだけで理由が出ないので、
-    # 余裕を持たせておく。40日で15分なので、100日到達時の見込みは35分前後
-    timeout-minutes: 40
+    # 余裕を持たせておく。40日で15分なので、100日到達時の見込みは35分前後としていたが、
+    # Day 053 で約35分、Day 054（3Dの家）で40分の上限に当たって cancelled になった（2026-10-01・PR #126）。
+    # 3DのDayはソフトウェア描画で重く、日数に比例しない。上限は60分にし、重いDayはテスト側で描画を軽くする
+    timeout-minutes: 60
     steps:
       - name: Check out repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1

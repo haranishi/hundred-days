@@ -97,13 +97,14 @@ function contactShadowTexture() {
   return tex;
 }
 
-export async function createWorld({ canvas, manifest, onProgress = () => {}, pixelRatioCap = 1.75 }) {
-  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance', preserveDrawingBuffer: false });
+/** shadows・antialias は自動テストで切る（ソフトウェア描画では影と縁のなめらか処理がいちばん重い） */
+export async function createWorld({ canvas, manifest, onProgress = () => {}, pixelRatioCap = 1.75, shadows = true, antialias = true }) {
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias, powerPreference: 'high-performance', preserveDrawingBuffer: false });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, pixelRatioCap));
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure = 1.1;
-  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.enabled = shadows;
   renderer.shadowMap.type = THREE.PCFShadowMap;
   renderer.shadowMap.autoUpdate = false;
 
