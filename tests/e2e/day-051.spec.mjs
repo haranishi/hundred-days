@@ -14,6 +14,9 @@ for (const width of [390, 768, 1440]) {
     await expect(card).toContainText('309,253施設');
     const screenshot = card.locator('img');
     await expect(screenshot).toBeVisible();
+    /* 一覧のスクショは loading="lazy"。新しいDayが上に増えるとカードが下へずれ、
+       390px幅では読み込みの範囲の外に出る（Day 053 を足したときに落ちた）。人と同じくカードまで下げてから測る */
+    await screenshot.scrollIntoViewIfNeeded();
     await expect(screenshot).toHaveJSProperty('naturalWidth', 1440);
     const link = card.getByRole('link', { name: /紹介ページを開く/ });
     await expect(link).toHaveAttribute('href', appUrl);
