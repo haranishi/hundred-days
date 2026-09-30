@@ -1,6 +1,7 @@
 このリポジトリのソースコードは、以下の MIT ライセンスです。
 
-ただし day-*/data/ と day-*/tests/fixtures/ 配下の第三者データは MIT の対象外で、
+ただし day-*/data/ と day-*/tests/fixtures/ 配下の第三者データと、
+day-053-kotoba-tsuji/fonts/ の書体（SIL Open Font License 1.1）は MIT の対象外で、
 それぞれ別のライセンスが適用されます。内訳は THIRD_PARTY_NOTICES.md にあります。
 とくに次の2つは、再配布するときに条件が付きます。
 

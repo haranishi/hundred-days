@@ -1,0 +1,39 @@
+/* 同梱の2書体（SIL Open Font License 1.1・同じフォルダの OFL-*.txt）。
+   画面に出る字だけに絞った woff2（tools/subset-fonts.mjs・字の一覧は chars.txt）。
+   太さは app.css と tools/og.html で実際に使うものだけ：明朝 500・700・800、ゴシック 500・700 */
+
+@font-face {
+  font-family: "Shippori Mincho B1";
+  src: url("./ShipporiMinchoB1-Medium-subset.woff2") format("woff2");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Shippori Mincho B1";
+  src: url("./ShipporiMinchoB1-Bold-subset.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Shippori Mincho B1";
+  src: url("./ShipporiMinchoB1-ExtraBold-subset.woff2") format("woff2");
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Zen Kaku Gothic New";
+  src: url("./ZenKakuGothicNew-Medium-subset.woff2") format("woff2");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Zen Kaku Gothic New";
+  src: url("./ZenKakuGothicNew-Bold-subset.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
