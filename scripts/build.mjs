@@ -199,7 +199,11 @@ const CONNECT_BY_APP = {
   'day-037-baito-law': 'https://laws.e-gov.go.jp',
   /* day-038 は消費者物価指数を同梱しない（毎年あとから追加・改定されるので古い数字を焼き付けない）。
      起動のたびに日本と米国の指数を1リクエストで取りに行く */
-  'day-038-yen-back-then': 'https://api.worldbank.org'
+  'day-038-yen-back-then': 'https://api.worldbank.org',
+  /* day-054 は外部へは出ない。3Dモデル（.glb）に埋め込まれた質感画像を、three.js の GLTFLoader が
+     blob: のURLにしてから fetch で読む（Chrome は ImageBitmapLoader を使うため）。
+     'self' は blob: に合わないので、足さないと本番だけ家具が真っ白になる（2026-10-01 に本番と同じCSPで確認） */
+  'day-054-what-vanished': 'blob:'
 };
 
 /* day-025 の MapLibre は blob: から Web Worker を起こす。

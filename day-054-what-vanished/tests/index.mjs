@@ -1,0 +1,10 @@
+import './rng.test.mjs';
+import './assets.test.mjs';
+import './arrange.test.mjs';
+import './rules.test.mjs';
+import './nav.test.mjs';
+import './game.test.mjs';
+import './visibility.test.mjs';
+import './place.test.mjs';
+import './reveal.test.mjs';
+import './walk.test.mjs';

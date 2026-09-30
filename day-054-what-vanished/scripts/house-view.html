@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<title>家の撮影（確認用）</title>
+<style>html,body{margin:0;height:100%;background:#000}canvas{display:block;width:100vw;height:100vh}</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<script type="module">
+// 決まった位置から家を撮る確認用の画面。?at=x,z,yaw,pitch&seed=1&round=0&hide=id
+import { createWorld } from '../lib/world.js';
+import { arrange } from '../lib/arrange.js';
+import { HOUSE } from '../lib/plan.js';
+
+const q = new URLSearchParams(location.search);
+const manifest = await (await fetch('../data/models.json')).json();
+const world = await createWorld({ canvas: document.getElementById('c'), manifest, pixelRatioCap: 1 });
+world.setArrangement(arrange(manifest, Number(q.get('seed') || 1), Number(q.get('round') || 0)));
+for (const id of (q.get('hide') || '').split(',').filter(Boolean)) world.setHidden(id, true);
+const [x, z, yaw, pitch] = (q.get('at') || `${HOUSE.start.x},${HOUSE.start.z},${HOUSE.start.yaw},0`).split(',').map(Number);
+const h = Number(q.get('h') || HOUSE.eyeHeight);
+world.camera.position.set(x, h, z);
+world.camera.rotation.set(pitch * Math.PI / 180, yaw * Math.PI / 180, 0);
+world.setSize(innerWidth, innerHeight);
+world.render();
+requestAnimationFrame(() => { world.render(); requestAnimationFrame(() => { world.render(); window.__sheetReady = true; }); });
+window.__world = world;
+</script>
+</body>
+</html>

@@ -1,0 +1,660 @@
+/* 消えたのは、どれ？ — 家の眺めを主役にし、文字は上下の端へ。2m離れても読める大きさを下限にする */
+:root {
+  color-scheme: light;
+  --ink: #1f1a16;
+  --ink-soft: #5a4e44;
+  --paper: rgba(255, 252, 246, 0.94);
+  --paper-solid: #fffcf6;
+  --line: rgba(31, 26, 22, 0.14);
+  /* 主ボタンの白文字と4.5:1以上になる濃さ（#e86f26 は3.1:1で、見た目の採点で指摘された） */
+  --accent: #bf5519;
+  --accent-deep: #9a4212;
+  --accent-soft: #fde6d4;
+  --ok: #23804f;
+  --ng: #b8372a;
+  /* 「えらんだ物」の色。候補の画面でも答え合わせでも青にそろえ、だいだいは主ボタンと「正解の場所」だけに使う
+     （見た目の採点3周目：選んだ候補がだいだい→答え合わせで青になり、だいだいの意味が入れ替わっていた） */
+  --mine: #1f5fbf;
+  --mine-soft: #e4edfb;
+  --font: "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Noto Sans JP", "Yu Gothic", "Meiryo", system-ui, sans-serif;
+  --safe-t: env(safe-area-inset-top, 0px);
+  --safe-r: env(safe-area-inset-right, 0px);
+  --safe-b: env(safe-area-inset-bottom, 0px);
+  --safe-l: env(safe-area-inset-left, 0px);
+  --gap: 12px;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body {
+  background: #1f1a16;
+  color: var(--ink);
+  font-family: var(--font);
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+}
+button, input { font: inherit; }
+/* 短い日本語は語の切れ目（<wbr> と句読点）でだけ折り返す。長すぎる語は最後の手段でどこでも折る */
+.hud-message, .banner-text, .banner-round, #lid-text, .card p, .answer-lead, .choice .name, .reveal-text, .reveal-choice,
+.result-title, .result-list, .how-to li, .controls-hint, .challenge-badge, .levels small {
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+button { cursor: pointer; }
+a { color: var(--accent-deep); }
+
+#app {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  background: #1f1a16;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+#scene {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  cursor: grab;
+}
+#scene:active { cursor: grabbing; }
+
+/* ---------- ボタン ---------- */
+.primary, .secondary, .icon-button, .share-chip, .link-button {
+  min-height: 48px;
+  border-radius: 999px;
+  border: 0;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  transition: transform 0.12s ease, background-color 0.2s ease, box-shadow 0.2s ease;
+}
+.primary {
+  padding: 12px 28px;
+  background: var(--accent);
+  color: #fff;
+  font-size: 18px;
+  box-shadow: 0 6px 18px rgba(178, 79, 22, 0.35);
+}
+.primary:hover:not(:disabled) { background: var(--accent-deep); }
+.primary:active:not(:disabled) { transform: scale(0.97); }
+.primary:disabled { background: #b9aea4; box-shadow: none; cursor: default; }
+.secondary {
+  padding: 10px 22px;
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--ink);
+  font-size: 16px;
+  box-shadow: inset 0 0 0 1.5px var(--line);
+}
+.secondary:hover { background: #fff; box-shadow: inset 0 0 0 1.5px var(--accent); }
+.icon-button {
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  background: rgba(255, 252, 246, 0.9);
+  color: var(--ink);
+  font-size: 20px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.18);
+}
+.icon-button[aria-pressed="true"] { color: #9b8f84; text-decoration: line-through; }
+.link-button {
+  min-height: 44px;
+  padding: 8px 12px;
+  background: none;
+  color: var(--accent-deep);
+  font-size: 15px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+:focus-visible { outline: 3px solid #2b6fd6; outline-offset: 3px; }
+
+/* ---------- 画面の上下の札 ---------- */
+.hud { position: absolute; z-index: 5; pointer-events: none; opacity: 0; transition: opacity 0.35s ease; }
+.hud button, .hud canvas, .hud .joystick { pointer-events: auto; }
+#app[data-phase="ready"] .hud, #app[data-phase="memorize"] .hud, #app[data-phase="search"] .hud, #app[data-phase="closing"] .hud-top { opacity: 1; }
+#app[data-phase="title"] .hud, #app[data-phase="answer"] .hud, #app[data-phase="reveal"] .hud-bottom, #app[data-phase="reveal"] .controls-hint, #app[data-phase="result"] .hud { visibility: hidden; }
+#app[data-phase="reveal"] .hud-top { opacity: 1; }
+#app[data-phase="reveal"] .hud-timer, #app[data-phase="closing"] .hud-timer { visibility: hidden; }
+/* 一時停止できるのは時間が進む場面だけ。押しても何も起きないボタンは出さない（評価の2周目） */
+#app:not([data-phase="ready"]):not([data-phase="memorize"]):not([data-phase="search"]) #pause { display: none; }
+
+.hud-top {
+  top: calc(var(--safe-t) + 10px);
+  left: calc(var(--safe-l) + 10px);
+  right: calc(var(--safe-r) + 10px);
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: start;
+  gap: 8px;
+}
+.hud-round {
+  margin: 0;
+  justify-self: start;
+  display: inline-flex;
+  flex-direction: column;
+  padding: 8px 14px;
+  background: var(--paper);
+  border-radius: 14px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.16);
+  font-size: 14px;
+  line-height: 1.25;
+}
+.hud-round b { font-size: 20px; }
+#app[data-phase="search"] .hud-round b { color: var(--accent-deep); }
+.hud-timer {
+  margin: 0;
+  min-width: 108px;
+  padding: 2px 18px 6px;
+  text-align: center;
+  background: var(--paper);
+  border-radius: 18px;
+  box-shadow: 0 2px 14px rgba(0, 0, 0, 0.2);
+  font-variant-numeric: tabular-nums;
+}
+.hud-timer strong { font-size: 56px; line-height: 1.05; letter-spacing: -0.02em; }
+.hud-timer span { font-size: 16px; margin-left: 2px; font-weight: 700; }
+.hud-timer.urgent strong { color: var(--ng); }
+/* 残りわずかは色だけでなく言葉でも出す（見た目の採点：赤だけに頼っていた） */
+.hud-timer.urgent::after { content: "残りわずか"; display: block; margin-top: -2px; font-size: 13px; font-weight: 800; color: var(--ng); }
+.hud-timer.urgent { animation: pulse 1s ease-in-out infinite; }
+@keyframes pulse { 50% { transform: scale(1.06); } }
+.hud-buttons { justify-self: end; display: flex; gap: 8px; }
+
+/* 目標の帯と操作の案内を縦に積む箱。画面の左右いっぱいに取り、中身は中央に寄せる。
+   left: 50% と translate で中央に置くと、使える幅が画面の半分になって短い目標でも2行に折れていた（390で「覚えよう」だけ次の行へ） */
+.hud-guide {
+  top: calc(var(--safe-t) + 104px);
+  left: 0;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 0 4vw;
+}
+.hud-message {
+  max-width: min(100%, 640px);
+  min-height: calc(1.45em + 20px);
+  margin: 0;
+  padding: 10px 18px;
+  background: rgba(31, 26, 22, 0.82);
+  color: #fff;
+  border-radius: 999px;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.45;
+  text-align: center;
+}
+/* 目標が消えても場所は残し、下の案内の帯が跳ねないようにする */
+.hud-message:empty { visibility: hidden; }
+
+.hud-bottom {
+  left: calc(var(--safe-l) + 10px);
+  right: calc(var(--safe-r) + 10px);
+  bottom: calc(var(--safe-b) + 10px);
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: end;
+  gap: 10px;
+}
+#minimap {
+  width: 232px;
+  height: 174px;
+  background: rgba(255, 252, 246, 0.8);
+  border-radius: 14px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+}
+.hud-actions { justify-self: center; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+/* 主ボタンは画面の中心線にそろえる（左右の見取り図とスティックの幅に引きずられない） */
+@media (min-width: 641px) {
+  .hud-actions { position: absolute; left: 50%; bottom: 0; transform: translateX(-50%); }
+  /* 主ボタンが流れの外に出ると、スティックが空いた真ん中の列に詰めて主ボタンに重なった（768の採点） */
+  .joystick { grid-column: 3; }
+}
+.hud-actions .primary { min-width: 200px; min-height: 56px; font-size: 20px; }
+.joystick {
+  display: none;
+  position: relative;
+  width: 116px;
+  height: 116px;
+  border-radius: 50%;
+  background: rgba(255, 252, 246, 0.35);
+  box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.75), 0 2px 12px rgba(0, 0, 0, 0.18);
+  touch-action: none;
+}
+.joystick i {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 50px;
+  height: 50px;
+  margin: -25px 0 0 -25px;
+  border-radius: 50%;
+  background: rgba(255, 252, 246, 0.95);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+}
+.touch .joystick { display: block; }
+
+.controls-hint {
+  /* 操作の案内は、上の目標の帯の下に控えめに出す。画面の中ほどに置くと、覚える物（廊下のベンチ）を隠した */
+  max-width: 100%;
+  margin: 0;
+  padding: 8px 16px;
+  background: rgba(31, 26, 22, 0.55);
+  color: #fff;
+  border-radius: 16px;
+  font-size: 15px;
+  line-height: 1.5;
+  text-align: center;
+  transition: opacity 0.35s ease;
+}
+.controls-hint.gone { opacity: 0 !important; }
+#app[data-phase="search"] .controls-hint { display: none; }
+.for-touch { display: none; }
+.touch .for-touch { display: inline; }
+.touch .for-pointer { display: none; }
+
+/* ---------- 全面の画面 ---------- */
+/* 札が画面より高いときも上端が切れないよう、中央寄せは子の margin: auto で行う（grid の center は上にもはみ出す） */
+.screen {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  display: grid;
+  justify-items: center;
+  align-items: start;
+  padding: calc(var(--safe-t) + 16px) calc(var(--safe-r) + 16px) calc(var(--safe-b) + 16px) calc(var(--safe-l) + 16px);
+  overflow-y: auto;
+  touch-action: pan-y;
+}
+.screen[hidden], .banner[hidden], .reveal-panel[hidden] { display: none; }
+#pause-screen { z-index: 30; background: rgba(31, 26, 22, 0.55); backdrop-filter: blur(4px); }
+.screen > * { margin-block: auto; }
+.card {
+  width: min(100%, 460px);
+  padding: 28px 24px;
+  background: var(--paper-solid);
+  border-radius: 24px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+  text-align: center;
+}
+.card h2 { margin: 0 0 8px; font-size: 26px; }
+.card p { margin: 0 0 18px; color: var(--ink-soft); line-height: 1.7; }
+.card .primary, .card .secondary { display: block; width: 100%; margin-top: 10px; }
+.eyebrow { margin: 0 0 6px; font-size: 13px; font-weight: 700; letter-spacing: 0.14em; color: var(--accent-deep); }
+.day-link { color: inherit; text-decoration: none; }
+
+/* タイトル。家の眺めを背景に、下へ札を置く */
+.title-screen > .title-card { margin-block: auto 0; }
+.title-screen { background: linear-gradient(180deg, rgba(31, 26, 22, 0) 30%, rgba(31, 26, 22, 0.45) 100%); }
+.title-card {
+  width: min(100%, 520px);
+  padding: 24px 24px 14px;
+  background: var(--paper);
+  border-radius: 26px;
+  box-shadow: 0 18px 60px rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(6px);
+}
+.title-card h1 { margin: 0 0 12px; font-size: clamp(34px, 9vw, 48px); line-height: 1.12; letter-spacing: 0.01em; }
+.how-to { margin: 0 0 16px; padding: 0; list-style: none; counter-reset: step; display: grid; gap: 6px; }
+.how-to li { counter-increment: step; display: flex; align-items: center; gap: 10px; font-size: 16px; line-height: 1.45; }
+.how-to li::before {
+  content: counter(step);
+  flex: 0 0 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--accent-soft);
+  color: var(--accent-deep);
+  font-weight: 800;
+  font-size: 15px;
+}
+.how-to b { color: var(--accent-deep); }
+.levels { margin: 0 0 14px; padding: 0; border: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.levels legend { padding: 0; margin-bottom: 6px; font-size: 13px; font-weight: 700; color: var(--ink-soft); }
+.levels label { position: relative; display: block; }
+.levels input { position: absolute; opacity: 0; inset: 0; margin: 0; cursor: pointer; }
+.levels span {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60px;
+  padding: 8px 4px;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: inset 0 0 0 1.5px var(--line);
+  text-align: center;
+}
+.levels b { font-size: 16px; }
+.levels small { font-size: 12px; color: var(--ink-soft); }
+.levels input:checked + span { background: var(--accent-soft); box-shadow: inset 0 0 0 2.5px var(--accent); }
+.levels input:focus-visible + span { outline: 3px solid #2b6fd6; outline-offset: 2px; }
+.start { width: 100%; min-height: 58px; font-size: 20px; }
+.load-bar { height: 4px; margin: 10px 4px 0; border-radius: 4px; background: rgba(31, 26, 22, 0.1); overflow: hidden; }
+.load-bar i { display: block; height: 100%; width: 0; background: var(--accent); transition: width 0.2s ease; }
+#app[data-loaded="true"] .load-bar { visibility: hidden; }
+.title-links { display: flex; justify-content: center; gap: 4px; margin: 4px 0 0; }
+.challenge-badge { margin: 0 0 12px; padding: 8px 12px; border-radius: 12px; background: var(--accent-soft); color: var(--accent-deep); font-weight: 700; font-size: 15px; }
+
+/* 問題の始まりの帯 */
+.banner {
+  position: absolute;
+  z-index: 15;
+  left: 50%;
+  /* 上の目標と案内の箱より下に置く（42% では、1440×900 で案内の帯に3px食い込んだ） */
+  top: 50%;
+  transform: translate(-50%, -50%);
+  padding: 18px 34px;
+  background: rgba(31, 26, 22, 0.84);
+  color: #fff;
+  border-radius: 22px;
+  text-align: center;
+  pointer-events: none;
+  animation: bannerIn 0.4s ease both;
+}
+.banner-round { margin: 0; font-size: 18px; font-weight: 700; color: #ffc89a; white-space: nowrap; }
+.banner-text { margin: 4px 0 0; font-size: 26px; font-weight: 800; white-space: nowrap; }
+@keyframes bannerIn { from { opacity: 0; transform: translate(-50%, -40%); } }
+
+/* 見取り図の移動で着けなかったときの、一瞬の暗転 */
+.fade { position: absolute; inset: 0; z-index: 17; background: #120e0b; opacity: 0; pointer-events: none; transition: opacity 0.18s ease; }
+.fade.on { opacity: 1; }
+
+/* まぶた */
+.eyelids { position: absolute; inset: 0; z-index: 18; pointer-events: none; }
+.lid { position: absolute; left: -5%; right: -5%; height: 52%; background: #120e0b; transition: transform 0.9s cubic-bezier(0.7, 0, 0.3, 1); }
+.lid-top { top: 0; transform: translateY(-102%); border-radius: 0 0 50% 50% / 0 0 22% 22%; }
+.lid-bottom { bottom: 0; transform: translateY(102%); border-radius: 50% 50% 0 0 / 22% 22% 0 0; }
+.eyelids.closed .lid { transform: translateY(0); }
+#lid-text { position: absolute; left: 0; right: 0; top: 50%; margin: 0; transform: translateY(-50%); text-align: center; color: #fff; font-size: 26px; font-weight: 800; text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9), 0 0 18px rgba(0, 0, 0, 0.7); opacity: 0; transition: opacity 0.4s ease 0.4s; }
+.eyelids.closed #lid-text { opacity: 1; }
+
+/* 答える */
+.answer-screen { background: rgba(31, 26, 22, 0.55); backdrop-filter: blur(3px); }
+.answer-card {
+  width: min(100%, 980px);
+  padding: 22px 20px 18px;
+  background: var(--paper-solid);
+  border-radius: 26px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+  text-align: center;
+}
+.answer-card h2 { margin: 0; font-size: 30px; }
+.answer-lead { margin: 4px 0 14px; color: var(--ink-soft); font-size: 16px; }
+.choices { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+.choice {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  min-height: 44px;
+  padding: 14px 10px 12px;
+  border: 0;
+  border-radius: 18px;
+  background: #fff;
+  box-shadow: inset 0 0 0 1.5px var(--line);
+  color: var(--ink);
+  transition: box-shadow 0.15s ease, background-color 0.15s ease, transform 0.12s ease;
+}
+.choice:hover { box-shadow: inset 0 0 0 2px rgba(31, 95, 191, 0.5); }
+.choice[aria-checked="true"] { background: var(--mine-soft); box-shadow: inset 0 0 0 3px var(--mine); }
+.choice[aria-checked="true"] .key { background: var(--mine); color: #fff; }
+/* 選んだことは色だけでなく言葉でも出す */
+.choice[aria-checked="true"]::after {
+  content: "えらんだ";
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  padding: 2px 9px 3px;
+  border-radius: 999px;
+  background: var(--mine);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1.4;
+}
+.choice .pic { position: relative; display: block; width: 100%; max-width: 150px; }
+.choice img { display: block; width: 100%; aspect-ratio: 1; object-fit: contain; border-radius: 12px; }
+.choice .name { font-size: 20px; font-weight: 800; line-height: 1.3; }
+.choice .key {
+  position: absolute;
+  z-index: 1;
+  top: 6px;
+  left: 6px;
+  width: 26px;
+  height: 26px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #efe8e0;
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 800;
+}
+/* 決定ボタンは札の下端に貼りつけ、候補が多くて札がはみ出しても常に見えるようにする（評価の2周目：スマホで候補8つのとき画面外に出た） */
+.answer-actions {
+  position: sticky;
+  bottom: calc(-1 * var(--safe-b));
+  margin: 14px -20px -18px;
+  padding: 12px 20px calc(14px + var(--safe-b));
+  background: linear-gradient(180deg, rgba(255, 252, 246, 0), var(--paper-solid) 30%);
+  border-radius: 0 0 26px 26px;
+}
+.answer-actions .primary { min-width: 240px; min-height: 56px; font-size: 20px; }
+
+/* 答え合わせで、戻ってきた物の真上に出す札（下向きの矢印つき） */
+.spot {
+  position: absolute;
+  z-index: 11;
+  left: 0;
+  top: 0;
+  margin: 0;
+  padding: 8px 16px 9px;
+  border-radius: 14px;
+  background: var(--accent);
+  color: #fff;
+  font-size: 22px;
+  font-weight: 900;
+  white-space: nowrap;
+  pointer-events: none;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+  transform: translate(-50%, calc(-100% - 14px));
+  animation: spotIn 0.35s ease both;
+}
+.spot::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -11px;
+  margin-left: -11px;
+  border: 11px solid transparent;
+  border-bottom: 0;
+  border-top-color: var(--accent);
+}
+.spot.choice { background: var(--mine); }
+.spot.choice::after { border-top-color: var(--mine); }
+@keyframes spotIn { from { opacity: 0; margin-top: -10px; } }
+/* 使えるまでの秒読みは、押せるボタンではなく案内の帯と同じ見た目にする。白い丸ボタンのままだと、
+   すぐ下の主ボタンと同じ形で押せそうに見えた（見た目の採点3周目）。使えるようになったら白いボタンに変わる */
+.hint-button:disabled, .hint-button:disabled:hover {
+  min-height: 0;
+  padding: 5px 14px 6px;
+  background: rgba(31, 26, 22, 0.55);
+  color: #fff;
+  box-shadow: none;
+  font-size: 15px;
+  cursor: default;
+}
+
+/* 答え合わせ */
+.reveal-panel {
+  position: absolute;
+  z-index: 12;
+  left: 50%;
+  bottom: calc(var(--safe-b) + 16px);
+  transform: translateX(-50%);
+  /* 左右の余白は、ほかの札と同じ16pxにそろえる（390で12pxだった） */
+  width: min(calc(100vw - 32px), 620px);
+  padding: 18px 22px;
+  background: var(--paper);
+  border-radius: 24px;
+  box-shadow: 0 16px 50px rgba(0, 0, 0, 0.35);
+  text-align: center;
+  animation: bannerUp 0.4s ease both;
+}
+@keyframes bannerUp { from { opacity: 0; transform: translate(-50%, 20px); } }
+.reveal-verdict { margin: 0; font-size: 34px; font-weight: 900; }
+.reveal-verdict.ok { color: var(--ok); }
+.reveal-verdict.ng { color: var(--ng); }
+.reveal-text { margin: 4px 0 0; font-size: 20px; line-height: 1.55; }
+.reveal-text b { color: var(--accent-deep); }
+.reveal-choice { margin: 6px 0 0; font-size: 16px; color: var(--ink-soft); }
+.reveal-actions { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 14px; }
+.reveal-actions .primary { min-width: 200px; }
+
+/* 結果 */
+.result-card h2 { font-size: 56px; line-height: 1.1; }
+.result-card h2 small { font-size: 22px; }
+.result-title { font-size: 24px; font-weight: 800; color: var(--accent-deep) !important; margin-bottom: 12px !important; }
+.result-list { margin: 0 0 16px; padding: 0; list-style: none; display: grid; gap: 6px; text-align: left; }
+.result-list li { display: grid; grid-template-columns: auto 44px 1fr auto; align-items: center; gap: 10px; padding: 6px 10px; border-radius: 12px; background: #fff; box-shadow: inset 0 0 0 1px var(--line); font-size: 16px; }
+.result-list img { width: 44px; height: 44px; object-fit: contain; border-radius: 8px; }
+.result-list .mark { font-weight: 900; font-size: 18px; }
+.nowrap { white-space: nowrap; }
+.result-list .mark { text-align: center; line-height: 1.2; }
+/* 補足のある行は2段にする。問目と写真は2段ぶんの高さの真ん中に置き、補足は名前と正誤の下に通す */
+.result-list li.has-note { row-gap: 0; }
+.result-list li.has-note > span:first-child, .result-list li.has-note > img { grid-row: 1 / span 2; }
+.result-note { grid-column: 3 / -1; display: flex; flex-wrap: wrap; column-gap: 0.9em; color: var(--ink-soft); font-size: 14px; line-height: 1.4; }
+.result-list li { min-height: 58px; }
+.result-list .mark.ok { color: var(--ok); }
+.result-list .mark.ng { color: var(--ng); }
+.result-share { margin: 0 0 10px; padding: 12px; border-radius: 16px; background: var(--accent-soft); }
+.result-share h3 { margin: 0 0 8px; font-size: 15px; }
+.result-share-row { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
+.share-chip { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 8px 13px; background: #fff; color: var(--ink); text-decoration: none; font-size: 15px; box-shadow: inset 0 0 0 1.5px var(--line); }
+.copied { margin: 6px 0 0 !important; font-size: 14px; }
+.copied:empty { display: none; }
+
+/* 小窓 */
+.sheet {
+  width: min(92vw, 560px);
+  max-height: 86vh;
+  padding: 22px 22px 18px;
+  border: 0;
+  border-radius: 22px;
+  background: var(--paper-solid);
+  color: var(--ink);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+  touch-action: pan-y;
+}
+.sheet::backdrop { background: rgba(31, 26, 22, 0.72); backdrop-filter: blur(3px); }
+.sheet h2 { margin: 0 0 12px; font-size: 22px; }
+.sheet h3 { margin: 16px 0 6px; font-size: 16px; }
+.about-steps { margin: 0 0 10px; padding-left: 1.4em; line-height: 1.8; font-size: 15px; }
+.sheet p { margin: 0 0 10px; line-height: 1.75; font-size: 15px; }
+.sheet .secondary { margin-top: 12px; width: 100%; }
+/* 共通の共有欄は「最低でも画面幅の92%」を取る決まりなので、小窓の内側では外す（スマホで右にはみ出した） */
+.sheet .share { min-width: 0; max-width: 100%; margin-top: 0; padding-top: 0; border-top: 0; }
+.sheet p, .sheet .share__note { word-break: auto-phrase; line-break: strict; }
+/* 閉じるボタンは小窓の下端に貼りつけ、本文が長くても常に見えるようにする。
+   上端をぼかすと、下に続く本文の1行が上半分だけ薄く残り、切れた文字に見えた（見た目の採点2・3周目）。
+   地を塗りつぶし、境目に線と影を引いて「下にまだ続く」ことを示す */
+.sheet .sheet-foot { position: sticky; bottom: -18px; margin: 12px -22px -18px; padding: 14px 22px 18px; background: var(--paper-solid); box-shadow: 0 -1px 0 var(--line), 0 -12px 14px -12px rgba(31, 26, 22, 0.28); }
+.sheet .sheet-foot .secondary { margin-top: 0; }
+
+/* ---------- 狭い画面 ---------- */
+@media (max-width: 640px) {
+  .hud-timer { min-width: 88px; padding: 0 12px 4px; }
+  .hud-timer strong { font-size: 44px; }
+  .hud-round { padding: 6px 10px; font-size: 12px; }
+  .hud-round b { font-size: 17px; }
+  .hud-guide { top: calc(var(--safe-t) + 84px); }
+  .hud-message { font-size: 16px; border-radius: 18px; }
+  /* 下の段は、主ボタンを上に1本、見取り図とスティックを左右の角に置く */
+  .hud-bottom { grid-template-columns: auto 1fr auto; grid-template-areas: "act act act" "map . stick"; row-gap: 10px; }
+  .hud-actions { grid-area: act; }
+  /* 部屋名を12px以上で描ける大きさ（136pxでは約10pxまで縮んだ） */
+  #minimap { grid-area: map; width: 156px; height: 117px; }
+  .joystick { grid-area: stick; width: 96px; height: 96px; background: rgba(255, 252, 246, 0.22); }
+  .hud-actions .primary { min-width: 220px; padding: 12px 22px; font-size: 18px; white-space: nowrap; }
+  .controls-hint { font-size: 13px; }
+  .banner { width: 88vw; padding: 14px 16px; }
+  .banner-round { font-size: 15px; }
+  .banner-text { font-size: 20px; white-space: normal; }
+  .reveal-actions .primary, .reveal-actions .secondary { width: 100%; min-width: 0; }
+  .answer-card { padding: 16px 12px 14px; border-radius: 22px; }
+  .answer-card h2 { font-size: 24px; }
+  .answer-actions { margin: 10px -12px -14px; padding: 10px 12px calc(12px + var(--safe-b)); border-radius: 0 0 22px 22px; }
+  .choice .name { font-size: 17px; }
+  /* 候補が7つ以上なら写真を小さくして、4段が1画面に収まるようにする */
+  .choices.many { gap: 8px; }
+  .choices.many .choice { padding: 6px 6px 8px; }
+  .choices.many .choice .pic { max-width: 84px; }
+  .choices.many .choice .key { top: 3px; left: 3px; width: 22px; height: 22px; font-size: 13px; }
+  .choices.many .choice .name { font-size: 16px; }
+  .reveal-verdict { font-size: 28px; }
+  /* 共有の3つは、XとLINEを横に並べ、コピーを下の段いっぱいに置く（成り行きで2つ＋1つに折れて見えた） */
+  .result-share-row { display: grid; grid-template-columns: 1fr 1fr; }
+  .result-share-row .share-chip:last-child { grid-column: 1 / -1; }
+  .reveal-text { font-size: 17px; }
+}
+@media (min-width: 900px) {
+  .choices { grid-template-columns: repeat(4, 1fr); }
+  .choices.count-6 { grid-template-columns: repeat(3, 1fr); }
+}
+@media (min-width: 641px) and (max-width: 899px) {
+  .choices { grid-template-columns: repeat(3, 1fr); }
+  .choices.count-4 { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-height: 560px) {
+  /* 横向きのスマホは背が低く、準備の帯が案内の帯に重なるので、準備の間だけ案内を隠す */
+  #app[data-phase="ready"] .controls-hint { visibility: hidden; }
+  .choice .pic { max-width: 92px; }
+  .title-card { padding: 16px 20px 10px; }
+  .how-to { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .lid { transition: none; }
+  .hud-timer.urgent, .banner, .reveal-panel { animation: none; }
+}
+
+/* ---------- 大きな画面（パソコン・テレビ）：2m離れても読める大きさへ拡大する ----------
+   画面の部品は px で組んであるので、文字と部品をまとめて zoom で拡大する（3Dの画面は拡大しない）。
+   1440×900 で本文20px前後・ボタン22px以上になる倍率。見た目の採点で「スマホと同じ大きさのまま」と指摘された */
+@media (min-width: 1100px) and (min-height: 700px) {
+  /* 遊んでいる間の文字（上下の札・目標と案内・答え合わせ・吹き出し）は2m先から読めるよう大きめに */
+  .hud-top, .hud-bottom, .hud-guide, .banner, .reveal-panel, .spot { zoom: 1.4; }
+  /* 札や小窓は背が高いので、画面に収まる倍率にとどめる。vh の上限は倍率で割り戻す */
+  .title-card, .card, .sheet { zoom: 1.28; }
+  .sheet { max-height: calc(86vh / 1.28); }
+  .answer-card { zoom: 1.28; width: min(100%, 1060px); }
+  .answer-lead { font-size: 17px; }
+  /* みんなで読む文字は、2m先から読める大きさにそろえる（1440で答え合わせの補足22px・結果の一覧24px前後） */
+  .reveal-choice { font-size: 17px; }
+  .result-list li { font-size: 19px; }
+  .result-list .mark { font-size: 20px; }
+  .result-note { font-size: 15px; }
+  .choice .pic { max-width: 176px; }
+  .choice .name { font-size: 22px; }
+  /* 番号は「2番じゃない？」と声で相談するときの呼び名なので、離れても読める大きさに（1440で丸44px・数字26px） */
+  .choice .key { width: 34px; height: 34px; font-size: 20px; }
+  #lid-text { font-size: 46px; }
+}
+@media (min-width: 1700px) and (min-height: 950px) {
+  .hud-top, .hud-bottom, .hud-guide, .banner, .reveal-panel, .spot { zoom: 1.7; }
+  .title-card, .card, .sheet, .answer-card { zoom: 1.5; }
+  .sheet { max-height: calc(86vh / 1.5); }
+  #lid-text { font-size: 56px; }
+}
+@media (min-width: 641px) and (max-width: 1099px) {
+  .choice .pic { max-width: 190px; }
+  /* 候補4つの2列では札が広いので、写真を札の幅いっぱい近くまで大きくする（768で左右に75pxずつ空いていた） */
+  .choices.count-4 .choice .pic { max-width: 260px; }
+}
