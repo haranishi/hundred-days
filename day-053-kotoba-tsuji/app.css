@@ -1,0 +1,990 @@
+/* ことば辻 — 紙・墨・朱・藍・木の5つの素材だけで組む（docs/VISUAL.md）。夜の配色は作らない */
+:root {
+  color-scheme: light;
+  --washi: #F2E8D5;
+  --washi-deep: #E4D4B4;
+  --sumi: #26221E;
+  --usuzumi: #5B5147;
+  --shu: #B33A2B;
+  --ai: #22406B;
+  --kinari-light: #FBF6EA;
+  --akari: #F6DFA4;
+  --wood: #6B4428;
+  --wood-face: #C99E6E;
+  --wood-light: #E2C49A;
+  --kincha: #C8963E; /* 朱塗りの札の細い縁・花火の金茶 */
+  --koge: #3A2A1F;
+  --ai-wash: #D6D2C8; /* 藍を約13%に薄めた地（いまの問のマス） */ /* 黒マス（字の入らないマス）の焦げ茶 */
+  --line: rgba(107, 68, 40, 0.3);
+  --font-display: "Shippori Mincho B1", "Hiragino Mincho ProN", "Yu Mincho", serif;
+  --font-ui: "Zen Kaku Gothic New", "Hiragino Sans", "Yu Gothic", sans-serif;
+  --safe-t: env(safe-area-inset-top, 0px);
+  --safe-r: env(safe-area-inset-right, 0px);
+  --safe-b: env(safe-area-inset-bottom, 0px);
+  --safe-l: env(safe-area-inset-left, 0px);
+  --key-h: 38px;
+  --fn-h: 36px;
+  --frame: 5px;
+}
+@media (min-height: 740px) {
+  :root { --key-h: 44px; --fn-h: 40px; }
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html, body { height: 100%; margin: 0; }
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  background-color: var(--washi);
+  /* 和紙の繊維：細かな粒と、横に流れる長い繊維 */
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='260'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.012 .11' numOctaves='2' seed='3'/%3E%3CfeColorMatrix values='0 0 0 0 .42 0 0 0 0 .3 0 0 0 0 .16 0 0 0 .09 -.02'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23f)'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .4 0 0 0 0 .28 0 0 0 0 .14 0 0 0 .07 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+body {
+  background: transparent;
+  color: var(--sumi);
+  font-family: var(--font-display);
+  font-weight: 500;
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+}
+body::before {
+  /* 行灯の灯りのような、周りがわずかに沈む光 */
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(ellipse 90% 70% at 50% 32%, transparent 55%, rgba(107, 68, 40, 0.1));
+}
+#app { min-height: 100%; }
+body[data-screen="play"] { overflow: hidden; }
+body[data-screen="play"] #app { height: 100%; }
+button, input { font: inherit; color: inherit; }
+h1, h2, h3, p, .li-text, .annai-text, .lc-line, .clue-row {
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+  text-wrap: pretty;
+}
+@supports (word-break: auto-phrase) {
+  h1, h2, h3, p, .li-text, .annai-text, .lc-line, .clue-row { word-break: auto-phrase; }
+}
+.noscript { max-width: 30em; margin: 40px auto; padding: 0 16px; }
+
+/* ---- 画面の共通 ---- */
+.screen { min-height: 100%; outline: none; animation: screen-in 0.15s ease-out both; }
+@keyframes screen-in { from { opacity: 0; } }
+.col {
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto;
+  padding: calc(24px + var(--safe-t)) max(16px, var(--safe-r)) calc(36px + var(--safe-b)) max(16px, var(--safe-l));
+}
+.screen-head { margin: 10px 0 20px; font-size: 26px; font-weight: 800; letter-spacing: 0.1em; line-height: 1.4; text-align: center; }
+.note { margin: 14px 0 0; font-family: var(--font-ui); font-size: 13px; line-height: 1.75; color: var(--usuzumi); }
+.back-row { display: flex; justify-content: center; margin-top: 26px; }
+.back-row .fuda { min-width: 9em; }
+.btn-row { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: 10px; }
+.btn-row .fuda { width: 100%; }
+
+/* ---- 木札のボタン：角を斜めに落とした板。押すと沈み、影が詰まる ---- */
+.fuda {
+  --cut: 7px;
+  --edge: var(--wood);
+  --face: linear-gradient(180deg, #EBD3AC 0%, var(--wood-light) 45%, var(--wood-face) 100%);
+  position: relative;
+  isolation: isolate;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35em;
+  min-height: 44px;
+  padding: 8px 18px;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  color: var(--sumi);
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: 0.08em;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+  filter: drop-shadow(0 2px 0 rgba(75, 46, 26, 0.5));
+  transition: transform 0.06s ease-out, filter 0.06s ease-out;
+}
+.fuda::before, .fuda::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  pointer-events: none;
+  clip-path: polygon(var(--cut) 0, calc(100% - var(--cut)) 0, 100% var(--cut), 100% calc(100% - var(--cut)), calc(100% - var(--cut)) 100%, var(--cut) 100%, 0 calc(100% - var(--cut)), 0 var(--cut));
+}
+.fuda::before { inset: 0; background: var(--edge); }
+.fuda::after {
+  inset: 1.5px;
+  background:
+    repeating-linear-gradient(97deg, rgba(107, 68, 40, 0.07) 0 1px, transparent 1px 5px, rgba(107, 68, 40, 0.045) 5px 7px, transparent 7px 12px),
+    var(--face);
+}
+.fuda:hover::after { filter: brightness(1.04); }
+.fuda:active { transform: translateY(2px); filter: drop-shadow(0 0 0 rgba(75, 46, 26, 0.5)); }
+.fuda:focus-visible { outline: 2px solid var(--ai); outline-offset: 2px; }
+.fuda.is-primary {
+  --edge: var(--kincha);
+  --face: linear-gradient(180deg, #C54B3B 0%, var(--shu) 50%, #9C3124 100%);
+  color: var(--washi);
+}
+.fuda.is-primary::after { background: linear-gradient(180deg, rgba(255, 255, 255, 0.14), transparent 45%), var(--face); }
+.fuda.is-danger { color: var(--koge); }
+.fuda-lg { --cut: 9px; min-height: 58px; padding: 12px 28px; font-size: 21px; letter-spacing: 0.12em; }
+.fuda-sm { --cut: 5px; min-height: 40px; padding: 6px 12px; font-size: 15px; }
+.fuda-xs { --cut: 4px; min-height: 34px; padding: 4px 11px; font-size: 14px; letter-spacing: 0.04em; }
+
+.mark { display: block; flex: none; }
+.mark-ch { font-family: var(--font-display); }
+.zumi {
+  display: inline-grid;
+  place-items: center;
+  width: 1.5em;
+  height: 1.5em;
+  border-radius: 3px;
+  background: var(--ai);
+  color: var(--kinari-light);
+  font-family: var(--font-display);
+  font-size: 0.78em;
+  font-weight: 700;
+  line-height: 1;
+}
+
+/* ---- 案内役の一言：短冊が降りてきて消える ---- */
+.annai {
+  position: fixed;
+  z-index: 45;
+  top: calc(var(--safe-t) + 56px);
+  left: 50%;
+  width: max-content;
+  max-width: min(calc(100vw - 32px), 440px);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px 8px 9px;
+  background: var(--kinari-light);
+  border: 1px solid var(--wood-face);
+  border-left: 3px solid var(--shu);
+  box-shadow: 0 6px 16px rgba(38, 34, 30, 0.2);
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.5;
+  color: var(--sumi);
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transform: translate(-50%, -12px);
+}
+/* 対局中は見出し帯の中央の枠（退くと残りの間）に重ねて出す。盤・退く・残りは隠さない。2行まで、あふれたら送る */
+.annai-box { display: block; min-width: 0; overflow: hidden; }
+.annai-text { display: block; }
+.annai.is-local { position: absolute; z-index: 20; top: 2px; bottom: 2px; left: 0; right: 0; width: auto; max-width: none; padding: 1px 8px 1px 7px; gap: 6px; font-size: 13.5px; line-height: 1.3; transform: translateY(-4px); }
+.annai.is-local .annai-box { max-height: 2.6em; }
+.annai.is-local[data-state="on"] { transform: none; }
+.annai.is-local[data-state="out"] { transform: translateY(-3px); }
+@media (max-width: 599px) {
+  .annai.is-local .mark { display: none; }
+}
+.annai[data-state="on"] { opacity: 1; visibility: visible; transform: translate(-50%, 0); transition: opacity 0.2s ease-out, transform 0.2s ease-out; }
+.annai[data-state="out"] { opacity: 0; visibility: visible; transform: translate(-50%, -6px); transition: opacity 0.2s, transform 0.2s; }
+
+.busy {
+  position: fixed;
+  z-index: 70;
+  left: 50%;
+  top: 45%;
+  transform: translate(-50%, -50%);
+  padding: 12px 22px;
+  background: var(--kinari-light);
+  border: 1px solid var(--wood-face);
+  box-shadow: 0 8px 20px rgba(38, 34, 30, 0.2);
+  font-weight: 700;
+  pointer-events: none;
+  opacity: 0;
+  animation: busy-in 0.2s ease-out 0.15s forwards;
+}
+@keyframes busy-in { to { opacity: 1; } }
+
+/* ---- 札（高札風のダイアログ） ---- */
+.dlg-back {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: grid;
+  place-items: center;
+  padding: 40px 24px;
+  background: rgba(38, 34, 30, 0.55);
+  animation: screen-in 0.15s ease-out both;
+}
+.kosatsu {
+  position: relative;
+  width: min(100%, 400px);
+  padding: 26px 20px 18px;
+  background: var(--washi);
+  border: 5px solid var(--wood);
+  box-shadow: 0 0 0 1px #4E3120, 0 16px 36px rgba(0, 0, 0, 0.35);
+}
+.kosatsu::before {
+  /* 高札の屋根 */
+  content: "";
+  position: absolute;
+  left: -16px;
+  right: -16px;
+  top: -24px;
+  height: 18px;
+  background: linear-gradient(180deg, #54351F, var(--wood));
+  clip-path: polygon(7% 0, 93% 0, 100% 100%, 0 100%);
+}
+.kosatsu-text { margin: 0 0 18px; font-size: 17px; font-weight: 700; line-height: 1.8; text-align: center; }
+.kosatsu-sub { margin: -10px 0 16px; font-family: var(--font-ui); font-size: 13px; font-weight: 700; text-align: center; color: var(--ai); }
+.kosatsu-btns { display: grid; gap: 10px; }
+.kosatsu-btns .fuda { width: 100%; }
+.kosatsu-extra {
+  display: block;
+  min-height: 36px;
+  margin: 12px auto 0;
+  padding: 6px 10px;
+  border: 0;
+  background: none;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--usuzumi);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+.kosatsu-extra:focus-visible { outline: 2px solid var(--ai); outline-offset: 2px; }
+
+/* ---- タイトル ---- */
+.title-col { text-align: center; padding-top: calc(26px + var(--safe-t)); }
+.title-sign { display: flex; flex-direction: row-reverse; justify-content: center; align-items: flex-start; gap: 14px; margin: 0 auto 22px; }
+.kanban {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding: 24px 16px 16px;
+  background:
+    repeating-linear-gradient(90deg, rgba(107, 68, 40, 0.06) 0 1px, transparent 1px 6px, rgba(107, 68, 40, 0.04) 6px 9px, transparent 9px 15px),
+    linear-gradient(90deg, #D6B281, var(--wood-light) 28%, #E7CCA4 60%, #D3AD7A);
+  border: 4px solid var(--wood);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.35), 0 8px 18px rgba(75, 46, 26, 0.3);
+}
+.title-main { margin: 0; writing-mode: vertical-rl; font-size: 64px; font-weight: 800; line-height: 1; letter-spacing: 0.1em; color: var(--sumi); }
+.title-sub {
+  margin: 30px 0 0;
+  padding: 14px 7px;
+  writing-mode: vertical-rl;
+  background: var(--kinari-light);
+  border: 1px solid var(--wood-face);
+  box-shadow: 0 3px 8px rgba(38, 34, 30, 0.12);
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.3em;
+  line-height: 1;
+  color: var(--usuzumi);
+}
+.kojo { margin: 0 auto 6px; max-width: 21em; font-size: 17px; font-weight: 700; line-height: 1.85; }
+.kojo span { display: inline-block; }
+.kojo-small { margin: 0 0 22px; font-family: var(--font-ui); font-size: 13px; letter-spacing: 0.06em; color: var(--usuzumi); }
+.title-actions { display: grid; gap: 12px; }
+.title-actions > .fuda { width: 100%; }
+
+/* 暖簾：藍染めの2枚。中央の割れ目に白抜きの「丸に辻」と「ことば辻」 */
+.noren { position: fixed; z-index: 60; top: 0; left: 0; right: 0; height: min(60%, 520px); display: flex; pointer-events: none; }
+.noren-pole {
+  position: absolute;
+  z-index: 2;
+  top: calc(var(--safe-t) + 4px);
+  left: 0;
+  right: 0;
+  height: 14px;
+  border-radius: 7px;
+  background: linear-gradient(180deg, #9A6A42, var(--wood) 60%, #4E3120);
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+}
+.noren-panel {
+  position: relative;
+  flex: 1;
+  overflow: hidden;
+  transform-origin: 50% 0;
+  background:
+    linear-gradient(90deg, rgba(0, 0, 0, 0.2), transparent 9%, transparent 91%, rgba(0, 0, 0, 0.2)),
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.035) 0 1px, transparent 1px 4px),
+    linear-gradient(180deg, #1B355A 0%, var(--ai) 50%, #1D3860 100%);
+  border-bottom: 4px solid #172D4D;
+  box-shadow: 0 12px 26px rgba(0, 0, 0, 0.3);
+}
+.noren-mark { position: absolute; top: 22%; width: 128px; height: 128px; }
+/* 割れ目は隙間を空けず、内側の縁の影で描く（奥の看板が透けないように） */
+.noren-panel.is-left { box-shadow: inset -2px 0 0 rgba(0, 0, 0, 0.45), 0 12px 26px rgba(0, 0, 0, 0.3); }
+.noren-panel.is-right { box-shadow: inset 2px 0 0 rgba(0, 0, 0, 0.45), 0 12px 26px rgba(0, 0, 0, 0.3); }
+.noren-panel.is-left .noren-mark { right: -64px; }
+.noren-panel.is-right .noren-mark { left: -64px; }
+.noren-name { position: absolute; top: calc(22% + 150px); margin: 0; font-size: 40px; font-weight: 800; line-height: 1; letter-spacing: 0.1em; color: var(--washi); }
+.noren-panel.is-left .noren-name { right: 6px; }
+.noren-panel.is-right .noren-name { left: 10px; }
+
+/* ---- 腕前選び ---- */
+.level-list { display: grid; gap: 16px; }
+.level-card {
+  --cut: 10px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas: "name nums" "line line" "rec rec";
+  align-items: center;
+  gap: 6px 12px;
+  width: 100%;
+  padding: 16px 18px 15px 20px;
+  text-align: left;
+  letter-spacing: 0.02em;
+}
+.lc-name { grid-area: name; display: flex; flex-direction: column; font-size: 27px; font-weight: 800; line-height: 1.2; letter-spacing: 0.06em; }
+.lc-reading { font-family: var(--font-ui); font-size: 13px; font-weight: 700; letter-spacing: 0.12em; color: #4A4038; }
+.lc-nums { grid-area: nums; display: grid; justify-items: end; gap: 3px; font-family: var(--font-ui); font-weight: 700; }
+/* いちばん大きな数字は「埋める字」。盤の大きさと言葉の数は小さく添える */
+.lc-blanks { display: inline-flex; align-items: baseline; gap: 5px; font-size: 13px; line-height: 1; letter-spacing: 0.04em; color: var(--sumi); }
+.lc-blanks b { min-width: 0.6em; font-family: var(--font-display); font-size: 44px; font-weight: 800; line-height: 0.9; letter-spacing: 0; text-align: right; color: var(--sumi); font-variant-numeric: tabular-nums; }
+.lc-aki { align-self: baseline; width: 13px; height: 13px; border: 2px dotted var(--shu); border-radius: 1px; background: var(--washi); }
+.lc-counts { font-size: 12px; line-height: 1.3; letter-spacing: 0.02em; color: #4A4038; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.lc-line { grid-area: line; font-size: 14px; font-weight: 700; line-height: 1.6; }
+.lc-rec { grid-area: rec; font-family: var(--font-ui); font-size: 12px; font-weight: 700; color: var(--ai); font-variant-numeric: tabular-nums; }
+
+/* ---- 対局 ---- */
+.screen-play {
+  height: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding: var(--safe-t) max(6px, var(--safe-r)) 0 max(6px, var(--safe-l));
+}
+.play-head { position: relative; flex: none; display: flex; align-items: center; gap: 8px; width: 100%; max-width: 560px; height: 44px; margin: 0 auto; }
+.play-slot { position: relative; flex: 1; min-width: 0; align-self: stretch; display: flex; align-items: center; justify-content: center; }
+.play-level { min-width: 0; max-width: 100%; overflow: hidden; font-size: 15px; font-weight: 800; letter-spacing: 0.04em; text-align: center; text-overflow: ellipsis; white-space: nowrap; }
+.play-meta { display: flex; align-items: center; gap: 10px; font-family: var(--font-ui); font-size: 14px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.play-prog, .play-time { display: inline-flex; align-items: center; gap: 4px; }
+.play-prog { gap: 0; align-items: baseline; white-space: nowrap; }
+.prog-val { min-width: 1.1em; margin: 0 1px; font-family: var(--font-display); font-size: 18px; font-weight: 800; line-height: 1; text-align: right; color: var(--shu); }
+.time-val { min-width: 2.7em; }
+.play-body { flex: 1; min-height: 0; display: flex; width: 100%; max-width: 560px; margin: 0 auto; }
+.play-main { flex: 1; min-width: 0; min-height: 0; display: flex; flex-direction: column; gap: 6px; padding-bottom: calc(12px + var(--safe-b)); }
+.board-wrap { position: relative; flex: 1 1 0; min-height: 0; display: flex; align-items: center; justify-content: center; }
+
+.board {
+  display: grid;
+  grid-template-columns: repeat(var(--cols), var(--cell, 32px));
+  grid-auto-rows: var(--cell, 32px);
+  gap: var(--gap, 2px);
+  background: var(--wood);
+  border: var(--frame) solid var(--wood);
+  border-radius: 2px;
+  box-shadow: 0 0 0 1px #4E3120, 0 8px 18px rgba(75, 46, 26, 0.25);
+}
+.cell {
+  position: relative;
+  display: grid;
+  place-items: center;
+  background: var(--washi);
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+.cell.is-blank { background: var(--koge); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05), inset 0 -2px 4px rgba(0, 0, 0, 0.25); cursor: default; }
+.cell .ch { font-size: calc(var(--cell, 32px) * 0.6); font-weight: 800; line-height: 1; color: var(--sumi); }
+.cell .num {
+  position: absolute;
+  top: 1px;
+  left: 2px;
+  font-family: var(--font-ui);
+  font-size: max(8px, calc(var(--cell, 32px) * 0.25));
+  font-weight: 700;
+  line-height: 1;
+  color: var(--usuzumi);
+  pointer-events: none;
+}
+.cell.is-word { background: var(--ai-wash); }
+.cell.is-cur { background: var(--akari); box-shadow: inset 0 0 0 2px var(--shu); }
+.cell.is-solved .ch { color: var(--ai); }
+.cell.is-wrong .ch { color: var(--shu); }
+.cell.is-wrong::after {
+  content: "×";
+  position: absolute;
+  top: 1px;
+  right: 2px;
+  font-family: var(--font-ui);
+  font-size: max(9px, calc(var(--cell, 32px) * 0.3));
+  font-weight: 700;
+  line-height: 1;
+  color: var(--shu);
+}
+/* v2：空いた辻（ここを埋める）は朱の点線で内側を縁取る。確定したら外す（助太刀の朱の点と ::before を分け合う）。
+   いまのマスでは朱の実線の枠を優先する */
+.cell.is-aki:not(.is-locked)::before {
+  content: "";
+  position: absolute;
+  inset: max(2px, calc(var(--cell, 32px) * 0.09));
+  border: 2px dotted var(--shu);
+  border-radius: 1px;
+  pointer-events: none;
+}
+.cell.is-aki.is-cur:not(.is-locked)::before { inset: max(4px, calc(var(--cell, 32px) * 0.16)); }
+.cell.is-aki .num { z-index: 1; padding-right: 1px; background: inherit; }
+.cell.is-revealed::before {
+  content: "";
+  position: absolute;
+  right: 3px;
+  bottom: 3px;
+  width: max(4px, calc(var(--cell, 32px) * 0.12));
+  height: max(4px, calc(var(--cell, 32px) * 0.12));
+  border-radius: 50%;
+  background: var(--shu);
+}
+.cell.dye { animation: dye-bg 0.5s ease-out var(--d, 0ms) backwards; }
+.cell.dye .ch { animation: dye-ch 0.38s ease-out var(--d, 0ms) backwards; }
+@keyframes dye-bg { from { background: #A9B7CB; } }
+@keyframes dye-ch {
+  0% { color: var(--sumi); transform: none; }
+  45% { transform: scale(1.14); }
+  100% { color: var(--ai); transform: none; }
+}
+.cell.shake { animation: shake 0.25s ease-in-out; }
+/* 書いてある字を押したとき、埋める空き辻を朱で短く光らせる（2回） */
+.cell.flash { animation: aki-flash 0.6s ease-in-out 2; }
+@keyframes aki-flash { 45% { background-color: #F2C4B6; box-shadow: inset 0 0 0 3px var(--shu); } }
+@keyframes shake {
+  20% { transform: translateX(-3px); }
+  40% { transform: translateX(3px); }
+  60% { transform: translateX(-2px); }
+  80% { transform: translateX(2px); }
+}
+
+/* いまの問（短冊）。空いた辻では横と縦の2段：いまの向きを上に太く、もう一方は下に小さく（押すと入れ替わる） */
+.clue {
+  position: relative;
+  flex: none;
+  display: grid;
+  grid-template-columns: 30px minmax(0, 1fr) 30px;
+  height: 84px;
+  background: var(--kinari-light);
+  border: 1px solid var(--wood-face);
+  box-shadow: 0 1px 0 rgba(75, 46, 26, 0.18);
+}
+.clue-nav { padding: 0; border: 0; background: none; font-size: 28px; line-height: 1; color: var(--wood); cursor: pointer; touch-action: manipulation; }
+.clue-nav:active { background: rgba(201, 158, 110, 0.2); }
+.clue-nav:focus-visible { outline: 2px solid var(--ai); outline-offset: -3px; }
+.clue-body { min-width: 0; display: flex; flex-direction: column; justify-content: center; gap: 3px; padding: 5px 3px; overflow: hidden; }
+.clue-row { display: block; min-width: 0; width: 100%; margin: 0; padding: 0; border: 0; border-radius: 0; background: none; font-family: var(--font-display); text-align: left; color: var(--sumi); }
+.clue-row[hidden] { display: none; }
+.clue-line { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; overflow: hidden; }
+.is-main .clue-line { font-size: 15px; font-weight: 700; line-height: 1.45; }
+.clue.is-pair .is-main .clue-line { -webkit-line-clamp: 2; }
+.clue-row.is-sub { flex: none; padding-top: 3px; border-top: 1px dashed rgba(107, 68, 40, 0.45); cursor: pointer; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+.clue-row.is-sub:active { background: rgba(201, 158, 110, 0.2); }
+.clue-row.is-sub:focus-visible { outline: 2px solid var(--ai); outline-offset: -2px; }
+.is-sub .clue-line { -webkit-line-clamp: 1; font-size: 13px; font-weight: 500; line-height: 1.45; color: #4A4038; }
+.clue-label { display: inline-block; margin-right: 6px; padding: 0 5px; border-radius: 2px; background: var(--ai); color: var(--kinari-light); font-family: var(--font-ui); font-size: 11px; font-weight: 700; line-height: 1.6; letter-spacing: 0.02em; white-space: nowrap; vertical-align: 0.1em; }
+.is-sub .clue-label { background: transparent; color: var(--ai); box-shadow: inset 0 0 0 1px rgba(34, 64, 107, 0.55); }
+.clue-ans { margin-right: 6px; font-weight: 800; color: var(--ai); }
+.clue-ans:empty { display: none; }
+.clue-ans .zumi { margin-right: 4px; vertical-align: 0.08em; }
+.clue-row.is-solved .clue-text { color: var(--usuzumi); }
+/* 段に収まらない問：字を小さく → それでも収まらなければ文節の途中でも折り返す */
+.clue-row.is-main.is-long .clue-line { font-size: 13.5px; line-height: 1.4; }
+.clue-row.is-sub.is-long .clue-line { font-size: 12px; line-height: 1.4; }
+.clue-row.is-main.is-longer .clue-line { font-size: 12.5px; line-height: 1.35; }
+.clue-row.is-sub.is-longer .clue-line { font-size: 11.5px; line-height: 1.35; }
+/* 帯を全文の高さにできる画面：下の段も2行まで（上の段も下の段も省略しない） */
+.screen-play.is-roomy .clue { height: 102px; }
+.screen-play.is-roomy .is-sub .clue-line { -webkit-line-clamp: 2; }
+.clue-pend { position: absolute; z-index: 3; top: 0; right: 34px; transform: translateY(-62%); display: inline-flex; align-items: baseline; gap: 4px; padding: 0 7px; border: 1px solid var(--wood-face); border-radius: 3px; background: var(--washi); font-family: var(--font-ui); font-size: 13px; line-height: 1.5; color: var(--sumi); box-shadow: 0 2px 6px rgba(38, 34, 30, 0.15); }
+.clue-pend small { font-size: 10px; font-weight: 500; color: var(--usuzumi); }
+.clue-pend[hidden] { display: none; }
+
+/* 道具の列 */
+.tools { flex: none; display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: 6px; }
+.tools .fuda { width: 100%; padding: 4px 6px; letter-spacing: 0.04em; }
+.dir-v, .dir-h { padding: 1px 3px; border-radius: 3px; color: var(--usuzumi); }
+.dir-arrow { font-size: 0.85em; color: var(--usuzumi); }
+[data-dir="down"] .dir-v, [data-dir="across"] .dir-h { background: var(--ai); color: var(--kinari-light); }
+
+/* 五十音盤 */
+.keypad {
+  position: relative;
+  flex: none;
+  display: grid;
+  grid-template-columns: repeat(10, minmax(0, 1fr));
+  grid-template-rows: repeat(5, var(--key-h)) var(--fn-h);
+  gap: 3px;
+  padding: 3px;
+  background: rgba(107, 68, 40, 0.13);
+  border-radius: 4px;
+}
+.key {
+  --cut: 3px;
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  place-items: center;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--sumi);
+  font-family: var(--font-display);
+  font-size: 19px;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  -webkit-user-select: none;
+  filter: drop-shadow(0 1.5px 0 rgba(75, 46, 26, 0.45));
+}
+.key::before, .key::after { content: ""; position: absolute; z-index: -1; pointer-events: none; clip-path: polygon(var(--cut) 0, calc(100% - var(--cut)) 0, 100% var(--cut), 100% calc(100% - var(--cut)), calc(100% - var(--cut)) 100%, var(--cut) 100%, 0 calc(100% - var(--cut)), 0 var(--cut)); }
+.key::before { inset: 0; background: var(--wood); }
+.key::after { inset: 1px; background: linear-gradient(180deg, #F2E1C1, var(--wood-light)); }
+.key:active { transform: translateY(1.5px); filter: none; }
+.key:focus-visible { z-index: 1; outline: 2px solid var(--ai); outline-offset: 1px; }
+.key-fn { display: flex; align-items: center; justify-content: center; gap: 4px; font-size: 15px; }
+.key-fn small { font-family: var(--font-display); font-size: 15px; font-weight: 700; color: var(--sumi); }
+.key-fn::after { background: linear-gradient(180deg, #D9B98C, var(--wood-face)); }
+.key-erase { font-size: 15px; letter-spacing: 0.08em; }
+/* ゛゜の字形は左上に寄っているので、大きくして中央へ寄せる */
+.key-dakuten .kp-lbl, .key-handakuten .kp-lbl { font-size: 30px; line-height: 1; transform: translate(0.18em, 0.2em); }
+.key-pop {
+  position: absolute;
+  z-index: 5;
+  width: 50px;
+  height: 54px;
+  display: grid;
+  place-items: center;
+  transform: translate(-50%, calc(-100% - 8px));
+  background: var(--kinari-light);
+  border: 2px solid var(--wood);
+  box-shadow: 0 6px 14px rgba(38, 34, 30, 0.3);
+  font-size: 30px;
+  font-weight: 800;
+  line-height: 1;
+  color: var(--sumi);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+.key-pop.is-on { opacity: 1; visibility: visible; }
+
+/* 問の一覧：スマホは下から出る札 */
+.play-list {
+  position: fixed;
+  z-index: 30;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  max-height: 78%;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 0 16px calc(16px + var(--safe-b));
+  background: var(--washi);
+  border-top: 5px solid var(--wood);
+  box-shadow: 0 -10px 30px rgba(38, 34, 30, 0.3);
+  transform: translateY(105%);
+  visibility: hidden;
+  transition: transform 0.2s ease-out, visibility 0s linear 0.2s;
+}
+.play-list[data-open="true"] { transform: none; visibility: visible; transition: transform 0.2s ease-out; }
+.list-back { position: fixed; inset: 0; z-index: 29; background: rgba(38, 34, 30, 0.45); opacity: 0; visibility: hidden; transition: opacity 0.2s, visibility 0s linear 0.2s; }
+.list-back[data-open="true"] { opacity: 1; visibility: visible; transition: opacity 0.2s; }
+.list-top { position: sticky; top: 0; z-index: 1; display: flex; align-items: center; justify-content: space-between; padding: 12px 0 8px; background: var(--washi); }
+.list-title { margin: 0; font-size: 18px; font-weight: 800; letter-spacing: 0.06em; }
+.list-h { margin: 12px 0 4px; padding-bottom: 4px; border-bottom: 1px solid rgba(34, 64, 107, 0.3); font-size: 14px; font-weight: 800; letter-spacing: 0.12em; color: var(--ai); }
+.list-ol { display: grid; gap: 2px; margin: 0; padding: 0; list-style: none; }
+.list-item {
+  display: grid;
+  grid-template-columns: 4.2em minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 8px;
+  width: 100%;
+  padding: 8px;
+  border: 0;
+  border-radius: 2px;
+  background: none;
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.6;
+  color: var(--sumi);
+  text-align: left;
+  cursor: pointer;
+}
+.list-item:hover { background: rgba(201, 158, 110, 0.16); }
+.list-item:focus-visible { outline: 2px solid var(--ai); outline-offset: -2px; }
+.list-item.is-current { background: var(--kinari-light); box-shadow: inset 3px 0 0 var(--shu); }
+.li-label { display: flex; flex-direction: column; font-family: var(--font-ui); font-size: 13px; line-height: 1.35; color: var(--ai); }
+.li-label small { font-size: 13px; font-weight: 500; color: var(--usuzumi); }
+.li-ans { display: block; color: var(--ai); font-weight: 800; }
+.li-done {
+  display: inline-grid;
+  place-items: center;
+  width: 1.6em;
+  height: 1.6em;
+  margin-top: 0.1em;
+  border-radius: 3px;
+  background: var(--ai);
+  color: var(--kinari-light);
+  font-size: 12px;
+  line-height: 1;
+  visibility: hidden;
+}
+.list-item.is-done .li-done { visibility: visible; }
+.list-item.is-done .li-text { color: var(--usuzumi); }
+/* 空きの無い問（最初から埋まっている）：「済」は付けず、薄く出す */
+.list-item.is-given { font-weight: 500; }
+.list-item.is-given .li-label, .list-item.is-given .li-text { color: var(--usuzumi); }
+.list-item.is-given .li-label { font-weight: 500; }
+.list-foot { display: flex; justify-content: center; padding: 18px 0 4px; }
+
+/* ---- 結果 ---- */
+.hanabi { position: fixed; inset: 0; z-index: 0; width: 100%; height: 100%; pointer-events: none; }
+.result-col { position: relative; z-index: 1; text-align: center; }
+.result-top { display: grid; justify-items: center; gap: 16px; margin: 10px 0 20px; }
+.seal {
+  display: grid;
+  place-items: center;
+  width: 116px;
+  height: 116px;
+  border-radius: 12px;
+  background: var(--shu);
+  box-shadow: inset 0 0 0 4px var(--shu), inset 0 0 0 7px var(--washi), inset 0 0 22px rgba(0, 0, 0, 0.22);
+  transform: rotate(-7deg);
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='m'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.1' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1.7 1.95'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23m)'/%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='m'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.1' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1.7 1.95'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23m)'/%3E%3C/svg%3E");
+}
+.seal-ch { writing-mode: vertical-rl; font-size: 44px; font-weight: 800; line-height: 1; letter-spacing: 0.04em; color: var(--washi); }
+.seal-sumi { background: var(--sumi); box-shadow: inset 0 0 0 4px var(--sumi), inset 0 0 0 7px var(--washi); }
+.seal.is-drop { animation: seal-drop 0.18s cubic-bezier(0.55, 0, 0.9, 0.4) both; }
+@keyframes seal-drop {
+  from { transform: scale(2.3) rotate(-20deg); opacity: 0; }
+  60% { opacity: 1; }
+  to { transform: rotate(-7deg); opacity: 1; }
+}
+.result-head { margin: 0; font-size: 22px; font-weight: 800; line-height: 1.55; letter-spacing: 0.04em; }
+.duel { margin: 0 0 18px; padding: 12px 14px; background: var(--kinari-light); border: 2px solid var(--shu); font-size: 16px; font-weight: 800; line-height: 1.7; }
+.duel[data-duel="lose"], .duel[data-duel="giveup"] { border-color: var(--sumi); }
+.duel[data-duel="draw"] { border-color: var(--ai); }
+.stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); margin: 0 0 18px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.stat { padding: 10px 4px; }
+.stats .stat + .stat { border-left: 1px solid rgba(107, 68, 40, 0.22); }
+.stat dt { font-family: var(--font-ui); font-size: 12px; line-height: 1.5; color: var(--usuzumi); }
+.stat dd { margin: 2px 0 0; font-size: 18px; font-weight: 800; line-height: 1.4; font-variant-numeric: tabular-nums; }
+.rank { margin: 0 0 18px; padding: 12px 12px 14px; background: var(--kinari-light); border-top: 3px double var(--shu); border-bottom: 3px double var(--shu); }
+.rank-head { margin: 0; font-family: var(--font-ui); font-size: 12px; letter-spacing: 0.14em; color: var(--usuzumi); }
+.rank-label { margin: 2px 0 4px; padding-left: 0.3em; font-size: 40px; font-weight: 800; line-height: 1.2; letter-spacing: 0.3em; }
+.rank-line { margin: 0; font-size: 15px; font-weight: 700; }
+.new-best { margin: -4px 0 18px; font-weight: 800; color: var(--shu); }
+
+/* ---- 果たし状 ---- */
+.letter {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 12px 16px;
+  margin: 14px 0 26px;
+  padding: 22px 18px 18px 20px;
+  background:
+    linear-gradient(90deg, transparent calc(33% - 1px), rgba(107, 68, 40, 0.07) 33%, transparent calc(33% + 1px)),
+    linear-gradient(90deg, transparent calc(66% - 1px), rgba(107, 68, 40, 0.07) 66%, transparent calc(66% + 1px)),
+    var(--kinari-light);
+  border: 1px solid var(--wood-face);
+  box-shadow: 0 12px 26px rgba(75, 46, 26, 0.2);
+}
+.letter-cover {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  align-self: start;
+  margin: 0;
+  padding: 12px 8px;
+  border: 2px solid var(--sumi);
+  writing-mode: vertical-rl;
+  font-size: 32px;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: 0.22em;
+}
+.letter-body { grid-column: 1; grid-row: 1; }
+.letter-head { margin: 0 0 12px; font-size: 19px; font-weight: 800; line-height: 1.5; }
+.screen-challenge .col { min-height: 100%; display: flex; flex-direction: column; justify-content: center; }
+.letter-text { margin: 0 0 8px; font-size: 16px; font-weight: 700; line-height: 1.85; }
+.letter-time { margin: 0; font-size: 15px; font-weight: 800; color: var(--shu); }
+.letter-seal { grid-column: 1; grid-row: 2; justify-self: end; transform: rotate(-6deg); }
+
+/* ---- 番付 ---- */
+.banzuke { padding: 4px 16px; background: var(--kinari-light); border: 1px solid var(--wood-face); border-top: 4px double var(--shu); border-bottom: 4px double var(--shu); }
+.bz-row { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 14px; padding: 14px 0; border-bottom: 1px solid rgba(107, 68, 40, 0.22); }
+.bz-name { margin: 0; padding: 10px 6px; writing-mode: vertical-rl; font-size: 19px; font-weight: 800; line-height: 1; letter-spacing: 0.14em; background: linear-gradient(90deg, #D6B281, var(--wood-light) 40%, #D3AD7A); border: 2px solid var(--wood); }
+.bz-stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); margin: 0; }
+.bz-stats .stat { padding: 0 4px 0 0; }
+.bz-stats dd { font-size: 17px; }
+.bz-best { display: grid; justify-items: center; gap: 4px; }
+.bz-cap { font-family: var(--font-ui); font-size: 12px; color: var(--usuzumi); }
+.bz-seal { display: grid; place-items: center; width: 60px; height: 60px; margin: 0; border-radius: 8px; background: var(--shu); color: var(--washi); box-shadow: inset 0 0 0 3px var(--shu), inset 0 0 0 5px var(--washi); transform: rotate(-6deg); writing-mode: vertical-rl; font-size: 19px; font-weight: 800; line-height: 1; letter-spacing: 0.06em; }
+.bz-seal.is-empty { background: transparent; color: var(--usuzumi); box-shadow: inset 0 0 0 1.5px var(--line); transform: none; font-size: 15px; }
+.bz-total { margin: 0; padding: 12px 0 10px; font-family: var(--font-ui); font-size: 13px; text-align: right; color: var(--usuzumi); }
+.bz-total b { font-family: var(--font-display); font-size: 19px; color: var(--sumi); }
+.bz-empty { margin: 0; padding: 28px 6px; font-size: 16px; font-weight: 700; line-height: 1.85; text-align: center; }
+
+/* ---- 指南書（巻物） ---- */
+.makimono {
+  position: relative;
+  padding: 8px 18px;
+  background: var(--kinari-light);
+  border-left: 10px solid var(--wood);
+  border-right: 10px solid var(--wood);
+  box-shadow: inset 1px 0 0 var(--wood-face), inset -1px 0 0 var(--wood-face), 0 8px 20px rgba(75, 46, 26, 0.16);
+}
+.howto-list { margin: 0; padding: 0; list-style: none; }
+.howto-item { display: grid; grid-template-columns: 3.4em minmax(0, 1fr); gap: 8px; padding: 13px 0; border-bottom: 1px dashed rgba(107, 68, 40, 0.3); }
+.howto-no { padding-top: 0.3em; font-size: 13px; font-weight: 800; color: var(--shu); }
+.howto-item p { margin: 0; font-size: 15px; font-weight: 700; line-height: 1.85; }
+.howto-ex { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 8px; }
+.mini-cells { display: inline-flex; gap: 1px; background: var(--wood-face); border: 2px solid var(--wood); }
+.mini-cell { display: grid; place-items: center; width: 26px; height: 26px; background: var(--washi); font-size: 15px; font-weight: 800; line-height: 1; }
+.howto-pc { padding: 14px 0 8px; }
+.howto-pc h2 { margin: 0 0 4px; font-size: 14px; font-weight: 800; letter-spacing: 0.08em; color: var(--ai); }
+.howto-pc p { margin: 0; font-family: var(--font-ui); font-size: 13px; line-height: 1.8; color: var(--usuzumi); }
+
+/* ---- しつらえ ---- */
+.settings { display: grid; gap: 20px; }
+.set-group { min-width: 0; margin: 0; padding: 0; border: 0; }
+.set-group legend { margin-bottom: 8px; padding: 0; font-size: 16px; font-weight: 800; letter-spacing: 0.06em; }
+.set-group .note { margin-top: 6px; }
+.seg { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: 8px; }
+.seg-opt { position: relative; display: block; cursor: pointer; }
+.seg-opt input { position: absolute; top: 50%; left: 50%; width: 1px; height: 1px; margin: 0; opacity: 0; pointer-events: none; }
+.seg-opt span {
+  --cut: 5px;
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 44px;
+  padding: 6px 10px;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.35;
+  text-align: center;
+  color: var(--sumi);
+  filter: drop-shadow(0 2px 0 rgba(75, 46, 26, 0.45));
+}
+.seg-opt span::before, .seg-opt span::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  pointer-events: none;
+  clip-path: polygon(var(--cut) 0, calc(100% - var(--cut)) 0, 100% var(--cut), 100% calc(100% - var(--cut)), calc(100% - var(--cut)) 100%, var(--cut) 100%, 0 calc(100% - var(--cut)), 0 var(--cut));
+}
+.seg-opt span::before { inset: 0; background: var(--wood); }
+.seg-opt span::after {
+  inset: 1.5px;
+  background:
+    repeating-linear-gradient(97deg, rgba(107, 68, 40, 0.07) 0 1px, transparent 1px 5px, rgba(107, 68, 40, 0.045) 5px 7px, transparent 7px 12px),
+    linear-gradient(180deg, #EBD3AC 0%, var(--wood-light) 45%, var(--wood-face) 100%);
+}
+.seg-opt:active span { transform: translateY(2px); filter: none; }
+.seg-dot { display: none; font-size: 9px; font-style: normal; line-height: 1; }
+.seg-lbl { font-weight: inherit; }
+.seg-opt input:checked + span { color: var(--kinari-light); }
+.seg-opt input:checked + span::before { background: #16294A; }
+.seg-opt input:checked + span::after { background: linear-gradient(180deg, #2E5387 0%, var(--ai) 60%, #1B3558 100%); }
+.seg-opt input:checked + span .seg-dot { display: inline; }
+.seg-opt input:focus-visible + span { outline: 2px solid var(--ai); outline-offset: 2px; }
+.set-reset { display: flex; justify-content: center; padding-top: 22px; border-top: 1px solid var(--line); }
+.screen-settings .back-row { margin-top: 36px; }
+.mini-in { display: inline-grid; place-items: center; width: 18px; height: 18px; border-radius: 2px; background: var(--shu); color: var(--washi); font-size: 11px; font-weight: 800; line-height: 1; letter-spacing: 0; transform: rotate(-6deg); }
+
+/* ---- 共有 ---- */
+.hatashi { margin-top: 30px; padding-top: 18px; border-top: 1px solid var(--line); text-align: center; }
+.hatashi-head { margin: 0 0 4px; font-size: 17px; font-weight: 800; letter-spacing: 0.06em; }
+.hatashi-head small { margin-left: 0.7em; font-family: var(--font-ui); font-size: 12px; font-weight: 500; letter-spacing: 0.02em; color: var(--usuzumi); }
+.hatashi-lead { margin: 0 0 12px; font-family: var(--font-ui); font-size: 13px; color: var(--usuzumi); }
+.hatashi-btns { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-top: 10px; }
+.hatashi-btns.has-native { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.hatashi-btns .fuda { width: 100%; letter-spacing: 0.04em; }
+.hatashi-url { width: 100%; margin-top: 10px; padding: 8px 10px; border: 1px solid var(--wood-face); background: var(--kinari-light); font-family: var(--font-ui); font-size: 13px; }
+.hatashi-note { margin: 12px 0 0; font-family: var(--font-ui); font-size: 13px; line-height: 1.75; color: var(--usuzumi); }
+/* タイトルの共有欄は全アプリ共通の部品（shared/share.js・share.css）。色と押せる大きさは部品のまま、
+   置き方だけを口上の列（中央ぞろえ）に合わせる。狭い幅で列の外へはみ出さないよう、部品の最低幅は外す */
+.share-host { margin-top: 30px; }
+.share-host .share { min-width: 0; max-width: 100%; margin: 0; text-align: center; }
+.share-host .share__row { justify-content: center; }
+.share-host .share__note { margin-inline: auto; }
+
+@media (min-width: 768px) and (min-height: 820px) {
+  .title-main { font-size: 82px; }
+  .title-sub { font-size: 17px; margin-top: 40px; }
+}
+
+@media (max-height: 739px) {
+  .play-main { gap: 5px; padding-bottom: calc(12px + var(--safe-b)); }
+  .tools .fuda { min-height: 36px; }
+  /* 問が2段になった分、五十音盤のすき間を詰める（キーの高さ38pxは保つ） */
+  .keypad { gap: 2px; padding: 2px; }
+  .clue { height: 72px; }
+  .screen-play.is-roomy .clue { height: 90px; }
+  .clue-body { padding: 4px 3px; gap: 2px; }
+  .is-main .clue-line { font-size: 14px; line-height: 1.38; }
+  .is-sub .clue-line { font-size: 12.5px; line-height: 1.4; }
+  .clue-row.is-main.is-long .clue-line { font-size: 13px; line-height: 1.38; }
+  .clue-row.is-sub.is-long .clue-line { font-size: 11.5px; line-height: 1.4; }
+}
+
+/* 背の低い画面（〜700px。ツールバーの出た Safari など）：見出し帯・すき間・道具の列・五十音盤の余白を詰め、
+   11段の盤でもマスを24px以上に保つ（キーの高さは36pxを守る） */
+@media (max-height: 700px) {
+  :root { --key-h: 36px; --fn-h: 36px; --frame: 3px; }
+  .play-head { height: 40px; }
+  .play-main { gap: 3px; }
+  .tools .fuda { min-height: 32px; padding-top: 2px; padding-bottom: 2px; }
+  .keypad { gap: 1px; padding: 0; }
+  .clue { height: 62px; }
+  .screen-play.is-roomy .clue { height: 78px; }
+  .clue-body { padding: 3px 3px; gap: 2px; }
+  .is-main .clue-line { font-size: 13px; line-height: 1.25; }
+  .is-sub .clue-line { font-size: 12px; line-height: 1.25; }
+  .clue-row.is-main.is-long .clue-line { font-size: 12.5px; line-height: 1.25; }
+  .clue-row.is-sub.is-long .clue-line { font-size: 11.5px; line-height: 1.25; }
+}
+
+/* スマホ：残りの字数と時間を縦に積み、見出し帯の中央の枠（案内役の一言）を広く取る */
+@media (max-width: 599px) {
+  .play-meta { flex-direction: column; align-items: flex-end; gap: 0; line-height: 1.15; font-size: 13px; }
+  .prog-val { font-size: 16px; }
+}
+
+/* ---- PC：盤・いまの問・五十音盤は左、縦と横の問の一覧は右の列に常に出す ---- */
+@media (min-width: 1024px) {
+  .screen-play { padding-left: max(24px, var(--safe-l)); padding-right: max(24px, var(--safe-r)); }
+  .play-head { max-width: 1160px; height: 56px; }
+  .play-level { font-size: 17px; }
+  .play-body { max-width: 1160px; gap: 32px; }
+  .play-main { max-width: 620px; margin: 0 auto; }
+  .play-list {
+    position: static;
+    flex: 0 0 340px;
+    max-height: none;
+    padding: 0 6px 16px 22px;
+    background: transparent;
+    border-top: 0;
+    border-left: 1px solid var(--line);
+    box-shadow: none;
+    transform: none;
+    visibility: visible;
+    transition: none;
+  }
+  .list-top { position: static; background: transparent; padding-top: 4px; }
+  .list-back, .list-close, .tool-list { display: none; }
+  .is-review .tools { display: none; }
+  .clue { height: 88px; }
+  .screen-play.is-roomy .clue { height: 108px; }
+  .is-main .clue-line { font-size: 16px; }
+  .is-sub .clue-line { font-size: 14px; }
+  .clue-row.is-main.is-long .clue-line { font-size: 14.5px; }
+  .clue-row.is-sub.is-long .clue-line { font-size: 13px; }
+}
+
+/* ---- 動きを控えめに（端末の設定か、しつらえの「控えめ」）。画面の切り替えのフェードだけ残す ---- */
+[data-motion="reduce"] .seal.is-drop,
+[data-motion="reduce"] .cell.dye,
+[data-motion="reduce"] .cell.dye .ch,
+[data-motion="reduce"] .cell.shake { animation: none; }
+[data-motion="reduce"] .annai,
+[data-motion="reduce"] .play-list,
+[data-motion="reduce"] .list-back,
+[data-motion="reduce"] .fuda { transition: none; }
+
+/* ---- 第2周の追加 ---- */
+/* いまの問の外周を2pxの藍の線で囲む（色の差だけに頼らない） */
+.word-frame { position: relative; z-index: 2; pointer-events: none; box-shadow: 0 0 0 2px var(--ai); border-radius: 1px; }
+.word-frame[hidden] { display: none; }
+
+/* 共有の札：副ボタンより軽く小さく */
+.fuda-share { --cut: 4px; --edge: #A57C55; min-height: 36px; padding: 4px 6px; font-size: 13px; letter-spacing: 0.02em; white-space: nowrap; filter: drop-shadow(0 1px 0 rgba(75, 46, 26, 0.35)); }
+
+/* 札（ダイアログ）の小さな文字の選択肢（やめておく・いっそ降参する…） */
+.kosatsu-extras { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 22px; margin-top: 12px; }
+.kosatsu-extras .kosatsu-extra { margin: 0; }
+
+/* 腕前選び：見出しの下の一言と、段位の朱の小印 */
+.screen-lead { margin: -10px 0 18px; font-size: 15px; font-weight: 700; text-align: center; color: var(--usuzumi); }
+.lc-seals { display: flex; gap: 3px; margin-bottom: 6px; }
+.lc-seal { width: 12px; height: 12px; border-radius: 2px; background: var(--shu); box-shadow: inset 0 0 0 1.5px rgba(255, 255, 255, 0.35); transform: rotate(-6deg); }
+
+/* （v2-r2）手習いの結果：解いた言葉（漢字つき）と、3局続けて解いたときの一人前への誘い */
+.solved-words { margin: 8px 0 0; font-size: 16px; font-weight: 700; line-height: 1.6; text-align: center; color: var(--ai); }
+.sw-label { font-family: var(--font-ui); font-size: 13px; color: var(--usuzumi); }
+.graduate { margin: 22px 0 6px; padding: 14px 16px 16px; text-align: center; background: var(--kinari-light); border: 1px solid var(--wood-face); box-shadow: 0 1px 0 rgba(75, 46, 26, 0.18); }
+.graduate-text { margin: 0 0 12px; font-size: 16px; font-weight: 700; }
+.graduate .fuda { width: 100%; }
+
+/* 果たし状の上の小さな題字 */
+.ch-brand { display: flex; flex-direction: column; align-items: center; gap: 2px; margin: 0 0 12px; }
+.ch-title { font-size: 24px; font-weight: 800; letter-spacing: 0.14em; line-height: 1.3; }
+.ch-sub { font-family: var(--font-ui); font-size: 13px; letter-spacing: 0.12em; color: var(--usuzumi); }
+
+@media (min-width: 600px) {
+  .clue-label { font-size: 13px; }
+}
+
+/* PC：見出し帯を盤の列の幅にそろえ、一覧は右の列。案内の一言は盤の列の中央の見出し帯に出す */
+@media (min-width: 1024px) {
+  .screen-play { display: grid; grid-template-columns: minmax(0, 620px) 340px; grid-template-rows: 56px minmax(0, 1fr); justify-content: center; column-gap: 40px; }
+  .play-head { grid-column: 1; grid-row: 1; max-width: none; margin: 0; position: relative; }
+  .play-body { display: contents; }
+  .play-main { grid-column: 1; grid-row: 2; width: 100%; max-width: none; margin: 0; }
+  .play-list { grid-column: 2; grid-row: 1 / span 2; height: 100%; min-height: 0; }
+  .annai.is-local { top: 8px; bottom: auto; left: 50%; right: auto; width: max-content; max-width: 560px; padding: 6px 14px 6px 9px; font-size: 15px; line-height: 1.45; transform: translate(-50%, -4px); }
+  .annai.is-local[data-state="on"] { transform: translate(-50%, 0); }
+  .annai.is-local[data-state="out"] { transform: translate(-50%, -3px); }
+}
+
+/* ---- 第3周（v2-r3）の追加 ---- */
+/* 全角の「！」は直立した字形のゴシックで（明朝では寝た線に見えるため） */
+.bang { font-family: var(--font-ui); font-weight: 700; }
+/* 番付の空欄は縦書きの枠でも「—」に見せる */
+.bz-seal.is-empty { writing-mode: horizontal-tb; }
+/* タイトル：看板の中心を口上と主ボタンの軸に。脇の札は看板の左肩に少し重ねる */
+.title-sign { display: flex; justify-content: center; margin: 0 auto 22px; }
+.kanban-wrap { position: relative; }
+.title-sign .title-sub { position: absolute; z-index: 1; top: 30px; right: calc(100% - 12px); margin: 0; }
+/* しつらえ：「閉じる」の下に離して「記録を消す」 */
+.screen-settings .back-row { margin-top: 30px; }
+.screen-settings .set-reset { margin-top: 40px; }
+/* 768px〜：中身の列を約560pxに、小さな字は13px以上に。腕前選びは縦の中央へ */
+@media (min-width: 768px) {
+  .col { max-width: 560px; }
+  .lc-counts, .lc-rec, .hatashi-head small, .clue-pend small { font-size: 13px; }
+  .cell .num { font-size: max(13px, calc(var(--cell, 32px) * 0.25)); }
+  .screen-select { display: flex; flex-direction: column; justify-content: center; }
+  .title-sign .title-sub { top: 40px; }
+}
+/* 1280px〜：問の一覧の本文の幅を約320pxに */
+@media (min-width: 1280px) {
+  .screen-play { grid-template-columns: minmax(0, 620px) 460px; }
+}

@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=1200">
+<title>ことば辻 OGP</title>
+<!-- tools/make-og.mjs がこのページを 1200×630 で撮って assets/og.png にする -->
+<!-- 書体はアプリと同じ同梱の woff2（外の書体配信は読まない） -->
+<link rel="stylesheet" href="../fonts/fonts.css">
+<style>
+  :root {
+    --washi: #F2E8D5; --washi-deep: #E4D4B4; --sumi: #26221E; --usuzumi: #5B5147; --shu: #B33A2B; --ai: #22406B;
+    --kinari-light: #FBF6EA; --akari: #F6DFA4; --wood: #6B4428; --wood-face: #C99E6E; --wood-light: #E2C49A; --kincha: #C8963E;
+    --font-display: "Shippori Mincho B1", "Hiragino Mincho ProN", "Yu Mincho", serif;
+    --font-ui: "Zen Kaku Gothic New", "Hiragino Sans", "Yu Gothic", sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body {
+    width: 1200px; height: 630px; overflow: hidden; position: relative;
+    background-color: var(--washi);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .4 0 0 0 0 .28 0 0 0 0 .14 0 0 0 .08 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    font-family: var(--font-display); color: var(--sumi);
+  }
+  body::after { content: ""; position: absolute; inset: 0; background: radial-gradient(ellipse 80% 75% at 50% 55%, transparent 60%, rgba(107, 68, 40, .14)); pointer-events: none; }
+  /* 上に垂れる藍の暖簾（中央で割れ、白抜きの丸に辻） */
+  .noren { position: absolute; top: 0; left: 0; right: 0; height: 118px; display: flex; gap: 5px; }
+  .noren::before { content: ""; position: absolute; z-index: 2; top: 6px; left: 0; right: 0; height: 14px; border-radius: 7px; background: linear-gradient(180deg, #9A6A42, var(--wood) 60%, #4E3120); }
+  .panel { position: relative; flex: 1; overflow: hidden; border-bottom: 4px solid #172D4D;
+    background: linear-gradient(90deg, rgba(0,0,0,.18), transparent 8%, transparent 92%, rgba(0,0,0,.18)), repeating-linear-gradient(90deg, rgba(255,255,255,.035) 0 1px, transparent 1px 4px), linear-gradient(180deg, #1B355A, var(--ai) 60%, #1D3860); }
+  .panel svg { position: absolute; top: 26px; width: 84px; height: 84px; }
+  .panel.l svg { right: -44.5px; }
+  .panel.r svg { left: -44.5px; }
+  .main { position: absolute; left: 88px; top: 168px; width: 640px; }
+  h1 { margin: 0 0 0 -8px; font-size: 128px; font-weight: 800; line-height: 1; letter-spacing: .04em; white-space: nowrap; }
+  .sub { margin: 20px 0 0; font-size: 42px; font-weight: 800; letter-spacing: .14em; }
+  .lead { margin: 18px 0 0; line-height: 1.45; font-family: var(--font-ui); font-size: 23px; white-space: nowrap; font-weight: 700; color: var(--usuzumi); letter-spacing: .02em; }
+  .chips { display: flex; gap: 14px; margin-top: 26px; }
+  .chip { position: relative; padding: 9px 18px 10px; font-size: 22px; font-weight: 800; letter-spacing: .04em; isolation: isolate; }
+  .chip::before, .chip::after { content: ""; position: absolute; z-index: -1; clip-path: polygon(7px 0, calc(100% - 7px) 0, 100% 7px, 100% calc(100% - 7px), calc(100% - 7px) 100%, 7px 100%, 0 calc(100% - 7px), 0 7px); }
+  .chip::before { inset: 0; background: var(--wood); }
+  .chip::after { inset: 2px; background: linear-gradient(180deg, #EBD3AC, var(--wood-light) 45%, var(--wood-face)); }
+  .chip b { font-family: var(--font-display); color: var(--shu); }
+  /* 障子の盤：えど・どじよう・よる（辻2か所）。ほぼ埋まっていて、辻が1つだけ空いている */
+  .board { position: absolute; right: 96px; top: 196px; display: grid; grid-template-columns: repeat(4, 78px); grid-auto-rows: 78px; gap: 3px; background: var(--wood); border: 7px solid var(--wood); box-shadow: 0 0 0 1px #4E3120, 0 16px 30px rgba(75,46,26,.28); }
+  .c { position: relative; display: grid; place-items: center; background: var(--washi); font-size: 46px; font-weight: 800; line-height: 1; }
+  .c.x { background: #3A2A1F; box-shadow: inset 0 -3px 6px rgba(0,0,0,.25); }
+  .c.t { background: var(--akari); box-shadow: inset 0 0 0 3px var(--shu); }
+  /* 空いた辻（ここを埋める）：朱の点線で内側を縁取る（本体の盤と同じ印） */
+  .c.a::before { content: ""; position: absolute; inset: 9px; border: 4px dotted var(--shu); border-radius: 2px; }
+  .c.a i { z-index: 1; padding: 0 2px 1px 0; background: var(--washi); }
+  .c.s { color: var(--ai); }
+  .c i { position: absolute; top: 3px; left: 5px; font-style: normal; font-family: var(--font-ui); font-size: 15px; font-weight: 700; color: var(--usuzumi); }
+  .tag { position: absolute; right: 96px; top: 540px; width: 339px; text-align: center; font-family: var(--font-ui); font-size: 19px; font-weight: 700; color: var(--usuzumi); }
+  .tag span { display: inline-block; width: 18px; height: 18px; margin-right: 6px; vertical-align: -3px; border: 3px dotted var(--shu); border-radius: 2px; background: var(--washi); }
+</style>
+</head>
+<body>
+  <div class="noren" aria-hidden="true">
+    <div class="panel l"><svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="43" fill="none" stroke="#F2E8D5" stroke-width="9"/><text x="50" y="52" text-anchor="middle" dominant-baseline="central" font-size="56" font-weight="800" fill="#F2E8D5" style="font-family: var(--font-display)">辻</text></svg></div>
+    <div class="panel r"><svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="43" fill="none" stroke="#F2E8D5" stroke-width="9"/><text x="50" y="52" text-anchor="middle" dominant-baseline="central" font-size="56" font-weight="800" fill="#F2E8D5" style="font-family: var(--font-display)">辻</text></svg></div>
+  </div>
+  <div class="main">
+    <h1>ことば辻</h1>
+    <p class="sub">江戸のクロスワード</p>
+    <p class="lead">空いた辻に、縦にも横にも合う一字を。<br>難しさは、埋める字の数で選ぶでござる</p>
+    <div class="chips">
+      <span class="chip">手習い <b>1</b>字</span>
+      <span class="chip">一人前 <b>7</b>字</span>
+      <span class="chip">免許皆伝 <b>15</b>字</span>
+    </div>
+  </div>
+  <div class="board" aria-hidden="true">
+    <div class="c"><i>1</i>え</div><div class="c a"><i>2</i></div><div class="c x"></div><div class="c x"></div>
+    <div class="c x"></div><div class="c">じ</div><div class="c x"></div><div class="c x"></div>
+    <div class="c x"></div><div class="c"><i>3</i>よ</div><div class="c">る</div><div class="c x"></div>
+    <div class="c x"></div><div class="c">う</div><div class="c x"></div><div class="c x"></div>
+  </div>
+  <p class="tag"><span></span>が空いた辻（ここに一字）</p>
+</body>
+</html>
