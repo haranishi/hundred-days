@@ -588,6 +588,8 @@ export async function createWorld({ canvas, manifest, onProgress = () => {}, pix
   // 床・物に当たった点（押した場所へ歩くため）
   const raycaster = new THREE.Raycaster();
   function pick(ndcX, ndcY) {
+    // カメラの向きの行列は描いたときにしか更新されない。描き直しを間引く自動テストでも、押した瞬間の向きで当てる
+    camera.updateMatrixWorld();
     raycaster.setFromCamera(new THREE.Vector2(ndcX, ndcY), camera);
     const hits = raycaster.intersectObjects([shell, fixtures, propLayer], true).filter(h => h.object.visible && h.object.material !== glassMat && !(h.object.material && h.object.material.map === shadowTex));
     const hit = hits.find(h => isVisibleChain(h.object));
@@ -604,7 +606,11 @@ export async function createWorld({ canvas, manifest, onProgress = () => {}, pix
   key.position.set(1.5, 3, 2.5);
   thumbScene.add(key, new THREE.HemisphereLight('#fff6ea', '#8f7760', 1.0));
   const thumbCam = new THREE.PerspectiveCamera(30, 1, 0.01, 50);
-  function thumbnail(id, size = 256) {
+  /**
+   * 候補の写真。家を描いている画面の左下の角を借りて描き、写し取る。
+   * restore: 写したあと家を描き直して角を元に戻す（自動テストでは省く。ソフトウェア描画では描き直し1回に数秒かかる）
+   */
+  function thumbnail(id, size = 256, { restore = true } = {}) {
     const clone = props[id].model.clone(true);
     clone.position.set(0, 0, 0);
     clone.rotation.set(0, THREE.MathUtils.degToRad(PROPS[id].front ?? 0), 0);
@@ -661,7 +667,7 @@ export async function createWorld({ canvas, manifest, onProgress = () => {}, pix
     renderer.setScissor(scissor);
     renderer.setViewport(viewport);
     renderer.setClearColor(clearColor, clearAlpha);
-    render();
+    if (restore) render();
     return c.toDataURL('image/png');
   }
 
