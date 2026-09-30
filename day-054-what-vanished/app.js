@@ -39,7 +39,7 @@ const params = new URLSearchParams(location.search);
 const pace = params.get('pace') === 'fast' ? 'fast' : 'normal';
 // 自動テスト用。?clock=manual では進行の時間が advance() でしか進まない（描画の速さに左右されない）
 const manualClock = params.get('clock') === 'manual';
-// 自動テスト用。?gfx=test では描画を軽くする（画面の細かさ半分・影なし・描き直しは1秒に1回）。
+// 自動テスト用。?gfx=test では描画を軽くする（画面の細かさ半分・影なし・描き直しは3秒に1回）。
 // CI のソフトウェア描画では1コマに数秒かかり、テストの操作が毎回そのコマを待たされて時間切れになった
 const testGfx = params.get('gfx') === 'test';
 const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -326,8 +326,9 @@ function updateTimer() {
 
 // ---------- 答える ----------
 function thumbOf(id) {
-  // 画面の細かさを半分にしたテストでは、256pxの写真が描く場所からはみ出すので小さく作る
-  if (!s.thumbs.has(id)) s.thumbs.set(id, s.world.thumbnail(id, testGfx ? 96 : 256));
+  // 画面の細かさを半分にしたテストでは、256pxの写真が描く場所からはみ出すので小さく作る。
+  // 写したあとの家の描き直しも省く（候補8つで8回。CI では3問を通すテストがこれで150秒の上限に届いた）
+  if (!s.thumbs.has(id)) s.thumbs.set(id, s.world.thumbnail(id, testGfx ? 96 : 256, { restore: !testGfx }));
   return s.thumbs.get(id);
 }
 function prepareThumbs(ids) {
@@ -893,7 +894,7 @@ function frame(now) {
   }
   // 共有や遊び方の小窓が開いている間は、後ろの家は止まって見えているので描き直さない
   // （電池の節約。ソフトウェア描画の端末では1枚に約1秒かかり、小窓の操作が待たされた）
-  if (!document.querySelector('dialog[open]') && (!testGfx || now - s.renderedAt >= 1000)) {
+  if (!document.querySelector('dialog[open]') && (!testGfx || now - s.renderedAt >= 3000)) {
     s.world.render();
     s.renderedAt = now;
     placeSpotLabel();

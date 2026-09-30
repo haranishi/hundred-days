@@ -7,14 +7,16 @@ import { planGame } from '../../day-054-what-vanished/lib/rules.js';
 /* Day 054 消えたのは、どれ？
    3Dの描画はCIではソフトウェア描画で遅いので、時間はテスト用の窓口 window.__day054.advance() で早送りする。
    ?pace=fast は覚える・探す時間を4秒にする録画・テスト用の進行、?clock=manual は時間を advance() だけで進める。
-   ?gfx=test は描画を軽くする（細かさ半分・影なし・描き直しは1秒に1回）。CI では1コマに数秒かかり、
-   操作のたびにそのコマを待たされて、1本150秒の上限に2本続けて届いた（2026-10-01 の PR #126）。
+   ?gfx=test は描画を軽くする（細かさ半分・影なし・描き直しは3秒に1回・候補の写真のあとの描き直しなし）。
+   CI では1コマに数秒かかり、操作のたびにそのコマを待たされて、1本150秒の上限に2本続けて届いた
+   （2026-10-01 の PR #126。描き直しを1秒に1回にしたあとも、main の CI で3問を通す2本が150秒に届いた）。
+   上限は CI の機械の速さのぶれ（同じコードでテスト全体が37分と44分）を見込んで240秒にしている。
    外への通信はすべて塞いで数える。 */
 
 const APP = '/day-054-what-vanished/';
 const manifest = JSON.parse(readFileSync(new URL('../../day-054-what-vanished/data/models.json', import.meta.url), 'utf8'));
 
-test.describe.configure({ timeout: 150_000 });
+test.describe.configure({ timeout: 240_000 });
 
 // CI の描画はソフトウェアで1秒に数枚なので、画面は小さめにし、動きを減らす設定で視点の移動を一瞬にする
 async function openApp(browser, { viewport = { width: 960, height: 600 }, hash = '', touch = false } = {}) {
