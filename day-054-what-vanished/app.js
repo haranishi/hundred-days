@@ -39,8 +39,10 @@ const params = new URLSearchParams(location.search);
 const pace = params.get('pace') === 'fast' ? 'fast' : 'normal';
 // 自動テスト用。?clock=manual では進行の時間が advance() でしか進まない（描画の速さに左右されない）
 const manualClock = params.get('clock') === 'manual';
-// 自動テスト用。?gfx=test では描画を軽くする（画面の細かさ半分・影なし・描き直しは3秒に1回）。
-// CI のソフトウェア描画では1コマに数秒かかり、テストの操作が毎回そのコマを待たされて時間切れになった
+// 自動テスト用。?gfx=test では家を描かない（候補の写真だけ、細かさ半分・影なし・縁のなめらか処理なしで描く）。
+// ソフトウェア描画は、初めて描く組み合わせごとに描画の手順をその場で組み立てるので、最初の1枚で
+// ページが5秒（CI では30秒超）止まり、テストの操作が時間切れになった（2026-10-01）。
+// テストが確かめるのは進行と画面の部品で、3Dの絵は手元の撮影と本番の確認で見る
 const testGfx = params.get('gfx') === 'test';
 const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const touch = matchMedia('(pointer: coarse)').matches;
@@ -81,8 +83,7 @@ const s = {
   moved: false,
   stepDist: 0,
   visited: new Set(),
-  travel: null,
-  renderedAt: -Infinity
+  travel: null
 };
 
 // ---------- 起動 ----------
@@ -894,9 +895,8 @@ function frame(now) {
   }
   // 共有や遊び方の小窓が開いている間は、後ろの家は止まって見えているので描き直さない
   // （電池の節約。ソフトウェア描画の端末では1枚に約1秒かかり、小窓の操作が待たされた）
-  if (!document.querySelector('dialog[open]') && (!testGfx || now - s.renderedAt >= 3000)) {
+  if (!testGfx && !document.querySelector('dialog[open]')) {
     s.world.render();
-    s.renderedAt = now;
     placeSpotLabel();
     adaptQuality(now);
   }

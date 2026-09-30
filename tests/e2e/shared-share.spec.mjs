@@ -16,8 +16,14 @@ test('公開しているアプリが1つ以上ある', () => {
   expect(published.length).toBeGreaterThan(0);
 });
 
+/* 3Dの家を描くDayは、CI のソフトウェア描画だと最初の1枚でページが30秒以上止まり、
+   このテストの読み取りが時間切れになった（Day 054・2026-10-01）。そのDayだけ、家を描かないテスト用の開き方にする。
+   共有欄・OGP・canonical は3Dの描画と関係しない。ほかのDayの多くは URL の引数を読むので、一律には付けない */
+const TEST_QUERY = { 'day-054-what-vanished': '?gfx=test' };
+const pathOf = (dir) => `/${dir}/${TEST_QUERY[dir] ?? ''}`;
+
 async function openShare(page, dir) {
-  await page.goto(`/${dir}/`);
+  await page.goto(pathOf(dir));
   // 全画面ビューでは共有欄をダイアログに置く。利用者と同じ入口を操作して検証する。
   const opener = page.getByRole('button', { name: 'このアプリを共有する', exact: true });
   if (await opener.count()) await opener.click();
@@ -28,7 +34,7 @@ for (const { dir, meta } of published) {
     const url = `https://hundred-days.pages.dev/${dir}/`;
 
     test('リンクを貼ったときに中身が出る（OGPとcanonical）', async ({ page }) => {
-      await page.goto(`/${dir}/`);
+      await page.goto(pathOf(dir));
 
       await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', url);
       await expect(page.locator('meta[property="og:title"]')).toHaveAttribute('content', meta.title);
