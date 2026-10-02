@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="絵を1枚えらぶと、材料と量、前の晩と朝の段取り、食材ごとの実寸の型紙まで出します。画像は端末の中だけで処理します。">
+  <meta name="share:text" content="キャラ弁設計図 — 絵を1枚えらぶと、材料・段取り・実寸の型紙まで出してくれる">
+  <meta name="theme-color" content="#FFFBF2">
+  <title>キャラ弁設計図</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="shared/share.css">
+  <link rel="stylesheet" href="app.css">
+  <script src="shared/share.js" defer></script>
+  <script type="module" src="app.js"></script>
+</head>
+<body>
+  <header class="site-header">
+    <span class="brand"><img src="favicon.svg" alt="" width="28" height="28">キャラ弁設計図</span>
+  </header>
+
+  <main id="app" data-state="empty">
+    <section class="hero" aria-labelledby="title">
+      <h1 id="title">キャラ弁設計図</h1>
+      <p class="lead">絵を1枚えらぶと、<wbr>材料・段取り・<wbr>実寸の型紙まで出します</p>
+    </section>
+
+    <section class="card pick" aria-labelledby="pick-h">
+      <h2 id="pick-h"><span class="num" aria-hidden="true">1</span>絵をえらぶ</h2>
+      <div class="pick__buttons">
+        <label class="btn btn--primary btn--file">
+          <input type="file" id="file" accept="image/*">
+          <span>絵をえらぶ</span>
+        </label>
+        <button type="button" class="btn" id="sample-neko">サンプルで試す</button>
+        <button type="button" class="btn" id="sample-kodomo">こどもの絵のサンプル</button>
+      </div>
+      <div class="drop" id="drop">ここに画像をドロップ。<wbr>貼り付けても読み込めます</div>
+      <p class="note">PNG・JPEG・WebP・GIF（20MBまで）。<wbr>白い紙に描いた、<wbr>色のはっきりした絵が向いています。</p>
+      <p class="note note--safe">えらんだ画像は、<wbr>この端末の中だけで処理します。<wbr>どこにも送らず、<wbr>保存もしません。</p>
+      <p class="status" id="status" role="status" aria-live="polite"></p>
+      <p class="error" id="error" role="alert"></p>
+    </section>
+
+    <div class="work">
+      <section class="card adjust" id="adjust" aria-labelledby="adjust-h">
+        <h2 id="adjust-h"><span class="num" aria-hidden="true">2</span>整える</h2>
+        <figure class="preview">
+          <canvas id="preview" role="img" aria-label="完成イメージ"></canvas>
+          <figcaption>完成イメージ（見当をつけるための絵です）<br><span id="char-size"></span></figcaption>
+        </figure>
+
+        <div class="panel">
+          <h3>読み取った絵</h3>
+          <canvas id="source" class="source" tabindex="0" aria-label="読み取った絵。消し残しをタップすると背景として消えます。矢印キーで印を動かし、Enterキーでも消せます" aria-describedby="source-help"></canvas>
+          <p class="hint" id="source-help">消し残しをタップすると、<wbr>背景として消えます。</p>
+          <div class="row">
+            <button type="button" class="btn btn--small" id="undo" disabled>元に戻す</button>
+            <span class="said" id="source-said" role="status" aria-live="polite"></span>
+          </div>
+        </div>
+
+        <div class="panel">
+          <label class="slider" for="tolerance">
+            <span class="slider__label">背景の消し具合 <output id="tolerance-out" for="tolerance">14</output></span>
+            <input type="range" id="tolerance" min="6" max="30" step="1" value="14">
+            <span class="slider__ends" aria-hidden="true"><span>弱い</span><span>強い</span></span>
+          </label>
+        </div>
+
+        <fieldset class="panel seg-group">
+          <legend>弁当箱</legend>
+          <div class="seg">
+            <label><input type="radio" name="box" value="kid"><span>幼児用<small>13×9cm</small></span></label>
+            <label><input type="radio" name="box" value="school" checked><span>小学生<small>16×11cm</small></span></label>
+            <label><input type="radio" name="box" value="adult"><span>大人<small>18×12cm</small></span></label>
+          </div>
+        </fieldset>
+
+        <fieldset class="panel seg-group">
+          <legend>難易度</legend>
+          <div class="seg">
+            <label><input type="radio" name="difficulty" value="easy"><span>かんたん</span></label>
+            <label><input type="radio" name="difficulty" value="normal" checked><span>ふつう</span></label>
+            <label><input type="radio" name="difficulty" value="hard"><span>こだわり</span></label>
+          </div>
+          <p class="hint">かんたんにすると、<wbr>細かいパーツが減ります。</p>
+        </fieldset>
+
+        <div class="panel layers-panel">
+          <h3>色ごとの食材</h3>
+          <p class="hint">家に無い食材は、<wbr>ほかの食材に変えられます。</p>
+          <ul class="layers" id="layers"></ul>
+        </div>
+      </section>
+
+      <section class="card make" id="make" aria-labelledby="make-h">
+        <h2 id="make-h"><span class="num" aria-hidden="true">3</span>作る</h2>
+
+        <div class="block">
+          <h3>材料 <small>量は目安です</small></h3>
+          <ul class="materials" id="materials"></ul>
+          <p class="rice-total" id="rice-total"></p>
+          <div class="row">
+            <button type="button" class="btn" id="copy-memo">買い物メモをコピー</button>
+            <span class="said" id="copy-said" role="status" aria-live="polite"></span>
+          </div>
+        </div>
+
+        <div class="block">
+          <h3>道具</h3>
+          <ul class="tools" id="tools"></ul>
+        </div>
+
+        <div class="block">
+          <h3>手順 <small>チェックで消し込めます</small></h3>
+          <h4 class="when when--night">前の晩</h4>
+          <ol class="steps" id="night"></ol>
+          <h4 class="when when--morning">当日の朝</h4>
+          <ol class="steps" id="morning"></ol>
+        </div>
+
+        <div class="block">
+          <h3>型紙</h3>
+          <div class="templates" id="templates"></div>
+          <button type="button" class="btn btn--primary btn--wide" id="print">型紙を印刷する（実寸）</button>
+          <ul class="hint-list">
+            <li>印刷の設定で「実際のサイズ」か「倍率100%」をえらびます。<wbr>「ページに合わせる」だと大きさが変わります。</li>
+            <li>印刷したら、<wbr>1cmの枠を定規で確かめます。<wbr>PDFに保存してもかまいません。</li>
+          </ul>
+        </div>
+
+        <div class="block cautions">
+          <h3>注意</h3>
+          <h4>衛生</h4>
+          <ul id="hygiene"></ul>
+          <h4>アレルギー</h4>
+          <ul id="allergy"></ul>
+          <h4>キャラクターの使い方</h4>
+          <p id="private-use"></p>
+          <ul class="notices" id="notices"></ul>
+        </div>
+      </section>
+    </div>
+
+    <div id="share"></div>
+  </main>
+
+  <footer class="site-footer">
+    <a href="privacy.html">プライバシー</a>
+  </footer>
+
+  <div id="print-root" aria-hidden="true"></div>
+</body>
+</html>

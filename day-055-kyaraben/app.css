@@ -1,0 +1,302 @@
+/* キャラ弁設計図。色は弁当の定番（ご飯の白・のりの黒・卵の黄・トマトの赤）から取る */
+:root {
+  --bg: #FFFBF2;
+  --surface: #FFFFFF;
+  --ink: #1F2421;
+  --muted: #4E5650;
+  --line: #E8DCC4;
+  --tomato: #C8331F;       /* 白い文字とのコントラスト 5.3:1 */
+  --tomato-dark: #A42716;
+  --egg: #F6C445;
+  --egg-soft: #FFF3CC;
+  --nori: #1E2320;
+  --radius: 14px;
+  color-scheme: light;
+}
+
+* { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: "Hiragino Maru Gothic ProN", "Hiragino Sans", "BIZ UDPGothic", "Yu Gothic", "Meiryo", system-ui, sans-serif;
+  font-size: 16px;
+  line-height: 1.7;
+  /* 日本語を単語の途中で折り返さない（対応していないブラウザは <wbr> と短い文で補う） */
+  word-break: auto-phrase;
+  overflow-wrap: break-word;
+  line-break: strict;
+}
+
+img, svg, canvas { max-width: 100%; }
+
+a { color: var(--tomato-dark); }
+
+:focus-visible {
+  outline: 3px solid var(--ink);
+  outline-offset: 3px;
+}
+
+.site-header, main, .site-footer {
+  width: min(1120px, 100%);
+  margin: 0 auto;
+  padding-inline: 16px;
+}
+
+.site-header { padding-block: 14px 0; }
+.brand { display: inline-flex; align-items: center; gap: 8px; font-weight: 800; letter-spacing: .04em; }
+
+.hero { padding: 20px 0 8px; }
+.hero h1 { margin: 0; font-size: clamp(30px, 6vw, 44px); line-height: 1.25; letter-spacing: .02em; }
+.lead { margin: 8px 0 0; font-size: 18px; color: var(--muted); }
+
+.card {
+  margin: 16px 0;
+  padding: 20px 16px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  box-shadow: 0 10px 24px -20px rgba(80, 60, 20, .45);
+}
+.card h2 { display: flex; align-items: center; gap: 10px; margin: 0 0 14px; font-size: 22px; line-height: 1.3; }
+.num {
+  display: inline-grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--egg);
+  color: var(--ink);
+  font-size: 18px;
+}
+h3 { margin: 0 0 8px; font-size: 18px; line-height: 1.4; }
+h3 small, h4 small { font-size: 14px; font-weight: 400; color: var(--muted); margin-left: 6px; }
+h4 { margin: 14px 0 6px; font-size: 16px; }
+
+/* ---- ボタン ---- */
+.btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 48px;
+  padding: 0 20px;
+  border: 2px solid var(--ink);
+  border-radius: 12px;
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+  font-weight: 700;
+  line-height: 1.3;
+  text-align: center;
+  cursor: pointer;
+}
+.btn:hover { background: var(--egg-soft); }
+.btn:disabled { border-color: #B9B2A4; color: #6A6F6B; background: #F4F1EA; cursor: default; }
+.btn--primary { border-color: var(--tomato); background: var(--tomato); color: #fff; }
+.btn--primary:hover { border-color: var(--tomato-dark); background: var(--tomato-dark); }
+.btn--small { min-height: 44px; padding: 0 16px; }
+.btn--wide { width: 100%; margin-top: 12px; }
+/* ファイル選択はラベルで包んでボタンに見せる。input は透明にして上に重ね、押す・フォーカスをそのまま受ける */
+.btn--file input { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: pointer; }
+.btn--file:has(input:focus-visible) { outline: 3px solid var(--ink); outline-offset: 3px; }
+
+.row { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; margin-top: 10px; }
+.said { font-size: 14px; color: var(--muted); }
+
+/* ---- ① 絵をえらぶ ---- */
+.pick__buttons { display: grid; gap: 10px; }
+.pick__buttons .btn--primary { min-height: 56px; font-size: 18px; }
+@media (min-width: 560px) {
+  .pick__buttons { grid-template-columns: 1.3fr 1fr 1fr; }
+}
+.drop {
+  display: none;
+  margin-top: 12px;
+  padding: 18px;
+  border: 2px dashed #CDBF9F;
+  border-radius: var(--radius);
+  color: var(--muted);
+  text-align: center;
+}
+@media (pointer: fine) {
+  .drop { display: block; }
+}
+.drop.is-over { border-color: var(--tomato); background: #FFF0EC; color: var(--ink); }
+.note { margin: 10px 0 0; font-size: 14px; color: var(--muted); }
+.note--safe { padding-left: 22px; position: relative; }
+.note--safe::before { content: ""; position: absolute; left: 2px; top: .45em; width: 12px; height: 12px; border-radius: 3px; background: var(--nori); box-shadow: 3px 3px 0 var(--egg); }
+.status:empty, .error:empty { display: none; }
+.status { margin: 12px 0 0; font-weight: 700; }
+#app[data-state="processing"] .status::before {
+  content: "";
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  margin-right: 8px;
+  border-radius: 50%;
+  background: var(--egg);
+  animation: pulse 0.9s ease-in-out infinite alternate;
+}
+@keyframes pulse { from { transform: scale(.6); } to { transform: scale(1.1); } }
+@media (prefers-reduced-motion: reduce) {
+  #app[data-state="processing"] .status::before { animation: none; }
+}
+.error { margin: 12px 0 0; padding: 10px 14px; border-radius: 10px; background: #FDECEA; color: #8E1F12; font-weight: 700; }
+
+/* ---- 状態ごとの見せ方 ---- */
+#app:not([data-state="ready"]) .work { display: none; }
+/* 絵が見つからないときは、消し具合を戻せるように「整える」だけ残す */
+#app[data-state="error"][data-error="no-foreground"] .work { display: block; }
+#app[data-state="error"] .make,
+#app[data-state="error"] .preview,
+#app[data-state="error"] .layers-panel { display: none; }
+
+/* ---- ② 整える ---- */
+.preview { margin: 0 0 8px; }
+.preview canvas { display: block; width: 100%; }
+.preview figcaption { margin-top: 6px; font-size: 14px; color: var(--muted); text-align: center; }
+.panel { margin: 14px 0 0; padding: 14px; border: 1px solid var(--line); border-radius: var(--radius); background: #FFFDF8; }
+fieldset.panel { min-width: 0; }
+legend { padding: 0 4px; font-size: 18px; font-weight: 700; }
+.hint { margin: 6px 0 0; font-size: 14px; color: var(--muted); }
+.source {
+  display: block;
+  width: 100%;
+  max-width: 360px;
+  height: auto;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  background: repeating-conic-gradient(#ECE6D8 0 25%, #FFFFFF 0 50%) 0 0 / 16px 16px;
+  cursor: crosshair;
+  touch-action: manipulation;
+}
+
+.slider { display: grid; gap: 4px; }
+.slider__label { font-size: 18px; font-weight: 700; }
+.slider output { display: inline-block; min-width: 2em; margin-left: 6px; padding: 0 8px; border-radius: 8px; background: var(--egg-soft); font-size: 16px; text-align: center; }
+.slider input { width: 100%; height: 44px; margin: 0; accent-color: var(--tomato); }
+.slider__ends { display: flex; justify-content: space-between; font-size: 14px; color: var(--muted); }
+
+.seg { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-top: 4px; }
+.seg label { position: relative; display: block; }
+.seg input { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: pointer; }
+.seg span {
+  display: grid;
+  place-items: center;
+  min-height: 52px;
+  padding: 4px 6px;
+  border: 2px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface);
+  font-weight: 700;
+  line-height: 1.3;
+  text-align: center;
+}
+.seg small { display: block; font-size: 13px; font-weight: 400; color: var(--muted); }
+.seg input:checked + span { border-color: var(--ink); background: var(--egg-soft); box-shadow: inset 0 -4px 0 var(--egg); }
+.seg input:focus-visible + span { outline: 3px solid var(--ink); outline-offset: 2px; }
+
+.layers { margin: 10px 0 0; padding: 0; list-style: none; display: grid; gap: 10px; }
+.layer { display: grid; grid-template-columns: 32px minmax(0, 1fr); align-items: center; gap: 6px 10px; }
+.swatch { width: 32px; height: 32px; border-radius: 50%; border: 2px solid rgba(0, 0, 0, .18); }
+.layer__name { font-weight: 700; line-height: 1.3; }
+.layer__name small { display: block; font-size: 13px; font-weight: 400; color: var(--muted); }
+.layer select { grid-column: 1 / -1; }
+@media (min-width: 480px) {
+  .layer { grid-template-columns: 32px minmax(0, 1fr) minmax(0, 1.4fr); }
+  .layer select { grid-column: auto; }
+}
+/* Safari の標準の select は高さ31px前後で固定されるので、見た目を自前にして44px以上を保つ */
+select {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  min-height: 44px;
+  padding: 0 36px 0 10px;
+  border: 2px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='9' viewBox='0 0 14 9'%3E%3Cpath d='M1 1l6 6 6-6' fill='none' stroke='%231F2421' stroke-width='2'/%3E%3C/svg%3E") no-repeat right 12px center;
+  color: var(--ink);
+  font: inherit;
+  font-size: 16px;
+}
+
+/* ---- ③ 作る ---- */
+.block { margin-top: 18px; padding-top: 16px; border-top: 1px dashed var(--line); }
+.block:first-of-type { margin-top: 0; padding-top: 0; border-top: 0; }
+.materials, .tools, .cautions ul, .hint-list, .notices { margin: 0; padding-left: 1.2em; }
+.materials { padding: 0; list-style: none; display: grid; gap: 6px; }
+.materials li { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; padding: 8px 12px; border-radius: 10px; background: #FFFDF8; border: 1px solid var(--line); }
+.mat__name { font-weight: 700; }
+.mat__amount { font-weight: 800; }
+.mat__note { flex-basis: 100%; font-size: 13px; color: var(--muted); }
+.tag { display: inline-block; padding: 0 8px; border-radius: 999px; font-size: 13px; line-height: 1.7; border: 1px solid #C9A227; background: var(--egg-soft); }
+.tag--always { border-color: var(--tomato); background: #FDECEA; color: #8E1F12; font-weight: 700; }
+.rice-total { margin: 8px 0 0; font-weight: 700; }
+.tools li { margin: 2px 0; }
+.when { display: inline-block; padding: 0 10px; border-radius: 8px; }
+.when--night { background: #2F3A4A; color: #fff; }
+.when--morning { background: var(--egg-soft); }
+.steps { margin: 6px 0 0; padding: 0; list-style: none; counter-reset: step; display: grid; gap: 4px; }
+.steps li { counter-increment: step; }
+.check { display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 8px; align-items: start; min-height: 44px; padding: 8px 6px; border-radius: 10px; cursor: pointer; }
+.check:hover { background: #FFFDF3; }
+.check input { width: 22px; height: 22px; margin: 2px 0 0; accent-color: var(--tomato); }
+.check span::before { content: counter(step) ". "; font-weight: 800; }
+.check input:checked + span { color: var(--muted); text-decoration: line-through; text-decoration-color: rgba(31, 36, 33, .5); }
+.templates { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; }
+.tpl { margin: 0; }
+.tpl__paper { padding: 6px; border: 1px solid var(--line); border-radius: 10px; background: #fff; }
+.tpl__paper svg { display: block; width: 100%; height: auto; }
+.tpl figcaption { margin-top: 4px; font-size: 14px; text-align: center; }
+.hint-list { margin-top: 10px; font-size: 14px; color: var(--muted); }
+.cautions { font-size: 15px; }
+.cautions p { margin: 0; }
+.notices { margin-top: 12px; color: var(--muted); }
+/* share.css は置き場所の幅より広がることがあるので、この欄の中では幅いっぱいまでに抑える */
+#share .share { min-width: 0; max-width: 100%; margin-top: 24px; }
+
+.site-footer { padding-block: 8px 32px; font-size: 14px; color: var(--muted); }
+.site-footer a { display: inline-flex; align-items: center; min-height: 44px; }
+
+/* ---- 2列（960px以上）：左に完成イメージと調整、右に材料・手順・型紙 ---- */
+@media (min-width: 960px) {
+  .card { padding: 24px; }
+  #app[data-state="ready"] .work,
+  #app[data-state="error"][data-error="no-foreground"] .work {
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+    gap: 20px;
+    align-items: start;
+  }
+  .work .card { margin: 0; }
+  .adjust { position: sticky; top: 12px; max-height: calc(100vh - 24px); overflow: auto; overscroll-behavior: contain; }
+}
+
+/* ---- プライバシーのページ ---- */
+.privacy { padding-block: 16px 24px; }
+.privacy h1 { font-size: 28px; }
+
+/* ---- 印刷（型紙） ---- */
+#print-root { display: none; }
+@page { size: A4 portrait; margin: 10mm; }
+@media print {
+  body { background: #fff; }
+  body > *:not(#print-root) { display: none !important; }
+  #print-root { display: block !important; color: #111; font-size: 8.5pt; line-height: 1.45; }
+  .print-head h1 { margin: 0; font-size: 14pt; }
+  .print-head p { margin: 1mm 0; }
+  .print-warn { font-weight: 700; }
+  .print-cols { display: grid; grid-template-columns: 1fr 1.4fr; gap: 5mm; margin: 2mm 0 4mm; }
+  .print-cols h2 { margin: 2mm 0 1mm; font-size: 9.5pt; }
+  .print-cols ul, .print-cols ol { margin: 0; padding-left: 4.5mm; }
+  .print-tpls { display: flex; flex-wrap: wrap; gap: 4mm; align-items: flex-start; }
+  .print-tpl { margin: 0; break-inside: avoid; page-break-inside: avoid; }
+  .print-tpl svg { display: block; }
+  .print-tpl figcaption { font-size: 8pt; }
+}
