@@ -9,11 +9,12 @@ const app = 'day-056-dragon-rush';
 const out = resolve(repo, '.social-output/day056-verification');
 const require = createRequire(resolve(repo, 'package.json'));
 const { chromium } = require('playwright');
-const url = process.env.PUBLIC_VERIFY_URL || 'http://127.0.0.1:5310';
+const port = process.env.PUBLIC_VERIFY_PORT || '5310';
+const url = process.env.PUBLIC_VERIFY_URL || `http://127.0.0.1:${port}`;
 let server;
 if (!process.env.PUBLIC_VERIFY_URL) {
   server = spawn(process.execPath, ['scripts/serve-dist.mjs'], {
-    cwd: repo, env: { ...process.env, PLAYWRIGHT_PORT: '5310' }, stdio: ['ignore', 'pipe', 'inherit']
+    cwd: repo, env: { ...process.env, PLAYWRIGHT_PORT: port }, stdio: ['ignore', 'pipe', 'inherit']
   });
   await new Promise((resolve, reject) => {
     server.stdout.once('data', resolve); server.once('error', reject); server.once('exit', code => reject(new Error(`server ${code}`)));
@@ -48,6 +49,10 @@ try {
       gpu: window.__app?.gpu, limiter: window.__audioLog?.limiter,
       cardImages: [...document.querySelectorAll('.dr-card-art')].map(n => n.style.getPropertyValue('--dr-art')) }));
     await page.screenshot({ path: resolve(out, `playing-${creature}.png`) });
+    // 音の先読み中にcontextを閉じると、検証用route.fetchが中断される。
+    // playingの記録を取った後に停止し、通信完了を待ってから次の怪獣へ進む。
+    await page.evaluate(() => window.__pauseGame?.());
+    await page.waitForLoadState('networkidle', { timeout: 60_000 });
     if (state.error || errors.length || state.phase !== 'playing' || state.limiter !== 'worklet')
       throw new Error(JSON.stringify({ creature, state, errors }));
     if (hosts.size !== 1 || !hosts.has(new URL(url).origin)) throw new Error('想定外の外部通信');

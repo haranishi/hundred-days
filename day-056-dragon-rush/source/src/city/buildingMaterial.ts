@@ -35,8 +35,8 @@ varying vec3 vFacColor;
 varying vec4 vFac;
 varying vec4 vFac2;
 varying vec4 vFac3;
-varying vec3 vTrim;
-varying vec3 vGlass;
+flat varying highp uint vTrimPacked;
+flat varying highp uint vGlassPacked;
 varying vec3 vFacNormal;
 varying vec3 vFacPos;
 varying float vShop;
@@ -51,8 +51,11 @@ vFacColor = aColor;
 vFac = aFac;
 vFac2 = aFac2;
 vFac3 = aFac3;
-vTrim = aTrim;
-vGlass = aGlass;
+// 各建物内で一定の8bit色。Safari/Metalの頂点出力上限を節約する。
+uvec3 trim8 = uvec3(round(aTrim * 255.0));
+uvec3 glass8 = uvec3(round(aGlass * 255.0));
+vTrimPacked = (trim8.r << 16u) | (trim8.g << 8u) | trim8.b;
+vGlassPacked = (glass8.r << 16u) | (glass8.g << 8u) | glass8.b;
 vShop = aShop;
 vFacNormal = normalize(mat3(modelMatrix) * normal);
 vFacPos = (modelMatrix * vec4(transformed, 1.0)).xyz;
@@ -65,8 +68,13 @@ varying vec3 vFacColor;
 varying vec4 vFac;
 varying vec4 vFac2;
 varying vec4 vFac3;
-varying vec3 vTrim;
-varying vec3 vGlass;
+flat varying highp uint vTrimPacked;
+flat varying highp uint vGlassPacked;
+vec3 unpackBuildingColor(uint packed) {
+  return vec3(float((packed >> 16u) & 255u), float((packed >> 8u) & 255u), float(packed & 255u)) / 255.0;
+}
+#define vTrim unpackBuildingColor(vTrimPacked)
+#define vGlass unpackBuildingColor(vGlassPacked)
 varying vec3 vFacNormal;
 varying vec3 vFacPos;
 varying float vShop;

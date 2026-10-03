@@ -6,12 +6,15 @@ import { createHash } from 'node:crypto';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 const read = name => readFileSync(root + name, 'utf8');
-test('Day56はPC向けで、実績・制作時間を創作しない', () => {
+test('Day56はスマホの条件を明示し、実績・制作時間を創作しない', () => {
   const meta = JSON.parse(read('meta.json'));
   assert.equal(meta.day, 56);
   assert.equal(meta.title, '夕暮れ破壊紀行');
   assert.equal(meta.actualMinutes, undefined);
-  assert.match(read('index.html'), /スマートフォンのタッチ操作には未対応/);
+  assert.match(read('index.html'), /スマートフォンのタッチ操作に対応/);
+  assert.match(read('index.html'), /スマホは横向き/);
+  assert.match(read('index.html'), /軽量画質固定/);
+  assert.doesNotMatch(read('app.js'), /loaded \|\| touchOnly/);
   assert.match(read('index.html'), /強い光と画面の揺れ/);
 });
 test('全配信素材の指紋が実物と一致する', () => {
@@ -20,6 +23,7 @@ test('全配信素材の指紋が実物と一致する', () => {
   assert.deepEqual(files.filter(f => /^assets\/index-[\w-]+\.js$/.test(f.file)).map(f => f.file), [module]);
   assert.equal(files.filter(f => f.file.endsWith('.glb')).length, 3);
   assert.equal(files.filter(f => f.file.endsWith('.ogg')).length, 306);
+  assert.equal(files.filter(f => /^assets\/index-[\w-]+\.js$/.test(f.file)).length, 1);
   for (const file of files) {
     const bytes = readFileSync(root + 'game/' + file.file);
     assert.equal(bytes.length, file.bytes, file.file);

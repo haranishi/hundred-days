@@ -68,6 +68,8 @@ declare global {
     __state?: PlayState;
     /** 入力の注入口（ポインタロックが使えないとき用） */
     __input?: InputApi;
+    /** 公開入口の共有ボタンから、タッチ環境でも時間と操作を止める。 */
+    __pauseGame?: () => void;
     /** ?playtest=script で流す台本（ページを開く前に addInitScript で置く） */
     __playtestScript?: ScriptStep[];
     __play?: PlayControl;

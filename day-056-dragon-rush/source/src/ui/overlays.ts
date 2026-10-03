@@ -5,6 +5,7 @@
 // どこをクリックしても始まる。札を押すとその怪獣で始まり、数字キー 1〜3 で選び直せる（キーは play.ts が読む）。
 import { CREATURE_CONFIG, type CreatureId } from '../config/creatures';
 import type { QualityName } from '../config/quality';
+import { isTouchDevice } from '../mobile/input';
 import { LOOK } from '../config/controls';
 import type { LookPrefs } from '../core/input';
 import type { VolumeKind } from '../core/prefs';
@@ -80,12 +81,12 @@ export class Overlays {
     this.start.setAttribute('data-testid', 'start-overlay');
     const sp = el('div', 'dr-panel dr-start');
     this.startCards = new CreatureCards('creature-cards', false, (id) => h.choose(id));
-    sp.append(el('div', 'dr-title', '夕暮れ破壊紀行'), el('div', 'dr-sub', '3分で、夕暮れの湾岸の街をどれだけ壊せるか'), el('div', 'dr-cta', 'クリックで始める'));
+    sp.append(el('div', 'dr-title', '夕暮れ破壊紀行'), el('div', 'dr-sub', '3分で、夕暮れの湾岸の街をどれだけ壊せるか'), el('div', 'dr-cta', isTouchDevice() ? 'タップで始める' : 'クリックで始める'));
     // r05-play（体験の採点 r04 の B4）：札は画面の下に置く（CHARACTERS.md の骨格「札は画面の下に小さく3枚」）。
     // 旧は題と同じ中央の板に並べ、画面のちょうど中央に雷翼の札が来て、初めての人が中央を押すと紅竜でなく雷翼で始まった。
     // 札の外（板・空き）を押せば選んでいる怪獣（初回は紅竜）で始まり、札を押せばその怪獣ですぐ始まる
     const dock = el('div', 'dr-start-dock');
-    dock.append(this.startCards.root, el('div', 'dr-small dr-cards-hint', '数字キー 1〜3 で怪獣を選べる（札を押すと、その怪獣ですぐ始まる）'));
+    dock.append(this.startCards.root, el('div', 'dr-small dr-cards-hint', isTouchDevice() ? '怪獣の札をタップして始める' : '数字キー 1〜3 で怪獣を選べる（札を押すと、その怪獣ですぐ始まる）'));
     this.start.append(sp, dock);
     this.start.addEventListener('click', () => h.start());
 
@@ -96,9 +97,10 @@ export class Overlays {
     const buttons = el('div', 'dr-row');
     buttons.append(this.button('再開', h.resume), this.button('やり直し', h.restart));
     const qRow = el('div', 'dr-row');
-    qRow.append(el('span', 'dr-label', '画質（読み込み直します）'));
+    qRow.append(el('span', 'dr-label', isTouchDevice() ? 'スマホは軽量画質固定' : '画質（読み込み直します）'));
     for (const [q, label] of QUALITY_LABELS) {
       const b = this.button(label, () => h.quality(q));
+      if (isTouchDevice()) { b.hidden = q !== 'low'; b.disabled = true; }
       if (q === quality) b.classList.add('dr-sel');
       qRow.append(b);
     }
@@ -119,7 +121,7 @@ export class Overlays {
     const guide = guideElement('dr-small', creature);
     guide.style.textAlign = 'left';
     this.guide = guide;
-    pp.append(el('div', 'dr-title', '一時停止'), buttons, qRow, ...vRows, ...lookRows, guide, el('div', 'dr-small', 'Esc かクリックで再開'));
+    pp.append(el('div', 'dr-title', '一時停止'), buttons, qRow, ...vRows, ...lookRows, guide, el('div', 'dr-small', isTouchDevice() ? '「再開」で続ける。入口・共有は画面左上から。' : 'Esc かクリックで再開'));
     this.pause.append(pp);
     this.pause.addEventListener('click', () => h.resume());
 
@@ -129,10 +131,10 @@ export class Overlays {
     rp.addEventListener('click', (e) => e.stopPropagation());
     this.resultBody = el('div');
     const again = el('div', 'dr-row');
-    again.append(this.button('もう一度（R）', h.restart));
+    again.append(this.button(isTouchDevice() ? 'もう一度' : 'もう一度（R）', h.restart));
     this.resultCards = new CreatureCards('result-cards', true, (id) => h.choose(id));
     this.resultTitle = el('div', 'dr-title', '結果');
-    rp.append(this.resultTitle, this.resultBody, again, el('div', 'dr-label dr-change', '怪獣を変える（1〜3）'), this.resultCards.root);
+    rp.append(this.resultTitle, this.resultBody, again, el('div', 'dr-label dr-change', isTouchDevice() ? '札をタップして怪獣を変える' : '怪獣を変える（1〜3）'), this.resultCards.root);
     this.result.append(rp);
 
     this.photo = el('div', 'dr-photo-hint', '撮影モード：WASD・Q/E で移動、マウスで向き、Enter で PNG を保存、P で戻る');
@@ -168,7 +170,8 @@ export class Overlays {
     slider.min = '0';
     slider.max = '100';
     slider.value = String(Math.round((100 * Math.log(Math.min(LOOK.scaleMax, Math.max(LOOK.scaleMin, look.scale)) / LOOK.scaleMin)) / span));
-    slider.setAttribute('aria-label', 'マウスの感度');
+    const lookLabel = isTouchDevice() ? '視点の感度' : 'マウスの感度';
+    slider.setAttribute('aria-label', lookLabel);
     slider.setAttribute('data-testid', 'look-sensitivity');
     const shown = el('span', 'dr-label dr-num', `×${look.scale.toFixed(2)}`);
     slider.addEventListener('input', () => {
@@ -176,7 +179,7 @@ export class Overlays {
       shown.textContent = `×${current.scale.toFixed(2)}`;
       h.look({ ...current });
     });
-    sRow.append(el('span', 'dr-label', 'マウスの感度'), slider, shown);
+    sRow.append(el('span', 'dr-label', lookLabel), slider, shown);
     const iRow = el('div', 'dr-row');
     const label = el('label', 'dr-check');
     const box = el('input');
@@ -187,7 +190,7 @@ export class Overlays {
       current.invertY = box.checked;
       h.look({ ...current });
     });
-    label.append(box, document.createTextNode('上下反転（マウスを前へ押すと下を向く）'));
+    label.append(box, document.createTextNode(isTouchDevice() ? '上下反転（上へなぞると下を向く）' : '上下反転（マウスを前へ押すと下を向く）'));
     iRow.append(label);
     return [sRow, iRow];
   }

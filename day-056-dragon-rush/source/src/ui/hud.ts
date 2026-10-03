@@ -9,6 +9,8 @@ import type { CueKind } from '../gameplay/combat';
 import type { CoachStep } from '../gameplay/coach';
 import { formatPercent, formatTime, formatYen } from './format';
 import { el, installUiCss } from './styles';
+import { isTouchDevice } from '../mobile/input';
+import { touchCoachLine, TOUCH_GUIDE } from '../mobile/hints';
 
 export interface HudState {
   timeLeft: number;
@@ -97,7 +99,8 @@ export function guideElement(className: string, creature: CreatureId = 'kurenai'
 
 /** 操作の表の中身を、怪獣の行で書き直す。 */
 export function fillGuide(g: HTMLElement, creature: CreatureId): void {
-  g.replaceChildren(...guideRows(creature).flatMap(([key, what]) => [el('span', 'dr-key', key), el('span', 'dr-key-what', what)]));
+  const rows = isTouchDevice() ? TOUCH_GUIDE : guideRows(creature);
+  g.replaceChildren(...rows.flatMap(([key, what]) => [el('span', 'dr-key', key), el('span', 'dr-key-what', what)]));
 }
 
 /** 案内の1行（段ごと）。キーは <b> で囲んで目立たせる。 */
@@ -182,7 +185,6 @@ export class Hud {
     bottom.style.minHeight = `${HUD_BOTTOM_HEIGHT}px`;
     bottom.append(this.coach);
     const corner = el('div', 'dr-corner');
-    Object.assign(corner.style, { position: 'absolute', right: '22px', bottom: '22px', width: 'min(260px, 34vw)', textAlign: 'right' });
     corner.setAttribute('data-testid', 'combo-rage');
     corner.append(this.combo, this.rageRow);
     this.reticle = el('div', 'dr-reticle');
@@ -224,7 +226,7 @@ export class Hud {
       this.rageFill.style.width = fill;
     }
     this.rageRow.classList.toggle('dr-full', s.rageFull);
-    this.text(this.rageHint, s.rageFull ? 'E で大技' : '怒り');
+    this.text(this.rageHint, s.rageFull ? (isTouchDevice() ? '大技を押す' : 'E で大技') : '怒り');
     this.updateReticle(s, frameDt);
     this.updateCoach(s);
     this.hold.classList.toggle('dr-gone', s.restartHold <= 0);
@@ -265,7 +267,8 @@ export class Hud {
     this.coach.classList.toggle('dr-on', s.coach !== null);
     this.coach.setAttribute('data-step', s.coach ?? 'none');
     if (!s.coach) return;
-    const parts = coachLine(s.coach, s.grounded, creature).flatMap(([k, rest]) => [el('b', '', k), document.createTextNode(rest)]);
+    const line = isTouchDevice() ? touchCoachLine(s.coach, s.grounded, creature) : coachLine(s.coach, s.grounded, creature);
+    const parts = line.flatMap(([k, rest]) => [el('b', '', k), document.createTextNode(rest)]);
     this.coach.replaceChildren(...parts);
   }
 
