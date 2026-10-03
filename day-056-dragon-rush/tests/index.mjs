@@ -9,7 +9,7 @@ const read = name => readFileSync(root + name, 'utf8');
 test('Day56はスマホの条件を明示し、実績・制作時間を創作しない', () => {
   const meta = JSON.parse(read('meta.json'));
   assert.equal(meta.day, 56);
-  assert.equal(meta.title, '夕暮れ怪獣ラッシュ');
+  assert.equal(meta.title, '夕暮れ破壊紀行');
   assert.equal(meta.actualMinutes, undefined);
   assert.match(read('index.html'), /スマートフォンのタッチ操作に対応/);
   assert.match(read('index.html'), /スマホは横向き/);
@@ -19,6 +19,8 @@ test('Day56はスマホの条件を明示し、実績・制作時間を創作し
 });
 test('全配信素材の指紋が実物と一致する', () => {
   const { files } = JSON.parse(read('game/asset-manifest.json'));
+  const { module } = JSON.parse(read('game/entry.json'));
+  assert.deepEqual(files.filter(f => /^assets\/index-[\w-]+\.js$/.test(f.file)).map(f => f.file), [module]);
   assert.equal(files.filter(f => f.file.endsWith('.glb')).length, 3);
   assert.equal(files.filter(f => f.file.endsWith('.ogg')).length, 306);
   assert.equal(files.filter(f => /^assets\/index-[\w-]+\.js$/.test(f.file)).length, 1);
@@ -42,4 +44,11 @@ test('許諾全文と旧実装の除去を配信に確認する', () => {
   assert.match(bundle, /limiter\.worklet-[\w-]+\.js/);
   assert.match(read('source/src/core/springs.ts'), /Math\.exp/);
   assert.doesNotMatch(read('source/src/core/springs.ts'), /0\.48|0\.235/);
+  assert.match(read('source/src/city/lifeSoup.ts'), /new BoxGeometry\(1, 1, 1\)/);
+  for (const file of ['index.html', 'source/index.html', 'source/src/ui/overlays.ts', 'tools/promo/timeline.mjs']) {
+    assert.match(read(file), /夕暮れ破壊紀行/);
+    assert.doesNotMatch(read(file), /怪獣ラッシュ/);
+  }
+  assert.match(read('game/index.html'), /夕暮れ破壊紀行/);
+  assert.match(bundle, /夕暮れ破壊紀行/);
 });

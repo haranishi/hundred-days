@@ -1,6 +1,6 @@
 export const DURATION_SECONDS = 32;
 export const FPS = 30;
-export const TITLE = '夕暮れ怪獣ラッシュ';
+export const TITLE = '夕暮れ破壊紀行';
 export const CUTS = [
   { creature: 'kurenai', from: 10, duration: 3, lines: ['今日は、街を壊す側。', '怪獣になって大暴れ'] },
   { creature: 'kurenai', from: 4, duration: 5, lines: ['紅竜は、炎と飛行。'] },

@@ -49,6 +49,7 @@ node day-056-dragon-rush/tools/promo/render-promo.mjs
 
 別のPlaywright依存を使う場合は`PLAYWRIGHT_ROOT`、音源の場所は`AUDIO_ROOT`、
 日本語フォントは`PROMO_FONT`で指定できる。`REBUILD_RAW=1`で素材MP4を再生成する。
+修正版は両スクリプトに同じ`PROMO_OUTPUT_DIR`を指定し、原本とは別の保存先へ出す。
 原本のゲームと音源は変更しない。生成物はGit対象外で、`cache/`に中間素材を残す。
 録画のGPU・エラー・時刻・技のイベントは各怪獣の`cache/*/record.json`に保存する。
 

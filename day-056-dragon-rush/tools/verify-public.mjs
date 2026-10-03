@@ -49,6 +49,10 @@ try {
       gpu: window.__app?.gpu, limiter: window.__audioLog?.limiter,
       cardImages: [...document.querySelectorAll('.dr-card-art')].map(n => n.style.getPropertyValue('--dr-art')) }));
     await page.screenshot({ path: resolve(out, `playing-${creature}.png`) });
+    // 音の先読み中にcontextを閉じると、検証用route.fetchが中断される。
+    // playingの記録を取った後に停止し、通信完了を待ってから次の怪獣へ進む。
+    await page.evaluate(() => window.__pauseGame?.());
+    await page.waitForLoadState('networkidle', { timeout: 60_000 });
     if (state.error || errors.length || state.phase !== 'playing' || state.limiter !== 'worklet')
       throw new Error(JSON.stringify({ creature, state, errors }));
     if (hosts.size !== 1 || !hosts.has(new URL(url).origin)) throw new Error('想定外の外部通信');

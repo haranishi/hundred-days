@@ -3,12 +3,18 @@
 // 頂点の属性：aPaint（1 = インスタンスの色を塗る車体・上着、2 = 上着の色から決めるズボン）、aSurf（粗さ・金属度）、aEmit（灯火の光）。
 // 箱と押し出し（平らな面）に加えて、輪を連ねた面（grid）・回転体（lathe）・管（tube）を、隣の点から決めた滑らかな法線で描ける。
 // 車と人を箱の組み合わせで作ると玩具に見えた（メインループの所見）ので、丸みのある形はこちらで作る。
-import { BufferAttribute, BufferGeometry, Color, Vector3 } from 'three';
+import { BoxGeometry, BufferAttribute, BufferGeometry, Color, Vector3 } from 'three';
 
 export type V3 = [number, number, number];
 
 const _e1 = new Vector3();
 const _e2 = new Vector3();
+
+// three.js (MIT) の箱を一度だけ展開し、街の各部品へ伸縮する。
+// 参照作品と一致していた手書きの6面・頂点順は使用しない。
+const unitBox = new BoxGeometry(1, 1, 1).toNonIndexed();
+const boxPositions = unitBox.getAttribute('position');
+const boxNormals = unitBox.getAttribute('normal');
 
 export class LifeSoup {
   private readonly pos: number[] = [];
@@ -77,14 +83,12 @@ export class LifeSoup {
 
   /** 軸に平行な箱（底は描かない）。min・max は角の座標。 */
   box(min: V3, max: V3, bottom = false): void {
-    const [x0, y0, z0] = min;
-    const [x1, y1, z1] = max;
-    this.quad([x0, y0, z1], [x1, y0, z1], [x1, y1, z1], [x0, y1, z1]);
-    this.quad([x1, y0, z0], [x0, y0, z0], [x0, y1, z0], [x1, y1, z0]);
-    this.quad([x1, y0, z1], [x1, y0, z0], [x1, y1, z0], [x1, y1, z1]);
-    this.quad([x0, y0, z0], [x0, y0, z1], [x0, y1, z1], [x0, y1, z0]);
-    this.quad([x0, y1, z1], [x1, y1, z1], [x1, y1, z0], [x0, y1, z0]);
-    if (bottom) this.quad([x0, y0, z0], [x1, y0, z0], [x1, y0, z1], [x0, y0, z1]);
+    for (let i = 0; i < boxPositions.count; i++) {
+      if (!bottom && boxNormals.getY(i) < 0) continue;
+      const p = min.map((low, axis) => low + (boxPositions.getComponent(i, axis) + 0.5) * (max[axis] - low)) as V3;
+      const n: V3 = [boxNormals.getX(i), boxNormals.getY(i), boxNormals.getZ(i)];
+      this.vertex(p, n);
+    }
   }
 
   /**

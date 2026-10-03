@@ -5,7 +5,7 @@ test('Day56: 開始前に3D・音を読まない', async ({ page }) => {
   const requests = [];
   page.on('request', request => requests.push(request.url()));
   await page.goto(path);
-  await expect(page.getByRole('heading', { level: 1 })).toContainText('怪獣ラッシュ');
+  await expect(page.getByRole('heading', { level: 1 })).toContainText('破壊紀行');
   await expect(page.locator('#start')).toBeEnabled();
   expect(requests.some(url => /\.glb|\.ogg|assets\/index-/.test(url))).toBe(false);
   expect(await page.evaluate(() => window.__appReady)).toBeUndefined();
