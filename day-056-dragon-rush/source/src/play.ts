@@ -25,6 +25,7 @@ import { Overlays, type OverlayKind } from './ui/overlays';
 import { loadRecords, recordRun } from './ui/records';
 import { isTouchDevice } from './mobile/input';
 import { installTouchControls } from './mobile/controls';
+import { getLoadingScreen, loadingPaint } from '../../loading.mjs';
 
 const pressedAny = (input: InputState, codes: readonly string[]): boolean => codes.some((c) => input.wasPressed(c));
 
@@ -144,21 +145,44 @@ export async function runPlay(app: App): Promise<FixedStepLoop> {
     if (switching || (phase !== 'ready' && phase !== 'result')) return;
     audio?.wake();
     click(`creature.${id}`);
-    prefs.creature = id;
-    savePrefs(prefs);
-    overlays?.setCreature(id);
     const done = (): void => {
       switching = false;
       if (then === 'start' && game.session.phase === 'ready') start();
       else if (then === 'restart' && game.session.phase === 'result') restart();
     };
-    if (game.creature.id === id) return done();
+    if (game.creature.id === id && then !== 'restart') return done();
     switching = true;
-    stage.setCreature(id).then(done, (e: unknown) => {
-      switching = false;
-      window.__appError = `怪獣を替えられませんでした: ${e instanceof Error ? e.message : String(e)}`;
-      console.error(window.__appError);
-    });
+    touch?.reset();
+    input.releaseAll();
+    unlockPointer();
+    const loading = getLoadingScreen();
+    const task = loading.begin({ title: `${CREATURE_CONFIG[id].name}を準備しています`,
+      steps: ['モデル', '描画', '街と操作'], detail: '怪獣のモデルを読み込んでいます…' });
+    void (async () => {
+      try {
+        await loadingPaint();
+        await stage.setCreature(id, async (phase) => {
+          loading.step(task, phase === 'model' ? 0 : 1,
+            phase === 'model' ? `${CREATURE_CONFIG[id].name}のモデルを読み込んでいます…` : '怪獣の描画を準備しています…');
+          await loadingPaint();
+        });
+        loading.step(task, 2, '街と操作を新しい怪獣に合わせています…');
+        await loadingPaint();
+        prefs.creature = id;
+        savePrefs(prefs);
+        overlays?.setCreature(id);
+        input.releaseAll();
+        done();
+        await loadingPaint();
+        loading.finish(task);
+      } catch (e: unknown) {
+        switching = false;
+        input.releaseAll();
+        loading.fail(task, '怪獣の切り替えに失敗しました。通信状況を確認し、再読み込みしてください。');
+        window.__appError = `怪獣を替えられませんでした: ${e instanceof Error ? e.message : String(e)}`;
+        console.error(window.__appError);
+      }
+    })();
   };
   overlays = new Overlays(
     document.body,
@@ -244,6 +268,7 @@ export async function runPlay(app: App): Promise<FixedStepLoop> {
   };
 
   const handleKeys = (): void => {
+    if (switching) return;
     if (pressedAny(input, KEYS.photo)) togglePhoto();
     if (photo) {
       if (pressedAny(input, KEYS.photoSave)) saveRequested = true;
@@ -284,6 +309,7 @@ export async function runPlay(app: App): Promise<FixedStepLoop> {
         if (wasPlaying && game.session.phase === 'result') unlockPointer();
       },
       render: (_alpha, frameDt) => {
+        if (switching) { input.endFrame(); return; }
         handleKeys();
         if (!photo && game.session.phase === 'playing' && KEYS.restart.some((c) => input.isDown(c))) {
           restartHeld += frameDt;

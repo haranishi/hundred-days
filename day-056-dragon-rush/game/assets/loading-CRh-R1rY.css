@@ -1,0 +1,55 @@
+.dr-loading {
+  position: fixed; inset: 0; z-index: 1000; display: grid; place-items: center;
+  padding: max(18px, env(safe-area-inset-top)) max(18px, env(safe-area-inset-right)) max(18px, env(safe-area-inset-bottom)) max(18px, env(safe-area-inset-left));
+  overflow: auto; background: radial-gradient(ellipse at 75% 0%, #713e3440, transparent 60%), #121521;
+  color: #f4f1ee; font-family: system-ui, -apple-system, sans-serif; box-sizing: border-box;
+}
+.dr-loading[hidden], .dr-load-reload[hidden], .dr-load-slow[hidden] { display: none; }
+.dr-loading *, .dr-loading *::before, .dr-loading *::after { box-sizing: border-box; }
+.dr-loading:focus { outline: none; }
+.dr-load-panel {
+  width: min(100%, 580px); padding: 32px; border: 1px solid #50586e; border-radius: 20px;
+  background: #1c2030; box-shadow: 0 24px 80px #0005;
+}
+.dr-load-brand { margin: 0 0 24px; font-size: 13px; font-weight: 650; letter-spacing: .06em; }
+.dr-load-brand span { color: #bdc1ce; font-size: 10px; letter-spacing: .15em; margin-left: 8px; }
+.dr-load-heading { display: flex; align-items: center; gap: 18px; }
+.dr-load-heading > div { min-width: 0; }
+.dr-load-heading h2 { margin: 0 0 8px; font-size: clamp(20px, 3vw, 26px); line-height: 1.4; }
+.dr-load-heading p { margin: 0; color: #bdc1ce; font-size: 14px; line-height: 1.7; overflow-wrap: anywhere; }
+.dr-load-spinner {
+  flex: 0 0 48px; width: 48px; height: 48px; border: 3px solid #50586e; border-top-color: #ffb789;
+  border-radius: 50%; animation: dr-load-spin 1s linear infinite;
+}
+@keyframes dr-load-spin { to { transform: rotate(360deg); } }
+.dr-load-progress { margin-top: 26px; }
+.dr-load-meta { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 10px; color: #bdc1ce; font-size: 12px; font-variant-numeric: tabular-nums; }
+.dr-load-meta [data-loading-count] { color: #ffb789; }
+.dr-loading progress { display: block; width: 100%; height: 6px; border: 0; border-radius: 6px; overflow: hidden; background: #353b50; accent-color: #ffb789; }
+.dr-loading progress::-webkit-progress-bar { background: #353b50; border-radius: 6px; }
+.dr-loading progress::-webkit-progress-value { background: #ffb789; border-radius: 6px; }
+.dr-loading progress::-moz-progress-bar { background: #ffb789; border-radius: 6px; }
+.dr-load-steps { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: 6px; padding: 0; margin: 18px 0 0; list-style: none; }
+.dr-load-steps li { display: grid; justify-items: center; gap: 7px; text-align: center; color: #a8afc0; font-size: 12px; line-height: 1.4; }
+.dr-load-steps li::before { content: attr(data-number); display: grid; place-items: center; width: 26px; height: 26px; border: 1px solid #636d85; border-radius: 50%; font-size: 11px; font-variant-numeric: tabular-nums; }
+.dr-load-steps li[data-state="active"] { color: #ffb789; font-weight: 700; }
+.dr-load-steps li[data-state="active"]::before { border-color: #ffb789; background: #ffb78916; }
+.dr-load-steps li[data-state="done"] { color: #f4f1ee; }
+.dr-load-steps li[data-state="done"]::before { background: #ffb789; color: #171923; border-color: #ffb789; }
+.dr-load-note { margin: 24px 0 0; color: #bdc1ce; font-size: 12px; line-height: 1.7; }
+.dr-load-slow { margin: 12px 0 0; color: #ffcead; font-size: 13px; line-height: 1.7; }
+.dr-load-reload { margin-top: 16px; min-height: 44px; padding: 11px 18px; border: 1px solid #ffb789; border-radius: 8px; background: #ffb789; color: #171923; font: inherit; font-size: 14px; font-weight: 650; cursor: pointer; }
+.dr-load-reload:focus-visible { outline: 3px solid #fff; outline-offset: 4px; }
+.dr-loading[data-phase="error"] .dr-load-spinner { animation: none; border-color: #ffb789; }
+.dr-loading[data-phase="error"] .dr-load-spinner::after { content: "!"; display: grid; place-items: center; height: 100%; color: #ffb789; font-size: 24px; font-weight: 700; }
+.dr-loading[data-phase="error"] .dr-load-progress, .dr-loading[data-phase="error"] .dr-load-note { display: none; }
+@media (max-width: 450px), (max-height: 440px) {
+  .dr-load-panel { padding: 22px; border-radius: 14px; }
+  .dr-load-brand { margin-bottom: 18px; }
+  .dr-load-heading { gap: 14px; }
+  .dr-load-spinner { flex-basis: 38px; width: 38px; height: 38px; }
+  .dr-load-heading h2 { font-size: 20px; }
+  .dr-load-progress { margin-top: 20px; }
+  .dr-load-note { margin-top: 18px; }
+}
+@media (prefers-reduced-motion: reduce) { .dr-load-spinner { animation: none; } }

@@ -1549,14 +1549,19 @@
       "sha256": "3dafa6ca5408da7823acec4537de0467c0db4be382f7b9bd459507034d8cb345"
     },
     {
-      "file": "assets/index-BK8BvPSq.js",
-      "bytes": 1588023,
-      "sha256": "dbe33c370b4e2fdc734fc09c4d15bb8a55a7ad370d68abfb407540ffead195ba"
+      "file": "assets/index-BcbzOuiH.js",
+      "bytes": 1594429,
+      "sha256": "956ace1eafcce19d5ad1334f64541ee03a572c683864b540cab0d0f0c7d847b0"
     },
     {
       "file": "assets/limiter.worklet-BbDqUn_A.js",
       "bytes": 2553,
       "sha256": "ff1ff5ce61026776c68ba997105effae33a4bfc0df6c2ab7e4dcdc017b441bce"
+    },
+    {
+      "file": "assets/loading-CRh-R1rY.css",
+      "bytes": 4441,
+      "sha256": "8cd21de00cf4f3763ca8688b9839e7d89a3eb8dc89124b0dff8d51c7d8173514"
     },
     {
       "file": "assets/raiyoku.glb",

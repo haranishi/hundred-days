@@ -9,6 +9,7 @@
   <title>夕暮れ破壊紀行</title>
   <link rel="icon" href="data:,">
   <link rel="stylesheet" href="app.css">
+  <link rel="stylesheet" href="loading.css" data-loading-styles>
   <link rel="stylesheet" href="shared/share.css">
   <script src="shared/share.js" defer></script>
   <script src="app.js" type="module"></script>
@@ -38,7 +39,7 @@
     </section>
     <footer><p>舞台と怪獣は架空です。自己ベストと音量設定は、このブラウザの中に保存します。ゲーム中の操作記録を外部へ送信しません。</p><p><a href="credits.html">素材・第三者コードの出典</a> · <a href="https://github.com/haranishi/hundred-days/tree/main/day-056-dragon-rush" target="_blank" rel="noopener noreferrer">ソースコード</a> · <button type="button" class="text-button" data-share>このアプリを共有する</button></p></footer>
   </main>
-  <div id="app" hidden><p id="boot-status" role="status" aria-live="polite" hidden>街と怪獣を読み込んでいます…</p></div>
+  <div id="app" hidden></div>
   <nav id="game-links" hidden aria-label="ゲーム外の操作"><button type="button" id="back">入口へ</button><button type="button" data-share aria-label="ゲームを共有する">共有する</button></nav>
   <dialog id="share-dialog" aria-label="このアプリを共有する"><button type="button" id="share-close" class="dialog-close" aria-label="共有画面を閉じる">閉じる ×</button><div id="share"></div></dialog>
   <noscript><p>ゲームと共有ボタンにはJavaScriptが必要です。</p></noscript>

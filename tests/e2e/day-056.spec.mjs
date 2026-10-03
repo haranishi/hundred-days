@@ -28,6 +28,48 @@ test('Day56: 読み込み失敗を入口に表示する', async ({ page }) => {
   await page.locator('#start').click();
   await expect(page.locator('#load-status')).toContainText('失敗');
   await expect(page.locator('#landing')).toBeVisible();
+  await expect(page.getByTestId('loading-screen')).toHaveAttribute('data-phase', 'error');
+  await expect(page.locator('.dr-load-reload')).toBeVisible();
+  await expect(page.locator('.dr-load-reload')).toBeFocused();
+  await page.keyboard.press('Tab');
+  await expect(page.locator('.dr-load-reload')).toBeFocused();
+  await page.locator('.dr-load-reload').click();
+  await expect(page.locator('#start')).toBeEnabled();
+  await expect(page.getByTestId('loading-screen')).toBeHidden();
+});
+test('Day56: 本体を待つ間は実進捗・経過時間を出し、背後の操作を止める', async ({ page }) => {
+  let release;
+  const gate = new Promise(resolve => { release = resolve; });
+  await page.route('**/game/entry.json', async route => {
+    await gate;
+    await route.fulfill({ status: 503, body: '' });
+  });
+  try {
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await page.goto(path);
+    await page.locator('#start').click();
+    const loading = page.getByTestId('loading-screen');
+    await expect(loading).toBeVisible();
+    await expect(loading).toHaveAttribute('data-phase', 'loading');
+    await expect(loading.locator('progress')).toHaveAttribute('value', '0');
+    await expect(page.locator('#landing')).toHaveJSProperty('inert', true);
+    await page.keyboard.press('Tab');
+    await expect(loading).toBeFocused();
+    await expect(loading.locator('[data-loading-time]')).toContainText('1秒', { timeout: 5000 });
+    expect(await loading.locator('.dr-load-spinner').evaluate(node => getComputedStyle(node).animationName)).toBe('none');
+    for (const [width, height] of [[390, 844], [768, 1024], [1440, 900], [667, 375]]) {
+      await page.setViewportSize({ width, height });
+      expect(await loading.locator('.dr-load-panel').evaluate(node => {
+        const rect = node.getBoundingClientRect();
+        return rect.left >= 0 && rect.right <= innerWidth && rect.top >= 0 && rect.bottom <= innerHeight;
+      })).toBe(true);
+    }
+    await expect(loading.locator('.dr-load-slow')).toBeVisible({ timeout: 20_000 });
+    await expect(loading.locator('.dr-load-reload')).toBeVisible();
+    await expect(loading).toHaveAttribute('data-phase', 'loading');
+    await expect(loading.locator('progress')).toHaveAttribute('value', '0');
+  } finally { release(); }
+  await expect(page.getByTestId('loading-screen')).toHaveAttribute('data-phase', 'error');
 });
 test('Day56: クレジットから許諾全文が読める', async ({ page }) => {
   await page.goto(path + 'credits.html');

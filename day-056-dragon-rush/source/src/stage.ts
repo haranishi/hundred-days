@@ -100,8 +100,8 @@ export class Stage {
    * 遊ぶ怪獣を替える（始める前・結果の画面から）。表示を差し替えてから規則の側を替え、カメラを新しい始まりへ飛ばす。
    * 結果の画面からは、この後に restart を呼ぶ（街も点数も最初に戻す）。
    */
-  async setCreature(id: CreatureId): Promise<void> {
-    await this.app.setCreature(id);
+  async setCreature(id: CreatureId, onStage?: (phase: 'model' | 'render') => void | Promise<void>): Promise<void> {
+    await this.app.setCreature(id, onStage);
     this.game.setCreature(id);
     this.creatureFx.clear();
     this.follow.reset();

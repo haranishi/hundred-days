@@ -9,11 +9,16 @@ const game = resolve(app, 'game');
 const html = await readFile(resolve(game, 'index.html'), 'utf8');
 const modulePath = html.match(/src="(?:\.\/|\/)?(assets\/index-[A-Za-z0-9_-]+\.js)"/)?.[1];
 if (!modulePath) throw new Error('配信ビルドの入口が見つかりません');
+const bundle = await readFile(resolve(game, modulePath), 'utf8');
 // 素材を残すVite設定でも、差し替え済みの旧実行コードは配信に残さない。
 for (const name of await readdir(resolve(game, 'assets'))) {
   if (/^index-[A-Za-z0-9_-]+\.js$/.test(name) && name !== basename(modulePath)) {
     await unlink(resolve(game, 'assets', name));
     console.log(`未使用の旧入口bundleを除外しました: ${name}`);
+  }
+  if (/^loading-[A-Za-z0-9_-]+\.css$/.test(name) && !bundle.includes(name)) {
+    await unlink(resolve(game, 'assets', name));
+    console.log(`未使用の読み込み画面CSSを除外しました: ${name}`);
   }
 }
 await writeFile(resolve(game, 'entry.json'), JSON.stringify({ module: modulePath }, null, 2) + '\n');

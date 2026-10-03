@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { readFileSync, existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { createHash } from 'node:crypto';
+import './loading.test.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 const read = name => readFileSync(root + name, 'utf8');

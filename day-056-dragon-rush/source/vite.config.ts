@@ -14,7 +14,7 @@ export default defineConfig({
     target: 'es2022',
     chunkSizeWarningLimit: 2000,
     // 小さいworkletでもdata:へ埋め込まず、CSPのscript-src selfで読み込む。
-    assetsInlineLimit: (filePath) => filePath.endsWith('.worklet.js') ? false : undefined,
+    assetsInlineLimit: (filePath) => /(?:\.worklet\.js|loading\.css)$/.test(filePath) ? false : undefined,
   },
   test: {
     include: ['tests/**/*.test.ts'],
