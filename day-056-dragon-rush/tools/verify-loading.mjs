@@ -31,6 +31,8 @@ try {
     .split('/day-056-dragon-rush/*')[1]?.split('\n\n')[0]?.match(/Content-Security-Policy: (.+)/)?.[1];
   assert.ok(policy);
   if (!process.env.PUBLIC_VERIFY_URL) await context.route('**/day-056-dragon-rush/**', async route => {
+    // CSPは文書に付ける。素材の通信までfetch/fulfillで複製しない。
+    if (route.request().resourceType() !== 'document') return route.continue();
     const response = await route.fetch();
     await route.fulfill({ response, headers: { ...response.headers(), 'content-security-policy': policy } });
   });
@@ -98,7 +100,10 @@ try {
   check('reload returns to usable landing', await failed.locator('#start').isEnabled());
   const switchFailed = await context.newPage();
   const failureErrors = [];
+  const failedPreload = gate();
   switchFailed.on('pageerror', error => failureErrors.push(String(error)));
+  // 背景の先読みで事前にcatchされないよう、前のモデルの先読みを止める。
+  await switchFailed.route('**/game/assets/raiyoku.glb', async route => { await failedPreload.promise; await route.fallback(); });
   await switchFailed.route('**/game/assets/homuratsuno.glb', route => route.fulfill({ status: 503, body: '' }));
   await switchFailed.goto(`${url}/day-056-dragon-rush/?creature=kurenai`);
   await switchFailed.locator('#start').click();
@@ -108,12 +113,14 @@ try {
   await switchFailed.locator('[data-testid="creature-cards"] [data-creature="homuratsuno"]').click();
   await switchFailed.waitForFunction(() => document.querySelector('#boot-status')?.dataset.phase === 'error');
   check('failed creature switch preserves old creature and saved preference', await switchFailed.evaluate(saved => window.__state.creature.id === 'kurenai' && localStorage.getItem('dragon-rampage.prefs') === saved, saved));
-  check('failed switch offers reload without unhandled exception', await switchFailed.locator('.dr-load-reload').isVisible() && failureErrors.length === 0);
+  check(`failed switch offers reload without unhandled exception: ${JSON.stringify(failureErrors)}`, await switchFailed.locator('.dr-load-reload').isVisible() && failureErrors.length === 0);
   await switchFailed.screenshot({ path: resolve(out, 'switch-error.png') });
+  failedPreload.release();
   await switchFailed.waitForLoadState('networkidle', { timeout: 60_000 });
   await writeFile(resolve(out, 'results.json'), JSON.stringify({ engine, url, checks, errors, hosts: [...hosts], gl }, null, 2) + '\n');
 } finally {
   for (const release of releases) release();
+  for (const page of context?.pages() ?? []) await page.unrouteAll({ behavior: 'wait' });
   await context?.unrouteAll({ behavior: 'wait' });
   await browser?.close(); server?.kill('SIGTERM');
 }

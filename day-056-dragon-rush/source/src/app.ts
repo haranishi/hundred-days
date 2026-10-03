@@ -9,6 +9,7 @@ import { CREATURE_CONFIG, CREATURE_IDS, type CreatureId } from './config/creatur
 import { QUALITY_PRESETS, type QualityPreset } from './config/quality';
 import { AMBIENT, CAMERA } from './config/render';
 import { loadPrefs } from './core/prefs';
+import { waitForLoadingStage } from './core/loadingStage';
 import type { Settings } from './core/settings';
 import { CityView } from './city/cityView';
 import { initialCreature } from './creatures/params';
@@ -101,8 +102,7 @@ export class App {
   /** 環境マップを焼き、シェーダーを前もってコンパイルする。 */
   async init(onStage?: (phase: 'model' | 'render', name: string) => void | Promise<void>): Promise<void> {
     // r00c-竜：竜の GLB を読み終えてから焼き・コンパイルする（撮影と遊びが同じ姿勢の竜で始まる）
-    await onStage?.('model', this.dragon.creature.name);
-    await this.dragon.ready;
+    await waitForLoadingStage(this.dragon.ready, () => onStage?.('model', this.dragon.creature.name));
     await onStage?.('render', this.dragon.creature.name);
     const probe = new Vector3(-150, AMBIENT.envProbeHeight, 0);
     const size = this.quality.envMapSize;
@@ -141,8 +141,7 @@ export class App {
   async setCreature(id: CreatureId, onStage?: (phase: 'model' | 'render') => void | Promise<void>): Promise<void> {
     if (this.dragon.creature.id === id) return;
     const next = this.view(id);
-    await onStage?.('model');
-    await next.ready;
+    await waitForLoadingStage(next.ready, () => onStage?.('model'));
     await onStage?.('render');
     // コンパイルが失敗しても、表示と規則が別の怪獣にならないよう差し替え前に待つ。
     await this.renderer.compileAsync(next.root, this.camera, this.scene);
