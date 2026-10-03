@@ -3,10 +3,11 @@ import { createRequire } from 'node:module';
 import { dirname, resolve, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const here = dirname(fileURLToPath(import.meta.url));
+const sourceDir = dirname(fileURLToPath(import.meta.url));
+const here = resolve(process.env.PROMO_OUTPUT_DIR || sourceDir);
 const cache = join(here, 'cache');
 const gameUrl = process.env.GAME_URL || 'http://127.0.0.1:5301/';
-const pwRoot = resolve(process.env.PLAYWRIGHT_ROOT || join(here, '../../..'));
+const pwRoot = resolve(process.env.PLAYWRIGHT_ROOT || join(sourceDir, '../../..'));
 const require = createRequire(join(pwRoot, 'package.json'));
 const { chromium } = require('playwright');
 const args = ['--use-angle=metal', '--enable-gpu', '--ignore-gpu-blocklist'];

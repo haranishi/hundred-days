@@ -4,7 +4,7 @@
 
 |対象|著作者・出典|許諾全文|
 |---|---|---|
-|three.js 0.186.1（GLTFLoader・CSM・Reflectorの手順を含む）|three.js authors|[MIT](three.txt)|
+|three.js 0.186.1（BoxGeometry・GLTFLoader・CSM・Reflectorの手順を含む）|three.js authors|[MIT](three.txt)|
 |postprocessing 6.39.5|Raoul van Rüschen|[Zlib](postprocessing.txt)|
 |n8ao 2.0.1|N8python|[CC0](n8ao.txt)|
 |SMAAのGLSL・検索画像|Jorge Jimenezら（詳細は同梱声明）|[MITと補足](SMAA.txt)|

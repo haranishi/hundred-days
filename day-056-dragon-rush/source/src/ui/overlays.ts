@@ -80,7 +80,7 @@ export class Overlays {
     this.start.setAttribute('data-testid', 'start-overlay');
     const sp = el('div', 'dr-panel dr-start');
     this.startCards = new CreatureCards('creature-cards', false, (id) => h.choose(id));
-    sp.append(el('div', 'dr-title', '夕暮れ怪獣ラッシュ'), el('div', 'dr-sub', '3分で、夕暮れの湾岸の街をどれだけ壊せるか'), el('div', 'dr-cta', 'クリックで始める'));
+    sp.append(el('div', 'dr-title', '夕暮れ破壊紀行'), el('div', 'dr-sub', '3分で、夕暮れの湾岸の街をどれだけ壊せるか'), el('div', 'dr-cta', 'クリックで始める'));
     // r05-play（体験の採点 r04 の B4）：札は画面の下に置く（CHARACTERS.md の骨格「札は画面の下に小さく3枚」）。
     // 旧は題と同じ中央の板に並べ、画面のちょうど中央に雷翼の札が来て、初めての人が中央を押すと紅竜でなく雷翼で始まった。
     // 札の外（板・空き）を押せば選んでいる怪獣（初回は紅竜）で始まり、札を押せばその怪獣ですぐ始まる
