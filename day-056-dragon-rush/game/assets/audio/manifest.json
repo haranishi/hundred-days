@@ -1,0 +1,6938 @@
+{
+ "generator": "tools/audio/build.mjs（すべて合成。第三者の音源・サンプルは使っていない）",
+ "seed": 20260930,
+ "sampleRate": 48000,
+ "monsters": [
+  "dragon",
+  "raiyoku",
+  "homuratsuno"
+ ],
+ "ir": {
+  "near": {
+   "name": "near",
+   "file": "ir/near.ogg",
+   "seconds": 1.8,
+   "rt60": [
+    1.35,
+    1.05,
+    0.5
+   ],
+   "predelay": 0.01
+  },
+  "mid": {
+   "name": "mid",
+   "file": "ir/mid.ogg",
+   "seconds": 3.2,
+   "rt60": [
+    2.6,
+    1.9,
+    0.85
+   ],
+   "predelay": 0.03
+  },
+  "far": {
+   "name": "far",
+   "file": "ir/far.ogg",
+   "seconds": 4.6,
+   "rt60": [
+    3.9,
+    3,
+    1.1
+   ],
+   "predelay": 0.08
+  }
+ },
+ "sfx": {
+  "air/wind": {
+   "loop": true,
+   "target": -20,
+   "variants": [
+    {
+     "file": "sfx/air/wind_1.ogg",
+     "loop": true,
+     "layers": {
+      "core": "none",
+      "body": "moving-bands+gusts",
+      "tail": "whistle"
+     },
+     "rmsDb": -23.4,
+     "seconds": 10,
+     "momentaryMax": -20,
+     "shortTermMax": -20.3,
+     "samplePeakDb": -9.3,
+     "truePeakDb": -9.3,
+     "limiterGrDb": 0,
+     "onsetMs": 0,
+     "tailSeconds": 10,
+     "bands": [
+      0.008,
+      0.137,
+      0.811,
+      0.043,
+      0.001
+     ]
+    }
+   ]
+  },
+  "attack/diveWind": {
+   "loop": false,
+   "target": -16,
+   "variants": [
+    {
+     "file": "sfx/attack/diveWind_1.ogg",
+     "loop": false,
+     "layers": {
+      "core": "none",
+      "body": "rising-whoosh",
+      "tail": "hiss"
+     },
+     "rmsDb": -24.3,
+     "seconds": 2.4,
+     "momentaryMax": -16,
+     "shortTermMax": -21.2,
+     "samplePeakDb": -8.4,
+     "truePeakDb": -8.1,
+     "limiterGrDb": 0,
+     "onsetMs": 72.8,
+     "tailSeconds": 2.39,
+     "bands": [
+      0.002,
+      0.032,
+      0.752,
+      0.169,
+      0.045
+     ]
+    },
+    {
+     "file": "sfx/attack/diveWind_2.ogg",
+     "loop": false,
+     "layers": {
+      "core": "none",
+      "body": "rising-whoosh",
+      "tail": "hiss"
+     },
+     "rmsDb": -24.1,
+     "seconds": 2.4,
+     "momentaryMax": -16,
+     "shortTermMax": -21.2,
+     "samplePeakDb": -8.8,
+     "truePeakDb": -8.7,
+     "limiterGrDb": 0,
+     "onsetMs": 70.6,
+     "tailSeconds": 2.39,
+     "bands": [
+      0.002,
+      0.036,
+      0.773,
+      0.156,
+      0.032
+     ]
+    },
+    {
+     "file": "sfx/attack/diveWind_3.ogg",
+     "loop": false,
+     "layers": {
+      "core": "none",
+      "body": "rising-whoosh",
+      "tail": "hiss"
+     },
+     "rmsDb": -24.3,
+     "seconds": 2.4,
+     "momentaryMax": -16,
+     "shortTermMax": -21.2,
+     "samplePeakDb": -7.9,
+     "truePeakDb": -7.7,
+     "limiterGrDb": 0,
+     "onsetMs": 76.4,
+     "tailSeconds": 2.39,
+     "bands": [
+      0.002,
+      0.034,
+      0.743,
+      0.177,
+      0.045
+     ]
+    }
+   ]
+  },
+  "building/collapseFar": {
+   "loop": false,
+   "target": -13,
+   "variants": [
+    {
+     "file": "sfx/building/collapseFar_1.ogg",
+     "loop": false,
+     "layers": {
+      "core": "fracture-burst",
+      "body": "head 82→47Hz(0.4s)+noise-rumble+low-tones+mid-debris+11-chunks+grind",
+      "tail": "rumble+trickle+far-reverb(lp)"
+     },
+     "rmsDb": -19.9,
+     "seconds": 9.857,
+     "momentaryMax": -13,
+     "shortTermMax": -15.4,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.2,
+     "limiterGrDb": 0,
+     "onsetMs": 0.5,
+     "tailSeconds": 9.27,
+     "bands": [
+      0.478,
+      0.361,
+      0.159,
+      0.002,
+      0
+     ]
+    },
+    {
+     "file": "sfx/building/collapseFar_2.ogg",
+     "loop": false,
+     "layers": {
+      "core": "fracture-burst",
+      "body": "head 82→46Hz(0.4s)+noise-rumble+low-tones+mid-debris+11-chunks+grind",
+      "tail": "rumble+trickle+far-reverb(lp)"
+     },
+     "rmsDb": -19.6,
+     "seconds": 9.867,
+     "momentaryMax": -13,
+     "shortTermMax": -15,
+     "samplePeakDb": -3.2,
+     "truePeakDb": -3.2,
+     "limiterGrDb": 0,
+     "onsetMs": 0.9,
+     "tailSeconds": 9.55,
+     "bands": [
+      0.466,
+      0.392,
+      0.14,
+      0.002,
+      0
+     ]
+    },
+    {
+     "file": "sfx/building/collapseFar_3.ogg",
+     "loop": false,
+     "layers": {
+      "core": "fracture-burst",
+      "body": "head 72→46Hz(0.4s)+noise-rumble+low-tones+mid-debris+8-chunks+grind",
+      "tail": "rumble+trickle+far-reverb(lp)"
+     },
+     "rmsDb": -19.7,
+     "seconds": 9.644,
+     "momentaryMax": -13,
+     "shortTermMax": -15,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.2,
+     "limiterGrDb": 0.2,
+     "onsetMs": 5.4,
+     "tailSeconds": 9.22,
+     "bands": [
+      0.461,
+      0.362,
+      0.175,
+      0.002,
+      0
+     ]
+    },
+    {
+     "file": "sfx/building/collapseFar_4.ogg",
+     "loop": false,
+     "layers": {
+      "core": "fracture-burst",
+      "body": "head 81→43Hz(0.4s)+noise-rumble+low-tones+mid-debris+9-chunks+grind",
+      "tail": "rumble+trickle+far-reverb(lp)"
+     },
+     "rmsDb": -20.6,
+     "seconds": 9.639,
+     "momentaryMax": -13,
+     "shortTermMax": -15.9,
+     "samplePeakDb": -3,
+     "truePeakDb": -3,
+     "limiterGrDb": 0,
+     "onsetMs": 3.2,
+     "tailSeconds": 9.26,
+     "bands": [
+      0.443,
+      0.386,
+      0.168,
+      0.002,
+      0
+     ]
+    }
+   ]
+  },
+  "building/collapseNear": {
+   "loop": false,
+   "target": -9,
+   "variants": [
+    {
+     "file": "sfx/building/collapseNear_1.ogg",
+     "loop": false,
+     "layers": {
+      "core": "fracture-burst×1",
+      "body": "crumble: hits 0.00s+noise-rumble+low-tones+mid-debris+chunks+grind",
+      "tail": "rumble+trickle+far-reverb"
+     },
+     "rmsDb": -16.5,
+     "seconds": 8.598,
+     "momentaryMax": -10.4,
+     "shortTermMax": -11.9,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.2,
+     "limiterGrDb": 4.5,
+     "onsetMs": 0,
+     "tailSeconds": 8.35,
+     "bands": [
+      0.467,
+      0.356,
+      0.148,
+      0.027,
+      0.002
+     ]
+    },
+    {
+     "file": "sfx/building/collapseNear_2.ogg",
+     "loop": false,
+     "layers": {
+      "core": "fracture-burst×1",
+      "body": "topple: hits 0.56s+noise-rumble+low-tones+mid-debris+chunks+grind",
+      "tail": "rumble+trickle+far-reverb"
+     },
+     "rmsDb": -17,
+     "seconds": 9.399,
+     "momentaryMax": -10.5,
+     "shortTermMax": -12,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.2,
+     "limiterGrDb": 4.5,
+     "onsetMs": 0,
+     "tailSeconds": 8.81,
+     "bands": [
+      0.459,
+      0.381,
+      0.138,
+      0.02,
+      0.002
+     ]
+    },
+    {
+     "file": "sfx/building/collapseNear_3.ogg",
+     "loop": false,
+     "layers": {
+      "core": "fracture-burst×4",
+      "body": "pancake: hits 0.00/0.40/0.69/0.91s+noise-rumble+low-tones+mid-debris+chunks+grind",
+      "tail": "rumble+trickle+far-reverb"
+     },
+     "rmsDb": -16.5,
+     "seconds": 8.091,
+     "momentaryMax": -10.1,
+     "shortTermMax": -12.7,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.1,
+     "limiterGrDb": 4.5,
+     "onsetMs": 0,
+     "tailSeconds": 7.78,
+     "bands": [
+      0.553,
+      0.349,
+      0.079,
+      0.017,
+      0.002
+     ]
+    },
+    {
+     "file": "sfx/building/collapseNear_4.ogg",
+     "loop": false,
+     "layers": {
+      "core": "fracture-burst×2",
+      "body": "split: hits 0.00/1.33s+noise-rumble+low-tones+mid-debris+chunks+grind",
+      "tail": "rumble+trickle+far-reverb"
+     },
+     "rmsDb": -18,
+     "seconds": 9.34,
+     "momentaryMax": -11.7,
+     "shortTermMax": -13.3,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.2,
+     "limiterGrDb": 4.5,
+     "onsetMs": 0,
+     "tailSeconds": 9,
+     "bands": [
+      0.422,
+      0.371,
+      0.183,
+      0.022,
+      0.002
+     ]
+    },
+    {
+     "file": "sfx/building/collapseNear_5.ogg",
+     "loop": false,
+     "layers": {
+      "core": "fracture-burst×1",
+      "body": "crumble: hits 0.00s+noise-rumble+low-tones+mid-debris+chunks+grind",
+      "tail": "rumble+trickle+far-reverb"
+     },
+     "rmsDb": -16.7,
+     "seconds": 8.857,
+     "momentaryMax": -10.9,
+     "shortTermMax": -12.1,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.1,
+     "limiterGrDb": 4.6,
+     "onsetMs": 0,
+     "tailSeconds": 8.54,
+     "bands": [
+      0.415,
+      0.42,
+      0.144,
+      0.02,
+      0.002
+     ]
+    },
+    {
+     "file": "sfx/building/collapseNear_6.ogg",
+     "loop": false,
+     "layers": {
+      "core": "fracture-burst×1",
+      "body": "topple: hits 0.69s+noise-rumble+low-tones+mid-debris+chunks+grind",
+      "tail": "rumble+trickle+far-reverb"
+     },
+     "rmsDb": -17.6,
+     "seconds": 9.155,
+     "momentaryMax": -10.6,
+     "shortTermMax": -12.5,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.2,
+     "limiterGrDb": 4.5,
+     "onsetMs": 0.1,
+     "tailSeconds": 8.58,
+     "bands": [
+      0.38,
+      0.413,
+      0.184,
+      0.022,
+      0.002
+     ]
+    },
+    {
+     "file": "sfx/building/collapseNear_7.ogg",
+     "loop": false,
+     "layers": {
+      "core": "fracture-burst×5",
+      "body": "pancake: hits 0.00/0.42/0.76/1.03/1.25s+noise-rumble+low-tones+mid-debris+chunks+grind",
+      "tail": "rumble+trickle+far-reverb"
+     },
+     "rmsDb": -17.9,
+     "seconds": 8.452,
+     "momentaryMax": -11.2,
+     "shortTermMax": -13.3,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.2,
+     "limiterGrDb": 4.6,
+     "onsetMs": 0,
+     "tailSeconds": 8.14,
+     "bands": [
+      0.4,
+      0.45,
+      0.129,
+      0.02,
+      0.002
+     ]
+    },
+    {
+     "file": "sfx/building/collapseNear_8.ogg",
+     "loop": false,
+     "layers": {
+      "core": "fracture-burst×2",
+      "body": "split: hits 0.00/1.11s+noise-rumble+low-tones+mid-debris+chunks+grind",
+      "tail": "rumble+trickle+far-reverb"
+     },
+     "rmsDb": -17.2,
+     "seconds": 9.521,
+     "momentaryMax": -11.1,
+     "shortTermMax": -12.5,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.2,
+     "limiterGrDb": 4.5,
+     "onsetMs": 0,
+     "tailSeconds": 9.11,
+     "bands": [
+      0.388,
+      0.409,
+      0.176,
+      0.025,
+      0.002
+     ]
+    }
+   ]
+  },
+  "building/crack": {
+   "loop": false,
+   "target": -15,
+   "variants": [
+    {
+     "file": "sfx/building/crack_1.ogg",
+     "loop": false,
+     "layers": {
+      "core": "rounded-snap-run",
+      "body": "noise-thunk+groan?+grind",
+      "tail": "dribble 0.9s"
+     },
+     "rmsDb": -22.2,
+     "seconds": 0.862,
+     "momentaryMax": -15.1,
+     "shortTermMax": -23.8,
+     "samplePeakDb": -2.9,
+     "truePeakDb": -2.1,
+     "limiterGrDb": 2,
+     "onsetMs": 0,
+     "tailSeconds": 0.81,
+     "bands": [
+      0.01,
+      0.261,
+      0.488,
+      0.207,
+      0.034
+     ]
+    },
+    {
+     "file": "sfx/building/crack_2.ogg",
+     "loop": false,
+     "layers": {
+      "core": "rounded-snap-short",
+      "body": "noise-thunk+groan?+grind",
+      "tail": "dribble 1.4s"
+     },
+     "rmsDb": -25.9,
+     "seconds": 1.176,
+     "momentaryMax": -16.6,
+     "shortTermMax": -25.3,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2,
+     "limiterGrDb": 8.1,
+     "onsetMs": 0,
+     "tailSeconds": 1.12,
+     "bands": [
+      0.006,
+      0.044,
+      0.63,
+      0.296,
+      0.024
+     ]
+    },
+    {
+     "file": "sfx/building/crack_3.ogg",
+     "loop": false,
+     "layers": {
+      "core": "rounded-snap-split",
+      "body": "noise-thunk+groan?+grind",
+      "tail": "dribble 1.5s"
+     },
+     "rmsDb": -24.3,
+     "seconds": 1.6,
+     "momentaryMax": -15.2,
+     "shortTermMax": -23.7,
+     "samplePeakDb": -3.2,
+     "truePeakDb": -2,
+     "limiterGrDb": 2,
+     "onsetMs": 0,
+     "tailSeconds": 1.54,
+     "bands": [
+      0.024,
+      0.431,
+      0.406,
+      0.117,
+      0.023
+     ]
+    },
+    {
+     "file": "sfx/building/crack_4.ogg",
+     "loop": false,
+     "layers": {
+      "core": "rounded-snap-sparse",
+      "body": "noise-thunk+groan?+grind",
+      "tail": "dribble 0.6s"
+     },
+     "rmsDb": -21.9,
+     "seconds": 0.68,
+     "momentaryMax": -15.6,
+     "shortTermMax": -24.2,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2,
+     "limiterGrDb": 6.9,
+     "onsetMs": 0,
+     "tailSeconds": 0.63,
+     "bands": [
+      0.077,
+      0.157,
+      0.502,
+      0.238,
+      0.026
+     ]
+    },
+    {
+     "file": "sfx/building/crack_5.ogg",
+     "loop": false,
+     "layers": {
+      "core": "rounded-snap-run",
+      "body": "noise-thunk+groan?+grind",
+      "tail": "dribble 1.6s"
+     },
+     "rmsDb": -23.8,
+     "seconds": 1.343,
+     "momentaryMax": -15.2,
+     "shortTermMax": -23.3,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.1,
+     "limiterGrDb": 5,
+     "onsetMs": 0,
+     "tailSeconds": 1.28,
+     "bands": [
+      0.049,
+      0.166,
+      0.437,
+      0.291,
+      0.056
+     ]
+    },
+    {
+     "file": "sfx/building/crack_6.ogg",
+     "loop": false,
+     "layers": {
+      "core": "rounded-snap-short",
+      "body": "noise-thunk+groan?+grind",
+      "tail": "dribble 0.8s"
+     },
+     "rmsDb": -19.7,
+     "seconds": 0.845,
+     "momentaryMax": -15.3,
+     "shortTermMax": -22.9,
+     "samplePeakDb": -2.7,
+     "truePeakDb": -2,
+     "limiterGrDb": 7.5,
+     "onsetMs": 0,
+     "tailSeconds": 0.79,
+     "bands": [
+      0.06,
+      0.711,
+      0.197,
+      0.025,
+      0.007
+     ]
+    },
+    {
+     "file": "sfx/building/crack_7.ogg",
+     "loop": false,
+     "layers": {
+      "core": "rounded-snap-split",
+      "body": "noise-thunk+groan?+grind",
+      "tail": "dribble 1.3s"
+     },
+     "rmsDb": -22.9,
+     "seconds": 1.185,
+     "momentaryMax": -15.2,
+     "shortTermMax": -23.7,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.2,
+     "limiterGrDb": 2.8,
+     "onsetMs": 0,
+     "tailSeconds": 1.13,
+     "bands": [
+      0.048,
+      0.508,
+      0.28,
+      0.138,
+      0.026
+     ]
+    },
+    {
+     "file": "sfx/building/crack_8.ogg",
+     "loop": false,
+     "layers": {
+      "core": "rounded-snap-sparse",
+      "body": "noise-thunk+groan?+grind",
+      "tail": "dribble 0.8s"
+     },
+     "rmsDb": -21.5,
+     "seconds": 0.776,
+     "momentaryMax": -15.1,
+     "shortTermMax": -23.8,
+     "samplePeakDb": -2.4,
+     "truePeakDb": -2.1,
+     "limiterGrDb": 1.5,
+     "onsetMs": 0,
+     "tailSeconds": 0.72,
+     "bands": [
+      0.019,
+      0.3,
+      0.505,
+      0.159,
+      0.017
+     ]
+    }
+   ]
+  },
+  "building/glass": {
+   "loop": false,
+   "target": -15,
+   "variants": [
+    {
+     "file": "sfx/building/glass_1.ogg",
+     "loop": false,
+     "layers": {
+      "core": "shatter(burst)",
+      "body": "shards(inharmonic)+pane-crash+crunch",
+      "tail": "tinkle 2.9s+wet 0.17"
+     },
+     "rmsDb": -28.7,
+     "seconds": 3.204,
+     "momentaryMax": -15,
+     "shortTermMax": -22.5,
+     "samplePeakDb": -8,
+     "truePeakDb": -7.9,
+     "limiterGrDb": 0,
+     "onsetMs": 0.1,
+     "tailSeconds": 3.1,
+     "bands": [
+      0,
+      0.007,
+      0.239,
+      0.681,
+      0.072
+     ]
+    },
+    {
+     "file": "sfx/building/glass_2.ogg",
+     "loop": false,
+     "layers": {
+      "core": "shatter(tinkle)",
+      "body": "shards(inharmonic)+crunch",
+      "tail": "tinkle 0.8s+wet 0.00"
+     },
+     "rmsDb": -25.7,
+     "seconds": 1.103,
+     "momentaryMax": -15,
+     "shortTermMax": -23.7,
+     "samplePeakDb": -4.2,
+     "truePeakDb": -3.8,
+     "limiterGrDb": 0,
+     "onsetMs": 0,
+     "tailSeconds": 1.01,
+     "bands": [
+      0,
+      0,
+      0.001,
+      0.752,
+      0.247
+     ]
+    },
+    {
+     "file": "sfx/building/glass_3.ogg",
+     "loop": false,
+     "layers": {
+      "core": "shatter(double)",
+      "body": "shards(inharmonic)+crunch",
+      "tail": "tinkle 2.1s+wet 0.19"
+     },
+     "rmsDb": -29,
+     "seconds": 2.616,
+     "momentaryMax": -15,
+     "shortTermMax": -23.4,
+     "samplePeakDb": -5.2,
+     "truePeakDb": -5.1,
+     "limiterGrDb": 0,
+     "onsetMs": 0,
+     "tailSeconds": 2.51,
+     "bands": [
+      0,
+      0,
+      0.006,
+      0.837,
+      0.157
+     ]
+    },
+    {
+     "file": "sfx/building/glass_4.ogg",
+     "loop": false,
+     "layers": {
+      "core": "shatter(cascade)",
+      "body": "shards(inharmonic)+crunch",
+      "tail": "tinkle 2.7s+wet 0.19"
+     },
+     "rmsDb": -26.8,
+     "seconds": 3.026,
+     "momentaryMax": -15,
+     "shortTermMax": -20.5,
+     "samplePeakDb": -6.3,
+     "truePeakDb": -6.2,
+     "limiterGrDb": 0,
+     "onsetMs": 0,
+     "tailSeconds": 2.86,
+     "bands": [
+      0,
+      0,
+      0.004,
+      0.859,
+      0.136
+     ]
+    },
+    {
+     "file": "sfx/building/glass_5.ogg",
+     "loop": false,
+     "layers": {
+      "core": "shatter(burst)",
+      "body": "shards(inharmonic)+pane-crash+crunch",
+      "tail": "tinkle 2.8s+wet 0.24"
+     },
+     "rmsDb": -28.6,
+     "seconds": 3.221,
+     "momentaryMax": -15,
+     "shortTermMax": -22.4,
+     "samplePeakDb": -7.5,
+     "truePeakDb": -7.5,
+     "limiterGrDb": 0,
+     "onsetMs": 0,
+     "tailSeconds": 2.88,
+     "bands": [
+      0.001,
+      0.011,
+      0.185,
+      0.738,
+      0.065
+     ]
+    },
+    {
+     "file": "sfx/building/glass_6.ogg",
+     "loop": false,
+     "layers": {
+      "core": "shatter(tinkle)",
+      "body": "shards(inharmonic)+crunch",
+      "tail": "tinkle 0.7s+wet 0.00"
+     },
+     "rmsDb": -23.7,
+     "seconds": 0.685,
+     "momentaryMax": -15,
+     "shortTermMax": -23.7,
+     "samplePeakDb": -5.7,
+     "truePeakDb": -5,
+     "limiterGrDb": 0,
+     "onsetMs": 0,
+     "tailSeconds": 0.62,
+     "bands": [
+      0,
+      0,
+      0.001,
+      0.792,
+      0.208
+     ]
+    },
+    {
+     "file": "sfx/building/glass_7.ogg",
+     "loop": false,
+     "layers": {
+      "core": "shatter(double)",
+      "body": "shards(inharmonic)+crunch",
+      "tail": "tinkle 1.9s+wet 0.09"
+     },
+     "rmsDb": -28.4,
+     "seconds": 2.3,
+     "momentaryMax": -15,
+     "shortTermMax": -23.3,
+     "samplePeakDb": -6.6,
+     "truePeakDb": -6.6,
+     "limiterGrDb": 0,
+     "onsetMs": 0,
+     "tailSeconds": 2.23,
+     "bands": [
+      0,
+      0,
+      0.004,
+      0.855,
+      0.141
+     ]
+    },
+    {
+     "file": "sfx/building/glass_8.ogg",
+     "loop": false,
+     "layers": {
+      "core": "shatter(cascade)",
+      "body": "shards(inharmonic)+crunch",
+      "tail": "tinkle 3.0s+wet 0.18"
+     },
+     "rmsDb": -28.8,
+     "seconds": 3.441,
+     "momentaryMax": -15,
+     "shortTermMax": -21.9,
+     "samplePeakDb": -6.9,
+     "truePeakDb": -6.8,
+     "limiterGrDb": 0,
+     "onsetMs": 0,
+     "tailSeconds": 3.32,
+     "bands": [
+      0,
+      0,
+      0.003,
+      0.842,
+      0.155
+     ]
+    }
+   ]
+  },
+  "building/peel": {
+   "loop": false,
+   "target": -14,
+   "variants": [
+    {
+     "file": "sfx/building/peel_1.ogg",
+     "loop": false,
+     "layers": {
+      "core": "tear+snaps",
+      "body": "6-chunk-noise-impacts",
+      "tail": "trickle+dust"
+     },
+     "rmsDb": -20.6,
+     "seconds": 3,
+     "momentaryMax": -14.3,
+     "shortTermMax": -19.5,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.2,
+     "limiterGrDb": 3,
+     "onsetMs": 0.7,
+     "tailSeconds": 2.98,
+     "bands": [
+      0.261,
+      0.589,
+      0.102,
+      0.041,
+      0.007
+     ]
+    },
+    {
+     "file": "sfx/building/peel_2.ogg",
+     "loop": false,
+     "layers": {
+      "core": "tear+snaps",
+      "body": "4-chunk-noise-impacts",
+      "tail": "trickle+dust"
+     },
+     "rmsDb": -22.7,
+     "seconds": 3,
+     "momentaryMax": -15.2,
+     "shortTermMax": -20.5,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.2,
+     "limiterGrDb": 5,
+     "onsetMs": 0.5,
+     "tailSeconds": 2.99,
+     "bands": [
+      0.333,
+      0.338,
+      0.187,
+      0.122,
+      0.02
+     ]
+    },
+    {
+     "file": "sfx/building/peel_3.ogg",
+     "loop": false,
+     "layers": {
+      "core": "tear+snaps",
+      "body": "7-chunk-noise-impacts",
+      "tail": "trickle+dust"
+     },
+     "rmsDb": -20.5,
+     "seconds": 3,
+     "momentaryMax": -14.5,
+     "shortTermMax": -19.8,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.2,
+     "limiterGrDb": 5,
+     "onsetMs": 0.5,
+     "tailSeconds": 2.98,
+     "bands": [
+      0.313,
+      0.528,
+      0.095,
+      0.055,
+      0.008
+     ]
+    },
+    {
+     "file": "sfx/building/peel_4.ogg",
+     "loop": false,
+     "layers": {
+      "core": "tear+snaps",
+      "body": "6-chunk-noise-impacts",
+      "tail": "trickle+dust"
+     },
+     "rmsDb": -21.4,
+     "seconds": 3,
+     "momentaryMax": -15.3,
+     "shortTermMax": -19.6,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.2,
+     "limiterGrDb": 5,
+     "onsetMs": 0.6,
+     "tailSeconds": 2.99,
+     "bands": [
+      0.194,
+      0.579,
+      0.162,
+      0.056,
+      0.01
+     ]
+    }
+   ]
+  },
+  "building/tilt": {
+   "loop": false,
+   "target": -14,
+   "variants": [
+    {
+     "file": "sfx/building/tilt_1.ogg",
+     "loop": false,
+     "layers": {
+      "core": "deep-crack(noise)",
+      "body": "groan 56Hz↓+steel-creak+grind",
+      "tail": "creak+mid-reverb"
+     },
+     "rmsDb": -18.8,
+     "seconds": 5.2,
+     "momentaryMax": -14,
+     "shortTermMax": -16.9,
+     "samplePeakDb": -3.8,
+     "truePeakDb": -3.8,
+     "limiterGrDb": 0,
+     "onsetMs": 0,
+     "tailSeconds": 5.17,
+     "bands": [
+      0.569,
+      0.4,
+      0.024,
+      0.007,
+      0
+     ]
+    },
+    {
+     "file": "sfx/building/tilt_2.ogg",
+     "loop": false,
+     "layers": {
+      "core": "deep-crack(noise)",
+      "body": "groan 66Hz↓+steel-creak+grind",
+      "tail": "creak+mid-reverb"
+     },
+     "rmsDb": -18.8,
+     "seconds": 5.2,
+     "momentaryMax": -14.1,
+     "shortTermMax": -16.6,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.2,
+     "limiterGrDb": 1.6,
+     "onsetMs": 0,
+     "tailSeconds": 5.12,
+     "bands": [
+      0.49,
+      0.457,
+      0.039,
+      0.014,
+      0
+     ]
+    },
+    {
+     "file": "sfx/building/tilt_3.ogg",
+     "loop": false,
+     "layers": {
+      "core": "deep-crack(noise)",
+      "body": "groan 66Hz↓+steel-creak+grind",
+      "tail": "creak+mid-reverb"
+     },
+     "rmsDb": -19.4,
+     "seconds": 5.2,
+     "momentaryMax": -14,
+     "shortTermMax": -16.9,
+     "samplePeakDb": -4.1,
+     "truePeakDb": -4.1,
+     "limiterGrDb": 0,
+     "onsetMs": 0,
+     "tailSeconds": 5.17,
+     "bands": [
+      0.373,
+      0.558,
+      0.057,
+      0.012,
+      0
+     ]
+    },
+    {
+     "file": "sfx/building/tilt_4.ogg",
+     "loop": false,
+     "layers": {
+      "core": "deep-crack(noise)",
+      "body": "groan 59Hz↓+steel-creak+grind",
+      "tail": "creak+mid-reverb"
+     },
+     "rmsDb": -17.7,
+     "seconds": 5.2,
+     "momentaryMax": -14,
+     "shortTermMax": -15.6,
+     "samplePeakDb": -3.3,
+     "truePeakDb": -3.3,
+     "limiterGrDb": 0,
+     "onsetMs": 0,
+     "tailSeconds": 5.16,
+     "bands": [
+      0.53,
+      0.423,
+      0.036,
+      0.011,
+      0
+     ]
+    }
+   ]
+  },
+  "dragon/breathLoop": {
+   "loop": true,
+   "target": -15,
+   "variants": [
+    {
+     "file": "sfx/dragon/breathLoop_1.ogg",
+     "loop": true,
+     "layers": {
+      "core": "crackle",
+      "body": "jet(3 moving bands)",
+      "tail": "low-roar"
+     },
+     "rmsDb": -18.1,
+     "seconds": 6,
+     "momentaryMax": -15,
+     "shortTermMax": -15.5,
+     "samplePeakDb": -4.9,
+     "truePeakDb": -4.9,
+     "limiterGrDb": 0,
+     "onsetMs": 0,
+     "tailSeconds": 6,
+     "bands": [
+      0.119,
+      0.303,
+      0.496,
+      0.078,
+      0.004
+     ]
+    },
+    {
+     "file": "sfx/dragon/breathLoop_2.ogg",
+     "loop": true,
+     "layers": {
+      "core": "crackle",
+      "body": "jet(3 moving bands)",
+      "tail": "low-roar"
+     },
+     "rmsDb": -18.1,
+     "seconds": 6,
+     "momentaryMax": -15,
+     "shortTermMax": -15.6,
+     "samplePeakDb": -4.9,
+     "truePeakDb": -4.9,
+     "limiterGrDb": 0,
+     "onsetMs": 0,
+     "tailSeconds": 6,
+     "bands": [
+      0.144,
+      0.273,
+      0.518,
+      0.061,
+      0.004
+     ]
+    }
+   ]
+  },
+  "dragon/breathStart": {
+   "loop": false,
+   "target": -12,
+   "variants": [
+    {
+     "file": "sfx/dragon/breathStart_1.ogg",
+     "loop": false,
+     "layers": {
+      "core": "ignite-snap+hiss",
+      "body": "jet-rise(189ms)+low-thump(noise)",
+      "tail": "crackle"
+     },
+     "rmsDb": -17.6,
+     "seconds": 1.395,
+     "momentaryMax": -12,
+     "shortTermMax": -18,
+     "samplePeakDb": -2.5,
+     "truePeakDb": -2.5,
+     "limiterGrDb": 0,
+     "onsetMs": 0,
+     "tailSeconds": 1.39,
+     "bands": [
+      0.036,
+      0.235,
+      0.64,
+      0.084,
+      0.005
+     ]
+    },
+    {
+     "file": "sfx/dragon/breathStart_2.ogg",
+     "loop": false,
+     "layers": {
+      "core": "ignite-snap+hiss",
+      "body": "jet-rise(312ms)+low-thump(noise)",
+      "tail": "crackle"
+     },
+     "rmsDb": -17,
+     "seconds": 1.808,
+     "momentaryMax": -12,
+     "shortTermMax": -16.4,
+     "samplePeakDb": -3.2,
+     "truePeakDb": -3.1,
+     "limiterGrDb": 0,
+     "onsetMs": 0,
+     "tailSeconds": 1.8,
+     "bands": [
+      0.027,
+      0.225,
+      0.678,
+      0.066,
+      0.003
+     ]
+    },
+    {
+     "file": "sfx/dragon/breathStart_3.ogg",
+     "loop": false,
+     "layers": {
+      "core": "ignite-snap+hiss",
+      "body": "jet-rise(238ms)+low-thump(noise)",
+      "tail": "crackle"
+     },
+     "rmsDb": -16.9,
+     "seconds": 1.633,
+     "momentaryMax": -12,
+     "shortTermMax": -16.6,
+     "samplePeakDb": -3.2,
+     "truePeakDb": -3.2,
+     "limiterGrDb": 0,
+     "onsetMs": 0,
+     "tailSeconds": 1.62,
+     "bands": [
+      0.093,
+      0.245,
+      0.557,
+      0.1,
+      0.005
+     ]
+    }
+   ]
+  },
+  "dragon/breathStop": {
+   "loop": false,
+   "target": -15,
+   "variants": [
+    {
+     "file": "sfx/dragon/breathStop_1.ogg",
+     "loop": false,
+     "layers": {
+      "core": "collapse-whoosh",
+      "body": "fading-jet+flutter",
+      "tail": "crackle"
+     },
+     "rmsDb": -24.2,
+     "seconds": 2,
+     "momentaryMax": -15,
+     "shortTermMax": -23,
+     "samplePeakDb": -4.8,
+     "truePeakDb": -4.8,
+     "limiterGrDb": 0,
+     "onsetMs": 0,
+     "tailSeconds": 1.96,
+     "bands": [
+      0.022,
+      0.181,
+      0.736,
+      0.059,
+      0.003
+     ]
+    },
+    {
+     "file": "sfx/dragon/breathStop_2.ogg",
+     "loop": false,
+     "layers": {
+      "core": "collapse-whoosh",
+      "body": "fading-jet+flutter",
+      "tail": "crackle"
+     },
+     "rmsDb": -24.3,
+     "seconds": 2,
+     "momentaryMax": -15,
+     "shortTermMax": -23.1,
+     "samplePeakDb": -4.1,
+     "truePeakDb": -4.1,
+     "limiterGrDb": 0,
+     "onsetMs": 0,
+     "tailSeconds": 1.97,
+     "bands": [
+      0.011,
+      0.181,
+      0.734,
+      0.07,
+      0.004
+     ]
+    },
+    {
+     "file": "sfx/dragon/breathStop_3.ogg",
+     "loop": false,
+     "layers": {
+      "core": "collapse-whoosh",
+      "body": "fading-jet+flutter",
+      "tail": "crackle"
+     },
+     "rmsDb": -24.2,
+     "seconds": 2,
+     "momentaryMax": -15,
+     "shortTermMax": -23,
+     "samplePeakDb": -5.7,
+     "truePeakDb": -5.7,
+     "limiterGrDb": 0,
+     "onsetMs": 0,
+     "tailSeconds": 1.98,
+     "bands": [
+      0.011,
+      0.192,
+      0.724,
+      0.07,
+      0.003
+     ]
+    }
+   ]
+  },
+  "dragon/clawHit": {
+   "loop": false,
+   "target": -12,
+   "variants": [
+    {
+     "file": "sfx/dragon/clawHit_1.ogg",
+     "loop": false,
+     "layers": {
+      "core": "fracture-snaps",
+      "body": "thud+scrape(noise)+2-chunks",
+      "tail": "debris+chunks"
+     },
+     "rmsDb": -19.9,
+     "seconds": 1.089,
+     "momentaryMax": -15,
+     "shortTermMax": -23.6,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.2,
+     "limiterGrDb": 2.6,
+     "onsetMs": 0,
+     "tailSeconds": 1.03,
+     "bands": [
+      0.499,
+      0.364,
+      0.085,
+      0.049,
+      0.003
+     ]
+    },
+    {
+     "file": "sfx/dragon/clawHit_2.ogg",
+     "loop": false,
+     "layers": {
+      "core": "fracture-snaps",
+      "body": "thud+scrape(noise)+4-chunks",
+      "tail": "debris+chunks"
+     },
+     "rmsDb": -23.3,
+     "seconds": 1.159,
+     "momentaryMax": -16.8,
+     "shortTermMax": -25.5,
+     "samplePeakDb": -2.3,
+     "truePeakDb": -2.1,
+     "limiterGrDb": 2.6,
+     "onsetMs": 0,
+     "tailSeconds": 1.11,
+     "bands": [
+      0.258,
+      0.488,
+      0.181,
+      0.068,
+      0.004
+     ]
+    },
+    {
+     "file": "sfx/dragon/clawHit_3.ogg",
+     "loop": false,
+     "layers": {
+      "core": "fracture-snaps",
+      "body": "thud+scrape(noise)+3-chunks",
+      "tail": "debris+chunks"
+     },
+     "rmsDb": -21.3,
+     "seconds": 1.348,
+     "momentaryMax": -14.5,
+     "shortTermMax": -23.2,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.1,
+     "limiterGrDb": 2.5,
+     "onsetMs": 0,
+     "tailSeconds": 1.29,
+     "bands": [
+      0.284,
+      0.424,
+      0.216,
+      0.073,
+      0.004
+     ]
+    },
+    {
+     "file": "sfx/dragon/clawHit_4.ogg",
+     "loop": false,
+     "layers": {
+      "core": "fracture-snaps",
+      "body": "thud+scrape(noise)+4-chunks",
+      "tail": "debris+chunks"
+     },
+     "rmsDb": -22.7,
+     "seconds": 1.401,
+     "momentaryMax": -15.9,
+     "shortTermMax": -24.5,
+     "samplePeakDb": -2.3,
+     "truePeakDb": -2.2,
+     "limiterGrDb": 2.6,
+     "onsetMs": 0,
+     "tailSeconds": 1.34,
+     "bands": [
+      0.363,
+      0.361,
+      0.167,
+      0.103,
+      0.007
+     ]
+    }
+   ]
+  },
+  "dragon/clawSwing": {
+   "loop": false,
+   "target": -16,
+   "variants": [
+    {
+     "file": "sfx/dragon/clawSwing_1.ogg",
+     "loop": false,
+     "layers": {
+      "core": "whoosh-peak",
+      "body": "whoosh+claw-fines",
+      "tail": "stop×83%"
+     },
+     "rmsDb": -23.8,
+     "seconds": 0.79,
+     "momentaryMax": -16,
+     "shortTermMax": -24.7,
+     "samplePeakDb": -4.1,
+     "truePeakDb": -4,
+     "limiterGrDb": 0,
+     "onsetMs": 0.1,
+     "tailSeconds": 0.77,
+     "bands": [
+      0,
+      0.002,
+      0.591,
+      0.388,
+      0.019
+     ]
+    },
+    {
+     "file": "sfx/dragon/clawSwing_2.ogg",
+     "loop": false,
+     "layers": {
+      "core": "whoosh-peak",
+      "body": "whoosh+claw-fines",
+      "tail": "trail×80%"
+     },
+     "rmsDb": -23.2,
+     "seconds": 0.78,
+     "momentaryMax": -16,
+     "shortTermMax": -24.7,
+     "samplePeakDb": -5.1,
+     "truePeakDb": -5.1,
+     "limiterGrDb": 0,
+     "onsetMs": 1.9,
+     "tailSeconds": 0.77,
+     "bands": [
+      0,
+      0.002,
+      0.792,
+      0.195,
+      0.011
+     ]
+    },
+    {
+     "file": "sfx/dragon/clawSwing_3.ogg",
+     "loop": false,
+     "layers": {
+      "core": "whoosh-peak",
+      "body": "whoosh+claw-fines",
+      "tail": "stop-back×86%"
+     },
+     "rmsDb": -21.8,
+     "seconds": 0.799,
+     "momentaryMax": -16,
+     "shortTermMax": -23.8,
+     "samplePeakDb": -2.4,
+     "truePeakDb": -2.4,
+     "limiterGrDb": 0,
+     "onsetMs": 0.1,
+     "tailSeconds": 0.78,
+     "bands": [
+      0.002,
+      0.027,
+      0.853,
+      0.116,
+      0.003
+     ]
+    },
+    {
+     "file": "sfx/dragon/clawSwing_4.ogg",
+     "loop": false,
+     "layers": {
+      "core": "whoosh-peak",
+      "body": "whoosh+claw-fines",
+      "tail": "trail-back×125%"
+     },
+     "rmsDb": -24,
+     "seconds": 0.938,
+     "momentaryMax": -16,
+     "shortTermMax": -24.3,
+     "samplePeakDb": -6.2,
+     "truePeakDb": -6.1,
+     "limiterGrDb": 0,
+     "onsetMs": 1.2,
+     "tailSeconds": 0.92,
+     "bands": [
+      0,
+      0.002,
+      0.686,
+      0.293,
+      0.019
+     ]
+    }
+   ]
+  },
+  "dragon/flap": {
+   "loop": false,
+   "target": -15,
+   "variants": [
+    {
+     "file": "sfx/dragon/flap_1.ogg",
+     "loop": false,
+     "layers": {
+      "core": "membrane-snap+flutter",
+      "body": "air-pressure(noise)+whoosh(snap)",
+      "tail": "turbulence"
+     },
+     "rmsDb": -22.1,
+     "seconds": 1.722,
+     "momentaryMax": -15.1,
+     "shortTermMax": -22.6,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.2,
+     "limiterGrDb": 0.3,
+     "onsetMs": 0.2,
+     "tailSeconds": 1.67,
+     "bands": [
+      0.127,
+      0.38,
+      0.48,
+      0.012,
+      0.001
+     ]
+    },
+    {
+     "file": "sfx/dragon/flap_2.ogg",
+     "loop": false,
+     "layers": {
+      "core": "membrane-snap+flutter",
+      "body": "air-pressure(noise)+whoosh(swell)",
+      "tail": "turbulence"
+     },
+     "rmsDb": -21.3,
+     "seconds": 1.598,
+     "momentaryMax": -15,
+     "shortTermMax": -22.5,
+     "samplePeakDb": -5.4,
+     "truePeakDb": -5.4,
+     "limiterGrDb": 0,
+     "onsetMs": 0.2,
+     "tailSeconds": 1.55,
+     "bands": [
+      0.228,
+      0.386,
+      0.38,
+      0.006,
+      0
+     ]
+    },
+    {
+     "file": "sfx/dragon/flap_3.ogg",
+     "loop": false,
+     "layers": {
+      "core": "membrane-snap+flutter",
+      "body": "air-pressure(noise)+whoosh(double)",
+      "tail": "turbulence"
+     },
+     "rmsDb": -20.1,
+     "seconds": 1.064,
+     "momentaryMax": -15.2,
+     "shortTermMax": -23.5,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.2,
+     "limiterGrDb": 0.6,
+     "onsetMs": 0.6,
+     "tailSeconds": 1.01,
+     "bands": [
+      0.324,
+      0.388,
+      0.274,
+      0.013,
+      0.001
+     ]
+    },
+    {
+     "file": "sfx/dragon/flap_4.ogg",
+     "loop": false,
+     "layers": {
+      "core": "membrane-snap+flutter",
+      "body": "air-pressure(noise)+whoosh(swell-double)",
+      "tail": "turbulence"
+     },
+     "rmsDb": -21.2,
+     "seconds": 1.351,
+     "momentaryMax": -15,
+     "shortTermMax": -23.1,
+     "samplePeakDb": -2.4,
+     "truePeakDb": -2.4,
+     "limiterGrDb": 0,
+     "onsetMs": 0.7,
+     "tailSeconds": 1.3,
+     "bands": [
+      0.266,
+      0.387,
+      0.339,
+      0.007,
+      0
+     ]
+    }
+   ]
+  },
+  "dragon/land": {
+   "loop": false,
+   "target": -11,
+   "variants": [
+    {
+     "file": "sfx/dragon/land_1.ogg",
+     "loop": false,
+     "layers": {
+      "core": "ground-crack+slam+claw-dig+wing-flare",
+      "body": "head 42Hz+noise-thump+rumble+6-chunks",
+      "tail": "rumble+trickle+mid-reverb"
+     },
+     "rmsDb": -23.5,
+     "seconds": 4.892,
+     "momentaryMax": -12.8,
+     "shortTermMax": -20.2,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.2,
+     "limiterGrDb": 2.6,
+     "onsetMs": 0.2,
+     "tailSeconds": 4.57,
+     "bands": [
+      0.539,
+      0.259,
+      0.082,
+      0.118,
+      0.002
+     ]
+    },
+    {
+     "file": "sfx/dragon/land_2.ogg",
+     "loop": false,
+     "layers": {
+      "core": "ground-crack+slam+claw-dig+wing-flare",
+      "body": "head 40Hz+noise-thump+rumble+2-chunks",
+      "tail": "rumble+trickle+mid-reverb"
+     },
+     "rmsDb": -23.4,
+     "seconds": 4.457,
+     "momentaryMax": -12.9,
+     "shortTermMax": -20.9,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.2,
+     "limiterGrDb": 2.5,
+     "onsetMs": 0.2,
+     "tailSeconds": 4.13,
+     "bands": [
+      0.562,
+      0.275,
+      0.055,
+      0.105,
+      0.002
+     ]
+    },
+    {
+     "file": "sfx/dragon/land_3.ogg",
+     "loop": false,
+     "layers": {
+      "core": "ground-crack+slam+claw-dig+wing-flare",
+      "body": "head 48Hz+noise-thump+rumble+4-chunks",
+      "tail": "rumble+trickle+mid-reverb"
+     },
+     "rmsDb": -23.1,
+     "seconds": 4.055,
+     "momentaryMax": -13.7,
+     "shortTermMax": -21.4,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.2,
+     "limiterGrDb": 2.6,
+     "onsetMs": 0.2,
+     "tailSeconds": 3.62,
+     "bands": [
+      0.595,
+      0.239,
+      0.067,
+      0.097,
+      0.002
+     ]
+    },
+    {
+     "file": "sfx/dragon/land_4.ogg",
+     "loop": false,
+     "layers": {
+      "core": "ground-crack+slam+claw-dig+wing-flare",
+      "body": "head 39Hz+noise-thump+rumble+3-chunks",
+      "tail": "rumble+trickle+mid-reverb"
+     },
+     "rmsDb": -25.7,
+     "seconds": 4.403,
+     "momentaryMax": -15.6,
+     "shortTermMax": -23.3,
+     "samplePeakDb": -2.3,
+     "truePeakDb": -2.2,
+     "limiterGrDb": 2.6,
+     "onsetMs": 0.3,
+     "tailSeconds": 4.02,
+     "bands": [
+      0.63,
+      0.165,
+      0.124,
+      0.079,
+      0.001
+     ]
+    }
+   ]
+  },
+  "dragon/landHeavy": {
+   "loop": false,
+   "target": -9,
+   "variants": [
+    {
+     "file": "sfx/dragon/landHeavy_1.ogg",
+     "loop": false,
+     "layers": {
+      "core": "ground-crack+slam+claw-dig+wing-flare",
+      "body": "head 35Hz+noise-thump+rumble+14-chunks",
+      "tail": "rumble+trickle+far-reverb"
+     },
+     "rmsDb": -21.1,
+     "seconds": 6.468,
+     "momentaryMax": -12.2,
+     "shortTermMax": -17.1,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.2,
+     "limiterGrDb": 2.5,
+     "onsetMs": 0.1,
+     "tailSeconds": 6.15,
+     "bands": [
+      0.463,
+      0.338,
+      0.115,
+      0.082,
+      0.002
+     ]
+    },
+    {
+     "file": "sfx/dragon/landHeavy_2.ogg",
+     "loop": false,
+     "layers": {
+      "core": "ground-crack+slam+claw-dig+wing-flare",
+      "body": "head 35Hz+noise-thump+rumble+6-chunks",
+      "tail": "rumble+trickle+far-reverb"
+     },
+     "rmsDb": -22.4,
+     "seconds": 6.279,
+     "momentaryMax": -13.8,
+     "shortTermMax": -18.9,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.2,
+     "limiterGrDb": 2.5,
+     "onsetMs": 0.1,
+     "tailSeconds": 6,
+     "bands": [
+      0.572,
+      0.251,
+      0.101,
+      0.074,
+      0.002
+     ]
+    },
+    {
+     "file": "sfx/dragon/landHeavy_3.ogg",
+     "loop": false,
+     "layers": {
+      "core": "ground-crack+slam+claw-dig+wing-flare",
+      "body": "head 34Hz+noise-thump+rumble+10-chunks",
+      "tail": "rumble+trickle+far-reverb"
+     },
+     "rmsDb": -22.2,
+     "seconds": 6.819,
+     "momentaryMax": -11.6,
+     "shortTermMax": -17.4,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.2,
+     "limiterGrDb": 2.5,
+     "onsetMs": 0.3,
+     "tailSeconds": 6.43,
+     "bands": [
+      0.446,
+      0.282,
+      0.125,
+      0.145,
+      0.002
+     ]
+    }
+   ]
+  },
+  "dragon/roar": {
+   "loop": false,
+   "target": -9,
+   "variants": [
+    {
+     "file": "sfx/dragon/roar_1.ogg",
+     "loop": false,
+     "layers": {
+      "core": "bark",
+      "body": "one-throat f0 49Hz+doubling×3+chest",
+      "tail": "exhale+far-reverb"
+     },
+     "rmsDb": -17.2,
+     "seconds": 6.765,
+     "momentaryMax": -11.3,
+     "shortTermMax": -12,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.2,
+     "limiterGrDb": 2.5,
+     "onsetMs": 0.1,
+     "tailSeconds": 6.31,
+     "bands": [
+      0.158,
+      0.127,
+      0.707,
+      0.008,
+      0
+     ]
+    },
+    {
+     "file": "sfx/dragon/roar_2.ogg",
+     "loop": false,
+     "layers": {
+      "core": "bark",
+      "body": "one-throat f0 55Hz+doubling×2+chest",
+      "tail": "exhale+far-reverb"
+     },
+     "rmsDb": -16.9,
+     "seconds": 6.682,
+     "momentaryMax": -10.6,
+     "shortTermMax": -11.7,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.2,
+     "limiterGrDb": 2.5,
+     "onsetMs": 0.2,
+     "tailSeconds": 6.48,
+     "bands": [
+      0.13,
+      0.147,
+      0.716,
+      0.007,
+      0
+     ]
+    },
+    {
+     "file": "sfx/dragon/roar_3.ogg",
+     "loop": false,
+     "layers": {
+      "core": "bark",
+      "body": "one-throat f0 58Hz+doubling×2+chest",
+      "tail": "exhale+far-reverb"
+     },
+     "rmsDb": -16.1,
+     "seconds": 7.175,
+     "momentaryMax": -10.2,
+     "shortTermMax": -11,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.2,
+     "limiterGrDb": 2.5,
+     "onsetMs": 0.3,
+     "tailSeconds": 6.84,
+     "bands": [
+      0.11,
+      0.141,
+      0.741,
+      0.007,
+      0
+     ]
+    },
+    {
+     "file": "sfx/dragon/roar_4.ogg",
+     "loop": false,
+     "layers": {
+      "core": "bark",
+      "body": "one-throat f0 56Hz+doubling×2+chest",
+      "tail": "exhale+far-reverb"
+     },
+     "rmsDb": -16.1,
+     "seconds": 7.125,
+     "momentaryMax": -10.2,
+     "shortTermMax": -11.1,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.2,
+     "limiterGrDb": 2.5,
+     "onsetMs": 0.2,
+     "tailSeconds": 7.05,
+     "bands": [
+      0.139,
+      0.149,
+      0.705,
+      0.007,
+      0
+     ]
+    }
+   ]
+  },
+  "dragon/roarShort": {
+   "loop": false,
+   "target": -10,
+   "variants": [
+    {
+     "file": "sfx/dragon/roarShort_1.ogg",
+     "loop": false,
+     "layers": {
+      "core": "bark",
+      "body": "one-throat f0 58Hz+doubling×1+chest",
+      "tail": "exhale+far-reverb"
+     },
+     "rmsDb": -19,
+     "seconds": 5.365,
+     "momentaryMax": -11.9,
+     "shortTermMax": -14.3,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.2,
+     "limiterGrDb": 2.5,
+     "onsetMs": 0.3,
+     "tailSeconds": 5.09,
+     "bands": [
+      0.111,
+      0.145,
+      0.732,
+      0.012,
+      0
+     ]
+    },
+    {
+     "file": "sfx/dragon/roarShort_2.ogg",
+     "loop": false,
+     "layers": {
+      "core": "bark",
+      "body": "one-throat f0 60Hz+doubling×1+chest",
+      "tail": "exhale+far-reverb"
+     },
+     "rmsDb": -18,
+     "seconds": 5.647,
+     "momentaryMax": -11.3,
+     "shortTermMax": -13.1,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.2,
+     "limiterGrDb": 2.5,
+     "onsetMs": 0.1,
+     "tailSeconds": 5.32,
+     "bands": [
+      0.114,
+      0.152,
+      0.724,
+      0.011,
+      0
+     ]
+    },
+    {
+     "file": "sfx/dragon/roarShort_3.ogg",
+     "loop": false,
+     "layers": {
+      "core": "bark",
+      "body": "one-throat f0 64Hz+doubling×1+chest",
+      "tail": "exhale+far-reverb"
+     },
+     "rmsDb": -17.5,
+     "seconds": 5.502,
+     "momentaryMax": -10.4,
+     "shortTermMax": -12.7,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.2,
+     "limiterGrDb": 2.5,
+     "onsetMs": 0.3,
+     "tailSeconds": 5.14,
+     "bands": [
+      0.076,
+      0.172,
+      0.741,
+      0.01,
+      0
+     ]
+    }
+   ]
+  },
+  "dragon/stepFront": {
+   "loop": false,
+   "target": -15,
+   "variants": [
+    {
+     "file": "sfx/dragon/stepFront_1.ogg",
+     "loop": false,
+     "layers": {
+      "core": "splay+asphalt-crunch",
+      "body": "noise-thump 55Hz×88%",
+      "tail": "debris+short-rumble"
+     },
+     "rmsDb": -20.9,
+     "seconds": 0.871,
+     "momentaryMax": -15.7,
+     "shortTermMax": -24.4,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.1,
+     "limiterGrDb": 4,
+     "onsetMs": 0.1,
+     "tailSeconds": 0.8,
+     "bands": [
+      0.441,
+      0.326,
+      0.138,
+      0.093,
+      0.003
+     ]
+    },
+    {
+     "file": "sfx/dragon/stepFront_2.ogg",
+     "loop": false,
+     "layers": {
+      "core": "slap+rubble-crunch",
+      "body": "noise-thump 68Hz×70%+1-chunks",
+      "tail": "debris+short-rumble"
+     },
+     "rmsDb": -20.3,
+     "seconds": 0.75,
+     "momentaryMax": -15.2,
+     "shortTermMax": -23.7,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.2,
+     "limiterGrDb": 2,
+     "onsetMs": 0.1,
+     "tailSeconds": 0.68,
+     "bands": [
+      0.238,
+      0.263,
+      0.321,
+      0.173,
+      0.005
+     ]
+    },
+    {
+     "file": "sfx/dragon/stepFront_3.ogg",
+     "loop": false,
+     "layers": {
+      "core": "splayScrape+soil-crunch",
+      "body": "noise-thump 64Hz×111%+1-chunks",
+      "tail": "debris+short-rumble"
+     },
+     "rmsDb": -22.1,
+     "seconds": 1.303,
+     "momentaryMax": -15.2,
+     "shortTermMax": -24,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.2,
+     "limiterGrDb": 2.8,
+     "onsetMs": 0.1,
+     "tailSeconds": 1.25,
+     "bands": [
+      0.36,
+      0.319,
+      0.204,
+      0.115,
+      0.002
+     ]
+    },
+    {
+     "file": "sfx/dragon/stepFront_4.ogg",
+     "loop": false,
+     "layers": {
+      "core": "press+concrete-crunch",
+      "body": "noise-thump 59Hz×121%+2-chunks",
+      "tail": "debris+short-rumble"
+     },
+     "rmsDb": -22.7,
+     "seconds": 1.899,
+     "momentaryMax": -15.2,
+     "shortTermMax": -23.4,
+     "samplePeakDb": -2.3,
+     "truePeakDb": -2.2,
+     "limiterGrDb": 1.1,
+     "onsetMs": 0.1,
+     "tailSeconds": 1.84,
+     "bands": [
+      0.566,
+      0.224,
+      0.089,
+      0.114,
+      0.007
+     ]
+    },
+    {
+     "file": "sfx/dragon/stepFront_5.ogg",
+     "loop": false,
+     "layers": {
+      "core": "slip+asphalt-crunch",
+      "body": "noise-thump 58Hz×114%+1-chunks",
+      "tail": "debris+short-rumble"
+     },
+     "rmsDb": -20.3,
+     "seconds": 1.051,
+     "momentaryMax": -15,
+     "shortTermMax": -23.7,
+     "samplePeakDb": -4,
+     "truePeakDb": -4,
+     "limiterGrDb": 0,
+     "onsetMs": 0.1,
+     "tailSeconds": 0.96,
+     "bands": [
+      0.399,
+      0.45,
+      0.102,
+      0.047,
+      0.001
+     ]
+    }
+   ]
+  },
+  "dragon/stepHind": {
+   "loop": false,
+   "target": -14.5,
+   "variants": [
+    {
+     "file": "sfx/dragon/stepHind_1.ogg",
+     "loop": false,
+     "layers": {
+      "core": "heelToe+asphalt-crunch",
+      "body": "noise-thump 51Hz×93%+1-chunks",
+      "tail": "debris+short-rumble"
+     },
+     "rmsDb": -20.1,
+     "seconds": 1.158,
+     "momentaryMax": -14.7,
+     "shortTermMax": -23.5,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.2,
+     "limiterGrDb": 2.8,
+     "onsetMs": 0.1,
+     "tailSeconds": 1.09,
+     "bands": [
+      0.616,
+      0.241,
+      0.073,
+      0.069,
+      0.001
+     ]
+    },
+    {
+     "file": "sfx/dragon/stepHind_2.ogg",
+     "loop": false,
+     "layers": {
+      "core": "flat+rubble-crunch",
+      "body": "noise-thump 43Hz×70%+3-chunks",
+      "tail": "debris+short-rumble"
+     },
+     "rmsDb": -18.9,
+     "seconds": 0.833,
+     "momentaryMax": -14.5,
+     "shortTermMax": -22.9,
+     "samplePeakDb": -2.3,
+     "truePeakDb": -2.3,
+     "limiterGrDb": 0,
+     "onsetMs": 0.2,
+     "tailSeconds": 0.73,
+     "bands": [
+      0.382,
+      0.343,
+      0.185,
+      0.088,
+      0.003
+     ]
+    },
+    {
+     "file": "sfx/dragon/stepHind_3.ogg",
+     "loop": false,
+     "layers": {
+      "core": "heelToeDrag+soil-crunch",
+      "body": "noise-thump 48Hz×106%",
+      "tail": "debris+short-rumble"
+     },
+     "rmsDb": -19.6,
+     "seconds": 1.32,
+     "momentaryMax": -14.5,
+     "shortTermMax": -23.2,
+     "samplePeakDb": -2.9,
+     "truePeakDb": -2.9,
+     "limiterGrDb": 0,
+     "onsetMs": 0.1,
+     "tailSeconds": 1.23,
+     "bands": [
+      0.63,
+      0.288,
+      0.065,
+      0.016,
+      0
+     ]
+    },
+    {
+     "file": "sfx/dragon/stepHind_4.ogg",
+     "loop": false,
+     "layers": {
+      "core": "stomp+concrete-crunch",
+      "body": "noise-thump 52Hz×123%+1-chunks",
+      "tail": "debris+short-rumble"
+     },
+     "rmsDb": -22.8,
+     "seconds": 1.788,
+     "momentaryMax": -16,
+     "shortTermMax": -24.1,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.2,
+     "limiterGrDb": 4,
+     "onsetMs": 0.1,
+     "tailSeconds": 1.74,
+     "bands": [
+      0.475,
+      0.374,
+      0.077,
+      0.071,
+      0.004
+     ]
+    },
+    {
+     "file": "sfx/dragon/stepHind_5.ogg",
+     "loop": false,
+     "layers": {
+      "core": "slip+asphalt-crunch",
+      "body": "noise-thump 45Hz×113%+1-chunks",
+      "tail": "debris+short-rumble"
+     },
+     "rmsDb": -20.6,
+     "seconds": 1.409,
+     "momentaryMax": -14.7,
+     "shortTermMax": -23.1,
+     "samplePeakDb": -2.3,
+     "truePeakDb": -2.2,
+     "limiterGrDb": 0.6,
+     "onsetMs": 0.1,
+     "tailSeconds": 1.33,
+     "bands": [
+      0.662,
+      0.161,
+      0.091,
+      0.085,
+      0.002
+     ]
+    }
+   ]
+  },
+  "dragon/tailHit": {
+   "loop": false,
+   "target": -11,
+   "variants": [
+    {
+     "file": "sfx/dragon/tailHit_1.ogg",
+     "loop": false,
+     "layers": {
+      "core": "fracture-snaps",
+      "body": "thud(noise)+5-chunks",
+      "tail": "debris+chunks"
+     },
+     "rmsDb": -23.8,
+     "seconds": 1.602,
+     "momentaryMax": -17.1,
+     "shortTermMax": -25.6,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.2,
+     "limiterGrDb": 2.5,
+     "onsetMs": 0,
+     "tailSeconds": 1.54,
+     "bands": [
+      0.446,
+      0.364,
+      0.161,
+      0.027,
+      0.002
+     ]
+    },
+    {
+     "file": "sfx/dragon/tailHit_2.ogg",
+     "loop": false,
+     "layers": {
+      "core": "fracture-snaps",
+      "body": "thud(noise)+6-chunks",
+      "tail": "debris+chunks"
+     },
+     "rmsDb": -22.8,
+     "seconds": 1.766,
+     "momentaryMax": -15.6,
+     "shortTermMax": -24.3,
+     "samplePeakDb": -2.4,
+     "truePeakDb": -2.2,
+     "limiterGrDb": 2.7,
+     "onsetMs": 0,
+     "tailSeconds": 1.71,
+     "bands": [
+      0.318,
+      0.521,
+      0.138,
+      0.022,
+      0.002
+     ]
+    },
+    {
+     "file": "sfx/dragon/tailHit_3.ogg",
+     "loop": false,
+     "layers": {
+      "core": "fracture-snaps",
+      "body": "thud(noise)+6-chunks",
+      "tail": "debris+chunks"
+     },
+     "rmsDb": -21.8,
+     "seconds": 1.861,
+     "momentaryMax": -14.8,
+     "shortTermMax": -23.2,
+     "samplePeakDb": -2.3,
+     "truePeakDb": -2.1,
+     "limiterGrDb": 2.6,
+     "onsetMs": 0,
+     "tailSeconds": 1.8,
+     "bands": [
+      0.523,
+      0.304,
+      0.144,
+      0.027,
+      0.003
+     ]
+    },
+    {
+     "file": "sfx/dragon/tailHit_4.ogg",
+     "loop": false,
+     "layers": {
+      "core": "fracture-snaps",
+      "body": "thud(noise)+5-chunks",
+      "tail": "debris+chunks"
+     },
+     "rmsDb": -23.1,
+     "seconds": 1.927,
+     "momentaryMax": -15.6,
+     "shortTermMax": -24.2,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.2,
+     "limiterGrDb": 2.5,
+     "onsetMs": 0,
+     "tailSeconds": 1.87,
+     "bands": [
+      0.48,
+      0.297,
+      0.187,
+      0.032,
+      0.003
+     ]
+    }
+   ]
+  },
+  "dragon/tailSwing": {
+   "loop": false,
+   "target": -15,
+   "variants": [
+    {
+     "file": "sfx/dragon/tailSwing_1.ogg",
+     "loop": false,
+     "layers": {
+      "core": "whoosh-peak",
+      "body": "broad-whoosh+noise-hum",
+      "tail": "stop×107%"
+     },
+     "rmsDb": -22.1,
+     "seconds": 1.201,
+     "momentaryMax": -15,
+     "shortTermMax": -23.6,
+     "samplePeakDb": -3.9,
+     "truePeakDb": -3.9,
+     "limiterGrDb": 0,
+     "onsetMs": 0.2,
+     "tailSeconds": 1.18,
+     "bands": [
+      0.035,
+      0.116,
+      0.83,
+      0.018,
+      0.001
+     ]
+    },
+    {
+     "file": "sfx/dragon/tailSwing_2.ogg",
+     "loop": false,
+     "layers": {
+      "core": "whoosh-peak",
+      "body": "broad-whoosh+noise-hum",
+      "tail": "trail×112%"
+     },
+     "rmsDb": -20.9,
+     "seconds": 1.228,
+     "momentaryMax": -15,
+     "shortTermMax": -22.6,
+     "samplePeakDb": -5.1,
+     "truePeakDb": -5.1,
+     "limiterGrDb": 0,
+     "onsetMs": 1.1,
+     "tailSeconds": 1.21,
+     "bands": [
+      0.089,
+      0.115,
+      0.78,
+      0.016,
+      0.001
+     ]
+    },
+    {
+     "file": "sfx/dragon/tailSwing_3.ogg",
+     "loop": false,
+     "layers": {
+      "core": "whoosh-peak",
+      "body": "broad-whoosh+noise-hum",
+      "tail": "stop-back×114%"
+     },
+     "rmsDb": -21.1,
+     "seconds": 1.235,
+     "momentaryMax": -15.1,
+     "shortTermMax": -22.9,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.2,
+     "limiterGrDb": 2.3,
+     "onsetMs": 0.3,
+     "tailSeconds": 1.22,
+     "bands": [
+      0.105,
+      0.143,
+      0.741,
+      0.01,
+      0
+     ]
+    },
+    {
+     "file": "sfx/dragon/tailSwing_4.ogg",
+     "loop": false,
+     "layers": {
+      "core": "whoosh-peak",
+      "body": "broad-whoosh+noise-hum",
+      "tail": "trail-back×91%"
+     },
+     "rmsDb": -20.3,
+     "seconds": 1.11,
+     "momentaryMax": -15,
+     "shortTermMax": -22.5,
+     "samplePeakDb": -3.9,
+     "truePeakDb": -3.9,
+     "limiterGrDb": 0,
+     "onsetMs": 1,
+     "tailSeconds": 1.1,
+     "bands": [
+      0.092,
+      0.146,
+      0.75,
+      0.011,
+      0
+     ]
+    }
+   ]
+  },
+  "fire/bedFar": {
+   "loop": true,
+   "target": -20,
+   "variants": [
+    {
+     "file": "sfx/fire/bedFar_1.ogg",
+     "loop": true,
+     "layers": {
+      "core": "none",
+      "body": "roar",
+      "tail": "low-roar"
+     },
+     "rmsDb": -20.1,
+     "seconds": 10,
+     "momentaryMax": -20,
+     "shortTermMax": -20.8,
+     "samplePeakDb": -7.2,
+     "truePeakDb": -7.2,
+     "limiterGrDb": 0,
+     "onsetMs": 0.3,
+     "tailSeconds": 10,
+     "bands": [
+      0.697,
+      0.266,
+      0.037,
+      0,
+      0
+     ]
+    }
+   ]
+  },
+  "fire/bedNear": {
+   "loop": true,
+   "target": -20,
+   "variants": [
+    {
+     "file": "sfx/fire/bedNear_1.ogg",
+     "loop": true,
+     "layers": {
+      "core": "crackle",
+      "body": "roar",
+      "tail": "low-roar"
+     },
+     "rmsDb": -23.6,
+     "seconds": 8,
+     "momentaryMax": -20,
+     "shortTermMax": -21.2,
+     "samplePeakDb": -4.6,
+     "truePeakDb": -4.6,
+     "limiterGrDb": 0,
+     "onsetMs": 0,
+     "tailSeconds": 8,
+     "bands": [
+      0.256,
+      0.197,
+      0.48,
+      0.042,
+      0.025
+     ]
+    }
+   ]
+  },
+  "fire/ignite": {
+   "loop": false,
+   "target": -14,
+   "variants": [
+    {
+     "file": "sfx/fire/ignite_1.ogg",
+     "loop": false,
+     "layers": {
+      "core": "whump(noise)+pop",
+      "body": "flash-flame(133ms)+0-flares",
+      "tail": "crackle(settle)"
+     },
+     "rmsDb": -23.6,
+     "seconds": 2.049,
+     "momentaryMax": -14,
+     "shortTermMax": -21.8,
+     "samplePeakDb": -4.8,
+     "truePeakDb": -4.7,
+     "limiterGrDb": 0,
+     "onsetMs": 0.4,
+     "tailSeconds": 2.03,
+     "bands": [
+      0.091,
+      0.108,
+      0.664,
+      0.131,
+      0.006
+     ]
+    },
+    {
+     "file": "sfx/fire/ignite_2.ogg",
+     "loop": false,
+     "layers": {
+      "core": "whump(noise)+pop",
+      "body": "build-flame(733ms)+1-flares",
+      "tail": "crackle(grow)"
+     },
+     "rmsDb": -20.7,
+     "seconds": 2.491,
+     "momentaryMax": -14,
+     "shortTermMax": -18,
+     "samplePeakDb": -6,
+     "truePeakDb": -6,
+     "limiterGrDb": 0,
+     "onsetMs": 0.5,
+     "tailSeconds": 2.48,
+     "bands": [
+      0.015,
+      0.068,
+      0.795,
+      0.117,
+      0.005
+     ]
+    },
+    {
+     "file": "sfx/fire/ignite_3.ogg",
+     "loop": false,
+     "layers": {
+      "core": "whump(noise)+pop",
+      "body": "double-flame(271ms)+2-flares",
+      "tail": "crackle(settle)"
+     },
+     "rmsDb": -20.4,
+     "seconds": 2.573,
+     "momentaryMax": -14,
+     "shortTermMax": -17.8,
+     "samplePeakDb": -5.2,
+     "truePeakDb": -5.2,
+     "limiterGrDb": 0,
+     "onsetMs": 0.8,
+     "tailSeconds": 2.56,
+     "bands": [
+      0.034,
+      0.09,
+      0.783,
+      0.09,
+      0.004
+     ]
+    },
+    {
+     "file": "sfx/fire/ignite_4.ogg",
+     "loop": false,
+     "layers": {
+      "core": "whump(noise)+pop",
+      "body": "build-long-flame(777ms)+0-flares",
+      "tail": "crackle(grow)"
+     },
+     "rmsDb": -21.3,
+     "seconds": 3.003,
+     "momentaryMax": -14,
+     "shortTermMax": -18.2,
+     "samplePeakDb": -5.4,
+     "truePeakDb": -5.4,
+     "limiterGrDb": 0,
+     "onsetMs": 1.3,
+     "tailSeconds": 2.99,
+     "bands": [
+      0.035,
+      0.103,
+      0.794,
+      0.066,
+      0.003
+     ]
+    }
+   ]
+  },
+  "fire/spread": {
+   "loop": false,
+   "target": -16,
+   "variants": [
+    {
+     "file": "sfx/fire/spread_1.ogg",
+     "loop": false,
+     "layers": {
+      "core": "pop",
+      "body": "flash-flame(88ms)+0-flares",
+      "tail": "crackle(settle)"
+     },
+     "rmsDb": -25.6,
+     "seconds": 1.812,
+     "momentaryMax": -16,
+     "shortTermMax": -23.9,
+     "samplePeakDb": -6.5,
+     "truePeakDb": -6.5,
+     "limiterGrDb": 0,
+     "onsetMs": 0.7,
+     "tailSeconds": 1.79,
+     "bands": [
+      0.003,
+      0.058,
+      0.758,
+      0.173,
+      0.008
+     ]
+    },
+    {
+     "file": "sfx/fire/spread_2.ogg",
+     "loop": false,
+     "layers": {
+      "core": "pop",
+      "body": "build-flame(488ms)+1-flares",
+      "tail": "crackle(grow)"
+     },
+     "rmsDb": -23.3,
+     "seconds": 2.144,
+     "momentaryMax": -16,
+     "shortTermMax": -21.2,
+     "samplePeakDb": -8.4,
+     "truePeakDb": -8.3,
+     "limiterGrDb": 0,
+     "onsetMs": 0.7,
+     "tailSeconds": 2.13,
+     "bands": [
+      0.003,
+      0.046,
+      0.84,
+      0.106,
+      0.004
+     ]
+    },
+    {
+     "file": "sfx/fire/spread_3.ogg",
+     "loop": false,
+     "layers": {
+      "core": "pop",
+      "body": "double-flame(188ms)+2-flares",
+      "tail": "crackle(settle)"
+     },
+     "rmsDb": -24.3,
+     "seconds": 2.187,
+     "momentaryMax": -16,
+     "shortTermMax": -22,
+     "samplePeakDb": -7.9,
+     "truePeakDb": -7.9,
+     "limiterGrDb": 0,
+     "onsetMs": 0.5,
+     "tailSeconds": 2.17,
+     "bands": [
+      0.004,
+      0.076,
+      0.785,
+      0.13,
+      0.005
+     ]
+    },
+    {
+     "file": "sfx/fire/spread_4.ogg",
+     "loop": false,
+     "layers": {
+      "core": "pop",
+      "body": "build-long-flame(666ms)+0-flares",
+      "tail": "crackle(grow)"
+     },
+     "rmsDb": -23.2,
+     "seconds": 2.745,
+     "momentaryMax": -16,
+     "shortTermMax": -20.2,
+     "samplePeakDb": -7.1,
+     "truePeakDb": -7.1,
+     "limiterGrDb": 0,
+     "onsetMs": 0.7,
+     "tailSeconds": 2.73,
+     "bands": [
+      0.004,
+      0.062,
+      0.835,
+      0.095,
+      0.004
+     ]
+    }
+   ]
+  },
+  "homuratsuno/breathHit": {
+   "loop": false,
+   "target": -11,
+   "variants": [
+    {
+     "file": "sfx/homuratsuno/breathHit_1.ogg",
+     "loop": false,
+     "layers": {
+      "core": "wet-splat(splat)",
+      "body": "noise-thump+6-rocks+bubbles",
+      "tail": "sizzle+crackle+mid-reverb 0.18"
+     },
+     "rmsDb": -21,
+     "seconds": 3.038,
+     "momentaryMax": -12.7,
+     "shortTermMax": -19.7,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.2,
+     "limiterGrDb": 2.7,
+     "onsetMs": 0,
+     "tailSeconds": 2.77,
+     "bands": [
+      0.379,
+      0.403,
+      0.157,
+      0.036,
+      0.025
+     ]
+    },
+    {
+     "file": "sfx/homuratsuno/breathHit_2.ogg",
+     "loop": false,
+     "layers": {
+      "core": "wet-splat(thud)",
+      "body": "noise-thump+2-rocks+bubbles",
+      "tail": "sizzle+crackle+mid-reverb 0.18"
+     },
+     "rmsDb": -23.2,
+     "seconds": 3.39,
+     "momentaryMax": -14.8,
+     "shortTermMax": -21.9,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.2,
+     "limiterGrDb": 2.5,
+     "onsetMs": 0,
+     "tailSeconds": 3.23,
+     "bands": [
+      0.471,
+      0.332,
+      0.116,
+      0.047,
+      0.033
+     ]
+    },
+    {
+     "file": "sfx/homuratsuno/breathHit_3.ogg",
+     "loop": false,
+     "layers": {
+      "core": "wet-splat(spray)",
+      "body": "noise-thump+10-rocks+bubbles",
+      "tail": "sizzle+crackle+mid-reverb 0.14"
+     },
+     "rmsDb": -21.3,
+     "seconds": 3.507,
+     "momentaryMax": -13.2,
+     "shortTermMax": -19.6,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.2,
+     "limiterGrDb": 2.7,
+     "onsetMs": 0,
+     "tailSeconds": 3.32,
+     "bands": [
+      0.421,
+      0.335,
+      0.173,
+      0.041,
+      0.029
+     ]
+    },
+    {
+     "file": "sfx/homuratsuno/breathHit_4.ogg",
+     "loop": false,
+     "layers": {
+      "core": "wet-splat(sizzle)",
+      "body": "noise-thump+3-rocks+bubbles",
+      "tail": "sizzle+crackle+mid-reverb 0.13"
+     },
+     "rmsDb": -21.9,
+     "seconds": 4.179,
+     "momentaryMax": -12.2,
+     "shortTermMax": -16.7,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.2,
+     "limiterGrDb": 2.6,
+     "onsetMs": 0,
+     "tailSeconds": 3.93,
+     "bands": [
+      0.277,
+      0.227,
+      0.093,
+      0.236,
+      0.168
+     ]
+    },
+    {
+     "file": "sfx/homuratsuno/breathHit_5.ogg",
+     "loop": false,
+     "layers": {
+      "core": "wet-splat(splat)",
+      "body": "noise-thump+6-rocks+bubbles",
+      "tail": "sizzle+crackle+mid-reverb 0.16"
+     },
+     "rmsDb": -21.8,
+     "seconds": 3.643,
+     "momentaryMax": -12.4,
+     "shortTermMax": -19.6,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.2,
+     "limiterGrDb": 2.5,
+     "onsetMs": 0,
+     "tailSeconds": 3.38,
+     "bands": [
+      0.426,
+      0.311,
+      0.201,
+      0.036,
+      0.026
+     ]
+    },
+    {
+     "file": "sfx/homuratsuno/breathHit_6.ogg",
+     "loop": false,
+     "layers": {
+      "core": "wet-splat(thud)",
+      "body": "noise-thump+2-rocks+bubbles",
+      "tail": "sizzle+crackle+mid-reverb 0.22"
+     },
+     "rmsDb": -20.1,
+     "seconds": 3.571,
+     "momentaryMax": -11.5,
+     "shortTermMax": -18.7,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.2,
+     "limiterGrDb": 2.5,
+     "onsetMs": 0,
+     "tailSeconds": 3.3,
+     "bands": [
+      0.539,
+      0.298,
+      0.118,
+      0.026,
+      0.018
+     ]
+    },
+    {
+     "file": "sfx/homuratsuno/breathHit_7.ogg",
+     "loop": false,
+     "layers": {
+      "core": "wet-splat(spray)",
+      "body": "noise-thump+9-rocks+bubbles",
+      "tail": "sizzle+crackle+mid-reverb 0.22"
+     },
+     "rmsDb": -20.6,
+     "seconds": 3.775,
+     "momentaryMax": -12.1,
+     "shortTermMax": -17.8,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.2,
+     "limiterGrDb": 2.5,
+     "onsetMs": 0.1,
+     "tailSeconds": 3.55,
+     "bands": [
+      0.185,
+      0.533,
+      0.208,
+      0.045,
+      0.029
+     ]
+    },
+    {
+     "file": "sfx/homuratsuno/breathHit_8.ogg",
+     "loop": false,
+     "layers": {
+      "core": "wet-splat(sizzle)",
+      "body": "noise-thump+7-rocks+bubbles",
+      "tail": "sizzle+crackle+mid-reverb 0.13"
+     },
+     "rmsDb": -21.6,
+     "seconds": 5.116,
+     "momentaryMax": -11.6,
+     "shortTermMax": -15.4,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.2,
+     "limiterGrDb": 2.5,
+     "onsetMs": 0,
+     "tailSeconds": 4.94,
+     "bands": [
+      0.199,
+      0.207,
+      0.093,
+      0.292,
+      0.209
+     ]
+    }
+   ]
+  },
+  "homuratsuno/breathStart": {
+   "loop": false,
+   "target": -12,
+   "variants": [
+    {
+     "file": "sfx/homuratsuno/breathStart_1.ogg",
+     "loop": false,
+     "layers": {
+      "core": "throat-heave+grunt",
+      "body": "viscous-tear(hurk)+bubbles",
+      "tail": "flying-glob+crackle"
+     },
+     "rmsDb": -20.8,
+     "seconds": 1.514,
+     "momentaryMax": -14.1,
+     "shortTermMax": -22.2,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.2,
+     "limiterGrDb": 2.5,
+     "onsetMs": 1.6,
+     "tailSeconds": 1.5,
+     "bands": [
+      0.144,
+      0.427,
+      0.419,
+      0.009,
+      0.001
+     ]
+    },
+    {
+     "file": "sfx/homuratsuno/breathStart_2.ogg",
+     "loop": false,
+     "layers": {
+      "core": "throat-heave+grunt",
+      "body": "viscous-tear(heave)+bubbles",
+      "tail": "flying-glob+crackle"
+     },
+     "rmsDb": -19.6,
+     "seconds": 1.844,
+     "momentaryMax": -12.2,
+     "shortTermMax": -19.7,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.2,
+     "limiterGrDb": 1.5,
+     "onsetMs": 4.6,
+     "tailSeconds": 1.82,
+     "bands": [
+      0.056,
+      0.525,
+      0.408,
+      0.011,
+      0
+     ]
+    },
+    {
+     "file": "sfx/homuratsuno/breathStart_3.ogg",
+     "loop": false,
+     "layers": {
+      "core": "throat-heave+grunt",
+      "body": "viscous-tear(double)+bubbles",
+      "tail": "flying-glob+crackle"
+     },
+     "rmsDb": -18.1,
+     "seconds": 1.71,
+     "momentaryMax": -12.1,
+     "shortTermMax": -18.8,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.2,
+     "limiterGrDb": 0.3,
+     "onsetMs": 1.7,
+     "tailSeconds": 1.69,
+     "bands": [
+      0.158,
+      0.39,
+      0.441,
+      0.01,
+      0.002
+     ]
+    },
+    {
+     "file": "sfx/homuratsuno/breathStart_4.ogg",
+     "loop": false,
+     "layers": {
+      "core": "throat-heave+grunt",
+      "body": "viscous-tear(hurl)+bubbles",
+      "tail": "flying-glob+crackle"
+     },
+     "rmsDb": -21.5,
+     "seconds": 2.251,
+     "momentaryMax": -13.6,
+     "shortTermMax": -20.7,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.2,
+     "limiterGrDb": 2.5,
+     "onsetMs": 1.4,
+     "tailSeconds": 2.23,
+     "bands": [
+      0.124,
+      0.39,
+      0.468,
+      0.016,
+      0.002
+     ]
+    }
+   ]
+  },
+  "homuratsuno/chargeLoop": {
+   "loop": true,
+   "target": -16,
+   "variants": [
+    {
+     "file": "sfx/homuratsuno/chargeLoop_1.ogg",
+     "loop": true,
+     "layers": {
+      "core": "rock-rattle",
+      "body": "rolling-rumble+debris-spray",
+      "tail": "dust"
+     },
+     "rmsDb": -17.1,
+     "seconds": 4,
+     "momentaryMax": -16,
+     "shortTermMax": -18.1,
+     "samplePeakDb": -3.6,
+     "truePeakDb": -3.5,
+     "limiterGrDb": 0,
+     "onsetMs": 0,
+     "tailSeconds": 4,
+     "bands": [
+      0.765,
+      0.173,
+      0.031,
+      0.023,
+      0.007
+     ]
+    }
+   ]
+  },
+  "homuratsuno/clawHit": {
+   "loop": false,
+   "target": -11,
+   "variants": [
+    {
+     "file": "sfx/homuratsuno/clawHit_1.ogg",
+     "loop": false,
+     "layers": {
+      "core": "stone-horn-clack×2+fracture",
+      "body": "heavy-thud+crumble+falling-chunks",
+      "tail": "debris+pebbles"
+     },
+     "rmsDb": -20.6,
+     "seconds": 1.309,
+     "momentaryMax": -14.6,
+     "shortTermMax": -23,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.2,
+     "limiterGrDb": 4,
+     "onsetMs": 0,
+     "tailSeconds": 1.26,
+     "bands": [
+      0.318,
+      0.366,
+      0.297,
+      0.017,
+      0.002
+     ]
+    },
+    {
+     "file": "sfx/homuratsuno/clawHit_2.ogg",
+     "loop": false,
+     "layers": {
+      "core": "stone-horn-clack×2+fracture",
+      "body": "heavy-thud+crumble+falling-chunks",
+      "tail": "debris+pebbles"
+     },
+     "rmsDb": -23,
+     "seconds": 1.734,
+     "momentaryMax": -15.4,
+     "shortTermMax": -23.8,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.2,
+     "limiterGrDb": 4,
+     "onsetMs": 0,
+     "tailSeconds": 1.5,
+     "bands": [
+      0.237,
+      0.431,
+      0.317,
+      0.015,
+      0.001
+     ]
+    },
+    {
+     "file": "sfx/homuratsuno/clawHit_3.ogg",
+     "loop": false,
+     "layers": {
+      "core": "stone-horn-clack×2+fracture",
+      "body": "heavy-thud+crumble+falling-chunks",
+      "tail": "debris+pebbles"
+     },
+     "rmsDb": -21.7,
+     "seconds": 1.692,
+     "momentaryMax": -14.3,
+     "shortTermMax": -22.6,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.2,
+     "limiterGrDb": 4,
+     "onsetMs": 0,
+     "tailSeconds": 1.64,
+     "bands": [
+      0.158,
+      0.501,
+      0.317,
+      0.021,
+      0.003
+     ]
+    },
+    {
+     "file": "sfx/homuratsuno/clawHit_4.ogg",
+     "loop": false,
+     "layers": {
+      "core": "stone-horn-clack×2+fracture",
+      "body": "heavy-thud+crumble+falling-chunks",
+      "tail": "debris+pebbles"
+     },
+     "rmsDb": -22.5,
+     "seconds": 1.449,
+     "momentaryMax": -16,
+     "shortTermMax": -24.1,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.2,
+     "limiterGrDb": 4,
+     "onsetMs": 0,
+     "tailSeconds": 1.39,
+     "bands": [
+      0.242,
+      0.361,
+      0.375,
+      0.02,
+      0.002
+     ]
+    }
+   ]
+  },
+  "homuratsuno/clawSwing": {
+   "loop": false,
+   "target": -15.5,
+   "variants": [
+    {
+     "file": "sfx/homuratsuno/clawSwing_1.ogg",
+     "loop": false,
+     "layers": {
+      "core": "rock-skin-clacks",
+      "body": "low-head-whoosh+mass-hum",
+      "tail": "stop×98%"
+     },
+     "rmsDb": -21.3,
+     "seconds": 1.091,
+     "momentaryMax": -15.5,
+     "shortTermMax": -24.1,
+     "samplePeakDb": -4.7,
+     "truePeakDb": -4.7,
+     "limiterGrDb": 0,
+     "onsetMs": 0.3,
+     "tailSeconds": 1.08,
+     "bands": [
+      0.127,
+      0.424,
+      0.448,
+      0.001,
+      0
+     ]
+    },
+    {
+     "file": "sfx/homuratsuno/clawSwing_2.ogg",
+     "loop": false,
+     "layers": {
+      "core": "rock-skin-clacks",
+      "body": "low-head-whoosh+mass-hum",
+      "tail": "trail×85%"
+     },
+     "rmsDb": -20.5,
+     "seconds": 1.024,
+     "momentaryMax": -15.5,
+     "shortTermMax": -23.5,
+     "samplePeakDb": -6.2,
+     "truePeakDb": -6.2,
+     "limiterGrDb": 0,
+     "onsetMs": 0.9,
+     "tailSeconds": 1,
+     "bands": [
+      0.086,
+      0.589,
+      0.324,
+      0.001,
+      0
+     ]
+    },
+    {
+     "file": "sfx/homuratsuno/clawSwing_3.ogg",
+     "loop": false,
+     "layers": {
+      "core": "rock-skin-clacks",
+      "body": "low-head-whoosh+mass-hum",
+      "tail": "stop-back×82%"
+     },
+     "rmsDb": -20.7,
+     "seconds": 1.008,
+     "momentaryMax": -15.5,
+     "shortTermMax": -23.8,
+     "samplePeakDb": -4.1,
+     "truePeakDb": -4.1,
+     "limiterGrDb": 0,
+     "onsetMs": 0.5,
+     "tailSeconds": 0.99,
+     "bands": [
+      0.086,
+      0.465,
+      0.448,
+      0.001,
+      0
+     ]
+    },
+    {
+     "file": "sfx/homuratsuno/clawSwing_4.ogg",
+     "loop": false,
+     "layers": {
+      "core": "rock-skin-clacks",
+      "body": "low-head-whoosh+mass-hum",
+      "tail": "trail-back×96%"
+     },
+     "rmsDb": -20.2,
+     "seconds": 1.08,
+     "momentaryMax": -15.5,
+     "shortTermMax": -22.9,
+     "samplePeakDb": -6.3,
+     "truePeakDb": -6.3,
+     "limiterGrDb": 0,
+     "onsetMs": 0.5,
+     "tailSeconds": 1.06,
+     "bands": [
+      0.095,
+      0.497,
+      0.408,
+      0.001,
+      0
+     ]
+    }
+   ]
+  },
+  "homuratsuno/fissure": {
+   "loop": false,
+   "target": -10,
+   "variants": [
+    {
+     "file": "sfx/homuratsuno/fissure_1.ogg",
+     "loop": false,
+     "layers": {
+      "core": "underfoot-rupture",
+      "body": "9-receding-segments+moving-tear",
+      "tail": "deep-rumble+far-reverb"
+     },
+     "rmsDb": -17.1,
+     "seconds": 6.234,
+     "momentaryMax": -11.8,
+     "shortTermMax": -14,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.2,
+     "limiterGrDb": 3.5,
+     "onsetMs": 0,
+     "tailSeconds": 6.19,
+     "bands": [
+      0.51,
+      0.299,
+      0.18,
+      0.01,
+      0.001
+     ]
+    },
+    {
+     "file": "sfx/homuratsuno/fissure_2.ogg",
+     "loop": false,
+     "layers": {
+      "core": "underfoot-rupture",
+      "body": "14-receding-segments+moving-tear",
+      "tail": "deep-rumble+far-reverb"
+     },
+     "rmsDb": -16,
+     "seconds": 6.251,
+     "momentaryMax": -11.8,
+     "shortTermMax": -13,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.2,
+     "limiterGrDb": 3.5,
+     "onsetMs": 0,
+     "tailSeconds": 6.23,
+     "bands": [
+      0.552,
+      0.26,
+      0.179,
+      0.008,
+      0
+     ]
+    },
+    {
+     "file": "sfx/homuratsuno/fissure_3.ogg",
+     "loop": false,
+     "layers": {
+      "core": "underfoot-rupture",
+      "body": "11-receding-segments+moving-tear",
+      "tail": "deep-rumble+far-reverb"
+     },
+     "rmsDb": -17.5,
+     "seconds": 5.746,
+     "momentaryMax": -12.6,
+     "shortTermMax": -15,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.2,
+     "limiterGrDb": 3.5,
+     "onsetMs": 0,
+     "tailSeconds": 5.72,
+     "bands": [
+      0.578,
+      0.262,
+      0.151,
+      0.008,
+      0
+     ]
+    }
+   ]
+  },
+  "homuratsuno/land": {
+   "loop": false,
+   "target": -11,
+   "variants": [
+    {
+     "file": "sfx/homuratsuno/land_1.ogg",
+     "loop": false,
+     "layers": {
+      "core": "ground-crack+slam",
+      "body": "head 29Hz+noise-thump+rumble+6-chunks+rock-plates+pebbles",
+      "tail": "rumble+trickle+mid-reverb"
+     },
+     "rmsDb": -21.7,
+     "seconds": 5.906,
+     "momentaryMax": -13.1,
+     "shortTermMax": -19.8,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.2,
+     "limiterGrDb": 2.6,
+     "onsetMs": 0.2,
+     "tailSeconds": 5.68,
+     "bands": [
+      0.637,
+      0.214,
+      0.142,
+      0.006,
+      0
+     ]
+    },
+    {
+     "file": "sfx/homuratsuno/land_2.ogg",
+     "loop": false,
+     "layers": {
+      "core": "ground-crack+slam",
+      "body": "head 33Hz+noise-thump+rumble+2-chunks+rock-plates+pebbles",
+      "tail": "rumble+trickle+mid-reverb"
+     },
+     "rmsDb": -23.3,
+     "seconds": 5.714,
+     "momentaryMax": -14.4,
+     "shortTermMax": -21.5,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.2,
+     "limiterGrDb": 2.5,
+     "onsetMs": 0.3,
+     "tailSeconds": 5.37,
+     "bands": [
+      0.663,
+      0.2,
+      0.132,
+      0.005,
+      0
+     ]
+    },
+    {
+     "file": "sfx/homuratsuno/land_3.ogg",
+     "loop": false,
+     "layers": {
+      "core": "ground-crack+slam",
+      "body": "head 29Hz+noise-thump+rumble+4-chunks+rock-plates+pebbles",
+      "tail": "rumble+trickle+mid-reverb"
+     },
+     "rmsDb": -21.4,
+     "seconds": 4.857,
+     "momentaryMax": -13,
+     "shortTermMax": -19.9,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.2,
+     "limiterGrDb": 2.5,
+     "onsetMs": 0.3,
+     "tailSeconds": 4.42,
+     "bands": [
+      0.593,
+      0.262,
+      0.139,
+      0.005,
+      0
+     ]
+    },
+    {
+     "file": "sfx/homuratsuno/land_4.ogg",
+     "loop": false,
+     "layers": {
+      "core": "ground-crack+slam",
+      "body": "head 29Hz+noise-thump+rumble+3-chunks+rock-plates+pebbles",
+      "tail": "rumble+trickle+mid-reverb"
+     },
+     "rmsDb": -23.9,
+     "seconds": 5.294,
+     "momentaryMax": -15.1,
+     "shortTermMax": -21.5,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.2,
+     "limiterGrDb": 2.5,
+     "onsetMs": 0.2,
+     "tailSeconds": 4.91,
+     "bands": [
+      0.502,
+      0.343,
+      0.146,
+      0.009,
+      0
+     ]
+    }
+   ]
+  },
+  "homuratsuno/landHeavy": {
+   "loop": false,
+   "target": -9,
+   "variants": [
+    {
+     "file": "sfx/homuratsuno/landHeavy_1.ogg",
+     "loop": false,
+     "layers": {
+      "core": "ground-crack+slam",
+      "body": "head 29Hz+noise-thump+rumble+14-chunks+rock-plates+pebbles",
+      "tail": "rumble+trickle+far-reverb"
+     },
+     "rmsDb": -22.5,
+     "seconds": 9.024,
+     "momentaryMax": -14,
+     "shortTermMax": -18.4,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.2,
+     "limiterGrDb": 2.5,
+     "onsetMs": 0.4,
+     "tailSeconds": 8.7,
+     "bands": [
+      0.646,
+      0.19,
+      0.157,
+      0.007,
+      0
+     ]
+    },
+    {
+     "file": "sfx/homuratsuno/landHeavy_2.ogg",
+     "loop": false,
+     "layers": {
+      "core": "ground-crack+slam",
+      "body": "head 27Hz+noise-thump+rumble+6-chunks+rock-plates+pebbles",
+      "tail": "rumble+trickle+far-reverb"
+     },
+     "rmsDb": -22.4,
+     "seconds": 9.077,
+     "momentaryMax": -13.6,
+     "shortTermMax": -18.2,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.2,
+     "limiterGrDb": 2.5,
+     "onsetMs": 0.3,
+     "tailSeconds": 8.69,
+     "bands": [
+      0.623,
+      0.217,
+      0.153,
+      0.007,
+      0
+     ]
+    },
+    {
+     "file": "sfx/homuratsuno/landHeavy_3.ogg",
+     "loop": false,
+     "layers": {
+      "core": "ground-crack+slam",
+      "body": "head 29Hz+noise-thump+rumble+10-chunks+rock-plates+pebbles",
+      "tail": "rumble+trickle+far-reverb"
+     },
+     "rmsDb": -23.3,
+     "seconds": 7.979,
+     "momentaryMax": -15.2,
+     "shortTermMax": -19.9,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.2,
+     "limiterGrDb": 2.5,
+     "onsetMs": 0.6,
+     "tailSeconds": 7.76,
+     "bands": [
+      0.581,
+      0.267,
+      0.146,
+      0.006,
+      0
+     ]
+    }
+   ]
+  },
+  "homuratsuno/roar": {
+   "loop": false,
+   "target": -9,
+   "variants": [
+    {
+     "file": "sfx/homuratsuno/roar_1.ogg",
+     "loop": false,
+     "layers": {
+      "core": "bark",
+      "body": "one-throat f0 41Hz+doubling×2+chest",
+      "tail": "exhale+far-reverb"
+     },
+     "rmsDb": -16.1,
+     "seconds": 8.024,
+     "momentaryMax": -11.3,
+     "shortTermMax": -11.9,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.2,
+     "limiterGrDb": 2.5,
+     "onsetMs": 0.5,
+     "tailSeconds": 7.57,
+     "bands": [
+      0.23,
+      0.245,
+      0.522,
+      0.002,
+      0
+     ]
+    },
+    {
+     "file": "sfx/homuratsuno/roar_2.ogg",
+     "loop": false,
+     "layers": {
+      "core": "bark",
+      "body": "one-throat f0 33Hz+doubling×2+chest",
+      "tail": "exhale+far-reverb"
+     },
+     "rmsDb": -16.6,
+     "seconds": 7.404,
+     "momentaryMax": -11.4,
+     "shortTermMax": -12.1,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.2,
+     "limiterGrDb": 2.5,
+     "onsetMs": 0.2,
+     "tailSeconds": 6.82,
+     "bands": [
+      0.243,
+      0.233,
+      0.52,
+      0.003,
+      0
+     ]
+    },
+    {
+     "file": "sfx/homuratsuno/roar_3.ogg",
+     "loop": false,
+     "layers": {
+      "core": "bark",
+      "body": "one-throat f0 41Hz+doubling×3+chest",
+      "tail": "exhale+far-reverb"
+     },
+     "rmsDb": -15.9,
+     "seconds": 7.817,
+     "momentaryMax": -10.9,
+     "shortTermMax": -11.7,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.2,
+     "limiterGrDb": 2.5,
+     "onsetMs": 0.1,
+     "tailSeconds": 7.51,
+     "bands": [
+      0.248,
+      0.223,
+      0.526,
+      0.003,
+      0
+     ]
+    },
+    {
+     "file": "sfx/homuratsuno/roar_4.ogg",
+     "loop": false,
+     "layers": {
+      "core": "bark",
+      "body": "one-throat f0 40Hz+doubling×3+chest",
+      "tail": "exhale+far-reverb"
+     },
+     "rmsDb": -16.3,
+     "seconds": 7.692,
+     "momentaryMax": -11.3,
+     "shortTermMax": -11.8,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.2,
+     "limiterGrDb": 2.5,
+     "onsetMs": 0.3,
+     "tailSeconds": 7.51,
+     "bands": [
+      0.222,
+      0.229,
+      0.546,
+      0.002,
+      0
+     ]
+    }
+   ]
+  },
+  "homuratsuno/roarShort": {
+   "loop": false,
+   "target": -10,
+   "variants": [
+    {
+     "file": "sfx/homuratsuno/roarShort_1.ogg",
+     "loop": false,
+     "layers": {
+      "core": "bark",
+      "body": "one-throat f0 45Hz+doubling×1+chest",
+      "tail": "exhale+far-reverb"
+     },
+     "rmsDb": -17.7,
+     "seconds": 5.67,
+     "momentaryMax": -11.3,
+     "shortTermMax": -13.5,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.2,
+     "limiterGrDb": 2.5,
+     "onsetMs": 0.6,
+     "tailSeconds": 5.23,
+     "bands": [
+      0.259,
+      0.191,
+      0.547,
+      0.003,
+      0
+     ]
+    },
+    {
+     "file": "sfx/homuratsuno/roarShort_2.ogg",
+     "loop": false,
+     "layers": {
+      "core": "none",
+      "body": "growl f0 30Hz(closed mouth)",
+      "tail": "exhale+far-reverb"
+     },
+     "rmsDb": -17.7,
+     "seconds": 5.776,
+     "momentaryMax": -11.2,
+     "shortTermMax": -13.6,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.2,
+     "limiterGrDb": 2.5,
+     "onsetMs": 31.2,
+     "tailSeconds": 5.72,
+     "bands": [
+      0.249,
+      0.465,
+      0.28,
+      0.006,
+      0
+     ]
+    },
+    {
+     "file": "sfx/homuratsuno/roarShort_3.ogg",
+     "loop": false,
+     "layers": {
+      "core": "snort×1",
+      "body": "chest-grunt",
+      "tail": "far-reverb"
+     },
+     "rmsDb": -21.9,
+     "seconds": 3,
+     "momentaryMax": -12.7,
+     "shortTermMax": -20.2,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.2,
+     "limiterGrDb": 2.5,
+     "onsetMs": 1,
+     "tailSeconds": 2.98,
+     "bands": [
+      0.096,
+      0.613,
+      0.287,
+      0.004,
+      0
+     ]
+    },
+    {
+     "file": "sfx/homuratsuno/roarShort_4.ogg",
+     "loop": false,
+     "layers": {
+      "core": "bark",
+      "body": "one-throat f0 39Hz+doubling×1+chest",
+      "tail": "exhale+far-reverb"
+     },
+     "rmsDb": -17.1,
+     "seconds": 5.789,
+     "momentaryMax": -10.9,
+     "shortTermMax": -12.9,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.2,
+     "limiterGrDb": 2.5,
+     "onsetMs": 0.2,
+     "tailSeconds": 5.51,
+     "bands": [
+      0.237,
+      0.275,
+      0.484,
+      0.003,
+      0
+     ]
+    },
+    {
+     "file": "sfx/homuratsuno/roarShort_5.ogg",
+     "loop": false,
+     "layers": {
+      "core": "none",
+      "body": "growl f0 31Hz(closed mouth)",
+      "tail": "exhale+far-reverb"
+     },
+     "rmsDb": -17.2,
+     "seconds": 5.958,
+     "momentaryMax": -10.7,
+     "shortTermMax": -12.9,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.2,
+     "limiterGrDb": 2.5,
+     "onsetMs": 23.9,
+     "tailSeconds": 5.87,
+     "bands": [
+      0.235,
+      0.431,
+      0.33,
+      0.005,
+      0
+     ]
+    },
+    {
+     "file": "sfx/homuratsuno/roarShort_6.ogg",
+     "loop": false,
+     "layers": {
+      "core": "snort×2",
+      "body": "chest-grunt",
+      "tail": "far-reverb"
+     },
+     "rmsDb": -19.9,
+     "seconds": 3,
+     "momentaryMax": -12,
+     "shortTermMax": -18.2,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.2,
+     "limiterGrDb": 2.5,
+     "onsetMs": 0.5,
+     "tailSeconds": 2.99,
+     "bands": [
+      0.069,
+      0.636,
+      0.292,
+      0.003,
+      0
+     ]
+    }
+   ]
+  },
+  "homuratsuno/shove": {
+   "loop": false,
+   "target": -10,
+   "variants": [
+    {
+     "file": "sfx/homuratsuno/shove_1.ogg",
+     "loop": false,
+     "layers": {
+      "core": "horn-impact+chunks",
+      "body": "concrete-crush+steel-groan+creak+glass",
+      "tail": "lean-rumble+mid-reverb"
+     },
+     "rmsDb": -20.7,
+     "seconds": 5.169,
+     "momentaryMax": -10.1,
+     "shortTermMax": -15.9,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.2,
+     "limiterGrDb": 0.4,
+     "onsetMs": 0,
+     "tailSeconds": 4.92,
+     "bands": [
+      0.439,
+      0.221,
+      0.091,
+      0.214,
+      0.037
+     ]
+    },
+    {
+     "file": "sfx/homuratsuno/shove_2.ogg",
+     "loop": false,
+     "layers": {
+      "core": "horn-impact+chunks",
+      "body": "concrete-crush+steel-groan+creak+glass",
+      "tail": "lean-rumble+mid-reverb"
+     },
+     "rmsDb": -19.6,
+     "seconds": 5.256,
+     "momentaryMax": -10.2,
+     "shortTermMax": -15.3,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.2,
+     "limiterGrDb": 1.5,
+     "onsetMs": 0,
+     "tailSeconds": 5.01,
+     "bands": [
+      0.461,
+      0.22,
+      0.145,
+      0.151,
+      0.024
+     ]
+    },
+    {
+     "file": "sfx/homuratsuno/shove_3.ogg",
+     "loop": false,
+     "layers": {
+      "core": "horn-impact+chunks",
+      "body": "concrete-crush+steel-groan+creak+glass",
+      "tail": "lean-rumble+mid-reverb"
+     },
+     "rmsDb": -20.9,
+     "seconds": 5.182,
+     "momentaryMax": -10.2,
+     "shortTermMax": -15.9,
+     "samplePeakDb": -2.3,
+     "truePeakDb": -2.1,
+     "limiterGrDb": 2.2,
+     "onsetMs": 0,
+     "tailSeconds": 5.04,
+     "bands": [
+      0.298,
+      0.317,
+      0.163,
+      0.186,
+      0.035
+     ]
+    },
+    {
+     "file": "sfx/homuratsuno/shove_4.ogg",
+     "loop": false,
+     "layers": {
+      "core": "horn-impact+chunks",
+      "body": "concrete-crush+steel-groan+creak+glass",
+      "tail": "lean-rumble+mid-reverb"
+     },
+     "rmsDb": -19.1,
+     "seconds": 5.025,
+     "momentaryMax": -10.3,
+     "shortTermMax": -14.9,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.1,
+     "limiterGrDb": 3,
+     "onsetMs": 0,
+     "tailSeconds": 4.75,
+     "bands": [
+      0.45,
+      0.261,
+      0.125,
+      0.139,
+      0.025
+     ]
+    }
+   ]
+  },
+  "homuratsuno/stepFront": {
+   "loop": false,
+   "target": -15,
+   "variants": [
+    {
+     "file": "sfx/homuratsuno/stepFront_1.ogg",
+     "loop": false,
+     "layers": {
+      "core": "splay+asphalt-crunch",
+      "body": "noise-thump 40Hz×92%+1-chunks",
+      "tail": "debris+short-rumble"
+     },
+     "rmsDb": -21.9,
+     "seconds": 1.392,
+     "momentaryMax": -17.4,
+     "shortTermMax": -25.7,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.2,
+     "limiterGrDb": 4,
+     "onsetMs": 0.2,
+     "tailSeconds": 1.3,
+     "bands": [
+      0.647,
+      0.2,
+      0.143,
+      0.009,
+      0
+     ]
+    },
+    {
+     "file": "sfx/homuratsuno/stepFront_2.ogg",
+     "loop": false,
+     "layers": {
+      "core": "slap+rubble-crunch",
+      "body": "noise-thump 47Hz×68%+2-chunks",
+      "tail": "debris+short-rumble"
+     },
+     "rmsDb": -20.4,
+     "seconds": 1.035,
+     "momentaryMax": -15.2,
+     "shortTermMax": -23.8,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.2,
+     "limiterGrDb": 1.1,
+     "onsetMs": 0.2,
+     "tailSeconds": 0.94,
+     "bands": [
+      0.337,
+      0.27,
+      0.372,
+      0.02,
+      0
+     ]
+    },
+    {
+     "file": "sfx/homuratsuno/stepFront_3.ogg",
+     "loop": false,
+     "layers": {
+      "core": "splayScrape+soil-crunch",
+      "body": "noise-thump 43Hz×113%",
+      "tail": "debris+short-rumble"
+     },
+     "rmsDb": -21.3,
+     "seconds": 1.682,
+     "momentaryMax": -15.2,
+     "shortTermMax": -23.8,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.2,
+     "limiterGrDb": 3.5,
+     "onsetMs": 0.3,
+     "tailSeconds": 1.58,
+     "bands": [
+      0.596,
+      0.158,
+      0.243,
+      0.003,
+      0
+     ]
+    },
+    {
+     "file": "sfx/homuratsuno/stepFront_4.ogg",
+     "loop": false,
+     "layers": {
+      "core": "press+concrete-crunch",
+      "body": "noise-thump 39Hz×126%+1-chunks",
+      "tail": "debris+short-rumble"
+     },
+     "rmsDb": -20.5,
+     "seconds": 1.911,
+     "momentaryMax": -15.2,
+     "shortTermMax": -23.1,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.2,
+     "limiterGrDb": 1.5,
+     "onsetMs": 0.1,
+     "tailSeconds": 1.86,
+     "bands": [
+      0.653,
+      0.203,
+      0.135,
+      0.009,
+      0
+     ]
+    },
+    {
+     "file": "sfx/homuratsuno/stepFront_5.ogg",
+     "loop": false,
+     "layers": {
+      "core": "slip+asphalt-crunch",
+      "body": "noise-thump 43Hz×95%+1-chunks",
+      "tail": "debris+short-rumble"
+     },
+     "rmsDb": -20.6,
+     "seconds": 1.43,
+     "momentaryMax": -15.2,
+     "shortTermMax": -23.8,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.2,
+     "limiterGrDb": 2.8,
+     "onsetMs": 0.3,
+     "tailSeconds": 1.38,
+     "bands": [
+      0.647,
+      0.146,
+      0.201,
+      0.006,
+      0
+     ]
+    },
+    {
+     "file": "sfx/homuratsuno/stepFront_6.ogg",
+     "loop": false,
+     "layers": {
+      "core": "splay+soil-crunch",
+      "body": "noise-thump 47Hz×108%+1-chunks",
+      "tail": "debris+short-rumble"
+     },
+     "rmsDb": -21.5,
+     "seconds": 1.592,
+     "momentaryMax": -15.3,
+     "shortTermMax": -23.9,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.2,
+     "limiterGrDb": 4,
+     "onsetMs": 0.3,
+     "tailSeconds": 1.53,
+     "bands": [
+      0.399,
+      0.303,
+      0.293,
+      0.004,
+      0
+     ]
+    },
+    {
+     "file": "sfx/homuratsuno/stepFront_7.ogg",
+     "loop": false,
+     "layers": {
+      "core": "slap+concrete-crunch",
+      "body": "noise-thump 40Hz×75%+1-chunks",
+      "tail": "debris+short-rumble"
+     },
+     "rmsDb": -20.5,
+     "seconds": 1.097,
+     "momentaryMax": -15.2,
+     "shortTermMax": -23.9,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.2,
+     "limiterGrDb": 1,
+     "onsetMs": 0.2,
+     "tailSeconds": 1,
+     "bands": [
+      0.405,
+      0.33,
+      0.258,
+      0.006,
+      0
+     ]
+    },
+    {
+     "file": "sfx/homuratsuno/stepFront_8.ogg",
+     "loop": false,
+     "layers": {
+      "core": "splayScrape+asphalt-crunch",
+      "body": "noise-thump 37Hz×107%+1-chunks",
+      "tail": "debris+short-rumble"
+     },
+     "rmsDb": -20.5,
+     "seconds": 1.632,
+     "momentaryMax": -15.2,
+     "shortTermMax": -23.5,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.2,
+     "limiterGrDb": 2.3,
+     "onsetMs": 0.1,
+     "tailSeconds": 1.55,
+     "bands": [
+      0.677,
+      0.186,
+      0.127,
+      0.01,
+      0
+     ]
+    }
+   ]
+  },
+  "homuratsuno/stepHind": {
+   "loop": false,
+   "target": -14.5,
+   "variants": [
+    {
+     "file": "sfx/homuratsuno/stepHind_1.ogg",
+     "loop": false,
+     "layers": {
+      "core": "heelToe+asphalt-crunch",
+      "body": "noise-thump 32Hz×98%",
+      "tail": "debris+short-rumble"
+     },
+     "rmsDb": -19.6,
+     "seconds": 1.638,
+     "momentaryMax": -14.7,
+     "shortTermMax": -23.3,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.2,
+     "limiterGrDb": 0.5,
+     "onsetMs": 0.2,
+     "tailSeconds": 1.55,
+     "bands": [
+      0.69,
+      0.071,
+      0.233,
+      0.007,
+      0
+     ]
+    },
+    {
+     "file": "sfx/homuratsuno/stepHind_2.ogg",
+     "loop": false,
+     "layers": {
+      "core": "flat+rubble-crunch",
+      "body": "noise-thump 37Hz×77%+3-chunks",
+      "tail": "debris+short-rumble"
+     },
+     "rmsDb": -19.4,
+     "seconds": 1.281,
+     "momentaryMax": -14.7,
+     "shortTermMax": -23,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.2,
+     "limiterGrDb": 3.3,
+     "onsetMs": 0.3,
+     "tailSeconds": 1.21,
+     "bands": [
+      0.545,
+      0.22,
+      0.23,
+      0.005,
+      0
+     ]
+    },
+    {
+     "file": "sfx/homuratsuno/stepHind_3.ogg",
+     "loop": false,
+     "layers": {
+      "core": "heelToeDrag+soil-crunch",
+      "body": "noise-thump 36Hz×99%",
+      "tail": "debris+short-rumble"
+     },
+     "rmsDb": -19.1,
+     "seconds": 1.663,
+     "momentaryMax": -14.6,
+     "shortTermMax": -23.1,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.2,
+     "limiterGrDb": 3.7,
+     "onsetMs": 0.4,
+     "tailSeconds": 1.6,
+     "bands": [
+      0.674,
+      0.164,
+      0.16,
+      0.002,
+      0
+     ]
+    },
+    {
+     "file": "sfx/homuratsuno/stepHind_4.ogg",
+     "loop": false,
+     "layers": {
+      "core": "stomp+concrete-crunch",
+      "body": "noise-thump 32Hz×130%+1-chunks",
+      "tail": "debris+short-rumble"
+     },
+     "rmsDb": -20.4,
+     "seconds": 2.161,
+     "momentaryMax": -14.7,
+     "shortTermMax": -22.8,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.2,
+     "limiterGrDb": 2.7,
+     "onsetMs": 0.4,
+     "tailSeconds": 2.1,
+     "bands": [
+      0.682,
+      0.168,
+      0.144,
+      0.005,
+      0
+     ]
+    },
+    {
+     "file": "sfx/homuratsuno/stepHind_5.ogg",
+     "loop": false,
+     "layers": {
+      "core": "slip+asphalt-crunch",
+      "body": "noise-thump 38Hz×112%+1-chunks",
+      "tail": "debris+short-rumble"
+     },
+     "rmsDb": -20.2,
+     "seconds": 1.884,
+     "momentaryMax": -14.7,
+     "shortTermMax": -22.9,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.2,
+     "limiterGrDb": 0.7,
+     "onsetMs": 0.2,
+     "tailSeconds": 1.79,
+     "bands": [
+      0.683,
+      0.155,
+      0.157,
+      0.005,
+      0
+     ]
+    },
+    {
+     "file": "sfx/homuratsuno/stepHind_6.ogg",
+     "loop": false,
+     "layers": {
+      "core": "heelToe+soil-crunch",
+      "body": "noise-thump 38Hz×99%",
+      "tail": "debris+short-rumble"
+     },
+     "rmsDb": -20.1,
+     "seconds": 1.652,
+     "momentaryMax": -14.6,
+     "shortTermMax": -22.9,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.2,
+     "limiterGrDb": 0.2,
+     "onsetMs": 0.4,
+     "tailSeconds": 1.55,
+     "bands": [
+      0.498,
+      0.266,
+      0.233,
+      0.003,
+      0
+     ]
+    },
+    {
+     "file": "sfx/homuratsuno/stepHind_7.ogg",
+     "loop": false,
+     "layers": {
+      "core": "flat+concrete-crunch",
+      "body": "noise-thump 33Hz×70%+1-chunks",
+      "tail": "debris+short-rumble"
+     },
+     "rmsDb": -20.4,
+     "seconds": 1.178,
+     "momentaryMax": -15,
+     "shortTermMax": -23.7,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.2,
+     "limiterGrDb": 3.7,
+     "onsetMs": 0.3,
+     "tailSeconds": 1.13,
+     "bands": [
+      0.429,
+      0.312,
+      0.248,
+      0.01,
+      0
+     ]
+    },
+    {
+     "file": "sfx/homuratsuno/stepHind_8.ogg",
+     "loop": false,
+     "layers": {
+      "core": "heelToeDrag+asphalt-crunch",
+      "body": "noise-thump 36Hz×88%+1-chunks",
+      "tail": "debris+short-rumble"
+     },
+     "rmsDb": -20.3,
+     "seconds": 1.5,
+     "momentaryMax": -15.1,
+     "shortTermMax": -23.7,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.2,
+     "limiterGrDb": 4,
+     "onsetMs": 0.2,
+     "tailSeconds": 1.43,
+     "bands": [
+      0.682,
+      0.212,
+      0.099,
+      0.006,
+      0
+     ]
+    }
+   ]
+  },
+  "homuratsuno/tailHit": {
+   "loop": false,
+   "target": -10.5,
+   "variants": [
+    {
+     "file": "sfx/homuratsuno/tailHit_1.ogg",
+     "loop": false,
+     "layers": {
+      "core": "low-crack+rock-club",
+      "body": "deep-thud+head-push+big-chunks",
+      "tail": "rumble+debris"
+     },
+     "rmsDb": -21,
+     "seconds": 2.525,
+     "momentaryMax": -13.5,
+     "shortTermMax": -21.8,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.2,
+     "limiterGrDb": 4,
+     "onsetMs": 0,
+     "tailSeconds": 2.46,
+     "bands": [
+      0.572,
+      0.277,
+      0.145,
+      0.006,
+      0
+     ]
+    },
+    {
+     "file": "sfx/homuratsuno/tailHit_2.ogg",
+     "loop": false,
+     "layers": {
+      "core": "low-crack+rock-club",
+      "body": "deep-thud+head-push+big-chunks",
+      "tail": "rumble+debris"
+     },
+     "rmsDb": -21.6,
+     "seconds": 2.623,
+     "momentaryMax": -13.7,
+     "shortTermMax": -22.1,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.2,
+     "limiterGrDb": 4,
+     "onsetMs": 0,
+     "tailSeconds": 2.57,
+     "bands": [
+      0.583,
+      0.274,
+      0.138,
+      0.005,
+      0
+     ]
+    },
+    {
+     "file": "sfx/homuratsuno/tailHit_3.ogg",
+     "loop": false,
+     "layers": {
+      "core": "low-crack+rock-club",
+      "body": "deep-thud+head-push+big-chunks",
+      "tail": "rumble+debris"
+     },
+     "rmsDb": -20,
+     "seconds": 2.496,
+     "momentaryMax": -12.6,
+     "shortTermMax": -20.9,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.2,
+     "limiterGrDb": 4,
+     "onsetMs": 0,
+     "tailSeconds": 2.43,
+     "bands": [
+      0.516,
+      0.36,
+      0.119,
+      0.004,
+      0
+     ]
+    },
+    {
+     "file": "sfx/homuratsuno/tailHit_4.ogg",
+     "loop": false,
+     "layers": {
+      "core": "low-crack+rock-club",
+      "body": "deep-thud+head-push+big-chunks",
+      "tail": "rumble+debris"
+     },
+     "rmsDb": -19.6,
+     "seconds": 1.954,
+     "momentaryMax": -13.6,
+     "shortTermMax": -21.9,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.2,
+     "limiterGrDb": 4,
+     "onsetMs": 0,
+     "tailSeconds": 1.89,
+     "bands": [
+      0.648,
+      0.27,
+      0.079,
+      0.003,
+      0
+     ]
+    }
+   ]
+  },
+  "homuratsuno/tailSwing": {
+   "loop": false,
+   "target": -15,
+   "variants": [
+    {
+     "file": "sfx/homuratsuno/tailSwing_1.ogg",
+     "loop": false,
+     "layers": {
+      "core": "club-rock-clacks",
+      "body": "very-low-whoosh+mass-hum",
+      "tail": "stop×101%"
+     },
+     "rmsDb": -20.2,
+     "seconds": 1.286,
+     "momentaryMax": -15.1,
+     "shortTermMax": -23.3,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.2,
+     "limiterGrDb": 1,
+     "onsetMs": 1,
+     "tailSeconds": 1.26,
+     "bands": [
+      0.314,
+      0.579,
+      0.107,
+      0,
+      0
+     ]
+    },
+    {
+     "file": "sfx/homuratsuno/tailSwing_2.ogg",
+     "loop": false,
+     "layers": {
+      "core": "club-rock-clacks",
+      "body": "very-low-whoosh+mass-hum",
+      "tail": "trail×111%"
+     },
+     "rmsDb": -20.2,
+     "seconds": 1.343,
+     "momentaryMax": -15,
+     "shortTermMax": -22.5,
+     "samplePeakDb": -6.6,
+     "truePeakDb": -6.6,
+     "limiterGrDb": 0,
+     "onsetMs": 0.8,
+     "tailSeconds": 1.32,
+     "bands": [
+      0.218,
+      0.633,
+      0.148,
+      0,
+      0
+     ]
+    },
+    {
+     "file": "sfx/homuratsuno/tailSwing_3.ogg",
+     "loop": false,
+     "layers": {
+      "core": "club-rock-clacks",
+      "body": "very-low-whoosh+mass-hum",
+      "tail": "stop-back×83%"
+     },
+     "rmsDb": -20,
+     "seconds": 1.177,
+     "momentaryMax": -15,
+     "shortTermMax": -23.2,
+     "samplePeakDb": -3.5,
+     "truePeakDb": -3.5,
+     "limiterGrDb": 0,
+     "onsetMs": 2.4,
+     "tailSeconds": 1.15,
+     "bands": [
+      0.269,
+      0.584,
+      0.147,
+      0,
+      0
+     ]
+    },
+    {
+     "file": "sfx/homuratsuno/tailSwing_4.ogg",
+     "loop": false,
+     "layers": {
+      "core": "club-rock-clacks",
+      "body": "very-low-whoosh+mass-hum",
+      "tail": "trail-back×81%"
+     },
+     "rmsDb": -18.9,
+     "seconds": 1.167,
+     "momentaryMax": -15,
+     "shortTermMax": -21.9,
+     "samplePeakDb": -5.4,
+     "truePeakDb": -5.4,
+     "limiterGrDb": 0,
+     "onsetMs": 0.5,
+     "tailSeconds": 1.15,
+     "bands": [
+      0.208,
+      0.689,
+      0.102,
+      0,
+      0
+     ]
+    }
+   ]
+  },
+  "raiyoku/arc": {
+   "loop": false,
+   "target": -12,
+   "variants": [
+    {
+     "file": "sfx/raiyoku/arc_1.ogg",
+     "loop": false,
+     "layers": {
+      "core": "1-jump-crack(near)",
+      "body": "short-buzz",
+      "tail": "thunder -6dB+mid-reverb 0.10"
+     },
+     "rmsDb": -22.4,
+     "seconds": 2.089,
+     "momentaryMax": -13.6,
+     "shortTermMax": -21.7,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2,
+     "limiterGrDb": 4,
+     "onsetMs": 0,
+     "tailSeconds": 2.07,
+     "bands": [
+      0.313,
+      0.288,
+      0.192,
+      0.109,
+      0.098
+     ]
+    },
+    {
+     "file": "sfx/raiyoku/arc_2.ogg",
+     "loop": false,
+     "layers": {
+      "core": "2-jump-crack(roll)",
+      "body": "short-buzz",
+      "tail": "thunder -5dB+mid-reverb 0.26"
+     },
+     "rmsDb": -20.3,
+     "seconds": 4.295,
+     "momentaryMax": -12.2,
+     "shortTermMax": -17.3,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2,
+     "limiterGrDb": 2.4,
+     "onsetMs": 0,
+     "tailSeconds": 4.02,
+     "bands": [
+      0.278,
+      0.507,
+      0.179,
+      0.018,
+      0.018
+     ]
+    },
+    {
+     "file": "sfx/raiyoku/arc_3.ogg",
+     "loop": false,
+     "layers": {
+      "core": "4-jump-crack(chain)",
+      "body": "short-buzz",
+      "tail": "thunder -6dB+mid-reverb 0.19"
+     },
+     "rmsDb": -22.2,
+     "seconds": 3.373,
+     "momentaryMax": -14.7,
+     "shortTermMax": -19.7,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2,
+     "limiterGrDb": 4,
+     "onsetMs": 0,
+     "tailSeconds": 3.34,
+     "bands": [
+      0.334,
+      0.394,
+      0.206,
+      0.034,
+      0.031
+     ]
+    },
+    {
+     "file": "sfx/raiyoku/arc_4.ogg",
+     "loop": false,
+     "layers": {
+      "core": "1-jump-crack(fizz)",
+      "body": "short-buzz",
+      "tail": "thunder -13dB+mid-reverb 0.20"
+     },
+     "rmsDb": -25.2,
+     "seconds": 2.67,
+     "momentaryMax": -15.7,
+     "shortTermMax": -22.9,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.2,
+     "limiterGrDb": 4,
+     "onsetMs": 0,
+     "tailSeconds": 2.64,
+     "bands": [
+      0.141,
+      0.31,
+      0.398,
+      0.103,
+      0.047
+     ]
+    },
+    {
+     "file": "sfx/raiyoku/arc_5.ogg",
+     "loop": false,
+     "layers": {
+      "core": "1-jump-crack(near)",
+      "body": "short-buzz",
+      "tail": "thunder -7dB+mid-reverb 0.08"
+     },
+     "rmsDb": -23.7,
+     "seconds": 2.234,
+     "momentaryMax": -14.9,
+     "shortTermMax": -22.7,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -1.9,
+     "limiterGrDb": 4,
+     "onsetMs": 0,
+     "tailSeconds": 2.21,
+     "bands": [
+      0.3,
+      0.317,
+      0.303,
+      0.039,
+      0.039
+     ]
+    },
+    {
+     "file": "sfx/raiyoku/arc_6.ogg",
+     "loop": false,
+     "layers": {
+      "core": "1-jump-crack(roll)",
+      "body": "short-buzz",
+      "tail": "thunder -3dB+mid-reverb 0.31"
+     },
+     "rmsDb": -19.8,
+     "seconds": 3.905,
+     "momentaryMax": -12,
+     "shortTermMax": -17.2,
+     "samplePeakDb": -2.4,
+     "truePeakDb": -2.1,
+     "limiterGrDb": 4.6,
+     "onsetMs": 0,
+     "tailSeconds": 3.73,
+     "bands": [
+      0.304,
+      0.501,
+      0.157,
+      0.021,
+      0.017
+     ]
+    },
+    {
+     "file": "sfx/raiyoku/arc_7.ogg",
+     "loop": false,
+     "layers": {
+      "core": "4-jump-crack(chain)",
+      "body": "short-buzz",
+      "tail": "thunder -6dB+mid-reverb 0.25"
+     },
+     "rmsDb": -23.4,
+     "seconds": 3.167,
+     "momentaryMax": -14.9,
+     "shortTermMax": -20.8,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.1,
+     "limiterGrDb": 4,
+     "onsetMs": 0,
+     "tailSeconds": 3.14,
+     "bands": [
+      0.197,
+      0.464,
+      0.184,
+      0.084,
+      0.072
+     ]
+    },
+    {
+     "file": "sfx/raiyoku/arc_8.ogg",
+     "loop": false,
+     "layers": {
+      "core": "1-jump-crack(fizz)",
+      "body": "short-buzz",
+      "tail": "thunder -11dB+mid-reverb 0.16"
+     },
+     "rmsDb": -26.5,
+     "seconds": 2.366,
+     "momentaryMax": -17.6,
+     "shortTermMax": -25.2,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.2,
+     "limiterGrDb": 4,
+     "onsetMs": 0,
+     "tailSeconds": 2.33,
+     "bands": [
+      0.279,
+      0.282,
+      0.333,
+      0.068,
+      0.038
+     ]
+    }
+   ]
+  },
+  "raiyoku/breathLoop": {
+   "loop": true,
+   "target": -15,
+   "variants": [
+    {
+     "file": "sfx/raiyoku/breathLoop_1.ogg",
+     "loop": true,
+     "layers": {
+      "core": "sparks+discharges",
+      "body": "arc-buzz×2",
+      "tail": "ozone-hiss"
+     },
+     "rmsDb": -20.2,
+     "seconds": 5,
+     "momentaryMax": -15,
+     "shortTermMax": -16,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.1,
+     "limiterGrDb": 1.4,
+     "onsetMs": 0,
+     "tailSeconds": 5,
+     "bands": [
+      0,
+      0.059,
+      0.684,
+      0.126,
+      0.132
+     ]
+    },
+    {
+     "file": "sfx/raiyoku/breathLoop_2.ogg",
+     "loop": true,
+     "layers": {
+      "core": "sparks+discharges",
+      "body": "arc-buzz×2",
+      "tail": "ozone-hiss"
+     },
+     "rmsDb": -20.2,
+     "seconds": 5,
+     "momentaryMax": -15,
+     "shortTermMax": -15.9,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -1.9,
+     "limiterGrDb": 1.3,
+     "onsetMs": 0,
+     "tailSeconds": 5,
+     "bands": [
+      0,
+      0.048,
+      0.691,
+      0.136,
+      0.124
+     ]
+    }
+   ]
+  },
+  "raiyoku/breathStart": {
+   "loop": false,
+   "target": -12,
+   "variants": [
+    {
+     "file": "sfx/raiyoku/breathStart_1.ogg",
+     "loop": false,
+     "layers": {
+      "core": "air-tear-crack",
+      "body": "rising-arc-buzz+hiss",
+      "tail": "sparks"
+     },
+     "rmsDb": -18.4,
+     "seconds": 1.484,
+     "momentaryMax": -13,
+     "shortTermMax": -17.5,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.1,
+     "limiterGrDb": 4.1,
+     "onsetMs": 0,
+     "tailSeconds": 1.48,
+     "bands": [
+      0.073,
+      0.068,
+      0.629,
+      0.089,
+      0.141
+     ]
+    },
+    {
+     "file": "sfx/raiyoku/breathStart_2.ogg",
+     "loop": false,
+     "layers": {
+      "core": "air-tear-crack",
+      "body": "rising-arc-buzz+hiss",
+      "tail": "sparks"
+     },
+     "rmsDb": -17.9,
+     "seconds": 1.387,
+     "momentaryMax": -12.8,
+     "shortTermMax": -17.2,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.1,
+     "limiterGrDb": 4.4,
+     "onsetMs": 0,
+     "tailSeconds": 1.39,
+     "bands": [
+      0.029,
+      0.058,
+      0.645,
+      0.118,
+      0.149
+     ]
+    },
+    {
+     "file": "sfx/raiyoku/breathStart_3.ogg",
+     "loop": false,
+     "layers": {
+      "core": "air-tear-crack",
+      "body": "rising-arc-buzz+hiss",
+      "tail": "sparks"
+     },
+     "rmsDb": -18,
+     "seconds": 1.357,
+     "momentaryMax": -13.1,
+     "shortTermMax": -17.7,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.1,
+     "limiterGrDb": 4.1,
+     "onsetMs": 0,
+     "tailSeconds": 1.36,
+     "bands": [
+      0.054,
+      0.094,
+      0.633,
+      0.087,
+      0.132
+     ]
+    }
+   ]
+  },
+  "raiyoku/breathStop": {
+   "loop": false,
+   "target": -15,
+   "variants": [
+    {
+     "file": "sfx/raiyoku/breathStop_1.ogg",
+     "loop": false,
+     "layers": {
+      "core": "last-snap",
+      "body": "falling-buzz",
+      "tail": "fizzle"
+     },
+     "rmsDb": -25.6,
+     "seconds": 1.358,
+     "momentaryMax": -17,
+     "shortTermMax": -25.4,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.2,
+     "limiterGrDb": 2.5,
+     "onsetMs": 0,
+     "tailSeconds": 1.31,
+     "bands": [
+      0,
+      0.069,
+      0.815,
+      0.059,
+      0.057
+     ]
+    },
+    {
+     "file": "sfx/raiyoku/breathStop_2.ogg",
+     "loop": false,
+     "layers": {
+      "core": "last-snap",
+      "body": "falling-buzz",
+      "tail": "fizzle"
+     },
+     "rmsDb": -26,
+     "seconds": 1.388,
+     "momentaryMax": -17.6,
+     "shortTermMax": -26.2,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.2,
+     "limiterGrDb": 2.5,
+     "onsetMs": 0,
+     "tailSeconds": 1.34,
+     "bands": [
+      0,
+      0.103,
+      0.847,
+      0.03,
+      0.021
+     ]
+    },
+    {
+     "file": "sfx/raiyoku/breathStop_3.ogg",
+     "loop": false,
+     "layers": {
+      "core": "last-snap",
+      "body": "falling-buzz",
+      "tail": "fizzle"
+     },
+     "rmsDb": -25,
+     "seconds": 1.142,
+     "momentaryMax": -17.1,
+     "shortTermMax": -25.5,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.2,
+     "limiterGrDb": 2.5,
+     "onsetMs": 0,
+     "tailSeconds": 1.09,
+     "bands": [
+      0,
+      0.049,
+      0.851,
+      0.088,
+      0.011
+     ]
+    }
+   ]
+  },
+  "raiyoku/clawHit": {
+   "loop": false,
+   "target": -13,
+   "variants": [
+    {
+     "file": "sfx/raiyoku/clawHit_1.ogg",
+     "loop": false,
+     "layers": {
+      "core": "membrane-snap×2+snaps",
+      "body": "gust+light-thud",
+      "tail": "light-debris"
+     },
+     "rmsDb": -21.2,
+     "seconds": 0.995,
+     "momentaryMax": -14.7,
+     "shortTermMax": -23.1,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.2,
+     "limiterGrDb": 2.5,
+     "onsetMs": 0.1,
+     "tailSeconds": 0.94,
+     "bands": [
+      0.051,
+      0.229,
+      0.646,
+      0.07,
+      0.003
+     ]
+    },
+    {
+     "file": "sfx/raiyoku/clawHit_2.ogg",
+     "loop": false,
+     "layers": {
+      "core": "membrane-snap×2+snaps",
+      "body": "gust+light-thud",
+      "tail": "light-debris"
+     },
+     "rmsDb": -23.8,
+     "seconds": 1.097,
+     "momentaryMax": -16.9,
+     "shortTermMax": -25.6,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.2,
+     "limiterGrDb": 2.5,
+     "onsetMs": 0.1,
+     "tailSeconds": 1.04,
+     "bands": [
+      0.05,
+      0.213,
+      0.666,
+      0.067,
+      0.004
+     ]
+    },
+    {
+     "file": "sfx/raiyoku/clawHit_3.ogg",
+     "loop": false,
+     "layers": {
+      "core": "membrane-snap×2+snaps",
+      "body": "gust+light-thud",
+      "tail": "light-debris"
+     },
+     "rmsDb": -20.8,
+     "seconds": 1.348,
+     "momentaryMax": -13.2,
+     "shortTermMax": -21.6,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.2,
+     "limiterGrDb": 2.5,
+     "onsetMs": 0.2,
+     "tailSeconds": 0.97,
+     "bands": [
+      0.042,
+      0.206,
+      0.695,
+      0.054,
+      0.002
+     ]
+    },
+    {
+     "file": "sfx/raiyoku/clawHit_4.ogg",
+     "loop": false,
+     "layers": {
+      "core": "membrane-snap×2+snaps",
+      "body": "gust+light-thud",
+      "tail": "light-debris"
+     },
+     "rmsDb": -21.3,
+     "seconds": 1.072,
+     "momentaryMax": -14.7,
+     "shortTermMax": -23.4,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.2,
+     "limiterGrDb": 2.5,
+     "onsetMs": 0.1,
+     "tailSeconds": 1.02,
+     "bands": [
+      0.132,
+      0.354,
+      0.474,
+      0.039,
+      0.002
+     ]
+    }
+   ]
+  },
+  "raiyoku/clawSwing": {
+   "loop": false,
+   "target": -15.5,
+   "variants": [
+    {
+     "file": "sfx/raiyoku/clawSwing_1.ogg",
+     "loop": false,
+     "layers": {
+      "core": "membrane-flutter",
+      "body": "broad-wing-whoosh+air-push",
+      "tail": "stop×118%"
+     },
+     "rmsDb": -22.5,
+     "seconds": 1.202,
+     "momentaryMax": -15.7,
+     "shortTermMax": -24.2,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.2,
+     "limiterGrDb": 0.8,
+     "onsetMs": 0.3,
+     "tailSeconds": 1.14,
+     "bands": [
+      0.072,
+      0.162,
+      0.748,
+      0.016,
+      0.001
+     ]
+    },
+    {
+     "file": "sfx/raiyoku/clawSwing_2.ogg",
+     "loop": false,
+     "layers": {
+      "core": "membrane-flutter",
+      "body": "broad-wing-whoosh+air-push",
+      "tail": "trail×71%"
+     },
+     "rmsDb": -21.3,
+     "seconds": 0.947,
+     "momentaryMax": -15.5,
+     "shortTermMax": -23.9,
+     "samplePeakDb": -4.4,
+     "truePeakDb": -4.4,
+     "limiterGrDb": 0,
+     "onsetMs": 0.6,
+     "tailSeconds": 0.9,
+     "bands": [
+      0.032,
+      0.13,
+      0.823,
+      0.015,
+      0.001
+     ]
+    },
+    {
+     "file": "sfx/raiyoku/clawSwing_3.ogg",
+     "loop": false,
+     "layers": {
+      "core": "membrane-flutter",
+      "body": "broad-wing-whoosh+air-push",
+      "tail": "stop-back×126%"
+     },
+     "rmsDb": -22.1,
+     "seconds": 1.25,
+     "momentaryMax": -15.7,
+     "shortTermMax": -23.6,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.2,
+     "limiterGrDb": 0.8,
+     "onsetMs": 1.8,
+     "tailSeconds": 1.19,
+     "bands": [
+      0.043,
+      0.193,
+      0.737,
+      0.027,
+      0.001
+     ]
+    },
+    {
+     "file": "sfx/raiyoku/clawSwing_4.ogg",
+     "loop": false,
+     "layers": {
+      "core": "membrane-flutter",
+      "body": "broad-wing-whoosh+air-push",
+      "tail": "trail-back×118%"
+     },
+     "rmsDb": -21.7,
+     "seconds": 1.205,
+     "momentaryMax": -15.6,
+     "shortTermMax": -23.1,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.2,
+     "limiterGrDb": 0.4,
+     "onsetMs": 3.8,
+     "tailSeconds": 1.15,
+     "bands": [
+      0.071,
+      0.144,
+      0.752,
+      0.031,
+      0.001
+     ]
+    }
+   ]
+  },
+  "raiyoku/flap": {
+   "loop": false,
+   "target": -15,
+   "variants": [
+    {
+     "file": "sfx/raiyoku/flap_1.ogg",
+     "loop": false,
+     "layers": {
+      "core": "membrane-snap+flutter",
+      "body": "air-pressure(noise)+whoosh(snap)",
+      "tail": "turbulence"
+     },
+     "rmsDb": -21.6,
+     "seconds": 1.971,
+     "momentaryMax": -15,
+     "shortTermMax": -21.9,
+     "samplePeakDb": -2.6,
+     "truePeakDb": -2.6,
+     "limiterGrDb": 0,
+     "onsetMs": 0.5,
+     "tailSeconds": 1.91,
+     "bands": [
+      0.283,
+      0.325,
+      0.379,
+      0.012,
+      0.001
+     ]
+    },
+    {
+     "file": "sfx/raiyoku/flap_2.ogg",
+     "loop": false,
+     "layers": {
+      "core": "membrane-snap+flutter",
+      "body": "air-pressure(noise)+whoosh(swell)",
+      "tail": "turbulence"
+     },
+     "rmsDb": -20.7,
+     "seconds": 1.624,
+     "momentaryMax": -15,
+     "shortTermMax": -21.8,
+     "samplePeakDb": -5.6,
+     "truePeakDb": -5.6,
+     "limiterGrDb": 0,
+     "onsetMs": 0.3,
+     "tailSeconds": 1.57,
+     "bands": [
+      0.186,
+      0.482,
+      0.327,
+      0.005,
+      0
+     ]
+    },
+    {
+     "file": "sfx/raiyoku/flap_3.ogg",
+     "loop": false,
+     "layers": {
+      "core": "membrane-snap+flutter",
+      "body": "air-pressure(noise)+whoosh(double)",
+      "tail": "turbulence"
+     },
+     "rmsDb": -20.2,
+     "seconds": 1.434,
+     "momentaryMax": -15.2,
+     "shortTermMax": -22.5,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.2,
+     "limiterGrDb": 0.8,
+     "onsetMs": 0.3,
+     "tailSeconds": 1.37,
+     "bands": [
+      0.291,
+      0.427,
+      0.274,
+      0.008,
+      0
+     ]
+    },
+    {
+     "file": "sfx/raiyoku/flap_4.ogg",
+     "loop": false,
+     "layers": {
+      "core": "membrane-snap+flutter",
+      "body": "air-pressure(noise)+whoosh(swell-double)",
+      "tail": "turbulence"
+     },
+     "rmsDb": -19.3,
+     "seconds": 1.24,
+     "momentaryMax": -15,
+     "shortTermMax": -22.1,
+     "samplePeakDb": -4.7,
+     "truePeakDb": -4.7,
+     "limiterGrDb": 0,
+     "onsetMs": 0.3,
+     "tailSeconds": 1.19,
+     "bands": [
+      0.25,
+      0.462,
+      0.282,
+      0.005,
+      0
+     ]
+    }
+   ]
+  },
+  "raiyoku/land": {
+   "loop": false,
+   "target": -11,
+   "variants": [
+    {
+     "file": "sfx/raiyoku/land_1.ogg",
+     "loop": false,
+     "layers": {
+      "core": "ground-crack+slam+wing-flare",
+      "body": "head 63Hz+noise-thump+rumble+6-chunks",
+      "tail": "rumble+trickle+mid-reverb"
+     },
+     "rmsDb": -22.3,
+     "seconds": 4.509,
+     "momentaryMax": -11.7,
+     "shortTermMax": -18.9,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.2,
+     "limiterGrDb": 2.5,
+     "onsetMs": 0.3,
+     "tailSeconds": 4.19,
+     "bands": [
+      0.29,
+      0.448,
+      0.2,
+      0.061,
+      0.001
+     ]
+    },
+    {
+     "file": "sfx/raiyoku/land_2.ogg",
+     "loop": false,
+     "layers": {
+      "core": "ground-crack+slam+wing-flare",
+      "body": "head 72Hz+noise-thump+rumble+2-chunks",
+      "tail": "rumble+trickle+mid-reverb"
+     },
+     "rmsDb": -23.7,
+     "seconds": 4.242,
+     "momentaryMax": -13.7,
+     "shortTermMax": -21.1,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.2,
+     "limiterGrDb": 2.5,
+     "onsetMs": 0.2,
+     "tailSeconds": 3.91,
+     "bands": [
+      0.49,
+      0.309,
+      0.153,
+      0.047,
+      0
+     ]
+    },
+    {
+     "file": "sfx/raiyoku/land_3.ogg",
+     "loop": false,
+     "layers": {
+      "core": "ground-crack+slam+wing-flare",
+      "body": "head 66Hz+noise-thump+rumble+4-chunks",
+      "tail": "rumble+trickle+mid-reverb"
+     },
+     "rmsDb": -24.5,
+     "seconds": 4.366,
+     "momentaryMax": -13.2,
+     "shortTermMax": -21.1,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.2,
+     "limiterGrDb": 2.5,
+     "onsetMs": 0.2,
+     "tailSeconds": 4.1,
+     "bands": [
+      0.301,
+      0.367,
+      0.263,
+      0.068,
+      0.002
+     ]
+    },
+    {
+     "file": "sfx/raiyoku/land_4.ogg",
+     "loop": false,
+     "layers": {
+      "core": "ground-crack+slam+wing-flare",
+      "body": "head 62Hz+noise-thump+rumble+3-chunks",
+      "tail": "rumble+trickle+mid-reverb"
+     },
+     "rmsDb": -23.9,
+     "seconds": 4.382,
+     "momentaryMax": -13.6,
+     "shortTermMax": -20.8,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.2,
+     "limiterGrDb": 2.5,
+     "onsetMs": 0.1,
+     "tailSeconds": 3.96,
+     "bands": [
+      0.407,
+      0.287,
+      0.255,
+      0.049,
+      0.001
+     ]
+    }
+   ]
+  },
+  "raiyoku/landHeavy": {
+   "loop": false,
+   "target": -9,
+   "variants": [
+    {
+     "file": "sfx/raiyoku/landHeavy_1.ogg",
+     "loop": false,
+     "layers": {
+      "core": "ground-crack+slam+wing-flare",
+      "body": "head 60Hz+noise-thump+rumble+14-chunks",
+      "tail": "rumble+trickle+far-reverb+thunder"
+     },
+     "rmsDb": -20.6,
+     "seconds": 6.982,
+     "momentaryMax": -12.2,
+     "shortTermMax": -15.6,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.2,
+     "limiterGrDb": 2.5,
+     "onsetMs": 0,
+     "tailSeconds": 6.52,
+     "bands": [
+      0.272,
+      0.391,
+      0.301,
+      0.033,
+      0.003
+     ]
+    },
+    {
+     "file": "sfx/raiyoku/landHeavy_2.ogg",
+     "loop": false,
+     "layers": {
+      "core": "ground-crack+slam+wing-flare",
+      "body": "head 63Hz+noise-thump+rumble+6-chunks",
+      "tail": "rumble+trickle+far-reverb+thunder"
+     },
+     "rmsDb": -20.2,
+     "seconds": 6.917,
+     "momentaryMax": -11.7,
+     "shortTermMax": -15.3,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.1,
+     "limiterGrDb": 2.6,
+     "onsetMs": 0,
+     "tailSeconds": 6.41,
+     "bands": [
+      0.304,
+      0.349,
+      0.315,
+      0.027,
+      0.005
+     ]
+    },
+    {
+     "file": "sfx/raiyoku/landHeavy_3.ogg",
+     "loop": false,
+     "layers": {
+      "core": "ground-crack+slam+wing-flare",
+      "body": "head 56Hz+noise-thump+rumble+10-chunks",
+      "tail": "rumble+trickle+far-reverb+thunder"
+     },
+     "rmsDb": -19.2,
+     "seconds": 7.064,
+     "momentaryMax": -11.1,
+     "shortTermMax": -14.4,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.1,
+     "limiterGrDb": 2.5,
+     "onsetMs": 0,
+     "tailSeconds": 6.65,
+     "bands": [
+      0.381,
+      0.291,
+      0.306,
+      0.019,
+      0.003
+     ]
+    }
+   ]
+  },
+  "raiyoku/roar": {
+   "loop": false,
+   "target": -9,
+   "variants": [
+    {
+     "file": "sfx/raiyoku/roar_1.ogg",
+     "loop": false,
+     "layers": {
+      "core": "bark",
+      "body": "one-throat f0 102Hz+doubling×1+chest",
+      "tail": "exhale+far-reverb"
+     },
+     "rmsDb": -16.9,
+     "seconds": 6.4,
+     "momentaryMax": -10.1,
+     "shortTermMax": -11,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.2,
+     "limiterGrDb": 2.5,
+     "onsetMs": 0.3,
+     "tailSeconds": 6.01,
+     "bands": [
+      0.001,
+      0.044,
+      0.925,
+      0.03,
+      0.001
+     ]
+    },
+    {
+     "file": "sfx/raiyoku/roar_2.ogg",
+     "loop": false,
+     "layers": {
+      "core": "bark",
+      "body": "one-throat f0 96Hz+doubling×1+chest",
+      "tail": "exhale+far-reverb"
+     },
+     "rmsDb": -18.1,
+     "seconds": 5.94,
+     "momentaryMax": -10.8,
+     "shortTermMax": -12.3,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.2,
+     "limiterGrDb": 2.5,
+     "onsetMs": 0.2,
+     "tailSeconds": 5.5,
+     "bands": [
+      0.001,
+      0.046,
+      0.919,
+      0.034,
+      0.001
+     ]
+    },
+    {
+     "file": "sfx/raiyoku/roar_3.ogg",
+     "loop": false,
+     "layers": {
+      "core": "bark",
+      "body": "one-throat f0 94Hz+doubling×1+chest",
+      "tail": "exhale+far-reverb"
+     },
+     "rmsDb": -17.5,
+     "seconds": 6.458,
+     "momentaryMax": -10.5,
+     "shortTermMax": -11.6,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.2,
+     "limiterGrDb": 2.6,
+     "onsetMs": 0.2,
+     "tailSeconds": 6.1,
+     "bands": [
+      0.001,
+      0.056,
+      0.912,
+      0.031,
+      0.001
+     ]
+    },
+    {
+     "file": "sfx/raiyoku/roar_4.ogg",
+     "loop": false,
+     "layers": {
+      "core": "bark",
+      "body": "one-throat f0 112Hz+doubling×1+chest",
+      "tail": "exhale+far-reverb"
+     },
+     "rmsDb": -18.4,
+     "seconds": 5.975,
+     "momentaryMax": -11.2,
+     "shortTermMax": -12.7,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.2,
+     "limiterGrDb": 2.5,
+     "onsetMs": 0.3,
+     "tailSeconds": 5.62,
+     "bands": [
+      0,
+      0.034,
+      0.934,
+      0.03,
+      0.001
+     ]
+    }
+   ]
+  },
+  "raiyoku/roarShort": {
+   "loop": false,
+   "target": -10,
+   "variants": [
+    {
+     "file": "sfx/raiyoku/roarShort_1.ogg",
+     "loop": false,
+     "layers": {
+      "core": "bark",
+      "body": "one-throat f0 119Hz+doubling×1+chest",
+      "tail": "exhale+far-reverb"
+     },
+     "rmsDb": -18.2,
+     "seconds": 5.124,
+     "momentaryMax": -10.3,
+     "shortTermMax": -13.1,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.2,
+     "limiterGrDb": 2.1,
+     "onsetMs": 0.1,
+     "tailSeconds": 4.75,
+     "bands": [
+      0.001,
+      0.037,
+      0.921,
+      0.04,
+      0.001
+     ]
+    },
+    {
+     "file": "sfx/raiyoku/roarShort_2.ogg",
+     "loop": false,
+     "layers": {
+      "core": "bark",
+      "body": "one-throat f0 116Hz+doubling×1+chest",
+      "tail": "exhale+far-reverb"
+     },
+     "rmsDb": -19.1,
+     "seconds": 4.944,
+     "momentaryMax": -10.9,
+     "shortTermMax": -14.1,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.2,
+     "limiterGrDb": 2.5,
+     "onsetMs": 0.1,
+     "tailSeconds": 4.52,
+     "bands": [
+      0.001,
+      0.037,
+      0.919,
+      0.042,
+      0.001
+     ]
+    },
+    {
+     "file": "sfx/raiyoku/roarShort_3.ogg",
+     "loop": false,
+     "layers": {
+      "core": "bark",
+      "body": "one-throat f0 118Hz+doubling×1+chest",
+      "tail": "exhale+far-reverb"
+     },
+     "rmsDb": -18.8,
+     "seconds": 4.933,
+     "momentaryMax": -10.5,
+     "shortTermMax": -13.7,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.2,
+     "limiterGrDb": 2.5,
+     "onsetMs": 0.3,
+     "tailSeconds": 4.66,
+     "bands": [
+      0,
+      0.042,
+      0.913,
+      0.044,
+      0.001
+     ]
+    }
+   ]
+  },
+  "raiyoku/stepFront": {
+   "loop": false,
+   "target": -15,
+   "variants": [
+    {
+     "file": "sfx/raiyoku/stepFront_1.ogg",
+     "loop": false,
+     "layers": {
+      "core": "wrist+asphalt-crunch",
+      "body": "noise-thump 123Hz×114%+1-chunks",
+      "tail": "debris+short-rumble"
+     },
+     "rmsDb": -21.9,
+     "seconds": 0.985,
+     "momentaryMax": -15.2,
+     "shortTermMax": -23.9,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.2,
+     "limiterGrDb": 0.3,
+     "onsetMs": 0.1,
+     "tailSeconds": 0.93,
+     "bands": [
+      0.18,
+      0.251,
+      0.496,
+      0.07,
+      0.002
+     ]
+    },
+    {
+     "file": "sfx/raiyoku/stepFront_2.ogg",
+     "loop": false,
+     "layers": {
+      "core": "wristDouble+rubble-crunch",
+      "body": "noise-thump 108Hz×93%+2-chunks",
+      "tail": "debris+short-rumble"
+     },
+     "rmsDb": -23,
+     "seconds": 1.406,
+     "momentaryMax": -15,
+     "shortTermMax": -23.4,
+     "samplePeakDb": -3.6,
+     "truePeakDb": -3.6,
+     "limiterGrDb": 0,
+     "onsetMs": 0.2,
+     "tailSeconds": 1.35,
+     "bands": [
+      0.042,
+      0.361,
+      0.535,
+      0.06,
+      0.001
+     ]
+    },
+    {
+     "file": "sfx/raiyoku/stepFront_3.ogg",
+     "loop": false,
+     "layers": {
+      "core": "wristDrag+soil-crunch",
+      "body": "noise-thump 96Hz×104%",
+      "tail": "debris+short-rumble"
+     },
+     "rmsDb": -20.7,
+     "seconds": 0.812,
+     "momentaryMax": -15,
+     "shortTermMax": -23.7,
+     "samplePeakDb": -4.6,
+     "truePeakDb": -4.6,
+     "limiterGrDb": 0,
+     "onsetMs": 0.1,
+     "tailSeconds": 0.76,
+     "bands": [
+      0.057,
+      0.493,
+      0.319,
+      0.13,
+      0.002
+     ]
+    },
+    {
+     "file": "sfx/raiyoku/stepFront_4.ogg",
+     "loop": false,
+     "layers": {
+      "core": "wristLight+concrete-crunch",
+      "body": "noise-thump 115Hz×77%+2-chunks",
+      "tail": "debris+short-rumble"
+     },
+     "rmsDb": -18.4,
+     "seconds": 0.48,
+     "momentaryMax": -15.2,
+     "shortTermMax": -24,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.2,
+     "limiterGrDb": 0.4,
+     "onsetMs": 0.1,
+     "tailSeconds": 0.41,
+     "bands": [
+      0.075,
+      0.474,
+      0.422,
+      0.028,
+      0.001
+     ]
+    },
+    {
+     "file": "sfx/raiyoku/stepFront_5.ogg",
+     "loop": false,
+     "layers": {
+      "core": "wristSlam+asphalt-crunch",
+      "body": "noise-thump 95Hz×128%+1-chunks",
+      "tail": "debris+short-rumble"
+     },
+     "rmsDb": -24.3,
+     "seconds": 2.245,
+     "momentaryMax": -15.2,
+     "shortTermMax": -23.4,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.2,
+     "limiterGrDb": 1.8,
+     "onsetMs": 0.1,
+     "tailSeconds": 2.19,
+     "bands": [
+      0.24,
+      0.33,
+      0.379,
+      0.05,
+      0.001
+     ]
+    }
+   ]
+  },
+  "raiyoku/stepHind": {
+   "loop": false,
+   "target": -14.5,
+   "variants": [
+    {
+     "file": "sfx/raiyoku/stepHind_1.ogg",
+     "loop": false,
+     "layers": {
+      "core": "heelToe+asphalt-crunch",
+      "body": "noise-thump 86Hz×87%",
+      "tail": "debris+short-rumble"
+     },
+     "rmsDb": -21.5,
+     "seconds": 1.022,
+     "momentaryMax": -16.1,
+     "shortTermMax": -24.9,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.2,
+     "limiterGrDb": 4,
+     "onsetMs": 0.1,
+     "tailSeconds": 0.97,
+     "bands": [
+      0.236,
+      0.449,
+      0.292,
+      0.023,
+      0
+     ]
+    },
+    {
+     "file": "sfx/raiyoku/stepHind_2.ogg",
+     "loop": false,
+     "layers": {
+      "core": "flat+rubble-crunch",
+      "body": "noise-thump 77Hz×76%+1-chunks",
+      "tail": "debris+short-rumble"
+     },
+     "rmsDb": -20,
+     "seconds": 0.743,
+     "momentaryMax": -14.5,
+     "shortTermMax": -23.1,
+     "samplePeakDb": -2.8,
+     "truePeakDb": -2.7,
+     "limiterGrDb": 0,
+     "onsetMs": 0.1,
+     "tailSeconds": 0.67,
+     "bands": [
+      0.147,
+      0.29,
+      0.435,
+      0.128,
+      0
+     ]
+    },
+    {
+     "file": "sfx/raiyoku/stepHind_3.ogg",
+     "loop": false,
+     "layers": {
+      "core": "heelToeDrag+soil-crunch",
+      "body": "noise-thump 73Hz×111%+1-chunks",
+      "tail": "debris+short-rumble"
+     },
+     "rmsDb": -20.2,
+     "seconds": 1.008,
+     "momentaryMax": -14.5,
+     "shortTermMax": -23.3,
+     "samplePeakDb": -2.3,
+     "truePeakDb": -2.2,
+     "limiterGrDb": 0,
+     "onsetMs": 0.3,
+     "tailSeconds": 0.95,
+     "bands": [
+      0.283,
+      0.367,
+      0.327,
+      0.022,
+      0
+     ]
+    },
+    {
+     "file": "sfx/raiyoku/stepHind_4.ogg",
+     "loop": false,
+     "layers": {
+      "core": "stomp+concrete-crunch",
+      "body": "noise-thump 77Hz×128%",
+      "tail": "debris+short-rumble"
+     },
+     "rmsDb": -23.6,
+     "seconds": 1.962,
+     "momentaryMax": -14.7,
+     "shortTermMax": -23.2,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.2,
+     "limiterGrDb": 3.2,
+     "onsetMs": 0.1,
+     "tailSeconds": 1.91,
+     "bands": [
+      0.294,
+      0.349,
+      0.284,
+      0.072,
+      0.002
+     ]
+    },
+    {
+     "file": "sfx/raiyoku/stepHind_5.ogg",
+     "loop": false,
+     "layers": {
+      "core": "slip+asphalt-crunch",
+      "body": "noise-thump 73Hz×85%+1-chunks",
+      "tail": "debris+short-rumble"
+     },
+     "rmsDb": -18.8,
+     "seconds": 0.693,
+     "momentaryMax": -14.5,
+     "shortTermMax": -23.2,
+     "samplePeakDb": -3.1,
+     "truePeakDb": -3.1,
+     "limiterGrDb": 0,
+     "onsetMs": 0.1,
+     "tailSeconds": 0.64,
+     "bands": [
+      0.204,
+      0.432,
+      0.328,
+      0.036,
+      0
+     ]
+    }
+   ]
+  },
+  "raiyoku/tailHit": {
+   "loop": false,
+   "target": -12,
+   "variants": [
+    {
+     "file": "sfx/raiyoku/tailHit_1.ogg",
+     "loop": false,
+     "layers": {
+      "core": "whip-crack(clean)",
+      "body": "facade-slit+light-thud",
+      "tail": "fine-debris"
+     },
+     "rmsDb": -25.5,
+     "seconds": 0.666,
+     "momentaryMax": -17.9,
+     "shortTermMax": -26.7,
+     "samplePeakDb": -2.3,
+     "truePeakDb": -2.1,
+     "limiterGrDb": 6.2,
+     "onsetMs": 0,
+     "tailSeconds": 0.61,
+     "bands": [
+      0.019,
+      0.212,
+      0.097,
+      0.583,
+      0.09
+     ]
+    },
+    {
+     "file": "sfx/raiyoku/tailHit_2.ogg",
+     "loop": false,
+     "layers": {
+      "core": "whip-crack(double)",
+      "body": "facade-slit+light-thud",
+      "tail": "fine-debris"
+     },
+     "rmsDb": -28.5,
+     "seconds": 0.82,
+     "momentaryMax": -20.1,
+     "shortTermMax": -28.9,
+     "samplePeakDb": -2.7,
+     "truePeakDb": -2.2,
+     "limiterGrDb": 6.5,
+     "onsetMs": 0,
+     "tailSeconds": 0.77,
+     "bands": [
+      0.045,
+      0.134,
+      0.257,
+      0.517,
+      0.048
+     ]
+    },
+    {
+     "file": "sfx/raiyoku/tailHit_3.ogg",
+     "loop": false,
+     "layers": {
+      "core": "whip-crack(drag)",
+      "body": "facade-slit+light-thud",
+      "tail": "fine-debris"
+     },
+     "rmsDb": -24.5,
+     "seconds": 0.802,
+     "momentaryMax": -16,
+     "shortTermMax": -24.7,
+     "samplePeakDb": -2.4,
+     "truePeakDb": -2.2,
+     "limiterGrDb": 6.2,
+     "onsetMs": 0,
+     "tailSeconds": 0.74,
+     "bands": [
+      0.018,
+      0.135,
+      0.087,
+      0.743,
+      0.017
+     ]
+    },
+    {
+     "file": "sfx/raiyoku/tailHit_4.ogg",
+     "loop": false,
+     "layers": {
+      "core": "whip-crack(echo)",
+      "body": "facade-slit+light-thud",
+      "tail": "fine-debris"
+     },
+     "rmsDb": -27.6,
+     "seconds": 1.201,
+     "momentaryMax": -18.1,
+     "shortTermMax": -26.8,
+     "samplePeakDb": -2.3,
+     "truePeakDb": -2.1,
+     "limiterGrDb": 6.1,
+     "onsetMs": 0,
+     "tailSeconds": 1.15,
+     "bands": [
+      0.048,
+      0.299,
+      0.268,
+      0.34,
+      0.045
+     ]
+    }
+   ]
+  },
+  "raiyoku/tailSwing": {
+   "loop": false,
+   "target": -16.5,
+   "variants": [
+    {
+     "file": "sfx/raiyoku/tailSwing_1.ogg",
+     "loop": false,
+     "layers": {
+      "core": "tip-pish",
+      "body": "thin-fast-whoosh×2",
+      "tail": "stop×120%"
+     },
+     "rmsDb": -25.4,
+     "seconds": 0.748,
+     "momentaryMax": -16.5,
+     "shortTermMax": -25.2,
+     "samplePeakDb": -4.9,
+     "truePeakDb": -4.7,
+     "limiterGrDb": 0,
+     "onsetMs": 1.8,
+     "tailSeconds": 0.69,
+     "bands": [
+      0,
+      0,
+      0.021,
+      0.961,
+      0.018
+     ]
+    },
+    {
+     "file": "sfx/raiyoku/tailSwing_2.ogg",
+     "loop": false,
+     "layers": {
+      "core": "tip-pish",
+      "body": "thin-fast-whoosh×2",
+      "tail": "trail×110%"
+     },
+     "rmsDb": -25.3,
+     "seconds": 0.729,
+     "momentaryMax": -16.5,
+     "shortTermMax": -25.2,
+     "samplePeakDb": -5.7,
+     "truePeakDb": -5.5,
+     "limiterGrDb": 0,
+     "onsetMs": 2.2,
+     "tailSeconds": 0.68,
+     "bands": [
+      0,
+      0,
+      0.035,
+      0.943,
+      0.022
+     ]
+    },
+    {
+     "file": "sfx/raiyoku/tailSwing_3.ogg",
+     "loop": false,
+     "layers": {
+      "core": "tip-pish",
+      "body": "thin-fast-whoosh×2",
+      "tail": "stop-back×97%"
+     },
+     "rmsDb": -24.7,
+     "seconds": 0.696,
+     "momentaryMax": -16.5,
+     "shortTermMax": -25.1,
+     "samplePeakDb": -5,
+     "truePeakDb": -5,
+     "limiterGrDb": 0,
+     "onsetMs": 9.8,
+     "tailSeconds": 0.64,
+     "bands": [
+      0,
+      0.002,
+      0.16,
+      0.822,
+      0.017
+     ]
+    },
+    {
+     "file": "sfx/raiyoku/tailSwing_4.ogg",
+     "loop": false,
+     "layers": {
+      "core": "tip-pish",
+      "body": "thin-fast-whoosh×2",
+      "tail": "trail-back×78%"
+     },
+     "rmsDb": -24.6,
+     "seconds": 0.663,
+     "momentaryMax": -16.5,
+     "shortTermMax": -25.1,
+     "samplePeakDb": -6.6,
+     "truePeakDb": -6.2,
+     "limiterGrDb": 0,
+     "onsetMs": 4.2,
+     "tailSeconds": 0.66,
+     "bands": [
+      0,
+      0.001,
+      0.119,
+      0.853,
+      0.026
+     ]
+    }
+   ]
+  },
+  "ui/click": {
+   "loop": false,
+   "target": -20,
+   "variants": [
+    {
+     "file": "sfx/ui/click_1.ogg",
+     "loop": false,
+     "layers": {
+      "core": "hyoshigi",
+      "body": "wood-modes",
+      "tail": "near-room"
+     },
+     "rmsDb": -27.6,
+     "seconds": 1.004,
+     "momentaryMax": -20,
+     "shortTermMax": -28.7,
+     "samplePeakDb": -6.8,
+     "truePeakDb": -6.8,
+     "limiterGrDb": 0,
+     "onsetMs": 0,
+     "tailSeconds": 0.85,
+     "bands": [
+      0,
+      0,
+      0.985,
+      0.015,
+      0
+     ]
+    },
+    {
+     "file": "sfx/ui/click_2.ogg",
+     "loop": false,
+     "layers": {
+      "core": "hyoshigi",
+      "body": "wood-modes",
+      "tail": "near-room"
+     },
+     "rmsDb": -27.7,
+     "seconds": 0.967,
+     "momentaryMax": -20,
+     "shortTermMax": -28.7,
+     "samplePeakDb": -7.1,
+     "truePeakDb": -7.1,
+     "limiterGrDb": 0,
+     "onsetMs": 0,
+     "tailSeconds": 0.84,
+     "bands": [
+      0,
+      0,
+      0.969,
+      0.031,
+      0
+     ]
+    },
+    {
+     "file": "sfx/ui/click_3.ogg",
+     "loop": false,
+     "layers": {
+      "core": "hyoshigi",
+      "body": "wood-modes",
+      "tail": "near-room"
+     },
+     "rmsDb": -28,
+     "seconds": 0.973,
+     "momentaryMax": -20,
+     "shortTermMax": -28.7,
+     "samplePeakDb": -5.5,
+     "truePeakDb": -5.5,
+     "limiterGrDb": 0,
+     "onsetMs": 0,
+     "tailSeconds": 0.75,
+     "bands": [
+      0,
+      0,
+      0.833,
+      0.167,
+      0
+     ]
+    }
+   ]
+  },
+  "ui/combo": {
+   "loop": false,
+   "target": -18,
+   "variants": [
+    {
+     "file": "sfx/ui/combo_1.ogg",
+     "loop": false,
+     "layers": {
+      "core": "strike",
+      "body": "rin 880Hz",
+      "tail": "ring"
+     },
+     "rmsDb": -25.9,
+     "seconds": 3.549,
+     "momentaryMax": -18,
+     "shortTermMax": -22,
+     "samplePeakDb": -12.1,
+     "truePeakDb": -12.1,
+     "limiterGrDb": 0,
+     "onsetMs": 0.3,
+     "tailSeconds": 3.4,
+     "bands": [
+      0,
+      0,
+      0.896,
+      0.104,
+      0
+     ]
+    },
+    {
+     "file": "sfx/ui/combo_2.ogg",
+     "loop": false,
+     "layers": {
+      "core": "strike",
+      "body": "rin 1175Hz",
+      "tail": "ring"
+     },
+     "rmsDb": -25.7,
+     "seconds": 3.552,
+     "momentaryMax": -18,
+     "shortTermMax": -21.3,
+     "samplePeakDb": -13.5,
+     "truePeakDb": -13.5,
+     "limiterGrDb": 0,
+     "onsetMs": 0.3,
+     "tailSeconds": 3.35,
+     "bands": [
+      0,
+      0,
+      0.944,
+      0.056,
+      0.001
+     ]
+    },
+    {
+     "file": "sfx/ui/combo_3.ogg",
+     "loop": false,
+     "layers": {
+      "core": "strike",
+      "body": "rin 1175+1760Hz",
+      "tail": "ring"
+     },
+     "rmsDb": -25.8,
+     "seconds": 3.51,
+     "momentaryMax": -18,
+     "shortTermMax": -21,
+     "samplePeakDb": -12.5,
+     "truePeakDb": -12.4,
+     "limiterGrDb": 0,
+     "onsetMs": 0.6,
+     "tailSeconds": 3.31,
+     "bands": [
+      0,
+      0,
+      0.949,
+      0.049,
+      0.002
+     ]
+    }
+   ]
+  },
+  "ui/pause": {
+   "loop": false,
+   "target": -19,
+   "variants": [
+    {
+     "file": "sfx/ui/pause_1.ogg",
+     "loop": false,
+     "layers": {
+      "core": "low-wood",
+      "body": "wood-modes",
+      "tail": "near-room"
+     },
+     "rmsDb": -25.9,
+     "seconds": 1.084,
+     "momentaryMax": -19,
+     "shortTermMax": -27.7,
+     "samplePeakDb": -5.7,
+     "truePeakDb": -5.7,
+     "limiterGrDb": 0,
+     "onsetMs": 0.1,
+     "tailSeconds": 0.92,
+     "bands": [
+      0,
+      0,
+      0.999,
+      0.001,
+      0
+     ]
+    }
+   ]
+  },
+  "ui/rage": {
+   "loop": false,
+   "target": -14,
+   "variants": [
+    {
+     "file": "sfx/ui/rage_1.ogg",
+     "loop": false,
+     "layers": {
+      "core": "rin",
+      "body": "brass-swell",
+      "tail": "rin-ring"
+     },
+     "rmsDb": -21.1,
+     "seconds": 4.2,
+     "momentaryMax": -14,
+     "shortTermMax": -17.5,
+     "samplePeakDb": -2.2,
+     "truePeakDb": -2.2,
+     "limiterGrDb": 0.2,
+     "onsetMs": 0.9,
+     "tailSeconds": 4,
+     "bands": [
+      0.06,
+      0.28,
+      0.637,
+      0.023,
+      0
+     ]
+    }
+   ]
+  },
+  "ui/result": {
+   "loop": false,
+   "target": -12,
+   "variants": [
+    {
+     "file": "sfx/ui/result_1.ogg",
+     "loop": false,
+     "layers": {
+      "core": "odaiko",
+      "body": "gong",
+      "tail": "gong-bloom+room"
+     },
+     "rmsDb": -19.1,
+     "seconds": 7.821,
+     "momentaryMax": -12,
+     "shortTermMax": -14.6,
+     "samplePeakDb": -3.4,
+     "truePeakDb": -3.4,
+     "limiterGrDb": 0,
+     "onsetMs": 0,
+     "tailSeconds": 7.56,
+     "bands": [
+      0.236,
+      0.727,
+      0.037,
+      0,
+      0
+     ]
+    }
+   ]
+  },
+  "ui/resultGong": {
+   "loop": false,
+   "target": -12.5,
+   "variants": [
+    {
+     "file": "sfx/ui/resultGong_1.ogg",
+     "loop": false,
+     "layers": {
+      "core": "gong-strike",
+      "body": "gong D2",
+      "tail": "gong-bloom+room"
+     },
+     "rmsDb": -19.1,
+     "seconds": 8.093,
+     "momentaryMax": -12.5,
+     "shortTermMax": -14.9,
+     "samplePeakDb": -4.3,
+     "truePeakDb": -4.3,
+     "limiterGrDb": 0,
+     "onsetMs": 0,
+     "tailSeconds": 7.97,
+     "bands": [
+      0.071,
+      0.904,
+      0.024,
+      0,
+      0
+     ]
+    }
+   ]
+  },
+  "ui/resume": {
+   "loop": false,
+   "target": -19,
+   "variants": [
+    {
+     "file": "sfx/ui/resume_1.ogg",
+     "loop": false,
+     "layers": {
+      "core": "low-wood",
+      "body": "wood-modes",
+      "tail": "near-room"
+     },
+     "rmsDb": -26.6,
+     "seconds": 1.078,
+     "momentaryMax": -19,
+     "shortTermMax": -27.7,
+     "samplePeakDb": -6,
+     "truePeakDb": -6,
+     "limiterGrDb": 0,
+     "onsetMs": 0,
+     "tailSeconds": 0.95,
+     "bands": [
+      0,
+      0,
+      0.92,
+      0.08,
+      0
+     ]
+    }
+   ]
+  },
+  "ui/start": {
+   "loop": false,
+   "target": -14,
+   "variants": [
+    {
+     "file": "sfx/ui/start_1.ogg",
+     "loop": false,
+     "layers": {
+      "core": "hyoshigi",
+      "body": "odaiko",
+      "tail": "near-room"
+     },
+     "rmsDb": -21.7,
+     "seconds": 3.47,
+     "momentaryMax": -14,
+     "shortTermMax": -20.7,
+     "samplePeakDb": -2.4,
+     "truePeakDb": -2.3,
+     "limiterGrDb": 0,
+     "onsetMs": 0,
+     "tailSeconds": 3.22,
+     "bands": [
+      0.609,
+      0.333,
+      0.055,
+      0.002,
+      0
+     ]
+    }
+   ]
+  }
+ },
+ "music": {
+  "bpm": 96,
+  "beatsPerBar": 4,
+  "bars": 72,
+  "barSeconds": 2.5,
+  "beatSeconds": 0.625,
+  "length": 180,
+  "chunkBars": 4,
+  "chunkSeconds": 10,
+  "pad": 0.1,
+  "stems": [
+   "calm",
+   "rampage",
+   "peak"
+  ],
+  "chunks": {
+   "calm": [
+    "music/calm_01.ogg",
+    "music/calm_02.ogg",
+    "music/calm_03.ogg",
+    "music/calm_04.ogg",
+    "music/calm_05.ogg",
+    "music/calm_06.ogg",
+    "music/calm_07.ogg",
+    "music/calm_08.ogg",
+    "music/calm_09.ogg",
+    "music/calm_10.ogg",
+    "music/calm_11.ogg",
+    "music/calm_12.ogg",
+    "music/calm_13.ogg",
+    "music/calm_14.ogg",
+    "music/calm_15.ogg",
+    "music/calm_16.ogg",
+    "music/calm_17.ogg",
+    "music/calm_18.ogg"
+   ],
+   "rampage": [
+    "music/rampage_01.ogg",
+    "music/rampage_02.ogg",
+    "music/rampage_03.ogg",
+    "music/rampage_04.ogg",
+    "music/rampage_05.ogg",
+    "music/rampage_06.ogg",
+    "music/rampage_07.ogg",
+    "music/rampage_08.ogg",
+    "music/rampage_09.ogg",
+    "music/rampage_10.ogg",
+    "music/rampage_11.ogg",
+    "music/rampage_12.ogg",
+    "music/rampage_13.ogg",
+    "music/rampage_14.ogg",
+    "music/rampage_15.ogg",
+    "music/rampage_16.ogg",
+    "music/rampage_17.ogg",
+    "music/rampage_18.ogg"
+   ],
+   "peak": [
+    "music/peak_01.ogg",
+    "music/peak_02.ogg",
+    "music/peak_03.ogg",
+    "music/peak_04.ogg",
+    "music/peak_05.ogg",
+    "music/peak_06.ogg",
+    "music/peak_07.ogg",
+    "music/peak_08.ogg",
+    "music/peak_09.ogg",
+    "music/peak_10.ogg",
+    "music/peak_11.ogg",
+    "music/peak_12.ogg",
+    "music/peak_13.ogg",
+    "music/peak_14.ogg",
+    "music/peak_15.ogg",
+    "music/peak_16.ogg",
+    "music/peak_17.ogg",
+    "music/peak_18.ogg"
+   ]
+  },
+  "fills": [
+   "music/fill_1.ogg",
+   "music/fill_2.ogg",
+   "music/fill_3.ogg"
+  ],
+  "fillLead": 0.625,
+  "sections": [
+   {
+    "name": "intro",
+    "bar": 1
+   },
+   {
+    "name": "A",
+    "bar": 9
+   },
+   {
+    "name": "B",
+    "bar": 25
+   },
+   {
+    "name": "C",
+    "bar": 41
+   },
+   {
+    "name": "bridge",
+    "bar": 57
+   },
+   {
+    "name": "finale",
+    "bar": 65
+   }
+  ],
+  "hold": {
+   "bars": 5,
+   "holds": 4,
+   "leadIn": 4,
+   "seconds": 12.5,
+   "splitBar": 64,
+   "chunks": {
+    "calm": "music/calm_hold.ogg",
+    "rampage": "music/rampage_hold.ogg",
+    "peak": "music/peak_hold.ogg"
+   }
+  },
+  "sourceSha1": {
+   "calm": [
+    "170deb4f21c6071166e006ca753467aee23c9342",
+    "20acabd05977dadc355e13af24da6fe35179f92b",
+    "c5afacd0a16811e667224a84ea5f8f5fae055b54",
+    "f726d94d9732c35c350948f82d36df0ec9114efd",
+    "c009f0da7a797ebd9ef5fb7672e6d9779ffae52e",
+    "21a7a2ab5b6486b3d7efd7d686d64d75e21eb54b",
+    "0fef978d28c6f22f7f6c316d10d3c02b317ddbd6",
+    "99052f69c84fefcd9ff2ee3e9a6622494d736b77",
+    "7b087b8e0c7613a6ec10a7e96c9e6464b144a338",
+    "8b94cce973794f2e725e9c1e0017a18dc02ac011",
+    "fc8f70bf24e177ae4117173b3f5cef31347f005c",
+    "dd17c198b9dfcbcac2cfc24d2b66975e0561a47d",
+    "8fc969170a0c4c787c7c85c219ca09aa56ccc940",
+    "7ee3c70d3f702b5d96ed1f03585ca1d022fb2f17",
+    "818b0626a5dc0190064b95867383a0737bbfbfec",
+    "65e55a9e7a782d52618624ce7c53b2cc53c35128",
+    "000021b51e74b9f3090aa791be3983fcf16f757f",
+    "f39ebf3bc3660fafaf2153709eb8f8e9c2ce0504"
+   ],
+   "rampage": [
+    "5c230c24e64bdcab1005c75469b50cdd96d40f2b",
+    "285412eb897a469bfd17c1c0fd2fc6e590c92159",
+    "7c6461a360670cba443f7019bb6457ab95703638",
+    "49f5ae42815b911f5abfb8fbb59bec6844a123ec",
+    "abb400eba55520eb9dfb4ddfe24501b2bb2652bf",
+    "283eca5013e480c45ec45fb4757408e80d543e20",
+    "192ec757b0144a571fd88ce9d0809c66f579d66a",
+    "03386b0085352d0774975f2abc97d2cda5c6422c",
+    "9f30f02899fa23c4f8d1a84e8eb6b35fe1cfb4f5",
+    "c44d864c119d1242ff09018a88c345c013189cb6",
+    "9b4821e664a3fca3ec624766a50c23336738ab0e",
+    "fb0e5d6ff525fc49734bc3b07894ec7dcbb8db25",
+    "1b6b5a76b08953f64ccbcc8c29292e94e233e5ec",
+    "0429f46f903e4510aa7800a222bb5028c0a0cc6d",
+    "69bf3ba13b80bbd0d7ed5165c2d04e1f3d6e5f54",
+    "1ae8b47859b9fbbd12b963084bb36b3b77f44e04",
+    "9bd0d7683666da8d650f7c7b00eb4876b403f855",
+    "c130e7619d6487c98aa71c02f68643b520a7fb8a"
+   ],
+   "peak": [
+    "5f602e984baf58feb22889b0ccc4367550c13733",
+    "dba4649ed96c75fb112c3fff779aafdffae36701",
+    "a1a6eec133f0e2657cb55f5ba6818e49f34657aa",
+    "bd01857b475d3aedde9fe008513e305fbda6d8d7",
+    "4e359684d7563610c20477d9a223fc3c5c23e5c7",
+    "86fd3840e485571d8ce73b49bf48e6567093ffd8",
+    "303f613dd84ad318068e151ffc21445af3898546",
+    "77867bd5b666a17777e5ca723cd21ae51e69bb50",
+    "5b4d57d3d0bea917e99e660ec2f3db82bf6270e3",
+    "3a8420714cb5878dbd2c44256dba903b7a672ae9",
+    "3594db06e39827e24970f9996fec6c26396dd83d",
+    "9eaa0f43f7ea29899e103211e354238556d2885e",
+    "2995e0ab6b147bfe55997de5fec16fd810560116",
+    "551af284e389bcf4c7fd4a7e9b63dbd53e4ee2cc",
+    "917548a2fa3316c701acf37649d67bc90841f7f8",
+    "3462aca99f6a56c441f15a790bbac73ea088d58d",
+    "30faf1a7f4fc57e16b42bdd9aa54d91438851dea",
+    "f0c2e26b150a639e31cc6bbcf63c6fead73f8ca1"
+   ],
+   "hold": {
+    "calm": "3a492fda837ff9dad73694f17397b6857adc54e8",
+    "rampage": "ad8734c1c6c77545da1f17f0b95c8f5ddbf2ff44",
+    "peak": "13b80e5440c8b30ef5ec87e37d240064e993d9bd"
+   }
+  },
+  "report": {
+   "stemGainsDb": [
+    -11.7,
+    -10.4,
+    -11.4
+   ],
+   "limiterMaxGrDb": 4.6,
+   "limiterGr": {
+    "p50": 0,
+    "p99": 2.2,
+    "overOneDbShare": 0.086
+   },
+   "limiterCeilingDb": -2.9,
+   "stages": {
+    "calm": {
+     "lufs": -17.8,
+     "truePeakDb": -2.7,
+     "shortTermMax": -14.2,
+     "bands": [
+      0.108,
+      0.127,
+      0.695,
+      0.062,
+      0.007
+     ]
+    },
+    "rampage": {
+     "lufs": -16,
+     "truePeakDb": -1.9,
+     "shortTermMax": -13.1,
+     "bands": [
+      0.125,
+      0.199,
+      0.62,
+      0.051,
+      0.005
+     ]
+    },
+    "peak": {
+     "lufs": -14.4,
+     "truePeakDb": -1.6,
+     "shortTermMax": -11.1,
+     "bands": [
+      0.098,
+      0.152,
+      0.683,
+      0.062,
+      0.004
+     ]
+    }
+   },
+   "parts": {
+    "calm.pad": {
+     "stem": "calm",
+     "notes": 157,
+     "rmsDb": -19.2
+    },
+    "calm.bass": {
+     "stem": "calm",
+     "notes": 40,
+     "rmsDb": -18
+    },
+    "calm.koto": {
+     "stem": "calm",
+     "notes": 540,
+     "rmsDb": -16.3
+    },
+    "calm.flute": {
+     "stem": "calm",
+     "notes": 5,
+     "rmsDb": -14.3
+    },
+    "calm.taiko": {
+     "stem": "calm",
+     "notes": 98,
+     "rmsDb": -18.6
+    },
+    "calm.melody": {
+     "stem": "calm",
+     "notes": 60,
+     "rmsDb": -15.5
+    },
+    "calm.atmos": {
+     "stem": "calm",
+     "notes": 2,
+     "rmsDb": -36.1
+    },
+    "rampage.taiko": {
+     "stem": "rampage",
+     "notes": 709,
+     "rmsDb": -14.7
+    },
+    "rampage.brass": {
+     "stem": "rampage",
+     "notes": 138,
+     "rmsDb": -20
+    },
+    "rampage.spiccato": {
+     "stem": "rampage",
+     "notes": 432,
+     "rmsDb": -19.7
+    },
+    "rampage.spiccatoHigh": {
+     "stem": "rampage",
+     "notes": 292,
+     "rmsDb": -19.9
+    },
+    "rampage.shime": {
+     "stem": "rampage",
+     "notes": 432,
+     "rmsDb": -23.1
+    },
+    "peak.shime": {
+     "stem": "peak",
+     "notes": 800,
+     "rmsDb": -21
+    },
+    "peak.odaiko": {
+     "stem": "peak",
+     "notes": 93,
+     "rmsDb": -20.8
+    },
+    "peak.chappa": {
+     "stem": "peak",
+     "notes": 200,
+     "rmsDb": -27.3
+    },
+    "peak.horns": {
+     "stem": "peak",
+     "notes": 98,
+     "rmsDb": -17.9
+    },
+    "peak.choir": {
+     "stem": "peak",
+     "notes": 54,
+     "rmsDb": -25.8
+    },
+    "peak.tremolo": {
+     "stem": "peak",
+     "notes": 39,
+     "rmsDb": -22.3
+    },
+    "peak.shinobue": {
+     "stem": "peak",
+     "notes": 3,
+     "rmsDb": -16.1
+    }
+   },
+   "fills": [
+    {
+     "file": "music/fill_1.ogg",
+     "seconds": 3.304,
+     "momentaryMax": -13,
+     "shortTermMax": -18.8,
+     "samplePeakDb": -3.2,
+     "truePeakDb": -3.2,
+     "limiterGrDb": 0,
+     "onsetMs": 0.1,
+     "tailSeconds": 3.25,
+     "bands": [
+      0.267,
+      0.612,
+      0.117,
+      0.004,
+      0.001
+     ]
+    },
+    {
+     "file": "music/fill_2.ogg",
+     "seconds": 3.296,
+     "momentaryMax": -13,
+     "shortTermMax": -18.1,
+     "samplePeakDb": -3.2,
+     "truePeakDb": -3.2,
+     "limiterGrDb": 0,
+     "onsetMs": 0.1,
+     "tailSeconds": 3.24,
+     "bands": [
+      0.43,
+      0.479,
+      0.086,
+      0.005,
+      0.001
+     ]
+    },
+    {
+     "file": "music/fill_3.ogg",
+     "seconds": 3.304,
+     "momentaryMax": -13,
+     "shortTermMax": -18.8,
+     "samplePeakDb": -3.9,
+     "truePeakDb": -3.9,
+     "limiterGrDb": 0,
+     "onsetMs": 156.5,
+     "tailSeconds": 3.24,
+     "bands": [
+      0.402,
+      0.505,
+      0.088,
+      0.004,
+      0.001
+     ]
+    }
+   ],
+   "hold": {
+    "limiterMaxGrDb": 0,
+    "stages": {
+     "calm": {
+      "lufs": -17.8,
+      "truePeakDb": -5.1,
+      "perBarLufs": [
+       -18,
+       -17.5,
+       -17.9,
+       -17.6,
+       -17.4
+      ]
+     },
+     "rampage": {
+      "lufs": -16.9,
+      "truePeakDb": -3.6,
+      "perBarLufs": [
+       -17.4,
+       -16.9,
+       -17.1,
+       -16.6,
+       -16.1
+      ]
+     },
+     "peak": {
+      "lufs": -16.4,
+      "truePeakDb": -3,
+      "perBarLufs": [
+       -17,
+       -16.5,
+       -16.4,
+       -16,
+       -15.6
+      ]
+     }
+    }
+   }
+  }
+ }
+}

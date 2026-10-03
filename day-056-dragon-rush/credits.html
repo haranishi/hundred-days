@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="ja">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>素材と第三者コードの出典 — 夕暮れ怪獣ラッシュ</title><link rel="stylesheet" href="app.css"></head>
+<body><main class="credits">
+<a href="./">← ゲームの入口へ</a><h1>素材と第三者コードの出典</h1>
+<p>怪獣のGLBと動きは同梱のBlenderスクリプトで生成しました。怪獣の影絵はそのGLBから撮影したものです。街、空、炎、煙、瓦礫はコードとシェーダーで描きます。効果音とBGMは数値計算で合成した波形を使います。</p>
+<p>描画ライブラリに含まれるブルーノイズとSMAAの検索画像は第三者由来です。ゲーム用の写真、他作品の怪獣モデル、既存曲の録音素材は同梱していません。</p>
+<h2>配信に含めるライブラリと実装</h2>
+<ul>
+<li>three.js 0.186.1 — three.js authors、MIT。GLTFLoaderとCSMを含みます。<a href="game/licenses/three.txt">許諾全文</a></li>
+<li>postprocessing 6.39.5 — Raoul van Rüschen、Zlib。<a href="game/licenses/postprocessing.txt">許諾全文</a></li>
+<li>n8ao 2.0.1 — N8python。配布LICENSEとREADMEはCC0です（package.jsonのISC表記とは一致していません）。<a href="game/licenses/n8ao.txt">配布LICENSE全文</a></li>
+<li>SMAA — Jorge Jimenez、Jose I. Echevarria、Belen Masia、Fernando Navarro、Diego Gutierrez。MIT。<a href="game/licenses/SMAA.txt">許諾全文</a></li>
+<li>ブルーノイズ — Christoph Peters、CC0。Calinouのfree-blue-noise-textures経由。<a href="game/licenses/BlueNoise.txt">出典と声明</a></li>
+<li>ACESの当てはめ — Stephen Hill、BakingLab（MJP / David Neubelt）からGLSLへ移植。MIT。<a href="game/licenses/BakingLab.txt">帰属と許諾全文</a></li>
+<li>乱数とハッシュ — SFC32、FNV-1a、MurmurHash3の公開手法を利用。<a href="game/licenses/README.md">出典一覧</a></li>
+</ul>
+<p>カメラの臨界減衰は微分方程式の解析解による実装です。Unityの参照コードは配布していません。</p>
+<h2>保存と通信</h2>
+<p>音量・マウス設定・最後に選んだ怪獣・自己ベストはlocalStorageに保存します。ゲームは同じサイトから同梱ファイルを読み込み、操作記録を外部へ送りません。X・LINE・端末の共有は利用者がボタンを押したときに各サービスへ渡します。</p>
+<p>この作品は特定の既存作品・企業の公式サービスではありません。モデル・シェーダー・音の生成コードとテストは<a href="https://github.com/haranishi/hundred-days/tree/main/day-056-dragon-rush/source" target="_blank" rel="noopener noreferrer">GitHubのソース</a>にあります。</p>
+</main></body></html>

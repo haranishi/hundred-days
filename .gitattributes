@@ -1,0 +1,4 @@
+# Preserve generated GLSL literals and verbatim upstream license statements.
+day-056-dragon-rush/game/assets/index-*.js -whitespace
+day-056-dragon-rush/game/licenses/BlueNoise.txt -whitespace
+day-056-dragon-rush/source/LICENSES/upstream/BlueNoise.txt -whitespace

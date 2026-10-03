@@ -13,7 +13,7 @@ const files = run('git', ['ls-files', '-c', '-o', '--exclude-standard'])
   .split('\n')
   .filter(Boolean);
 
-const BINARY = /\.(png|jpe?g|gif|webp|ico|svg|mp4|mov|webm|mp3|wav|zip|gz|woff2?|ttf|otf|pdf|bin)$/i;
+const BINARY = /\.(png|jpe?g|gif|webp|ico|svg|mp4|mov|webm|mp3|wav|ogg|flac|glb|zip|gz|woff2?|ttf|otf|pdf|bin)$/i;
 
 /* 同じフォルダにバイナリが何本も入るときは、1本ずつ出すと本当の指摘が流れる
    （day-041 の事故データは1フォルダに375本）。10本を超えたらフォルダ単位でまとめる。

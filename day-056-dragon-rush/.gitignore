@@ -1,0 +1,5 @@
+source/.captures/
+source/.audio/
+source/dist/
+source/test-results/
+source/playwright-report/

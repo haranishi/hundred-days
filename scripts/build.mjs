@@ -118,7 +118,12 @@ const skipToolsCache = (source) => !isExcluded(source);
 
 for (const app of apps) {
   if (app.published) {
-    const filter = source => skipToolsCache(source) && !(app.dir === 'day-044-train-here' && source.includes(`${sep}tools`));
+    const filter = source => skipToolsCache(source)
+      && !(app.dir === 'day-044-train-here' && source.includes(`${sep}tools`))
+      && !(app.dir === 'day-056-dragon-rush' && ['source', 'tools'].some(dir => {
+        const marker = `${sep}${dir}`;
+        return source.endsWith(marker) || source.includes(`${marker}${sep}`);
+      }));
     cpSync(join(appsDir, app.dir), join(distDir, app.dir), { recursive: true, filter });
   } else if (app.hasShot || app.hasDemo) {
     // 「制作記録のみ」のDayはアプリ本体を公開しないが、一覧に出すスクショとデモ動画だけはコピーする

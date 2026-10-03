@@ -1,5 +1,8 @@
 このリポジトリのソースコードは、以下の MIT ライセンスです。
 
+Day056の配信ビルドに含む第三者ライブラリ・移植実装・検索画像には、
+day-056-dragon-rush/game/licenses/ の個別の許諾が適用されます。
+
 ただし day-*/data/ と day-*/tests/fixtures/ 配下の第三者データと、
 day-053-kotoba-tsuji/fonts/ の書体（SIL Open Font License 1.1）、
 day-054-what-vanished/assets/ の3Dモデルと質感画像（Poly Haven・CC0 1.0）は MIT の対象外で、
