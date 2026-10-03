@@ -1,6 +1,8 @@
 // OWNER: ui
 // HUD と重ねる画面の見た目（CSS）。半透明で細く、街と竜を隠さない。主役の色は炎なので、UI は白と炎の橙だけにする。
 
+import { TOUCH_CSS } from '../mobile/styles';
+
 export const UI_CSS = /* css */ `
 .dr-ui { position: fixed; inset: 0; pointer-events: none; color: rgba(255, 248, 238, 0.95);
   font-family: "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Noto Sans JP", system-ui, sans-serif;
@@ -14,6 +16,7 @@ export const UI_CSS = /* css */ `
 .dr-tr { position: absolute; right: 22px; top: 16px; text-align: right; }
 .dr-rate { font-size: 28px; font-weight: 600; line-height: 1.05; }
 .dr-bottom { position: absolute; left: 50%; bottom: 22px; transform: translateX(-50%); width: min(380px, 70vw); text-align: center; }
+.dr-corner { position: absolute; right: 22px; bottom: 22px; width: min(260px, 34vw); text-align: right; }
 /* r02-controls：連鎖の数字に縁取り（指摘「暗い路面で連鎖の文字が沈む」）。縁は文字の後ろに描く */
 .dr-combo { font-size: 22px; font-weight: 700; height: 30px; opacity: 0; transition: opacity 0.25s;
   -webkit-text-stroke: 3px rgba(14, 9, 6, 0.82); paint-order: stroke fill;
@@ -128,7 +131,7 @@ export function installUiCss(): void {
   if (installed) return;
   installed = true;
   const style = document.createElement('style');
-  style.textContent = UI_CSS;
+  style.textContent = UI_CSS + TOUCH_CSS;
   document.head.appendChild(style);
 }
 

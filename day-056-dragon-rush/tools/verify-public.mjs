@@ -9,11 +9,12 @@ const app = 'day-056-dragon-rush';
 const out = resolve(repo, '.social-output/day056-verification');
 const require = createRequire(resolve(repo, 'package.json'));
 const { chromium } = require('playwright');
-const url = process.env.PUBLIC_VERIFY_URL || 'http://127.0.0.1:5310';
+const port = process.env.PUBLIC_VERIFY_PORT || '5310';
+const url = process.env.PUBLIC_VERIFY_URL || `http://127.0.0.1:${port}`;
 let server;
 if (!process.env.PUBLIC_VERIFY_URL) {
   server = spawn(process.execPath, ['scripts/serve-dist.mjs'], {
-    cwd: repo, env: { ...process.env, PLAYWRIGHT_PORT: '5310' }, stdio: ['ignore', 'pipe', 'inherit']
+    cwd: repo, env: { ...process.env, PLAYWRIGHT_PORT: port }, stdio: ['ignore', 'pipe', 'inherit']
   });
   await new Promise((resolve, reject) => {
     server.stdout.once('data', resolve); server.once('error', reject); server.once('exit', code => reject(new Error(`server ${code}`)));

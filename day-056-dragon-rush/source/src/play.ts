@@ -23,6 +23,8 @@ import { formatYen } from './ui/format';
 import { Hud } from './ui/hud';
 import { Overlays, type OverlayKind } from './ui/overlays';
 import { loadRecords, recordRun } from './ui/records';
+import { isTouchDevice } from './mobile/input';
+import { installTouchControls } from './mobile/controls';
 
 const pressedAny = (input: InputState, codes: readonly string[]): boolean => codes.some((c) => input.wasPressed(c));
 
@@ -88,10 +90,11 @@ export async function runPlay(app: App): Promise<FixedStepLoop> {
   let shownOverlay: OverlayKind = 'none';
   /** 怪獣を差し替えている最中（読み込みを待つ間）。その間は始める・選び直す操作を受けない */
   let switching = false;
+  let touch: { reset(): void } | undefined;
 
   const click = (target: string): void => game.bus.emit('ui.click', { t: game.clock, target });
   const lockPointer = (): void => {
-    if (bot || document.pointerLockElement === canvas) return;
+    if (bot || isTouchDevice() || document.pointerLockElement === canvas) return;
     try {
       const r = canvas.requestPointerLock() as unknown;
       if (r instanceof Promise) r.catch(() => undefined);
@@ -112,6 +115,7 @@ export async function runPlay(app: App): Promise<FixedStepLoop> {
   const pause = (): void => {
     if (game.session.phase !== 'playing') return;
     game.pause();
+    touch?.reset();
     input.releaseAll();
     unlockPointer();
   };
@@ -124,6 +128,7 @@ export async function runPlay(app: App): Promise<FixedStepLoop> {
   const restart = (): void => {
     if (switching) return;
     click('restart');
+    touch?.reset();
     input.releaseAll();
     photo = false;
     stage.restart();
@@ -191,6 +196,13 @@ export async function runPlay(app: App): Promise<FixedStepLoop> {
   overlays.setBests(bestsText());
   const bridge = new InputBridge(input, () => (game.session.phase === 'ready' ? start() : resume()));
   window.__input = bridge.api;
+  window.__pauseGame = pause;
+  touch = installTouchControls(
+    () => game.session.phase === 'playing' ? bridge.api : undefined,
+    () => ({ phase: game.session.phase, creature: game.creature.id }),
+    () => ({ scale: prefs.lookScale, invertY: prefs.invertY }),
+    pause,
+  );
   // r03-roster：freezeOn は、出来事がその回数だけ出てから after 秒（ゲーム内時刻）たった刻みで止める（技の瞬間を撮る。tools/play.mjs の --shot-on）
   let freezeWatch: { type: string; left: number; after: number } | null = null;
   let freezeAt: number | null = null;

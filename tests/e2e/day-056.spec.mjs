@@ -10,12 +10,15 @@ test('Day56: 開始前に3D・音を読まない', async ({ page }) => {
   expect(requests.some(url => /\.glb|\.ogg|assets\/index-/.test(url))).toBe(false);
   expect(await page.evaluate(() => window.__appReady)).toBeUndefined();
 });
-test('Day56: スマホに未対応を明示し、横にはみ出さない', async ({ browser }) => {
+test('Day56: スマホの開始が有効で、条件を示し横にはみ出さない', async ({ browser }) => {
   const context = await browser.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
   const page = await context.newPage();
   await page.goto(path);
-  await expect(page.locator('#start')).toBeDisabled();
-  await expect(page.getByText('スマートフォンのタッチ操作には未対応です。', { exact: false })).toBeVisible();
+  await expect(page.locator('#start')).toBeEnabled();
+  await expect(page.locator('#device-note')).toContainText('横向きでタッチ操作');
+  await expect(page.getByText('スマートフォンのタッチ操作に対応。', { exact: false })).toBeVisible();
+  expect(await page.evaluate(() => document.body.classList.contains('dr-mobile'))).toBe(true);
+  expect(await page.evaluate(() => window.__appReady)).toBeUndefined();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   await context.close();
 });

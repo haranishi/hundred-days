@@ -6,9 +6,14 @@ import './harness/globals';
 import { runPerf } from './harness/perfRunner';
 import { nextFrame, runFilm, runShot } from './harness/shotRunner';
 import { runPlay } from './play';
+import { isTouchDevice } from './mobile/input';
 
 async function boot(): Promise<void> {
   const settings = parseSettings(window.location.search);
+  if (settings.mode === 'play' && isTouchDevice()) {
+    settings.quality = 'low';
+    document.body.classList.add('dr-mobile');
+  }
   const container = document.getElementById('app');
   if (!container) throw new Error('#app が無い');
   const app = new App(container, settings);
