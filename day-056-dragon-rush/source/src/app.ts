@@ -99,9 +99,11 @@ export class App {
   }
 
   /** 環境マップを焼き、シェーダーを前もってコンパイルする。 */
-  async init(): Promise<void> {
+  async init(onStage?: (phase: 'model' | 'render', name: string) => void | Promise<void>): Promise<void> {
     // r00c-竜：竜の GLB を読み終えてから焼き・コンパイルする（撮影と遊びが同じ姿勢の竜で始まる）
+    await onStage?.('model', this.dragon.creature.name);
     await this.dragon.ready;
+    await onStage?.('render', this.dragon.creature.name);
     const probe = new Vector3(-150, AMBIENT.envProbeHeight, 0);
     const size = this.quality.envMapSize;
     this.scene.environment = bakeSkyEnvironment(this.renderer, this.sky, { position: probe, size, hidden: [] });
@@ -136,15 +138,17 @@ export class App {
   }
 
   /** 操作する怪獣の表示を差し替える（読み終えるまで待つ）。 */
-  async setCreature(id: CreatureId): Promise<void> {
+  async setCreature(id: CreatureId, onStage?: (phase: 'model' | 'render') => void | Promise<void>): Promise<void> {
     if (this.dragon.creature.id === id) return;
     const next = this.view(id);
+    await onStage?.('model');
     await next.ready;
+    await onStage?.('render');
+    // コンパイルが失敗しても、表示と規則が別の怪獣にならないよう差し替え前に待つ。
+    await this.renderer.compileAsync(next.root, this.camera, this.scene);
     this.scene.remove(this.dragon.root);
     this.scene.add(next.root);
     this.dragon = next;
-    // 裏で読み終えていれば、材質はもう作ってある（この呼び出しはすぐ返る）
-    await this.renderer.compileAsync(next.root, this.camera, this.scene);
   }
 
   resize(): void {

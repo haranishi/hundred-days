@@ -1,3 +1,5 @@
+import { getLoadingScreen } from './loading.mjs';
+
 const landing = document.querySelector('#landing');
 const app = document.querySelector('#app');
 const start = document.querySelector('#start');
@@ -7,6 +9,7 @@ const links = document.querySelector('#game-links');
 const touchOnly = matchMedia('(pointer: coarse)').matches ||
   (navigator.maxTouchPoints > 0 && matchMedia('(any-pointer: coarse)').matches);
 let loaded = false;
+const loading = getLoadingScreen();
 
 if (touchOnly) document.body.classList.add('dr-mobile');
 
@@ -24,6 +27,8 @@ start.addEventListener('click', async () => {
   if (loaded || start.disabled) return;
   start.disabled = true;
   status.textContent = '街と怪獣を読み込んでいます…';
+  const task = loading.begin({ title: '街と怪獣を準備しています',
+    steps: ['ゲーム', '街', '怪獣', '描画', '操作'], detail: 'ゲーム本体を読み込んでいます…' });
   try {
     const response = await fetch('game/entry.json');
     if (!response.ok) throw new Error('ゲームの読み込みに失敗しました');
@@ -35,8 +40,6 @@ start.addEventListener('click', async () => {
     landing.hidden = true;
     links.hidden = false;
     document.body.classList.add('playing');
-    const bootStatus = document.querySelector('#boot-status');
-    bootStatus.hidden = false;
     await import(new URL(`game/${module}`, location.href).href);
     const deadline = performance.now() + 120_000;
     const captureMode = ['shot', 'film', 'perf'].some(key => new URLSearchParams(location.search).has(key));
@@ -45,10 +48,11 @@ start.addEventListener('click', async () => {
       if (performance.now() > deadline) throw new Error('読み込みが時間内に終わりませんでした。通信環境を確認して再読み込みしてください。');
       await new Promise(resolve => setTimeout(resolve, 200));
     }
-    bootStatus.hidden = true;
+    if (captureMode) loading.finish(task);
     loaded = true;
     links.setAttribute('aria-label', touchOnly ? '一時停止後に入口や共有を選べます' : 'Escで一時停止してから入口や共有を選べます');
   } catch (error) {
+    loading.fail(task, `${error.message} ページを再読み込みして再試行できます。`);
     app.hidden = true;
     landing.hidden = false;
     links.hidden = true;
