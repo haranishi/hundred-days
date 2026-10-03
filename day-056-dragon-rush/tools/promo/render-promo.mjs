@@ -5,10 +5,11 @@ import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { CUTS, DEMO_CUTS, DURATION_SECONDS, FPS, TITLE } from './timeline.mjs';
 
-const here = dirname(fileURLToPath(import.meta.url));
+const sourceDir = dirname(fileURLToPath(import.meta.url));
+const here = resolve(process.env.PROMO_OUTPUT_DIR || sourceDir);
 const cache = join(here, 'cache');
 const font = process.env.PROMO_FONT || '/System/Library/Fonts/ヒラギノ角ゴシック W6.ttc';
-const audio = resolve(process.env.AUDIO_ROOT || join(here, '../../game/assets/audio'));
+const audio = resolve(process.env.AUDIO_ROOT || join(sourceDir, '../../game/assets/audio'));
 const ffmpeg = (...args) => execFileSync('ffmpeg', ['-hide_banner', '-loglevel', 'warning', ...args], { stdio: 'inherit' });
 const encode = ['-c:v', 'libx264', '-preset', 'fast', '-crf', '20', '-pix_fmt', 'yuv420p', '-color_range', 'tv', '-r', String(FPS), '-movflags', '+faststart'];
 const textEscape = s => s.replaceAll('\\', '\\\\').replaceAll(':', '\\:').replaceAll("'", "\\'");
