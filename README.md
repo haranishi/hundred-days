@@ -89,6 +89,7 @@ Day 051「ハコニワ」も外部公開アプリです。本体は独立リポ�
 | 053 | ことば辻 | [day-053-kotoba-tsuji/](day-053-kotoba-tsuji/) | [アプリを開く](https://hundred-days.pages.dev/day-053-kotoba-tsuji/) |
 | 054 | 消えたのは、どれ？ | [day-054-what-vanished/](day-054-what-vanished/) | [アプリを開く](https://hundred-days.pages.dev/day-054-what-vanished/) |
 | 055 | キャラ弁設計図 | [day-055-kyaraben/](day-055-kyaraben/) | [アプリを開く](https://hundred-days.pages.dev/day-055-kyaraben/) |
+| 056 | 夕暮れ怪獣ラッシュ | [day-056-dragon-rush/](day-056-dragon-rush/) | [アプリを開く](https://hundred-days.pages.dev/day-056-dragon-rush/) |
 <!-- day-index:end -->
 
 ## 1日アプリのルール

@@ -1,0 +1,255 @@
+{
+ "source": "sync_homuratsuno.json のコンテキストの秒 84.94〜144.94（低い帯を引く出来事：r05 の決まりで 43・r06 の決まりで 12）",
+ "window": [
+  0,
+  60.0
+ ],
+ "events": [
+  {
+   "at": 1.0,
+   "kind": "roarRelease"
+  },
+  {
+   "at": 1.565,
+   "kind": "fissure"
+  },
+  {
+   "at": 2.003,
+   "kind": "collapse",
+   "near": true,
+   "volume": 63839
+  },
+  {
+   "at": 3.549,
+   "kind": "collapse",
+   "near": true,
+   "volume": 130665
+  },
+  {
+   "at": 3.864,
+   "kind": "collapse",
+   "near": true,
+   "volume": null
+  },
+  {
+   "at": 4.531,
+   "kind": "collapse",
+   "near": true,
+   "volume": 65307
+  },
+  {
+   "at": 4.717,
+   "kind": "collapse",
+   "near": true,
+   "volume": 111677
+  },
+  {
+   "at": 4.851,
+   "kind": "collapse",
+   "near": true,
+   "volume": 67559
+  },
+  {
+   "at": 4.984,
+   "kind": "collapse",
+   "near": true,
+   "volume": 84090
+  },
+  {
+   "at": 5.048,
+   "kind": "landHeavy"
+  },
+  {
+   "at": 6.435,
+   "kind": "collapse",
+   "near": true,
+   "volume": 43085
+  },
+  {
+   "at": 11.632,
+   "kind": "collapse",
+   "near": true,
+   "volume": 52324
+  },
+  {
+   "at": 13.864,
+   "kind": "collapse",
+   "near": true,
+   "volume": 97665
+  },
+  {
+   "at": 17.064,
+   "kind": "landHeavy"
+  },
+  {
+   "at": 17.064,
+   "kind": "collapse",
+   "near": true,
+   "volume": 104485
+  },
+  {
+   "at": 19.533,
+   "kind": "collapse",
+   "near": true,
+   "volume": 21099
+  },
+  {
+   "at": 24.616,
+   "kind": "collapse",
+   "near": true,
+   "volume": 18873
+  },
+  {
+   "at": 24.851,
+   "kind": "collapse",
+   "near": true,
+   "volume": 5884
+  },
+  {
+   "at": 30.147,
+   "kind": "landHeavy"
+  },
+  {
+   "at": 30.264,
+   "kind": "collapse",
+   "near": true,
+   "volume": 14984
+  },
+  {
+   "at": 31.533,
+   "kind": "collapse",
+   "near": true,
+   "volume": 5299
+  },
+  {
+   "at": 35.283,
+   "kind": "collapse",
+   "near": true,
+   "volume": 25026
+  },
+  {
+   "at": 35.667,
+   "kind": "collapse",
+   "near": true,
+   "volume": 17190
+  },
+  {
+   "at": 39.248,
+   "kind": "collapse",
+   "near": true,
+   "volume": null
+  },
+  {
+   "at": 39.699,
+   "kind": "roarRelease"
+  },
+  {
+   "at": 40.264,
+   "kind": "fissure"
+  },
+  {
+   "at": 41.965,
+   "kind": "collapse",
+   "near": true,
+   "volume": 16381
+  },
+  {
+   "at": 42.216,
+   "kind": "collapse",
+   "near": true,
+   "volume": 6036
+  },
+  {
+   "at": 42.296,
+   "kind": "collapse",
+   "near": true,
+   "volume": 9597
+  },
+  {
+   "at": 42.547,
+   "kind": "collapse",
+   "near": true,
+   "volume": 10891
+  },
+  {
+   "at": 42.547,
+   "kind": "collapse",
+   "near": true,
+   "volume": 12465
+  },
+  {
+   "at": 42.696,
+   "kind": "collapse",
+   "near": false,
+   "volume": null
+  },
+  {
+   "at": 43.283,
+   "kind": "collapse",
+   "near": true,
+   "volume": 4997
+  },
+  {
+   "at": 43.597,
+   "kind": "collapse",
+   "near": true,
+   "volume": 845
+  },
+  {
+   "at": 43.816,
+   "kind": "landHeavy"
+  },
+  {
+   "at": 43.816,
+   "kind": "collapse",
+   "near": true,
+   "volume": 10266
+  },
+  {
+   "at": 43.832,
+   "kind": "collapse",
+   "near": true,
+   "volume": 8155
+  },
+  {
+   "at": 45.197,
+   "kind": "collapse",
+   "near": true,
+   "volume": 3560
+  },
+  {
+   "at": 45.197,
+   "kind": "collapse",
+   "near": true,
+   "volume": 8650
+  },
+  {
+   "at": 49.747,
+   "kind": "collapse",
+   "near": true,
+   "volume": 9546
+  },
+  {
+   "at": 49.981,
+   "kind": "collapse",
+   "near": true,
+   "volume": 12365
+  },
+  {
+   "at": 55.181,
+   "kind": "collapse",
+   "near": true,
+   "volume": 9205
+  },
+  {
+   "at": 55.283,
+   "kind": "landHeavy"
+  },
+  {
+   "at": 56.664,
+   "kind": "collapse",
+   "near": true,
+   "volume": 5984
+  }
+ ]
+}

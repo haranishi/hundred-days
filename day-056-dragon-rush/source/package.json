@@ -1,0 +1,37 @@
+{
+  "name": "dragon-rampage",
+  "private": true,
+  "version": "0.0.0",
+  "description": "巨大な竜になって夕暮れの湾岸都市を壊すブラウザ3Dアクション（仮題）",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --port 5301 --strictPort",
+    "build": "node tools/licenses.mjs && tsc --noEmit -p tsconfig.json && vite build && node ../tools/package-release.mjs",
+    "preview": "vite preview --port 5302 --strictPort",
+    "test": "vitest run",
+    "e2e": "playwright test",
+    "capture": "node tools/capture.mjs",
+    "perf": "node tools/perf.mjs",
+    "metrics": "node tools/metrics.mjs",
+    "play": "node tools/play.mjs",
+    "build:dragon": "${BLENDER:-/Applications/Blender.app/Contents/MacOS/Blender} --background --factory-startup --python tools/blender/build_dragon.py -- --out public/assets/dragon.glb --report tools/blender/dragon-report.json",
+    "build:creatures": "node tools/blender/build_creatures.mjs",
+    "capture:specimens": "node tools/blender/specimens.mjs",
+    "build:audio": "node tools/audio/build.mjs",
+    "audio": "node tools/audio-render.mjs"
+  },
+  "dependencies": {
+    "n8ao": "2.0.1",
+    "postprocessing": "6.39.5",
+    "three": "0.186.1"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.63.0",
+    "@types/node": "24.x",
+    "@types/three": "0.186.0",
+    "pngjs": "7.0.0",
+    "typescript": "~6.0.3",
+    "vite": "8.3.1",
+    "vitest": "5.0.2"
+  }
+}

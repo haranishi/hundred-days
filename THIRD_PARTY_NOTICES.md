@@ -95,6 +95,15 @@
 | 054 | 窓の外の景色（`day-054-what-vanished/assets/textures/garden_sky.webp`。HDRI「Charolettenbrunn Park」、Grzegorz Wronkowski） | [Poly Haven](https://polyhaven.com/a/charolettenbrunn_park) | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) | 色調済みのJPGを取得し、2048×1024のWebPへ縮小。窓の外の背景にだけ使い、家の中の光には使わない |
 | 054 | `day-054-what-vanished/vendor/three.js`（three.js 0.186.0・GLTFLoader・RoomEnvironment・mergeGeometries を含むESMビルド） | [three.js](https://threejs.org/) | [MIT](day-054-what-vanished/vendor/LICENSE-three.txt) | npm の three@0.186.0 から esbuild で1ファイルにまとめた。中身は未改変 |
 
+## Day56「夕暮れ怪獣ラッシュ」の描画依存
+
+three.js 0.186.1（MIT）、postprocessing 6.39.5（Zlib）、n8ao 2.0.1（配布LICENSEはCC0）、
+SMAAのGLSLと検索画像（Jorge Jimenezほか・MIT）、ブルーノイズ（Christoph Peters・CC0）、
+Stephen HillのACES fitted実装のGLSL移植（BakingLab・MIT）を含みます。
+著作者と原典の許諾全文は[同梱ライセンス](day-056-dragon-rush/game/licenses/README.md)、
+利用範囲は[画面のクレジット](day-056-dragon-rush/credits.html)に記録しています。
+怪獣モデルと音声は同梱スクリプトで生成したものです。個人用資料・参考画像は同梱しません。
+
 ## Day51「ハコニワ」のスクリーンショット
 
 `day-051-hakoniwa/screenshot.png` はハコニワの実画面を撮影したものです。
