@@ -43,15 +43,15 @@
           <p class="card__badge" id="fbadge" hidden>自己ベスト更新</p>
           <p class="card__meta" id="fmeta">ベスト 0点 ／ 最高到達 ブルーベリー</p>
           <button class="btn" id="btn-again">もう一度あそぶ</button>
-          <div id="share"><section class="share" aria-labelledby="share-label">
-            <h2 id="share-label" class="share__label">今回のスコアを共有する</h2>
-            <div class="share__row">
-              <a id="sh-x" class="share__button" target="_blank" rel="noopener noreferrer">Xで投稿</a>
-              <a id="sh-line" class="share__button" target="_blank" rel="noopener noreferrer">LINEで送る</a>
-              <button id="sh-native" class="share__button" hidden>共有…</button>
-              <button id="sh-copy" class="share__button">リンクをコピー</button>
+          <div id="score-share"><section class="score-share" aria-labelledby="score-share-label">
+            <h2 id="score-share-label" class="score-share__label">今回のスコアを共有する</h2>
+            <div class="score-share__row">
+              <a id="sh-x" class="score-share__button" target="_blank" rel="noopener noreferrer">Xで投稿</a>
+              <a id="sh-line" class="score-share__button" target="_blank" rel="noopener noreferrer">LINEで送る</a>
+              <button id="sh-native" class="score-share__button" hidden>共有…</button>
+              <button id="sh-copy" class="score-share__button">リンクをコピー</button>
             </div>
-            <span id="share-said" class="share__said" role="status"></span>
+            <span id="share-said" class="score-share__said" role="status"></span>
           </section></div>
         </div>
       </div>
@@ -81,12 +81,16 @@
       <button class="icon" id="btn-music" aria-label="BGMをオフにする" aria-pressed="true" title="BGM">♪<span>BGM</span></button>
       <button class="icon" id="btn-effects" aria-label="効果音をオフにする" aria-pressed="true" title="効果音">♬<span>効果音</span></button>
       <button class="icon" id="btn-restart" aria-label="やり直す" title="やり直す">↻</button>
+      <button class="icon" id="btn-share" aria-label="このアプリを共有する" title="共有">↗<span>共有</span></button>
     </div>
     <p id="controls">同じくだものを合わせよう。PCは ← → と Space。<a href="about.html" target="_blank" rel="noopener noreferrer" title="別のタブで開きます">遊び方・素材</a></p>
   </footer>
   <p id="notice" class="sr-only" role="status" aria-live="polite"></p>
 </main>
-
+<dialog id="app-share-dialog" class="app-share-dialog" aria-label="このアプリを共有する">
+  <div id="share"></div>
+  <button class="btn" id="btn-share-close">箱に戻る</button>
+</dialog>
 
 <script src="vendor/matter-0.20.0.min.js"></script>
 <script type="module" src="app.js"></script>

@@ -143,6 +143,7 @@ var over=false, paused=false, heat=0, shakeAmt=0, tPrev=0, acc=0, elapsed=0, sta
 var cv=$('#cv'), ctx=cv.getContext('2d'), frame=$('#frame'), board=$('#board');
 var elScore=$('#score'), elBest=$('#best'), elHint=$('#hint'), veil=$('#veil');
 var nextCv=$('#nextcv'), nextCtx=nextCv.getContext('2d'), nextName=$('#nextname');
+var appShareDialog=$('#app-share-dialog'), shareWasPaused=false;
 var chainEl=$('#chain'), chainItems=[], viewScale=1;
 
 for(var ci=0;ci<FRUITS.length;ci++){
@@ -480,6 +481,7 @@ cv.addEventListener('pointerup',function(e){
 cv.addEventListener('pointercancel',function(e){if(e.pointerId===activePointer){pressing=false;activePointer=null;}});
 cv.addEventListener('lostpointercapture',function(){pressing=false;activePointer=null;});
 addEventListener('keydown',function(e){
+  if(appShareDialog.open)return;
   var modal=!veil.hidden?veil:!$('#pause-veil').hidden?$('#pause-veil'):null;
   if(e.key==='Tab'&&modal){
     var items=Array.from(modal.querySelectorAll('button:not([hidden]),a[href],input'));
@@ -513,11 +515,17 @@ function setPaused(value){
 }
 $('#btn-pause').addEventListener('click',()=>{void sfx.unlock();setPaused(!paused);});
 $('#btn-resume').addEventListener('click',()=>setPaused(false));
-function pauseAway(){sfx.setActive(false);if(!over)setPaused(true);}
+function pauseAway(){sfx.setActive(false);if(!over&&!appShareDialog.open)setPaused(true);}
 document.addEventListener('visibilitychange',()=>{if(document.hidden)pauseAway();});
 window.addEventListener('pagehide',pauseAway);
 window.addEventListener('blur',pauseAway);
 $('#btn-again').addEventListener('click',()=>{restart();cv.focus({preventScroll:true});});
+$('#btn-share').addEventListener('click',()=>{
+  if(over)return;
+  shareWasPaused=paused;setPaused(true);$('#pause-veil').hidden=true;appShareDialog.showModal();
+});
+$('#btn-share-close').addEventListener('click',()=>appShareDialog.close());
+appShareDialog.addEventListener('close',()=>setPaused(shareWasPaused));
 
 var btnRestart=$('#btn-restart'),armed=0;
 btnRestart.addEventListener('click',function(){

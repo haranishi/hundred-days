@@ -18,6 +18,10 @@ test('local-only loading works under the production CSP',async({page})=>{
   const errors=[],outside=[];page.on('pageerror',e=>errors.push(e.message));page.on('request',r=>{if(!r.url().startsWith('http://127.0.0.1:')&&!r.url().startsWith('data:'))outside.push(r.url());});
   await open(page);await drop(page);await expect(page.locator('#frame')).toHaveAttribute('data-fruits','1');
   expect(errors).toEqual([]);expect(outside).toEqual([]);await expect(page.locator('#share .share')).toHaveCount(1);
+  await page.locator('#btn-share').click();await expect(page.locator('#app-share-dialog')).toBeVisible();
+  await expect(page.locator('#frame')).toHaveAttribute('data-state','paused');
+  await page.keyboard.press('Escape');await expect(page.locator('#app-share-dialog')).toBeHidden();
+  await expect(page.locator('#frame')).toHaveAttribute('data-state','playing');await expect(page.locator('#frame')).toHaveAttribute('data-fruits','1');
   await expect(page.locator('#nextname')).toHaveText('ブルーベリー');
   expect(await page.locator('#nextname').evaluate(el=>getComputedStyle(el).display)).not.toBe('none');
   const popup=page.waitForEvent('popup');await page.getByRole('link',{name:'遊び方・素材'}).click();const guide=await popup;
@@ -27,10 +31,10 @@ test('local-only loading works under the production CSP',async({page})=>{
   await expect.poll(()=>guide.evaluate(()=>scrollY)).toBeGreaterThan(100);
   await expect(guide.getByRole('link',{name:'箱に戻って、あそぶ →'})).toBeInViewport();await guide.close();
 });
-for(const [width,height] of [[390,844],[768,1024],[1440,900],[390,600]])test(`play and pause fit ${width}x${height}`,async({page})=>{
+for(const [width,height] of [[390,844],[768,1024],[1440,900],[390,600],[320,568]])test(`play and pause fit ${width}x${height}`,async({page})=>{
   await page.setViewportSize({width,height});await open(page);
   const overflow=await page.evaluate(()=>({x:document.documentElement.scrollWidth-innerWidth,y:document.documentElement.scrollHeight-innerHeight}));expect(overflow).toEqual({x:0,y:0});
-  for(const id of ['btn-pause','btn-music','btn-effects','btn-restart']){const box=await page.locator('#'+id).boundingBox();expect(box.width).toBeGreaterThanOrEqual(44);expect(box.height).toBeGreaterThanOrEqual(44);}
+  for(const id of ['btn-pause','btn-music','btn-effects','btn-restart','btn-share']){const box=await page.locator('#'+id).boundingBox();expect(box.width).toBeGreaterThanOrEqual(44);expect(box.height).toBeGreaterThanOrEqual(44);}
   await page.locator('#btn-pause').click();await expect(page.locator('#pause-veil')).toBeVisible();await expect(page.locator('#btn-resume')).toBeInViewport();
   await page.locator('#btn-resume').click();await expect(page.locator('#frame')).toHaveAttribute('data-state','playing');
 });
@@ -78,14 +82,23 @@ test('blocked storage still allows play and audio settings',async({page})=>{
   const errors=[];page.on('pageerror',e=>errors.push(e.message));await open(page);await drop(page);await page.locator('#btn-music').click();
   await expect(page.locator('#frame')).toHaveAttribute('data-fruits','1');expect(errors).toEqual([]);
 });
-test('a seeded real stack ends, shares the actual score, and retries with one click',async({page})=>{
-  test.setTimeout(90000);await open(page,{clock:true,seed:429735});
-  // A reproducible normal distribution, including drawing randomness, without forcing game state.
-  const lanes=[.08,.28,.48,.68,.88,.08,.91];
-  for(let i=0;i<130&&await page.locator('#veil').isHidden();i++){
-    await drop(page,lanes[i%lanes.length]);await page.clock.runFor(720);
-  }
-  await page.clock.runFor(2000);await expect(page.locator('#veil')).toBeVisible();
+test('a stable overflow gets its grace period, shares the actual score, and retries with one click',async({page})=>{
+  // Capture the real Matter world in the browser fixture; ship no game-state test hooks.
+  await page.addInitScript(()=>{
+    let matter;Object.defineProperty(window,'Matter',{configurable:true,get(){return matter;},set(value){
+      matter=value;const create=value.Engine.create;value.Engine.create=function(...args){const engine=create.apply(this,args);window.__gameEngine=engine;return engine;};
+    }});
+  });
+  await open(page,{clock:true});await drop(page);await page.clock.runFor(1300);await drop(page);await page.clock.runFor(2000);
+  await expect(page.locator('#score')).toHaveText('4');
+  const landed=await page.evaluate(()=>{
+    const fruit=Matter.Composite.allBodies(__gameEngine.world).find(body=>body.label==='fruit');
+    const landed=fruit.plugin.landed;
+    // Model a settled stack at the limit using the fruit that actually landed and merged.
+    Matter.Body.setPosition(fruit,{x:210,y:100});Matter.Body.setStatic(fruit,true);return landed;
+  });expect(landed).toBe(true);
+  await page.clock.runFor(1600);await expect(page.locator('#veil')).toBeHidden();
+  await page.clock.runFor(250);await expect(page.locator('#veil')).toBeVisible();
   const score=await page.locator('#score').innerText(),href=await page.locator('#sh-x').getAttribute('href');
   expect(new globalThis.URL(href).searchParams.get('text')).toContain(score+'点');expect(new globalThis.URL(href).searchParams.get('url')).toBe('https://hundred-days.pages.dev/day-057-fruit-box/');
   await page.locator('#sh-copy').click();await expect(page.locator('#share-said')).toContainText('コピー');
