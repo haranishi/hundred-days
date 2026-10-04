@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="description" content="同じくだものを合わせて育てる、夜店の落下パズル。オリジナルの合成BGMと効果音。登録なし、ブラウザだけで遊べます。">
+<meta name="share:text" content="夜店のくだもの箱 — 同じくだものを合わせて育てる落下パズル。">
+<meta name="theme-color" content="#090E20">
+<title>夜店のくだもの箱</title>
+<link rel="canonical" href="https://hundred-days.pages.dev/day-057-fruit-box/">
+<meta property="og:type" content="website">
+<meta property="og:title" content="夜店のくだもの箱">
+<meta property="og:description" content="ころん、ぽん。夜店のくだものを合わせて育てる落下パズル。">
+<meta property="og:url" content="https://hundred-days.pages.dev/day-057-fruit-box/">
+<meta property="og:image" content="https://hundred-days.pages.dev/day-057-fruit-box/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="stylesheet" href="app.css">
+<link rel="stylesheet" href="shared/share.css">
+</head>
+<body>
+
+
+<main class="stage">
+  <header class="sign">
+    <div class="sign__title">
+      <span class="sign__eyebrow">DAY 057 · 夜店の遊び</span>
+      <h1>くだもの箱</h1>
+    </div>
+    <dl class="scores">
+      <div class="score score--now"><dt>スコア</dt><dd id="score">0</dd></div>
+      <div class="score"><dt>ベスト</dt><dd id="best">0</dd></div>
+    </dl>
+  </header>
+
+  <div class="board" id="board">
+    <div class="frame" id="frame">
+      <canvas id="cv" tabindex="0" aria-describedby="controls" aria-label="くだものを落とす木箱。左右キーで位置を選び、スペースで落とす"></canvas>
+      <p class="hint" id="hint">左右に動かして、離すと落ちる</p>
+      <div class="veil" id="veil" role="dialog" aria-modal="true" aria-label="今回の結果" hidden>
+        <div class="card">
+          <p class="card__eyebrow">つみあがった</p>
+          <p class="card__score"><span id="fscore">0</span><small>点</small></p>
+          <p class="card__badge" id="fbadge" hidden>自己ベスト更新</p>
+          <p class="card__meta" id="fmeta">ベスト 0点 ／ 最高到達 ブルーベリー</p>
+          <button class="btn" id="btn-again">もう一度あそぶ</button>
+          <div id="score-share"><section class="score-share" aria-labelledby="score-share-label">
+            <h2 id="score-share-label" class="score-share__label">今回のスコアを共有する</h2>
+            <div class="score-share__row">
+              <a id="sh-x" class="score-share__button" target="_blank" rel="noopener noreferrer">Xで投稿</a>
+              <a id="sh-line" class="score-share__button" target="_blank" rel="noopener noreferrer">LINEで送る</a>
+              <button id="sh-native" class="score-share__button" hidden>共有…</button>
+              <button id="sh-copy" class="score-share__button">リンクをコピー</button>
+            </div>
+            <span id="share-said" class="score-share__said" role="status"></span>
+          </section></div>
+        </div>
+      </div>
+      <div class="veil" id="pause-veil" role="dialog" aria-modal="true" aria-labelledby="pause-title" hidden>
+        <div class="card pause-card">
+          <p class="card__eyebrow">ひとやすみ</p>
+          <h2 id="pause-title">箱は、そのまま。</h2>
+          <p>再開するまで、くだものも音も止まります。</p>
+          <label class="volume" for="music-volume">BGM <output id="music-value">28%</output><input id="music-volume" type="range" min="0" max="100" value="28"></label>
+          <label class="volume" for="effects-volume">効果音 <output id="effects-value">52%</output><input id="effects-volume" type="range" min="0" max="100" value="52"></label>
+          <button class="btn" id="btn-resume">つづきをあそぶ</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="tray">
+    <div class="next">
+      <span class="tray__label">NEXT</span>
+      <canvas id="nextcv" width="120" height="120" aria-hidden="true"></canvas>
+      <span class="sr-only" id="nextname" aria-live="polite">ブルーベリー</span>
+    </div>
+    <p id="goal">スイカを目指そう</p>
+    <ol class="chain" id="chain" aria-label="果物の進化順"></ol>
+    <div class="acts">
+      <button class="icon" id="btn-pause" aria-label="一時停止" aria-pressed="false" title="一時停止・音量">Ⅱ</button>
+      <button class="icon" id="btn-music" aria-label="BGMをオフにする" aria-pressed="true" title="BGM">♪<span>BGM</span></button>
+      <button class="icon" id="btn-effects" aria-label="効果音をオフにする" aria-pressed="true" title="効果音">♬<span>効果音</span></button>
+      <button class="icon" id="btn-restart" aria-label="やり直す" title="やり直す">↻</button>
+      <button class="icon" id="btn-share" aria-label="このアプリを共有する" title="共有">↗<span>共有</span></button>
+    </div>
+    <p id="controls">同じくだものを合わせよう。PCは ← → と Space。<a href="about.html" target="_blank" rel="noopener noreferrer" title="別のタブで開きます">遊び方・素材</a></p>
+  </footer>
+  <p id="notice" class="sr-only" role="status" aria-live="polite"></p>
+</main>
+<dialog id="app-share-dialog" class="app-share-dialog" aria-label="このアプリを共有する">
+  <div id="share"></div>
+  <button class="btn" id="btn-share-close">箱に戻る</button>
+</dialog>
+
+<script src="vendor/matter-0.20.0.min.js"></script>
+<script type="module" src="app.js"></script>
+<script src="shared/share.js" defer></script>
+</body>
+</html>
