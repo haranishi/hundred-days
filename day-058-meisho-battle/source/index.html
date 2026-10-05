@@ -11,7 +11,7 @@
     <!-- canonical・og:*・twitter:* は、リポジトリの共通ビルド（scripts/build.mjs）が meta.json から差し込む -->
     <link rel="icon" href="favicon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="apple-touch-icon.png" />
-    <!-- 共通の共有部品。手元の vite では 404 になる（公開物の ../shared/ は npm run shared:sync が置く） -->
+    <!-- 共通の共有部品。公開物の ../shared/ は npm run shared:sync が置き、手元の vite は public/shared（そこへのリンク）から配る -->
     <link rel="stylesheet" href="shared/share.css" />
     <script src="shared/share.js" defer></script>
     <style>
