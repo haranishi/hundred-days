@@ -18,8 +18,9 @@ test('公開しているアプリが1つ以上ある', () => {
 
 /* 3Dの家を描くDayは、CI のソフトウェア描画だと最初の1枚でページが30秒以上止まり、
    このテストの読み取りが時間切れになった（Day 054・2026-10-01）。そのDayだけ、家を描かないテスト用の開き方にする。
-   共有欄・OGP・canonical は3Dの描画と関係しない。ほかのDayの多くは URL の引数を読むので、一律には付けない */
-const TEST_QUERY = { 'day-054-what-vanished': '?gfx=test' };
+   共有欄・OGP・canonical は3Dの描画と関係しない。ほかのDayの多くは URL の引数を読むので、一律には付けない。
+   Day 058 も影と後処理つきの3Dで開くので、同じ軽い開き方にする（通常の描画は day-058.spec.mjs が受け持つ） */
+const TEST_QUERY = { 'day-054-what-vanished': '?gfx=test', 'day-058-meisho-battle': '?gfx=test' };
 const pathOf = (dir) => `/${dir}/${TEST_QUERY[dir] ?? ''}`;
 
 async function openShare(page, dir) {

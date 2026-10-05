@@ -1,0 +1,12 @@
+node_modules/
+dist/
+.wrangler/
+test-results*/
+playwright-report/
+shots/
+.DS_Store
+*.log
+.dev.vars
+.env*
+.agent-harness/
+tmp-pr.md
