@@ -1,0 +1,30 @@
+{
+  "name": "day-058-meisho-kumitate",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Day58 名所くみたて早押し（100日チャレンジ版）：組み上がる名所の3Dミニチュアを見て、早押しの4択で当てるゲーム。ひとりで・ふたりで",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --port 5321 --strictPort",
+    "build": "npm run typecheck && vite build",
+    "release": "npm run build && node tools/release.mjs",
+    "preview": "vite preview --port 5322 --strictPort",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "test": "vitest run",
+    "e2e": "playwright test"
+  },
+  "dependencies": {
+    "three": "0.186.1"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.63.0",
+    "@types/node": "24.x",
+    "@types/three": "0.186.0",
+    "@types/topojson-client": "3.1.5",
+    "topojson-client": "3.1.0",
+    "typescript": "~6.0.3",
+    "vite": "8.3.1",
+    "vitest": "5.0.2",
+    "world-atlas": "2.0.2"
+  }
+}

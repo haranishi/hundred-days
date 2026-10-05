@@ -1,14 +1,14 @@
 import { expect, test } from '@playwright/test';
 import { readFileSync } from 'node:fs';
 
-/* Day 058 ミニチュア観光名所バトル。ゲームのルールと模型は day-058-meisho-battle/source の vitest が見る。
+/* Day 058 名所くみたて早押し。ゲームのルールと模型は day-058-meisho-kumitate/source の vitest が見る。
    ここでは公開ページとして、本番と同じCSPの下で ひとりで・ふたりで が遊べること、
    ネット対戦の入口が無いこと、一覧へ戻るリンクと共有の窓が使えることを確かめる。
 
    CI はソフトウェア描画で重いので、?gfx=test（軽い描画）で開く。8問を通す試験は ?test=1 の
    窓口（window.__MMB__）でゲームの時計を止めて進める。押す・答えるの操作そのものは本物のボタンで行う。 */
 
-const DIR = 'day-058-meisho-battle';
+const DIR = 'day-058-meisho-kumitate';
 const policy = readFileSync('dist/_headers', 'utf8')
   .split(`/${DIR}/*\n`)[1]
   .split('\n')[0]
@@ -35,7 +35,7 @@ async function open(page, query = '?gfx=test') {
     await route.fulfill({ response, headers: { ...response.headers(), 'content-security-policy': policy } });
   });
   await page.goto(`/${DIR}/${query}`);
-  await expect(page.getByRole('heading', { name: 'ミニチュア観光名所バトル' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: '名所くみたて早押し' })).toBeVisible();
   return { errors, outside };
 }
 
@@ -110,7 +110,7 @@ test('本番と同じCSPで開き、エラーと外への通信が0件。ネッ�
       await page.locator('[data-action="back"]').click();
     }
     await page.locator('[data-action="back"]').click();
-    await expect(page.getByRole('heading', { name: 'ミニチュア観光名所バトル' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: '名所くみたて早押し' })).toBeVisible();
   }
 
   expect(errors).toEqual([]);
