@@ -120,7 +120,7 @@ const skipToolsCache = (source) => !isExcluded(source);
    見るのはDayのフォルダ直下の名前だけ（リポジトリを置いた場所の名前に source が含まれていても外さない） */
 const SOURCE_DIRS_BY_APP = {
   'day-056-dragon-rush': ['source', 'tools'],
-  'day-058-meisho-battle': ['source']
+  'day-058-meisho-kumitate': ['source', 'tools']
 };
 const isSourceDir = (app, source) => {
   const [top] = relative(join(appsDir, app.dir), source).split(sep);

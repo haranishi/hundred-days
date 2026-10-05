@@ -94,9 +94,9 @@
 | 054 | 床・敷物・壁の質感画像（`day-054-what-vanished/assets/textures/*.webp`。herringbone_parquet・laminate_floor_02・floor_tiles_06・floor_tiles_08・beige_wall_001・fabric_pattern_05） | [Poly Haven](https://polyhaven.com/) | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) | 1kのjpgを取得し、512〜1024pxのWebPへ変換。壁は凹凸の画像だけを使う |
 | 054 | 窓の外の景色（`day-054-what-vanished/assets/textures/garden_sky.webp`。HDRI「Charolettenbrunn Park」、Grzegorz Wronkowski） | [Poly Haven](https://polyhaven.com/a/charolettenbrunn_park) | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) | 色調済みのJPGを取得し、2048×1024のWebPへ縮小。窓の外の背景にだけ使い、家の中の光には使わない |
 | 054 | `day-054-what-vanished/vendor/three.js`（three.js 0.186.0・GLTFLoader・RoomEnvironment・mergeGeometries を含むESMビルド） | [three.js](https://threejs.org/) | [MIT](day-054-what-vanished/vendor/LICENSE-three.txt) | npm の three@0.186.0 から esbuild で1ファイルにまとめた。中身は未改変 |
-| 058 | 答えあわせの地図の陸地（日本・世界。`day-058-meisho-battle/source/src/client/map/paths.ts` に変換して同梱） | [Natural Earth](https://www.naturalearthdata.com/)（[world-atlas](https://github.com/topojson/world-atlas) 2.0.2 経由。© 2013-2019 Michael Bostock） | Natural Earthは[パブリックドメイン](https://www.naturalearthdata.com/about/terms-of-use/)、world-atlasはISC（全文はゲーム内の「クレジット」） | 陸地をSVGのpathに変換。国境は描かない。沖縄・奄美の島々は日本の地図の右下の枠に移す |
-| 058 | three.js 0.186.1（`day-058-meisho-battle/assets/` のビルドに同梱） | [three.js](https://threejs.org/) | [MIT](https://github.com/mrdoob/three.js/blob/dev/LICENSE)（全文はゲーム内の「クレジット」） | 改変なし。ビルドで使う部分だけを同梱 |
-| 058 | 答えあわせの豆知識（71名所） | 寺社・自治体・観光局・文化財の管理者・UNESCO・Wikipediaなどの公開資料（一覧はゲーム内の「クレジット → 豆知識の出典」） | 出典で確かめた事実を、40字以内の文に書き起こしたもの | — |
+| 058 | 答えあわせの地図の陸地（日本・世界。`day-058-meisho-kumitate/source/src/client/map/paths.ts` に変換して同梱） | [Natural Earth](https://www.naturalearthdata.com/)（[world-atlas](https://github.com/topojson/world-atlas) 2.0.2 経由。© 2013-2019 Michael Bostock） | Natural Earthは[パブリックドメイン](https://www.naturalearthdata.com/about/terms-of-use/)、world-atlasはISC（全文はゲーム内の「クレジット」） | 陸地をSVGのpathに変換。国境は描かない。沖縄・奄美の島々は日本の地図の右下の枠に移す |
+| 058 | three.js 0.186.1（`day-058-meisho-kumitate/assets/` のビルドに同梱） | [three.js](https://threejs.org/) | [MIT](https://github.com/mrdoob/three.js/blob/dev/LICENSE)（全文はゲーム内の「クレジット」） | 改変なし。ビルドで使う部分だけを同梱 |
+| 058 | 答えあわせの豆知識（68名所） | 寺社・自治体・観光局・文化財の管理者・UNESCO・Wikipediaなどの公開資料（一覧はゲーム内の「クレジット → 豆知識の出典」） | 出典で確かめた事実を、40字以内の文に書き起こしたもの | — |
 
 ## Day56「夕暮れ破壊紀行」の描画依存
 
