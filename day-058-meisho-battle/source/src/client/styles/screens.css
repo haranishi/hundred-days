@@ -1,0 +1,670 @@
+/* タイトル・遊び方・ふたりでの説明・クレジット・出典・結果・シェア */
+
+/* ── タイトル：上に題字、下にボタン。真ん中は島が見えるように空ける ── */
+
+.ui > .screen-title {
+  pointer-events: none;
+}
+
+.screen-title {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  padding: calc(var(--sat) + 18px) calc(var(--sar) + 16px) calc(var(--sab) + 16px) calc(var(--sal) + 16px);
+}
+
+.title-head {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+/* 100日チャレンジ版の帯：一覧へ戻るリンクと、このアプリの共有。題字の上に小さく置く */
+.title-day-bar {
+  pointer-events: auto;
+  align-self: stretch;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  margin: -10px 0 -4px;
+}
+
+.title-day-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(255, 253, 248, 0.88);
+  color: var(--ink);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.title-day-link:focus-visible {
+  outline: 3px solid var(--ink);
+  outline-offset: 2px;
+}
+
+/* 題字が左に寄る横長の画面では、帯の2つも左に並べる（「共有する」だけが画面の真ん中に浮かないように） */
+@media (min-width: 900px) and (min-aspect-ratio: 5/4), (min-width: 600px) and (max-height: 560px) {
+  .title-day-bar {
+    justify-content: flex-start;
+  }
+}
+
+/* 共有の欄（index.html の dialog。中身は共通部品 shared/share.js が据え付ける） */
+.day-share-dialog {
+  width: min(420px, calc(100vw - 32px));
+  max-height: calc(100dvh - 32px);
+  overflow: auto;
+  padding: 20px;
+  border: 0;
+  border-radius: 18px;
+  background: #fffdf8;
+  color: var(--ink);
+  box-shadow: 0 18px 50px rgba(31, 42, 68, 0.28);
+}
+
+.day-share-dialog::backdrop {
+  background: rgba(31, 42, 68, 0.45);
+}
+
+.day-share-dialog h2 {
+  margin: 0 0 12px;
+  font-size: 18px;
+}
+
+/* 共通部品は、幅が中身で決まる親でも横に並ぶよう最低幅（画面の92%）を持つ。
+   余白のある窓の中ではそれが窓からはみ出すので、窓の中だけ外す。見出しは窓の h2 が受け持つ */
+.day-share-dialog .share {
+  min-width: 0;
+  max-width: 100%;
+  margin: 0;
+  padding-top: 0;
+  border-top: 0;
+}
+
+.day-share-dialog .share__label {
+  display: none;
+}
+
+.day-share-close {
+  display: flex;
+  justify-content: flex-end;
+  margin: 12px 0 0;
+}
+
+.day-share-close button {
+  min-height: 44px;
+  padding: 0 18px;
+  border: 2px solid var(--ink);
+  border-radius: 999px;
+  background: #fffdf8;
+  color: var(--ink);
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.title-kicker {
+  display: inline-block;
+  background: var(--mustard);
+  color: var(--ink);
+  font-weight: 800;
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  padding: 3px 14px;
+  border-radius: 999px;
+}
+
+.title-logo {
+  font-size: clamp(34px, 10vw, 64px);
+  font-weight: 900;
+  line-height: 1.1;
+  letter-spacing: 0.03em;
+  text-shadow:
+    0 3px 0 #fff,
+    0 0 22px rgba(255, 253, 248, 0.95);
+}
+
+.title-logo span {
+  display: block;
+}
+
+.title-logo span:first-child {
+  font-size: 0.62em;
+  color: var(--shu);
+  letter-spacing: 0.2em;
+}
+
+.title-lead {
+  font-weight: 700;
+  font-size: 15px;
+  line-height: 1.5;
+  background: rgba(255, 253, 248, 0.88);
+  border-radius: 14px;
+  padding: 4px 14px;
+}
+
+.title-menu {
+  pointer-events: auto;
+  margin: 0;
+  max-width: 420px;
+  gap: 10px;
+  padding: 16px;
+}
+
+.btn-mode {
+  flex-direction: column;
+  gap: 0;
+  min-height: 62px;
+  padding: 8px 16px;
+}
+
+.btn-mode-label {
+  font-size: 20px;
+  font-weight: 800;
+}
+
+.btn-mode small {
+  font-size: 13px;
+  font-weight: 600;
+  opacity: 0.92;
+}
+
+.title-links {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0 4px;
+  margin-top: -2px;
+}
+
+.title-links .btn {
+  min-height: 44px;
+  padding: 8px 12px;
+}
+
+/* 広い画面：題字は左上、ボタンは右下に寄せ、真ん中の島（「？」の立て札）を見せる */
+@media (min-width: 900px) and (min-aspect-ratio: 5/4) {
+  .screen-title {
+    align-items: stretch;
+    padding: calc(var(--sat) + 28px) calc(var(--sar) + 32px) calc(var(--sab) + 28px) calc(var(--sal) + 32px);
+  }
+
+  .title-head {
+    align-self: flex-start;
+    align-items: flex-start;
+    text-align: left;
+  }
+
+  .title-logo {
+    font-size: 56px;
+  }
+
+  .title-menu {
+    align-self: flex-end;
+    width: 360px;
+  }
+}
+
+/* ── 遊び方 ── */
+
+.howto-steps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 10px;
+}
+
+.howto-step {
+  display: grid;
+  grid-template-columns: 108px 1fr;
+  gap: 12px;
+  align-items: center;
+  background: #fff;
+  border-radius: 14px;
+  padding: 10px;
+  border: 1.5px solid #e6dfd1;
+}
+
+.howto-art svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.howto-text h2 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.howto-n {
+  flex: none;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--shu);
+  color: #fff;
+  font-size: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.howto-text p {
+  font-size: 14.5px;
+  line-height: 1.65;
+}
+
+.howto-keys {
+  font-size: 14px;
+  color: var(--sub);
+}
+
+@media (min-width: 720px) {
+  .howto-steps {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .howto-step {
+    grid-template-columns: 1fr;
+    align-content: start;
+  }
+}
+
+/* ── ふたりで：左右のキー ── */
+
+.duo-keys {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.duo-side {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 12px 8px;
+  border-radius: 16px;
+  background: var(--pc);
+  color: var(--pc-ink);
+  font-weight: 800;
+}
+
+.duo-side b {
+  font-size: 22px;
+  line-height: 1.2;
+}
+
+.duo-side kbd {
+  border: 2px solid currentColor;
+  border-radius: 6px;
+  padding: 0 12px;
+  font-size: 20px;
+  font-weight: 800;
+  margin-top: 4px;
+}
+
+.duo-dot {
+  display: flex;
+}
+
+.duo-note {
+  font-size: 14.5px;
+}
+
+/* ── クレジット・出典 ── */
+
+.credits {
+  margin: 0;
+  display: grid;
+}
+
+.credits dt {
+  font-weight: 800;
+  margin-top: 10px;
+}
+
+.credits dt:first-child {
+  margin-top: 0;
+}
+
+.credits dd {
+  margin: 0;
+  font-size: 14.5px;
+  line-height: 1.7;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.license summary {
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--indigo);
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  text-decoration: underline;
+}
+
+.license pre {
+  white-space: pre-wrap;
+  font-size: 12px;
+  line-height: 1.5;
+  background: #fff;
+  border-radius: 10px;
+  padding: 10px;
+  border: 1px solid var(--line);
+  max-height: 220px;
+  overflow: auto;
+  margin: 4px 0 0;
+}
+
+.sources {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.source {
+  background: #fff;
+  border-radius: 12px;
+  padding: 10px 12px;
+  border: 1px solid #e6dfd1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.source-fact {
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.source-link {
+  font-size: 13px;
+  color: var(--indigo);
+  word-break: break-all;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+}
+
+/* ── 結果 ── */
+
+.result .card {
+  gap: 14px;
+}
+
+.result-kicker {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--sub);
+}
+
+.result-headline {
+  font-size: 34px;
+  line-height: 1.2;
+  margin-top: -6px;
+}
+
+.result[data-tone='win'] .result-headline {
+  color: var(--shu);
+}
+
+.result-note {
+  font-size: 14px;
+  color: var(--sub);
+}
+
+.result-title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 2px 10px;
+  background: #fff6de;
+  border: 2px dashed var(--mustard);
+  border-radius: 14px;
+  padding: 10px 14px;
+}
+
+.result-title-label {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--sub);
+  width: 100%;
+}
+
+.result-title-name {
+  font-size: 24px;
+  font-weight: 900;
+}
+
+.result-score {
+  margin-left: auto;
+  font-size: 22px;
+  font-weight: 900;
+  font-variant-numeric: tabular-nums;
+}
+
+.standings {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.standing {
+  display: grid;
+  grid-template-columns: auto 1fr auto auto;
+  grid-template-areas: 'icon who score badge' 'icon title score badge';
+  align-items: center;
+  column-gap: 10px;
+  padding: 8px 12px;
+  border-radius: 12px;
+  background: #fff;
+  border: 2px solid #e6dfd1;
+}
+
+.standing[data-winner='true'] {
+  border-color: var(--pc);
+}
+
+.standing > svg {
+  grid-area: icon;
+}
+
+.standing-who {
+  grid-area: who;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.standing-title {
+  grid-area: title;
+  font-size: 12.5px;
+  color: var(--sub);
+}
+
+.standing-score {
+  grid-area: score;
+  font-weight: 900;
+  font-size: 18px;
+  font-variant-numeric: tabular-nums;
+}
+
+.standing-badge {
+  grid-area: badge;
+  background: var(--shu);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 800;
+  padding: 2px 8px;
+  border-radius: 999px;
+}
+
+.result-questions h2 {
+  font-size: 16px;
+  margin-bottom: 2px;
+}
+
+.qr-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.qr {
+  display: grid;
+  grid-template-columns: 3.6em 1fr;
+  column-gap: 8px;
+  padding: 7px 0;
+  border-bottom: 1px solid var(--soft);
+  font-size: 14px;
+}
+
+.qr-no {
+  color: var(--sub);
+  font-weight: 700;
+}
+
+.qr-name {
+  font-weight: 800;
+}
+
+.qr-who {
+  grid-column: 2;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 12px;
+  font-size: 13px;
+}
+
+.qr-attempt {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-variant-numeric: tabular-nums;
+}
+
+.qr-attempt.is-correct {
+  color: var(--ok);
+  font-weight: 800;
+}
+
+.qr-attempt.is-wrong {
+  color: var(--ng);
+}
+
+.qr-none {
+  color: var(--sub);
+}
+
+.result-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* ── シェア ── */
+
+.result-share {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  border-top: 1px solid var(--line);
+  padding-top: 12px;
+}
+
+.share-heading {
+  font-size: 16px;
+}
+
+.share-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(128px, 1fr));
+  gap: 8px;
+}
+
+.share-btn {
+  min-height: 48px;
+  font-size: 15px;
+  padding: 8px 10px;
+}
+
+.share-native {
+  background: var(--teal);
+  border-color: var(--teal);
+  color: #fff;
+}
+
+.share-said {
+  min-height: 1.2em;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ok);
+}
+
+.share-said:empty {
+  display: none;
+}
+
+.share-fallback {
+  width: 100%;
+  font: inherit;
+  font-size: 14px;
+  padding: 8px 10px;
+  border: 2px solid var(--indigo);
+  border-radius: 10px;
+  resize: none;
+  user-select: text;
+  -webkit-user-select: text;
+}
+
+.share-note {
+  font-size: 13px;
+  color: var(--sub);
+}
+
+/* Short viewports keep the full title menu reachable after orientation changes. */
+@media (max-height: 560px) {
+  .screen-title {
+    overflow-y: auto;
+    justify-content: flex-start;
+    overscroll-behavior: contain;
+  }
+  .title-menu { flex-shrink: 0; }
+}
+@media (min-width: 600px) and (max-height: 560px) {
+  .screen-title {
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-around;
+    gap: 16px;
+  }
+  .title-head { flex: 1; position: sticky; top: 0; }
+  .title-logo { font-size: clamp(28px, 5vw, 42px); }
+  .title-menu { flex: 1; max-width: 360px; margin: 0; }
+}

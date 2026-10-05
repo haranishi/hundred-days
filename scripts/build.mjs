@@ -3,7 +3,7 @@
 'use strict';
 
 import { copyFileSync, cpSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
-import { basename, join, sep } from 'node:path';
+import { basename, join, relative, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = fileURLToPath(new URL('..', import.meta.url));
@@ -116,14 +116,22 @@ const isExcluded = (source) => EXCLUDED_DIRS.some((dir) => {
 });
 const skipToolsCache = (source) => !isExcluded(source);
 
+/* ソースから組み立てたビルド結果を同じフォルダに置いているDayは、ソースと生成ツールを配信しない。
+   見るのはDayのフォルダ直下の名前だけ（リポジトリを置いた場所の名前に source が含まれていても外さない） */
+const SOURCE_DIRS_BY_APP = {
+  'day-056-dragon-rush': ['source', 'tools'],
+  'day-058-meisho-battle': ['source']
+};
+const isSourceDir = (app, source) => {
+  const [top] = relative(join(appsDir, app.dir), source).split(sep);
+  return (SOURCE_DIRS_BY_APP[app.dir] ?? []).includes(top);
+};
+
 for (const app of apps) {
   if (app.published) {
     const filter = source => skipToolsCache(source)
       && !(app.dir === 'day-044-train-here' && source.includes(`${sep}tools`))
-      && !(app.dir === 'day-056-dragon-rush' && ['source', 'tools'].some(dir => {
-        const marker = `${sep}${dir}`;
-        return source.endsWith(marker) || source.includes(`${marker}${sep}`);
-      }));
+      && !isSourceDir(app, source);
     cpSync(join(appsDir, app.dir), join(distDir, app.dir), { recursive: true, filter });
   } else if (app.hasShot || app.hasDemo) {
     // 「制作記録のみ」のDayはアプリ本体を公開しないが、一覧に出すスクショとデモ動画だけはコピーする
