@@ -1,0 +1,123 @@
+@import "tailwindcss";
+
+@theme {
+  --color-bg: #0c1115;
+  --color-panel: #131b20;
+  --color-panel-2: #1a242b;
+  --color-border: #2b383f;
+  --color-text: #eaf0ef;
+  --color-muted: #99abad;
+  --color-accent: #83e8cf;
+  --color-accent-2: #83e8cf;
+  --color-danger: #ff9d9d;
+  --color-ok: #83e8cf;
+}
+
+:root { font-family: -apple-system, BlinkMacSystemFont, "Hiragino Kaku Gothic ProN", "Noto Sans JP", "Yu Gothic", sans-serif; color: var(--color-text); background: var(--color-bg); color-scheme: dark; font-synthesis: none; text-rendering: optimizeLegibility; -webkit-font-smoothing: antialiased; }
+/* 日本語の折り返し（UI採点 M8）。行頭の「ー」や小書きの仮名を禁止し（strict）、最終行の1〜2字残りを減らす（pretty）。
+   Chrome 系は文節で折る（auto-phrase）。iPhone の Safari には auto-phrase が効かないので、
+   決まった短い文は文節ごとに <wbr> を入れて keep-all で語の途中を守る（.jp-phrase。src/components/ui/Phrases.tsx） */
+body { line-break: strict; text-wrap: pretty; word-break: auto-phrase; }
+.jp-phrase { word-break: keep-all; overflow-wrap: anywhere; }
+/* 選んでいる項目に付ける ✓（色と明るさだけで選択を示さない。UI採点 M10） */
+.selected-mark { margin-right: 5px; color: var(--color-accent); font-weight: 700; }
+* { box-sizing: border-box; }
+body { margin: 0; min-width: 320px; }
+button, input, select { font: inherit; }
+button, a, input, summary { -webkit-tap-highlight-color: transparent; }
+button:not(:disabled), summary, input[type="range"]:not(:disabled) { cursor: pointer; }
+button:disabled, input:disabled { cursor: not-allowed; }
+button:disabled { opacity: .4; }
+a { color: inherit; text-decoration: none; }
+button, a, input, summary { outline-offset: 4px; }
+:focus-visible { outline: 2px solid var(--color-accent); }
+::selection { background: #83e8cf40; }
+h1, h2, h3, p { margin: 0; }
+input[type="file"] { max-width: 100%; }
+.studio { max-width: 1664px; padding: 0 32px; margin: 0 auto; }
+.studio-header { min-height: 102px; display: flex; align-items: center; justify-content: space-between; gap: 20px; border-bottom: 1px solid var(--color-border); }
+.brand { display: flex; align-items: center; gap: 13px; }
+.brand-symbol { width: 43px; color: var(--color-accent); }
+.brand-name { font-size: 24px; font-weight: 750; letter-spacing: .04em; display: flex; align-items: center; gap: 12px; line-height: 1.3; }
+.brand-label { font-size: 9px; letter-spacing: .16em; font-weight: 500; color: var(--color-accent); border: 1px solid #83e8cf40; padding: 4px 6px; border-radius: 4px; }
+.brand-caption { display: block; margin-top: 5px; font-size: 11px; color: var(--color-muted); letter-spacing: .06em; }
+.header-actions, .privacy-badge { display: flex; align-items: center; gap: 22px; }
+.privacy-badge { gap: 8px; font-size: 11px; color: var(--color-muted); }
+.status-dot { width: 6px; height: 6px; background: var(--color-accent); display: inline-block; border-radius: 50%; flex: 0 0 auto; }
+.status-dot-muted { background: #718085; }
+.studio-intro { padding: 36px 0 28px; }
+.eyebrow { font-size: 9px; font-weight: 650; letter-spacing: .14em; color: var(--color-muted); }
+.studio-intro h1 { font-size: clamp(22px, 2.2vw, 30px); font-weight: 650; letter-spacing: .035em; margin-top: 9px; }
+.intro-description { margin-top: 10px; font-size: 12px; }
+.sample-action { display: flex; align-items: flex-start; flex-direction: column; gap: 9px; margin-top: 20px; }
+/* 見出しの「ブラウザ内で完結」が隠れるスマホの幅でだけ出す（UI採点 M2） */
+.sample-privacy { display: none; align-items: center; gap: 8px; font-size: 11px; color: var(--color-muted); }
+.sample-next { display: flex; align-items: center; flex-wrap: wrap; gap: 10px 16px; margin-bottom: 20px; }
+.sample-notice { margin: 0; font-size: 12px; color: var(--color-accent); }
+.sample-notice.error-message { margin-bottom: 20px; }
+.workflow-strip { display: flex; align-items: center; gap: 20px; max-width: 620px; font-size: 12px; color: var(--color-muted); margin-bottom: 25px; }
+.workflow-strip > span:not(.workflow-line) { flex: 0 0 auto; }
+.workflow-strip b { color: var(--color-accent); margin-right: 8px; font-family: ui-monospace, monospace; font-size: 11px; font-weight: 500; }
+.workflow-line { height: 1px; background: var(--color-border); flex: 1; }
+.studio-workspace { min-width: 0; padding: 0; margin: 0; border: 0; }
+.studio-grid { display: grid; grid-template-columns: minmax(245px, .95fr) minmax(340px, 1.7fr) minmax(260px, 1fr); align-items: start; gap: 20px; }
+.studio-inputs, .studio-preview, .studio-settings { min-width: 0; display: flex; flex-direction: column; gap: 18px; }
+.studio-preview { position: sticky; top: 20px; }
+.panel { min-width: 0; background: var(--color-panel); border: 1px solid var(--color-border); border-radius: 14px; overflow: hidden; }
+.panel-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 20px 20px 17px; border-bottom: 1px solid #2b383f99; }
+.panel-heading h2 { font-size: 14px; font-weight: 600; line-height: 1.5; }
+.panel-heading .eyebrow { margin-bottom: 5px; font-size: 8px; }
+.panel-content { padding: 20px; }
+.button { min-height: 40px; padding: 9px 15px; border: 1px solid #36474e; border-radius: 8px; background: var(--color-panel-2); color: var(--color-text); font-size: 12px; font-weight: 550; display: inline-flex; align-items: center; justify-content: center; gap: 8px; line-height: 1.4; transition: background .15s, border-color .15s, color .15s; }
+.button:not(:disabled):hover { background: #26353c; border-color: #77968e; }
+.button-primary { color: #0e2b24; background: var(--color-accent); border-color: var(--color-accent); font-weight: 700; }
+.button-primary:not(:disabled):hover { background: #a5f4e0; border-color: #a5f4e0; }
+.button-ghost { background: transparent; border-color: transparent; color: var(--color-muted); }
+.button-ghost:not(:disabled):hover { border-color: var(--color-border); background: var(--color-panel-2); color: var(--color-text); }
+.button-small { min-height: 32px; padding: 6px 10px; font-size: 11px; }
+.button-danger { border-color: #ff9d9d40; color: var(--color-danger); background: #ff9d9d0a; }
+.sample-button { border-color: #83e8cf66; color: var(--color-accent); background: #83e8cf09; gap: 20px; }
+/* 素材がそろうまでは、最初に押す「サンプルで試す」を塗りにする（UI採点 M1） */
+.sample-button.is-primary { color: #0e2b24; background: var(--color-accent); border-color: var(--color-accent); font-weight: 700; }
+.sample-button.is-primary:not(:disabled):hover { background: #a5f4e0; border-color: #a5f4e0; }
+.muted { color: var(--color-muted); }
+.hint { color: var(--color-muted); font-size: 12px; line-height: 1.8; display: block; }
+.mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-variant-numeric: tabular-nums; }
+.field-label { color: #d4dfde; font-size: 12px; line-height: 1.6; }
+.error-message { color: var(--color-danger); font-size: 11px; line-height: 1.7; border: 1px solid #ff9d9d33; border-radius: 8px; padding: 10px 12px; background: #ff9d9d08; overflow-wrap: anywhere; }
+.stack { display: flex; flex-direction: column; gap: 18px; }
+.control-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.chip { display: inline-flex; align-items: center; gap: 5px; font-size: 9px; line-height: 1.4; background: #83e8cf0a; color: var(--color-accent); border: 1px solid #83e8cf33; border-radius: 5px; padding: 4px 7px; }
+.slider-field { display: flex; flex-direction: column; gap: 9px; }
+.slider-value { font-size: 11px; min-width: 38px; padding: 3px 6px; text-align: right; color: #c8ded8; background: var(--color-bg); border: 1px solid var(--color-border); border-radius: 4px; }
+input[type="range"] { width: 100%; height: 18px; background: transparent; appearance: none; margin: 0; accent-color: var(--color-accent); }
+input[type="range"]::-webkit-slider-runnable-track { height: 3px; border-radius: 3px; background: linear-gradient(to right, var(--color-accent) var(--range-progress, 0%), #33444b var(--range-progress, 0%)); }
+input[type="range"]::-webkit-slider-thumb { appearance: none; width: 11px; height: 11px; margin-top: -4px; border-radius: 50%; background: var(--color-accent); border: 2px solid #cbfff2; }
+input[type="range"]::-moz-range-track { height: 3px; background: #33444b; border-radius: 3px; }
+input[type="range"]::-moz-range-progress { height: 3px; background: var(--color-accent); }
+input[type="range"]::-moz-range-thumb { width: 8px; height: 8px; border-radius: 50%; border: 2px solid #cbfff2; background: var(--color-accent); }
+.toggle-field { display: flex; align-items: center; justify-content: space-between; gap: 14px; }
+.toggle-field label { cursor: pointer; }
+.toggle-field .hint { margin-top: 3px; }
+input.toggle { flex: 0 0 auto; appearance: none; width: 30px; height: 18px; border-radius: 14px; background: #405057; position: relative; margin: 0; transition: background .15s; cursor: pointer; }
+input.toggle::after { content: ''; position: absolute; width: 12px; height: 12px; border-radius: 50%; background: #c1d1d0; left: 3px; top: 3px; transition: transform .15s; }
+input.toggle:checked { background: var(--color-accent); }
+input.toggle:checked::after { transform: translateX(12px); background: #12392d; }
+.is-disabled { opacity: .45; }
+/* 使えないトグルは本体とラベルだけ暗くし、「どうすれば使えるか」の説明は読める色のまま残す（UI採点 L4） */
+.toggle-field.is-disabled { opacity: 1; }
+.toggle-field.is-disabled .field-label, .toggle-field.is-disabled input.toggle { opacity: .45; }
+.studio-footer { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 28px 0; margin-top: 24px; font-size: 12px; color: var(--color-muted); border-top: 1px solid var(--color-border); line-height: 1.8; }
+.studio-footer > span:first-child { display: flex; align-items: center; gap: 8px; }
+.guide-dialog { width: min(540px, calc(100vw - 32px)); max-height: calc(100dvh - 48px); margin: auto; padding: 26px; color: var(--color-text); background: var(--color-panel); border: 1px solid #40544f; border-radius: 16px; box-shadow: 0 28px 120px #000a; }
+.guide-dialog::backdrop { background: #07100fd9; backdrop-filter: blur(4px); }
+.guide-heading { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.guide-heading h2 { font-size: 18px; }
+.guide-steps { padding-left: 24px; margin: 24px 0; display: flex; flex-direction: column; gap: 20px; }
+.guide-steps li::marker { color: var(--color-accent); font-family: ui-monospace, monospace; }
+.guide-steps strong { font-size: 13px; font-weight: 600; }
+.guide-steps p { font-size: 12px; line-height: 1.9; color: var(--color-muted); margin-top: 5px; }
+@media (min-width: 1440px) { .studio { padding: 0 48px; } .studio-grid { gap: 24px; } }
+@media (max-width: 1120px) { .studio { padding: 0 20px; } .studio-grid { grid-template-columns: minmax(225px, 1fr) minmax(295px, 1.45fr); gap: 18px; } .studio-settings { grid-column: 1 / -1; } .studio-settings > div { display: grid; grid-template-columns: 1fr 1fr; align-items: start; gap: 18px; } .studio-preview { position: static; } }
+@media (max-width: 700px) { .studio { padding: 0 16px; } .studio-header { min-height: 82px; gap: 8px; } .brand-symbol { width: 33px; } .brand { gap: 9px; } .brand-name { font-size: 21px; gap: 8px; } .brand-label { font-size: 7px; } .brand-caption { font-size: 10px; } .privacy-badge { display: none; } .studio-intro { padding: 27px 0 22px; } .studio-intro h1 { font-size: 23px; } .sample-action { width: 100%; gap: 7px; } .sample-button { width: 100%; } .sample-action > .hint { text-align: center; width: 100%; } .sample-privacy { display: flex; justify-content: center; width: 100%; } .sample-next { flex-direction: column; align-items: stretch; gap: 10px; } .sample-play { width: 100%; min-height: 44px; } .workflow-strip { font-size: 11px; gap: 8px; margin-bottom: 20px; } .workflow-strip b { margin-right: 4px; } .studio-grid { display: flex; flex-direction: column; gap: 18px; } .studio-preview { order: 0; width: 100%; } .studio-inputs { order: 1; width: 100%; } .studio-settings { order: 2; width: 100%; } .studio-settings > div { display: flex; flex-direction: column; } .studio-settings > div > section { width: 100%; } .panel-heading { padding: 17px 18px 14px; } .panel-content { padding: 18px; } .studio-footer { flex-direction: column; align-items: flex-start; gap: 8px; padding: 22px 0; } }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; } }

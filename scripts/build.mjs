@@ -120,7 +120,8 @@ const skipToolsCache = (source) => !isExcluded(source);
    見るのはDayのフォルダ直下の名前だけ（リポジトリを置いた場所の名前に source が含まれていても外さない） */
 const SOURCE_DIRS_BY_APP = {
   'day-056-dragon-rush': ['source', 'tools'],
-  'day-058-meisho-kumitate': ['source', 'tools']
+  'day-058-meisho-kumitate': ['source', 'tools'],
+  'day-059-kuchi-sanmai': ['source', 'tools']
 };
 const isSourceDir = (app, source) => {
   const [top] = relative(join(appsDir, app.dir), source).split(sep);
@@ -237,7 +238,10 @@ const WORKER_BY_APP = {
 const MEDIA_BY_APP = {
   'day-021-nearby-radio': ' https:',
   // day-030 は提供元のHLS配信（.m3u8）を Safari の <video> で直接再生する。ホストは事前に列挙できない
-  'day-030-world-window': ' https:'
+  'day-030-world-window': ' https:',
+  /* day-059 は選んだ音声ファイルを blob: のURLにして非表示の <audio> で鳴らし、録画した動画も blob: で <video> に出す。
+     どちらも端末の中のデータで、外へは出ない。'self' は blob: に合わないので、足さないと再生とプレビューが黙って止まる */
+  'day-059-kuchi-sanmai': ' blob:'
 };
 const IMG_BY_APP = {
   /* day-040 の地理院タイルは MapLibre が fetch で取るので connect-src で足りるが、
@@ -286,6 +290,17 @@ const appCsp = (dir) => [
   ...(FRAME_BY_APP[dir] ? [FRAME_BY_APP[dir]] : [])
 ].join('; ');
 
+/* 端末の機能（マイク・カメラなど）は全ページで閉じておき、使うDayのパスだけで開け直す。
+   Cloudflare Pages は同じヘッダーが2つのルールに当たると値をカンマでつなぐので、全体（/*）の値を
+   `! Permissions-Policy` で外してから、そのDayの値を書く。2026-10-06 に wrangler pages dev で実測し、そのDayのパスには
+   付け直した値の1本だけが付き、ほかのパスは全体の値のままであることを確かめた。
+   マイクの許可はブラウザがサイト（オリジン）単位で覚えることがあるので、ほかのDayは方針で閉じたままにする */
+const GLOBAL_PERMISSIONS = 'geolocation=(self), camera=(), microphone=(), payment=(), usb=()';
+const PERMISSIONS_BY_APP = {
+  // day-059 は話した声に合わせて口を動かす。「マイクを開始」を押したときだけ許可を求める。位置情報は使わないので閉じる
+  'day-059-kuchi-sanmai': 'geolocation=(), camera=(), microphone=(self), payment=(), usb=()'
+};
+
 /* 一覧ページ（/）にCSPを入れていないのは、インラインscriptが2本とGA4があり、
    ハッシュを付けないと動かなくなるため。枠内表示の禁止は X-Frame-Options が全ページに掛かる。
    一覧ページのCSPは別途対応する。 */
@@ -297,7 +312,7 @@ const headerLines = [
   '  X-Content-Type-Options: nosniff',
   '  Referrer-Policy: strict-origin-when-cross-origin',
   '  Cross-Origin-Opener-Policy: same-origin',
-  '  Permissions-Policy: geolocation=(self), camera=(), microphone=(), payment=(), usb=()',
+  `  Permissions-Policy: ${GLOBAL_PERMISSIONS}`,
   ''
 ];
 
@@ -305,7 +320,9 @@ const headerLines = [
 // （/day-010-wikipedia-live/）と配下のファイルの両方に掛かる。
 // wrangler pages dev で実測して確認済み（末尾なしのパスも併記するとCSPが二重に付く）。
 for (const app of apps.filter((a) => a.published)) {
-  headerLines.push(`/${app.dir}/*`, `  Content-Security-Policy: ${appCsp(app.dir)}`, '');
+  headerLines.push(`/${app.dir}/*`, `  Content-Security-Policy: ${appCsp(app.dir)}`);
+  if (PERMISSIONS_BY_APP[app.dir]) headerLines.push('  ! Permissions-Policy', `  Permissions-Policy: ${PERMISSIONS_BY_APP[app.dir]}`);
+  headerLines.push('');
 }
 writeFileSync(join(distDir, '_headers'), headerLines.join('\n'));
 

@@ -39,8 +39,38 @@ test('全ページに枠内表示の禁止と端末機能の制限が付く', ()
   const global = rules.get('/*');
   expect(global, '/* の指定が無い').toBeTruthy();
   expect(global.join('\n')).toContain('X-Frame-Options: DENY');
-  expect(global.join('\n')).toContain('Permissions-Policy:');
   expect(global.join('\n')).toContain('X-Content-Type-Options: nosniff');
+  const policy = global.filter((line) => line.startsWith('Permissions-Policy:'));
+  expect(policy, '/* の Permissions-Policy は1行だけ').toHaveLength(1);
+  // マイクとカメラはサイト全体では閉じたまま（開けるのは下の表のDayのパスだけ）
+  expect(policy[0]).toContain('microphone=()');
+  expect(policy[0]).toContain('camera=()');
+});
+
+/* マイクの許可はブラウザがサイト（オリジン）単位で覚えることがある。全Dayが同じオリジンにあるので、
+   1つのDayで許可されたマイクが、ほかのDayからも使える状態にしない。開けるのはマイクを使うDayのパスだけで、
+   そのパスでは全体の値を `! Permissions-Policy` で外してから付け直す（Cloudflare は同じヘッダーをカンマでつなぐため）。
+   付け直しが本当に効くかは wrangler pages dev で実測した（Day 059 の作業記録）。 */
+const MIC_DAYS = ['day-059-kuchi-sanmai'];
+
+test('マイクは全体で閉じたまま、開けるのはマイクを使うDayのパスだけ', () => {
+  for (const dir of MIC_DAYS) {
+    const lines = rules.get(`/${dir}/*`) || [];
+    const policy = lines.filter((line) => line.startsWith('Permissions-Policy:'));
+    expect(policy, `${dir} の Permissions-Policy`).toHaveLength(1);
+    expect(policy[0]).toContain('microphone=(self)');
+    expect(policy[0]).toContain('camera=()');
+    expect(policy[0]).toContain('geolocation=()');
+    // 外してから付け直す順番（逆だと、付けた値まで外れる）
+    const detach = lines.indexOf('! Permissions-Policy');
+    expect(detach, `${dir} で全体の値を外していない`).toBeGreaterThanOrEqual(0);
+    expect(detach).toBeLessThan(lines.indexOf(policy[0]));
+  }
+  for (const [path, lines] of rules) {
+    if (path === '/*' || MIC_DAYS.some((dir) => path === `/${dir}/*`)) continue;
+    expect(lines.join('\n'), `${path} がマイクを開けている`).not.toContain('microphone=(self)');
+    expect(lines, `${path} が全体の端末機能の制限を外している`).not.toContain('! Permissions-Policy');
+  }
 });
 
 test('公開する全アプリにCSPが付く', () => {
@@ -62,9 +92,14 @@ test('公開する全アプリにCSPが付く', () => {
    href に入れるだけのURLは接続ではないので数えない。組み立ててから渡す書き方（`https://${host}/…`）は
    拾えないので、これは足し忘れの多くを捕まえる網であって、完全な保証ではない。 */
 const CONNECT_PATTERNS = [
-  /\b(?:const|let|var)\s+[A-Za-z_$][\w$]*\s*=\s*[`'"]https:\/\/([a-z0-9.-]+)/gi,
-  /(?:fetch|EventSource|WebSocket)\(\s*[`'"]https:\/\/([a-z0-9.-]+)/gi,
+  /\b(?:const|let|var)\s+[A-Za-z_$][\w$]*\s*=\s*[`'"]https:\/\/([a-z0-9.-]+)([^`'"]*)/gi,
+  /(?:fetch|EventSource|WebSocket)\(\s*[`'"]https:\/\/([a-z0-9.-]+)([^`'"]*)/gi,
 ];
+
+/* 接続ではないと分かっているURL。React の本番ビルドは、エラーの説明ページのURL（https://react.dev/errors/番号）を
+   変数に入れて例外の文に足すだけで、通信はしない（Day 059 が React を同梱したときに、この網に掛かった） */
+const TEXT_ONLY_URLS = [{ host: 'react.dev', path: /^\/errors\// }];
+const textOnly = (host, path) => TEXT_ONLY_URLS.some((url) => url.host === host && url.path.test(path));
 
 const connectSources = (dir) => {
   const csp = (rules.get(`/${dir}/*`) || []).find((line) => line.startsWith('Content-Security-Policy:')) ?? '';
@@ -105,7 +140,8 @@ test('コードに書いてある接続先が、そのDayのCSPで許されて�
     for (const file of codeFiles(join(appsDir, dir))) {
       const code = readFileSync(file, 'utf8');
       for (const pattern of CONNECT_PATTERNS) {
-        for (const [, host] of code.matchAll(pattern)) {
+        for (const [, host, path] of code.matchAll(pattern)) {
+          if (textOnly(host, path)) continue;
           checked += 1;
           expect(allows(sources, host), `${dir} は ${host} に繋ぐのに connect-src が許していない`).toBe(true);
         }

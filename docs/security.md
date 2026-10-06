@@ -21,6 +21,10 @@
 
 `style-src` に `'unsafe-inline'` が残っているのは day-004 に `style` 属性があるため。属性を消せば外せる。
 
+端末の機能（マイク・カメラ）は `/*` の Permissions-Policy で全ページ閉じている。マイクを使う Day 059 だけ、
+そのパスで `! Permissions-Policy` を書いて全体の値を外し、`microphone=(self)` で付け直す（`scripts/build.mjs` の `PERMISSIONS_BY_APP`）。
+マイクの許可はブラウザがオリジン単位で覚えることがあるので、ほかのDayは開けない。
+
 > ⚠️ **新しいDayで外部のAPIを叩くときは、`scripts/build.mjs` の `CONNECT_BY_APP` にホストを足す。**
 > 足し忘れるとブラウザが接続を止めるが、アプリ側の try/catch に吸われて「なぜか動かない」だけになる。
 
