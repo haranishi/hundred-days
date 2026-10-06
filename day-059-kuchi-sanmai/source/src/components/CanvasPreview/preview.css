@@ -1,0 +1,24 @@
+.preview-panel { overflow: hidden; }
+.preview-live { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; color: #a7bbb4; white-space: nowrap; }
+.preview-live i { width: 5px; height: 5px; border-radius: 50%; background: #82e4b8; box-shadow: 0 0 10px #82e4b832; }
+.preview-live.is-recording { color: #ffaaa5; }
+.preview-live.is-recording i { background: #ff8279; }
+.preview-stage { display: flex; align-items: center; justify-content: center; min-height: 370px; padding: 24px 16px; background: radial-gradient(ellipse at center, #20292b 0%, #151b1e 75%); border: 1px solid #ffffff08; border-radius: 10px; }
+.preview-frame { position: relative; width: min(100%, calc(min(59vh, 580px) * var(--canvas-ratio))); aspect-ratio: var(--canvas-ratio); overflow: hidden; background-color: #242c2e; background-image: linear-gradient(45deg, #30383a 25%, transparent 25%), linear-gradient(-45deg, #30383a 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #30383a 75%), linear-gradient(-45deg, transparent 75%, #30383a 75%); background-size: 20px 20px; background-position: 0 0, 0 10px, 10px -10px, -10px 0; box-shadow: 0 9px 30px #0000004d, 0 0 0 1px #ffffff0f; }
+.preview-frame canvas { display: block; width: 100%; height: 100%; }
+.preview-empty { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 12px; text-align: center; color: #cad8d2; background: #141c20b3; }
+.preview-empty svg { width: 60px; height: 60px; color: #8ddbbb; margin-bottom: 16px; }
+.preview-empty strong { font-size: clamp(12px, 1.3vw, 16px); font-weight: 600; }
+.preview-empty p { margin: 10px 0 0; color: #a3b1ae; font-size: 11px; line-height: 1.9; }
+.preview-caption { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin: 12px 0 20px; font-size: 11px; color: #82938e; }
+.preview-status { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); padding-top: 16px; border-top: 1px solid #ffffff0b; }
+.preview-status > div { display: flex; flex-direction: column; gap: 7px; padding: 0 14px; border-left: 1px solid #ffffff0b; font-size: 11px; }
+.preview-status > div:first-child { padding-left: 0; border-left: 0; }
+.preview-status strong { color: #cfdbd5; font-size: 13px; font-weight: 500; }
+.preview-status .is-active { color: #9ce8c5; }
+@media (max-width: 760px) {
+  .preview-stage { min-height: 260px; padding: 18px 12px; }
+  .preview-frame { width: min(100%, calc(min(52vh, 440px) * var(--canvas-ratio))); }
+  .preview-empty strong { font-size: 13px; }
+  .preview-caption { font-size: 9px; }
+}

@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="dark" />
+    <meta name="theme-color" content="#0c1115" />
+    <!-- 名前は src/appName.ts の APP_NAME と同じにする。CSP はサイトの _headers（scripts/build.mjs）が付ける -->
+    <title>口さんまい</title>
+    <meta name="description" content="口の形がちがう3枚の画像と音声から、口パク動画をブラウザの中だけで作るスタジオ。画像も声も外へは送りません。" />
+    <!-- canonical・og:*・twitter:* は、リポジトリの共通ビルド（scripts/build.mjs）が meta.json から差し込む -->
+    <link rel="icon" type="image/svg+xml" href="%BASE_URL%favicon.svg" />
+    <!-- 共通の共有部品。公開物の ../shared/ は npm run shared:sync が置き、手元の vite は public/shared（そこへのリンク）から配る -->
+    <link rel="stylesheet" href="shared/share.css" />
+    <script src="shared/share.js" defer></script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <dialog id="share-dialog" class="day-share-dialog" aria-labelledby="share-dialog-title">
+      <h2 id="share-dialog-title">このアプリを共有する</h2>
+      <div id="share"></div>
+      <form method="dialog" class="day-share-close"><button type="submit">閉じる</button></form>
+    </dialog>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

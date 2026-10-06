@@ -1,0 +1,39 @@
+{
+  "name": "day-059-kuchi-sanmai",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Day59（100日チャレンジ版）：口の形がちがう3枚の画像と音声から、口パク動画をブラウザの中だけで作るスタジオ",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "prebuild": "node tools/generate-notices.mjs",
+    "build": "tsc -b && vite build",
+    "release": "npm run build && node tools/release.mjs",
+    "preview": "vite preview",
+    "typecheck": "tsc -b",
+    "lint": "oxlint",
+    "test": "vitest run",
+    "check": "npm run typecheck && npm run lint && npm run test",
+    "notices:check": "node tools/generate-notices.mjs --check"
+  },
+  "dependencies": {
+    "fix-webm-duration": "^1.0.6",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "zustand": "^5.0.15"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.3.3",
+    "@types/node": "^24.13.3",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.7",
+    "@vitejs/plugin-react": "^6.1.1",
+    "jsdom": "^29.1.1",
+    "oxlint": "^1.81.0",
+    "playwright": "1.62.1",
+    "tailwindcss": "^4.3.3",
+    "typescript": "~6.0.2",
+    "vite": "^8.3.0",
+    "vitest": "^5.0.1"
+  }
+}

@@ -1,0 +1,18 @@
+/* 100日チャレンジ版の帯（一覧へ戻る・共有する）と、共有の窓。幅と左右の余白はスタジオ（.studio）にそろえる */
+.day-bar { max-width: 1664px; margin: 0 auto; padding: 12px 32px 0; display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.day-bar-link { display: inline-flex; align-items: center; min-height: 44px; padding: 0 14px; border: 1px solid #83e8cf55; border-radius: 999px; background: var(--color-panel); color: var(--color-text); font: inherit; font-size: 12px; font-weight: 700; letter-spacing: .08em; text-decoration: none; cursor: pointer; }
+.day-bar-link:hover { border-color: var(--color-accent); color: var(--color-accent); }
+
+/* 共有の窓（中身は共通部品 shared/share.js）。文字色を窓の上で決めるので、共通部品の枠と面はこの色から作られる */
+.day-share-dialog { width: min(420px, calc(100vw - 32px)); max-height: calc(100dvh - 32px); overflow: auto; margin: auto; padding: 20px; border: 1px solid #40544f; border-radius: 16px; background: var(--color-panel); color: var(--color-text); box-shadow: 0 28px 120px #000a; }
+.day-share-dialog::backdrop { background: #07100fd9; }
+.day-share-dialog h2 { margin: 0 0 12px; font-size: 16px; font-weight: 700; }
+/* 共通部品は、幅が中身で決まる親でも横に並ぶよう最低幅（画面の92%）を持つ。窓の中ではそれがはみ出すので外す。見出しは窓の h2 が受け持つ */
+.day-share-dialog .share { min-width: 0; max-width: 100%; margin: 0; padding-top: 0; border-top: 0; }
+.day-share-dialog .share__label { display: none; }
+.day-share-close { display: flex; justify-content: flex-end; margin: 12px 0 0; }
+.day-share-close button { min-height: 44px; padding: 0 18px; border: 1px solid #83e8cf88; border-radius: 999px; background: transparent; color: var(--color-text); font: inherit; font-size: 12px; font-weight: 700; cursor: pointer; }
+
+@media (max-width: 1120px) { .day-bar { padding: 12px 20px 0; } }
+@media (max-width: 700px) { .day-bar { padding: 10px 16px 0; } }
+@media (min-width: 1440px) { .day-bar { padding: 12px 48px 0; } }
