@@ -97,6 +97,8 @@
 | 058 | 答えあわせの地図の陸地（日本・世界。`day-058-meisho-kumitate/source/src/client/map/paths.ts` に変換して同梱） | [Natural Earth](https://www.naturalearthdata.com/)（[world-atlas](https://github.com/topojson/world-atlas) 2.0.2 経由。© 2013-2019 Michael Bostock） | Natural Earthは[パブリックドメイン](https://www.naturalearthdata.com/about/terms-of-use/)、world-atlasはISC（全文はゲーム内の「クレジット」） | 陸地をSVGのpathに変換。国境は描かない。沖縄・奄美の島々は日本の地図の右下の枠に移す |
 | 058 | three.js 0.186.1（`day-058-meisho-kumitate/assets/` のビルドに同梱） | [three.js](https://threejs.org/) | [MIT](https://github.com/mrdoob/three.js/blob/dev/LICENSE)（全文はゲーム内の「クレジット」） | 改変なし。ビルドで使う部分だけを同梱 |
 | 058 | 答えあわせの豆知識（68名所） | 寺社・自治体・観光局・文化財の管理者・UNESCO・Wikipediaなどの公開資料（一覧はゲーム内の「クレジット → 豆知識の出典」） | 出典で確かめた事実を、40字以内の文に書き起こしたもの | — |
+| 059 | 同梱の `day-059-laureate-age/data/laureates.json`（個人のべ999回・団体31回）、`tests/fixtures/` の実応答4本 | [Nobel Prize API 2.1](https://www.nobelprize.org/about/developer-zone-2/)（2026-10-06取得） | [CC0](https://www.nobelprize.org/about/terms-of-use-for-api-nobelprize-org-and-data-nobelprize-org/) | **加工あり**。生年月日と没年月日は配らず、発表日の年齢（`lib/age.js` で計算）と注記の印に置き換えた。表示に使う項目だけを残し、Wikidataの日本語ラベルを付けた。fixturesは2026-10-06 18:45と18:53の実応答のまま（詳細は[`day-059-laureate-age/data/SOURCES.md`](day-059-laureate-age/data/SOURCES.md)） |
+| 059 | 受賞者の日本語ラベル（`data/laureates.json`） | [Wikidata](https://www.wikidata.org/) | [CC0](https://www.wikidata.org/wiki/Wikidata:Licensing) | 日本語ラベル、無い場合は日本語版記事名を使用 |
 
 ## Day56「夕暮れ破壊紀行」の描画依存
 

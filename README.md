@@ -92,6 +92,7 @@ Day 051「ハコニワ」も外部公開アプリです。本体は独立リポ�
 | 056 | 夕暮れ破壊紀行 | [day-056-dragon-rush/](day-056-dragon-rush/) | [アプリを開く](https://hundred-days.pages.dev/day-056-dragon-rush/) |
 | 057 | 夜店のくだもの箱 | [day-057-fruit-box/](day-057-fruit-box/) | [アプリを開く](https://hundred-days.pages.dev/day-057-fruit-box/) |
 | 058 | 名所くみたて早押し | [day-058-meisho-kumitate/](day-058-meisho-kumitate/) | [アプリを開く](https://hundred-days.pages.dev/day-058-meisho-kumitate/) |
+| 059 | その歳で、受賞した人 | [day-059-laureate-age/](day-059-laureate-age/) | [アプリを開く](https://hundred-days.pages.dev/day-059-laureate-age/) |
 <!-- day-index:end -->
 
 ## 1日アプリのルール

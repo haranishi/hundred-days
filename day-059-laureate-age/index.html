@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="年齢を入れると、その歳でノーベル賞を受けた人の数と顔ぶれが出ます。0人なら近い歳と最年少の人も。2026年の発表も入ります。">
+  <meta name="share:text" content="その歳で、受賞した人 — 年齢を入れると、その歳で受賞した人が出る">
+  <title>その歳で、受賞した人</title>
+  <link rel="stylesheet" href="./app.css">
+  <script type="module" src="./app.js"></script>
+  <link rel="stylesheet" href="./shared/share.css">
+  <script src="./shared/share.js" defer></script>
+</head>
+<body>
+<main id="app" data-state="loading" data-input="empty">
+  <header>
+    <p class="eyebrow">100日チャレンジ・DAY 059</p>
+    <h1>その歳で、<br class="mobile-break">受賞した人</h1>
+    <p class="intro phr">年齢を<wbr>入れると、<wbr>その歳で<wbr>ノーベル賞を<wbr>受けた人が<wbr>出ます。</p>
+    <p class="intro-sub phr">受賞が<wbr>発表された日の<wbr>年齢で<wbr>数えます。<wbr>1901年から<wbr>今年まで、<wbr>経済学賞も<wbr>含みます。</p>
+  </header>
+  <section class="controls" aria-label="年齢を入れる">
+    <label for="age">あなたの歳は？</label>
+    <div class="age-field"><input id="age" type="text" inputmode="numeric" maxlength="12" autocomplete="off" placeholder="例：26" aria-describedby="input-note"><span>歳</span></div>
+    <p id="input-note" data-warn="false">1〜120歳。年齢はこの端末にだけ保存します。</p>
+  </section>
+  <section id="answer-section" class="answer" aria-label="答え">
+    <div id="answer" role="status" aria-live="polite" aria-atomic="true"><p>記録を読み込んでいます…</p></div>
+    <div id="result-share" class="result-share" hidden><a id="result-x" href="https://x.com/intent/post" target="_blank" rel="noopener noreferrer">結果をXで共有</a><button id="copy" type="button">文をコピー</button><span id="copy-note" role="status"></span></div>
+    <p id="pulse" class="pulse phr" hidden></p>
+  </section>
+  <!-- 分野の絞り込みは答えの下。上に置くと、スマホで入力欄と答えのあいだに2段挟まり、答えが画面の下端に押し出される（UI採点1周目） -->
+  <section class="filters" aria-label="分野でしぼる">
+    <fieldset><legend>分野でしぼる</legend><div id="categories" class="categories"></div></fieldset>
+  </section>
+  <section class="distribution" aria-labelledby="band-title"><div class="section-heading"><h2 id="band-title">受賞した歳のひろがり</h2><span>棒1本が1歳・高さが回数</span></div><div id="band"></div><p id="count-note" class="small phr"></p></section>
+  <section id="matches-section" hidden><h2 id="matches-title">その歳の受賞者</h2><div id="matches"></div><button id="more" type="button" hidden></button></section>
+  <section id="current" data-live="loading" aria-labelledby="current-title"><div class="section-heading"><h2 id="current-title">今年の受賞者</h2><span id="current-year">2026</span></div><p id="live-note" role="status">今年の発表を確認しています…</p><button id="retry" type="button" hidden>もう一度取りにいく</button><div id="announcements"></div></section>
+  <footer>
+    <h2>数え方と出典</h2>
+    <ul class="rules phr">
+      <li>年齢は、<wbr>受賞が<wbr>発表された日の<wbr>満年齢です。</li>
+      <li>同じ人が<wbr>2回受けたら<wbr>2回と数えます。<wbr>団体は<wbr>数えません。<wbr>辞退した人も<wbr>数えます。</li>
+      <li>生まれた月日が<wbr>分からない人は、<wbr>7月1日生まれとして<wbr>数えます。<wbr>実際は<wbr>1歳若いことが<wbr>あります。</li>
+      <li>発表の前に<wbr>亡くなっていた人は、<wbr>亡くなった日の<wbr>年齢です。</li>
+      <li>受賞理由は<wbr>公式データの<wbr>原文のままです。</li>
+    </ul>
+    <p class="phr">経済学賞の<wbr>正式名称は<wbr>「アルフレッド・ノーベル記念<wbr>スウェーデン国立銀行<wbr><span class="nw">経済学賞」です。</span><wbr>スウェーデン国立銀行が<wbr>1968年に設け、<wbr>スウェーデン王立科学アカデミーが<wbr>選びます。</p>
+    <p class="phr">年齢は、<wbr>このアプリが<wbr>公開データから<wbr>数えたものです。<wbr>最新の情報は<wbr>公式の紹介ページで<wbr>確かめてください。<wbr>誤りに気づいたら<wbr><a href="https://github.com/haranishi/hundred-days/issues" target="_blank" rel="noopener noreferrer">GitHubのIssue</a>で<wbr>知らせてください。</p>
+    <p class="phr">データ：<wbr><a href="https://www.nobelprize.org/about/developer-zone-2/" target="_blank" rel="noopener noreferrer">Nobel Prize API</a>（nobelprize.org・<wbr><span class="nw"><a href="https://www.nobelprize.org/about/terms-of-use-for-api-nobelprize-org-and-data-nobelprize-org/" target="_blank" rel="noopener noreferrer">CC0・利用条件</a>）</span><br>日本語の名前：<wbr><a href="https://www.wikidata.org/wiki/Wikidata:Licensing" target="_blank" rel="noopener noreferrer">Wikidata</a>（CC0）<br>同梱データの取得日：<wbr>2026年10月6日。<wbr>今年の分は<wbr>公式APIから<wbr>取得します。</p>
+    <p class="phr">このアプリは<wbr>ノーベル財団・<wbr>Nobel Prize Outreachとは<wbr>関係ありません。</p>
+    <nav class="footer-nav" aria-label="ほかのページ"><a href="../privacy.html">プライバシー</a><a href="../">100日チャレンジ</a></nav>
+  </footer>
+</main>
+</body>
+</html>
