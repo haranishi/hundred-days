@@ -41,6 +41,9 @@ day-*/tools/promo/promo-audio.wav
 # 聴き比べ用に書き出すA案・B案も生成物（Day 039〜）
 day-*/tools/promo/promo-audio-?.wav
 day-*/tools/promo/promo.mp4
+# B案の音を重ねた版と、聴き比べ用のBGMのmp3（Day 060〜）
+day-*/tools/promo/promo-b.mp4
+day-*/tools/promo/bgm-?.mp3
 day-*/tools/promo/preview-contact.jpg
 day-*/tools/promo/promo-first-frame.png
 
