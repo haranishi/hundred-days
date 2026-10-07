@@ -1,0 +1,460 @@
+{
+  "schema": 1,
+  "year": 2026,
+  "entries": {
+    "med": {
+      "verifiedAt": "2026-10-07",
+      "mode": "science",
+      "headline": "光に反応するたんぱく質を使い、神経の細胞を光で操作する方法",
+      "what": [
+        {
+          "text": "光遺伝学（オプトジェネティクス）は、神経細胞の電気的な活動を、光で操作して調べる実験の方法です。狙った細胞に、光に反応するたんぱく質を遺伝子の働きでつくらせておき、光を当てて活動を変えます。",
+          "src": [
+            "s4"
+          ]
+        },
+        {
+          "text": "光遺伝学で使われるたんぱく質の一つが、藻（クラミドモナス）に由来するチャネルロドプシンです。2002年の論文はチャネルロドプシン1が水素イオン（電気を帯びた粒）を通す性質を、2003年の論文はチャネルロドプシン2がプラスの電気を帯びた粒（陽イオン）を通す性質を示しました。ナーゲルさんとヘーゲマンさんは、両論文の著者です。",
+          "src": [
+            "s1",
+            "s2"
+          ]
+        },
+        {
+          "text": "2005年の論文は、遺伝子を使って狙った神経細胞の活動を、1000分の1秒（ミリ秒）の単位で光によって操作できることを示しました。ダイセロスさんは、この論文の著者の1人です。",
+          "src": [
+            "s3"
+          ]
+        }
+      ],
+      "changed": [
+        {
+          "text": "神経活動を観察するだけでなく、特定の神経細胞の活動を光で変えて、その後の行動の変化を調べる実験に使われています。",
+          "src": [
+            "s4"
+          ]
+        },
+        {
+          "text": "2021年の論文は、網膜色素変性症で視力を失った1例について、研究段階の治療による視覚機能の部分的な回復を報告しました。光に反応するたんぱく質を網膜の神経細胞につくらせる治療と専用のゴーグルを組み合わせました。治療後の検査でも、ゴーグルなしでは物体を視覚で検出できませんでした。この1例の結果だけでは、治療としての効果や安全性は判断できません。",
+          "src": [
+            "s5"
+          ]
+        }
+      ],
+      "expected": [
+        {
+          "text": "ゲッティンゲン大学医療センターの研究ページには、光で聴覚神経を刺激する人工内耳の開発計画が載っています。年表上の目標は、2029年の人での臨床試験（第I・II相）と、2036年の欧州での販売承認です。研究側の予定で、試験の開始や承認を約束するものではありません。動物では、行動の上での知覚（2018年）や、ヒト以外の霊長類での実証（2025年）が論文になっています。",
+          "src": [
+            "s8"
+          ]
+        }
+      ],
+      "gap": [
+        {
+          "startYear": 2002,
+          "endYear": 2026,
+          "years": 24,
+          "what": "2026年との年の差です。光に反応してイオンを通すたんぱく質を調べた2002年の論文から数えると24年、神経の細胞を光で操作した2005年の論文から数えると21年です。",
+          "src": [
+            "s1",
+            "s3"
+          ]
+        }
+      ],
+      "people": [
+        {
+          "id": "1061",
+          "ja": "カール・ダイセロス",
+          "jaSrc": "https://www.wikidata.org/wiki/Q935993"
+        },
+        {
+          "id": "1062",
+          "ja": "ペーター・ヘーゲマン",
+          "jaSrc": "https://www.wikidata.org/wiki/Q2075526"
+        },
+        {
+          "id": "1063",
+          "ja": "ゲオルグ・ナーゲル",
+          "jaSrc": "https://www.wikidata.org/wiki/Q1247068"
+        }
+      ],
+      "sources": {
+        "s1": {
+          "title": "Channelrhodopsin-1: A Light-Gated Proton Channel in Green Algae",
+          "publisher": "Science（2002年）",
+          "kind": "paper",
+          "url": "https://doi.org/10.1126/science.1072068",
+          "lang": "en"
+        },
+        "s2": {
+          "title": "Channelrhodopsin-2, a directly light-gated cation-selective membrane channel",
+          "publisher": "Proceedings of the National Academy of Sciences（2003年）",
+          "kind": "paper",
+          "url": "https://doi.org/10.1073/pnas.1936192100",
+          "lang": "en"
+        },
+        "s3": {
+          "title": "Millisecond-timescale, genetically targeted optical control of neural activity",
+          "publisher": "Nature Neuroscience（2005年）",
+          "kind": "paper",
+          "url": "https://doi.org/10.1038/nn1525",
+          "lang": "en"
+        },
+        "s4": {
+          "title": "Optogenetic control of neural activity: The biophysics of microbial rhodopsins in neuroscience",
+          "publisher": "Quarterly Reviews of Biophysics（2023年・ケンブリッジ大学出版局）",
+          "kind": "paper",
+          "url": "https://doi.org/10.1017/S0033583523000033",
+          "lang": "en"
+        },
+        "s5": {
+          "title": "Partial recovery of visual function in a blind patient after optogenetic therapy",
+          "publisher": "Nature Medicine（2021年）",
+          "kind": "paper",
+          "url": "https://doi.org/10.1038/s41591-021-01351-4",
+          "lang": "en"
+        },
+        "s8": {
+          "title": "光刺激を使う人工内耳の研究計画と研究の経過",
+          "publisher": "ゲッティンゲン大学医療センター 聴覚神経科学研究所",
+          "kind": "institution",
+          "url": "https://www.auditory-neuroscience.uni-goettingen.de/hearing_the_light_EN.html",
+          "lang": "en"
+        }
+      }
+    },
+    "phy": {
+      "verifiedAt": "2026-10-07",
+      "mode": "science",
+      "headline": "アイスキューブの観測データから、宇宙由来の高エネルギーニュートリノの証拠を示した研究",
+      "what": [
+        {
+          "text": "アイスキューブは、南極の氷の中、深さ1450〜2450mに、光を感じる装置5160個を86本のケーブルに取り付けた、体積約1立方キロメートルの観測装置です。観測データから推定するのは、ニュートリノの来た方向とエネルギーです。手がかりは、ニュートリノが氷の中で反応したとき、できた粒子が出す光です。",
+          "src": [
+            "p1",
+            "p2"
+          ]
+        },
+        {
+          "text": "高エネルギーのニュートリノの来た方向は、宇宙線の発生場所を調べる手がかりになります。ニュートリノは電荷を持たず、磁場で進む向きが変わりません。電荷を持つ宇宙線は、磁場で向きが変わるので、来た方向をそのまま発生場所と結びつけることはできません。",
+          "src": [
+            "p10",
+            "p1"
+          ]
+        },
+        {
+          "text": "2013年の論文で、アイスキューブの共同研究チームは、2010年5月〜2012年5月のデータで見つかった28件の事象をまとめて調べ、すべてが大気でできる粒子によるものという説明を、統計的に退けたと報告しました。宇宙から来た高エネルギーのニュートリノが含まれることの証拠です。",
+          "src": [
+            "p5"
+          ]
+        },
+        {
+          "text": "ハルツェンさんは、1999年11月のアイスキューブの計画書で研究代表者とされ、2026年の発表でも研究代表者と紹介されています。アイスキューブは国際共同研究で、2026年の発表では約450人・58機関・14か国の規模とされています。",
+          "src": [
+            "p3",
+            "p4"
+          ]
+        }
+      ],
+      "changed": [
+        {
+          "text": "2013年の報告に続き、2014年には、3年分のデータを使った観測結果が論文になりました。",
+          "src": [
+            "p5",
+            "p6"
+          ]
+        },
+        {
+          "text": "選んだ事象の来た方向などを、すぐに世界の天文観測施設へ知らせる仕組みの運用が、2016年4月に始まりました。ほかの望遠鏡が同じ方向を追って観測できます。",
+          "src": [
+            "p7"
+          ]
+        },
+        {
+          "text": "2018年の論文で、2017年9月に観測された高エネルギーのニュートリノの来た方向が、増光中だった天体（TXS 0506+056）の方向と、観測の誤差の範囲で一致したと報告されました。",
+          "src": [
+            "p8"
+          ]
+        },
+        {
+          "text": "2022年の論文で、近くの活動銀河NGC 1068の方向から、背景から予想される数を上回るニュートリノが来ている証拠が報告されました。",
+          "src": [
+            "p9"
+          ]
+        },
+        {
+          "text": "2023年の論文で、10年分のデータから、天の川銀河の面に沿った方向からニュートリノが出ている証拠が報告されました。個々の天体を特定したものではありません。",
+          "src": [
+            "p10"
+          ]
+        }
+      ],
+      "expected": [
+        {
+          "text": "より低いエネルギーのニュートリノの観測と、来た方向の推定の精度向上が目標です。そのための拡張部分（アップグレード）は、2025〜2026年に氷の中へ設置されました。最初の科学データは2026年のうちに得られる見込みだと、アイスキューブは説明しています。",
+          "src": [
+            "p4"
+          ]
+        },
+        {
+          "text": "後継計画（アイスキューブ・ジェンツー）では、光を検出する部分の観測体積を約8倍にする案が提案されています。まだ提案の段階で、完成した装置の仕様ではありません。",
+          "src": [
+            "p4"
+          ]
+        }
+      ],
+      "gap": [
+        {
+          "startYear": 2013,
+          "endYear": 2026,
+          "years": 13,
+          "what": "宇宙から来た高エネルギーのニュートリノの証拠を報告した2013年11月の論文から、年の差で数えました。3年分のデータを使った2014年の論文からは12年です。",
+          "src": [
+            "p5",
+            "p6"
+          ]
+        }
+      ],
+      "people": [
+        {
+          "id": "1064",
+          "ja": "フランシス・ハルツェン",
+          "jaSrc": "https://www.wikidata.org/wiki/Q20942818"
+        }
+      ],
+      "sources": {
+        "p1": {
+          "title": "ニュートリノの性質と検出のしくみ",
+          "publisher": "IceCube共同研究（ウィスコンシン大学マディソン校のサイト）",
+          "kind": "institution",
+          "url": "https://icecube.wisc.edu/outreach/neutrinos/",
+          "lang": "en"
+        },
+        "p2": {
+          "title": "観測装置の仕様と共同研究の概要",
+          "publisher": "IceCube共同研究（ウィスコンシン大学マディソン校のサイト）",
+          "kind": "institution",
+          "url": "https://icecube.wisc.edu/about-us/facts/",
+          "lang": "en"
+        },
+        "p3": {
+          "title": "計画・建設・観測の年表",
+          "publisher": "IceCube共同研究（ウィスコンシン大学マディソン校のサイト）",
+          "kind": "institution",
+          "url": "https://icecube.wisc.edu/about-us/icecube10/timeline/",
+          "lang": "en"
+        },
+        "p4": {
+          "title": "観測装置の更新状況と共同研究体制（2026年10月6日の機関発表）",
+          "publisher": "IceCube共同研究（ウィスコンシン大学マディソン校のサイト）",
+          "kind": "institution",
+          "url": "https://icecube.wisc.edu/news/awards/2026/10/francis-halzen-icecube-principal-investigator-wins-2026-physics-nobel-prize/",
+          "lang": "en"
+        },
+        "p5": {
+          "title": "Evidence for High-Energy Extraterrestrial Neutrinos at the IceCube Detector",
+          "publisher": "Science（2013年）",
+          "kind": "paper",
+          "url": "https://doi.org/10.1126/science.1242856",
+          "lang": "en"
+        },
+        "p6": {
+          "title": "Observation of High-Energy Astrophysical Neutrinos in Three Years of IceCube Data",
+          "publisher": "Physical Review Letters（2014年）",
+          "kind": "paper",
+          "url": "https://doi.org/10.1103/PhysRevLett.113.101101",
+          "lang": "en"
+        },
+        "p7": {
+          "title": "ニュートリノ事象の通知（アラート）と追尾観測の解説",
+          "publisher": "千葉大学 ハドロン宇宙国際研究センター",
+          "kind": "institution",
+          "url": "https://www.icehap.chiba-u.jp/icecube/multimessenger.html"
+        },
+        "p8": {
+          "title": "Multimessenger observations of a flaring blazar coincident with high-energy neutrino IceCube-170922A",
+          "publisher": "Science（2018年）",
+          "kind": "paper",
+          "url": "https://doi.org/10.1126/science.aat1378",
+          "lang": "en"
+        },
+        "p9": {
+          "title": "Evidence for neutrino emission from the nearby active galaxy NGC 1068",
+          "publisher": "Science（2022年）",
+          "kind": "paper",
+          "url": "https://doi.org/10.1126/science.abg3395",
+          "lang": "en"
+        },
+        "p10": {
+          "title": "Observation of high-energy neutrinos from the Galactic plane",
+          "publisher": "Science（2023年）",
+          "kind": "paper",
+          "url": "https://doi.org/10.1126/science.adc9818",
+          "lang": "en"
+        }
+      }
+    },
+    "che": {
+      "verifiedAt": "2026-10-07",
+      "mode": "science",
+      "headline": "できた物質が自分をつくる反応の触媒になるしくみと、触媒側と生成物側の鏡像異性体の偏りが比例しない現象",
+      "what": [
+        {
+          "text": "1995年の論文が報告したのは、できた物質が、その物質自身をつくる反応を助ける触媒としても働く反応（不斉自己触媒反応）です。この反応では、鏡像異性体（重ね合わせることのできない2つの形の分子）の割合の偏りが増幅されます。著者の1人が硤合憲三（そあい・けんそう）さんで、2026年の発表では東京理科大学の所属とされています。",
+          "src": [
+            "c5",
+            "c8",
+            "c1",
+            "c2",
+            "c9"
+          ]
+        },
+        {
+          "text": "2003年の論文は、ごく小さな偏りから、鏡像体過剰率（2つの形のうち多い方と少ない方の量の差を、その2つの形の合計量で割った割合）が99.5%を超えるまで増幅できたと報告しました。一方の形だけになったという意味ではありません。",
+          "src": [
+            "c7",
+            "c10"
+          ]
+        },
+        {
+          "text": "非線形効果とは、触媒の鏡像体過剰率と、生成物の鏡像体過剰率が、単純な比例の関係にならないことです。アンリ・カガンさんらが、1986年の論文で、そうなる反応の例を報告しました。",
+          "src": [
+            "c3",
+            "c4"
+          ]
+        },
+        {
+          "text": "グリシンを除くα-アミノ酸にはL型とD型の鏡像異性体があり、地球の生きものは主にL型を使っています。",
+          "src": [
+            "c8"
+          ]
+        }
+      ],
+      "changed": [
+        {
+          "text": "2022年の論文は、非線形効果から反応のしくみを推定するときの注意点を扱っています。検討した連続反応では、触媒が複数集まった状態や、2つの触媒種が同時に関わる反応段階がなくても、非線形効果が現れる場合を示しました。",
+          "src": [
+            "c4"
+          ]
+        }
+      ],
+      "expected": [
+        {
+          "text": "2018年の論文が調べたのは、不斉自己触媒反応（硤合反応）で偏りの増幅が始まる初期の過程です。生きもののアミノ酸の偏りが生じた道すじを確定した結果ではありません。論文は、この実験を、生命誕生前の環境でも起こりうる不斉自己触媒反応を探す研究と関連づけています。そうした反応の探索は、続いている段階です。",
+          "src": [
+            "c6"
+          ]
+        },
+        {
+          "text": "参照した東京理科大学の研究ページには、今後の課題として、新たな不斉自己触媒反応の開発が挙げられています。",
+          "src": [
+            "c8"
+          ]
+        }
+      ],
+      "gap": [
+        {
+          "label": "非線形効果の報告（1986年）",
+          "startYear": 1986,
+          "endYear": 2026,
+          "years": 40,
+          "what": "1986年4月の論文から、年の差で数えました。",
+          "src": [
+            "c3"
+          ]
+        },
+        {
+          "label": "不斉自己触媒の報告（1995年）",
+          "startYear": 1995,
+          "endYear": 2026,
+          "years": 31,
+          "what": "1995年12月の論文から、年の差で数えました。",
+          "src": [
+            "c5"
+          ]
+        }
+      ],
+      "people": [
+        {
+          "id": "1065",
+          "ja": "アンリ・カガン",
+          "jaSrc": "https://www.wikidata.org/wiki/Q354979"
+        },
+        {
+          "id": "1066",
+          "ja": "硤合憲三",
+          "jaSrc": "https://www.wikidata.org/wiki/Q24284511"
+        }
+      ],
+      "sources": {
+        "c1": {
+          "title": "鏡像異性体（用語解説）",
+          "publisher": "公益社団法人 日本薬学会",
+          "kind": "institution",
+          "url": "https://www.pharm.or.jp/words/word00506.html"
+        },
+        "c2": {
+          "title": "2026年の化学賞発表ページ",
+          "publisher": "NobelPrize.org",
+          "kind": "official",
+          "url": "https://www.nobelprize.org/prizes/chemistry/2026/press-release/",
+          "lang": "en"
+        },
+        "c3": {
+          "title": "Nonlinear effects in asymmetric synthesis. Examples in asymmetric oxidations and aldolization reactions",
+          "publisher": "Journal of the American Chemical Society（1986年）",
+          "kind": "paper",
+          "url": "https://doi.org/10.1021/ja00269a036",
+          "lang": "en"
+        },
+        "c4": {
+          "title": "Kinetic Rationalization of Nonlinear Effects in Asymmetric Catalytic Cascade Reactions under Curtin-Hammett Conditions",
+          "publisher": "ACS Catalysis（2022年）",
+          "kind": "paper",
+          "url": "https://doi.org/10.1021/acscatal.2c00783",
+          "lang": "en"
+        },
+        "c5": {
+          "title": "Asymmetric autocatalysis and amplification of enantiomeric excess of a chiral molecule",
+          "publisher": "Nature（1995年）",
+          "kind": "paper",
+          "url": "https://doi.org/10.1038/378767a0",
+          "lang": "en"
+        },
+        "c6": {
+          "title": "Rationalization of Asymmetric Amplification via Autocatalysis Triggered by Isotopically Chiral Molecules",
+          "publisher": "ACS Central Science（2018年）",
+          "kind": "paper",
+          "url": "https://doi.org/10.1021/acscentsci.8b00297",
+          "lang": "en"
+        },
+        "c7": {
+          "title": "Amplification of Chirality from Extremely Low to Greater than 99.5 % ee by Asymmetric Autocatalysis",
+          "publisher": "Angewandte Chemie International Edition（2003年）",
+          "kind": "paper",
+          "url": "https://doi.org/10.1002/anie.200390105",
+          "lang": "en"
+        },
+        "c8": {
+          "title": "研究室の研究紹介（東京理科大学）",
+          "publisher": "東京理科大学",
+          "kind": "institution",
+          "url": "https://www.rs.tus.ac.jp/tkawa/Research.html"
+        },
+        "c9": {
+          "title": "硤合憲三の研究者情報（J-GLOBAL）",
+          "publisher": "科学技術振興機構",
+          "kind": "institution",
+          "url": "https://jglobal.jst.go.jp/detail?JGLOBAL_ID=200901053045888759"
+        },
+        "c10": {
+          "title": "鏡像体過剰率（Enantiomeric excess）の解説",
+          "publisher": "Wikipedia（英語版）",
+          "kind": "reference",
+          "url": "https://en.wikipedia.org/wiki/Enantiomeric_excess",
+          "lang": "en"
+        }
+      }
+    }
+  }
+}

@@ -121,7 +121,9 @@ const skipToolsCache = (source) => !isExcluded(source);
 const SOURCE_DIRS_BY_APP = {
   'day-056-dragon-rush': ['source', 'tools'],
   'day-058-meisho-kumitate': ['source', 'tools'],
-  'day-059-kuchi-sanmai': ['source', 'tools']
+  'day-059-kuchi-sanmai': ['source', 'tools'],
+  // day-060 は素のJSをそのまま配信する（source は無い）。tools/ はデータの作り直し・解説の検査・宣伝動画の道具で、配信には要らない
+  'day-060-prize-explained': ['tools']
 };
 const isSourceDir = (app, source) => {
   const [top] = relative(join(appsDir, app.dir), source).split(sep);
@@ -168,6 +170,7 @@ const WIKIMEDIA_CONNECT = [
 /* 外部へ接続するのはここに挙げたDayだけ。ほかのアプリは同一オリジンに閉じている。
    ⚠️ 新しいDayで外部のAPIを叩くときは、ここに足さないとブラウザ側で接続が止まる（黙って失敗する）。 */
 const CONNECT_BY_APP = {
+  'day-060-prize-explained': 'https://api.nobelprize.org',
   /* day-042 は気象庁の台風JSON（一覧・確率・実況・予報の幾何）を直接読む。確率は全国ぶんが1本で届くので、
      現在地や選んだ市区町村は端末の外に出ない。海岸線は同梱 */
   'day-042-typhoon-coming': 'https://www.jma.go.jp',
