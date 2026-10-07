@@ -1,0 +1,201 @@
+{
+  "schema": 1,
+  "year": 2026,
+  "entries": {
+    "med": {
+      "verifiedAt": "2026-10-05",
+      "mode": "science",
+      "headline": "テスト用の作り話：紙の明かりを調べた人",
+      "what": [
+        {
+          "text": "テスト用の作り話：紙の明かりを測りました。",
+          "src": [
+            "second"
+          ]
+        },
+        {
+          "text": "テスト用の作り話：明かりの測り方を記録しました。",
+          "src": [
+            "first",
+            "second"
+          ]
+        }
+      ],
+      "changed": [
+        {
+          "text": "テスト用の作り話：測定の記録が公開されました。",
+          "src": [
+            "third"
+          ]
+        }
+      ],
+      "expected": [
+        {
+          "text": "テスト用の作り話：別の測り方に使うことが期待されています。",
+          "src": [
+            "first"
+          ]
+        }
+      ],
+      "gap": [
+        {
+          "startYear": 2002,
+          "endYear": 2026,
+          "years": 24,
+          "what": "テスト用の作り話：紙の測定を記録した年です。",
+          "src": [
+            "third"
+          ]
+        }
+      ],
+      "people": [
+        {
+          "id": "1061",
+          "ja": "テスト用の名前",
+          "jaSrc": "https://www.wikidata.org/wiki/Q1"
+        },
+        {
+          "id": "1062"
+        },
+        {
+          "id": "1063"
+        }
+      ],
+      "sources": {
+        "first": {
+          "title": "テスト用の資料A",
+          "publisher": "テスト用の架空機関",
+          "kind": "institution",
+          "url": "https://example.org/test-a"
+        },
+        "second": {
+          "title": "テスト用の論文B",
+          "publisher": "テスト用の架空機関",
+          "kind": "paper",
+          "url": "https://doi.org/10.0000/test-b"
+        },
+        "third": {
+          "title": "テスト用の資料C",
+          "publisher": "テスト用の架空機関",
+          "kind": "institution",
+          "url": "https://example.org/test-c"
+        }
+      }
+    },
+    "lit": {
+      "verifiedAt": "2026-10-05",
+      "mode": "facts",
+      "headline": "テスト用の作り話：紙の話を書いた人",
+      "what": [
+        {
+          "text": "テスト用の作り話：紙の話を書きました。",
+          "src": [
+            "a"
+          ]
+        },
+        {
+          "text": "テスト用の作り話：話を発表しました。",
+          "src": [
+            "a"
+          ]
+        }
+      ],
+      "people": [
+        {
+          "id": "999901"
+        }
+      ],
+      "sources": {
+        "a": {
+          "title": "テスト用の活動記録",
+          "publisher": "テスト用の架空機関",
+          "kind": "institution",
+          "url": "https://example.org/test-facts"
+        }
+      }
+    },
+    "che": {
+      "verifiedAt": "2026-10-05",
+      "mode": "science",
+      "headline": "テスト用の作り話：紙の明かりを調べた人",
+      "what": [
+        {
+          "text": "テスト用の作り話：紙の明かりを測りました。",
+          "src": [
+            "second"
+          ]
+        },
+        {
+          "text": "テスト用の作り話：明かりの測り方を記録しました。",
+          "src": [
+            "first",
+            "second"
+          ]
+        }
+      ],
+      "changed": [
+        {
+          "text": "テスト用の作り話：測定の記録が公開されました。",
+          "src": [
+            "third"
+          ]
+        }
+      ],
+      "expected": [
+        {
+          "text": "テスト用の作り話：別の測り方に使うことが期待されています。",
+          "src": [
+            "first"
+          ]
+        }
+      ],
+      "gap": [
+        {
+          "startYear": 2002,
+          "endYear": 2026,
+          "years": 24,
+          "what": "テスト用の作り話：紙の測定を記録した年です。",
+          "src": [
+            "third"
+          ],
+          "label": "テスト用の測定A"
+        },
+        {
+          "startYear": 1986,
+          "endYear": 2026,
+          "years": 40,
+          "what": "テスト用の作り話：紙の測定を記録した年です。",
+          "src": [
+            "third"
+          ],
+          "label": "テスト用の測定B"
+        }
+      ],
+      "people": [
+        {
+          "id": "999902"
+        }
+      ],
+      "sources": {
+        "first": {
+          "title": "テスト用の資料A",
+          "publisher": "テスト用の架空機関",
+          "kind": "institution",
+          "url": "https://example.org/test-a"
+        },
+        "second": {
+          "title": "テスト用の論文B",
+          "publisher": "テスト用の架空機関",
+          "kind": "paper",
+          "url": "https://doi.org/10.0000/test-b"
+        },
+        "third": {
+          "title": "テスト用の資料C",
+          "publisher": "テスト用の架空機関",
+          "kind": "institution",
+          "url": "https://example.org/test-c"
+        }
+      }
+    }
+  }
+}

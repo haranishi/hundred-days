@@ -93,6 +93,7 @@ Day 051「ハコニワ」も外部公開アプリです。本体は独立リポ�
 | 057 | 夜店のくだもの箱 | [day-057-fruit-box/](day-057-fruit-box/) | [アプリを開く](https://hundred-days.pages.dev/day-057-fruit-box/) |
 | 058 | 名所くみたて早押し | [day-058-meisho-kumitate/](day-058-meisho-kumitate/) | [アプリを開く](https://hundred-days.pages.dev/day-058-meisho-kumitate/) |
 | 059 | 口さんまい | [day-059-kuchi-sanmai/](day-059-kuchi-sanmai/) | [アプリを開く](https://hundred-days.pages.dev/day-059-kuchi-sanmai/) |
+| 060 | 今年の受賞の解説 | [day-060-prize-explained/](day-060-prize-explained/) | [アプリを開く](https://hundred-days.pages.dev/day-060-prize-explained/) |
 <!-- day-index:end -->
 
 ## 1日アプリのルール
