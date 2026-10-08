@@ -1,0 +1,37 @@
+import { chromium } from '@playwright/test';
+import { execFileSync } from 'node:child_process';
+import { mkdtempSync, readdirSync, rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+import { fileURLToPath } from 'node:url';
+const day = fileURLToPath(new URL('../', import.meta.url));
+const work = mkdtempSync(join(tmpdir(), 'day061-demo-'));
+const url = process.env.DAY061_URL || 'http://127.0.0.1:4612/day-061-kumimae/';
+const browser = await chromium.launch({ args: ['--use-angle=metal', '--enable-gpu', '--ignore-gpu-blocklist'] });
+try {
+  const shot = await browser.newPage({ viewport: { width: 1200, height: 750 }, deviceScaleFactor: 1 });
+  await shot.goto(url); await shot.locator('[data-ready="true"]').waitFor();
+  await shot.getByLabel('入力する部品', { exact: true }).selectOption('gpu');
+  await shot.evaluate(() => scrollTo(0, 0)); await shot.waitForTimeout(500);
+  await shot.screenshot({path: join(work, 'shot.png')});
+  execFileSync('ffmpeg', ['-hide_banner','-loglevel','error','-y','-i',join(work,'shot.png'),'-c:v','libwebp','-quality','87',join(day,'screenshot.webp')]);
+  await shot.close();
+  const context = await browser.newContext({ viewport:{width:540,height:960}, recordVideo:{dir:work,size:{width:540,height:960}} });
+  const page = await context.newPage(); const started = Date.now();
+  await page.goto(url); await page.locator('[data-ready="true"]').waitFor();
+  const leading = (Date.now()-started)/1000;
+  await page.waitForTimeout(1800);
+  await page.getByRole('link',{name:'寸法を入力する'}).click();
+  await page.getByLabel('入力する部品',{exact:true}).selectOption('gpu');
+  await page.locator('[data-field="gpu_length"]').fill('400');
+  await page.waitForTimeout(1600);
+  await page.locator('#results').scrollIntoViewIfNeeded(); await page.waitForTimeout(3600);
+  await page.locator('[data-field="gpu_length"]').fill('340'); await page.waitForTimeout(1000);
+  await page.locator('#results').scrollIntoViewIfNeeded(); await page.waitForTimeout(3000);
+  await page.getByLabel('分解して見る').check();
+  await page.locator('[data-testid="manual-diagram"]').scrollIntoViewIfNeeded(); await page.waitForTimeout(3000);
+  await context.close();
+  const video = readdirSync(work).find(file=>file.endsWith('.webm'));
+  execFileSync('ffmpeg',['-hide_banner','-loglevel','error','-y','-ss',String(leading),'-i',join(work,video),'-t','20','-an','-c:v','libx264','-preset','slow','-crf','25','-pix_fmt','yuv420p','-r','25','-vf','scale=720:1280:flags=lanczos','-map_metadata','-1','-movflags','+faststart',join(day,'demo.mp4')]);
+  console.log('Saved screenshot.webp and demo.mp4 from the running app. No external media.');
+} finally { await browser.close(); rmSync(work,{recursive:true,force:true}); }
