@@ -122,6 +122,7 @@ const SOURCE_DIRS_BY_APP = {
   'day-056-dragon-rush': ['source', 'tools'],
   'day-058-meisho-kumitate': ['source', 'tools'],
   'day-059-kuchi-sanmai': ['source', 'tools'],
+  'day-061-kumimae': ['source', 'tools'],
   // day-060 は素のJSをそのまま配信する（source は無い）。tools/ はデータの作り直し・解説の検査・宣伝動画の道具で、配信には要らない
   'day-060-prize-explained': ['tools']
 };

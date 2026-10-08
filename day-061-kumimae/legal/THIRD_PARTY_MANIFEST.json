@@ -1,0 +1,482 @@
+{
+  "schemaVersion": 1,
+  "scope": "Production browser modules, generated helpers and their upstream notices.",
+  "noticeSha256": "b4d2ecf6b04076324c8c3421e6e393fa80587b5a562abdd437613f856eac6092",
+  "fiberLicenseProvenance": {
+    "version": "9.8.0",
+    "file": "tools/licenses/react-three-fiber-9.8.0.LICENSE.txt",
+    "source": "https://raw.githubusercontent.com/pmndrs/react-three-fiber/7db6056f80f11db3ba97038429eb935514f8b4d1/LICENSE",
+    "packageMetadata": "https://raw.githubusercontent.com/pmndrs/react-three-fiber/7db6056f80f11db3ba97038429eb935514f8b4d1/packages/fiber/package.json",
+    "sha256": "9c35b5de7b7493a707fffe4eb23bd2f7f449153c1911f7c6eefb4e591fd5349a"
+  },
+  "generatedFiles": [
+    {
+      "file": "assets/Diagram-CF0sJrp4.js",
+      "sha256": "554523b87214b47765e1c94a28cfcba59d920cf30bd35997386edc9572c9d3a3"
+    },
+    {
+      "file": "assets/Diagram-DzDnQ6Kb.css",
+      "sha256": "ca2ceaf0698b4864665a77b975de75295a466ae01a2519a9576158f52874310f"
+    },
+    {
+      "file": "assets/index-ALxJGOB_.css",
+      "sha256": "bff0c47ef420a8aecc487ddd58f944c93451bfc23b92801eff6a6f0193c81127"
+    },
+    {
+      "file": "assets/index-cTEraY2S.js",
+      "sha256": "caf8a380ad68240bb03b7a66b4ac9c71b1e991be491375e91abd98c41ad34f8a"
+    },
+    {
+      "file": "index.html",
+      "sha256": "f83ad77d59930db14943aa6a5bbf9b04fd318b2e7c3aea0436ffabc32870fbe9"
+    }
+  ],
+  "packages": [
+    {
+      "name": "@babel/runtime",
+      "version": "7.29.7",
+      "license": "MIT",
+      "lockPath": "node_modules/@babel/runtime",
+      "integrity": "sha512-Nq8OhGWiZIZGV6hLHoyAKLLcJihP/xFeBMGJoUrxTX2psI8dCifzLhZISFb+VWS3wFMRDmCGw5R+dOySCqPLhw==",
+      "scope": "Babel helpers used by the browser modules.",
+      "licenses": [
+        {
+          "source": "node_modules/@babel/runtime/LICENSE",
+          "sourceSha256": "117da2af0d4ce0fe1c8e19b5cff9dcd806adf973d328d27b11d4448c4ff24f76",
+          "includedSha256": "117da2af0d4ce0fe1c8e19b5cff9dcd806adf973d328d27b11d4448c4ff24f76"
+        }
+      ],
+      "modules": [
+        {
+          "file": "helpers/esm/extends.js",
+          "sha256": "94d2689b0907907fbb08bae35e63abb07b35ebec5cdfd06ec9bdd8db3f611f1c"
+        }
+      ],
+      "embeddedNotices": []
+    },
+    {
+      "name": "@react-three/drei",
+      "version": "10.7.8",
+      "license": "MIT",
+      "lockPath": "node_modules/@react-three/drei",
+      "integrity": "sha512-rJXyuzLm2Xq0kafHuR47ajDGbOe/pEhzIr4m8E8zwzQs0iNjloFDqBwRhrXmP/w+onLeYyN3EYPFW/cwWK/4yA==",
+      "scope": "React Three Fiber browser helpers retained by the production bundle.",
+      "licenses": [
+        {
+          "source": "node_modules/@react-three/drei/LICENSE",
+          "sourceSha256": "2e36b208b403882158daf95cae207087bbb830db4d434a79ebafffca177244c8",
+          "includedSha256": "2e36b208b403882158daf95cae207087bbb830db4d434a79ebafffca177244c8"
+        }
+      ],
+      "modules": [
+        {
+          "file": "core/OrbitControls.js",
+          "sha256": "cca79b7921feae626646e367089852890876bcf6a5f892689743578b24ab9469"
+        }
+      ],
+      "embeddedNotices": []
+    },
+    {
+      "name": "@react-three/fiber",
+      "version": "9.8.0",
+      "license": "MIT",
+      "lockPath": "node_modules/@react-three/fiber",
+      "integrity": "sha512-We1NYDnG9/AN8VToe75S9B5WlDsSCE43t948niieOqQ1x4U/PIazRgZh09Qo+x8q5OTAS83xI0eFhzVcgc3mVg==",
+      "scope": "React renderer for Three.js. Embedded React reconciler notices are retained below; its MIT permission is also included with React.",
+      "licenses": [
+        {
+          "source": "https://raw.githubusercontent.com/pmndrs/react-three-fiber/7db6056f80f11db3ba97038429eb935514f8b4d1/LICENSE",
+          "sourceSha256": "9c35b5de7b7493a707fffe4eb23bd2f7f449153c1911f7c6eefb4e591fd5349a",
+          "includedSha256": "9c35b5de7b7493a707fffe4eb23bd2f7f449153c1911f7c6eefb4e591fd5349a"
+        }
+      ],
+      "modules": [
+        {
+          "file": "dist/events-803f4abc.esm.js",
+          "sha256": "24a76a5e593a34b3a7e48b72e135fa88b9ad2a5f82b1448f61136e99cd460d98"
+        },
+        {
+          "file": "dist/react-three-fiber.esm.js",
+          "sha256": "0c85c792884cd655043c3db0198e9d98ded2da31d0c03cb0e42c632757b21a6f"
+        }
+      ],
+      "embeddedNotices": [
+        {
+          "file": "dist/events-803f4abc.esm.js",
+          "sha256": "1834d892312378728fa27c8aff383895f21b02bf6301ed6cf3dfeeaa8c7ba8b6"
+        }
+      ]
+    },
+    {
+      "name": "its-fine",
+      "version": "2.0.0",
+      "license": "MIT",
+      "lockPath": "node_modules/its-fine",
+      "integrity": "sha512-KLViCmWx94zOvpLwSlsx6yOCeMhZYaxrJV87Po5k/FoZzcPSahvK5qJ7fYhS61sZi5ikmh2S3Hz55A2l3U69ng==",
+      "scope": "React context bridge used by the Three.js renderer.",
+      "licenses": [
+        {
+          "source": "node_modules/its-fine/LICENSE",
+          "sourceSha256": "506bca9e41227d2ae1fbea8342a1fcff853af8198e9e1f37693a635e86efc539",
+          "includedSha256": "506bca9e41227d2ae1fbea8342a1fcff853af8198e9e1f37693a635e86efc539"
+        }
+      ],
+      "modules": [
+        {
+          "file": "dist/index.js",
+          "sha256": "b7ca30c64032ecdfc48e1e44c542f97bcb5e76d0f9ad3571251bfb848259d49c"
+        }
+      ],
+      "embeddedNotices": []
+    },
+    {
+      "name": "react",
+      "version": "19.3.0",
+      "license": "MIT",
+      "lockPath": "node_modules/react",
+      "integrity": "sha512-E8LUcbtBWt20bbl2YoHfx4ZDBdxVTfOKtCZn9cDSJ4l6/nuoApcpIBcj47t2wZoVX8g2ZHuMHbiShgCR1T5Sog==",
+      "scope": "React browser and JSX runtimes; MIT permission for React code embedded in React Three Fiber.",
+      "licenses": [
+        {
+          "source": "node_modules/react/LICENSE",
+          "sourceSha256": "da6d3703ed11cbe42bd212c725957c98da23cbff1998c05fa4b3d976d1a58e93",
+          "includedSha256": "da6d3703ed11cbe42bd212c725957c98da23cbff1998c05fa4b3d976d1a58e93"
+        }
+      ],
+      "modules": [
+        {
+          "file": "cjs/react-jsx-runtime.production.js",
+          "sha256": "1e46f15002696985e80c61d47aaa30dabb03c954270a690f5f7dfbbacfa9002b"
+        },
+        {
+          "file": "cjs/react.production.js",
+          "sha256": "6b28feb9dbe9781ab1e1b64dea7b29a7c70f03d2dc10eaa966363053d8a9b4e5"
+        },
+        {
+          "file": "index.js",
+          "sha256": "60caffdecbdc5db3bc4ec4e83df9488345ccb271d07533b9210bf5750918d97e"
+        },
+        {
+          "file": "jsx-runtime.js",
+          "sha256": "b392951a77d0a2e6a6bd017e49d768481ae5b63c4109c6c31f622cf7b2433edc"
+        }
+      ],
+      "embeddedNotices": [
+        {
+          "file": "cjs/react-jsx-runtime.production.js",
+          "sha256": "f29b5902fdc1d4d28ee16330e88e90dd6ab64f5c77eb3ad8e9e66becbbfdbd4c"
+        },
+        {
+          "file": "cjs/react.production.js",
+          "sha256": "90eea83eadca9ee07f21d69c4d3e0f5636befedee93d5a1c22410020b8d57fb2"
+        }
+      ]
+    },
+    {
+      "name": "react-dom",
+      "version": "19.3.0",
+      "license": "MIT",
+      "lockPath": "node_modules/react-dom",
+      "integrity": "sha512-JDk8dgif51OjFoDE70+OT9ICyYr+69HlmihNwp1+Nsfbna3t5sIiCa9ZJktDmQ4/1b/rn26hIAR2uYXDMr5r0Q==",
+      "scope": "React DOM browser rendering runtime.",
+      "licenses": [
+        {
+          "source": "node_modules/react-dom/LICENSE",
+          "sourceSha256": "da6d3703ed11cbe42bd212c725957c98da23cbff1998c05fa4b3d976d1a58e93",
+          "includedSha256": "da6d3703ed11cbe42bd212c725957c98da23cbff1998c05fa4b3d976d1a58e93"
+        }
+      ],
+      "modules": [
+        {
+          "file": "cjs/react-dom-client.production.js",
+          "sha256": "8a8147c1cebdb19d82fd11bdb76391be9b20d00edf67cc8e8b30f44e850ce693"
+        },
+        {
+          "file": "cjs/react-dom.production.js",
+          "sha256": "fd016e2c887f97b82f466ca435ae259d08cf7d4e7fef37e087963336d4770c01"
+        },
+        {
+          "file": "client.js",
+          "sha256": "00e348ab3d6bc2eef908345d0bc4e008c95bcfecec060dfda5c4967953761396"
+        },
+        {
+          "file": "index.js",
+          "sha256": "ba1a3e33489f868371561777607e3ee5091df0f7ea3f1a10f789d6b86e4c1505"
+        }
+      ],
+      "embeddedNotices": [
+        {
+          "file": "cjs/react-dom-client.production.js",
+          "sha256": "8ed3d489d088a5a2dac14287d9e60cca9fa62a0437fe8d14c8b5097db5818761"
+        },
+        {
+          "file": "cjs/react-dom.production.js",
+          "sha256": "3a03c6e30fda3608e9e50224e4d3d0d859d8eebacbfc0452c9388cba839025f8"
+        }
+      ]
+    },
+    {
+      "name": "react-use-measure",
+      "version": "2.1.7",
+      "license": "MIT",
+      "lockPath": "node_modules/react-use-measure",
+      "integrity": "sha512-KrvcAo13I/60HpwGO5jpW7E9DfusKyLPLvuHlUyP5zqnmAPhNc6qTRjUQrdTADl0lpPpDVU2/Gg51UlOGHXbdg==",
+      "scope": "Browser element measurement hook.",
+      "licenses": [
+        {
+          "source": "node_modules/react-use-measure/LICENSE",
+          "sourceSha256": "1f9038eff8dbd6505a26f9d6830cc6da2b87ab1a9305d1100884986e9c11a31a",
+          "includedSha256": "1f9038eff8dbd6505a26f9d6830cc6da2b87ab1a9305d1100884986e9c11a31a"
+        }
+      ],
+      "modules": [
+        {
+          "file": "dist/index.js",
+          "sha256": "b9fe1ea95e47cb5682226cb9fa38c2d70744fab88250672c63dd9db8e608040c"
+        }
+      ],
+      "embeddedNotices": []
+    },
+    {
+      "name": "rolldown",
+      "version": "1.2.10",
+      "license": "MIT",
+      "lockPath": "node_modules/rolldown",
+      "integrity": "sha512-OxkA08pSryMK7B3XiFA09B4OJ1xJMPgIYCBMY2xchzpqgBGsV1o0DetPAE+Sl3N3L4oCPiEzmHVSOj7iR04Zog==",
+      "scope": "Generated browser module interop runtime, with upstream Rollup/esbuild notices retained. Build tools are not shipped.",
+      "licenses": [
+        {
+          "source": "node_modules/rolldown/LICENSE",
+          "sourceSha256": "23ecfff35a5a2e80d92142f75228912c3b1abc4b5a8337a821ff4397e2f9f734",
+          "includedSha256": "23ecfff35a5a2e80d92142f75228912c3b1abc4b5a8337a821ff4397e2f9f734"
+        },
+        {
+          "source": "node_modules/rolldown/THIRD-PARTY-LICENSE",
+          "sourceSha256": "a877291d800ed43692f3f9ae09d8e01cc6f7293ad39d43896059c188ffbb8b7c",
+          "includedSha256": "a877291d800ed43692f3f9ae09d8e01cc6f7293ad39d43896059c188ffbb8b7c"
+        }
+      ],
+      "modules": [
+        {
+          "file": "rolldown/runtime.js"
+        }
+      ],
+      "embeddedNotices": []
+    },
+    {
+      "name": "scheduler",
+      "version": "0.28.0",
+      "license": "MIT",
+      "lockPath": "node_modules/scheduler",
+      "integrity": "sha512-juorfCmIkIw8tT+p5BXSm6PJjQF/ycEYmKyzURCIt/RaZIhL+PulbQ9Yu2z1HdOJDdqDTlxA1+xKBmHXJsczAw==",
+      "scope": "React scheduling runtime.",
+      "licenses": [
+        {
+          "source": "node_modules/scheduler/LICENSE",
+          "sourceSha256": "da6d3703ed11cbe42bd212c725957c98da23cbff1998c05fa4b3d976d1a58e93",
+          "includedSha256": "da6d3703ed11cbe42bd212c725957c98da23cbff1998c05fa4b3d976d1a58e93"
+        }
+      ],
+      "modules": [
+        {
+          "file": "cjs/scheduler.production.js",
+          "sha256": "679adff761d31e9426604f80c0e99be44a3e6f4c6834b0218ecf0312a67c171f"
+        },
+        {
+          "file": "index.js",
+          "sha256": "145965504d60007bc25486ab930b0367867dcd5d579ccd343c148d69349a7cfb"
+        }
+      ],
+      "embeddedNotices": [
+        {
+          "file": "cjs/scheduler.production.js",
+          "sha256": "1259fe974cb4fccd7b27ba88b46817541f1786b86ae6d463c3ce1a805cc19eda"
+        }
+      ]
+    },
+    {
+      "name": "suspend-react",
+      "version": "0.1.3",
+      "license": "MIT",
+      "lockPath": "node_modules/suspend-react",
+      "integrity": "sha512-aqldKgX9aZqpoDp3e8/BZ8Dm7x1pJl+qI3ZKxDN0i/IQTWUwBx/ManmlVJ3wowqbno6c2bmiIfs+Um6LbsjJyQ==",
+      "scope": "React suspense cache used by the renderer.",
+      "licenses": [
+        {
+          "source": "node_modules/suspend-react/LICENSE",
+          "sourceSha256": "997e79b828d8b85d6f18730c8dbf58074811360a199506bd84e1263e17c227a2",
+          "includedSha256": "997e79b828d8b85d6f18730c8dbf58074811360a199506bd84e1263e17c227a2"
+        }
+      ],
+      "modules": [
+        {
+          "file": "index.js",
+          "sha256": "12b503b08c451b0f378d547b960399517da189f3d565ac8d0c909714b4d4bb4e"
+        }
+      ],
+      "embeddedNotices": []
+    },
+    {
+      "name": "three",
+      "version": "0.186.0",
+      "license": "MIT",
+      "lockPath": "node_modules/three",
+      "integrity": "sha512-cr/fIM2ddMSVbYVgkfD4jLJv7Fh/8ZTjvo+7gQeSVGUZHxpx9FDwoL5iC7hUz/LiRA8wMbqfnb90xKfm1/HHkQ==",
+      "scope": "Three.js renderer and retained example utilities. Three.js author permission also covers Three.js-derived code in three-stdlib.",
+      "licenses": [
+        {
+          "source": "node_modules/three/LICENSE",
+          "sourceSha256": "8b378ebe60e2fe500158cb0ac71cb5e8b7d92953c2abcc63a0eb90499653b5bc",
+          "includedSha256": "8b378ebe60e2fe500158cb0ac71cb5e8b7d92953c2abcc63a0eb90499653b5bc"
+        }
+      ],
+      "modules": [
+        {
+          "file": "build/three.core.js",
+          "sha256": "9edde002b066a9a05676a6127f67735b62baf399bdea529f2f7e31657da769e6"
+        },
+        {
+          "file": "build/three.module.js",
+          "sha256": "9052042d676cb0fdc1ddfefe193053f34b7ac0513a616fdac4535d49987812ea"
+        },
+        {
+          "file": "examples/jsm/geometries/RoundedBoxGeometry.js",
+          "sha256": "c5feab96123858ed8823c889b238dc8734adab7e760e3cfd21e7f3f2f3e348e3"
+        },
+        {
+          "file": "examples/jsm/utils/BufferGeometryUtils.js",
+          "sha256": "9fb63427ce6641fa14fd0baff9cc4d1b5f9c3d85fd084bf2e90e803c44ec1797"
+        }
+      ],
+      "embeddedNotices": [
+        {
+          "file": "build/three.core.js",
+          "sha256": "bb79bb2f6e9cd76f34fcaf15d87be7e750f3bc84e9c944aa8ae53459e7c9176c"
+        },
+        {
+          "file": "build/three.module.js",
+          "sha256": "12abfc85e0b7ec1b3c18a2a9f8074ab4bac5c6f50bf0d4378575ed6f96716b5c"
+        }
+      ]
+    },
+    {
+      "name": "three-stdlib",
+      "version": "2.36.1",
+      "license": "MIT",
+      "lockPath": "node_modules/three-stdlib",
+      "integrity": "sha512-XyGQrFmNQ5O/IoKm556ftwKsBg11TIb301MB5dWNicziQBEs2g3gtOYIf7pFiLa0zI2gUwhtCjv9fmjnxKZ1Cg==",
+      "scope": "Retained Three.js example utilities and Poimandres modifications; Three.js permission is included separately.",
+      "licenses": [
+        {
+          "source": "node_modules/three-stdlib/LICENSE",
+          "sourceSha256": "28eb7edf059a39094aa3d169db1fec46ac4a6279c921a90f965828d92ec86e79",
+          "includedSha256": "28eb7edf059a39094aa3d169db1fec46ac4a6279c921a90f965828d92ec86e79"
+        }
+      ],
+      "modules": [
+        {
+          "file": "controls/EventDispatcher.js",
+          "sha256": "5923cfcf6190505a0eaef03ecc86b389cfe9947ab697741ed19b9aef35a51a3e"
+        },
+        {
+          "file": "controls/OrbitControls.js",
+          "sha256": "43ad9d91407dc801105248c4c8a275015d4c7f28eebc5aabe09ff182954f99e3"
+        }
+      ],
+      "embeddedNotices": []
+    },
+    {
+      "name": "use-sync-external-store",
+      "version": "1.7.0",
+      "license": "MIT",
+      "lockPath": "node_modules/use-sync-external-store",
+      "integrity": "sha512-6L+EeigHMQhdaIPNIFUKwfWJSwWFQ8gJbJ2DLOs5sDIegTwR9fRxvnM3uciHKjIZhFz+KAv2emhWMRvDmMcY8A==",
+      "scope": "React external-store subscription helpers.",
+      "licenses": [
+        {
+          "source": "node_modules/use-sync-external-store/LICENSE",
+          "sourceSha256": "da6d3703ed11cbe42bd212c725957c98da23cbff1998c05fa4b3d976d1a58e93",
+          "includedSha256": "da6d3703ed11cbe42bd212c725957c98da23cbff1998c05fa4b3d976d1a58e93"
+        }
+      ],
+      "modules": [
+        {
+          "file": "cjs/use-sync-external-store-shim.production.js",
+          "sha256": "e8c2f1808804d75c9e0ffab8c37329b34f356140275dea0efe1e75684ded14fa"
+        },
+        {
+          "file": "cjs/use-sync-external-store-shim/with-selector.production.js",
+          "sha256": "fc76f309604db72c728d7c46cc593c6bba65e3f3d00dd38a1c32032927bb94d8"
+        },
+        {
+          "file": "shim/index.js",
+          "sha256": "de571b60495a636e12a24000b78531994a819aba03917e679803c2b482c66a89"
+        },
+        {
+          "file": "shim/with-selector.js",
+          "sha256": "08f4e878658941dd77b3d9032d2f0818649dd0a093288e768526090e9f00556f"
+        }
+      ],
+      "embeddedNotices": [
+        {
+          "file": "cjs/use-sync-external-store-shim.production.js",
+          "sha256": "6cc1fe93088718486eb67c3f2578891cdfd6b5bfa229521fac6340d068cc2d35"
+        },
+        {
+          "file": "cjs/use-sync-external-store-shim/with-selector.production.js",
+          "sha256": "bdc77ae504b520a2a68adfc28ab9d4dcf99e56f2b2d54153397e0ed4e7d55aee"
+        }
+      ]
+    },
+    {
+      "name": "vite",
+      "version": "8.3.0",
+      "license": "MIT",
+      "lockPath": "node_modules/vite",
+      "integrity": "sha512-lhZBVvEHefgE+HQZC9O7EBJgCU/nVzFNl7vkS4RE0APtWLP02/8QVIkQtzBxPquh7lq5/78NHipTj7ODQ6XuyQ==",
+      "scope": "Only the modulepreload and dynamic-import preload browser helpers; the build server is not distributed.",
+      "licenses": [
+        {
+          "source": "node_modules/vite/LICENSE.md",
+          "sourceSha256": "387dd7baa307083401a27c58c362c30832f5ba1dba84f10cc22c33401523f45c",
+          "includedSha256": "e373c2e74cd342b9e74d0b8813a8fddf3c9788515669a79c2ac238195673d38b"
+        }
+      ],
+      "modules": [
+        {
+          "file": "vite/modulepreload-polyfill.js"
+        },
+        {
+          "file": "vite/preload-helper.js"
+        }
+      ],
+      "embeddedNotices": []
+    },
+    {
+      "name": "zustand",
+      "version": "5.0.15",
+      "license": "MIT",
+      "lockPath": "node_modules/zustand",
+      "integrity": "sha512-MpSEjRiBkA9crSYeOUH32rJC7SVqAbm0Fqcqge/bUi2PPoLcBWKOsG+C8mevmpr8TwXHBVkChbbJiyvkE+i/3A==",
+      "scope": "Browser state stores and React bindings.",
+      "licenses": [
+        {
+          "source": "node_modules/zustand/LICENSE",
+          "sourceSha256": "c1e6e266563517467b1bf874817d23e426f3149252bd7d42758cd697514b8417",
+          "includedSha256": "c1e6e266563517467b1bf874817d23e426f3149252bd7d42758cd697514b8417"
+        }
+      ],
+      "modules": [
+        {
+          "file": "esm/traditional.mjs",
+          "sha256": "ff7306ddb731b9a4443a3025664eb4f51ab8835a70972af29c4f0aeffe0101e1"
+        },
+        {
+          "file": "esm/vanilla.mjs",
+          "sha256": "27f48c11ca4de834f68c505b695d5e2db1c1ebface7303c0e920ab3957260357"
+        }
+      ],
+      "embeddedNotices": []
+    }
+  ]
+}

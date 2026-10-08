@@ -1,0 +1,13 @@
+.manual-diagram{overflow:hidden;border:1px solid #333949;border-radius:18px;background:#11151e;color:#edf0f7}
+.manual-diagram__heading{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 18px;border-bottom:1px solid #2b3040}
+.manual-diagram__heading p{margin:0;color:#aab4c7;font-size:12px}
+.manual-diagram__heading strong{color:#d1c0ff;font-weight:600}
+.manual-diagram__reset{flex:none;min-height:44px;padding:9px 13px;border:1px solid #646d83;border-radius:10px;background:#1b2030;color:#e8e4ff;font:inherit;font-size:12px;cursor:pointer}
+.manual-diagram__reset:hover{background:#2c2c43;border-color:#bdabf6}
+.manual-diagram__reset:focus-visible{outline:3px solid #b89cff;outline-offset:3px}
+.manual-diagram__reset:disabled{opacity:.45;cursor:default}
+.manual-diagram__viewport{position:relative;height:clamp(280px,38vh,420px);background:#10131a}
+.manual-diagram__viewport canvas{display:block;touch-action:none}
+.manual-diagram__hint{margin:0;padding:9px 16px;border-top:1px solid #252c3a;color:#b4bed1;text-align:center;font-size:11px}
+.manual-diagram__fallback{display:flex;align-items:center;justify-content:center;height:100%;margin:0;padding:30px;color:#bfcbdd;font-size:14px;line-height:1.9;text-align:center}
+@media(max-width:600px){.manual-diagram{border-radius:14px}.manual-diagram__heading{padding:12px 14px}.manual-diagram__viewport{height:300px}}

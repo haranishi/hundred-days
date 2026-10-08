@@ -119,3 +119,9 @@ Stephen HillのACES fitted実装のGLSL移植（BakingLab・MIT）を含みま�
 画像内のクレジットを保持しています。3Dミニチュアは自作です。
 施設データや使用ソフトウェアの条件は[アプリの出典ページ](https://hakoniwa-map.haranishi.workers.dev/licenses/)を参照してください。
 アプリ本体・施設カタログはこのリポジトリには同梱しません。
+
+## Day61「くみまえ」の描画依存
+
+React、React DOM、React Three Fiber、Drei、Three.jsなど、実際の配布コードに入る依存を検査して通知を生成します。
+著作権表示・MIT許諾全文は[同梱通知](day-061-kumimae/legal/THIRD_PARTY_NOTICES.txt)、版と出典は[マニフェスト](day-061-kumimae/legal/THIRD_PARTY_MANIFEST.json)を参照してください。
+製品カタログ、価格・性能値、写真、外部3D素材は同梱しません。作例は架空の値、模式図は汎用形状をコードで生成したものです。
