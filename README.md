@@ -95,6 +95,7 @@ Day 051「ハコニワ」も外部公開アプリです。本体は独立リポ�
 | 059 | 口さんまい | [day-059-kuchi-sanmai/](day-059-kuchi-sanmai/) | [アプリを開く](https://hundred-days.pages.dev/day-059-kuchi-sanmai/) |
 | 060 | 今年の受賞の解説 | [day-060-prize-explained/](day-060-prize-explained/) | [アプリを開く](https://hundred-days.pages.dev/day-060-prize-explained/) |
 | 061 | くみまえ | [day-061-kumimae/](day-061-kumimae/) | [アプリを開く](https://hundred-days.pages.dev/day-061-kumimae/) |
+| 062 | 終電サドンデス | [day-062-last-train/](day-062-last-train/) | [アプリを開く](https://hundred-days.pages.dev/day-062-last-train/) |
 <!-- day-index:end -->
 
 ## 1日アプリのルール

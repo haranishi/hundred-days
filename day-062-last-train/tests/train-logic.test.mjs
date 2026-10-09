@@ -1,0 +1,194 @@
+import { describe, it } from 'node:test';
+import assert from 'node:assert/strict';
+import {
+  parseTrainTime,
+  calculateTotalLossMinutes,
+  calculateDeadline,
+  getStatusLevel,
+  formatTimeDisplay,
+  getFirstTrainRemainingMs,
+  calculateDistanceKm,
+  estimateWalkingMinutes,
+  findNearestStations,
+  DEFAULT_LOSS_ITEMS
+} from '../lib/train-logic.js';
+
+describe('終電サドンデス (train-logic)', () => {
+  describe('parseTrainTime', () => {
+    it('同日夜の時刻を正しくパースできる', () => {
+      const base = new Date('2026-10-09T20:00:00');
+      const parsed = parseTrainTime('23:45', base);
+      assert.equal(parsed.getFullYear(), 2026);
+      assert.equal(parsed.getMonth(), 9);
+      assert.equal(parsed.getDate(), 9);
+      assert.equal(parsed.getHours(), 23);
+      assert.equal(parsed.getMinutes(), 45);
+    });
+
+    it('夜から翌日未明（00:30）の時刻を翌日として補正する', () => {
+      const base = new Date('2026-10-09T22:30:00');
+      const parsed = parseTrainTime('00:30', base);
+      assert.equal(parsed.getDate(), 10);
+      assert.equal(parsed.getHours(), 0);
+      assert.equal(parsed.getMinutes(), 30);
+    });
+
+    it('不正な時刻形式ではエラーを投げる', () => {
+      assert.throws(() => parseTrainTime('invalid'));
+      assert.throws(() => parseTrainTime('99:99'));
+    });
+  });
+
+  describe('calculateTotalLossMinutes', () => {
+    it('デフォルトのロス合計を正しく算出する', () => {
+      // bill(5) + coat(3) + walk(7) + wicket(3) = 18分（toiletはデフォルトfalse）
+      const total = calculateTotalLossMinutes(DEFAULT_LOSS_ITEMS);
+      assert.equal(total, 18);
+    });
+
+    it('カスタム徒歩分数が反映される', () => {
+      const total = calculateTotalLossMinutes(DEFAULT_LOSS_ITEMS, 12);
+      // 5 + 3 + 12 + 3 = 23分
+      assert.equal(total, 23);
+    });
+
+    it('チェックを外した項目は除外される', () => {
+      const items = {
+        ...DEFAULT_LOSS_ITEMS,
+        bill: { ...DEFAULT_LOSS_ITEMS.bill, enabled: false },
+        toilet: { ...DEFAULT_LOSS_ITEMS.toilet, enabled: true }
+      };
+      // coat(3) + walk(7) + wicket(3) + toilet(4) = 17分
+      const total = calculateTotalLossMinutes(items);
+      assert.equal(total, 17);
+    });
+  });
+
+  describe('calculateDeadline', () => {
+    it('終電時刻からロスト分数を正しく引いたデッドラインを返す', () => {
+      const train = new Date('2026-10-09T23:50:00');
+      const deadline = calculateDeadline(train, 20); // 20分前
+      assert.equal(deadline.getHours(), 23);
+      assert.equal(deadline.getMinutes(), 30);
+    });
+  });
+
+  describe('getStatusLevel', () => {
+    it('30分以上は safe', () => {
+      assert.equal(getStatusLevel(35 * 60 * 1000), 'safe');
+    });
+
+    it('15分〜30分は caution', () => {
+      assert.equal(getStatusLevel(20 * 60 * 1000), 'caution');
+    });
+
+    it('5分〜15分は critical', () => {
+      assert.equal(getStatusLevel(10 * 60 * 1000), 'critical');
+    });
+
+    it('5分未満は suddendeath', () => {
+      assert.equal(getStatusLevel(3 * 60 * 1000), 'suddendeath');
+    });
+
+    it('0以下は gameover', () => {
+      assert.equal(getStatusLevel(0), 'gameover');
+      assert.equal(getStatusLevel(-5000), 'gameover');
+    });
+  });
+
+  describe('formatTimeDisplay', () => {
+    it('ミリ秒を正しくフォーマットする', () => {
+      const ms = (1 * 3600 + 23 * 60 + 45) * 1000 + 600; // 01:23:45.6
+      const formatted = formatTimeDisplay(ms);
+      assert.equal(formatted.hours, '01');
+      assert.equal(formatted.minutes, '23');
+      assert.equal(formatted.seconds, '45');
+      assert.equal(formatted.tenths, '6');
+      assert.equal(formatted.sign, '');
+    });
+
+    it('マイナス時刻も正しくフォーマットする', () => {
+      const formatted = formatTimeDisplay(-65000); // -1分05秒
+      assert.equal(formatted.sign, '-');
+      assert.equal(formatted.minutes, '01');
+      assert.equal(formatted.seconds, '05');
+    });
+  });
+
+  describe('getFirstTrainRemainingMs', () => {
+    it('現在時刻から朝5時までのミリ秒を正しく計算する', () => {
+      const now = new Date('2026-10-09T01:00:00');
+      const remaining = getFirstTrainRemainingMs(now);
+      assert.equal(remaining, 4 * 3600 * 1000); // 4時間
+    });
+  });
+
+  describe('位置情報・最寄り駅判定 (Geolocation)', () => {
+    it('2点間の距離を正しく計算する (新宿〜渋谷は約3.5km)', () => {
+      const shinjuku = { lat: 35.6896, lng: 139.7006 };
+      const shibuya = { lat: 35.6580, lng: 139.7016 };
+      const dist = calculateDistanceKm(shinjuku.lat, shinjuku.lng, shibuya.lat, shibuya.lng);
+      assert.ok(dist >= 3.4 && dist <= 3.6, `距離: ${dist}km`);
+    });
+
+    it('徒歩分数を正しく推定する (500mなら約8分)', () => {
+      // 0.5km * 1.3 = 650m / 80m/分 = 8.125 -> ceil 9分
+      const minutes = estimateWalkingMinutes(0.5);
+      assert.ok(minutes >= 8 && minutes <= 9, `徒歩: ${minutes}分`);
+    });
+
+    it('現在地から最も近い駅をソートして上位を返す', () => {
+      // 渋谷駅ハチ公前付近 (35.6591, 139.7005)
+      const lat = 35.6591;
+      const lon = 139.7005;
+      const nearest = findNearestStations(lat, lon, undefined, 3);
+      assert.equal(nearest.length, 3);
+      assert.equal(nearest[0].name, '渋谷駅');
+      assert.ok(nearest[0].distanceMeters < 300, `渋谷駅までの距離: ${nearest[0].distanceMeters}m`);
+      assert.ok(nearest[0].walkMinutes >= 1);
+    });
+  });
+
+  describe('全国駅検索・区間終電推定 (Route & Search)', () => {
+    it('全国主要駅のインクリメンタル検索ができる (駅名・ひらがな・都道府県)', async () => {
+      const { searchStations } = await import('../lib/stations-data.js');
+      // かな検索
+      const hakata = searchStations('はかた');
+      assert.ok(hakata.some((s) => s.name === '博多駅'));
+
+      // 都道府県検索
+      const hokkaido = searchStations('北海道');
+      assert.ok(hokkaido.some((s) => s.name === '札幌駅'));
+
+      // 路線検索
+      const chuo = searchStations('中央線');
+      assert.ok(chuo.some((s) => s.name === '吉祥寺駅'));
+    });
+
+    it('駅名から駅オブジェクトを特定できる', async () => {
+      const { findStationByName } = await import('../lib/train-logic.js');
+      const st = findStationByName('吉祥寺');
+      assert.ok(st);
+      assert.equal(st.name, '吉祥寺駅');
+      assert.equal(st.pref, '東京都');
+    });
+
+    it('区間（新宿➔吉祥寺）の距離と終電をスマート推定する', async () => {
+      const { estimateRouteDetails } = await import('../lib/train-logic.js');
+      const route = estimateRouteDetails('新宿駅', '吉祥寺駅');
+      assert.equal(route.fromStation.name, '新宿駅');
+      assert.equal(route.toStation.name, '吉祥寺駅');
+      assert.ok(route.distanceKm >= 11 && route.distanceKm <= 13, `新宿〜吉祥寺: ${route.distanceKm}km`);
+      assert.ok(route.rideMinutes >= 15 && route.rideMinutes <= 25, `乗車所要: ${route.rideMinutes}分`);
+      assert.equal(route.estimatedTrainTime, '23:55');
+      assert.equal(route.summary, '新宿駅 ➔ 吉祥寺駅');
+    });
+
+    it('長距離区間（東京➔八王子）では終電がより早く算出される', async () => {
+      const { estimateRouteDetails } = await import('../lib/train-logic.js');
+      const route = estimateRouteDetails('東京駅', '八王子駅');
+      assert.ok(route.distanceKm > 35, `東京〜八王子: ${route.distanceKm}km`);
+      assert.equal(route.estimatedTrainTime, '23:42');
+    });
+  });
+});
