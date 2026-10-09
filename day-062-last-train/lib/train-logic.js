@@ -1,6 +1,26 @@
-import { STATIONS_DATABASE } from './stations-data.js';
+import { STATIONS_DATABASE, searchStations } from './stations-data.js';
 
-export { STATIONS_DATABASE };
+export { STATIONS_DATABASE, searchStations };
+
+/**
+ * 駅名またはIDから駅オブジェクトを特定
+ * @param {string} query
+ * @returns {Object|null}
+ */
+export function findStationByName(query) {
+  if (!query || typeof query !== 'string') return null;
+  const q = query.trim().toLowerCase();
+  // 完全一致優先
+  const exact = STATIONS_DATABASE.find(
+    (s) => s.name.toLowerCase() === q || s.id.toLowerCase() === q || s.name.replace('駅', '').toLowerCase() === q
+  );
+  if (exact) return exact;
+
+  // 部分一致
+  return STATIONS_DATABASE.find(
+    (s) => s.name.toLowerCase().includes(q) || s.kana.includes(q)
+  ) || null;
+}
 
 /**
  * 2点間の直線距離 (km) を Haversine 公式で算出
@@ -62,19 +82,122 @@ export function findNearestStations(lat, lon, stations = STATIONS_DATABASE, limi
 }
 
 /**
- * プリセット駅リスト
+ * 出発駅と帰着駅（目的地）から区間詳細（距離・乗車時間・推定終電時刻）を算出
+ * @param {Object|string} from - 出発駅（オブジェクトまたは名前）
+ * @param {Object|string} to - 帰着駅（オブジェクトまたは名前）
+ * @returns {{
+ *   fromStation: Object,
+ *   toStation: Object,
+ *   distanceKm: number,
+ *   rideMinutes: number,
+ *   estimatedTrainTime: string,
+ *   summary: string
+ * }}
+ */
+export function estimateRouteDetails(from, to) {
+  const fromStation = typeof from === 'string'
+    ? (findStationByName(from) || { name: from, lat: null, lng: null, defaultTrain: '23:55' })
+    : (from || { name: '出発駅', defaultTrain: '23:55' });
+
+  const toStation = typeof to === 'string'
+    ? (findStationByName(to) || { name: to, lat: null, lng: null, defaultTrain: '23:55' })
+    : (to || { name: '帰着駅', defaultTrain: '23:55' });
+
+  let distanceKm = 0;
+  let rideMinutes = 0;
+  let estimatedTrainTime = fromStation.defaultTrain || '23:55';
+
+  if (fromStation && toStation) {
+    if (fromStation.name === toStation.name) {
+      distanceKm = 0;
+      rideMinutes = 0;
+      estimatedTrainTime = fromStation.defaultTrain || '23:55';
+    } else if (fromStation.lat && fromStation.lng && toStation.lat && toStation.lng) {
+      distanceKm = Number(calculateDistanceKm(fromStation.lat, fromStation.lng, toStation.lat, toStation.lng).toFixed(1));
+
+      // 乗車時間推定
+      if (distanceKm <= 5) {
+        rideMinutes = Math.max(3, Math.round(distanceKm * 2.2));
+      } else if (distanceKm <= 30) {
+        rideMinutes = Math.round(5 + distanceKm * 1.2);
+      } else if (distanceKm <= 100) {
+        rideMinutes = Math.round(15 + distanceKm * 0.9);
+      } else {
+        rideMinutes = Math.round(distanceKm * 0.45);
+      }
+
+      // 距離に応じた終電時刻推定
+      if (distanceKm < 3) {
+        estimatedTrainTime = '00:05';
+      } else if (distanceKm < 25) {
+        estimatedTrainTime = fromStation.defaultTrain || '23:55';
+      } else if (distanceKm < 45) {
+        estimatedTrainTime = '23:42';
+      } else if (distanceKm < 80) {
+        estimatedTrainTime = '23:25';
+      } else if (distanceKm < 150) {
+        estimatedTrainTime = '22:50';
+      } else if (distanceKm < 300) {
+        estimatedTrainTime = '22:00';
+      } else {
+        estimatedTrainTime = '21:30';
+      }
+
+      // 地方路線補正（主要大都市圏以外は終電が早まる）
+      const isMajorMetropolis = (pref) => ['東京都', '神奈川県', '大阪府', '愛知県'].includes(pref);
+      if ((!isMajorMetropolis(fromStation.pref) || !isMajorMetropolis(toStation.pref)) && distanceKm > 10) {
+        const [h, m] = estimatedTrainTime.split(':').map(Number);
+        let totalM = h * 60 + m - 15;
+        if (totalM < 0) totalM += 1440;
+        const newH = String(Math.floor(totalM / 60)).padStart(2, '0');
+        const newM = String(totalM % 60).padStart(2, '0');
+        estimatedTrainTime = `${newH}:${newM}`;
+      }
+    }
+  }
+
+  return {
+    fromStation,
+    toStation,
+    distanceKm,
+    rideMinutes,
+    estimatedTrainTime,
+    summary: `${fromStation.name} ➔ ${toStation.name}`
+  };
+}
+
+/**
+ * 全国主要駅プリセットリスト (主要都市・東西南北)
  */
 export const PRESET_STATIONS = [
-  { id: 'shinjuku', name: '新宿駅', line: '山手線 / 中央線方面', defaultTrain: '23:55', walkMinutes: 7 },
-  { id: 'shibuya', name: '渋谷駅', nameShort: '渋谷', line: '山手線 / 東横線方面', defaultTrain: '23:52', walkMinutes: 8 },
-  { id: 'tokyo', name: '東京駅', nameShort: '東京', line: '各線最終目安', defaultTrain: '23:58', walkMinutes: 9 },
-  { id: 'ikebukuro', name: '池袋駅', nameShort: '池袋', line: '山手線 / 西武 / 東武', defaultTrain: '23:50', walkMinutes: 7 },
-  { id: 'yokohama', name: '横浜駅', nameShort: '横浜', line: '京浜東北 / 東急', defaultTrain: '23:45', walkMinutes: 6 },
-  { id: 'osaka_umeda', name: '大阪・梅田駅', nameShort: '梅田', line: '環状線 / 御堂筋線', defaultTrain: '23:50', walkMinutes: 8 },
-  { id: 'nagoya', name: '名古屋駅', nameShort: '名古屋', line: '東海道線 / 東山線', defaultTrain: '23:52', walkMinutes: 7 },
-  { id: 'hakata', name: '博多駅', nameShort: '博多', line: '空港線 / 鹿児島本線', defaultTrain: '23:50', walkMinutes: 6 },
-  { id: 'akita', name: '秋田駅', nameShort: '秋田', line: '奥羽本線 / 羽越本線', defaultTrain: '23:18', walkMinutes: 5 },
-  { id: 'custom', name: 'カスタム設定', nameShort: '任意', line: '自分の最寄り駅', defaultTrain: '23:45', walkMinutes: 7 }
+  { id: 'shinjuku', name: '新宿駅', area: '東京', line: '中央線・山手線', defaultTrain: '23:55', walkMinutes: 7 },
+  { id: 'shibuya', name: '渋谷駅', area: '東京', line: '山手線・東急東横線', defaultTrain: '23:52', walkMinutes: 8 },
+  { id: 'tokyo', name: '東京駅', area: '東京', line: 'JR各線・東海道線', defaultTrain: '23:58', walkMinutes: 9 },
+  { id: 'yokohama', name: '横浜駅', area: '神奈川', line: 'JR線・東急東横線', defaultTrain: '23:45', walkMinutes: 6 },
+  { id: 'omiya', name: '大宮駅', area: '埼玉', line: '京浜東北線・埼京線', defaultTrain: '23:55', walkMinutes: 7 },
+  { id: 'chiba', name: '千葉駅', area: '千葉', line: 'JR総武線・内房線', defaultTrain: '23:50', walkMinutes: 7 },
+  { id: 'osaka_umeda', name: '大阪・梅田駅', area: '大阪', line: 'JR環状線・御堂筋線', defaultTrain: '23:50', walkMinutes: 8 },
+  { id: 'sannomiya', name: '三ノ宮駅', area: '兵庫', line: 'JR神戸線・阪急線', defaultTrain: '23:45', walkMinutes: 6 },
+  { id: 'kyoto', name: '京都駅', area: '京都', line: 'JR各線・地下鉄烏丸線', defaultTrain: '23:45', walkMinutes: 7 },
+  { id: 'nagoya', name: '名古屋駅', area: '愛知', line: '東山線・東海道本線', defaultTrain: '23:52', walkMinutes: 7 },
+  { id: 'hakata', name: '博多駅', area: '福岡', line: '空港線・鹿児島本線', defaultTrain: '23:50', walkMinutes: 6 },
+  { id: 'sapporo', name: '札幌駅', area: '北海道', line: '南北線・函館本線', defaultTrain: '23:50', walkMinutes: 7 },
+  { id: 'sendai', name: '仙台駅', area: '宮城', line: '南北線・東北本線', defaultTrain: '23:45', walkMinutes: 6 },
+  { id: 'hiroshima', name: '広島駅', area: '広島', line: '山陽本線・広電', defaultTrain: '23:45', walkMinutes: 6 }
+];
+
+/**
+ * 帰着駅（目的地）のクイック候補
+ */
+export const QUICK_DESTINATIONS = [
+  { name: '吉祥寺駅', desc: '中央線・井の頭線' },
+  { name: '中野駅', desc: '中央線・東西線' },
+  { name: '立川駅', desc: '中央線・南武線' },
+  { name: '横浜駅', desc: '神奈川ターミナル' },
+  { name: '大宮駅', desc: '埼玉ターミナル' },
+  { name: '船橋駅', desc: '千葉・総武線' },
+  { name: '高槻駅', desc: 'JR京都線・阪急' },
+  { name: '西宮駅', desc: '阪神・阪急神戸線' }
 ];
 
 /**

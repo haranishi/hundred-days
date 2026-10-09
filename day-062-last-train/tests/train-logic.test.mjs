@@ -148,4 +148,47 @@ describe('終電サドンデス (train-logic)', () => {
       assert.ok(nearest[0].walkMinutes >= 1);
     });
   });
+
+  describe('全国駅検索・区間終電推定 (Route & Search)', () => {
+    it('全国主要駅のインクリメンタル検索ができる (駅名・ひらがな・都道府県)', async () => {
+      const { searchStations } = await import('../lib/stations-data.js');
+      // かな検索
+      const hakata = searchStations('はかた');
+      assert.ok(hakata.some((s) => s.name === '博多駅'));
+
+      // 都道府県検索
+      const hokkaido = searchStations('北海道');
+      assert.ok(hokkaido.some((s) => s.name === '札幌駅'));
+
+      // 路線検索
+      const chuo = searchStations('中央線');
+      assert.ok(chuo.some((s) => s.name === '吉祥寺駅'));
+    });
+
+    it('駅名から駅オブジェクトを特定できる', async () => {
+      const { findStationByName } = await import('../lib/train-logic.js');
+      const st = findStationByName('吉祥寺');
+      assert.ok(st);
+      assert.equal(st.name, '吉祥寺駅');
+      assert.equal(st.pref, '東京都');
+    });
+
+    it('区間（新宿➔吉祥寺）の距離と終電をスマート推定する', async () => {
+      const { estimateRouteDetails } = await import('../lib/train-logic.js');
+      const route = estimateRouteDetails('新宿駅', '吉祥寺駅');
+      assert.equal(route.fromStation.name, '新宿駅');
+      assert.equal(route.toStation.name, '吉祥寺駅');
+      assert.ok(route.distanceKm >= 11 && route.distanceKm <= 13, `新宿〜吉祥寺: ${route.distanceKm}km`);
+      assert.ok(route.rideMinutes >= 15 && route.rideMinutes <= 25, `乗車所要: ${route.rideMinutes}分`);
+      assert.equal(route.estimatedTrainTime, '23:55');
+      assert.equal(route.summary, '新宿駅 ➔ 吉祥寺駅');
+    });
+
+    it('長距離区間（東京➔八王子）では終電がより早く算出される', async () => {
+      const { estimateRouteDetails } = await import('../lib/train-logic.js');
+      const route = estimateRouteDetails('東京駅', '八王子駅');
+      assert.ok(route.distanceKm > 35, `東京〜八王子: ${route.distanceKm}km`);
+      assert.equal(route.estimatedTrainTime, '23:42');
+    });
+  });
 });

@@ -198,13 +198,80 @@ h1 {
   letter-spacing: 0.1em;
   color: var(--text-dim);
   text-transform: uppercase;
+  margin-bottom: 8px;
 }
 
-.timer-target-sub {
-  font-size: 1rem;
+/* 区間バナー */
+.route-banner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  background: rgba(18, 20, 30, 0.6);
+  border: 1px solid var(--border-card);
+  border-radius: 12px;
+  padding: 10px 14px;
+  margin: 4px auto 12px;
+  max-width: 520px;
+}
+
+.route-nodes {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.route-node {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 1.05rem;
+  color: #ffffff;
+}
+
+.route-node .node-tag {
+  font-size: 0.72rem;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: var(--bg-card-sub);
   color: var(--text-muted);
-  margin-top: 4px;
-  font-weight: 500;
+  font-weight: 600;
+}
+
+.route-node.from .node-tag {
+  color: #38bdf8;
+  border: 1px solid rgba(56, 189, 248, 0.3);
+}
+
+.route-node.to .node-tag {
+  color: #4ade80;
+  border: 1px solid rgba(74, 222, 128, 0.3);
+}
+
+.route-arrow {
+  color: #94a3b8;
+  font-size: 1.1rem;
+  font-weight: 800;
+}
+
+.route-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.88rem;
+  color: var(--text-muted);
+}
+
+.route-badge {
+  font-size: 0.75rem;
+  padding: 2px 8px;
+  border-radius: 12px;
+  background: rgba(56, 189, 248, 0.12);
+  color: #38bdf8;
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  font-family: var(--font-mono);
 }
 
 .target-highlight {
@@ -414,6 +481,224 @@ h1 {
   color: #e0f2fe;
 }
 
+/* 区間入力カード */
+.route-inputs-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: var(--bg-card-sub);
+  border: 1px solid var(--border-card);
+  border-radius: 12px;
+  padding: 14px;
+  margin-bottom: 14px;
+}
+
+.station-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  position: relative;
+}
+
+.input-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.input-label {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+.btn-locate-inline {
+  background: rgba(56, 189, 248, 0.15);
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  color: #38bdf8;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.btn-locate-inline:hover {
+  background: rgba(56, 189, 248, 0.25);
+}
+
+.search-input-wrap {
+  position: relative;
+  width: 100%;
+}
+
+.station-search-input {
+  width: 100%;
+  background: #090a0f;
+  border: 1px solid var(--border-card);
+  color: #ffffff;
+  font-size: 1rem;
+  font-weight: 600;
+  padding: 10px 12px;
+  border-radius: 8px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.station-search-input:focus {
+  border-color: #38bdf8;
+  box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.2);
+}
+
+/* 検索サジェスト ドロップダウン */
+.search-dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  background: #141724;
+  border: 1px solid #333a52;
+  border-radius: 8px;
+  max-height: 220px;
+  overflow-y: auto;
+  z-index: 50;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6);
+}
+
+.search-result-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  cursor: pointer;
+  border-bottom: 1px solid #1f2436;
+  transition: background-color 0.1s;
+}
+
+.search-result-item:last-child {
+  border-bottom: none;
+}
+
+.search-result-item:hover,
+.search-result-item.highlighted {
+  background: #252b40;
+}
+
+.result-name-col {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.result-name {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.result-kana {
+  font-size: 0.75rem;
+  color: var(--text-dim);
+}
+
+.result-meta-col {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+}
+
+.result-pref {
+  font-size: 0.72rem;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: rgba(56, 189, 248, 0.15);
+  color: #38bdf8;
+}
+
+.result-line {
+  font-size: 0.7rem;
+  color: var(--text-dim);
+  max-width: 140px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 入れ替えボタン */
+.swap-btn-row {
+  display: flex;
+  justify-content: center;
+  margin: -4px 0;
+}
+
+.btn-swap {
+  background: #1e2335;
+  border: 1px solid var(--border-card);
+  color: #94a3b8;
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 4px 14px;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.btn-swap:hover {
+  background: #2a314b;
+  color: #ffffff;
+  border-color: #475569;
+}
+
+/* 帰着駅クイック候補 */
+.quick-dest-box {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+
+.quick-dest-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-dim);
+}
+
+.quick-dest-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.quick-dest-btn {
+  background: var(--bg-card-sub);
+  border: 1px solid var(--border-card);
+  color: #cbd5e1;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.quick-dest-btn:hover {
+  background: #24293d;
+  color: #ffffff;
+  border-color: #64748b;
+}
+
+.preset-section {
+  margin-bottom: 12px;
+}
+
+.preset-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-dim);
+  margin-bottom: 8px;
+}
+
 /* 駅・路線プリセットセレクター */
 .preset-grid {
   display: grid;
@@ -441,18 +726,28 @@ h1 {
   font-weight: 700;
 }
 
+/* 終電時刻と区間サマリー */
 .custom-train-row {
   display: flex;
   align-items: center;
-  gap: 12px;
+  justify-content: space-between;
+  gap: 14px;
   margin-top: 8px;
-  padding: 10px;
+  padding: 12px 14px;
   background: var(--bg-card-sub);
   border-radius: 8px;
+  flex-wrap: wrap;
 }
 
-.custom-train-row label {
-  font-size: 0.85rem;
+.train-time-field {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.train-time-field label {
+  font-size: 0.88rem;
+  font-weight: 600;
   color: var(--text-muted);
 }
 
@@ -465,6 +760,16 @@ h1 {
   padding: 6px 10px;
   border-radius: 6px;
   outline: none;
+}
+
+.route-summary-text {
+  font-size: 0.82rem;
+  color: #38bdf8;
+  font-family: var(--font-mono);
+  background: rgba(56, 189, 248, 0.1);
+  padding: 4px 10px;
+  border-radius: 6px;
+  border: 1px solid rgba(56, 189, 248, 0.2);
 }
 
 /* タイムロス診断チェックリスト */

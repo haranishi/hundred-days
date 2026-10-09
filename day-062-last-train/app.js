@@ -1,5 +1,6 @@
 import {
   PRESET_STATIONS,
+  QUICK_DESTINATIONS,
   DEFAULT_LOSS_ITEMS,
   STATUS_META,
   SURVIVAL_OPTIONS,
@@ -9,13 +10,17 @@ import {
   getStatusLevel,
   formatTimeDisplay,
   getFirstTrainRemainingMs,
-  findNearestStations
+  findNearestStations,
+  searchStations,
+  estimateRouteDetails
 } from './lib/train-logic.js';
 import { sound } from './lib/audio.js';
 
 // アプリケーション状態
 const state = {
-  stationName: '新宿駅',
+  fromStation: '新宿駅',
+  toStation: '吉祥寺駅',
+  stationName: '新宿駅', // 互換用
   trainTimeStr: '23:55',
   walkMinutes: 7,
   lossItems: JSON.parse(JSON.stringify(DEFAULT_LOSS_ITEMS)),
@@ -23,7 +28,13 @@ const state = {
   currentLevel: 'safe',
   lastBeatTime: 0,
   escaped: false,
-  coords: null
+  coords: null,
+  routeMeta: {
+    distanceKm: 12.4,
+    rideMinutes: 18,
+    estimatedTrainTime: '23:55',
+    summary: '新宿駅 ➔ 吉祥寺駅'
+  }
 };
 
 // DOM要素
@@ -40,8 +51,18 @@ const el = {
   statusBadge: document.getElementById('status-badge'),
   statusName: document.getElementById('status-name'),
   statusMessage: document.getElementById('status-message'),
+  displayFromStation: document.getElementById('display-from-station'),
+  displayToStation: document.getElementById('display-to-station'),
   displayStationName: document.getElementById('display-station-name'),
   displayTrainTime: document.getElementById('display-train-time'),
+  routeDistanceBadge: document.getElementById('route-distance-badge'),
+  routeSummaryText: document.getElementById('route-summary-text'),
+  inputFromStation: document.getElementById('input-from-station'),
+  inputToStation: document.getElementById('input-to-station'),
+  fromSearchResults: document.getElementById('from-search-results'),
+  toSearchResults: document.getElementById('to-search-results'),
+  btnSwapStations: document.getElementById('btn-swap-stations'),
+  quickDestList: document.getElementById('quick-dest-list'),
   digitHours: document.getElementById('digit-hours'),
   digitMinutes: document.getElementById('digit-minutes'),
   digitSeconds: document.getElementById('digit-seconds'),
@@ -73,28 +94,57 @@ const el = {
 // 初期化
 function init() {
   loadFromUrlOrStorage();
+  recalculateRoute(false);
   renderPresets();
+  renderQuickDestinations();
   syncInputsWithState();
   bindEvents();
   startTimerLoop();
 }
 
-// プリセット駅ボタンの生成
+// 区間情報の再計算と反映
+function recalculateRoute(updateTrainTime = true) {
+  const route = estimateRouteDetails(state.fromStation, state.toStation);
+  state.routeMeta = route;
+  state.stationName = state.fromStation;
+
+  if (updateTrainTime && route.estimatedTrainTime) {
+    state.trainTimeStr = route.estimatedTrainTime;
+  }
+
+  // 表示更新
+  if (el.displayFromStation) el.displayFromStation.textContent = state.fromStation;
+  if (el.displayToStation) el.displayToStation.textContent = state.toStation;
+  if (el.displayStationName) el.displayStationName.textContent = state.fromStation;
+  if (el.displayTrainTime) el.displayTrainTime.textContent = state.trainTimeStr;
+  if (el.inputTrainTime) el.inputTrainTime.value = state.trainTimeStr;
+
+  const distText = route.distanceKm > 0 ? `乗車約${route.rideMinutes}分 / ${route.distanceKm}km` : '同一駅・徒歩圏内';
+  if (el.routeDistanceBadge) el.routeDistanceBadge.textContent = distText;
+
+  const summaryText = route.distanceKm > 0
+    ? `推定所要: 約${route.rideMinutes}分（直線${route.distanceKm}km）`
+    : '同一駅または近傍エリア';
+  if (el.routeSummaryText) el.routeSummaryText.textContent = summaryText;
+}
+
+// プリセット駅ボタンの生成（全国主要ターミナル）
 function renderPresets() {
+  if (!el.presetGrid) return;
   el.presetGrid.innerHTML = '';
   PRESET_STATIONS.forEach((st) => {
     const btn = document.createElement('button');
     btn.type = 'button';
     btn.className = 'station-pill';
     btn.textContent = st.name;
-    if (st.name === state.stationName && st.defaultTrain === state.trainTimeStr) {
+    if (st.name === state.fromStation) {
       btn.classList.add('active');
     }
     btn.addEventListener('click', () => {
       sound.unlock();
-      state.stationName = st.name;
-      state.trainTimeStr = st.defaultTrain;
+      state.fromStation = st.name;
       state.walkMinutes = st.walkMinutes;
+      recalculateRoute(true);
       syncInputsWithState();
       saveState();
       updateDisplay();
@@ -103,26 +153,126 @@ function renderPresets() {
   });
 }
 
+// 帰着駅クイック候補の生成
+function renderQuickDestinations() {
+  if (!el.quickDestList) return;
+  el.quickDestList.innerHTML = '';
+  QUICK_DESTINATIONS.forEach((dest) => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'quick-dest-btn';
+    btn.textContent = dest.name;
+    btn.title = dest.desc;
+    if (dest.name === state.toStation) {
+      btn.style.borderColor = '#4ade80';
+      btn.style.color = '#4ade80';
+    }
+    btn.addEventListener('click', () => {
+      sound.unlock();
+      state.toStation = dest.name;
+      recalculateRoute(true);
+      syncInputsWithState();
+      saveState();
+      updateDisplay();
+    });
+    el.quickDestList.appendChild(btn);
+  });
+}
+
 // 画面入力値と状態の同期
 function syncInputsWithState() {
-  el.inputTrainTime.value = state.trainTimeStr;
-  el.inputStationName.value = state.stationName;
-  el.walkSlider.value = state.walkMinutes;
-  el.walkValDisplay.textContent = state.walkMinutes;
+  if (el.inputFromStation) el.inputFromStation.value = state.fromStation;
+  if (el.inputToStation) el.inputToStation.value = state.toStation;
+  if (el.inputStationName) el.inputStationName.value = state.fromStation;
+  if (el.inputTrainTime) el.inputTrainTime.value = state.trainTimeStr;
+  if (el.walkSlider) el.walkSlider.value = state.walkMinutes;
+  if (el.walkValDisplay) el.walkValDisplay.textContent = state.walkMinutes;
 
-  el.checkBill.checked = !!state.lossItems.bill?.enabled;
-  el.checkCoat.checked = !!state.lossItems.coat?.enabled;
-  el.checkToilet.checked = !!state.lossItems.toilet?.enabled;
-  el.checkWicket.checked = !!state.lossItems.wicket?.enabled;
+  if (el.checkBill) el.checkBill.checked = !!state.lossItems.bill?.enabled;
+  if (el.checkCoat) el.checkCoat.checked = !!state.lossItems.coat?.enabled;
+  if (el.checkToilet) el.checkToilet.checked = !!state.lossItems.toilet?.enabled;
+  if (el.checkWicket) el.checkWicket.checked = !!state.lossItems.wicket?.enabled;
 
   // プリセットのアクティブ表示更新
   const pills = el.presetGrid.querySelectorAll('.station-pill');
   pills.forEach((p, idx) => {
     const st = PRESET_STATIONS[idx];
-    if (st && st.name === state.stationName && st.defaultTrain === state.trainTimeStr) {
+    if (st && st.name === state.fromStation) {
       p.classList.add('active');
     } else {
       p.classList.remove('active');
+    }
+  });
+
+  // クイック候補のアクティブ表示更新
+  const destBtns = el.quickDestList.querySelectorAll('.quick-dest-btn');
+  destBtns.forEach((b, idx) => {
+    const dest = QUICK_DESTINATIONS[idx];
+    if (dest && dest.name === state.toStation) {
+      b.style.borderColor = '#4ade80';
+      b.style.color = '#4ade80';
+    } else {
+      b.style.borderColor = '';
+      b.style.color = '';
+    }
+  });
+}
+
+// 駅オートコンプリート検索の設定
+function setupAutocomplete(inputEl, dropdownEl, onSelect) {
+  if (!inputEl || !dropdownEl) return;
+
+  const closeDropdown = () => {
+    dropdownEl.hidden = true;
+    dropdownEl.innerHTML = '';
+  };
+
+  inputEl.addEventListener('input', (e) => {
+    const query = e.target.value.trim();
+    if (!query) {
+      closeDropdown();
+      return;
+    }
+
+    const results = searchStations(query, 6);
+    if (!results || results.length === 0) {
+      dropdownEl.innerHTML = '<div style="padding: 10px; font-size: 0.8rem; color: var(--text-dim); text-align: center;">一致する駅が見つかりません</div>';
+      dropdownEl.hidden = false;
+      return;
+    }
+
+    dropdownEl.innerHTML = '';
+    results.forEach((st) => {
+      const item = document.createElement('div');
+      item.className = 'search-result-item';
+      item.innerHTML = `
+        <div class="result-name-col">
+          <span class="result-name">${st.name}</span>
+          <span class="result-kana">${st.kana}</span>
+        </div>
+        <div class="result-meta-col">
+          <span class="result-pref">${st.pref}</span>
+          <span class="result-line">${st.line}</span>
+        </div>
+      `;
+      item.addEventListener('click', () => {
+        sound.unlock();
+        inputEl.value = st.name;
+        closeDropdown();
+        onSelect(st);
+      });
+      dropdownEl.appendChild(item);
+    });
+    dropdownEl.hidden = false;
+  });
+
+  inputEl.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeDropdown();
+  });
+
+  document.addEventListener('click', (e) => {
+    if (!inputEl.contains(e.target) && !dropdownEl.contains(e.target)) {
+      closeDropdown();
     }
   });
 }
@@ -142,6 +292,63 @@ function bindEvents() {
     el.soundText.textContent = enabled ? 'サウンド ON' : 'サウンド OFF';
   });
 
+  // 出発駅オートコンプリート
+  setupAutocomplete(el.inputFromStation, el.fromSearchResults, (station) => {
+    state.fromStation = station.name;
+    recalculateRoute(true);
+    syncInputsWithState();
+    saveState();
+    updateDisplay();
+  });
+
+  // 帰着駅オートコンプリート
+  setupAutocomplete(el.inputToStation, el.toSearchResults, (station) => {
+    state.toStation = station.name;
+    recalculateRoute(true);
+    syncInputsWithState();
+    saveState();
+    updateDisplay();
+  });
+
+  // 出発駅と帰着駅の入れ替え
+  if (el.btnSwapStations) {
+    el.btnSwapStations.addEventListener('click', () => {
+      sound.unlock();
+      const temp = state.fromStation;
+      state.fromStation = state.toStation;
+      state.toStation = temp;
+      recalculateRoute(true);
+      syncInputsWithState();
+      saveState();
+      updateDisplay();
+    });
+  }
+
+  // 出発駅・帰着駅の手動確定（Enterキーなど）
+  if (el.inputFromStation) {
+    el.inputFromStation.addEventListener('change', (e) => {
+      const val = e.target.value.trim();
+      if (val) {
+        state.fromStation = val;
+        recalculateRoute(false);
+        saveState();
+        updateDisplay();
+      }
+    });
+  }
+
+  if (el.inputToStation) {
+    el.inputToStation.addEventListener('change', (e) => {
+      const val = e.target.value.trim();
+      if (val) {
+        state.toStation = val;
+        recalculateRoute(false);
+        saveState();
+        updateDisplay();
+      }
+    });
+  }
+
   // 位置情報から最寄り駅を探す
   if (el.btnLocate) {
     el.btnLocate.addEventListener('click', handleLocate);
@@ -151,8 +358,9 @@ function bindEvents() {
   el.btnShareLink.addEventListener('click', () => {
     sound.unlock();
     const url = new URL(window.location.href);
+    url.searchParams.set('from', state.fromStation);
+    url.searchParams.set('to', state.toStation);
     url.searchParams.set('train', state.trainTimeStr);
-    url.searchParams.set('station', state.stationName);
     url.searchParams.set('walk', state.walkMinutes);
     navigator.clipboard.writeText(url.toString()).then(() => {
       const originalText = el.btnShareLink.textContent;
@@ -163,7 +371,7 @@ function bindEvents() {
     });
   });
 
-  // 駅名・時刻入力
+  // 終電時刻の手動入力
   el.inputTrainTime.addEventListener('change', (e) => {
     sound.unlock();
     if (e.target.value) {
@@ -171,12 +379,6 @@ function bindEvents() {
       saveState();
       updateDisplay();
     }
-  });
-
-  el.inputStationName.addEventListener('input', (e) => {
-    state.stationName = e.target.value.trim() || '最寄り駅';
-    saveState();
-    updateDisplay();
   });
 
   // チェックボックス
@@ -203,7 +405,26 @@ function bindEvents() {
     updateDisplay();
   });
 
-  // 位置情報の取得と最寄り駅の反映
+  // 脱出完了ボタン
+  el.btnEscaped.addEventListener('click', () => {
+    sound.unlock();
+    sound.playSuccess();
+    state.escaped = true;
+    showSuccessModal();
+  });
+
+  el.btnModalClose.addEventListener('click', () => {
+    el.successModal.classList.remove('active');
+  });
+
+  // ルーレットボタン
+  el.btnSpinRoulette.addEventListener('click', () => {
+    sound.unlock();
+    spinRoulette();
+  });
+}
+
+// 位置情報の取得と出発駅への反映
 function handleLocate() {
   sound.unlock();
   if (!navigator.geolocation) {
@@ -227,18 +448,18 @@ function handleLocate() {
         return;
       }
 
-      // 最も近い駅を自動選択
+      // 最も近い駅を出発駅にセット
       const top = candidates[0];
-      state.stationName = top.name;
-      state.trainTimeStr = top.train;
+      state.fromStation = top.name;
       state.walkMinutes = top.walkMinutes;
 
+      recalculateRoute(true);
       syncInputsWithState();
       saveState();
       updateDisplay();
 
       const distText = top.distanceMeters < 1000 ? `${top.distanceMeters}m` : `${top.distanceKm}km`;
-      el.geoStatusNote.textContent = `✅ 最寄り駅【${top.name}】（約${distText} / 徒歩${top.walkMinutes}分 / 終電${top.train}）をセットしました！`;
+      el.geoStatusNote.textContent = `✅ 出発駅に最寄り駅【${top.name}】（約${distText} / 徒歩${top.walkMinutes}分）をセットしました！`;
 
       renderGeoCandidates(candidates);
       el.btnLocate.disabled = false;
@@ -246,7 +467,7 @@ function handleLocate() {
     (err) => {
       let msg = '❌ 位置情報を取得できませんでした。';
       if (err.code === 1) {
-        msg = '⚠️ 位置情報の利用が許可されませんでした。下の駅一覧からお選びください。';
+        msg = '⚠️ 位置情報の利用が許可されませんでした。検索欄から駅名をご入力ください。';
       } else if (err.code === 2) {
         msg = '⚠️ 現在地を特定できませんでした。電波状況をご確認ください。';
       } else if (err.code === 3) {
@@ -271,37 +492,18 @@ function renderGeoCandidates(candidates) {
 
     btn.addEventListener('click', () => {
       sound.unlock();
-      state.stationName = st.name;
-      state.trainTimeStr = st.train;
+      state.fromStation = st.name;
       state.walkMinutes = st.walkMinutes;
+      recalculateRoute(true);
       syncInputsWithState();
       saveState();
       updateDisplay();
-      el.geoStatusNote.textContent = `📍【${st.name}】（徒歩${st.walkMinutes}分 / 終電${st.train}）に切り替えました。`;
+      el.geoStatusNote.textContent = `📍 出発駅を【${st.name}】（徒歩${st.walkMinutes}分）に切り替えました。`;
     });
 
     el.geoCandidateList.appendChild(btn);
   });
   el.geoCandidates.hidden = false;
-}
-
-// 脱出完了ボタン
-  el.btnEscaped.addEventListener('click', () => {
-    sound.unlock();
-    sound.playSuccess();
-    state.escaped = true;
-    showSuccessModal();
-  });
-
-  el.btnModalClose.addEventListener('click', () => {
-    el.successModal.classList.remove('active');
-  });
-
-  // ルーレットボタン
-  el.btnSpinRoulette.addEventListener('click', () => {
-    sound.unlock();
-    spinRoulette();
-  });
 }
 
 // メイン更新処理
@@ -337,9 +539,11 @@ function updateDisplay() {
   el.statusName.textContent = meta.name;
   el.statusMessage.textContent = meta.message;
 
-  // 終電情報
-  el.displayStationName.textContent = state.stationName;
-  el.displayTrainTime.textContent = state.trainTimeStr;
+  // 区間・終電情報
+  if (el.displayFromStation) el.displayFromStation.textContent = state.fromStation;
+  if (el.displayToStation) el.displayToStation.textContent = state.toStation;
+  if (el.displayStationName) el.displayStationName.textContent = state.fromStation;
+  if (el.displayTrainTime) el.displayTrainTime.textContent = state.trainTimeStr;
 
   // カウントダウン
   const timeInfo = formatTimeDisplay(remainingMs);
@@ -357,14 +561,12 @@ function updateDisplay() {
   // 音の再生（心拍音・秒針音）
   const currentTimeMs = now.getTime();
   if (level === 'suddendeath') {
-    // 1秒ごとに心拍音と秒針
     if (currentTimeMs - state.lastBeatTime > 800) {
       sound.playHeartbeat(0.9);
       sound.playTick();
       state.lastBeatTime = currentTimeMs;
     }
   } else if (level === 'critical') {
-    // 1.5秒ごとに心拍音
     if (currentTimeMs - state.lastBeatTime > 1500) {
       sound.playHeartbeat(0.6);
       state.lastBeatTime = currentTimeMs;
@@ -405,13 +607,13 @@ function showSuccessModal() {
   const diffMinutes = Math.round((deadlineDate.getTime() - now.getTime()) / (60 * 1000));
 
   const statsText = diffMinutes >= 0
-    ? `デッドラインまで残り【${diffMinutes}分】の時点で店を脱出しました！\n終電（${state.stationName} ${state.trainTimeStr}発）に十分間に合います。`
+    ? `デッドラインまで残り【${diffMinutes}分】の時点で店を脱出しました！\n区間（${state.fromStation} ➔ ${state.toStation}）の終電（${state.trainTimeStr}発）に十分間に合います。`
     : `デッドラインを【${Math.abs(diffMinutes)}分】超過して退店しました！駅までダッシュしてください！`;
 
   el.modalStats.textContent = statsText;
 
   // Xシェアリンク生成
-  const shareText = `【終電サドンデス 脱出完了！】\n${state.stationName}発 ${state.trainTimeStr}の終電に対し、デッドライン残り${diffMinutes}分で店を出ました！今夜の帰宅権を防衛完了🏃‍♂️💨\n\n#終電サドンデス #100日チャレンジ`;
+  const shareText = `【終電サドンデス 脱出完了！】\n${state.fromStation} ➔ ${state.toStation}（${state.trainTimeStr}発）に対し、デッドライン残り${diffMinutes}分で店を出ました！今夜の帰宅権を防衛完了🏃‍♂️💨\n\n#終電サドンデス #100日チャレンジ`;
   const shareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(window.location.href)}`;
   el.btnModalShare.href = shareUrl;
 
@@ -422,7 +624,8 @@ function showSuccessModal() {
 function saveState() {
   try {
     localStorage.setItem('day062_state', JSON.stringify({
-      stationName: state.stationName,
+      fromStation: state.fromStation,
+      toStation: state.toStation,
       trainTimeStr: state.trainTimeStr,
       walkMinutes: state.walkMinutes,
       lossItems: state.lossItems
@@ -432,20 +635,27 @@ function saveState() {
 
 function loadFromUrlOrStorage() {
   const params = new URLSearchParams(window.location.search);
+  const urlFrom = params.get('from') || params.get('station');
+  const urlTo = params.get('to');
   const urlTrain = params.get('train');
-  const urlStation = params.get('station');
   const urlWalk = params.get('walk');
 
+  if (urlFrom) {
+    state.fromStation = urlFrom;
+    state.stationName = urlFrom;
+  }
+  if (urlTo) state.toStation = urlTo;
   if (urlTrain) state.trainTimeStr = urlTrain;
-  if (urlStation) state.stationName = urlStation;
   if (urlWalk && !isNaN(parseInt(urlWalk, 10))) state.walkMinutes = parseInt(urlWalk, 10);
 
-  if (!urlTrain && !urlStation) {
+  if (!urlFrom && !urlTo && !urlTrain) {
     try {
       const saved = localStorage.getItem('day062_state');
       if (saved) {
         const parsed = JSON.parse(saved);
-        if (parsed.stationName) state.stationName = parsed.stationName;
+        if (parsed.fromStation) state.fromStation = parsed.fromStation;
+        if (parsed.toStation) state.toStation = parsed.toStation;
+        if (parsed.stationName && !parsed.fromStation) state.fromStation = parsed.stationName;
         if (parsed.trainTimeStr) state.trainTimeStr = parsed.trainTimeStr;
         if (parsed.walkMinutes) state.walkMinutes = parsed.walkMinutes;
         if (parsed.lossItems) state.lossItems = parsed.lossItems;

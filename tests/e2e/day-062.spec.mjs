@@ -87,3 +87,30 @@ test('位置情報を許可すると現在地から最寄り駅と徒歩分数�
   await expect(page.locator('#geo-status-note')).toContainText('切り替えました');
 });
 
+test('全国駅のインクリメンタル検索・帰着駅設定・入れ替えが動作する', async ({ page }) => {
+  await page.goto(PATH);
+
+  // 初期値の区間
+  await expect(page.locator('#display-from-station')).toContainText('新宿駅');
+  await expect(page.locator('#display-to-station')).toContainText('吉祥寺駅');
+
+  // 帰着駅を「大宮駅」にクイック候補から変更
+  await page.locator('.quick-dest-btn', { hasText: '大宮駅' }).click();
+  await expect(page.locator('#display-to-station')).toContainText('大宮駅');
+  await expect(page.locator('#route-distance-badge')).toContainText('km');
+
+  // 入れ替えボタンをクリック
+  await page.locator('#btn-swap-stations').click();
+  await expect(page.locator('#display-from-station')).toContainText('大宮駅');
+  await expect(page.locator('#display-to-station')).toContainText('新宿駅');
+
+  // 出発駅の検索サジェストで「はかた」を検索して選択
+  const fromInput = page.locator('#input-from-station');
+  await fromInput.fill('はかた');
+  const dropdown = page.locator('#from-search-results');
+  await expect(dropdown).toBeVisible();
+  await dropdown.locator('.search-result-item', { hasText: '博多駅' }).click();
+
+  await expect(page.locator('#display-from-station')).toContainText('博多駅');
+});
+
