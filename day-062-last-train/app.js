@@ -614,8 +614,7 @@ function showSuccessModal() {
 
   // Xシェアリンク生成
   const shareText = `【終電サドンデス 脱出完了！】\n${state.fromStation} ➔ ${state.toStation}（${state.trainTimeStr}発）に対し、デッドライン残り${diffMinutes}分で店を出ました！今夜の帰宅権を防衛完了🏃‍♂️💨\n\n#終電サドンデス #100日チャレンジ`;
-  const shareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(window.location.href)}`;
-  el.btnModalShare.href = shareUrl;
+  el.btnModalShare.href = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(window.location.href)}`;
 
   el.successModal.classList.add('active');
 }
