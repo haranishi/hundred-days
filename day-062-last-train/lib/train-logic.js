@@ -1,6 +1,65 @@
+import { STATIONS_DATABASE } from './stations-data.js';
+
+export { STATIONS_DATABASE };
+
 /**
- * 終電サドンデス (Day 062) コアロジック
+ * 2点間の直線距離 (km) を Haversine 公式で算出
+ * @param {number} lat1
+ * @param {number} lon1
+ * @param {number} lat2
+ * @param {number} lon2
+ * @returns {number} 距離 (km)
  */
+export function calculateDistanceKm(lat1, lon1, lat2, lon2) {
+  const R = 6371; // 地球半径 km
+  const dLat = (lat2 - lat1) * (Math.PI / 180);
+  const dLon = (lon2 - lon1) * (Math.PI / 180);
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(lat1 * (Math.PI / 180)) *
+      Math.cos(lat2 * (Math.PI / 180)) *
+      Math.sin(dLon / 2) *
+      Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c;
+}
+
+/**
+ * 距離から実際の徒歩所要時間（分）を推定
+ * 街路の迂回係数 1.25〜1.3倍、一般的な分速80m (時速4.8km) で計算
+ * @param {number} distanceKm - 直線距離 km
+ * @returns {number} 徒歩分数（整数）
+ */
+export function estimateWalkingMinutes(distanceKm) {
+  const actualWalkMeters = distanceKm * 1.3 * 1000;
+  const minutes = Math.ceil(actualWalkMeters / 80);
+  return Math.max(1, Math.min(60, minutes));
+}
+
+/**
+ * 現在地 (lat, lon) から最も近い駅リストを取得
+ * @param {number} lat - 緯度
+ * @param {number} lon - 経度
+ * @param {Array} [stations=STATIONS_DATABASE]
+ * @param {number} [limit=3]
+ * @returns {Array} 近い順の駅リスト（距離・徒歩分数つき）
+ */
+export function findNearestStations(lat, lon, stations = STATIONS_DATABASE, limit = 3) {
+  const scored = stations.map((st) => {
+    const distKm = calculateDistanceKm(lat, lon, st.lat, st.lng);
+    const distMeters = Math.round(distKm * 1000);
+    const walkMinutes = estimateWalkingMinutes(distKm);
+    return {
+      ...st,
+      distanceKm: Number(distKm.toFixed(2)),
+      distanceMeters: distMeters,
+      walkMinutes
+    };
+  });
+
+  scored.sort((a, b) => a.distanceKm - b.distanceKm);
+  return scored.slice(0, limit);
+}
 
 /**
  * プリセット駅リスト

@@ -150,6 +150,18 @@
       駅と終電時刻の選択
     </div>
 
+    <!-- 位置情報から探すボタン -->
+    <div class="geo-action-box">
+      <button id="btn-locate" class="btn-locate" type="button">
+        📍 現在地から最寄り駅と終電を探す
+      </button>
+      <div id="geo-status-note" class="geo-status-note" role="status" aria-live="polite"></div>
+      <div id="geo-candidates" class="geo-candidates" hidden>
+        <span class="geo-candidates-label">周辺の駅候補:</span>
+        <div id="geo-candidate-list" class="geo-candidate-list"></div>
+      </div>
+    </div>
+
     <div class="preset-grid" id="preset-grid" role="radiogroup" aria-label="主要駅プリセット">
       <!-- JSで動的生成 -->
     </div>

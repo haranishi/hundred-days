@@ -320,6 +320,100 @@ h1 {
   font-weight: 400;
 }
 
+/* 位置情報検索ブロック */
+.geo-action-box {
+  background: var(--bg-card-sub);
+  border: 1px dashed #38bdf8;
+  border-radius: 10px;
+  padding: 12px;
+  margin-bottom: 14px;
+  text-align: center;
+}
+
+.btn-locate {
+  background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 18px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s;
+  box-shadow: 0 4px 12px rgba(2, 132, 199, 0.3);
+  width: 100%;
+  justify-content: center;
+}
+
+.btn-locate:hover {
+  background: linear-gradient(135deg, #0369a1 0%, #075985 100%);
+  transform: translateY(-1px);
+}
+
+.btn-locate:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.geo-status-note {
+  font-size: 0.85rem;
+  color: #7dd3fc;
+  margin-top: 8px;
+  min-height: 1.2em;
+}
+
+.geo-candidates {
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border-card);
+  text-align: left;
+}
+
+.geo-candidates-label {
+  font-size: 0.78rem;
+  color: var(--text-dim);
+  display: block;
+  margin-bottom: 6px;
+}
+
+.geo-candidate-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.geo-candidate-btn {
+  background: #0f172a;
+  border: 1px solid #38bdf8;
+  color: #e0f2fe;
+  padding: 5px 10px;
+  border-radius: 6px;
+  font-size: 0.82rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.15s;
+}
+
+.geo-candidate-btn:hover {
+  background: #0284c7;
+  color: #ffffff;
+}
+
+.geo-candidate-btn span {
+  font-size: 0.72rem;
+  color: #94a3b8;
+}
+
+.geo-candidate-btn:hover span {
+  color: #e0f2fe;
+}
+
 /* 駅・路線プリセットセレクター */
 .preset-grid {
   display: grid;

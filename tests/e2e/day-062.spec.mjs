@@ -61,3 +61,29 @@ test('脱出完了ボタンでモーダルが開きシェアリンクが生成�
   await modal.locator('#btn-modal-close').click();
   await expect(modal).not.toHaveClass(/active/);
 });
+
+test('位置情報を許可すると現在地から最寄り駅と徒歩分数を自動設定できる', async ({ page, context }) => {
+  await context.grantPermissions(['geolocation']);
+  // 渋谷駅周辺 (ハチ公前付近) の緯度経度
+  await context.setGeolocation({ latitude: 35.6591, longitude: 139.7005 });
+
+  await page.goto(PATH);
+  const btnLocate = page.locator('#btn-locate');
+  await btnLocate.click();
+
+  // 最寄り駅として渋谷駅がセットされる
+  await expect(page.locator('#geo-status-note')).toContainText('渋谷駅');
+  await expect(page.locator('#display-station-name')).toContainText('渋谷駅');
+  await expect(page.locator('#display-train-time')).toContainText('23:52');
+
+  // 周辺候補ボタンが表示される
+  const candidateBox = page.locator('#geo-candidates');
+  await expect(candidateBox).toBeVisible();
+  const candidateBtns = candidateBox.locator('.geo-candidate-btn');
+  expect(await candidateBtns.count()).toBeGreaterThanOrEqual(1);
+
+  // 候補の駅をクリックして切り替えできる
+  await candidateBtns.first().click();
+  await expect(page.locator('#geo-status-note')).toContainText('切り替えました');
+});
+

@@ -8,7 +8,8 @@ import {
   calculateDeadline,
   getStatusLevel,
   formatTimeDisplay,
-  getFirstTrainRemainingMs
+  getFirstTrainRemainingMs,
+  findNearestStations
 } from './lib/train-logic.js';
 import { sound } from './lib/audio.js';
 
@@ -21,7 +22,8 @@ const state = {
   soundEnabled: true,
   currentLevel: 'safe',
   lastBeatTime: 0,
-  escaped: false
+  escaped: false,
+  coords: null
 };
 
 // DOM要素
@@ -31,6 +33,10 @@ const el = {
   soundIcon: document.getElementById('sound-icon'),
   soundText: document.getElementById('sound-text'),
   btnShareLink: document.getElementById('btn-share-link'),
+  btnLocate: document.getElementById('btn-locate'),
+  geoStatusNote: document.getElementById('geo-status-note'),
+  geoCandidates: document.getElementById('geo-candidates'),
+  geoCandidateList: document.getElementById('geo-candidate-list'),
   statusBadge: document.getElementById('status-badge'),
   statusName: document.getElementById('status-name'),
   statusMessage: document.getElementById('status-message'),
@@ -136,6 +142,11 @@ function bindEvents() {
     el.soundText.textContent = enabled ? 'サウンド ON' : 'サウンド OFF';
   });
 
+  // 位置情報から最寄り駅を探す
+  if (el.btnLocate) {
+    el.btnLocate.addEventListener('click', handleLocate);
+  }
+
   // URL共有
   el.btnShareLink.addEventListener('click', () => {
     sound.unlock();
@@ -192,7 +203,89 @@ function bindEvents() {
     updateDisplay();
   });
 
-  // 脱出完了ボタン
+  // 位置情報の取得と最寄り駅の反映
+function handleLocate() {
+  sound.unlock();
+  if (!navigator.geolocation) {
+    el.geoStatusNote.textContent = '❌ お使いのブラウザでは位置情報を利用できません。';
+    return;
+  }
+
+  el.btnLocate.disabled = true;
+  el.geoStatusNote.textContent = '📡 現在地を確認しています…';
+
+  navigator.geolocation.getCurrentPosition(
+    (position) => {
+      const lat = position.coords.latitude;
+      const lon = position.coords.longitude;
+      state.coords = { lat, lon };
+
+      const candidates = findNearestStations(lat, lon, undefined, 4);
+      if (!candidates || candidates.length === 0) {
+        el.geoStatusNote.textContent = '⚠️ 周辺の駅情報が見つかりませんでした。';
+        el.btnLocate.disabled = false;
+        return;
+      }
+
+      // 最も近い駅を自動選択
+      const top = candidates[0];
+      state.stationName = top.name;
+      state.trainTimeStr = top.train;
+      state.walkMinutes = top.walkMinutes;
+
+      syncInputsWithState();
+      saveState();
+      updateDisplay();
+
+      const distText = top.distanceMeters < 1000 ? `${top.distanceMeters}m` : `${top.distanceKm}km`;
+      el.geoStatusNote.textContent = `✅ 最寄り駅【${top.name}】（約${distText} / 徒歩${top.walkMinutes}分 / 終電${top.train}）をセットしました！`;
+
+      renderGeoCandidates(candidates);
+      el.btnLocate.disabled = false;
+    },
+    (err) => {
+      let msg = '❌ 位置情報を取得できませんでした。';
+      if (err.code === 1) {
+        msg = '⚠️ 位置情報の利用が許可されませんでした。下の駅一覧からお選びください。';
+      } else if (err.code === 2) {
+        msg = '⚠️ 現在地を特定できませんでした。電波状況をご確認ください。';
+      } else if (err.code === 3) {
+        msg = '⚠️ 位置情報の取得がタイムアウトしました。';
+      }
+      el.geoStatusNote.textContent = msg;
+      el.btnLocate.disabled = false;
+    },
+    { enableHighAccuracy: true, timeout: 8000, maximumAge: 30000 }
+  );
+}
+
+// 周辺駅の候補ボタン生成
+function renderGeoCandidates(candidates) {
+  el.geoCandidateList.innerHTML = '';
+  candidates.forEach((st) => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'geo-candidate-btn';
+    const distText = st.distanceMeters < 1000 ? `${st.distanceMeters}m` : `${st.distanceKm}km`;
+    btn.innerHTML = `<b>${st.name}</b> <span>約${distText}・徒歩${st.walkMinutes}分</span>`;
+
+    btn.addEventListener('click', () => {
+      sound.unlock();
+      state.stationName = st.name;
+      state.trainTimeStr = st.train;
+      state.walkMinutes = st.walkMinutes;
+      syncInputsWithState();
+      saveState();
+      updateDisplay();
+      el.geoStatusNote.textContent = `📍【${st.name}】（徒歩${st.walkMinutes}分 / 終電${st.train}）に切り替えました。`;
+    });
+
+    el.geoCandidateList.appendChild(btn);
+  });
+  el.geoCandidates.hidden = false;
+}
+
+// 脱出完了ボタン
   el.btnEscaped.addEventListener('click', () => {
     sound.unlock();
     sound.playSuccess();

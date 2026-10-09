@@ -7,6 +7,9 @@ import {
   getStatusLevel,
   formatTimeDisplay,
   getFirstTrainRemainingMs,
+  calculateDistanceKm,
+  estimateWalkingMinutes,
+  findNearestStations,
   DEFAULT_LOSS_ITEMS
 } from '../lib/train-logic.js';
 
@@ -117,6 +120,32 @@ describe('終電サドンデス (train-logic)', () => {
       const now = new Date('2026-10-09T01:00:00');
       const remaining = getFirstTrainRemainingMs(now);
       assert.equal(remaining, 4 * 3600 * 1000); // 4時間
+    });
+  });
+
+  describe('位置情報・最寄り駅判定 (Geolocation)', () => {
+    it('2点間の距離を正しく計算する (新宿〜渋谷は約3.5km)', () => {
+      const shinjuku = { lat: 35.6896, lng: 139.7006 };
+      const shibuya = { lat: 35.6580, lng: 139.7016 };
+      const dist = calculateDistanceKm(shinjuku.lat, shinjuku.lng, shibuya.lat, shibuya.lng);
+      assert.ok(dist >= 3.4 && dist <= 3.6, `距離: ${dist}km`);
+    });
+
+    it('徒歩分数を正しく推定する (500mなら約8分)', () => {
+      // 0.5km * 1.3 = 650m / 80m/分 = 8.125 -> ceil 9分
+      const minutes = estimateWalkingMinutes(0.5);
+      assert.ok(minutes >= 8 && minutes <= 9, `徒歩: ${minutes}分`);
+    });
+
+    it('現在地から最も近い駅をソートして上位を返す', () => {
+      // 渋谷駅ハチ公前付近 (35.6591, 139.7005)
+      const lat = 35.6591;
+      const lon = 139.7005;
+      const nearest = findNearestStations(lat, lon, undefined, 3);
+      assert.equal(nearest.length, 3);
+      assert.equal(nearest[0].name, '渋谷駅');
+      assert.ok(nearest[0].distanceMeters < 300, `渋谷駅までの距離: ${nearest[0].distanceMeters}m`);
+      assert.ok(nearest[0].walkMinutes >= 1);
     });
   });
 });
