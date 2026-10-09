@@ -1,0 +1,652 @@
+/* 終電サドンデス (Day 062) スタイル */
+:root {
+  --bg-main: #090a0f;
+  --bg-card: #12141e;
+  --bg-card-sub: #1a1e2d;
+  --border-card: #272c40;
+  
+  --text-main: #f1f5f9;
+  --text-muted: #94a3b8;
+  --text-dim: #64748b;
+
+  --col-safe: #10b981;
+  --col-caution: #f59e0b;
+  --col-critical: #f97316;
+  --col-suddendeath: #ef4444;
+  --col-deadend: #831843;
+
+  --accent-color: var(--col-safe);
+  --pulse-speed: 2s;
+
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--bg-main);
+  color: var(--text-main);
+  font-family: var(--font-sans);
+  line-height: 1.5;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: background-color 0.4s ease;
+  padding: 16px;
+}
+
+/* 臨界・サドンデス時の背景エフェクト */
+body[data-level="suddendeath"] {
+  background-color: #1a0507;
+  animation: bg-panic 1.2s infinite alternate;
+}
+
+body[data-level="gameover"] {
+  background-color: #0d0408;
+}
+
+@keyframes bg-panic {
+  0% { background-color: #170305; }
+  100% { background-color: #2b050a; }
+}
+
+#app {
+  width: 100%;
+  max-width: 680px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding-bottom: 40px;
+}
+
+header {
+  text-align: center;
+  padding: 12px 0 6px;
+}
+
+.eyebrow {
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: #38bdf8;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+h1 {
+  font-size: 1.85rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.sub-desc {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+/* コントロールバー（音声・共有） */
+.top-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-bottom: -10px;
+}
+
+.action-btn {
+  background: var(--bg-card);
+  border: 1px solid var(--border-card);
+  color: var(--text-main);
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s;
+}
+
+.action-btn:hover {
+  background: var(--bg-card-sub);
+  border-color: #475569;
+}
+
+/* ステータスカード */
+.status-banner {
+  background: var(--bg-card);
+  border: 2px solid var(--accent-color);
+  border-radius: 14px;
+  padding: 14px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.4);
+  transition: border-color 0.4s, background-color 0.4s;
+}
+
+.status-badge-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  background: var(--accent-color);
+  color: #000000;
+  width: fit-content;
+}
+
+.status-name {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #ffffff;
+}
+
+.status-message {
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  text-align: right;
+  max-width: 60%;
+  line-height: 1.35;
+}
+
+/* メインタイマーディスプレイ */
+.timer-board {
+  background: linear-gradient(180deg, #10131d 0%, #0a0d14 100%);
+  border: 1px solid var(--border-card);
+  border-radius: 18px;
+  padding: 24px 20px;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+.timer-board::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--accent-color);
+  transition: background-color 0.4s;
+}
+
+.timer-label {
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--text-dim);
+  text-transform: uppercase;
+}
+
+.timer-target-sub {
+  font-size: 1rem;
+  color: var(--text-muted);
+  margin-top: 4px;
+  font-weight: 500;
+}
+
+.target-highlight {
+  color: #38bdf8;
+  font-weight: 700;
+}
+
+.countdown-digits {
+  font-family: var(--font-mono);
+  font-size: 3.6rem;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  margin: 16px 0 12px;
+  color: var(--accent-color);
+  text-shadow: 0 0 25px rgba(239, 68, 68, 0.2);
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 2px;
+}
+
+.digits-unit {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--text-dim);
+  margin: 0 4px 0 1px;
+}
+
+.digits-sub {
+  font-size: 2.2rem;
+  color: var(--text-muted);
+}
+
+.time-breakdown {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px dashed var(--border-card);
+  font-size: 0.85rem;
+}
+
+.breakdown-item span {
+  display: block;
+}
+
+.item-label {
+  color: var(--text-dim);
+  font-size: 0.75rem;
+}
+
+.item-val {
+  font-weight: 700;
+  color: var(--text-main);
+  font-size: 1rem;
+  font-family: var(--font-mono);
+}
+
+/* アクションボタン */
+.escape-action-wrap {
+  margin-top: 18px;
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.btn-escape {
+  background: #10b981;
+  color: #000000;
+  font-weight: 800;
+  font-size: 1.05rem;
+  border: none;
+  border-radius: 12px;
+  padding: 14px 28px;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+  transition: transform 0.15s, background-color 0.2s;
+  flex: 1;
+  max-width: 320px;
+}
+
+.btn-escape:hover {
+  transform: translateY(-2px);
+  background: #34d399;
+}
+
+.btn-escape:active {
+  transform: translateY(0);
+}
+
+/* 設定カード */
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-card);
+  border-radius: 14px;
+  padding: 18px;
+}
+
+.card-title {
+  font-size: 1rem;
+  font-weight: 700;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.card-title span {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-weight: 400;
+}
+
+/* 駅・路線プリセットセレクター */
+.preset-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.station-pill {
+  background: var(--bg-card-sub);
+  border: 1px solid var(--border-card);
+  color: var(--text-main);
+  border-radius: 8px;
+  padding: 8px 6px;
+  font-size: 0.85rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.station-pill.active {
+  background: #2563eb;
+  border-color: #60a5fa;
+  color: #ffffff;
+  font-weight: 700;
+}
+
+.custom-train-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 8px;
+  padding: 10px;
+  background: var(--bg-card-sub);
+  border-radius: 8px;
+}
+
+.custom-train-row label {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.custom-train-row input[type="time"] {
+  background: #090a0f;
+  border: 1px solid var(--border-card);
+  color: #ffffff;
+  font-family: var(--font-mono);
+  font-size: 1.1rem;
+  padding: 6px 10px;
+  border-radius: 6px;
+  outline: none;
+}
+
+/* タイムロス診断チェックリスト */
+.loss-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.loss-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  background: var(--bg-card-sub);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.15s;
+}
+
+.loss-item:hover {
+  background: #23283c;
+}
+
+.loss-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.loss-left input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: #38bdf8;
+  cursor: pointer;
+}
+
+.loss-label {
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.loss-minutes {
+  font-family: var(--font-mono);
+  font-size: 0.88rem;
+  color: #f59e0b;
+  font-weight: 700;
+}
+
+.walk-slider-row {
+  margin-top: 6px;
+  padding: 12px 14px;
+  background: var(--bg-card-sub);
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.walk-slider-header {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.88rem;
+}
+
+.walk-slider-header b {
+  font-family: var(--font-mono);
+  color: #38bdf8;
+}
+
+.walk-slider-row input[type="range"] {
+  width: 100%;
+  accent-color: #38bdf8;
+  cursor: pointer;
+}
+
+/* 始発サバイバルモード (GameOver時) */
+.gameover-panel {
+  display: none;
+  background: #1e0915;
+  border: 2px solid var(--col-deadend);
+  border-radius: 14px;
+  padding: 20px;
+  text-align: center;
+}
+
+.gameover-panel.active {
+  display: block;
+  animation: fadeIn 0.4s ease;
+}
+
+.gameover-title {
+  font-size: 1.5rem;
+  font-weight: 900;
+  color: #f43f5e;
+  margin-bottom: 6px;
+}
+
+.first-train-timer {
+  font-family: var(--font-mono);
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: #fb7185;
+  margin: 12px 0;
+}
+
+.roulette-box {
+  background: #2a111e;
+  border-radius: 10px;
+  padding: 14px;
+  margin-top: 14px;
+  border: 1px dashed #f43f5e;
+}
+
+.roulette-title {
+  font-size: 0.85rem;
+  color: #fda4af;
+  margin-bottom: 4px;
+}
+
+.roulette-result {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #ffffff;
+  margin: 6px 0;
+}
+
+.roulette-cost {
+  font-size: 0.85rem;
+  color: #fcd34d;
+}
+
+.btn-roulette {
+  background: #e11d48;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 16px;
+  margin-top: 10px;
+  font-weight: 700;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+/* 脱出成功モーダル */
+.success-modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(4px);
+  z-index: 100;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.success-modal.active {
+  display: flex;
+}
+
+.modal-content {
+  background: var(--bg-card);
+  border: 2px solid var(--col-safe);
+  border-radius: 18px;
+  padding: 26px;
+  max-width: 440px;
+  width: 100%;
+  text-align: center;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+  animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes popIn {
+  from { transform: scale(0.85); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.modal-title {
+  font-size: 1.5rem;
+  font-weight: 900;
+  color: var(--col-safe);
+  margin-bottom: 8px;
+}
+
+.modal-stats {
+  background: var(--bg-card-sub);
+  border-radius: 10px;
+  padding: 14px;
+  margin: 16px 0;
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+.modal-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.btn-share-x {
+  background: #000000;
+  color: #ffffff;
+  border: 1px solid #475569;
+  border-radius: 8px;
+  padding: 12px;
+  font-weight: 700;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.btn-close {
+  background: transparent;
+  color: var(--text-dim);
+  border: none;
+  padding: 8px;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+/* フッター */
+footer {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border-card);
+  color: var(--text-dim);
+  font-size: 0.85rem;
+  line-height: 1.6;
+}
+
+footer h2 {
+  font-size: 0.95rem;
+  color: var(--text-muted);
+  margin: 12px 0 6px;
+}
+
+.footer-nav {
+  display: flex;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.footer-nav a {
+  color: #38bdf8;
+  text-decoration: none;
+}
+
+.footer-nav a:hover {
+  text-decoration: underline;
+}
+
+/* レスポンシブ */
+@media (max-width: 560px) {
+  .countdown-digits {
+    font-size: 2.8rem;
+  }
+  .digits-sub {
+    font-size: 1.8rem;
+  }
+  .status-banner {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .status-message {
+    text-align: left;
+    max-width: 100%;
+  }
+  .time-breakdown {
+    gap: 12px;
+  }
+}

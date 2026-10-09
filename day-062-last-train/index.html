@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="あと何分で、今日の帰宅権を失うか。居酒屋や職場の「まだ大丈夫」を逆算し、店を出るべき本当のリミットをミリ秒で突きつける終電脱出シミュレーター。">
+  <meta name="share:text" content="終電サドンデス — あと何分で、今日の帰宅権を失うか。油断を断ち切る脱出シミュレーター">
+  <title>終電サドンデス — 帰宅権脱出シミュレーター</title>
+  <link rel="icon" type="image/svg+xml" href="./favicon.svg">
+  <link rel="stylesheet" href="./app.css">
+  <script type="module" src="./app.js"></script>
+  <link rel="stylesheet" href="./shared/share.css">
+  <script src="./shared/share.js" defer></script>
+</head>
+<body data-level="safe">
+<main id="app">
+  <header>
+    <p class="eyebrow">100日チャレンジ・DAY 062</p>
+    <h1>終電サドンデス</h1>
+    <p class="sub-desc">居酒屋の「まだ大丈夫」を逆算。店を出るべき本当のリミットを突きつける。</p>
+  </header>
+
+  <!-- トップアクションバー -->
+  <div class="top-actions">
+    <button id="btn-sound" class="action-btn" type="button" aria-label="効果音の切り替え">
+      <span id="sound-icon">🔊</span> <span id="sound-text">サウンド ON</span>
+    </button>
+    <button id="btn-share-link" class="action-btn" type="button" aria-label="共有URLをコピー">
+      🔗 共有URL
+    </button>
+  </div>
+
+  <!-- ステータスバナー -->
+  <section class="status-banner" aria-label="警戒ステータス">
+    <div class="status-badge-wrap">
+      <span id="status-badge" class="status-badge">LEVEL 1</span>
+      <div id="status-name" class="status-name">平穏 (SAFE)</div>
+    </div>
+    <div id="status-message" class="status-message" role="status" aria-live="polite">
+      まだ余裕があります。グラスを傾ける時間は残されています。
+    </div>
+  </section>
+
+  <!-- カウントダウンメインボード -->
+  <section class="timer-board" aria-label="脱出カウントダウン">
+    <div class="timer-label">脱出デッドラインまで</div>
+    <div class="timer-target-sub">
+      終電: <span id="display-station-name" class="target-highlight">新宿駅</span>
+      <span id="display-train-time" class="target-highlight">23:55</span> 発
+    </div>
+
+    <div class="countdown-digits" id="countdown-digits" aria-live="off">
+      <span id="digit-hours">00</span><span class="digits-unit">時間</span>
+      <span id="digit-minutes">24</span><span class="digits-unit">分</span>
+      <span id="digit-seconds">18</span><span class="digits-unit">秒</span>
+      <span class="digits-sub">.<span id="digit-tenths">0</span></span>
+    </div>
+
+    <div class="time-breakdown">
+      <div class="breakdown-item">
+        <span class="item-label">店を出るべき時刻</span>
+        <span id="val-deadline" class="item-val">23:37</span>
+      </div>
+      <div class="breakdown-item">
+        <span class="item-label">想定タイムロス</span>
+        <span id="val-loss-total" class="item-val">18 分</span>
+      </div>
+      <div class="breakdown-item">
+        <span class="item-label">現在時刻</span>
+        <span id="val-current-time" class="item-val">--:--:--</span>
+      </div>
+    </div>
+
+    <div class="escape-action-wrap">
+      <button id="btn-escaped" class="btn-escape" type="button">
+        🏃‍♂️ 脱出完了！（店を出た）
+      </button>
+    </div>
+  </section>
+
+  <!-- 終電死亡・始発サバイバルパネル (GameOver時) -->
+  <section id="gameover-panel" class="gameover-panel" aria-label="始発サバイバルモード">
+    <h2 class="gameover-title">終電死亡 (DEAD END)</h2>
+    <p>今夜の終電は間に合いませんでした。始発サバイバルを開始します。</p>
+    
+    <div class="first-train-timer">
+      始発まで: <span id="first-train-digits">05:00:00</span>
+    </div>
+
+    <div class="roulette-box">
+      <div class="roulette-title">🎲 今夜のサバイバル行動ルーレット</div>
+      <div id="roulette-result" class="roulette-result">24時間ネットカフェ / 快活CLUB</div>
+      <div id="roulette-cost" class="roulette-cost">個室フラット席で仮眠＆スマホ充電確保 (約¥2,200)</div>
+      <button id="btn-spin-roulette" class="btn-roulette" type="button">もう一度回す</button>
+    </div>
+  </section>
+
+  <!-- タイムロス診断チェックリスト -->
+  <section class="card" aria-label="タイムロスの逆算">
+    <div class="card-title">
+      タイムロスの逆算 <span>チェックを入れるとリミットが早まります</span>
+    </div>
+
+    <div class="loss-list">
+      <label class="loss-item">
+        <div class="loss-left">
+          <input type="checkbox" id="check-bill" checked>
+          <span class="loss-label">お会計・割り勘のやり取り</span>
+        </div>
+        <span class="loss-minutes">+5分</span>
+      </label>
+
+      <label class="loss-item">
+        <div class="loss-left">
+          <input type="checkbox" id="check-coat" checked>
+          <span class="loss-label">上着を着る・荷物まとめ・退店エレベーター</span>
+        </div>
+        <span class="loss-minutes">+3分</span>
+      </label>
+
+      <label class="loss-item">
+        <div class="loss-left">
+          <input type="checkbox" id="check-toilet">
+          <span class="loss-label">店を出る直前のトイレ寄り道</span>
+        </div>
+        <span class="loss-minutes">+4分</span>
+      </label>
+
+      <label class="loss-item">
+        <div class="loss-left">
+          <input type="checkbox" id="check-wicket" checked>
+          <span class="loss-label">改札入場〜ホームダッシュ・階段の登り降り</span>
+        </div>
+        <span class="loss-minutes">+3分</span>
+      </label>
+    </div>
+
+    <div class="walk-slider-row">
+      <div class="walk-slider-header">
+        <span>店から駅までの徒歩時間</span>
+        <span><b id="walk-val-display">7</b> 分</span>
+      </div>
+      <input type="range" id="walk-slider" min="1" max="25" value="7" step="1">
+    </div>
+  </section>
+
+  <!-- 駅・終電時刻設定 -->
+  <section class="card" aria-label="駅と終電時刻の設定">
+    <div class="card-title">
+      駅と終電時刻の選択
+    </div>
+
+    <div class="preset-grid" id="preset-grid" role="radiogroup" aria-label="主要駅プリセット">
+      <!-- JSで動的生成 -->
+    </div>
+
+    <div class="custom-train-row">
+      <label for="input-train-time">終電発車時刻:</label>
+      <input type="time" id="input-train-time" value="23:55">
+      <label for="input-station-name">駅名:</label>
+      <input type="text" id="input-station-name" value="新宿駅" style="background:#090a0f; border:1px solid var(--border-card); color:#fff; padding:6px; border-radius:6px; width:100px;">
+    </div>
+  </section>
+
+  <!-- 脱出成功モーダル -->
+  <div id="success-modal" class="success-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal-content">
+      <h2 id="modal-title" class="modal-title">🎉 脱出成功！</h2>
+      <p>無事に店を出ました！今すぐ駅へ向かってください。</p>
+      <div id="modal-stats" class="modal-stats">
+        <!-- JSで統計を挿入 -->
+      </div>
+      <div class="modal-actions">
+        <a id="btn-modal-share" class="btn-share-x" href="#" target="_blank" rel="noopener noreferrer">
+          𝕏 で脱出成功を報告
+        </a>
+        <button id="btn-modal-close" class="btn-close" type="button">閉じる</button>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <h2>使い方・注意事項</h2>
+    <p>
+      このアプリは、飲み会や深夜残業の「まだ終電まで時間あるから大丈夫」という油断を断ち切るためのセルフ管理ツールです。<br>
+      電車の実際の運行情報や遅延情報とは連動していません。必ず各鉄道会社の最新運行情報や乗り換え案内アプリをご確認ください。
+    </p>
+    <nav class="footer-nav" aria-label="サイト内リンク">
+      <a href="../privacy.html">プライバシー</a>
+      <a href="../">100日チャレンジ トップ</a>
+    </nav>
+  </footer>
+</main>
+</body>
+</html>
