@@ -1,0 +1,75 @@
+{
+  "scope": "VM/mocked DOM; not browser gameplay",
+  "checks": 13,
+  "evidence": [
+    {
+      "name": "stage1_both_disarmed_timeout",
+      "damage": 0,
+      "title": "罠を見抜き、完全回避！"
+    },
+    {
+      "name": "stage1_partial_disarm_timeout",
+      "damage": 550
+    },
+    {
+      "name": "stage3_safe_unconfirmed_timeout",
+      "damage": 0,
+      "title": "罠を見抜き、完全回避！"
+    },
+    {
+      "name": "stage3_unsafe_unconfirmed_timeout",
+      "damage": 18000,
+      "title": "時間切れで意図しない請求が発生！"
+    },
+    {
+      "name": "stage5_safe_unconfirmed_timeout",
+      "damage": 0,
+      "title": "罠を見抜き、完全回避！"
+    },
+    {
+      "name": "stage5_unstarted_timeout",
+      "damage": 14800,
+      "title": "時間切れで意図しない請求が発生！"
+    },
+    {
+      "name": "stage2_no_acceptance_timeout",
+      "damage": 980
+    },
+    {
+      "name": "explicit_no_options_button_with_checked_options",
+      "damage": 5530
+    },
+    {
+      "name": "duplicate_result_guard_and_background_inert",
+      "damage": 5530,
+      "results": 1,
+      "inert": true
+    },
+    {
+      "name": "retry_stage1_preserves_prior_results",
+      "damage": 980,
+      "results": 1,
+      "activePlaySeconds": 3,
+      "remainingSeconds": 25
+    },
+    {
+      "name": "retry_stage4_preserves_prior_results",
+      "damage": 980,
+      "results": 1,
+      "activePlaySeconds": 3,
+      "remainingSeconds": 30
+    },
+    {
+      "name": "explanation_60_seconds_excluded",
+      "seconds": 3,
+      "display": "3 秒（実捜査時間）",
+      "rank": "S"
+    },
+    {
+      "name": "fractional_stage_time_is_lost",
+      "simulatedWallPlayMs": 4500,
+      "activePlaySeconds": 0,
+      "display": "1 秒（実捜査時間）"
+    }
+  ]
+}
