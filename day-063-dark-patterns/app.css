@@ -1,14 +1,28 @@
+/* Day063「解約ボタンは、どれ？」
+   外枠（ゲーム側）は暗い濃紺、偽サイトは明るいブラウザ枠。この描き分けは崩さない。
+   ゲーム側の文字は背景との比4.5:1以上（大きい文字は3:1）。偽サイトの中で、罠として意図して薄くしたもの
+   （極小の拒否リンク・薄い×・目立たない小ボタン・極小フッター）だけは data-trap を付けて例外にする。
+   数値は tests/e2e/day-063-layout.spec.mjs が実測するので、色を変えたらそちらも流すこと。 */
+
 :root {
   --bg-color: #0b0f19;
   --panel-bg: #111827;
   --panel-border: #1f2937;
+  --line-strong: #334155;
   --text-main: #f3f4f6;
+  --text-sub: #cbd5e1;
   --text-muted: #9ca3af;
   --accent-cyan: #06b6d4;
+  --accent-cyan-light: #67e8f9;
+  --ok: #34d399;
+  --hit: #fb7185;
+  --late: #fbbf24;
   --accent-emerald: #10b981;
   --accent-rose: #f43f5e;
   --accent-amber: #f59e0b;
-  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --primary-from: #0369a1;
+  --primary-to: #0e7490;
+  --font-sans: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 }
 
@@ -24,11 +38,52 @@ body {
   font-family: var(--font-sans);
   line-height: 1.5;
   min-height: 100vh;
+  min-height: 100dvh;
   display: flex;
   justify-content: center;
   align-items: flex-start;
   padding: 16px;
   -webkit-font-smoothing: antialiased;
+  overflow-wrap: break-word;
+}
+
+/* 文節の切れ目（<wbr>）でだけ改行する。lib/phrase.js が <wbr> と糊付けの span を入れた範囲（data-phrased）に効かせる。
+   word-break: auto-phrase は Chrome 系だけで Safari では効かないので使わない。
+   文節が1行より長いときだけ、overflow-wrap: anywhere で非常用に折れる */
+[data-phrased] {
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+  line-break: strict;
+}
+
+/* 文節の内側で、ブラウザが句読点・括弧・記号の前後で折ろうとする場所を糊付けする（2〜3文字だけ） */
+[data-ph] {
+  white-space: nowrap;
+}
+
+h1, h2, h3, h4, h5, .btn-primary, .btn-secondary, .busted-badge, .intel-val.highlight, .goal-line {
+  text-wrap: balance;
+}
+
+/* 最後の行に短い文節が1つだけ残らないようにする（「同意）」「始める」の孤立） */
+p, li, label, small, .intel-val {
+  text-wrap: pretty;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.nowrap {
+  white-space: nowrap;
 }
 
 #app {
@@ -39,13 +94,19 @@ body {
   gap: 16px;
 }
 
-/* ヘッダー */
+/* ---------------------------------------------------------------- ヘッダー */
 .app-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 12px;
   padding-bottom: 8px;
   border-bottom: 1px solid var(--panel-border);
+}
+
+/* 捜査中はヘッダーを畳み、HUDから偽サイトまでを画面の上に寄せる */
+#app[data-screen="game"] .app-header {
+  display: none;
 }
 
 .eyebrow {
@@ -57,28 +118,68 @@ body {
 }
 
 .app-header h1 {
-  font-size: 1.4rem;
+  font-size: 1.15rem;
   font-weight: 700;
-  letter-spacing: -0.02em;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+}
+
+.header-actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
 }
 
 .btn-icon {
+  min-width: 48px;
+  min-height: 46px;
+  padding: 4px 8px;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
   background: var(--panel-bg);
-  border: 1px solid var(--panel-border);
+  border: 1px solid var(--line-strong);
   color: var(--text-main);
-  border-radius: 8px;
-  padding: 8px 12px;
-  font-size: 1.1rem;
+  border-radius: 10px;
+  font: inherit;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: background-color 0.2s, border-color 0.2s;
+}
+
+.btn-icon[hidden] {
+  display: none;
 }
 
 .btn-icon:hover {
   background: #1e293b;
-  border-color: #334155;
+  border-color: #475569;
 }
 
-/* 画面切り替え */
+.btn-icon__glyph {
+  font-size: 1rem;
+  line-height: 1.1;
+}
+
+.btn-icon__text {
+  font-size: 0.75rem;
+  font-weight: 700;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.sound-state {
+  margin-left: 3px;
+  font-family: var(--font-mono);
+}
+
+[aria-pressed="false"] .sound-state {
+  color: var(--text-muted);
+}
+
+/* ---------------------------------------------------------------- 画面の切り替え */
 .game-screen {
   display: none;
   width: 100%;
@@ -94,15 +195,16 @@ body {
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* スタート画面 */
-.start-card, .result-card {
+/* ---------------------------------------------------------------- 開始画面 */
+.start-card,
+.result-card {
   background: var(--panel-bg);
   border: 1px solid var(--panel-border);
   border-radius: 16px;
   padding: 24px;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 18px;
   box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.4);
 }
 
@@ -115,60 +217,73 @@ body {
   padding: 6px 14px;
   border-radius: 999px;
   width: fit-content;
-  font-size: 0.85rem;
+  font-size: 0.82rem;
   font-weight: 600;
-  color: var(--accent-cyan);
+  color: var(--accent-cyan-light);
 }
 
 .start-card h2 {
-  font-size: 1.5rem;
-  line-height: 1.3;
+  font-size: 1.45rem;
+  line-height: 1.35;
 }
 
 .start-desc {
-  font-size: 0.95rem;
-  color: var(--text-muted);
+  font-size: 0.92rem;
+  color: var(--text-sub);
   line-height: 1.7;
+}
+
+.start-desc strong {
+  color: var(--text-main);
 }
 
 .rules-box {
   background: rgba(0, 0, 0, 0.3);
   border-left: 3px solid var(--accent-cyan);
-  padding: 14px 16px;
+  padding: 12px 14px;
   border-radius: 0 8px 8px 0;
 }
 
 .rules-box h3 {
   font-size: 0.9rem;
-  margin-bottom: 8px;
-  color: var(--accent-cyan);
+  margin-bottom: 6px;
+  color: var(--accent-cyan-light);
 }
 
 .rules-box ul {
-  padding-left: 20px;
-  font-size: 0.85rem;
-  color: var(--text-muted);
+  padding-left: 18px;
+  font-size: 0.84rem;
+  color: var(--text-sub);
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 5px;
+  line-height: 1.55;
 }
 
+.rules-box strong {
+  color: var(--text-main);
+}
+
+/* ---------------------------------------------------------------- ボタン（ゲーム側） */
 .btn-primary {
-  background: linear-gradient(135deg, #0284c7, #06b6d4);
+  background: linear-gradient(135deg, var(--primary-from), var(--primary-to));
   color: #ffffff;
   border: none;
   border-radius: 10px;
-  padding: 14px 20px;
+  min-height: 48px;
+  padding: 13px 18px;
+  font: inherit;
   font-size: 1rem;
   font-weight: 700;
+  line-height: 1.35;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: filter 0.2s, transform 0.2s;
   text-align: center;
-  box-shadow: 0 4px 14px rgba(6, 182, 212, 0.3);
+  box-shadow: 0 4px 14px rgba(14, 116, 144, 0.35);
 }
 
 .btn-primary:hover {
-  filter: brightness(1.1);
+  filter: brightness(1.08);
   transform: translateY(-1px);
 }
 
@@ -176,53 +291,168 @@ body {
   transform: translateY(0);
 }
 
-/* 捜査官HUD */
+.btn-secondary {
+  background: #1f2937;
+  color: var(--text-main);
+  border: 1px solid #475569;
+  border-radius: 10px;
+  min-height: 44px;
+  padding: 10px 16px;
+  font: inherit;
+  font-size: 0.92rem;
+  font-weight: 600;
+  line-height: 1.35;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  text-align: center;
+}
+
+.btn-secondary:hover {
+  background: #334155;
+}
+
+.start-pulse {
+  animation: startPulse 2.4s ease-in-out infinite;
+}
+
+@keyframes startPulse {
+  0%, 100% { box-shadow: 0 4px 14px rgba(14, 116, 144, 0.35); }
+  50% { box-shadow: 0 4px 22px rgba(6, 182, 212, 0.55); }
+}
+
+/* ---------------------------------------------------------------- 捜査HUD（細い帯・スクロールしても上に残る） */
 .investigator-hud {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  background: var(--bg-color);
+  padding: 4px 0 3px;
   margin-bottom: 6px;
+}
+
+.hud-tiles {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.45fr) minmax(0, 1fr) auto;
+  gap: 6px;
+  align-items: stretch;
 }
 
 .hud-item {
   background: var(--panel-bg);
   border: 1px solid var(--panel-border);
   border-radius: 10px;
-  padding: 8px 12px;
+  min-height: 46px;
+  padding: 4px 6px;
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
+  min-width: 0;
 }
 
 .hud-label {
-  font-size: 0.7rem;
+  font-size: 0.75rem;
+  line-height: 1.25;
   color: var(--text-muted);
-  text-transform: uppercase;
+  white-space: nowrap;
 }
 
 .hud-value {
-  font-size: 1.15rem;
-  font-weight: 700;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 2px;
   font-family: var(--font-mono);
+  font-size: 1.05rem;
+  font-weight: 700;
+  line-height: 1.25;
+  white-space: nowrap;
 }
 
+.hud-unit {
+  font-family: var(--font-sans);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+/* 被害額：¥0のときだけ緑。1円でも被弾したら赤のまま（色だけに頼らず⚠も出す） */
 .damage-val {
-  color: var(--accent-emerald);
-  transition: all 0.3s;
+  color: var(--ok);
 }
 
-.damage-val.hit {
-  color: var(--accent-rose);
+.hud-alert {
+  display: none;
+  font-family: var(--font-sans);
+  font-size: 0.85rem;
+  color: var(--hit);
+}
+
+.damage-meter.is-hit .damage-val {
+  color: var(--hit);
+}
+
+.damage-meter.is-hit .hud-alert {
+  display: inline;
+}
+
+.damage-meter.is-hit {
+  border-color: rgba(251, 113, 133, 0.55);
+}
+
+.damage-meter.just-hit .hud-value {
   animation: shake 0.4s;
+}
+
+/* 残り5秒以下：数字そのものを赤くして脈動させる（動きを減らす設定では色だけ） */
+.time-counter.is-critical {
+  border-color: rgba(251, 113, 133, 0.55);
+}
+
+.time-counter.is-critical .hud-value {
+  color: var(--hit);
+  animation: pulseValue 0.5s ease-in-out infinite alternate;
+}
+
+@keyframes pulseValue {
+  from { transform: scale(1); }
+  to { transform: scale(1.12); }
+}
+
+.hud-sound {
+  min-width: 48px;
+  min-height: 46px;
+  padding: 4px 6px;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+  background: var(--panel-bg);
+  border: 1px solid var(--line-strong);
+  border-radius: 10px;
+  color: var(--text-main);
+  font: inherit;
+  cursor: pointer;
+}
+
+.hud-sound__glyph {
+  font-size: 0.95rem;
+  line-height: 1.1;
+}
+
+.hud-sound__text {
+  font-size: 0.75rem;
+  font-weight: 700;
+  line-height: 1.2;
+  white-space: nowrap;
 }
 
 .timer-bar-wrap {
   width: 100%;
-  height: 6px;
+  height: 4px;
+  margin-top: 5px;
   background: #1f2937;
-  border-radius: 3px;
+  border-radius: 2px;
   overflow: hidden;
-  margin-bottom: 12px;
 }
 
 .timer-bar {
@@ -234,43 +464,109 @@ body {
 
 .timer-bar.critical {
   background: var(--accent-rose);
-  animation: pulseBar 0.5s infinite alternate;
 }
 
-@keyframes pulseBar {
-  from { opacity: 0.7; }
-  to { opacity: 1; }
+/* 罠解除の合図を出す帯。普段は現場名を薄く出し、解除したときだけ緑の帯で上書きする */
+.hud-status {
+  position: relative;
+  height: 24px;
+  margin-top: 3px;
 }
 
-/* ミッション指示バー */
-.mission-bar {
+.hud-case {
+  height: 100%;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 6px;
+  padding: 0 4px;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.hud-case__tag {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  color: var(--accent-cyan-light);
+  letter-spacing: 0.06em;
+}
+
+.hud-toast {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 10px;
+  border-radius: 6px;
+  background: #047857;
+  color: #ffffff;
+  font-size: 0.78rem;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.2s, visibility 0.2s;
+}
+
+.hud-toast.is-on {
+  opacity: 1;
+  visibility: visible;
+}
+
+.hud-toast__mark {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #ffffff;
+  color: #047857;
+  font-size: 0.75rem;
+  font-weight: 900;
+}
+
+/* ---------------------------------------------------------------- ミッション */
+.mission-bar {
   background: rgba(6, 182, 212, 0.1);
-  border: 1px solid rgba(6, 182, 212, 0.25);
+  border: 1px solid rgba(6, 182, 212, 0.3);
   border-radius: 8px;
-  padding: 10px 14px;
-  margin-bottom: 12px;
+  padding: 7px 10px;
+  margin-bottom: 6px;
+}
+
+.mission-line {
+  font-size: 0.86rem;
+  line-height: 1.45;
+  color: #e2e8f0;
 }
 
 .mission-tag {
+  display: inline-block;
+  margin-right: 8px;
+  padding: 1px 6px;
+  border-radius: 4px;
   background: var(--accent-cyan);
   color: #0b0f19;
-  font-size: 0.7rem;
+  font-size: 0.75rem;
   font-weight: 800;
-  padding: 2px 6px;
-  border-radius: 4px;
   letter-spacing: 0.05em;
-}
-
-.mission-text {
-  font-size: 0.88rem;
-  color: #e2e8f0;
   line-height: 1.4;
+  vertical-align: 1px;
 }
 
-/* 捜査対象ブラウザフレーム */
+.mission-text:focus {
+  outline: none;
+}
+
+/* ---------------------------------------------------------------- 偽ブラウザ枠 */
 .browser-frame {
   background: #ffffff;
   color: #1f2937;
@@ -282,16 +578,17 @@ body {
 
 .browser-topbar {
   background: #e5e7eb;
-  padding: 8px 12px;
+  padding: 6px 10px;
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   border-bottom: 1px solid #d1d5db;
 }
 
 .browser-dots {
   display: flex;
   gap: 6px;
+  flex-shrink: 0;
 }
 
 .dot {
@@ -305,30 +602,37 @@ body {
 
 .browser-address {
   background: #ffffff;
-  padding: 4px 10px;
+  padding: 3px 10px;
   border-radius: 6px;
   font-size: 0.75rem;
   font-family: var(--font-mono);
   color: #4b5563;
   flex: 1;
+  min-width: 0;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   border: 1px solid #d1d5db;
 }
 
+/* 偽サイトの枠の高さは中身に合わせる（タブレット・PCで下に大きな白い空きを残さない）。
+   最低の高さは、カットインの箱が収まる分だけ */
 .stage-viewport {
-  padding: 20px 16px;
-  min-height: 380px;
+  padding: 18px 14px;
+  min-height: 240px;
   position: relative;
   background: #f9fafb;
 }
 
-/* ステージ1 スタイル */
-.ec-stage-box {
+/* ---------------------------------------------------------------- 偽サイト共通 */
+.ec-stage-box,
+.ec-stage-content,
+.hotel-stage-box,
+.cancel-stage-box,
+.sub-stage-box {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 14px;
 }
 
 .product-card {
@@ -341,14 +645,14 @@ body {
 }
 
 .product-thumb {
-  width: 70px;
-  height: 70px;
+  width: 64px;
+  height: 64px;
   background: #e0f2fe;
   border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 2rem;
+  font-size: 1.9rem;
   flex-shrink: 0;
 }
 
@@ -360,94 +664,28 @@ body {
 
 .product-desc {
   font-size: 0.8rem;
-  color: #6b7280;
+  color: #4b5563;
   margin-bottom: 6px;
 }
 
 .price-tag {
-  color: #ef4444;
+  color: #b91c1c;
   font-size: 1.15rem;
   font-weight: 800;
 }
 
 .original-price {
   font-size: 0.8rem;
-  color: #9ca3af;
+  color: #4b5563;
   text-decoration: line-through;
   margin-left: 6px;
 }
 
-.options-group {
-  background: #ffffff;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
-  padding: 14px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
+/* 第1現場：割引ポップアップ（拒否リンクの位置と文言が周ごとに変わる） */
+.ec-stage-box.is-popup {
+  min-height: 430px;
 }
 
-.option-row {
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  font-size: 0.85rem;
-  cursor: pointer;
-}
-
-.option-row input[type="checkbox"] {
-  margin-top: 3px;
-  width: 16px;
-  height: 16px;
-  accent-color: #ef4444;
-  cursor: pointer;
-}
-
-.option-text strong {
-  display: block;
-  color: #1f2937;
-}
-
-.option-text span {
-  font-size: 0.78rem;
-  color: #6b7280;
-}
-
-.btn-ec-buy-loud {
-  background: linear-gradient(180deg, #ff4d4f 0%, #d9363e 100%);
-  color: #ffffff;
-  border: none;
-  padding: 14px;
-  font-size: 1.05rem;
-  font-weight: 800;
-  border-radius: 8px;
-  cursor: pointer;
-  box-shadow: 0 4px 10px rgba(239, 68, 68, 0.3);
-  transition: transform 0.1s;
-}
-
-.btn-ec-buy-loud:active {
-  transform: scale(0.98);
-}
-
-.btn-ec-subtle {
-  background: none;
-  border: 1px solid #d1d5db;
-  color: #6b7280;
-  padding: 8px 12px;
-  font-size: 0.8rem;
-  border-radius: 6px;
-  cursor: pointer;
-  margin-top: 4px;
-  align-self: center;
-}
-
-.btn-ec-subtle:hover {
-  background: #f3f4f6;
-  color: #111827;
-}
-
-/* ステージ2 スタイル（モーダル） */
 .fake-page-bg {
   opacity: 0.3;
   pointer-events: none;
@@ -461,14 +699,17 @@ body {
   align-items: center;
   justify-content: center;
   padding: 16px;
+  overflow-y: auto;
 }
 
+/* 上端の48pxは逃げる×の居場所。×は左へ滑るだけで、この余白の中から出ない（中身とは重ならない） */
 .fake-modal-card {
   background: #ffffff;
   border-radius: 12px;
-  padding: 24px 20px;
+  padding: 48px 20px 22px;
   width: 100%;
   max-width: 380px;
+  margin: auto;
   position: relative;
   text-align: center;
   box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
@@ -478,52 +719,62 @@ body {
   animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
+.fake-modal-card.is-shaking {
+  animation: shake 0.4s;
+}
+
 @keyframes popIn {
   from { transform: scale(0.85); opacity: 0; }
   to { transform: scale(1); opacity: 1; }
 }
 
-.fake-modal-close-fake {
-  position: absolute;
-  top: 10px;
-  right: 12px;
-  background: none;
-  border: none;
-  font-size: 1.4rem;
-  color: #9ca3af;
-  cursor: pointer;
-}
-
 .coupon-badge-loud {
   background: #fef2f2;
-  border: 2px dashed #ef4444;
-  color: #ef4444;
+  border: 2px dashed #dc2626;
+  color: #b91c1c;
   padding: 12px;
   border-radius: 8px;
   font-weight: 800;
   font-size: 1.3rem;
 }
 
-.btn-coupon-accept {
-  background: #10b981;
-  color: #ffffff;
-  border: none;
-  padding: 14px;
-  font-size: 0.95rem;
-  font-weight: 800;
-  border-radius: 8px;
-  cursor: pointer;
-  box-shadow: 0 4px 10px rgba(16, 185, 129, 0.3);
+.fake-modal-lead {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #111827;
 }
 
+.btn-coupon-accept {
+  background: #047857;
+  color: #ffffff;
+  border: none;
+  padding: 13px 12px;
+  font: inherit;
+  font-size: 0.95rem;
+  font-weight: 800;
+  line-height: 1.4;
+  border-radius: 8px;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(4, 120, 87, 0.3);
+}
+
+.btn-coupon-accept small {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-wrap: balance;
+}
+
+/* 罠：小さく薄い拒否リンク（data-trap）。罠として薄くするが、読める下限（11px以上・3:1以上）は割らない */
 .link-confirmshame {
   background: none;
   border: none;
-  color: #9ca3af;
+  color: #80868f;
+  font: inherit;
   font-size: 0.75rem;
   text-decoration: underline;
   cursor: pointer;
-  line-height: 1.4;
+  line-height: 1.45;
   padding: 6px;
 }
 
@@ -531,11 +782,205 @@ body {
   color: #4b5563;
 }
 
-/* ステージ3 スタイル（緊急性） */
-.hotel-stage-box {
+/* 罠：逃げる薄い×（data-trap）。逃げる先は lib/variants.js の dodgeOffset（左へ4〜72px・上下±3px） */
+.btn-running-close {
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  background: none;
+  border: none;
+  font-size: 1.4rem;
+  line-height: 1;
+  color: #80868f;
+  cursor: pointer;
+  transition: transform 0.15s ease-out;
+  padding: 6px;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* ×を押したときの、偽サイト自身の引き留め文（ブラウザの警告ダイアログは使わない）。
+   場所は最初から確保する：見えない写し（sizer）と同じマスに重ね、出たときに高さが変わらないようにする */
+.fake-modal-nag-slot {
+  display: grid;
+}
+
+.fake-modal-nag-slot > * {
+  grid-area: 1 / 1;
+}
+
+.fake-modal-nag-sizer,
+.fake-modal-nag {
+  padding: 8px 10px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+.fake-modal-nag-sizer {
+  visibility: hidden;
+}
+
+.fake-modal-nag {
+  visibility: hidden;
+  background: #fef2f2;
+  border-color: #fca5a5;
+  color: #b91c1c;
+}
+
+.fake-modal-nag.is-on {
+  visibility: visible;
+}
+
+/* 第2現場：音楽アプリ（危険な注記の置き場所とチェックの左右が周ごとに変わる） */
+.hero-free-box {
+  background: linear-gradient(135deg, #4f46e5, #7c3aed);
+  color: #ffffff;
+  padding: 18px;
+  border-radius: 10px;
+  text-align: center;
+}
+
+.hero-free-box h3 {
+  font-size: 1.35rem;
+  margin-bottom: 4px;
+}
+
+.hero-free-box p {
+  font-size: 0.85rem;
+}
+
+.accordion-details {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.accordion-summary {
   display: flex;
-  flex-direction: column;
-  gap: 14px;
+  align-items: flex-start;
+  gap: 6px;
+  padding: 10px 14px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #4b5563;
+  cursor: pointer;
+  background: #f3f4f6;
+  user-select: none;
+  list-style: none;
+}
+
+/* 開閉の記号は自前の1つだけにする（ブラウザ標準の三角を消す） */
+.accordion-summary::-webkit-details-marker {
+  display: none;
+}
+
+.accordion-summary::marker {
+  content: "";
+}
+
+.accordion-icon {
+  flex-shrink: 0;
+  width: 1em;
+}
+
+.accordion-content {
+  padding: 12px 14px;
+  font-size: 0.75rem;
+  color: #4b5563;
+  line-height: 1.6;
+}
+
+.toggle-switch-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px dashed #d1d5db;
+}
+
+.toggle-switch-row[data-check="left"] {
+  flex-direction: row-reverse;
+  justify-content: flex-end;
+}
+
+.switch-label {
+  flex: 1;
+  font-weight: 700;
+  color: #1f2937;
+  font-size: 0.78rem;
+  cursor: pointer;
+}
+
+.toggle-input {
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+}
+
+.btn-start-trial {
+  background: #7c3aed;
+  color: #ffffff;
+  border: none;
+  padding: 14px;
+  font: inherit;
+  font-size: 1rem;
+  font-weight: 800;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+/* 罠：開始ボタンの直下に置いた小さな注記（data-trap）。見落としやすい小ささは残すが、
+   解くために読む文なので、もう一方の変種（折りたたみの中）と同じく本文として読める濃さにする（11.5px・4.6:1） */
+.fine-print {
+  margin-top: -6px;
+  font-size: 0.72rem;
+  line-height: 1.5;
+  color: #6b7280;
+}
+
+.fine-print-box .toggle-switch-row {
+  margin-top: 6px;
+  padding-top: 6px;
+}
+
+/* 第3現場：宿の予約。最上段の「お知らせ帯」は、静かな案内と偽の仮予約通知を同じマスに重ねる。
+   高い方に合わせて場所を取るので、1.5秒後に入れ替わってもレイアウトは動かず、何にも重ならない */
+.notice-slot {
+  display: grid;
+  pointer-events: none; /* 偽の通知は、下の部品のタップを妨げない */
+}
+
+.notice-slot > * {
+  grid-area: 1 / 1;
+}
+
+.notice-calm {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  background: #eef2ff;
+  border: 1px solid #c7d2fe;
+  color: #3730a3;
+  font-size: 0.78rem;
+  font-weight: 700;
+  line-height: 1.45;
+}
+
+.notice-icon {
+  flex-shrink: 0;
+}
+
+.notice-slot[data-state="urgent"] .notice-calm {
+  visibility: hidden;
 }
 
 .urgency-banner {
@@ -564,7 +1009,24 @@ body {
   background: #ffffff;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
+}
+
+.hotel-plan-card h4 {
+  font-size: 1rem;
+  color: #111827;
+}
+
+.hotel-meta {
+  font-size: 0.78rem;
+  color: #4b5563;
+}
+
+.hotel-plans {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 4px;
 }
 
 .plan-radio-row {
@@ -584,8 +1046,9 @@ body {
 }
 
 .plan-radio-row input[type="radio"] {
+  flex-shrink: 0;
   margin-top: 3px;
-  accent-color: #3b82f6;
+  accent-color: #2563eb;
 }
 
 .plan-title {
@@ -596,7 +1059,7 @@ body {
 .plan-sub {
   display: block;
   font-size: 0.75rem;
-  color: #6b7280;
+  color: #4b5563;
 }
 
 .btn-hotel-book {
@@ -605,18 +1068,194 @@ body {
   border: none;
   padding: 12px;
   border-radius: 6px;
+  font: inherit;
   font-weight: 700;
   font-size: 0.95rem;
   cursor: pointer;
 }
 
-/* ステージ4 スタイル（退会画面） */
-.cancel-stage-box {
+.fake-toast {
+  background: #1e293b;
+  color: #ffffff;
+  border-left: 4px solid #f59e0b;
+  padding: 8px 12px;
+  border-radius: 6px;
+  box-shadow: 0 6px 12px -4px rgba(0, 0, 0, 0.35);
+  font-size: 0.75rem;
+  line-height: 1.45;
   display: flex;
-  flex-direction: column;
-  gap: 16px;
+  align-items: center;
+  gap: 8px;
+  visibility: hidden;
 }
 
+.notice-slot[data-state="urgent"] .fake-toast {
+  visibility: visible;
+  animation: noticeIn 0.35s ease;
+}
+
+.fake-toast strong {
+  display: block;
+}
+
+/* 入れ替わりは、その場で色と文字が変わるだけ（位置は動かさない） */
+@keyframes noticeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.fake-toast-icon {
+  font-size: 1.2rem;
+  flex-shrink: 0;
+}
+
+/* 第4現場：お試しサプリ（事前チェックと引き留めダイアログ） */
+.options-group {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.option-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.option-row input[type="checkbox"] {
+  flex-shrink: 0;
+  margin-top: 3px;
+  width: 16px;
+  height: 16px;
+  accent-color: #dc2626;
+  cursor: pointer;
+}
+
+.option-text strong {
+  display: block;
+  color: #1f2937;
+}
+
+.option-text span {
+  font-size: 0.78rem;
+  color: #4b5563;
+}
+
+.btn-ec-buy-loud {
+  background: linear-gradient(180deg, #dc2626 0%, #b91c1c 100%);
+  color: #ffffff;
+  border: none;
+  padding: 14px;
+  font: inherit;
+  font-size: 1.05rem;
+  font-weight: 800;
+  border-radius: 8px;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(220, 38, 38, 0.3);
+  transition: transform 0.1s;
+}
+
+.btn-ec-buy-loud:active {
+  transform: scale(0.98);
+}
+
+/* 罠：目立たない小さな確定ボタン（data-trap） */
+.btn-ec-subtle {
+  background: none;
+  border: 1px solid #d1d5db;
+  color: #6b7280;
+  padding: 8px 12px;
+  font: inherit;
+  font-size: 0.8rem;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-top: 2px;
+  align-self: center;
+}
+
+.btn-ec-subtle:hover {
+  background: #f3f4f6;
+  color: #111827;
+}
+
+.retention-mini-dialog {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  z-index: 60;
+  animation: fadeIn 0.2s ease;
+}
+
+.mini-dialog-card {
+  background: #ffffff;
+  color: #111827;
+  padding: 20px;
+  border-radius: 10px;
+  max-width: 320px;
+  text-align: center;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.mini-dialog-card h3 {
+  font-size: 0.95rem;
+  color: #b91c1c;
+}
+
+.mini-dialog-card p {
+  font-size: 0.8rem;
+  color: #4b5563;
+  line-height: 1.5;
+}
+
+.dialog-btn-row {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-dialog-stay {
+  flex: 1;
+  background: #dc2626;
+  color: #ffffff;
+  border: none;
+  padding: 10px;
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 700;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.btn-dialog-leave {
+  flex: 1;
+  background: #e5e7eb;
+  color: #374151;
+  border: none;
+  padding: 10px;
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 600;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.btn-dialog-leave:hover {
+  background: #d1d5db;
+}
+
+/* 第5現場：退会画面 */
 .retention-box {
   background: #f0fdf4;
   border: 1px solid #bbf7d0;
@@ -628,12 +1267,23 @@ body {
   gap: 8px;
 }
 
+.retention-box h4 {
+  color: #15803d;
+  font-size: 0.95rem;
+}
+
+.retention-box p {
+  font-size: 0.8rem;
+  color: #166534;
+}
+
 .btn-stay-loud {
-  background: #16a34a;
+  background: #15803d;
   color: #ffffff;
   border: none;
   padding: 12px;
   border-radius: 6px;
+  font: inherit;
   font-weight: 800;
   font-size: 0.95rem;
   cursor: pointer;
@@ -668,19 +1318,69 @@ body {
   cursor: pointer;
 }
 
+.survey-row input {
+  flex-shrink: 0;
+}
+
+/* 未回答の警告。場所は最初から確保する（見えない写しと同じマスに重ね、出入りで下のフッターが動かないように） */
+.survey-warning-slot {
+  display: grid;
+  margin-top: 10px;
+}
+
+.survey-warning-slot > * {
+  grid-area: 1 / 1;
+}
+
+.survey-warning-sizer,
+.survey-warning {
+  padding: 6px 10px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+.survey-warning-sizer {
+  visibility: hidden;
+}
+
+.survey-warning {
+  visibility: hidden;
+  background: #fef2f2;
+  border-color: #fca5a5;
+  color: #b91c1c;
+}
+
+.survey-warning.is-on {
+  visibility: visible;
+}
+
+/* 罠：小さく薄いフッター（data-trap）。読める下限（11px以上・3:1以上）は割らない */
 .footer-trick-area {
-  margin-top: 24px;
-  padding-top: 16px;
+  margin-top: 20px;
+  padding-top: 14px;
   border-top: 1px solid #e5e7eb;
   text-align: center;
   font-size: 0.7rem;
-  color: #9ca3af;
+  color: #80868f;
+}
+
+.footer-trick-area a {
+  color: #80868f;
+  text-decoration: none;
+}
+
+.footer-links {
+  margin-top: 4px;
 }
 
 .link-real-cancel {
   background: none;
   border: none;
-  color: #9ca3af;
+  color: #80868f;
+  font: inherit;
   font-size: 0.72rem;
   cursor: pointer;
   text-decoration: underline;
@@ -688,86 +1388,75 @@ body {
 }
 
 .link-real-cancel:hover {
-  color: #ef4444;
+  color: #b91c1c;
 }
 
-/* ステージ5 スタイル（隠された年額） */
-.sub-stage-box {
+.final-confirm-box {
+  background: #fff1f2;
+  border: 1px solid #fecdd3;
+  padding: 14px;
+  border-radius: 8px;
+  margin-top: 6px;
+  text-align: center;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 10px;
+  animation: fadeIn 0.3s;
 }
 
-.hero-free-box {
-  background: linear-gradient(135deg, #4f46e5, #7c3aed);
-  color: #ffffff;
-  padding: 20px;
-  border-radius: 10px;
-  text-align: center;
-}
-
-.hero-free-box h3 {
-  font-size: 1.4rem;
-  margin-bottom: 4px;
-}
-
-.accordion-details {
-  background: #ffffff;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
-  overflow: hidden;
-}
-
-.accordion-summary {
-  padding: 10px 14px;
-  font-size: 0.8rem;
+.final-confirm-box p {
+  font-size: 0.82rem;
+  color: #9f1239;
   font-weight: 700;
-  color: #4b5563;
-  cursor: pointer;
-  background: #f3f4f6;
-  user-select: none;
 }
 
-.accordion-content {
-  padding: 12px 14px;
-  font-size: 0.75rem;
-  color: #6b7280;
-  line-height: 1.6;
-}
-
-.toggle-switch-row {
+.final-btn-group {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-top: 10px;
-  padding-top: 10px;
-  border-top: 1px dashed #d1d5db;
+  gap: 8px;
 }
 
-.switch-label {
-  font-weight: 700;
-  color: #1f2937;
-  font-size: 0.78rem;
+/* 狭い画面では2つのボタンを縦に積んで全幅にする（「考え直す（契約を維持）」を括弧の途中で折らない） */
+@media (max-width: 440px) {
+  .final-btn-group {
+    flex-direction: column;
+  }
+
+  .final-btn-group button {
+    min-height: 44px;
+  }
 }
 
-.toggle-input {
-  width: 18px;
-  height: 18px;
-  cursor: pointer;
-}
-
-.btn-start-trial {
-  background: #7c3aed;
+.btn-trick-loud {
+  flex: 1;
+  background: #e11d48;
   color: #ffffff;
   border: none;
-  padding: 14px;
-  font-size: 1rem;
+  padding: 10px;
+  border-radius: 6px;
+  font: inherit;
+  font-size: 0.82rem;
   font-weight: 800;
-  border-radius: 8px;
   cursor: pointer;
 }
 
-/* モーダル */
+.btn-trick-subtle {
+  flex: 1;
+  background: #f3f4f6;
+  color: #4b5563;
+  border: 1px solid #d1d5db;
+  padding: 10px;
+  border-radius: 6px;
+  font: inherit;
+  font-size: 0.82rem;
+  cursor: pointer;
+}
+
+.btn-trick-subtle:hover {
+  background: #e5e7eb;
+  color: #111827;
+}
+
+/* ---------------------------------------------------------------- 解説モーダル */
 .modal-overlay {
   position: fixed;
   inset: 0;
@@ -790,24 +1479,46 @@ body {
   border: 1px solid var(--panel-border);
   border-radius: 16px;
   max-width: 480px;
+  max-height: calc(100vh - 32px);
+  max-height: calc(100dvh - 32px);
+  overflow-y: auto;
   width: 100%;
-  padding: 24px;
+  padding: 22px 20px 0;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 14px;
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
 }
 
+.modal-header h2 {
+  font-size: 1.3rem;
+  line-height: 1.35;
+}
+
+/* 判定の札。成功は緑、罠に被弾は赤、時間切れは琥珀（枠と地も失敗の色にする） */
 .busted-badge {
-  background: rgba(16, 185, 129, 0.15);
-  color: var(--accent-emerald);
-  border: 1px solid var(--accent-emerald);
-  padding: 4px 10px;
+  display: inline-block;
+  margin-bottom: 6px;
+  padding: 3px 10px;
   border-radius: 999px;
   font-size: 0.75rem;
   font-weight: 800;
-  display: inline-block;
-  margin-bottom: 6px;
+  white-space: nowrap;
+  background: rgba(16, 185, 129, 0.15);
+  color: #6ee7b7;
+  border: 1px solid var(--accent-emerald);
+}
+
+.busted-badge.is-trapped {
+  background: rgba(244, 63, 94, 0.18);
+  color: #fda4af;
+  border-color: var(--accent-rose);
+}
+
+.busted-badge.is-timeout {
+  background: rgba(245, 158, 11, 0.18);
+  color: #fcd34d;
+  border-color: var(--accent-amber);
 }
 
 .damage-report-row {
@@ -815,25 +1526,104 @@ body {
   padding: 10px 14px;
   border-radius: 8px;
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
+  gap: 4px 12px;
   font-size: 0.9rem;
 }
 
+.damage-report-row strong {
+  white-space: nowrap;
+  margin-left: auto;
+}
+
 .stage-damage-zero {
-  color: var(--accent-emerald);
+  color: var(--ok);
   font-weight: 700;
 }
 
 .stage-damage-hit {
-  color: var(--accent-rose);
+  color: var(--hit);
   font-weight: 700;
 }
 
+.stage-damage-timeout {
+  color: var(--late);
+  font-weight: 700;
+}
+
+.stage-traps-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: rgba(0, 0, 0, 0.25);
+  padding: 10px 12px;
+  border-radius: 8px;
+}
+
+.stage-traps-detail[hidden] {
+  display: none;
+}
+
+.trap-detail-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 0.84rem;
+  color: var(--text-sub);
+}
+
+.trap-detail-note {
+  font-size: 0.76rem;
+  color: var(--text-sub);
+  line-height: 1.5;
+}
+
+/* 被害の札は折り返さない */
+.trap-detail-tag {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.trap-detail-tag.is-ok {
+  background: rgba(16, 185, 129, 0.16);
+  color: #6ee7b7;
+  border: 1px solid rgba(16, 185, 129, 0.5);
+}
+
+.trap-detail-tag.is-hit {
+  background: rgba(244, 63, 94, 0.16);
+  color: #fda4af;
+  border: 1px solid rgba(244, 63, 94, 0.55);
+}
+
+.trap-detail-tag.is-timeout {
+  background: rgba(245, 158, 11, 0.16);
+  color: #fcd34d;
+  border: 1px solid rgba(245, 158, 11, 0.55);
+}
+
+.modal-body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* 手口の小見出しは、上の内訳の箱から離して下の本文とひとまとまりに見せる */
 .intel-box {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 14px;
+  margin-top: 10px;
 }
 
 .intel-item {
@@ -843,55 +1633,100 @@ body {
 }
 
 .intel-label {
-  font-size: 0.72rem;
-  color: var(--accent-cyan);
+  font-size: 0.75rem;
+  color: var(--accent-cyan-light);
   font-weight: 700;
-  text-transform: uppercase;
 }
 
 .intel-val {
-  font-size: 0.85rem;
-  color: #cbd5e1;
-  line-height: 1.5;
+  font-size: 0.86rem;
+  color: var(--text-sub);
+  line-height: 1.6;
 }
 
 .intel-val.highlight {
-  font-size: 0.95rem;
+  font-size: 0.98rem;
   font-weight: 700;
   color: #ffffff;
+  line-height: 1.45;
 }
 
 .legal-text {
   background: rgba(15, 23, 42, 0.6);
   padding: 8px 10px;
   border-radius: 6px;
-  font-size: 0.78rem;
+  font-size: 0.8rem;
   border-left: 2px solid var(--accent-amber);
 }
 
-/* リザルト画面 */
+/* ボタンは縦積みの全幅にする（390pxでも語の途中で折れない）。
+   本文が画面に収まらない高さ（375×667 や、アドレスバーで縮んだ実機の画面）では、2つのボタンを下端に貼り付けて
+   本文だけをスクロールさせる。収まるときは貼り付けても位置は変わらない。カードの下の余白はここに持たせる */
+.modal-footer {
+  position: sticky;
+  bottom: 0;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 6px 0 20px;
+  background: var(--panel-bg);
+}
+
+.modal-footer button {
+  width: 100%;
+}
+
+/* 本文の続きがボタンの下にあるあいだだけ、ボタンのすぐ上をぼかす（app.js が has-more を付け外しする） */
+.modal-footer::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 100%;
+  height: 28px;
+  background: linear-gradient(to bottom, rgba(17, 24, 39, 0), var(--panel-bg));
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.modal-card.has-more .modal-footer::before {
+  opacity: 1;
+}
+
+/* ---------------------------------------------------------------- 結果画面 */
 .result-header {
   text-align: center;
+}
+
+.result-header h2 {
+  font-size: 1.45rem;
+  line-height: 1.3;
+}
+
+.result-header h2:focus {
+  outline: none;
 }
 
 .rank-showcase {
   display: flex;
   align-items: center;
-  gap: 18px;
+  gap: 14px;
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid var(--panel-border);
-  padding: 16px;
+  padding: 14px;
   border-radius: 12px;
 }
 
 .rank-circle {
-  width: 72px;
-  height: 72px;
+  width: 64px;
+  height: 64px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 2.5rem;
+  font-size: 2.2rem;
   font-weight: 900;
   font-family: var(--font-mono);
   background: linear-gradient(135deg, #10b981, #059669);
@@ -903,54 +1738,224 @@ body {
 .rank-details {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 3px;
+  min-width: 0;
 }
 
 .rank-prefix {
-  font-size: 0.72rem;
+  font-size: 0.75rem;
   color: var(--text-muted);
-  text-transform: uppercase;
 }
 
 .rank-details h3 {
-  font-size: 1.25rem;
+  font-size: 1.08rem;
+  line-height: 1.4;
   color: #ffffff;
 }
 
 .rank-details p {
-  font-size: 0.85rem;
-  color: var(--text-muted);
+  font-size: 0.82rem;
+  line-height: 1.55;
+  color: var(--text-sub);
 }
 
+/* 被害総額と総捜査時間は同じ規則（大きな数値＋小さな見出し） */
 .result-stats-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 12px;
+  gap: 10px;
 }
 
 .stat-card {
   background: rgba(0, 0, 0, 0.3);
   border: 1px solid var(--panel-border);
   border-radius: 10px;
-  padding: 12px;
+  padding: 10px 8px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
+  gap: 2px;
+  text-align: center;
 }
 
 .stat-label {
-  font-size: 0.75rem;
+  font-size: 0.76rem;
   color: var(--text-muted);
 }
 
+/* 「¥0」と「5秒」は同じ規則：数字は等幅の大きな字、¥と秒は小さな単位 */
 .stat-value {
-  font-size: 1.4rem;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 2px;
   font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 1.6rem;
+  line-height: 1.25;
+  font-weight: 700;
+  white-space: nowrap;
+  color: #ffffff;
 }
 
-.damage-highlight {
-  color: var(--accent-emerald);
+.stat-unit {
+  font-family: var(--font-sans);
+  font-size: 0.95rem;
+}
+
+.stat-value.is-zero {
+  color: var(--ok);
+}
+
+.stat-value.is-hit {
+  color: var(--hit);
+}
+
+.stat-note {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+/* やり直さずに全現場を通した周の印 */
+.stat-note.is-perfect {
+  color: var(--ok);
+  font-weight: 700;
+}
+
+.stat-note.is-perfect::before {
+  content: "✓ ";
+}
+
+.goal-box {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: rgba(6, 182, 212, 0.08);
+  border: 1px solid rgba(6, 182, 212, 0.3);
+  text-align: center;
+}
+
+.goal-line {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #e2e8f0;
+}
+
+.best-line {
+  font-size: 0.8rem;
+  color: var(--text-sub);
+}
+
+.best-badge {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 0 8px;
+  border-radius: 999px;
+  background: #fbbf24;
+  color: #111827;
+  font-size: 0.75rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.best-badge[hidden] {
+  display: none;
+}
+
+.result-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* 結果画面の共有欄。開始画面の共有ダイアログ（共通の .share）と同じ見た目・並び・注記にそろえる：
+   見出し16px太字の白 → ボタンの列（390pxで3つ横並び）→ 12pxあけて注記 → コピーの結果。
+   クラス名は .share__* を使わない（全Day共通のE2Eが .share__button と .share__said を数えるため） */
+.result-share {
+  text-align: center;
+}
+
+.result-share__title,
+.app-share-dialog #share .share__label {
+  margin: 0 0 12px;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #ffffff;
+  opacity: 1;
+}
+
+.result-share__row,
+.app-share-dialog #share .share__row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+}
+
+.result-share__button,
+.app-share-dialog #share .share__button {
+  flex: 1 1 0;
+  min-width: fit-content;
+  padding: 0 10px;
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+
+.result-share__button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  border-radius: 10px;
+  /* 共通の .share__button と同じ作り（文字色から作る枠と面） */
+  border: 1px solid rgba(243, 244, 246, 0.9);
+  border-color: color-mix(in srgb, currentColor 90%, transparent);
+  background: rgba(243, 244, 246, 0.1);
+  background: color-mix(in srgb, currentColor 10%, transparent);
+  color: var(--text-main);
+  font: inherit;
+  font-size: 0.85rem;
+  line-height: 1;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.result-share__button--primary {
+  border-color: currentColor;
+  background: color-mix(in srgb, currentColor 22%, transparent);
+  font-weight: 600;
+}
+
+.result-share__button[hidden] {
+  display: none;
+}
+
+.result-share__button:hover {
+  background: color-mix(in srgb, currentColor 18%, transparent);
+}
+
+.result-share__note,
+.app-share-dialog #share .share__note {
+  margin: 12px auto 0;
+  max-width: 60ch;
+  font-size: 0.8rem;
+  line-height: 1.6;
+  color: var(--text-sub);
+}
+
+.result-share__said,
+.app-share-dialog #share .share__said {
+  min-height: 1.5em;
+  margin-top: 6px;
+  font-size: 0.8rem;
+  color: var(--text-sub);
+  opacity: 1;
+}
+
+.damage-breakdown-box h3 {
+  font-size: 0.95rem;
 }
 
 .stage-report-list {
@@ -963,75 +1968,82 @@ body {
 
 .stage-report-item {
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
+  gap: 2px 10px;
   background: rgba(0, 0, 0, 0.2);
   padding: 8px 12px;
   border-radius: 6px;
   font-size: 0.82rem;
+  color: var(--text-sub);
 }
 
-.result-actions {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.btn-share {
-  background: #000000;
-  color: #ffffff;
-  border: 1px solid #333333;
-  padding: 14px;
-  font-size: 0.95rem;
+.stage-report-no {
   font-weight: 700;
-  border-radius: 8px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
-  transition: all 0.2s;
-}
-
-.btn-share:hover {
-  background: #111111;
-  border-color: #555555;
-}
-
-.btn-secondary {
-  background: transparent;
   color: var(--text-main);
-  border: 1px solid var(--panel-border);
-  padding: 12px;
-  border-radius: 8px;
-  font-size: 0.9rem;
-  font-weight: 600;
-  cursor: pointer;
 }
 
-.btn-secondary:hover {
-  background: #1f2937;
+.stage-report-value {
+  margin-left: auto;
+  white-space: nowrap;
 }
+
+.stage-report-value.is-ok { color: var(--ok); }
+.stage-report-value.is-hit { color: var(--hit); }
+.stage-report-value.is-timeout { color: var(--late); }
 
 .result-footer {
   text-align: center;
-  font-size: 0.7rem;
-  color: #6b7280;
-  line-height: 1.5;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  line-height: 1.6;
 }
 
-@keyframes shake {
-  0%, 100% { transform: translateX(0); }
-  20%, 60% { transform: translateX(-6px); }
-  40%, 80% { transform: translateX(6px); }
+/* ---------------------------------------------------------------- 共有ダイアログ（全Day共通のシェア欄を入れる） */
+.app-share-dialog {
+  margin: auto;
+  width: min(92vw, 420px);
+  max-width: min(92vw, 420px);
+  max-height: 85vh;
+  max-height: 85dvh;
+  overflow: auto;
+  border: 1px solid var(--line-strong);
+  border-radius: 16px;
+  padding: 20px;
+  color: var(--text-main);
+  background: var(--panel-bg);
+  text-align: center;
 }
 
-/* -------------------------------------------
- * ハーネス改善 (Cycle 1): 演出・エフェクト追加
- * ------------------------------------------- */
+.app-share-dialog::backdrop {
+  background: rgba(3, 7, 18, 0.8);
+}
 
-/* 画面フラッシュ演出 */
+/* 共通の .share は親の幅を押し広げる最低幅を持つ。ダイアログの中では親の幅に従わせる（390pxの横はみ出し対策）。
+   並びは結果画面の共有欄と同じにする：見出し → ボタンの列 → 注記 → コピーの結果（share.js の並びを order で入れ替える） */
+.app-share-dialog #share .share {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  max-width: 100%;
+  margin: 0;
+  padding-top: 0;
+  border-top: 0;
+  text-align: center;
+}
+
+.app-share-dialog #share .share__label { order: 0; }
+.app-share-dialog #share .share__row { order: 1; }
+.app-share-dialog #share .share__note { order: 2; }
+.app-share-dialog #share .share__said { order: 3; }
+
+.app-share-dialog #btn-share-close {
+  width: 100%;
+  margin-top: 14px;
+}
+
+/* ---------------------------------------------------------------- 演出 */
 .flash-overlay {
   position: fixed;
   inset: 0;
@@ -1058,36 +2070,39 @@ body {
   100% { opacity: 0; }
 }
 
-/* ステージ開始カットイン */
+/* 現場の開始カットイン（約1秒）。表示中は偽サイトを inert にして操作を受け付けず、制限時間も進めない（app.js の CUTIN_MS） */
 .stage-cutin-banner {
   position: absolute;
   top: 50%;
   left: 50%;
+  width: calc(100% - 32px);
+  max-width: 420px;
   transform: translate(-50%, -50%) scale(0.9);
   background: rgba(11, 15, 25, 0.95);
   border: 2px solid var(--accent-cyan);
-  padding: 16px 28px;
+  padding: 14px 16px;
   border-radius: 12px;
   text-align: center;
   z-index: 50;
   box-shadow: 0 0 30px rgba(6, 182, 212, 0.5);
   pointer-events: none;
   opacity: 0;
-  animation: cutinAnim 1.2s forwards cubic-bezier(0.16, 1, 0.3, 1);
+  animation: cutinAnim 1s forwards cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .stage-cutin-tag {
   font-size: 0.8rem;
-  color: var(--accent-cyan);
+  color: var(--accent-cyan-light);
   font-weight: 800;
   letter-spacing: 0.1em;
 }
 
 .stage-cutin-title {
-  font-size: 1.3rem;
+  font-size: 1.25rem;
   color: #ffffff;
   font-weight: 800;
   margin-top: 4px;
+  white-space: nowrap;
 }
 
 @keyframes cutinAnim {
@@ -1097,169 +2112,191 @@ body {
   100% { opacity: 0; transform: translate(-50%, -50%) scale(1.05); }
 }
 
-/* 偽プッシュ通知トースト */
-.fake-toast {
-  position: absolute;
-  bottom: 14px;
-  left: 14px;
-  right: 14px;
-  background: #1e293b;
-  color: #ffffff;
-  border-left: 4px solid #f59e0b;
-  padding: 10px 14px;
-  border-radius: 6px;
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.4);
-  font-size: 0.78rem;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  z-index: 20;
-  animation: slideUpToast 0.4s ease;
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-6px); }
+  40%, 80% { transform: translateX(6px); }
 }
 
-@keyframes slideUpToast {
-  from { transform: translateY(30px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
+/* ---------------------------------------------------------------- フォーカス表示 */
+button:focus-visible,
+a:focus-visible,
+summary:focus-visible,
+input:focus-visible,
+[tabindex]:focus-visible {
+  outline: 3px solid var(--accent-cyan-light);
+  outline-offset: 2px;
 }
 
-.fake-toast-icon {
-  font-size: 1.2rem;
-  flex-shrink: 0;
+/* 偽サイトの中は明るい地なので、濃い青の枠にする */
+.stage-viewport button:focus-visible,
+.stage-viewport a:focus-visible,
+.stage-viewport summary:focus-visible,
+.stage-viewport input:focus-visible {
+  outline-color: #1d4ed8;
 }
 
-/* 逃げる×ボタン */
-.btn-running-close {
-  position: absolute;
-  top: 10px;
-  right: 12px;
-  background: none;
-  border: none;
-  font-size: 1.4rem;
-  color: #9ca3af;
-  cursor: pointer;
-  transition: transform 0.15s ease-out;
-  padding: 4px;
+/* ---------------------------------------------------------------- 画面幅ごとの調整 */
+@media (max-width: 480px) {
+  body {
+    padding: 12px 16px 16px;
+  }
+
+  #app {
+    gap: 12px;
+  }
+
+  .start-card,
+  .result-card {
+    padding: 20px 18px;
+    gap: 16px;
+  }
+
+  .start-card h2 {
+    font-size: 1.32rem;
+  }
 }
 
-/* 引き留め確認ミニモーダル */
-.retention-mini-dialog {
-  position: absolute;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.7);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 16px;
-  z-index: 60;
-  animation: fadeIn 0.2s ease;
+/* タブレット・PCでも、開始カードは見出しの直下から始め（縦の中央には寄せない）、偽ブラウザ枠の高さは中身に合わせる。
+   どちらも、画面の高さに合わせて伸ばすと大きな空白が残ったため（R2の評価） */
+
+/* 縦の短い画面（375×667 など）：開始画面の余白と行間を詰め、開始ボタン全体を最初の画面に入れる */
+@media (max-height: 720px) {
+  body {
+    padding-top: 8px;
+  }
+
+  #app {
+    gap: 10px;
+  }
+
+  .app-header {
+    padding-bottom: 6px;
+  }
+
+  .start-card {
+    padding: 16px 16px 18px;
+    gap: 12px;
+  }
+
+  .investigator-badge {
+    padding: 4px 12px;
+  }
+
+  .start-card h2 {
+    font-size: 1.25rem;
+    line-height: 1.3;
+  }
+
+  .start-desc {
+    line-height: 1.6;
+  }
+
+  .rules-box {
+    padding: 10px 12px;
+  }
+
+  .rules-box ul {
+    gap: 3px;
+    line-height: 1.5;
+  }
 }
 
-.mini-dialog-card {
-  background: #ffffff;
-  color: #111827;
-  padding: 20px;
-  border-radius: 10px;
-  max-width: 320px;
-  text-align: center;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
+/* 縦の短い画面の第4現場：商品カードと選択肢の余白を詰め、赤い大ボタンと灰色の確定ボタンを両方とも最初の画面に入れる
+   （罠の文言は削らない） */
+@media (max-height: 760px) {
+  .ec-stage-content {
+    gap: 10px;
+  }
+
+  .ec-stage-content .product-card {
+    padding: 10px;
+    gap: 10px;
+  }
+
+  .ec-stage-content .product-thumb {
+    width: 48px;
+    height: 48px;
+    font-size: 1.5rem;
+  }
+
+  .ec-stage-content .product-desc {
+    margin-bottom: 2px;
+  }
+
+  .options-group {
+    padding: 10px 12px;
+    gap: 8px;
+  }
+
+  .btn-ec-buy-loud {
+    padding: 11px;
+  }
+
+  .btn-ec-subtle {
+    margin-top: 0;
+  }
+
+  /* 第3現場：お知らせ帯・赤帯・プランの余白を詰め、予約の確定ボタンまで最初の画面に入れる */
+  .hotel-stage-box {
+    gap: 10px;
+  }
+
+  .notice-calm,
+  .fake-toast {
+    padding: 6px 10px;
+  }
+
+  .urgency-banner {
+    padding: 6px 10px;
+  }
+
+  .hotel-plan-card {
+    padding: 10px;
+    gap: 6px;
+  }
+
+  .hotel-plans {
+    gap: 6px;
+    margin-top: 2px;
+  }
+
+  .plan-radio-row {
+    padding: 7px 8px;
+  }
 }
 
-.mini-dialog-card h5 {
-  font-size: 0.95rem;
-  color: #b91c1c;
-}
+/* ---------------------------------------------------------------- 動きを減らす設定 */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 
-.mini-dialog-card p {
-  font-size: 0.8rem;
-  color: #4b5563;
-  line-height: 1.5;
-}
+  /* 脈動・揺れ・点滅は止める（色の変化だけ残す） */
+  .start-pulse,
+  .urgency-banner,
+  .time-counter.is-critical .hud-value,
+  .damage-meter.just-hit .hud-value,
+  .fake-modal-card.is-shaking,
+  .flash-overlay.flash-red,
+  .flash-overlay.flash-green {
+    animation: none !important;
+  }
 
-.dialog-btn-row {
-  display: flex;
-  gap: 8px;
-}
+  .flash-overlay.flash-red,
+  .flash-overlay.flash-green {
+    opacity: 0;
+  }
 
-.btn-dialog-stay {
-  flex: 1;
-  background: #ef4444;
-  color: #ffffff;
-  border: none;
-  padding: 10px;
-  font-size: 0.82rem;
-  font-weight: 700;
-  border-radius: 6px;
-  cursor: pointer;
-}
-
-.btn-dialog-leave {
-  flex: 1;
-  background: #e5e7eb;
-  color: #374151;
-  border: none;
-  padding: 10px;
-  font-size: 0.82rem;
-  font-weight: 600;
-  border-radius: 6px;
-  cursor: pointer;
-}
-
-.btn-dialog-leave:hover {
-  background: #d1d5db;
-}
-
-/* 二重否定ステップの配色逆転確認 */
-.final-confirm-box {
-  background: #fff1f2;
-  border: 1px solid #fecdd3;
-  padding: 14px;
-  border-radius: 8px;
-  margin-top: 14px;
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  animation: fadeIn 0.3s;
-}
-
-.final-confirm-box p {
-  font-size: 0.82rem;
-  color: #9f1239;
-  font-weight: 700;
-}
-
-.final-btn-group {
-  display: flex;
-  gap: 8px;
-}
-
-.btn-trick-loud {
-  flex: 1;
-  background: #e11d48;
-  color: #ffffff;
-  border: none;
-  padding: 10px;
-  border-radius: 6px;
-  font-size: 0.82rem;
-  font-weight: 800;
-  cursor: pointer;
-}
-
-.btn-trick-subtle {
-  flex: 1;
-  background: #f3f4f6;
-  color: #6b7280;
-  border: 1px solid #d1d5db;
-  padding: 10px;
-  border-radius: 6px;
-  font-size: 0.82rem;
-  cursor: pointer;
-}
-
-.btn-trick-subtle:hover {
-  background: #e5e7eb;
-  color: #111827;
+  /* カットインは動かさず、表示して消すだけにする */
+  .stage-cutin-banner {
+    animation: none !important;
+    opacity: 1;
+    transform: translate(-50%, -50%);
+  }
 }

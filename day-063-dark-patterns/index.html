@@ -5,117 +5,132 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="巧妙な二重否定、事前チェック、罪悪感の押し売り。ネット通販やサブスクに潜む悪質UI（ダークパターン）を見抜き、意図しない課金から無傷で生還する欺瞞UI脱出ゲーム。">
   <meta name="share:text" content="解約ボタンは、どれ？ — 悪質UI（ダークパターン）を見抜く脱出ゲーム #100日チャレンジ #Day063">
+  <meta name="theme-color" content="#0b0f19">
   <title>解約ボタンは、どれ？ — 欺瞞的UI脱出ゲーム</title>
   <link rel="icon" type="image/svg+xml" href="./favicon.svg">
   <link rel="stylesheet" href="./app.css">
-  <script type="module" src="./app.js"></script>
   <link rel="stylesheet" href="./shared/share.css">
+  <script type="module" src="./app.js"></script>
   <script src="./shared/share.js" defer></script>
 </head>
 <body>
 <div id="flash-overlay" class="flash-overlay" aria-hidden="true"></div>
-<main id="app">
-  <!-- ヘッダー -->
+<main id="app" data-screen="start">
+  <!-- ヘッダー（開始画面と結果画面だけに出す。捜査中は隠して偽サイトの領域を広げる） -->
   <header class="app-header">
     <div class="header-left">
       <p class="eyebrow">100日チャレンジ・DAY 063</p>
       <h1>解約ボタンは、どれ？</h1>
     </div>
     <div class="header-actions">
-      <button id="btn-sound" class="btn-icon" type="button" aria-label="効果音の切り替え">
-        <span id="sound-icon">🔊</span>
+      <button id="btn-share" class="btn-icon" type="button" aria-label="このアプリを共有する" title="共有">
+        <span class="btn-icon__glyph" aria-hidden="true">↗</span>
+        <span class="btn-icon__text">共有</span>
+      </button>
+      <button id="btn-sound" class="btn-icon" type="button" data-sound-toggle aria-pressed="true" title="効果音とBGM">
+        <span class="btn-icon__glyph" aria-hidden="true" data-sound-glyph>🔊</span>
+        <span class="btn-icon__text">音<span class="sound-state" aria-hidden="true" data-sound-state>ON</span></span>
       </button>
     </div>
   </header>
 
-  <!-- 1. スタート画面 -->
-  <section id="screen-start" class="game-screen active" aria-label="スタート画面">
+  <!-- 1. 開始画面 -->
+  <section id="screen-start" class="game-screen active" aria-labelledby="start-title">
     <div class="start-card">
       <div class="investigator-badge">
-        <span class="badge-icon">🕵️</span>
+        <span class="badge-icon" aria-hidden="true">🕵️</span>
         <span class="badge-text">特務UI捜査官 訓練プログラム</span>
       </div>
-      <h2>ネットに潜む「罠UI」を看破せよ</h2>
+      <h2 id="start-title">ネットに潜む「罠UI」を<wbr>看破せよ</h2>
       <p class="start-desc">
-        「初月0円」の奥に隠された年額縛り、極小フォントのチェックボックス、自尊心を削るキャンセル文言……。<br>
-        Webサイトに巧妙に仕組まれた<strong>「ダークパターン（欺瞞的UI）」</strong>を見抜き、無駄な課金を1円も払わずに目標を達成してください。
+        「初月0円」の裏の年額縛りや、断りにくいキャンセル文言。サイトに仕込まれた<strong>ダークパターン</strong><span class="nowrap"><strong>（欺瞞的UI）</strong>を</span>見抜き、1円も払わずに5つの現場を切り抜けてください。
       </p>
 
       <div class="rules-box">
-        <h3>🚨 捜査ルール</h3>
+        <h3>捜査ルール</h3>
         <ul>
-          <li><strong>制限時間</strong>：各現場でタイムリミットあり（焦らせる演出に惑わされるな！）</li>
-          <li><strong>被害額メーター</strong>：罠にかかると「被害額」が即座に加算</li>
-          <li><strong>生還条件</strong>：全5ステージを突破し、被害額0円での完全生還を目指せ</li>
+          <li><strong>制限時間</strong>：現場ごとに20〜30秒。現場名の表示（約1秒）の間は、操作できず、時間も進みません</li>
+          <li><strong>被害額メーター</strong>：罠にかかると、その金額が加算されます</li>
+          <li><strong>やり直し</strong>：失敗した現場はやり直せます。やり直すとその現場の記録は取り消され、使った時間は合計に残ります</li>
+          <li><strong>ランク</strong>：<span id="rules-rank">S＝被害0円・時間切れなし・合計45秒以内／A＝被害0円・時間切れなし</span>。時間切れのまま次へ進むと、その周は最高でもB</li>
         </ul>
       </div>
 
       <button id="btn-start-game" class="btn-primary start-pulse" type="button">
-        捜査を開始する（全5問）
+        捜査を開始する（全5現場）
       </button>
     </div>
   </section>
 
-  <!-- 2. 捜査プレイ画面 -->
+  <!-- 2. 捜査画面 -->
   <section id="screen-game" class="game-screen" aria-label="捜査画面">
-    <!-- 捜査官HUD -->
+    <!-- 捜査官HUD（スクロールしても上に残る細い帯） -->
     <div class="investigator-hud">
-      <div class="hud-item stage-counter">
-        <span class="hud-label">現場</span>
-        <span id="hud-stage-text" class="hud-value">1 / 5</span>
+      <div class="hud-tiles">
+        <div class="hud-item stage-counter">
+          <span class="hud-label">現場</span>
+          <span class="hud-value"><span id="hud-stage-text">1 / 5</span></span>
+        </div>
+        <div class="hud-item damage-meter" id="hud-damage">
+          <span class="hud-label">被害額</span>
+          <span class="hud-value"><span id="hud-damage-text" class="damage-val">¥0</span><span class="hud-alert" aria-hidden="true">⚠</span></span>
+          <span class="sr-only" id="hud-damage-note"></span>
+        </div>
+        <div class="hud-item time-counter" id="hud-time">
+          <span class="hud-label">残り</span>
+          <span class="hud-value"><span id="hud-timer-text">20</span><span class="hud-unit">秒</span></span>
+        </div>
+        <button id="btn-sound-hud" class="hud-sound" type="button" data-sound-toggle aria-pressed="true" title="効果音とBGM">
+          <span class="hud-sound__glyph" aria-hidden="true" data-sound-glyph>🔊</span>
+          <span class="hud-sound__text">音<span class="sound-state" aria-hidden="true" data-sound-state>ON</span></span>
+        </button>
       </div>
-      <div class="hud-item damage-meter">
-        <span class="hud-label">現在の請求被害額</span>
-        <span id="hud-damage-text" class="hud-value damage-val">¥0</span>
+      <div class="timer-bar-wrap" aria-hidden="true">
+        <div id="hud-timer-bar" class="timer-bar"></div>
       </div>
-      <div class="hud-item time-counter">
-        <span class="hud-label">リミット</span>
-        <span id="hud-timer-text" class="hud-value">25s</span>
+      <!-- 罠解除の合図はここ（ゲーム側の帯）に出す。偽サイトの文字には重ねない -->
+      <div class="hud-status">
+        <p id="hud-case" class="hud-case"></p>
+        <p id="hud-toast" class="hud-toast" role="status"></p>
       </div>
-    </div>
-    <div class="timer-bar-wrap">
-      <div id="hud-timer-bar" class="timer-bar"></div>
     </div>
 
-    <!-- ミッション指示バー -->
+    <!-- ミッション -->
     <div class="mission-bar">
-      <span class="mission-tag">MISSION</span>
-      <p id="mission-text" class="mission-text">ミッション内容を読み込み中...</p>
+      <p class="mission-line"><span class="mission-tag">MISSION</span><span id="mission-text" class="mission-text" tabindex="-1">ミッション内容を読み込み中...</span></p>
     </div>
 
-    <!-- 捜査対象ブラウザフレーム -->
+    <!-- 捜査対象の偽ブラウザ -->
     <div class="browser-frame" id="browser-frame">
       <div class="browser-topbar">
-        <div class="browser-dots">
+        <div class="browser-dots" aria-hidden="true">
           <span class="dot dot-red"></span>
           <span class="dot dot-yellow"></span>
           <span class="dot dot-green"></span>
         </div>
-        <div class="browser-address" id="browser-address">
-          🔒 https://example-shop.jp/checkout
-        </div>
+        <div class="browser-address"><span aria-hidden="true">🔒</span> <span id="browser-address">example-shop.jp</span></div>
       </div>
 
-      <!-- ステージUI展開エリア -->
-      <div id="stage-viewport" class="stage-viewport">
-        <!-- JSで各ステージのDOMがここに動的描画される -->
-      </div>
+      <!-- 各現場の偽サイトはJSでここに描く -->
+      <div id="stage-viewport" class="stage-viewport"></div>
     </div>
   </section>
 
-  <!-- 3. 看破解説モーダル -->
-  <div id="modal-cleared" class="modal-overlay" aria-hidden="true" role="dialog" aria-labelledby="modal-title">
+  <!-- 3. 解説モーダル -->
+  <div id="modal-cleared" class="modal-overlay" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="modal-title">
     <div class="modal-card">
       <div class="modal-header">
-        <span id="modal-badge" class="busted-badge">BUSTED! 看破成功</span>
-        <h2 id="modal-title">ダークパターンを看破！</h2>
+        <span id="modal-badge" class="busted-badge">BUSTED! 完全看破</span>
+        <h2 id="modal-title">罠を見抜き、完全回避！</h2>
       </div>
 
       <div class="modal-body">
         <div class="damage-report-row">
-          <span>この現場での被害額:</span>
+          <span id="modal-stage-damage-label">この現場の被害：</span>
           <strong id="modal-stage-damage" class="stage-damage-zero">¥0（完全回避）</strong>
         </div>
+
+        <div id="modal-stage-detail" class="stage-traps-detail" hidden></div>
 
         <div class="intel-box">
           <div class="intel-item">
@@ -134,22 +149,20 @@
       </div>
 
       <div class="modal-footer">
-        <button id="btn-next-stage" class="btn-primary" type="button">
-          次の現場へ進む ➔
-        </button>
+        <button id="btn-next-stage" class="btn-primary" type="button">次の現場へ進む <span aria-hidden="true">➔</span></button>
+        <button id="btn-retry-stage" class="btn-secondary" type="button">この現場をやり直す</button>
       </div>
     </div>
   </div>
 
-  <!-- 4. 最終リザルト画面 -->
-  <section id="screen-result" class="game-screen" aria-label="捜査報告書">
+  <!-- 4. 結果画面（見出し→ランク→統計→目標→再挑戦と共有→記録→出典の順） -->
+  <section id="screen-result" class="game-screen" aria-labelledby="result-title">
     <div class="result-card">
       <div class="result-header">
         <p class="eyebrow">FINAL INVESTIGATION REPORT</p>
-        <h2>捜査完了報告書</h2>
+        <h2 id="result-title" tabindex="-1">捜査完了報告書</h2>
       </div>
 
-      <!-- ランク表示 -->
       <div class="rank-showcase">
         <div class="rank-circle" id="result-rank-circle">
           <span id="result-rank-letter">S</span>
@@ -157,47 +170,62 @@
         <div class="rank-details">
           <span class="rank-prefix">捜査官称号</span>
           <h3 id="result-rank-title">特務UI捜査官</h3>
-          <p id="result-rank-desc">全手口を完全看破。見事なデジタル防衛力です。</p>
+          <p id="result-rank-desc"></p>
         </div>
       </div>
 
-      <!-- スコア内訳 -->
       <div class="result-stats-grid">
         <div class="stat-card">
-          <span class="stat-label">最終被害総額</span>
-          <strong id="result-total-damage" class="stat-value damage-highlight">¥0</strong>
+          <span class="stat-label">被害総額</span>
+          <strong id="result-total-damage" class="stat-value"><span class="stat-unit">¥</span><span id="result-damage-num">0</span></strong>
+          <span id="result-retries" class="stat-note"></span>
         </div>
         <div class="stat-card">
           <span class="stat-label">総捜査時間</span>
-          <strong id="result-total-time" class="stat-value">34 秒</strong>
+          <strong id="result-total-time" class="stat-value"><span id="result-time-num">0</span><span class="stat-unit">秒</span></strong>
+          <span class="stat-note">解説を読む時間は含みません</span>
         </div>
       </div>
 
-      <!-- 被害内訳リスト -->
-      <div class="damage-breakdown-box">
-        <h3>📋 各現場での捜査記録</h3>
-        <ul id="result-stage-list" class="stage-report-list">
-          <!-- JSで動的生成 -->
-        </ul>
+      <div class="goal-box">
+        <p id="result-goal" class="goal-line"></p>
+        <p class="best-line"><span id="result-best"></span><span id="result-best-badge" class="best-badge" hidden></span></p>
       </div>
 
-      <!-- アクションボタン -->
       <div class="result-actions">
-        <button id="btn-share-x" class="btn-share" type="button">
-          𝕏 で捜査結果をシェア
-        </button>
-        <button id="btn-retry" class="btn-secondary" type="button">
-          もう一度捜査する
-        </button>
+        <button id="btn-retry" class="btn-primary" type="button">もう一度、全現場に挑む</button>
+
+        <!-- 開始画面の共有ダイアログ（共通の .share）と同じ並び・同じ注記にそろえる -->
+        <section class="result-share" aria-labelledby="result-share-title">
+          <h3 id="result-share-title" class="result-share__title">結果をシェア</h3>
+          <div class="result-share__row">
+            <button id="btn-share-native" class="result-share__button result-share__button--primary" type="button" hidden>共有…</button>
+            <a id="btn-share-x" class="result-share__button" href="https://x.com/intent/post" target="_blank" rel="noopener noreferrer">Xで投稿</a>
+            <a id="btn-share-line" class="result-share__button" href="https://social-plugins.line.me/lineit/share" target="_blank" rel="noopener noreferrer">LINEで送る</a>
+            <button id="btn-share-copy" class="result-share__button" type="button">リンクをコピー</button>
+          </div>
+          <p id="result-share-note" class="result-share__note">InstagramとYouTubeはWebから直接投稿できない仕組みなので、リンクをコピーして貼ってください。</p>
+          <p id="result-share-said" class="result-share__said" role="status"></p>
+        </section>
       </div>
 
-      <!-- 出典と免責 -->
+      <div class="damage-breakdown-box">
+        <h3>各現場の捜査記録</h3>
+        <ul id="result-stage-list" class="stage-report-list"></ul>
+      </div>
+
       <footer class="result-footer">
         <p>※本ゲームに登場する企業名・サービス名・商品は架空のものです。実在の組織とは一切関係ありません。</p>
-        <p>出典参考：消費者庁「欺瞞的パターンに関する実態調査」、OECD「Dark Commercial Patterns」、国民生活センター相談事例。</p>
+        <p>出典参考：消費者庁「欺瞞的パターンに関する実態調査」、OECD<span class="nowrap">「Dark Commercial Patterns」</span>、国民生活センター相談事例。</p>
       </footer>
     </div>
   </section>
 </main>
+
+<!-- アプリ全体の共有（開始画面と結果画面のヘッダーから開く）。#share に共通のシェア欄が据え付く -->
+<dialog id="app-share-dialog" class="app-share-dialog" aria-label="このアプリを共有する">
+  <div id="share"></div>
+  <button id="btn-share-close" class="btn-secondary" type="button">閉じる</button>
+</dialog>
 </body>
 </html>
