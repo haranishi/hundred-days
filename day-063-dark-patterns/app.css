@@ -1026,3 +1026,240 @@ body {
   20%, 60% { transform: translateX(-6px); }
   40%, 80% { transform: translateX(6px); }
 }
+
+/* -------------------------------------------
+ * ハーネス改善 (Cycle 1): 演出・エフェクト追加
+ * ------------------------------------------- */
+
+/* 画面フラッシュ演出 */
+.flash-overlay {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 999;
+  opacity: 0;
+  transition: opacity 0.1s ease-out;
+}
+
+.flash-overlay.flash-red {
+  background: radial-gradient(circle, rgba(239, 68, 68, 0.4) 0%, rgba(220, 38, 38, 0.7) 100%);
+  opacity: 1;
+  animation: flashFade 0.45s forwards ease-out;
+}
+
+.flash-overlay.flash-green {
+  background: radial-gradient(circle, rgba(16, 185, 129, 0.3) 0%, rgba(5, 150, 105, 0.6) 100%);
+  opacity: 1;
+  animation: flashFade 0.45s forwards ease-out;
+}
+
+@keyframes flashFade {
+  0% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+/* ステージ開始カットイン */
+.stage-cutin-banner {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.9);
+  background: rgba(11, 15, 25, 0.95);
+  border: 2px solid var(--accent-cyan);
+  padding: 16px 28px;
+  border-radius: 12px;
+  text-align: center;
+  z-index: 50;
+  box-shadow: 0 0 30px rgba(6, 182, 212, 0.5);
+  pointer-events: none;
+  opacity: 0;
+  animation: cutinAnim 1.2s forwards cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.stage-cutin-tag {
+  font-size: 0.8rem;
+  color: var(--accent-cyan);
+  font-weight: 800;
+  letter-spacing: 0.1em;
+}
+
+.stage-cutin-title {
+  font-size: 1.3rem;
+  color: #ffffff;
+  font-weight: 800;
+  margin-top: 4px;
+}
+
+@keyframes cutinAnim {
+  0% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
+  25% { opacity: 1; transform: translate(-50%, -50%) scale(1.02); }
+  75% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  100% { opacity: 0; transform: translate(-50%, -50%) scale(1.05); }
+}
+
+/* 偽プッシュ通知トースト */
+.fake-toast {
+  position: absolute;
+  bottom: 14px;
+  left: 14px;
+  right: 14px;
+  background: #1e293b;
+  color: #ffffff;
+  border-left: 4px solid #f59e0b;
+  padding: 10px 14px;
+  border-radius: 6px;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.4);
+  font-size: 0.78rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  z-index: 20;
+  animation: slideUpToast 0.4s ease;
+}
+
+@keyframes slideUpToast {
+  from { transform: translateY(30px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.fake-toast-icon {
+  font-size: 1.2rem;
+  flex-shrink: 0;
+}
+
+/* 逃げる×ボタン */
+.btn-running-close {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  background: none;
+  border: none;
+  font-size: 1.4rem;
+  color: #9ca3af;
+  cursor: pointer;
+  transition: transform 0.15s ease-out;
+  padding: 4px;
+}
+
+/* 引き留め確認ミニモーダル */
+.retention-mini-dialog {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  z-index: 60;
+  animation: fadeIn 0.2s ease;
+}
+
+.mini-dialog-card {
+  background: #ffffff;
+  color: #111827;
+  padding: 20px;
+  border-radius: 10px;
+  max-width: 320px;
+  text-align: center;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.mini-dialog-card h5 {
+  font-size: 0.95rem;
+  color: #b91c1c;
+}
+
+.mini-dialog-card p {
+  font-size: 0.8rem;
+  color: #4b5563;
+  line-height: 1.5;
+}
+
+.dialog-btn-row {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-dialog-stay {
+  flex: 1;
+  background: #ef4444;
+  color: #ffffff;
+  border: none;
+  padding: 10px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.btn-dialog-leave {
+  flex: 1;
+  background: #e5e7eb;
+  color: #374151;
+  border: none;
+  padding: 10px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.btn-dialog-leave:hover {
+  background: #d1d5db;
+}
+
+/* 二重否定ステップの配色逆転確認 */
+.final-confirm-box {
+  background: #fff1f2;
+  border: 1px solid #fecdd3;
+  padding: 14px;
+  border-radius: 8px;
+  margin-top: 14px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  animation: fadeIn 0.3s;
+}
+
+.final-confirm-box p {
+  font-size: 0.82rem;
+  color: #9f1239;
+  font-weight: 700;
+}
+
+.final-btn-group {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-trick-loud {
+  flex: 1;
+  background: #e11d48;
+  color: #ffffff;
+  border: none;
+  padding: 10px;
+  border-radius: 6px;
+  font-size: 0.82rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.btn-trick-subtle {
+  flex: 1;
+  background: #f3f4f6;
+  color: #6b7280;
+  border: 1px solid #d1d5db;
+  padding: 10px;
+  border-radius: 6px;
+  font-size: 0.82rem;
+  cursor: pointer;
+}
+
+.btn-trick-subtle:hover {
+  background: #e5e7eb;
+  color: #111827;
+}

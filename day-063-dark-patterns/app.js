@@ -3,8 +3,11 @@ import {
   playSuccessSound,
   playTrapHitSound,
   playClickSound,
+  playInspectSound,
   playHeartbeatSound,
   playFanfareSound,
+  startBgm,
+  stopBgm,
   setSoundEnabled,
   isSoundEnabled
 } from "./lib/audio.js";
@@ -21,6 +24,7 @@ const state = {
 };
 
 // DOM要素
+const flashOverlay = document.getElementById("flash-overlay");
 const screenStart = document.getElementById("screen-start");
 const screenGame = document.getElementById("screen-game");
 const screenResult = document.getElementById("screen-result");
@@ -81,6 +85,27 @@ function init() {
   });
 }
 
+function triggerFlash(type) {
+  if (!flashOverlay) return;
+  flashOverlay.className = `flash-overlay flash-${type}`;
+  setTimeout(() => {
+    flashOverlay.className = "flash-overlay";
+  }, 450);
+}
+
+function showStageCutin(stage) {
+  const cutin = document.createElement("div");
+  cutin.className = "stage-cutin-banner";
+  cutin.innerHTML = `
+    <span class="stage-cutin-tag">CASE 0${stage.id}</span>
+    <h3 class="stage-cutin-title">${stage.title}</h3>
+  `;
+  stageViewport.appendChild(cutin);
+  setTimeout(() => {
+    if (cutin.parentNode) cutin.remove();
+  }, 1200);
+}
+
 function startGame() {
   state.currentStageIndex = 0;
   state.totalDamage = 0;
@@ -92,6 +117,7 @@ function startGame() {
   modalCleared.classList.remove("active");
   screenGame.classList.add("active");
 
+  startBgm();
   updateHUD();
   loadStage(state.currentStageIndex);
 }
@@ -112,6 +138,7 @@ function loadStage(index) {
   browserAddress.textContent = `🔒 https://${stage.siteName.toLowerCase().replace(/[^a-z0-9]/g, "")}.jp/`;
 
   renderStageContent(stage);
+  showStageCutin(stage);
   startStageTimer(stage.timeLimit);
 }
 
@@ -144,7 +171,6 @@ function startStageTimer(seconds) {
 
 function handleTimeout() {
   const stage = STAGES[state.currentStageIndex];
-  // 最大被害額を加算
   const maxTrapCost = stage.traps.reduce((acc, t) => acc + (t.cost || 0), 0);
   recordStageResult(maxTrapCost, true);
 }
@@ -165,10 +191,12 @@ function recordStageResult(damage, isTimeout = false) {
 
   if (damage > 0) {
     playTrapHitSound();
+    triggerFlash("red");
     hudDamageText.classList.add("hit");
     setTimeout(() => hudDamageText.classList.remove("hit"), 600);
   } else {
     playSuccessSound();
+    triggerFlash("green");
   }
 
   showClearedModal(stage, damage, isTimeout);
@@ -204,6 +232,7 @@ function nextStage() {
 }
 
 function finishGame() {
+  stopBgm();
   state.endTime = Date.now();
   screenGame.classList.remove("active");
   screenResult.classList.add("active");
@@ -289,7 +318,7 @@ function renderStageContent(stage) {
   }
 }
 
-// ステージ1: お試し500円サプリ
+// ステージ1: お試し500円サプリ（引き留めダイアログ付き）
 function renderStage1(stage) {
   const wrap = document.createElement("div");
   wrap.className = "ec-stage-box";
@@ -307,14 +336,14 @@ function renderStage1(stage) {
     </div>
 
     <div class="options-group">
-      <label class="option-row">
+      <label class="option-row" id="lbl-sub">
         <input type="checkbox" id="chk-opt-sub" checked>
         <div class="option-text">
           <strong>【人気No.1】便利でお得な毎月自動お届け定期便に申し込む</strong>
           <span>※2回目以降は月額¥4,980(税込)で毎月自動更新となります</span>
         </div>
       </label>
-      <label class="option-row">
+      <label class="option-row" id="lbl-warranty">
         <input type="checkbox" id="chk-opt-warranty" checked>
         <div class="option-text">
           <strong>プレミアムあんしん配送補償プラン (+¥550)</strong>
@@ -338,6 +367,44 @@ function renderStage1(stage) {
   const btnLoud = wrap.querySelector("#btn-stage1-loud");
   const btnSubtle = wrap.querySelector("#btn-stage1-subtle");
 
+  // チェックを外そうとした時の引き留めダイアログ
+  chkSub.addEventListener("click", (e) => {
+    if (!chkSub.checked) {
+      e.preventDefault(); // 一旦チェックを戻す
+      chkSub.checked = true;
+
+      // リアルな引き留めミニダイアログ
+      const dialog = document.createElement("div");
+      dialog.className = "retention-mini-dialog";
+      dialog.innerHTML = `
+        <div class="mini-dialog-card">
+          <h5>⚠️ 本当に定期便を解除しますか？</h5>
+          <p>今解除すると、初回限定の特別割引（-90%）や送料無料特典が失効する可能性があります。</p>
+          <div class="dialog-btn-row">
+            <button type="button" class="btn-dialog-stay" id="btn-keep-sub">お得な定期便を続ける</button>
+            <button type="button" class="btn-dialog-leave" id="btn-remove-sub">割引を捨てて解除する</button>
+          </div>
+        </div>
+      `;
+      wrap.appendChild(dialog);
+
+      dialog.querySelector("#btn-keep-sub").addEventListener("click", () => {
+        playClickSound();
+        dialog.remove();
+      });
+
+      dialog.querySelector("#btn-remove-sub").addEventListener("click", () => {
+        playInspectSound();
+        chkSub.checked = false;
+        dialog.remove();
+      });
+    }
+  });
+
+  chkWarranty.addEventListener("change", () => {
+    playInspectSound();
+  });
+
   btnLoud.addEventListener("click", () => {
     let damage = 0;
     if (chkSub.checked) damage += 4980;
@@ -346,12 +413,11 @@ function renderStage1(stage) {
   });
 
   btnSubtle.addEventListener("click", () => {
-    // 単品購入ボタンならノーダメージで看破
     recordStageResult(0);
   });
 }
 
-// ステージ2: コンファームシェイミング（モーダル）
+// ステージ2: コンファームシェイミング（逃げる×ボタン）
 function renderStage2(stage) {
   const wrap = document.createElement("div");
   wrap.className = "ec-stage-box";
@@ -368,7 +434,7 @@ function renderStage2(stage) {
 
     <div class="fake-modal-overlay">
       <div class="fake-modal-card">
-        <button type="button" id="btn-modal-fake-close" class="fake-modal-close-fake" aria-label="閉じる">×</button>
+        <button type="button" id="btn-modal-fake-close" class="btn-running-close" aria-label="閉じる">×</button>
         <div class="coupon-badge-loud">🎉 本日限定 30% OFF！</div>
         <p style="font-size: 0.9rem; font-weight: 700; color: #111827;">
           いま会員登録すると今すぐ使える¥3,840引きクーポンを進呈！
@@ -390,9 +456,16 @@ function renderStage2(stage) {
   const btnReject = wrap.querySelector("#btn-reject-confirmshame");
   const btnFakeClose = wrap.querySelector("#btn-modal-fake-close");
 
-  btnAccept.addEventListener("click", () => {
-    // メルマガ課金被弾
-    recordStageResult(980);
+  // 逃げる×ボタン
+  let escapeCount = 0;
+  btnFakeClose.addEventListener("mouseenter", () => {
+    if (escapeCount < 3) {
+      escapeCount++;
+      const randX = (Math.random() - 0.5) * 80;
+      const randY = (Math.random() - 0.5) * 40;
+      btnFakeClose.style.transform = `translate(${randX}px, ${randY}px)`;
+      playClickSound();
+    }
   });
 
   btnFakeClose.addEventListener("click", () => {
@@ -400,13 +473,16 @@ function renderStage2(stage) {
     alert("「このチャンスを本当に見逃しますか？画面内のリンクから選択してください。」");
   });
 
+  btnAccept.addEventListener("click", () => {
+    recordStageResult(980);
+  });
+
   btnReject.addEventListener("click", () => {
-    // 羞恥心を乗り越えて冷静に拒否
     recordStageResult(0);
   });
 }
 
-// ステージ3: 偽の緊急性と閲覧者数
+// ステージ3: 偽の緊急性と閲覧者数（トースト通知割り込み）
 function renderStage3(stage) {
   const wrap = document.createElement("div");
   wrap.className = "hotel-stage-box";
@@ -444,6 +520,22 @@ function renderStage3(stage) {
 
   stageViewport.appendChild(wrap);
 
+  // 2秒後に偽プッシュ通知トーストが出現
+  setTimeout(() => {
+    if (!wrap.isConnected) return;
+    const toast = document.createElement("div");
+    toast.className = "fake-toast";
+    toast.innerHTML = `
+      <span class="fake-toast-icon">🛎️</span>
+      <div>
+        <strong>東京都のユーザーが同じ部屋を仮予約中！</strong>
+        <p>あと1分以内に確定しないと部屋が解放されます</p>
+      </div>
+    `;
+    wrap.appendChild(toast);
+    playHeartbeatSound();
+  }, 2000);
+
   const radios = wrap.querySelectorAll('input[name="hotel-plan"]');
   const rowNonref = wrap.querySelector("#row-nonref");
   const rowFreecancel = wrap.querySelector("#row-freecancel");
@@ -451,7 +543,7 @@ function renderStage3(stage) {
 
   radios.forEach((r) => {
     r.addEventListener("change", () => {
-      playClickSound();
+      playInspectSound();
       if (r.value === "nonrefundable") {
         rowNonref.classList.add("selected");
         rowFreecancel.classList.remove("selected");
@@ -472,7 +564,7 @@ function renderStage3(stage) {
   });
 }
 
-// ステージ4: ゴキブリホイホイと二重否定
+// ステージ4: ゴキブリホイホイと二重否定（配色逆転の最終関門）
 function renderStage4(stage) {
   const wrap = document.createElement("div");
   wrap.className = "cancel-stage-box";
@@ -506,18 +598,20 @@ function renderStage4(stage) {
       <p style="margin-top: 4px;">
         <a href="#terms" style="color: #9ca3af; text-decoration: none;">利用規約</a> | 
         <a href="#privacy" style="color: #9ca3af; text-decoration: none;">プライバシーポリシー</a> | 
-        <button type="button" id="btn-real-cancel" class="link-real-cancel">退会手続きを完了する</button>
+        <button type="button" id="btn-real-cancel" class="link-real-cancel">退会手続きへ進む</button>
       </p>
     </div>
+
+    <div id="final-confirm-area"></div>
   `;
 
   stageViewport.appendChild(wrap);
 
   const btnStay = wrap.querySelector("#btn-cancel-stay");
   const btnRealCancel = wrap.querySelector("#btn-real-cancel");
+  const finalArea = wrap.querySelector("#final-confirm-area");
 
   btnStay.addEventListener("click", () => {
-    // 派手な引き留めボタンを押してしまった
     recordStageResult(1980);
   });
 
@@ -527,13 +621,31 @@ function renderStage4(stage) {
       alert("アンケートの質問にご回答ください。");
       return;
     }
-    if (selected.value === "leave") {
-      // 正しく二重否定を見破って解約
-      recordStageResult(0);
-    } else {
-      // 「いいえ」を選んでしまい解約中止に
+
+    if (selected.value === "stay") {
       recordStageResult(1980);
+      return;
     }
+
+    playInspectSound();
+    // 配色逆転の最終確認ボックスを表示
+    finalArea.innerHTML = `
+      <div class="final-confirm-box">
+        <p>最終確認：本当に会員特典を破棄しますか？</p>
+        <div class="final-btn-group">
+          <button type="button" id="btn-final-stay" class="btn-trick-loud">考え直す（契約を維持）</button>
+          <button type="button" id="btn-final-leave" class="btn-trick-subtle">退会する</button>
+        </div>
+      </div>
+    `;
+
+    finalArea.querySelector("#btn-final-stay").addEventListener("click", () => {
+      recordStageResult(1980);
+    });
+
+    finalArea.querySelector("#btn-final-leave").addEventListener("click", () => {
+      recordStageResult(0);
+    });
   });
 }
 
@@ -568,12 +680,14 @@ function renderStage5(stage) {
   const chkSafe = wrap.querySelector("#chk-safe-plan");
   const btnStartSub = wrap.querySelector("#btn-sub-start");
 
+  chkSafe.addEventListener("change", () => {
+    playInspectSound();
+  });
+
   btnStartSub.addEventListener("click", () => {
     if (chkSafe && chkSafe.checked) {
-      // 安全なプランに変更済み
       recordStageResult(0);
     } else {
-      // 年額電話縛りのまま開始
       recordStageResult(14800);
     }
   });
