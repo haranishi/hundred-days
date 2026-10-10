@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="巧妙な二重否定、事前チェック、罪悪感の押し売り。ネット通販やサブスクに潜む悪質UI（ダークパターン）を見抜き、意図しない課金から無傷で生還する欺瞞UI脱出ゲーム。">
+  <meta name="share:text" content="解約ボタンは、どれ？ — 悪質UI（ダークパターン）を見抜く脱出ゲーム #100日チャレンジ #Day063">
+  <title>解約ボタンは、どれ？ — 欺瞞的UI脱出ゲーム</title>
+  <link rel="icon" type="image/svg+xml" href="./favicon.svg">
+  <link rel="stylesheet" href="./app.css">
+  <script type="module" src="./app.js"></script>
+  <link rel="stylesheet" href="./shared/share.css">
+  <script src="./shared/share.js" defer></script>
+</head>
+<body>
+<main id="app">
+  <!-- ヘッダー -->
+  <header class="app-header">
+    <div class="header-left">
+      <p class="eyebrow">100日チャレンジ・DAY 063</p>
+      <h1>解約ボタンは、どれ？</h1>
+    </div>
+    <div class="header-actions">
+      <button id="btn-sound" class="btn-icon" type="button" aria-label="効果音の切り替え">
+        <span id="sound-icon">🔊</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- 1. スタート画面 -->
+  <section id="screen-start" class="game-screen active" aria-label="スタート画面">
+    <div class="start-card">
+      <div class="investigator-badge">
+        <span class="badge-icon">🕵️</span>
+        <span class="badge-text">特務UI捜査官 訓練プログラム</span>
+      </div>
+      <h2>ネットに潜む「罠UI」を看破せよ</h2>
+      <p class="start-desc">
+        「初月0円」の奥に隠された年額縛り、極小フォントのチェックボックス、自尊心を削るキャンセル文言……。<br>
+        Webサイトに巧妙に仕組まれた<strong>「ダークパターン（欺瞞的UI）」</strong>を見抜き、無駄な課金を1円も払わずに目標を達成してください。
+      </p>
+
+      <div class="rules-box">
+        <h3>🚨 捜査ルール</h3>
+        <ul>
+          <li><strong>制限時間</strong>：各現場でタイムリミットあり（焦らせる演出に惑わされるな！）</li>
+          <li><strong>被害額メーター</strong>：罠にかかると「被害額」が即座に加算</li>
+          <li><strong>生還条件</strong>：全5ステージを突破し、被害額0円での完全生還を目指せ</li>
+        </ul>
+      </div>
+
+      <button id="btn-start-game" class="btn-primary start-pulse" type="button">
+        捜査を開始する（全5問）
+      </button>
+    </div>
+  </section>
+
+  <!-- 2. 捜査プレイ画面 -->
+  <section id="screen-game" class="game-screen" aria-label="捜査画面">
+    <!-- 捜査官HUD -->
+    <div class="investigator-hud">
+      <div class="hud-item stage-counter">
+        <span class="hud-label">現場</span>
+        <span id="hud-stage-text" class="hud-value">1 / 5</span>
+      </div>
+      <div class="hud-item damage-meter">
+        <span class="hud-label">現在の請求被害額</span>
+        <span id="hud-damage-text" class="hud-value damage-val">¥0</span>
+      </div>
+      <div class="hud-item time-counter">
+        <span class="hud-label">リミット</span>
+        <span id="hud-timer-text" class="hud-value">25s</span>
+      </div>
+    </div>
+    <div class="timer-bar-wrap">
+      <div id="hud-timer-bar" class="timer-bar"></div>
+    </div>
+
+    <!-- ミッション指示バー -->
+    <div class="mission-bar">
+      <span class="mission-tag">MISSION</span>
+      <p id="mission-text" class="mission-text">ミッション内容を読み込み中...</p>
+    </div>
+
+    <!-- 捜査対象ブラウザフレーム -->
+    <div class="browser-frame" id="browser-frame">
+      <div class="browser-topbar">
+        <div class="browser-dots">
+          <span class="dot dot-red"></span>
+          <span class="dot dot-yellow"></span>
+          <span class="dot dot-green"></span>
+        </div>
+        <div class="browser-address" id="browser-address">
+          🔒 https://example-shop.jp/checkout
+        </div>
+      </div>
+
+      <!-- ステージUI展開エリア -->
+      <div id="stage-viewport" class="stage-viewport">
+        <!-- JSで各ステージのDOMがここに動的描画される -->
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. 看破解説モーダル -->
+  <div id="modal-cleared" class="modal-overlay" aria-hidden="true" role="dialog" aria-labelledby="modal-title">
+    <div class="modal-card">
+      <div class="modal-header">
+        <span id="modal-badge" class="busted-badge">BUSTED! 看破成功</span>
+        <h2 id="modal-title">ダークパターンを看破！</h2>
+      </div>
+
+      <div class="modal-body">
+        <div class="damage-report-row">
+          <span>この現場での被害額:</span>
+          <strong id="modal-stage-damage" class="stage-damage-zero">¥0（完全回避）</strong>
+        </div>
+
+        <div class="intel-box">
+          <div class="intel-item">
+            <span class="intel-label">仕掛けられていた手口</span>
+            <p id="modal-pattern-name" class="intel-val highlight"></p>
+          </div>
+          <div class="intel-item">
+            <span class="intel-label">心理誘導のメカニズム</span>
+            <p id="modal-explanation" class="intel-val"></p>
+          </div>
+          <div class="intel-item">
+            <span class="intel-label">防犯の知識と公的見解</span>
+            <p id="modal-legal-note" class="intel-val legal-text"></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button id="btn-next-stage" class="btn-primary" type="button">
+          次の現場へ進む ➔
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. 最終リザルト画面 -->
+  <section id="screen-result" class="game-screen" aria-label="捜査報告書">
+    <div class="result-card">
+      <div class="result-header">
+        <p class="eyebrow">FINAL INVESTIGATION REPORT</p>
+        <h2>捜査完了報告書</h2>
+      </div>
+
+      <!-- ランク表示 -->
+      <div class="rank-showcase">
+        <div class="rank-circle" id="result-rank-circle">
+          <span id="result-rank-letter">S</span>
+        </div>
+        <div class="rank-details">
+          <span class="rank-prefix">捜査官称号</span>
+          <h3 id="result-rank-title">特務UI捜査官</h3>
+          <p id="result-rank-desc">全手口を完全看破。見事なデジタル防衛力です。</p>
+        </div>
+      </div>
+
+      <!-- スコア内訳 -->
+      <div class="result-stats-grid">
+        <div class="stat-card">
+          <span class="stat-label">最終被害総額</span>
+          <strong id="result-total-damage" class="stat-value damage-highlight">¥0</strong>
+        </div>
+        <div class="stat-card">
+          <span class="stat-label">総捜査時間</span>
+          <strong id="result-total-time" class="stat-value">34 秒</strong>
+        </div>
+      </div>
+
+      <!-- 被害内訳リスト -->
+      <div class="damage-breakdown-box">
+        <h3>📋 各現場での捜査記録</h3>
+        <ul id="result-stage-list" class="stage-report-list">
+          <!-- JSで動的生成 -->
+        </ul>
+      </div>
+
+      <!-- アクションボタン -->
+      <div class="result-actions">
+        <button id="btn-share-x" class="btn-share" type="button">
+          𝕏 で捜査結果をシェア
+        </button>
+        <button id="btn-retry" class="btn-secondary" type="button">
+          もう一度捜査する
+        </button>
+      </div>
+
+      <!-- 出典と免責 -->
+      <footer class="result-footer">
+        <p>※本ゲームに登場する企業名・サービス名・商品は架空のものです。実在の組織とは一切関係ありません。</p>
+        <p>出典参考：消費者庁「欺瞞的パターンに関する実態調査」、OECD「Dark Commercial Patterns」、国民生活センター相談事例。</p>
+      </footer>
+    </div>
+  </section>
+</main>
+</body>
+</html>
