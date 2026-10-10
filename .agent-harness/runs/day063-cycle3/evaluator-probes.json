@@ -1,0 +1,264 @@
+{
+  "scope": "Source evaluation in Node VM; mocked DOM/audio/clock/timers; not browser gameplay",
+  "sourceSha256": {
+    "day-063-dark-patterns/lib/stages.js": "b38cfaf646777c21d3b0d1ae9ca5e67e6d4b7361d7e7399e9bb90150175b6dfe",
+    "day-063-dark-patterns/app.js": "07f86fc5a7784caf72c13cfc9160cdcef68d041daa631d5abd03ec571f9796f5"
+  },
+  "checks": 29,
+  "note": "Assertions verify observations, including remaining defects. Completion is not a product pass.",
+  "evidence": [
+    {
+      "name": "stage_order",
+      "kind": "improvement",
+      "titles": [
+        "罪悪感の押し売りモーダル",
+        "隠された年額自動更新",
+        "偽の緊急性と閲覧者数",
+        "お試し500円の罠",
+        "迷宮の退会アンケート"
+      ]
+    },
+    {
+      "name": "stage1_timeout",
+      "kind": "improvement",
+      "damage": 0,
+      "isTimeout": true,
+      "title": "時間切れ！ミッション失敗！",
+      "detail": "<div class=\"trap-detail-row\">\n          <span>時間切れで手続き未完了</span>\n          <span class=\"trap-detail-tag hit\">\n            被弾 +¥0\n          </span>\n        </div>"
+    },
+    {
+      "name": "stage2_timeout",
+      "kind": "improvement",
+      "damage": 0,
+      "isTimeout": true,
+      "title": "時間切れ！ミッション失敗！",
+      "detail": "<div class=\"trap-detail-row\">\n          <span>時間切れで手続き未完了</span>\n          <span class=\"trap-detail-tag hit\">\n            被弾 +¥0\n          </span>\n        </div>"
+    },
+    {
+      "name": "stage3_timeout",
+      "kind": "improvement",
+      "damage": 0,
+      "isTimeout": true,
+      "title": "時間切れ！ミッション失敗！",
+      "detail": "<div class=\"trap-detail-row\">\n          <span>時間切れで手続き未完了</span>\n          <span class=\"trap-detail-tag hit\">\n            被弾 +¥0\n          </span>\n        </div>"
+    },
+    {
+      "name": "stage4_timeout",
+      "kind": "improvement",
+      "damage": 0,
+      "isTimeout": true,
+      "title": "時間切れ！ミッション失敗！",
+      "detail": "<div class=\"trap-detail-row\">\n          <span>時間切れで手続き未完了</span>\n          <span class=\"trap-detail-tag hit\">\n            被弾 +¥0\n          </span>\n        </div>"
+    },
+    {
+      "name": "stage5_timeout",
+      "kind": "improvement",
+      "damage": 1980,
+      "isTimeout": true,
+      "title": "時間切れ！ミッション失敗！",
+      "detail": "<div class=\"trap-detail-row\">\n          <span>退会未完了による翌月自動更新</span>\n          <span class=\"trap-detail-tag hit\">\n            被弾 +¥1,980\n          </span>\n        </div>"
+    },
+    {
+      "name": "stage2_safe_unconfirmed_timeout",
+      "kind": "improvement",
+      "damage": 0,
+      "isTimeout": true
+    },
+    {
+      "name": "stage3_safe_unconfirmed_timeout",
+      "kind": "improvement",
+      "damage": 0,
+      "isTimeout": true
+    },
+    {
+      "name": "stage4_safe_unconfirmed_timeout",
+      "kind": "improvement",
+      "damage": 0,
+      "isTimeout": true
+    },
+    {
+      "name": "stage1_unsafe_commit",
+      "kind": "observation",
+      "damage": 980,
+      "selector": "#btn-accept-coupon"
+    },
+    {
+      "name": "stage2_unsafe_commit",
+      "kind": "observation",
+      "damage": 12800,
+      "selector": "#btn-sub-start"
+    },
+    {
+      "name": "stage3_unsafe_commit",
+      "kind": "observation",
+      "damage": 18000,
+      "selector": "#btn-hotel-submit"
+    },
+    {
+      "name": "stage4_unsafe_commit",
+      "kind": "observation",
+      "damage": 5530,
+      "selector": "#btn-stage1-subtle"
+    },
+    {
+      "name": "stage5_unsafe_commit",
+      "kind": "observation",
+      "damage": 1980,
+      "selector": "#btn-cancel-stay"
+    },
+    {
+      "name": "stage1_safe_commit",
+      "kind": "improvement",
+      "damage": 0,
+      "selector": "#btn-reject-confirmshame"
+    },
+    {
+      "name": "stage2_safe_commit",
+      "kind": "improvement",
+      "damage": 0,
+      "selector": "#btn-sub-start"
+    },
+    {
+      "name": "stage3_safe_commit",
+      "kind": "improvement",
+      "damage": 0,
+      "selector": "#btn-hotel-submit"
+    },
+    {
+      "name": "stage4_safe_commit",
+      "kind": "improvement",
+      "damage": 0,
+      "selector": "#btn-stage1-subtle"
+    },
+    {
+      "name": "stage5_safe_commit",
+      "kind": "improvement",
+      "damage": 0
+    },
+    {
+      "name": "duplicate_resolution",
+      "kind": "improvement",
+      "damage": 5530,
+      "results": 1,
+      "inert": true
+    },
+    {
+      "name": "stage1_retry",
+      "kind": "improvement",
+      "priorDamage": 1480,
+      "results": 1,
+      "retainedPlaySeconds": 3,
+      "remainingSeconds": 20
+    },
+    {
+      "name": "stage4_retry",
+      "kind": "improvement",
+      "priorDamage": 1480,
+      "results": 1,
+      "retainedPlaySeconds": 3,
+      "remainingSeconds": 25
+    },
+    {
+      "name": "stage5_retry",
+      "kind": "improvement",
+      "priorDamage": 1480,
+      "results": 1,
+      "retainedPlaySeconds": 3,
+      "remainingSeconds": 30
+    },
+    {
+      "name": "explanation_60_seconds_excluded",
+      "kind": "improvement",
+      "immediate": {
+        "seconds": 3,
+        "display": "3 秒（実捜査時間）",
+        "rank": "S"
+      },
+      "delayed": {
+        "seconds": 3,
+        "display": "3 秒（実捜査時間）",
+        "rank": "S"
+      },
+      "note": "Isolated finishGame probe; five-stage completion is not asserted here."
+    },
+    {
+      "name": "fractional_time_lost",
+      "kind": "remaining_defect",
+      "simulatedPlayMs": 4500,
+      "recordedSeconds": 0,
+      "displayedSeconds": 1
+    },
+    {
+      "name": "timeout_result_and_share_disagree",
+      "kind": "remaining_defect",
+      "visibleRank": "B",
+      "firstRow": "<span><strong>第1現場:</strong> 罪悪感の押し売りモーダル</span>\n      <strong style=\"color: #10b981\">\n        ¥0 (回避)\n      </strong>",
+      "sharedTitle": "特務UI捜査官（神の洞察眼）",
+      "externalWindowOpened": false
+    },
+    {
+      "name": "hotel_shuffle_always_preselects_first",
+      "kind": "remaining_defect",
+      "variants": [
+        {
+          "random": 0,
+          "first": "nonrefundable",
+          "firstChecked": true
+        },
+        {
+          "random": 0.99,
+          "first": "freecancel",
+          "firstChecked": true
+        }
+      ],
+      "note": "Generated HTML inspected; native radio grouping is not simulated."
+    },
+    {
+      "name": "basket_wording_and_charges",
+      "kind": "remaining_defect",
+      "variants": [
+        {
+          "random": 0,
+          "damage": 5530,
+          "button": "上記内容に同意して単品購入を確定",
+          "breakdown": [
+            {
+              "name": "定期便自動移行",
+              "hit": true,
+              "cost": 4980
+            },
+            {
+              "name": "安心配送プレミアム保証",
+              "hit": true,
+              "cost": 550
+            }
+          ]
+        },
+        {
+          "random": 0.99,
+          "damage": 7930,
+          "button": "上記内容に同意して単品購入を確定",
+          "breakdown": [
+            {
+              "name": "定期便自動移行",
+              "hit": true,
+              "cost": 6980
+            },
+            {
+              "name": "安心配送プレミアム保証",
+              "hit": true,
+              "cost": 950
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "random_prices_and_positions_exist",
+      "kind": "improvement",
+      "lowSubCost": 4980,
+      "highSubCost": 6980,
+      "optionOrderChanges": true
+    }
+  ]
+}
