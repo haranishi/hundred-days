@@ -961,7 +961,7 @@ function renderStageFakeUrgency(stage) {
       <span>⚠️ 残りあと1室！ 現在${viewers}人が検討中です！</span>
     </div>
     <div class="hotel-plan-card">
-      <h4>天然温泉 翠明館 — スタンダード和室</h4>
+      <h4>天然温泉 くもいろ亭 — スタンダード和室</h4>
       <p class="hotel-meta">1泊2食付き / 2名1室利用</p>
       <div class="hotel-plans">
         ${isReversed ? htmlFreecancel + htmlNonref : htmlNonref + htmlFreecancel}
@@ -1037,7 +1037,7 @@ function renderStageSneakIntoBasket(stage) {
       <div class="product-card">
         <div class="product-thumb" aria-hidden="true">💊</div>
         <div class="product-info">
-          <h4>超高濃度ブルーベリーEX（30日分）</h4>
+          <h4>ぎゅっとベリー濃縮粒（30日分）</h4>
           <p class="product-desc">初回限定お試し特別モニター価格！ ★★★★★ 4.9（3,842件）</p>
           <div>
             <span class="price-tag">¥500（税込）</span>

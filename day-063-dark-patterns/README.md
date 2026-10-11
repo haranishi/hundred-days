@@ -77,4 +77,11 @@ E2Eは `dist/` を配信して検査します。コードを変えたら、先�
 ## 権利・免責事項
 
 - 本ゲームに登場する企業名・商品名・サービス名はすべて架空のものです。実在の組織や個人とは一切関係ありません。
-- 手口の解説は、消費者庁の欺瞞的パターン実態調査報告書、OECD「Dark Commercial Patterns」、国民生活センターの公表資料を参考に制作しています。
+- 偽サイトのアドレスも架空で、実在のサイトではありません。名前は実在の商品・事業と重ならないよう、検索で同名・同分野のものが見つからないことを確かめて付けました（商標の登録までは確かめていません）。
+- 手口の解説と「知っておきたいルール」は、次の資料を参考に、制作者が自分の言葉で要約したものです。各機関の見解ではなく、文章や図は転載していません。
+  - 消費者庁 国際消費者政策研究センター「いわゆる『ダークパターン』に関する取引の実態調査」（2025年4月公表）https://www.caa.go.jp/policies/future/icprc/research_010
+  - 消費者庁「通信販売の申込み段階における表示についてのガイドライン」https://www.no-trouble.caa.go.jp/pdf/20241119la02_09.pdf
+  - デジタル取引・特定商取引法等検討会「中間取りまとめ」（2026年9月10日）https://www.caa.go.jp/policies/policy/consumer_transaction/meeting_materials/review_meeting_005/assets/consumer_transaction_cms101_260910_01.pdf
+  - OECD (2022), "Dark commercial patterns", OECD Digital Economy Papers, No. 336 https://doi.org/10.1787/44f5e846-en
+  - 国民生活センター「通信販売での定期購入」https://www.kokusen.go.jp/soudan_topics/data/subscription_traps.html
+- 法令の説明は2026年10月11日時点の公開資料にもとづく一般的な解説で、個々の表示が違法かどうかを判断するものではありません。困ったときは消費者ホットライン188へ。確認の経緯は `.agent-harness/runs/day063-rights.md` にあります。
