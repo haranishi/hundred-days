@@ -1,0 +1,63 @@
+name: Day64 data and Wasm
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'day-064-breach-atlas/**'
+      - 'docs/day064/research/**'
+      - 'tests/e2e/day-064*'
+      - '.github/workflows/day064.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'day-064-breach-atlas/**'
+      - 'docs/day064/research/**'
+      - 'tests/e2e/day-064*'
+      - '.github/workflows/day064.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: day064-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  checks:
+    name: Day64 data, Rust and browser checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      RUSTUP_TOOLCHAIN: 1.99.0
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            day-064-breach-atlas/source/package-lock.json
+      - name: Install dependencies
+        run: |
+          npm ci
+          npm ci --prefix day-064-breach-atlas/source
+          python3 -m pip install 'PyMuPDF==1.27.2.3'
+          rustup toolchain install 1.99.0 --profile minimal --target wasm32-unknown-unknown
+      - name: Validate data and PDF extraction
+        working-directory: day-064-breach-atlas/source
+        run: |
+          npm run data
+          npm test
+          python3 -m unittest discover -s tests -p '*_test.py'
+          npm run rust:test
+      - name: Build browser and Wasm
+        working-directory: day-064-breach-atlas/source
+        run: npm run build
+      - name: Install Chromium
+        timeout-minutes: 5
+        run: npx playwright install chromium
+      - name: Run Day64 browser checks
+        run: npx playwright test --config tests/e2e/day-064.config.mjs --project checks

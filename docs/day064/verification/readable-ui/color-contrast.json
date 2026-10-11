@@ -1,0 +1,82 @@
+{
+  "method": "Contrast calculation for primary text, muted text, selected labels, primary button, and seven cause text tokens. Not a full WCAG conformance audit.",
+  "pairs": [
+    {
+      "label": "本文",
+      "text": "#192638",
+      "background": "#ffffff",
+      "contrast": 15.27,
+      "atLeast4Point5": true
+    },
+    {
+      "label": "補助文字",
+      "text": "#5d6879",
+      "background": "#f6f8fc",
+      "contrast": 5.31,
+      "atLeast4Point5": true
+    },
+    {
+      "label": "リンク・選択文字",
+      "text": "#215ac6",
+      "background": "#eaf1ff",
+      "contrast": 5.54,
+      "atLeast4Point5": true
+    },
+    {
+      "label": "検索ボタン",
+      "text": "#ffffff",
+      "background": "#215ac6",
+      "contrast": 6.28,
+      "atLeast4Point5": true
+    },
+    {
+      "label": "intrusion",
+      "text": "#386da7",
+      "background": "#ffffff",
+      "contrast": 5.37,
+      "atLeast4Point5": true
+    },
+    {
+      "label": "ransomware",
+      "text": "#7654a8",
+      "background": "#ffffff",
+      "contrast": 5.83,
+      "atLeast4Point5": true
+    },
+    {
+      "label": "insider",
+      "text": "#ac4d31",
+      "background": "#ffffff",
+      "contrast": 5.44,
+      "atLeast4Point5": true
+    },
+    {
+      "label": "exposure",
+      "text": "#856312",
+      "background": "#ffffff",
+      "contrast": 5.54,
+      "atLeast4Point5": true
+    },
+    {
+      "label": "loss",
+      "text": "#247253",
+      "background": "#ffffff",
+      "contrast": 5.82,
+      "atLeast4Point5": true
+    },
+    {
+      "label": "mistake",
+      "text": "#a44372",
+      "background": "#ffffff",
+      "contrast": 5.79,
+      "atLeast4Point5": true
+    },
+    {
+      "label": "unknown",
+      "text": "#59677b",
+      "background": "#ffffff",
+      "contrast": 5.75,
+      "atLeast4Point5": true
+    }
+  ]
+}

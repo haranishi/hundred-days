@@ -98,8 +98,13 @@ const CONNECT_PATTERNS = [
 
 /* 接続ではないと分かっているURL。React の本番ビルドは、エラーの説明ページのURL（https://react.dev/errors/番号）を
    変数に入れて例外の文に足すだけで、通信はしない（Day 059 が React を同梱したときに、この網に掛かった） */
-const TEXT_ONLY_URLS = [{ host: 'react.dev', path: /^\/errors\// }];
-const textOnly = (host, path) => TEXT_ONLY_URLS.some((url) => url.host === host && url.path.test(path));
+const TEXT_ONLY_URLS = [
+  { host: 'react.dev', path: /^\/errors\// },
+  // Day64's guide constants become outbound anchors, not fetch requests.
+  // Its learning browser test also verifies there are no external requests.
+  { app: 'day-064-breach-atlas', host: 'www.ipa.go.jp', path: /^\/security\/guide\/sme\/(?:about\.html|ug65p90000019cbk-att\/sme_guideline_v4\.0\.pdf)$/ },
+];
+const textOnly = (host, path, app) => TEXT_ONLY_URLS.some((url) => (!url.app || url.app === app) && url.host === host && url.path.test(path));
 
 const connectSources = (dir) => {
   const csp = (rules.get(`/${dir}/*`) || []).find((line) => line.startsWith('Content-Security-Policy:')) ?? '';
@@ -141,7 +146,7 @@ test('コードに書いてある接続先が、そのDayのCSPで許されて�
       const code = readFileSync(file, 'utf8');
       for (const pattern of CONNECT_PATTERNS) {
         for (const [, host, path] of code.matchAll(pattern)) {
-          if (textOnly(host, path)) continue;
+          if (textOnly(host, path, dir)) continue;
           checked += 1;
           expect(allows(sources, host), `${dir} は ${host} に繋ぐのに connect-src が許していない`).toBe(true);
         }
@@ -160,6 +165,24 @@ test('外部への接続を許すのは、それが必要なDayだけ', () => {
   const day001 = (rules.get('/day-001-focus-timer/*') || []).join('\n');
   expect(day001).toContain("connect-src 'self';");
   expect(day001).not.toContain('wikipedia.org');
+});
+
+test('Day64の本番CSPでもRust/Wasm検索が動き、他のDayの権限を増やさない', async ({ page, context }) => {
+  const line = (rules.get('/day-064-breach-atlas/*') || []).find(value => value.startsWith('Content-Security-Policy:'));
+  const csp = line?.replace(/^Content-Security-Policy:\s*/, '');
+  expect(csp).toContain("'wasm-unsafe-eval'");
+  expect(csp).not.toContain("'unsafe-eval'");
+  expect((rules.get('/day-001-focus-timer/*') || []).join('\n')).not.toContain('wasm-unsafe-eval');
+  await context.route('**/day-064-breach-atlas/**', async route => {
+    const response = await route.fetch();
+    await route.fulfill({ response, headers: { ...response.headers(), 'content-security-policy': csp } });
+  });
+  await page.goto('/day-064-breach-atlas/?view=timeline');
+  await expect(page.locator('html')).toHaveAttribute('data-ready', 'true');
+  await expect(page.locator('html')).toHaveAttribute('data-engine', 'rust-wasm-worker');
+  await expect(page.locator('#visible-count')).toContainText('18,001記録');
+  await page.locator('#quick-search').fill('KDDI');
+  await expect(page.locator('#visible-count')).toContainText('3記録');
 });
 
 test('一覧ページにCSPを付けていないことを、意図として固定する', () => {

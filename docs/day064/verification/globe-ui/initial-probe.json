@@ -1,0 +1,18 @@
+{
+  "view": "globe",
+  "engine": "rust-wasm-worker",
+  "rendered": {
+    "renderer": "webgl",
+    "mode": "3d",
+    "rendered": "true"
+  },
+  "summary": "15,871記録 / 92地域 · 国単位 2,324",
+  "overflow": false,
+  "labels": [
+    "日本・地域未特定 · 2,301",
+    "ワシントン州 · 187",
+    "ハワイ州 · 24",
+    "沖縄県 · 4"
+  ],
+  "errors": []
+}

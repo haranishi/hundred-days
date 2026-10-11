@@ -1,0 +1,190 @@
+{
+  "incidents": [
+    {
+      "id": "kddi-dion-2006",
+      "company": "KDDI株式会社",
+      "shortName": "KDDI / DION",
+      "aliases": [
+        "DION",
+        "ディオン"
+      ],
+      "sector": "telecom",
+      "cause": "unknown",
+      "year": 2006,
+      "announcedAt": "2006-06-13",
+      "sourceUpdatedAt": "2006-06-13",
+      "status": "confirmed",
+      "scale": {
+        "value": 3996789,
+        "unit": "people",
+        "qualifier": "exact",
+        "label": "3,996,789人"
+      },
+      "summary": "DIONの過去の顧客情報が外部へ流出していることが確認されました。",
+      "informationTypes": [
+        "氏名",
+        "住所",
+        "連絡先電話番号",
+        "一部の性別・生年月日・連絡先メール"
+      ],
+      "scopeNote": "2003年12月18日時点の顧客情報を対象とする、2006年の公表事案です。",
+      "countNote": "情報のスナップショットの日付と公表日を区別しています。情報項目ごとの人数は総数の内訳であり、総数へ加算しません。この発表では具体的な流出経路を確定できません。",
+      "sourceKind": "corporate-release",
+      "sources": [
+        {
+          "title": "DIONのお客様情報の流出に関するお知らせ",
+          "url": "https://www.kddi.com/corporate/news_release/2006/0613/",
+          "publishedAt": "2006-06-13"
+        }
+      ]
+    },
+    {
+      "id": "kddi-employee-pc-2006",
+      "company": "KDDI株式会社",
+      "shortName": "KDDI / 社員情報",
+      "aliases": [
+        "Winny",
+        "ウィニー"
+      ],
+      "sector": "telecom",
+      "cause": "intrusion",
+      "year": 2006,
+      "announcedAt": "2006-03-30",
+      "sourceUpdatedAt": "2006-03-30",
+      "status": "confirmed",
+      "scale": {
+        "value": 186,
+        "unit": "people",
+        "qualifier": "exact",
+        "label": "186人"
+      },
+      "summary": "自宅の個人用パソコンがウイルスに感染し、保存されていた社員名簿等がファイル共有ソフトを介して流出しました。",
+      "informationTypes": [
+        "社員名簿",
+        "情報システムの仕様書"
+      ],
+      "scopeNote": "2001年頃の一部部署等の社員名簿が対象です。",
+      "countNote": "顧客情報の事案とは別の事故です。仕様書を社員人数へ換算したり、DIONの対象人数へ加算したりしません。",
+      "sourceKind": "corporate-release",
+      "sources": [
+        {
+          "title": "当社社員情報等の流出について",
+          "url": "https://www.kddi.com/news/kddi_home/news_topics/2006/0330/",
+          "publishedAt": "2006-03-30"
+        }
+      ]
+    },
+    {
+      "id": "nintendo-nnid-2020",
+      "company": "任天堂株式会社",
+      "shortName": "任天堂 / NNID",
+      "aliases": [
+        "Nintendo",
+        "ニンテンドー",
+        "NNID"
+      ],
+      "sector": "entertainment",
+      "cause": "intrusion",
+      "year": 2020,
+      "announcedAt": "2020-04-24",
+      "sourceUpdatedAt": "2020-06-09",
+      "status": "possible",
+      "scale": {
+        "value": 300000,
+        "unit": "accounts",
+        "qualifier": "approximate",
+        "label": "約300,000アカウント"
+      },
+      "summary": "他のサービスから得た認証情報を使う、NNIDへのなりすましログインが報告されました。",
+      "informationTypes": [
+        "ニックネーム",
+        "生年月日",
+        "国・地域",
+        "メールアドレス",
+        "連携アカウントの氏名・性別"
+      ],
+      "scopeNote": "世界中のNNIDを対象とする公表です。日本だけのアカウント数ではありません。",
+      "countNote": "初報の約16万と続報で「追加」と明記された約14万を合わせた約30万アカウントです。実際に不正取引の可能性があったものは全数の1%未満であり、30万件を決済被害の件数とは扱いません。",
+      "sourceKind": "corporate-release",
+      "sources": [
+        {
+          "title": "NNID不正ログインの報告（6月9日追記）",
+          "url": "https://support.nintendo.com/jp/information/2020/0424.html",
+          "publishedAt": "2020-04-24"
+        }
+      ]
+    },
+    {
+      "id": "uniqlo-partners-2019",
+      "company": "株式会社ユニクロ",
+      "shortName": "ユニクロ / 社外協力者",
+      "aliases": [
+        "UNIQLO",
+        "ファーストリテイリング"
+      ],
+      "sector": "retail",
+      "cause": "exposure",
+      "year": 2019,
+      "announcedAt": "2019-01-30",
+      "sourceUpdatedAt": "2019-01-30",
+      "status": "possible",
+      "scale": {
+        "value": 804,
+        "unit": "people",
+        "qualifier": "exact",
+        "label": "804人"
+      },
+      "summary": "社外協力者の情報を管理するサイトの接続情報が公開され、個人情報が閲覧される可能性が生じました。",
+      "informationTypes": [
+        "氏名",
+        "性別",
+        "生年月日",
+        "住所",
+        "電話番号",
+        "メールアドレス",
+        "職業・家族関連情報"
+      ],
+      "scopeNote": "国内448人・海外356人の社外協力者。店舗・アプリ・オンラインストアの顧客情報はこの事案の対象ではありません。",
+      "countNote": "公表総数804人を使用しています。サイト接続情報の公開と、個人情報の実際の流出確認を区別しています。",
+      "sourceKind": "corporate-release",
+      "sources": [
+        {
+          "title": "一部の社外協力者の個人情報流出の可能性について",
+          "url": "https://www.fastretailing.com/jp/group/news/1901300830.html",
+          "publishedAt": "2019-01-30"
+        }
+      ]
+    }
+  ],
+  "patches": [
+    {
+      "incidentId": "ipa-2019-05-13-561e741f",
+      "changes": {
+        "companyId": "fast-retailing",
+        "scale": {
+          "value": 461091,
+          "unit": "accounts",
+          "qualifier": "exact",
+          "label": "不正ログインが確認された461,091アカウント"
+        },
+        "status": "possible",
+        "summary": "ユニクロ・GUのオンラインストアでリスト型攻撃による不正ログインが発生し、登録情報が閲覧された可能性があります。",
+        "informationTypes": [
+          "氏名",
+          "住所",
+          "電話番号",
+          "メールアドレス",
+          "性別・生年月日",
+          "購入履歴",
+          "カード番号の一部"
+        ],
+        "countNote": "企業の公式発表は461,091件を「不正ログインされたアカウント数」と明記しています。白書の一般的な「件」表記よりも、企業が示した単位を優先してアカウントとして比較します。カード番号は一部のみで、CVVの漏えい可能性はないと発表しています。"
+      },
+      "source": {
+        "title": "ユニクロ・GUの不正ログインとパスワード変更の案内",
+        "url": "https://www.fastretailing.com/jp/group/news/1905132000.html",
+        "publishedAt": "2019-05-13"
+      }
+    }
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "commit": "ca96624a56bd078437bca8184e78163e5039ad19",
+  "inputs": [
+    {
+      "name": "ne_110m_land",
+      "url": "https://raw.githubusercontent.com/nvkelso/natural-earth-vector/ca96624a56bd078437bca8184e78163e5039ad19/geojson/ne_110m_land.geojson",
+      "bytes": 138160,
+      "sha256": "9e0729ee253ca7d7a5c4ae9395fb1902264c5377c52e224d13dd85010e2835d9"
+    },
+    {
+      "name": "ne_110m_admin_0_countries",
+      "url": "https://raw.githubusercontent.com/nvkelso/natural-earth-vector/ca96624a56bd078437bca8184e78163e5039ad19/geojson/ne_110m_admin_0_countries.geojson",
+      "bytes": 838726,
+      "sha256": "6866c877d39cba9c357620878839b336d569f8c662d3cfab4cb1dbe2d39c977f"
+    },
+    {
+      "name": "ne_10m_admin_1_states_provinces",
+      "url": "https://raw.githubusercontent.com/nvkelso/natural-earth-vector/ca96624a56bd078437bca8184e78163e5039ad19/geojson/ne_10m_admin_1_states_provinces.geojson",
+      "bytes": 40726851,
+      "sha256": "22d0e3ad85eb3e27f17cabf8ba2d50e554fbc27a87796ff891d958185da62fb5"
+    }
+  ],
+  "regionCount": 101,
+  "polygonCount": 127,
+  "terms": "https://www.naturalearthdata.com/about/terms-of-use/",
+  "scope": "Regional representative points and generalized land geometry. Not incident, headquarters or server coordinates."
+}

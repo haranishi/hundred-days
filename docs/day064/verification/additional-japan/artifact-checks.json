@@ -1,0 +1,97 @@
+{
+  "asOf": "2026-10-12",
+  "distributionFilesCompared": 212,
+  "distributionByteMatches": true,
+  "unexpectedAssets": [],
+  "records": 18001,
+  "japaneseRecords": 4652,
+  "addedJapaneseRecords": 2130,
+  "japanesePrefectureRecords": 2351,
+  "japaneseCountryOnlyRecords": 2301,
+  "groups": 92,
+  "countryOnlyRecords": 2324,
+  "sourceDocuments": 5251,
+  "details": 181,
+  "indexBytes": 4708636,
+  "downloadBytes": 35565335,
+  "localHttp": [
+    {
+      "path": "index.html",
+      "status": 200,
+      "contentType": "text/html;charset=utf-8",
+      "bytes": 20596,
+      "sha256": "8353ad4aeb0e685f888673d09b8b5e5d53f43ebc71deec4b4b1432f4586b0bef",
+      "matchesBuild": true
+    },
+    {
+      "path": "data/index.json",
+      "status": 200,
+      "contentType": "application/json",
+      "bytes": 4708636,
+      "sha256": "cc971cfc3f728adfd6c9e904688eaa842576cda9dd03f9af24dfe6f8bdb416f5",
+      "matchesBuild": true
+    },
+    {
+      "path": "data/map-land.json",
+      "status": 200,
+      "contentType": "application/json",
+      "bytes": 86325,
+      "sha256": "047e410efaa3156bf0ea71dd3387938ea18bac5ed10eb86fbd629725ebd7ddf6",
+      "matchesBuild": true
+    },
+    {
+      "path": "data/details/0.json",
+      "status": 200,
+      "contentType": "application/json",
+      "bytes": 203642,
+      "sha256": "6a6ef5d5c26f562c51fcb3f31cbbe0df18e1eac670f44064f6cff9473657c107",
+      "matchesBuild": true
+    },
+    {
+      "path": "data/details/180.json",
+      "status": 200,
+      "contentType": "application/json",
+      "bytes": 1769,
+      "sha256": "910af49c44cbe4af162960062b8b25bb0e55d6b02edd021160a04fee59403462",
+      "matchesBuild": true
+    },
+    {
+      "path": "data/coverage.json",
+      "status": 200,
+      "contentType": "application/json",
+      "bytes": 4647253,
+      "sha256": "cf43a500e19c7f6e74de81b33d43290df8dd486eb0ca3b667ec4095e3d015318",
+      "matchesBuild": true
+    },
+    {
+      "path": "engine/search.wasm",
+      "status": 200,
+      "contentType": "application/wasm",
+      "bytes": 52644,
+      "sha256": "ee8a9db145881486fd32710c65bbf1c5e180cb60d1718e373d58c07b732c0563",
+      "matchesBuild": true
+    },
+    {
+      "path": "licenses/THIRD_PARTY_NOTICES.txt",
+      "status": 200,
+      "contentType": "text/plain",
+      "bytes": 119719,
+      "sha256": "05c278d72a8b34c13163e69461ab217a75efb2d337ed349a06d4cc6edcfd15b8",
+      "matchesBuild": true
+    },
+    {
+      "path": "og.png",
+      "status": 200,
+      "contentType": "image/png",
+      "bytes": 234277,
+      "sha256": "ae5f85e813d919dc385b517892275ef117eedef0f6749be804cc341c505d95b7",
+      "matchesBuild": true
+    }
+  ],
+  "draftExcludedFromSite": true,
+  "siteBuild": "passed; 63 published days; Day64 excluded; external SSD output",
+  "browserChecks": 32,
+  "ogMatchesPublicAndBuild": true,
+  "screenshotMatchesDesktopEvidence": true,
+  "published": false
+}

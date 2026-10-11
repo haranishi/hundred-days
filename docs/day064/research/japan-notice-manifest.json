@@ -1,0 +1,75 @@
+{
+  "asOf": "2026-10-11",
+  "archiveCommit": "17fb7a537b6afa106f509a5ad77cbed7712cd3c2",
+  "baseJapaneseRecords": 201,
+  "addedJapaneseRecords": 2321,
+  "totalJapaneseRecords": 2522,
+  "newCauses": {
+    "loss": 103,
+    "ransomware": 276,
+    "intrusion": 1498,
+    "unknown": 320,
+    "mistake": 90,
+    "exposure": 21,
+    "insider": 13
+  },
+  "newSourceKinds": {
+    "official-notice-archive": 1504,
+    "news-index": 817
+  },
+  "newSourceCount": 4937,
+  "reports": [
+    {
+      "title": "国内インシデント公表アーカイブ",
+      "publisher": "piyokango・国内公表アーカイブ",
+      "url": "https://codeload.github.com/piyokango/SecurityIncidentArchive/zip/17fb7a537b6afa106f509a5ad77cbed7712cd3c2",
+      "sha256": "d86affda9bbf38fef0a0e1be46c63cf8c6f44784bbb4838847282957dea4b88e",
+      "tableRows": 2173,
+      "selection": "組織・日付・参照URL等の事実項目を収録。本文・通知文は配布しません。",
+      "inputFile": "archive.zip",
+      "included": 1504,
+      "duplicate": 576,
+      "merged-existing": 27,
+      "excluded": 66
+    },
+    {
+      "title": "国内の事例一覧・2020年代",
+      "publisher": "サイバーセキュリティ.com・事例索引",
+      "url": "https://cybersecurity-jp.com/leakage-of-personal-information",
+      "sha256": "31569a6e5c49affce46535774aa9e118e77812108078263dee701a3308280a6f",
+      "tableRows": 664,
+      "selection": "組織・日付・参照URL等の事実項目を収録。本文・通知文は配布しません。",
+      "inputFile": "cybersecurity-jp.html",
+      "included": 569,
+      "duplicate": 74,
+      "merged-existing": 14,
+      "excluded": 7
+    },
+    {
+      "title": "国内の事例一覧・2010年代",
+      "publisher": "サイバーセキュリティ.com・事例索引",
+      "url": "https://cybersecurity-jp.com/leakage-of-personal-information/2010-2019",
+      "sha256": "8530a0d377bcf139cf162d7d29a7a36d4ebcf100653b9a6238158407d1b9a596",
+      "tableRows": 204,
+      "selection": "組織・日付・参照URL等の事実項目を収録。本文・通知文は配布しません。",
+      "inputFile": "cybersecurity-jp-2010.html",
+      "included": 173,
+      "duplicate": 0,
+      "merged-existing": 22,
+      "excluded": 9
+    },
+    {
+      "title": "国内の事例一覧・2000年代",
+      "publisher": "サイバーセキュリティ.com・事例索引",
+      "url": "https://cybersecurity-jp.com/leakage-of-personal-information/2000-2009",
+      "sha256": "c9dee6c9f15f7d11d0d807edb23238747200efeb7b1a24364857635f947fdf05",
+      "tableRows": 81,
+      "selection": "組織・日付・参照URL等の事実項目を収録。本文・通知文は配布しません。",
+      "inputFile": "cybersecurity-jp-2000.html",
+      "included": 75,
+      "duplicate": 1,
+      "merged-existing": 1,
+      "excluded": 4
+    }
+  ]
+}

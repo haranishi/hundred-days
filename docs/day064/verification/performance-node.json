@@ -1,0 +1,66 @@
+{
+  "asOf": "2026-10-11",
+  "runtime": "v24.12.0",
+  "platform": "darwin",
+  "architecture": "arm64",
+  "records": 13550,
+  "scenarios": [
+    {
+      "query": "",
+      "unit": "all",
+      "region": "all",
+      "registry": "all",
+      "cause": "all",
+      "period": "all"
+    },
+    {
+      "query": "",
+      "unit": "all",
+      "region": "japan",
+      "registry": "all",
+      "cause": "all",
+      "period": "all"
+    },
+    {
+      "query": "ＫＤＤＩ",
+      "unit": "all",
+      "region": "all",
+      "registry": "all",
+      "cause": "all",
+      "period": "all"
+    },
+    {
+      "query": "",
+      "unit": "people",
+      "region": "us",
+      "registry": "hhs",
+      "cause": "all",
+      "period": "all"
+    },
+    {
+      "query": "",
+      "unit": "all",
+      "region": "all",
+      "registry": "all",
+      "cause": "intrusion",
+      "period": "2014"
+    }
+  ],
+  "rustWasm": {
+    "iterations": 150,
+    "medianMs": 0.346,
+    "p95Ms": 0.539
+  },
+  "javascriptFallback": {
+    "iterations": 150,
+    "medianMs": 0.378,
+    "p95Ms": 1.54
+  },
+  "sizes": {
+    "wasmBytes": 52572,
+    "indexBytes": 2588559,
+    "indexGzipBytes": 570896,
+    "fullDownloadBytes": 20909823
+  },
+  "limitation": "Local Node measurements of search, sorting and contextual aggregates. Not a guarantee for every browser or device; DOM rendering and Worker round trips are measured separately in the browser."
+}

@@ -1,0 +1,111 @@
+{
+  "asOf": "2026-10-11",
+  "distributionFilesCompared": 190,
+  "distributionByteMatches": true,
+  "unexpectedAssets": [],
+  "records": 15871,
+  "japaneseRecords": 2522,
+  "japanesePrefectureRecords": 221,
+  "japaneseCountryOnlyRecords": 2301,
+  "groups": 92,
+  "countryOnlyRecords": 2324,
+  "landPolygons": 127,
+  "mapCommit": "ca96624a56bd078437bca8184e78163e5039ad19",
+  "sourceDocuments": 5090,
+  "sourceDefinition": "Unique reference URLs including coverage inputs, with page fragments removed.",
+  "details": 159,
+  "localHttp": [
+    {
+      "path": "index.html",
+      "status": 200,
+      "contentType": "text/html;charset=utf-8",
+      "bytes": 19939,
+      "sha256": "033d520581b4e51872677b0499e60e3add5088b3912dfa141aa59ebf1c3221e0",
+      "matchesBuild": true
+    },
+    {
+      "path": "data/index.json",
+      "status": 200,
+      "contentType": "application/json",
+      "bytes": 3838832,
+      "sha256": "482ee23e60c398512b80976d81dc17b379e4ec0250f92fb599482c82e107ac52",
+      "matchesBuild": true
+    },
+    {
+      "path": "data/map-land.json",
+      "status": 200,
+      "contentType": "application/json",
+      "bytes": 86325,
+      "sha256": "047e410efaa3156bf0ea71dd3387938ea18bac5ed10eb86fbd629725ebd7ddf6",
+      "matchesBuild": true
+    },
+    {
+      "path": "data/details/0.json",
+      "status": 200,
+      "contentType": "application/json",
+      "bytes": 203642,
+      "sha256": "6a6ef5d5c26f562c51fcb3f31cbbe0df18e1eac670f44064f6cff9473657c107",
+      "matchesBuild": true
+    },
+    {
+      "path": "data/details/158.json",
+      "status": 200,
+      "contentType": "application/json",
+      "bytes": 132934,
+      "sha256": "192004523efbb5b0c38a752f439a5df55306a2cdfd122358fbec40e8b47aeba8",
+      "matchesBuild": true
+    },
+    {
+      "path": "engine/search.wasm",
+      "status": 200,
+      "contentType": "application/wasm",
+      "bytes": 52644,
+      "sha256": "ee8a9db145881486fd32710c65bbf1c5e180cb60d1718e373d58c07b732c0563",
+      "matchesBuild": true
+    },
+    {
+      "path": "licenses/rust/COPYRIGHT-library.html",
+      "status": 200,
+      "contentType": "text/html;charset=utf-8",
+      "bytes": 1499465,
+      "sha256": "5647be074c8edf7339fd863055923a8fc80bc5610a8d4661ec3b767b9d392c27",
+      "matchesBuild": true
+    },
+    {
+      "path": "licenses/THIRD_PARTY_NOTICES.txt",
+      "status": 200,
+      "contentType": "text/plain",
+      "bytes": 118092,
+      "sha256": "2449c77c960a561dd2eb6501dcfc7edb5b4a879211f38eea11849ce5bd1633e3",
+      "matchesBuild": true
+    },
+    {
+      "path": "og.png",
+      "status": 200,
+      "contentType": "image/png",
+      "bytes": 234913,
+      "sha256": "c166e2946b8f97e5cbc84b36638f3781e2b4b6e2b95e7a1c34113a5fcaf4ad35",
+      "matchesBuild": true
+    }
+  ],
+  "draftExcludedFromSite": true,
+  "siteBuild": "passed; 63 published days; Day64 excluded as draft",
+  "screens": [
+    "1440x1000",
+    "768x1100",
+    "390x1000",
+    "375x844",
+    "844x390"
+  ],
+  "browserChecks": 28,
+  "browserDurationSeconds": 43.9,
+  "screenshotMatchesDesktopEvidence": true,
+  "ogMatchesPublicAndBuild": true,
+  "published": false,
+  "experience": {
+    "completed": true,
+    "stages": 10,
+    "elapsedSeconds": 310.3,
+    "pageErrors": 0
+  }
+}

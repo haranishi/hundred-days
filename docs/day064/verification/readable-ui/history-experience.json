@@ -1,0 +1,165 @@
+{
+  "asOf": "2026-10-11",
+  "method": "Automated real Chromium operations; primary-agent review of screenshots and notes. Not a human user study.",
+  "elapsedSeconds": 309.1,
+  "stages": [
+    {
+      "name": "全履歴の分布と資料定義",
+      "elapsedSeconds": 1.5,
+      "visible": "13,550記録 · 10,953組織",
+      "selected": "リゾートトラスト",
+      "exactScale": "会員約2.6万件 / 予約者約3.6万件",
+      "sources": [
+        {
+          "title": "当社ウェブサイトへの一部不正アクセスによる個人情報漏洩に関するお詫びとご報告\n↗\nwww.resorttrust.co.jp · 2026.10.09",
+          "url": "https://www.resorttrust.co.jp/wp_api/wp-content/uploads/2026/10/20261009.pdf"
+        }
+      ],
+      "engine": "rust-wasm-worker"
+    },
+    {
+      "name": "国内の別事故をKDDIの履歴からたどる",
+      "elapsedSeconds": 32.2,
+      "visible": "3記録 · 1組織",
+      "selected": "KDDI / DION",
+      "exactScale": "3,996,789人",
+      "sources": [
+        {
+          "title": "DIONのお客様情報の流出に関するお知らせ\n↗\nwww.kddi.com · 2006.06.13",
+          "url": "https://www.kddi.com/corporate/news_release/2006/0613/"
+        }
+      ],
+      "engine": "rust-wasm-worker"
+    },
+    {
+      "name": "ぷららの訂正値と公式資料",
+      "elapsedSeconds": 62.9,
+      "visible": "1記録 · 1組織",
+      "selected": "NTTドコモ",
+      "exactScale": "約596万件",
+      "sources": [
+        {
+          "title": "ぷらら・ひかりTVのお客さま情報流出（調査結果・更新履歴）\n↗\nwww.docomo.ne.jp · 2023.07.21",
+          "url": "https://www.docomo.ne.jp/info/notice/page/230721_00_m.html"
+        }
+      ],
+      "engine": "rust-wasm-worker"
+    },
+    {
+      "name": "2014年の内部持ち出しと同単位比較",
+      "elapsedSeconds": 93.8,
+      "visible": "1記録 · 1組織",
+      "selected": "ベネッセ",
+      "exactScale": "約2,895万件（推計）",
+      "sources": [
+        {
+          "title": "事故の概要（会社による件数・情報項目の説明）\n↗\nwww.benesse.co.jp",
+          "url": "https://www.benesse.co.jp/customer/bcinfo/01"
+        },
+        {
+          "title": "個人情報漏えい事故調査委員会による調査結果のお知らせ\n↗\nwww.benesse.co.jp · 2014.09.25",
+          "url": "https://www.benesse.co.jp/customer/dl/incident_20140925_release.pdf"
+        },
+        {
+          "title": "2014年度 施行状況概要・主な事案表（PDF 43ページ）\n↗\nwww.ppc.go.jp",
+          "url": "https://www.ppc.go.jp/files/pdf/personal_sekou_26caa.pdf#page=43"
+        }
+      ],
+      "engine": "rust-wasm-worker"
+    },
+    {
+      "name": "HHS届出の規模と対象範囲",
+      "elapsedSeconds": 124.4,
+      "visible": "8,012記録 · 6,969組織",
+      "selected": "Change Healthcare, Inc.",
+      "exactScale": "届出に記載された対象人数 192,700,000人",
+      "sources": [
+        {
+          "title": "米国HHS OCR・医療情報漏えい届出台帳\n↗\nocrportal.hhs.gov",
+          "url": "https://ocrportal.hhs.gov/ocr/breach/breach_report_hip.jsf"
+        }
+      ],
+      "engine": "rust-wasm-worker"
+    },
+    {
+      "name": "州の通知日と発生日・規模未記載",
+      "elapsedSeconds": 155.6,
+      "visible": "5,336記録 · 4,456組織",
+      "selected": "Alisal Union Schol District",
+      "exactScale": "台帳には対象人数・件数の記載なし",
+      "sources": [
+        {
+          "title": "カリフォルニア州司法長官・漏えい通知台帳（全件CSV）\n↗\nwww.oag.ca.gov",
+          "url": "https://www.oag.ca.gov/privacy/databreach/list-export"
+        }
+      ],
+      "engine": "rust-wasm-worker"
+    },
+    {
+      "name": "3DとSVGの実際の球を選択",
+      "elapsedSeconds": 187.1,
+      "visible": "3記録 · 1組織",
+      "selected": "KDDI / DION",
+      "exactScale": "3,996,789人",
+      "sources": [
+        {
+          "title": "DIONのお客様情報の流出に関するお知らせ\n↗\nwww.kddi.com · 2006.06.13",
+          "url": "https://www.kddi.com/corporate/news_release/2006/0613/"
+        }
+      ],
+      "engine": "rust-wasm-worker"
+    },
+    {
+      "name": "ゼロ件からの復帰と最古のページ",
+      "elapsedSeconds": 217.8,
+      "visible": "13,550記録 · 10,953組織",
+      "selected": "Health Services for Children with Special Needs, Inc.",
+      "exactScale": "届出に記載された対象人数 3,800人",
+      "sources": [
+        {
+          "title": "米国HHS OCR・医療情報漏えい届出台帳\n↗\nocrportal.hhs.gov",
+          "url": "https://ocrportal.hhs.gov/ocr/breach/breach_report_hip.jsf"
+        }
+      ],
+      "engine": "rust-wasm-worker"
+    },
+    {
+      "name": "390px・動きを減らす設定で検索から資料へ",
+      "elapsedSeconds": 248.6,
+      "visible": "3記録 · 1組織",
+      "selected": "KDDI",
+      "exactScale": "12,231,954人",
+      "sources": [
+        {
+          "title": "ISP事業者向けメールシステムに対する不正アクセスについてのお詫びとご報告（2026年7月21日訂正）\n↗\nnewsroom.kddi.com · 2026.07.06",
+          "url": "https://newsroom.kddi.com/news/assets/2026/kddi_nr_s-73_4619/kddi_nr_s-73_4619_pdf_01.pdf"
+        },
+        {
+          "title": "KDDI及びISPに対する行政上の対応並びにメールサービス利用者に対する注意喚起\n↗\nwww.ppc.go.jp · 2026.08.19",
+          "url": "https://www.ppc.go.jp/files/pdf/260819_01_houdou.pdf"
+        }
+      ],
+      "engine": "rust-wasm-worker"
+    },
+    {
+      "name": "台帳の全行確認・除外と共有の定義",
+      "elapsedSeconds": 279.1,
+      "visible": "3記録 · 1組織",
+      "selected": "KDDI",
+      "exactScale": "12,231,954人",
+      "sources": [
+        {
+          "title": "ISP事業者向けメールシステムに対する不正アクセスについてのお詫びとご報告（2026年7月21日訂正）\n↗\nnewsroom.kddi.com · 2026.07.06",
+          "url": "https://newsroom.kddi.com/news/assets/2026/kddi_nr_s-73_4619/kddi_nr_s-73_4619_pdf_01.pdf"
+        },
+        {
+          "title": "KDDI及びISPに対する行政上の対応並びにメールサービス利用者に対する注意喚起\n↗\nwww.ppc.go.jp · 2026.08.19",
+          "url": "https://www.ppc.go.jp/files/pdf/260819_01_houdou.pdf"
+        }
+      ],
+      "engine": "rust-wasm-worker"
+    }
+  ],
+  "errors": [],
+  "completed": true
+}

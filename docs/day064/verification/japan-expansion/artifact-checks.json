@@ -1,0 +1,98 @@
+{
+  "asOf": "2026-10-11",
+  "distributionFilesCompared": 187,
+  "distributionByteMatches": true,
+  "unexpectedAssets": [],
+  "records": 15871,
+  "japaneseRecords": 2522,
+  "japaneseCauses": {
+    "intrusion": 1622,
+    "ransomware": 280,
+    "insider": 25,
+    "exposure": 30,
+    "loss": 146,
+    "mistake": 95,
+    "unknown": 324
+  },
+  "sourceDocuments": 5090,
+  "sourceDefinition": "Unique reference URLs including coverage inputs, with page fragments removed.",
+  "details": 159,
+  "localHttp": [
+    {
+      "path": "index.html",
+      "status": 200,
+      "contentType": "text/html;charset=utf-8",
+      "bytes": 16920,
+      "sha256": "3521664a523c0126a944b2d25b2ed58ec1439756ad29599582a9834eb055b817",
+      "matchesBuild": true
+    },
+    {
+      "path": "data/index.json",
+      "status": 200,
+      "contentType": "application/json",
+      "bytes": 3394518,
+      "sha256": "417b28044db681f72eb2dc41874562c7a518867e4822426ae0910ff45839b67f",
+      "matchesBuild": true
+    },
+    {
+      "path": "data/details/0.json",
+      "status": 200,
+      "contentType": "application/json",
+      "bytes": 199078,
+      "sha256": "d45570b34568704b70908ab4a31a436a778da53c6c1d75c2f3611de3d6476fc9",
+      "matchesBuild": true
+    },
+    {
+      "path": "data/details/158.json",
+      "status": 200,
+      "contentType": "application/json",
+      "bytes": 130002,
+      "sha256": "a31d8ed9560322fa3422b77d4ef78fa0634be97e62c5c8989aef93c30c029424",
+      "matchesBuild": true
+    },
+    {
+      "path": "engine/search.wasm",
+      "status": 200,
+      "contentType": "application/wasm",
+      "bytes": 52572,
+      "sha256": "05fa017b00187e9a9f21c6faa22e34447820c3709fdda0cc88cab41bbdc1d8e1",
+      "matchesBuild": true
+    },
+    {
+      "path": "licenses/rust/COPYRIGHT-library.html",
+      "status": 200,
+      "contentType": "text/html;charset=utf-8",
+      "bytes": 1499465,
+      "sha256": "5647be074c8edf7339fd863055923a8fc80bc5610a8d4661ec3b767b9d392c27",
+      "matchesBuild": true
+    },
+    {
+      "path": "licenses/THIRD_PARTY_NOTICES.txt",
+      "status": 200,
+      "contentType": "text/plain",
+      "bytes": 117279,
+      "sha256": "4cbad5069b6d9931951020211fc0b3f9f139549f3c396926748cd9e002bd20d2",
+      "matchesBuild": true
+    },
+    {
+      "path": "og.png",
+      "status": 200,
+      "contentType": "image/png",
+      "bytes": 157975,
+      "sha256": "12183660fa61161c535f25b61052d1c337e336dfdf04ddc1d16260ea7c1db571",
+      "matchesBuild": true
+    }
+  ],
+  "draftExcludedFromSite": true,
+  "siteBuild": "passed; 63 published days; Day64 excluded as draft",
+  "screens": [
+    "1920x1080",
+    "1440x1000",
+    "768x1100",
+    "390x1000"
+  ],
+  "screenCheck": "included in 22 passed browser checks; 24.2s total",
+  "screenshotMatchesDesktopEvidence": true,
+  "ogMatchesPublicAndBuild": true,
+  "published": false
+}

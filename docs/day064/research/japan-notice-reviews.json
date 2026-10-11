@@ -1,0 +1,48 @@
+{
+  "asOf": "2026-10-11",
+  "incidents": [],
+  "patches": [
+    {
+      "incidentId": "jp-notice-20260911-e70ca260a2f7",
+      "changes": {
+        "summary": "かわさき新産業創造センターのウェブサイトで不正アクセスを発見し、閉鎖して調査。最終報では、サイトの改ざんの痕跡と個人情報等の流出がなかったと公表しています。",
+        "scale": { "value": null, "unit": "unknown", "qualifier": "undisclosed", "label": "最終報では個人情報等の流出なしと公表" },
+        "informationTypes": ["ウェブサイトのフォームに入力された情報（最終報で流出なし）"],
+        "countNote": "当初の調査対象は27件・22名分でしたが、これは流出確認人数ではありません。調査を終えた最終報は個人情報等の流出がなかったとしています。調査対象の数を漏えい人数へ置き換えません。",
+        "noticeDetails": { "publications": 2, "hasOfficialArchive": true, "countReviewed": true, "outcome": "not-leaked" }
+      },
+      "source": { "title": "KBIC・不正アクセス調査の最終報（流出なしの公表）", "url": "https://kbic.jp/news/2327/", "publishedAt": "2026-10-06" }
+    },
+    {
+      "incidentId": "jp-notice-20260619-eefe690d7712",
+      "changes": {
+        "summary": "慶應義塾のアート・センターのウェブサイトで、利用ツールの脆弱性が悪用され、無関係なページへの転送が発生。該当ページを閉鎖し、公表時点で個人情報・機密情報の漏えいは確認していないとしています。",
+        "scale": { "value": null, "unit": "unknown", "qualifier": "undisclosed", "label": "公表時点で個人情報・機密情報の漏えいは未確認" },
+        "informationTypes": ["ウェブサイトの不正利用（個人情報・機密情報の漏えいは未確認）"],
+        "noticeDetails": { "publications": 1, "hasOfficialArchive": true, "countReviewed": true, "outcome": "not-confirmed" }
+      },
+      "source": { "title": "慶應義塾・ウェブサイトの不正利用の公表", "url": "https://www.keio.ac.jp/ja/news/20260619-2/", "publishedAt": "2026-06-19" }
+    },
+    {
+      "incidentId": "jp-notice-20261008-cd7e5353d2c6",
+      "changes": {
+        "status": "confirmed",
+        "sourceKind": "official-reviewed",
+        "dateKind": "published",
+        "sector": "retail",
+        "summary": "ローソンIDとローソンアプリ予約への第三者の不正アクセスにより、個人情報の一部が漏えいしたと公表。対象サービスの機能停止、利用者への案内と監視体制の強化を進めています。",
+        "scale": { "value": null, "unit": "unknown", "qualifier": "undisclosed", "label": "ローソンID 215万5,345件 / アプリ予約 26件" },
+        "informationTypes": ["メールアドレス・氏名", "入力した場合の性別・電話番号・住所等", "予約サービスの氏名・電話番号・カード番号の一部"],
+        "scopeNote": "ローソンIDとローソンアプリ予約で対象となる情報項目が異なります。全てのローソンの顧客・会員を示す人数ではありません。",
+        "countNote": "公式資料の見出しは対象人数ですが、数値の単位は215万5,345件と26件です。そのため人数へ置き換えません。両サービスの重複関係と合計が示されていないので合算せず、区分を分けて表示します。公表時点では、この事案による二次被害は確認されていません。",
+        "noticeDetails": { "publications": 1, "hasOfficialArchive": false, "countReviewed": true },
+        "sources": [
+          { "title": "ローソン・第三者の不正アクセスと個人情報漏えいの公表", "url": "https://www.lawson.co.jp/contents/cont07/1533174_3310.html", "publishedAt": "2026-10-08" },
+          { "title": "サイバーセキュリティ.com・参照記事（2026-10-08）", "url": "https://cybersecurity-jp.com/news/117118", "publishedAt": null },
+          { "title": "サイバーセキュリティ.com・国内事例一覧", "url": "https://cybersecurity-jp.com/leakage-of-personal-information", "publishedAt": null }
+        ]
+      },
+      "source": { "title": "ローソン・第三者の不正アクセスと個人情報漏えいの公表", "url": "https://www.lawson.co.jp/contents/cont07/1533174_3310.html", "publishedAt": "2026-10-08" }
+    }
+  ]
+}

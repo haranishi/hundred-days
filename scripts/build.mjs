@@ -3,13 +3,14 @@
 'use strict';
 
 import { copyFileSync, cpSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
-import { basename, join, relative, sep } from 'node:path';
+import { basename, join, relative, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = fileURLToPath(new URL('..', import.meta.url));
 const appsDir = root;
 const staticDir = join(root, 'static');
-const distDir = join(root, 'dist');
+const distDir = resolve(root, process.env.HUNDRED_DAYS_BUILD_DIR || 'dist');
+if (distDir !== join(root, 'dist') && existsSync(distDir)) throw new Error('Custom site build directory must be new; existing files are preserved.');
 
 const SITE = {
   origin: 'https://hundred-days.pages.dev',
@@ -123,6 +124,7 @@ const SOURCE_DIRS_BY_APP = {
   'day-058-meisho-kumitate': ['source', 'tools'],
   'day-059-kuchi-sanmai': ['source', 'tools'],
   'day-061-kumimae': ['source', 'tools'],
+  'day-064-breach-atlas': ['source', 'tools'],
   // day-060 は素のJSをそのまま配信する（source は無い）。tools/ はデータの作り直し・解説の検査・宣伝動画の道具で、配信には要らない
   'day-060-prize-explained': ['tools']
 };
@@ -280,7 +282,9 @@ const FRAME_BY_APP = {
 
 const appCsp = (dir) => [
   "default-src 'self'",
-  "script-src 'self'",
+  // Day64 compiles its local Rust module in a same-origin Worker.
+  // Permit Wasm compilation for this app without permitting JavaScript eval.
+  `script-src 'self'${dir === 'day-064-breach-atlas' ? " 'wasm-unsafe-eval'" : ''}`,
   "style-src 'self' 'unsafe-inline'",
   `img-src 'self' data: blob:${IMG_BY_APP[dir] || ''}`,
   `media-src 'self'${MEDIA_BY_APP[dir] || ''}`,
@@ -908,7 +912,7 @@ ${cards}
 writeFileSync(join(distDir, 'index.html'), html);
 console.log(
   `build: ${apps.length} day(s) / 公開 ${releasedCount}（うち外部 ${releasedCount - publishedCount}） / スクショ ${apps.filter((a) => a.hasShot).length}` +
-    ` / 動画 ${apps.filter((a) => a.hasDemo).length} / OGP付与 ${metaInjected} -> dist/` +
+    ` / 動画 ${apps.filter((a) => a.hasDemo).length} / OGP付与 ${metaInjected} -> ${process.env.HUNDRED_DAYS_BUILD_DIR ? "custom output/" : "dist/"}` +
     // 除外したものは必ず名前を出す（黙って落とすと「全部載っている」と誤解する）
     (drafts.length ? `\n  draft のため一覧から除外: ${drafts.map((d) => d.dir).join(', ')}` : '')
 );

@@ -1,0 +1,35 @@
+{
+  "checks": [
+    {
+      "label": "本文",
+      "foreground": "#1d3038",
+      "background": "#ffffff",
+      "ratio": 13.71
+    },
+    {
+      "label": "補足",
+      "foreground": "#526770",
+      "background": "#ffffff",
+      "ratio": 5.94
+    },
+    {
+      "label": "主操作・リンク",
+      "foreground": "#12695f",
+      "background": "#ffffff",
+      "ratio": 6.54
+    },
+    {
+      "label": "入力の境界",
+      "foreground": "#728b93",
+      "background": "#ffffff",
+      "ratio": 3.6
+    },
+    {
+      "label": "地図の補足",
+      "foreground": "#b9cbd9",
+      "background": "#061020",
+      "ratio": 11.43
+    }
+  ],
+  "method": "WCAG relative luminance; solid palette colors only, not all rendered pixels."
+}

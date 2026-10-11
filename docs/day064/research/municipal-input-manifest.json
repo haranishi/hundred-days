@@ -1,0 +1,1768 @@
+{
+  "retrievedAt": "2026-10-12",
+  "indexes": [
+    {
+      "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/archive/2021/index.html",
+      "inputFile": "municipal-e20ae03306fc16.html",
+      "sha256": "3086b896e49f6383957962a739194170aad0e60588e6a76f440eb212dc156f84",
+      "bytes": 41162
+    },
+    {
+      "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/archive/2021/202104/index.html",
+      "inputFile": "municipal-f11283b388073b.html",
+      "sha256": "27a98e3eae78dde9b5c1b53b6adf51286e58aedc793de5c5734cc533fd9e86eb",
+      "bytes": 86505
+    },
+    {
+      "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/archive/2021/202105/index.html",
+      "inputFile": "municipal-3e456616823dbd.html",
+      "sha256": "a66ce52c2ac90830e82d4b827dc21813f000fb2d4d42f8e3a88f1d357b4e07b1",
+      "bytes": 79655
+    },
+    {
+      "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/archive/2021/202106/index.html",
+      "inputFile": "municipal-54b9fff62b93ea.html",
+      "sha256": "ab3e4709c190ee22d4c44988ba44be2e1552e0496835de9c2e332618f1957597",
+      "bytes": 92707
+    },
+    {
+      "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/archive/2021/202107/index.html",
+      "inputFile": "municipal-9f8d5246c1af09.html",
+      "sha256": "fec74a95d5e858471ec81df1b94e5cfaa0e07cf165224e433a3c7d43b78ea9be",
+      "bytes": 100223
+    },
+    {
+      "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/archive/2021/202108/index.html",
+      "inputFile": "municipal-ba41810dad565e.html",
+      "sha256": "ca422b52c6577d3e048dbc9298b456395cfbc696a74127c3d257d3a6710f0e1a",
+      "bytes": 81552
+    },
+    {
+      "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/archive/2021/202109/index.html",
+      "inputFile": "municipal-a81782a8e117ee.html",
+      "sha256": "482c7777f3362b877ba06f3e93c7bf670ad1c15492124f6ebb510af13cb30225",
+      "bytes": 85040
+    },
+    {
+      "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/archive/2021/202110/index.html",
+      "inputFile": "municipal-46270e022503f0.html",
+      "sha256": "dd2719d2d89dd933511f64d70fd62df941ebb421acdacd1f90c4096c343a125d",
+      "bytes": 95807
+    },
+    {
+      "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/archive/2021/202111/index.html",
+      "inputFile": "municipal-341af9384a269e.html",
+      "sha256": "290287ddbed99b47c29765fe40a5667c553abd8bfc5423956f99d180feddf94b",
+      "bytes": 94341
+    },
+    {
+      "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/archive/2021/202112/index.html",
+      "inputFile": "municipal-fb5ff4befaa3bb.html",
+      "sha256": "2cb18048c3b0b99975acecee7c27567a5b6bc2db9a1a36f92118afeeae086c57",
+      "bytes": 96136
+    },
+    {
+      "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/archive/2021/202201/index.html",
+      "inputFile": "municipal-68a421804894c2.html",
+      "sha256": "fbf199b83c321b19d3efcc8398ebb442733157986946fd73b5c2515598324fe2",
+      "bytes": 80405
+    },
+    {
+      "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/archive/2021/202202/index.html",
+      "inputFile": "municipal-5db24cc6830618.html",
+      "sha256": "d426bf1cbcf92dc83ad274e171375a25dfd489a07a086550f2497262dc62b112",
+      "bytes": 91538
+    },
+    {
+      "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/archive/2021/202203/index.html",
+      "inputFile": "municipal-fe90a610b0366f.html",
+      "sha256": "6d69f2506c2fdcbe0c1f0112eb059569492a0478b2243b82709ffa066444ac5e",
+      "bytes": 115236
+    },
+    {
+      "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/archive/2022/index.html",
+      "inputFile": "municipal-6dfd4fa1c347df.html",
+      "sha256": "ba82e56e4609b4064e539d0300d6c1598fed9ffeaf567133552395d3d529a737",
+      "bytes": 41162
+    },
+    {
+      "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/archive/2022/202204/index.html",
+      "inputFile": "municipal-d0f99f36a8266f.html",
+      "sha256": "5e36b826b3211349caca5396602cf1dd29f29bcb8f850ee325262ab6dc50b6b1",
+      "bytes": 83375
+    },
+    {
+      "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/archive/2022/202205/index.html",
+      "inputFile": "municipal-e35fa78d63247b.html",
+      "sha256": "4352d1a2fa1b0335374feb13404ee5b86914006217ccd15158bff828c5508b72",
+      "bytes": 80370
+    },
+    {
+      "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/archive/2022/202206/index.html",
+      "inputFile": "municipal-c88b9a02839712.html",
+      "sha256": "063b59776874c05d81dd6458d5c7d662a408feb610338c9c056123e019fbe6af",
+      "bytes": 97220
+    },
+    {
+      "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/archive/2022/202207/index.html",
+      "inputFile": "municipal-c5500f0f4cd497.html",
+      "sha256": "8cf4f72134cf3d5cc3a102086003b526772bd76602a5c43a8cb01ece2504e396",
+      "bytes": 99243
+    },
+    {
+      "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/archive/2022/202208/index.html",
+      "inputFile": "municipal-66b90e8e8aa84f.html",
+      "sha256": "7365476000d25083587949655ce814ee49f64eedf516f667c47f50983f27e6cc",
+      "bytes": 82591
+    },
+    {
+      "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/archive/2022/202209/index.html",
+      "inputFile": "municipal-cc3ee60de89c12.html",
+      "sha256": "428c2979d0b562efc228a6d3a74b184fc72203760711c22b32eece9bdf96422a",
+      "bytes": 94891
+    },
+    {
+      "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/archive/2022/202210/index.html",
+      "inputFile": "municipal-658582c9025b27.html",
+      "sha256": "4ba55bfd23e33364a56c4724ce60893cfb371c634a72aa060b71d90eb35307a2",
+      "bytes": 102324
+    },
+    {
+      "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/archive/2022/202211/index.html",
+      "inputFile": "municipal-714c7456dbab0b.html",
+      "sha256": "b12ed32e009054596615adc95bf7e49ea5fa2d5dc7b41934c21ebfe01fe5e2bf",
+      "bytes": 106759
+    },
+    {
+      "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/archive/2022/202212/index.html",
+      "inputFile": "municipal-35156411646be3.html",
+      "sha256": "e831364d38b0b9b2b3ba896410fd557dd1e47f038ed4f30c4694d8af7fec59d3",
+      "bytes": 94017
+    },
+    {
+      "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/archive/2022/202301/index.html",
+      "inputFile": "municipal-bc6578d6bc2325.html",
+      "sha256": "c9f8b11ba8393ca9b9fb1e8fa467630d4409c4702536258b738d6f68ae7487e0",
+      "bytes": 88253
+    },
+    {
+      "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/archive/2022/202302/index.html",
+      "inputFile": "municipal-04bee8d73c0592.html",
+      "sha256": "496e743579cb28af6bec2d3f02eaae1dbc4ee96d551f8aac6db2e53586d6dc1b",
+      "bytes": 86989
+    },
+    {
+      "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/archive/2022/202303/index.html",
+      "inputFile": "municipal-93d43714ed9300.html",
+      "sha256": "8ba738c3efa5966046eef59ea69b1afdfb2c353d023835774eb4844552a147e6",
+      "bytes": 109576
+    },
+    {
+      "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/archive/2023/index.html",
+      "inputFile": "municipal-4ce8bb3a634d27.html",
+      "sha256": "582afbbec3d62834b8cc9253644a71c50ec41ab489f3d4e2f6f7e25cf4da2c74",
+      "bytes": 41162
+    },
+    {
+      "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/archive/2023/202304/index.html",
+      "inputFile": "municipal-3bf7f26cd9ec9f.html",
+      "sha256": "853af500ea3264a439d886b503253fd55ed36243211288e29d45ec19ec0c8dd8",
+      "bytes": 85131
+    },
+    {
+      "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/archive/2023/202305/index.html",
+      "inputFile": "municipal-b437d85874d34d.html",
+      "sha256": "1294868425fbc1ec3483a8c64f629af9e0028c3df8fd513bcd7ba20485ff19ec",
+      "bytes": 76262
+    },
+    {
+      "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/archive/2023/202306/index.html",
+      "inputFile": "municipal-b37e3f2bc92404.html",
+      "sha256": "e0c9a2291ce0abbc87f21d1b10f7d17c6b3aea8dded79aed586c58ce96c7f341",
+      "bytes": 82009
+    },
+    {
+      "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/archive/2023/202307/index.html",
+      "inputFile": "municipal-51bf51792593a6.html",
+      "sha256": "bcefd8f4cde510aa315f073420f201a3d6fa17bf6151601376ddad9d14986df5",
+      "bytes": 86939
+    },
+    {
+      "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/archive/2023/202308/index.html",
+      "inputFile": "municipal-18b9e4bc80bc47.html",
+      "sha256": "c1a480b32354b7966d7b72c8da16430b6ca6788e930420b6b88a8a9906a306a3",
+      "bytes": 75042
+    },
+    {
+      "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/archive/2023/202309/index.html",
+      "inputFile": "municipal-40ff52dfa1e381.html",
+      "sha256": "045972ef6d7cbf4f1dc8ffe8ab981cb5532c61b67c2e0b7c80d3e80128ab74ad",
+      "bytes": 89252
+    },
+    {
+      "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/archive/2023/202310/index.html",
+      "inputFile": "municipal-ff495e6d5cd3ee.html",
+      "sha256": "e51360e953e86ba1f4f14819075b9fef8a345963174e05f3bb716fbd4ed79767",
+      "bytes": 92137
+    },
+    {
+      "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/archive/2023/202311/index.html",
+      "inputFile": "municipal-a1150269c8504b.html",
+      "sha256": "097ca037eb86408f8bd3bb8f9fa66ab7627b695d229cb17cd417a0750bcf5cfd",
+      "bytes": 91781
+    },
+    {
+      "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/archive/2023/202312/index.html",
+      "inputFile": "municipal-5bdcc7174af477.html",
+      "sha256": "3118fa396c7eecbf2e8be907ef7e45dcb2079e3f5d486ad94f4ec85e820f600a",
+      "bytes": 90568
+    },
+    {
+      "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/archive/2023/202401/index.html",
+      "inputFile": "municipal-29aeacba60dfbc.html",
+      "sha256": "28dc9a91645e3fd969c39fc702ca85912553a15f8d1411a65b2297c79271711f",
+      "bytes": 87097
+    },
+    {
+      "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/archive/2023/202402/index.html",
+      "inputFile": "municipal-09d3955addd7ba.html",
+      "sha256": "98d547ebf2b29d4992056fa68655991be01e01508b42d4bf7dab0544591346b1",
+      "bytes": 83629
+    },
+    {
+      "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/archive/2023/202403/index.html",
+      "inputFile": "municipal-4dede9a34475e7.html",
+      "sha256": "20d72a4c7e2cf6893501269417318fed3f06b427b5dba9ee4df7376e36a69069",
+      "bytes": 95186
+    },
+    {
+      "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/archive/2024/index.html",
+      "inputFile": "municipal-24c2579441f7e7.html",
+      "sha256": "2da82f6b2d3474d5cedc4f3ae64610c58fdad800285a430b6f7d12d65425e596",
+      "bytes": 41162
+    },
+    {
+      "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/archive/2024/202404/index.html",
+      "inputFile": "municipal-b193fba66f105f.html",
+      "sha256": "810f15c4f86e3cc5019d8c8f875d1a454ff1745bcab5a7581de7084b848c7c8a",
+      "bytes": 71254
+    },
+    {
+      "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/archive/2024/202405/index.html",
+      "inputFile": "municipal-1045101fbe61f8.html",
+      "sha256": "41a0f0e9d7209d5d47ef37e2a6b28088bfb52500162863b27d145afead903972",
+      "bytes": 83286
+    },
+    {
+      "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/archive/2024/202406/index.html",
+      "inputFile": "municipal-1247174fecb338.html",
+      "sha256": "8119781f77871d7ff065a893a0b77e181967dc5d7cbc9c692e1ce8117b07ad00",
+      "bytes": 87224
+    },
+    {
+      "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/archive/2024/202407/index.html",
+      "inputFile": "municipal-c215d4c1a25f11.html",
+      "sha256": "a4f5d7f29f939ff71fc1bcb0516d995130d5467204c7b5a69a532496b2501cee",
+      "bytes": 84501
+    },
+    {
+      "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/archive/2024/202408/index.html",
+      "inputFile": "municipal-df2319e913d0c4.html",
+      "sha256": "9174c2c1ad9486867eb97e891c624cc0d14a37f5f508c1b80f65feb246a332b1",
+      "bytes": 78426
+    },
+    {
+      "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/archive/2024/202409/index.html",
+      "inputFile": "municipal-ea8f24682d2b51.html",
+      "sha256": "ed94deba3b949261e10d08803fbfc6daeef0411bf2e68a1c9e2a58fe548067b4",
+      "bytes": 86645
+    },
+    {
+      "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/archive/2024/202410/index.html",
+      "inputFile": "municipal-0c693bc6c6bf5a.html",
+      "sha256": "bbe7e86ac11101e0756423c018ac22daa4c082488fe977beaede409ff67af668",
+      "bytes": 101478
+    },
+    {
+      "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/archive/2024/202411/index.html",
+      "inputFile": "municipal-d8abb5ec11a137.html",
+      "sha256": "75baea0c6eef049affb5b320b39dd4bd3a9ef50f1cb0aecf558d18741220f01f",
+      "bytes": 95566
+    },
+    {
+      "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/archive/2024/202412/index.html",
+      "inputFile": "municipal-af5f7916d50537.html",
+      "sha256": "2b36c7eb2019160367a30bf4d1eb438669af19862c6faaa32e9071c0f71223c3",
+      "bytes": 84951
+    },
+    {
+      "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/archive/2024/202501/index.html",
+      "inputFile": "municipal-3d40c3cc39e7b8.html",
+      "sha256": "c8757384346da659753d10fe795272fbac3e1545b7ee1574930c143ce8b5fd49",
+      "bytes": 82190
+    },
+    {
+      "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/archive/2024/202502/index.html",
+      "inputFile": "municipal-53c76f4edd49b3.html",
+      "sha256": "6d7ee51334c09f3fce4d4105ee96d694ff253b3af19f4db1e67508cf9de55959",
+      "bytes": 77293
+    },
+    {
+      "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/archive/2024/202503/index.html",
+      "inputFile": "municipal-df806c032939d0.html",
+      "sha256": "e5d994a446d05efb07756ec6e52698dad5996ebbf03a08e78c42d3a5c3760cc3",
+      "bytes": 105114
+    },
+    {
+      "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/archive/2025/index.html",
+      "inputFile": "municipal-8ad89620c2079a.html",
+      "sha256": "90b7aa790479ae74dfac3dbb3e2491782c9acb03c7571f9f03530ce168016cae",
+      "bytes": 41162
+    },
+    {
+      "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/archive/2025/202504/index.html",
+      "inputFile": "municipal-50a1c240d5092c.html",
+      "sha256": "85895196ccba21a0c6dc98e099d4d7ea7994c13224814586f4bea499e8e6449a",
+      "bytes": 70800
+    },
+    {
+      "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/archive/2025/202505/index.html",
+      "inputFile": "municipal-61dc94a54025ff.html",
+      "sha256": "4bf9255a07b1736ef2ceafed69ed59725fbb555601cf55443d09e8968cf68633",
+      "bytes": 78937
+    },
+    {
+      "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/archive/2025/202506/index.html",
+      "inputFile": "municipal-3a925904a8d5d6.html",
+      "sha256": "5337b0641cfb6e60bb914562755ebe8662c9f71f19e63da0f45fa7ae44dc4a9e",
+      "bytes": 87122
+    },
+    {
+      "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/archive/2025/202507/index.html",
+      "inputFile": "municipal-b2d7de8abcfdbd.html",
+      "sha256": "d886d8da8363962eadebc08eb7fb0c64951bb252da13f38aa4c455ca6bdad169",
+      "bytes": 90212
+    },
+    {
+      "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/archive/2025/202508/index.html",
+      "inputFile": "municipal-2d743ffae83ed4.html",
+      "sha256": "6528f72c384c6eb923fe582bc7bc18892e5818d530a5682aafea0faeca0822fe",
+      "bytes": 81169
+    },
+    {
+      "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/archive/2025/202509/index.html",
+      "inputFile": "municipal-e8d9611ecf98db.html",
+      "sha256": "41b4df87fe0db0e86e23bf8b25a3131de8c004b17df19fb1c02819f62985315d",
+      "bytes": 87576
+    },
+    {
+      "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/archive/2025/202510/index.html",
+      "inputFile": "municipal-695a263d970c58.html",
+      "sha256": "296ed113d2bf8cb6f77f1f157a70096ed35dca6fa6bc61ae1b1de6bec913f39f",
+      "bytes": 115716
+    },
+    {
+      "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/archive/2025/202511/index.html",
+      "inputFile": "municipal-ffced47aee11c0.html",
+      "sha256": "d82c1ce5e1da8af70a07740d2391a46fa49650cf293494e99ec23284db039627",
+      "bytes": 88889
+    },
+    {
+      "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/archive/2025/202512/index.html",
+      "inputFile": "municipal-aa8cd7bd96d7a1.html",
+      "sha256": "9b438d576b39edecf3dbd15afeaa6e452fc933cc5e7cf77942cd5bba24769a93",
+      "bytes": 83078
+    },
+    {
+      "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/archive/2025/202601/index.html",
+      "inputFile": "municipal-d266ea76431238.html",
+      "sha256": "cc99dd6b964c3d5306ebc49e1e4abd9e429f96a9257dffd0eec3befdad76bc07",
+      "bytes": 85337
+    },
+    {
+      "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/archive/2025/202602/index.html",
+      "inputFile": "municipal-52082314457d10.html",
+      "sha256": "7cc492fd164bc34be35aab255069dfac516ab0265057d0af027beb6f3236e25d",
+      "bytes": 86359
+    },
+    {
+      "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/archive/2025/202603/index.html",
+      "inputFile": "municipal-b53ad0198104f5.html",
+      "sha256": "d8ceb5a9257028698fe9117e0ca0e6c9f883c86f145dc4b751f2839f0190f85f",
+      "bytes": 116462
+    },
+    {
+      "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/archive/2026/index.html",
+      "inputFile": "municipal-974c2e304776dc.html",
+      "sha256": "0037247f1774479d5dfebad07d17960bd7ba10216886108afde725b8cbbf6ebe",
+      "bytes": 40680
+    },
+    {
+      "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/archive/2026/202604/index.html",
+      "inputFile": "municipal-b85b5d76ffb849.html",
+      "sha256": "3221c9e511c0cb21171e90db5902b8dfaf2b332c069aa14a9d7d230549ed83c4",
+      "bytes": 75689
+    },
+    {
+      "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/archive/2026/202605/index.html",
+      "inputFile": "municipal-abd5104811cc11.html",
+      "sha256": "8f7353b4fe4baef2f7b1754367f7321850420986ae7f378de49e3c907cf89e3c",
+      "bytes": 68940
+    },
+    {
+      "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/archive/2026/202606/index.html",
+      "inputFile": "municipal-94c633909ae39c.html",
+      "sha256": "ccf1750631de078bf83dcd6c94f799d28a457ab2663645849b17888c681b0d0d",
+      "bytes": 89749
+    },
+    {
+      "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/archive/2026/202607/index.html",
+      "inputFile": "municipal-948872a59b9dbb.html",
+      "sha256": "1fad70e20276078e2b9855d56c6d7a325e311cf8a57fec8de4d89d0f385cb6db",
+      "bytes": 94688
+    },
+    {
+      "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/archive/2026/202608/index.html",
+      "inputFile": "municipal-bab082040e6fc6.html",
+      "sha256": "6e10e01a6df5b4bd063d63c11a9982a3a852540629bc7b5765a7ecfb71d98b3b",
+      "bytes": 90222
+    },
+    {
+      "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/archive/2026/202609/index.html",
+      "inputFile": "municipal-fef68165cf78e9.html",
+      "sha256": "f805829e93bb3e4d3d6e352c01657cd4de9a406195e0d6a6b626bb7057fa6c1f",
+      "bytes": 111279
+    },
+    {
+      "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/archive/2026/202610/index.html",
+      "inputFile": "municipal-e32a1fadfb5127.html",
+      "sha256": "0a7a486ac44bc9883b43851a206d1696bd4e0303a4fff8acac543ef41eaae1ea",
+      "bytes": 60185
+    },
+    {
+      "url": "https://www.city.saitama.lg.jp/006/006/004/001/p052387.html",
+      "inputFile": "municipal-281c6d743c342e.html",
+      "sha256": "3edc3f176ad12a4f2e71da75961e76e1d1c6d4a8ae4b8c1b5172636728ce7bf6",
+      "bytes": 35523
+    }
+  ],
+  "inputs": [
+    {
+      "url": "https://www.city.saitama.lg.jp/006/014/008/003/013/002/p114586.html",
+      "inputFile": "municipal-153bc6f2540943.html",
+      "sha256": "0a18166707740b1ea3658cf7679516496c7d7b72d2b91c425fac51c17ee345ce",
+      "bytes": 41135,
+      "kind": "saitama-bulletin",
+      "publisher": "さいたま市",
+      "documents": []
+    },
+    {
+      "url": "https://www.city.saitama.lg.jp/006/014/008/003/013/003/p115011.html",
+      "inputFile": "municipal-ea6cfb42d09560.html",
+      "sha256": "5f1ab100ec3db21752c6d059121a279bf137b2c8c7ac5590959a1f9dc161765f",
+      "bytes": 38039,
+      "kind": "saitama-bulletin",
+      "publisher": "さいたま市",
+      "documents": []
+    },
+    {
+      "url": "https://www.city.saitama.lg.jp/006/014/008/003/013/004/p115589.html",
+      "inputFile": "municipal-c0d46a30e8c4f9.html",
+      "sha256": "f62d4d5ce9dea83bd5b11a93d8156776dc0a93d08c4f9b1ee4c83561a232493e",
+      "bytes": 38302,
+      "kind": "saitama-bulletin",
+      "publisher": "さいたま市",
+      "documents": []
+    },
+    {
+      "url": "https://www.city.saitama.lg.jp/006/014/008/003/013/005/p116099.html",
+      "inputFile": "municipal-7f3ed326c29ae0.html",
+      "sha256": "ceace8ea5d1edc1a332d0d47bb3b117efaa2eafb977b32093882b1630693fba7",
+      "bytes": 38833,
+      "kind": "saitama-bulletin",
+      "publisher": "さいたま市",
+      "documents": []
+    },
+    {
+      "url": "https://www.city.saitama.lg.jp/006/014/008/003/013/006/p116616.html",
+      "inputFile": "municipal-c23eaa8c66b865.html",
+      "sha256": "43d4f8eb4197360feeab220cbcfaad9124bed795bdaa395a7fe7c11953f9f4be",
+      "bytes": 41421,
+      "kind": "saitama-bulletin",
+      "publisher": "さいたま市",
+      "documents": []
+    },
+    {
+      "url": "https://www.city.saitama.lg.jp/006/014/008/003/013/007/p117086.html",
+      "inputFile": "municipal-1462f53046d888.html",
+      "sha256": "165b5432d574cabe3793580f2deb6f8b4824508edcfd29509e19d82c4d2a4005",
+      "bytes": 36856,
+      "kind": "saitama-bulletin",
+      "publisher": "さいたま市",
+      "documents": []
+    },
+    {
+      "url": "https://www.city.saitama.lg.jp/006/014/008/003/013/008/p117663.html",
+      "inputFile": "municipal-b961d1f67323cf.html",
+      "sha256": "9357c8f82eaf596421c653da5e6abb4faaefb44c1f9b1585ecf4096ba78c0392",
+      "bytes": 40245,
+      "kind": "saitama-bulletin",
+      "publisher": "さいたま市",
+      "documents": []
+    },
+    {
+      "url": "https://www.city.saitama.lg.jp/006/014/008/003/013/009/p118160.html",
+      "inputFile": "municipal-a7cb9de88aed68.html",
+      "sha256": "7a17c7f560236efc6e4a47833a504c440abd64d95b628d3b3701a41a51e87102",
+      "bytes": 36320,
+      "kind": "saitama-bulletin",
+      "publisher": "さいたま市",
+      "documents": []
+    },
+    {
+      "url": "https://www.city.saitama.lg.jp/006/014/008/003/013/010/p118552.html",
+      "inputFile": "municipal-2fc5860ae1579e.html",
+      "sha256": "5e40b590bc1aafb4f31cbd3fb35c3c2dd4ea1eecb4f97a2e965c42b9a77f5975",
+      "bytes": 37045,
+      "kind": "saitama-bulletin",
+      "publisher": "さいたま市",
+      "documents": []
+    },
+    {
+      "url": "https://www.city.saitama.lg.jp/006/014/008/003/013/011/p119279.html",
+      "inputFile": "municipal-2a4fdfcb8e8a8a.html",
+      "sha256": "646140e7f3fd5cf76826a9dad4ca443e34d2ce8a274f97c5c97516c6f6b621a6",
+      "bytes": 37870,
+      "kind": "saitama-bulletin",
+      "publisher": "さいたま市",
+      "documents": []
+    },
+    {
+      "url": "https://www.city.saitama.lg.jp/006/014/008/003/013/012/p119822.html",
+      "inputFile": "municipal-ecd24d5fd4d68f.html",
+      "sha256": "8e91747ade29145dd1c8ca208fac218caca8bf278a019b7986e8126d84b674d8",
+      "bytes": 40050,
+      "kind": "saitama-bulletin",
+      "publisher": "さいたま市",
+      "documents": []
+    },
+    {
+      "url": "https://www.city.saitama.lg.jp/006/014/008/003/014/001/p120493.html",
+      "inputFile": "municipal-64b8b860f7e11d.html",
+      "sha256": "ce789c05219a6afcc82ab6b78e0c3eb551c0b5de896ba31bcaf19d000d98246b",
+      "bytes": 39503,
+      "kind": "saitama-bulletin",
+      "publisher": "さいたま市",
+      "documents": []
+    },
+    {
+      "url": "https://www.city.saitama.lg.jp/006/014/008/003/014/002/p121191.html",
+      "inputFile": "municipal-8078780a582941.html",
+      "sha256": "03fb977b38cf037f2a19349207e9e21068ef9784df268f87039737360846d48e",
+      "bytes": 39793,
+      "kind": "saitama-bulletin",
+      "publisher": "さいたま市",
+      "documents": []
+    },
+    {
+      "url": "https://www.city.saitama.lg.jp/006/014/008/003/014/003/p121955.html",
+      "inputFile": "municipal-2efe9848579156.html",
+      "sha256": "25b01807d36bbb6c2fbace1e1e25eafcdcbe53a865bba1c4622e148397ff7c8c",
+      "bytes": 40040,
+      "kind": "saitama-bulletin",
+      "publisher": "さいたま市",
+      "documents": []
+    },
+    {
+      "url": "https://www.city.saitama.lg.jp/006/014/008/003/014/004/p122749.html",
+      "inputFile": "municipal-2b0352f26b058d.html",
+      "sha256": "c5fba5e0482aff6e3186cbefa107bfc253f10fb6502189de4dd2471206246d2d",
+      "bytes": 39675,
+      "kind": "saitama-bulletin",
+      "publisher": "さいたま市",
+      "documents": []
+    },
+    {
+      "url": "https://www.city.saitama.lg.jp/006/014/008/003/014/005/p123502.html",
+      "inputFile": "municipal-bb81b6cd85f612.html",
+      "sha256": "9199c9996a06a47bb475f1fd08d9aff3e8fa92daef943556b74498bf16710603",
+      "bytes": 39165,
+      "kind": "saitama-bulletin",
+      "publisher": "さいたま市",
+      "documents": []
+    },
+    {
+      "url": "https://www.city.saitama.lg.jp/006/014/008/003/014/006/p124217.html",
+      "inputFile": "municipal-99b7e47c0b3595.html",
+      "sha256": "b8bb90919f6ca50be1e8c3ca98b33eaa436cd043e2382ee1fd394b164a9125cb",
+      "bytes": 35797,
+      "kind": "saitama-bulletin",
+      "publisher": "さいたま市",
+      "documents": []
+    },
+    {
+      "url": "https://www.city.saitama.lg.jp/006/014/008/003/014/007/p124888.html",
+      "inputFile": "municipal-f980203c89ec63.html",
+      "sha256": "887b2a9ae2d24491be8e984f7b0101a130936836d55c2428d5f64d9aaa69f635",
+      "bytes": 37906,
+      "kind": "saitama-bulletin",
+      "publisher": "さいたま市",
+      "documents": []
+    },
+    {
+      "url": "https://www.city.saitama.lg.jp/006/014/008/003/014/008/p125627.html",
+      "inputFile": "municipal-71d89f24ed6397.html",
+      "sha256": "34872a001388ddc126c4c63357f73c4aec061df1d8242410b8d05542b5bc2ffd",
+      "bytes": 36386,
+      "kind": "saitama-bulletin",
+      "publisher": "さいたま市",
+      "documents": []
+    },
+    {
+      "url": "https://www.city.saitama.lg.jp/006/014/008/003/014/009/p126160.html",
+      "inputFile": "municipal-1d605ff700d325.html",
+      "sha256": "6919b958bb8aeda198f44c0ee8b7449dd9212de049e3ce0d9a34e3340a212b6b",
+      "bytes": 37599,
+      "kind": "saitama-bulletin",
+      "publisher": "さいたま市",
+      "documents": []
+    },
+    {
+      "url": "https://www.city.saitama.lg.jp/006/014/008/003/014/010/p126912.html",
+      "inputFile": "municipal-36c6dbd4cfb94f.html",
+      "sha256": "618e970fd256f51937dd9021877fd457e69bd4ad1d362bb09b62ab99188893e5",
+      "bytes": 35961,
+      "kind": "saitama-bulletin",
+      "publisher": "さいたま市",
+      "documents": []
+    },
+    {
+      "url": "https://www.city.saitama.lg.jp/006/014/008/003/014/011/p127964.html",
+      "inputFile": "municipal-0e9ec61d6460ea.html",
+      "sha256": "f32354113433641fa73b590ad77c2c9a7009fb567be3bb2565e7c7ad95ee5b70",
+      "bytes": 40004,
+      "kind": "saitama-bulletin",
+      "publisher": "さいたま市",
+      "documents": []
+    },
+    {
+      "url": "https://www.city.saitama.lg.jp/006/014/008/003/014/012/p128753.html",
+      "inputFile": "municipal-ccf1810389771d.html",
+      "sha256": "c2ef6be27c1485323ed2814a2156bdf51e036646111ea1338ac1d52efc68a22c",
+      "bytes": 39196,
+      "kind": "saitama-bulletin",
+      "publisher": "さいたま市",
+      "documents": []
+    },
+    {
+      "url": "https://www.city.saitama.lg.jp/006/014/008/003/015/001/p129804.html",
+      "inputFile": "municipal-16271edd2c7f7a.html",
+      "sha256": "9cf1e62715e73d9fd7a0a67a312135631e09b6489c9881e3203cae836d60a25c",
+      "bytes": 39584,
+      "kind": "saitama-bulletin",
+      "publisher": "さいたま市",
+      "documents": []
+    },
+    {
+      "url": "https://www.city.saitama.lg.jp/006/014/008/003/015/002/p130447.html",
+      "inputFile": "municipal-fd2ed0a54a869c.html",
+      "sha256": "fb3339e3e736be316b781c9e0006d7da2d1d2dbab777145e7cc8ad0798208215",
+      "bytes": 37746,
+      "kind": "saitama-bulletin",
+      "publisher": "さいたま市",
+      "documents": []
+    },
+    {
+      "url": "https://www.city.saitama.lg.jp/006/014/008/003/015/003/p131163.html",
+      "inputFile": "municipal-fedfd3400fdcd9.html",
+      "sha256": "fceb555d239550b65ff47da8d6517734c0fc44821f40115e5faed810ee35e7ce",
+      "bytes": 37508,
+      "kind": "saitama-bulletin",
+      "publisher": "さいたま市",
+      "documents": []
+    },
+    {
+      "url": "https://www.city.saitama.lg.jp/006/014/008/003/015/004/p132016.html",
+      "inputFile": "municipal-83d2aad35575b5.html",
+      "sha256": "26cead7ee5574660b34ce7166722e9e986f30c340c5aca28dc860a37c1962c6d",
+      "bytes": 36596,
+      "kind": "saitama-bulletin",
+      "publisher": "さいたま市",
+      "documents": []
+    },
+    {
+      "url": "https://www.city.saitama.lg.jp/006/014/008/003/015/005/p132903.html",
+      "inputFile": "municipal-20e80e5c0e6569.html",
+      "sha256": "06f886f5efccddef46bcf434b885b324999b076790ac569897398cfeb4917b4b",
+      "bytes": 37069,
+      "kind": "saitama-bulletin",
+      "publisher": "さいたま市",
+      "documents": []
+    },
+    {
+      "url": "https://www.city.saitama.lg.jp/006/014/008/003/015/006/p133553.html",
+      "inputFile": "municipal-87f23be12f1bcb.html",
+      "sha256": "2407c5b4358bd2f3df8acb2ecfb90bad258fa0c459c311c02e9eff4a2a2abfff",
+      "bytes": 34019,
+      "kind": "saitama-bulletin",
+      "publisher": "さいたま市",
+      "documents": []
+    },
+    {
+      "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/somu/2021/0117jimusyorimisu.html",
+      "inputFile": "municipal-679eed723d3378.html",
+      "sha256": "d541d8b71da71db8690984d3d71f5422568ddf01a35214652f2372dc7f24dd83",
+      "bytes": 60123,
+      "kind": "yokohama-bulletin",
+      "publisher": "横浜市",
+      "documents": [
+        {
+          "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/somu/2021/0117jimusyorimisu.files/0037_20220114.pdf",
+          "inputFile": "municipal-6751b76f35bea5.pdf",
+          "sha256": "5f6d06d36eee300a18c630ac68a04e7231168e52d46e93d2dc424f860f612ecc",
+          "bytes": 542179
+        }
+      ]
+    },
+    {
+      "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/somu/2021/0215jimusyorimisu.html",
+      "inputFile": "municipal-18e396b65c45af.html",
+      "sha256": "c90e9535f4c44790a16d1aad49aa981b5b12b43a1db2a5a1cfc7ca492e659329",
+      "bytes": 60124,
+      "kind": "yokohama-bulletin",
+      "publisher": "横浜市",
+      "documents": [
+        {
+          "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/somu/2021/0215jimusyorimisu.files/0038_20220214.pdf",
+          "inputFile": "municipal-a0b6d9359352ba.pdf",
+          "sha256": "c1064e70585d6d2e4bd6d23ba4c2eac6f8a7e3171edcb938cb1e7fe392712092",
+          "bytes": 529630
+        }
+      ]
+    },
+    {
+      "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/somu/2021/0315jimusyorimisu.html",
+      "inputFile": "municipal-e406a47ca94cb4.html",
+      "sha256": "46849e2d4002375d52925432e28b303ba9a4dfcea3d37660343075eba19588d3",
+      "bytes": 60124,
+      "kind": "yokohama-bulletin",
+      "publisher": "横浜市",
+      "documents": [
+        {
+          "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/somu/2021/0315jimusyorimisu.files/0039_20220314.pdf",
+          "inputFile": "municipal-b3fd2d9331a6c6.pdf",
+          "sha256": "bf20bd79469d90dbd343414034733f2e1bdbf748a43118ed9e77e8cf8913f85f",
+          "bytes": 520275
+        }
+      ]
+    },
+    {
+      "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/somu/2021/0415jimusyorimisu.html",
+      "inputFile": "municipal-402d02041d3815.html",
+      "sha256": "b34e1d145f813f12426391253d2519eafea51c79159d563253c5aca8453cc8d4",
+      "bytes": 60124,
+      "kind": "yokohama-bulletin",
+      "publisher": "横浜市",
+      "documents": [
+        {
+          "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/somu/2021/0415jimusyorimisu.files/0026_20210414.pdf",
+          "inputFile": "municipal-38d1b08199e44b.pdf",
+          "sha256": "4409ea2d2153baac10b5c21ef07ff3fdda5d942bcbcc4da4342bd225aeb36fd7",
+          "bytes": 285260
+        }
+      ]
+    },
+    {
+      "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/somu/2021/0517jimusyorimisu.html",
+      "inputFile": "municipal-bb6edb1868da02.html",
+      "sha256": "5c67aa06d7e54e35216d90b00082b66fdab4b1eba44b43313b4f095a91ac48c5",
+      "bytes": 60124,
+      "kind": "yokohama-bulletin",
+      "publisher": "横浜市",
+      "documents": [
+        {
+          "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/somu/2021/0517jimusyorimisu.files/0028_20210514.pdf",
+          "inputFile": "municipal-6fe07359903d2a.pdf",
+          "sha256": "679774db40d24ae377b904d5937c88b8608e9708fd7c2e42dc25eeb3f99a5bb4",
+          "bytes": 265045
+        }
+      ]
+    },
+    {
+      "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/somu/2021/0615jimusyorimisu.html",
+      "inputFile": "municipal-2761de7f6efe8e.html",
+      "sha256": "d9b75b3a01ea961c7a012cc56f506c7b4c04a85086ed4ddbc0a895be63875f62",
+      "bytes": 60121,
+      "kind": "yokohama-bulletin",
+      "publisher": "横浜市",
+      "documents": [
+        {
+          "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/somu/2021/0615jimusyorimisu.files/0029_20210611.pdf",
+          "inputFile": "municipal-a755fccb1416cc.pdf",
+          "sha256": "c6b296f32f81ea8dd92beca4effa1de206e29cf8ab3b3dccad56ff94add1fa54",
+          "bytes": 261425
+        }
+      ]
+    },
+    {
+      "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/somu/2021/0715jimusyorimisu.html",
+      "inputFile": "municipal-5b7ac66a91938e.html",
+      "sha256": "52edf82b055be00548824a871982babd084c8eb085b1169066fd0c40ad004649",
+      "bytes": 60121,
+      "kind": "yokohama-bulletin",
+      "publisher": "横浜市",
+      "documents": [
+        {
+          "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/somu/2021/0715jimusyorimisu.files/0030_20210714.pdf",
+          "inputFile": "municipal-702ec0068d2ff5.pdf",
+          "sha256": "7449df94c692566af4699fb92390c5e465c8ff65b7f2beee9b89624a7ff17767",
+          "bytes": 276469
+        }
+      ]
+    },
+    {
+      "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/somu/2021/0816jimusyorimisu.html",
+      "inputFile": "municipal-d2b0ead0b33685.html",
+      "sha256": "bb458484b473f0f673947e33e667358bc543e328df7f34c2214f83cfd07398f7",
+      "bytes": 60121,
+      "kind": "yokohama-bulletin",
+      "publisher": "横浜市",
+      "documents": [
+        {
+          "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/somu/2021/0816jimusyorimisu.files/0031_20210813.pdf",
+          "inputFile": "municipal-834d7f3157abdd.pdf",
+          "sha256": "6cbd9c7d4bf29a373e73df858a2133090dd9211614a263280c3eb9cf5a64573f",
+          "bytes": 254173
+        }
+      ]
+    },
+    {
+      "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/somu/2021/0915jimusyorimisu.html",
+      "inputFile": "municipal-7ce8274bbea018.html",
+      "sha256": "de3199c19db1db40e0c16c1ae578273fb84c2c0c1ed3e03be5e16fa9d1818c20",
+      "bytes": 60121,
+      "kind": "yokohama-bulletin",
+      "publisher": "横浜市",
+      "documents": [
+        {
+          "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/somu/2021/0915jimusyorimisu.files/0032_20210914.pdf",
+          "inputFile": "municipal-73fad2ae1b5348.pdf",
+          "sha256": "8054ff12dd19f866322f564d36cf0f802f2d9ddd4b862f653f63d213b01f0af3",
+          "bytes": 296976
+        }
+      ]
+    },
+    {
+      "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/somu/2021/1015jimusyorimisu.html",
+      "inputFile": "municipal-6c59c1857c901b.html",
+      "sha256": "5093f438308e4cba7d5e88a935e35b7872259b9aee5fa716b2ea30063eea828a",
+      "bytes": 60121,
+      "kind": "yokohama-bulletin",
+      "publisher": "横浜市",
+      "documents": [
+        {
+          "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/somu/2021/1015jimusyorimisu.files/0034_20211015.pdf",
+          "inputFile": "municipal-69602cfd770ad6.pdf",
+          "sha256": "008bb7f1b9fc2eac09c221b1bb6196e9686d9f910102f3df6282482d40d57842",
+          "bytes": 252782
+        }
+      ]
+    },
+    {
+      "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/somu/2021/1115jimusyorimisu.html",
+      "inputFile": "municipal-55a0709594ee3d.html",
+      "sha256": "c336aa6cf502a6a687811dec187c593f483f2230ef11b6f831a8e33c4672bfae",
+      "bytes": 60120,
+      "kind": "yokohama-bulletin",
+      "publisher": "横浜市",
+      "documents": [
+        {
+          "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/somu/2021/1115jimusyorimisu.files/0035_20211112.pdf",
+          "inputFile": "municipal-22eabe08b08c22.pdf",
+          "sha256": "3463a29a697fe7de9671aa045fba81f8c81eb509bf96ae90fcee6550cbe019b4",
+          "bytes": 264607
+        }
+      ]
+    },
+    {
+      "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/somu/2021/1215jimusyorimisu.html",
+      "inputFile": "municipal-eb7b21f6cc0aaa.html",
+      "sha256": "713073fff64920217b757d2da3138c42a5a211566ff6f7d92dd02dd797ffce91",
+      "bytes": 60123,
+      "kind": "yokohama-bulletin",
+      "publisher": "横浜市",
+      "documents": [
+        {
+          "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/somu/2021/1215jimusyorimisu.files/0036_20211214.pdf",
+          "inputFile": "municipal-2f769a5e454d59.pdf",
+          "sha256": "95901c3f213acca0862fdfb3d9b46e933a12fa983067318b96ba5a5d9ebe5f6f",
+          "bytes": 255782
+        }
+      ]
+    },
+    {
+      "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/somu/2022/0116jimusyorimisu.html",
+      "inputFile": "municipal-43ead1a1f418b4.html",
+      "sha256": "015eab324c10bb13a10c89e8a14ea4b4fcff98bc985bc1c4a9f967a0337d6ff6",
+      "bytes": 54569,
+      "kind": "yokohama-bulletin",
+      "publisher": "横浜市",
+      "documents": [
+        {
+          "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/somu/2022/0116jimusyorimisu.files/0050_20230113.pdf",
+          "inputFile": "municipal-3b0da68f14dc8f.pdf",
+          "sha256": "d3b60457157c085061c6adbf1a2a51767b578605f451825bc2ca94798c26ebb8",
+          "bytes": 506821
+        }
+      ]
+    },
+    {
+      "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/somu/2022/0215jimusyorimisu.html",
+      "inputFile": "municipal-7280b6ef5dfce2.html",
+      "sha256": "c44834be2cd7199f74f29c4340d8c2aedb72e100ae8b0c7f5ca4223ccaeecdc0",
+      "bytes": 54570,
+      "kind": "yokohama-bulletin",
+      "publisher": "横浜市",
+      "documents": [
+        {
+          "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/somu/2022/0215jimusyorimisu.files/0051_20230214.pdf",
+          "inputFile": "municipal-b9ba0b09d4a4a5.pdf",
+          "sha256": "6e8f172422a2c4d305a2a59322dad9388f5a2bddb4129c5f1cf4e762d4bd1c5a",
+          "bytes": 510949
+        }
+      ]
+    },
+    {
+      "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/somu/2022/0315jimusyorimisu.html",
+      "inputFile": "municipal-84045ee7910468.html",
+      "sha256": "675e1a1024dc4791ce46cb2f30ce0224ec65f83459f887309ff53d8228aeddcf",
+      "bytes": 54570,
+      "kind": "yokohama-bulletin",
+      "publisher": "横浜市",
+      "documents": [
+        {
+          "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/somu/2022/0315jimusyorimisu.files/0052_20230313.pdf",
+          "inputFile": "municipal-c1e7763bdc9b7d.pdf",
+          "sha256": "84bde3d30f2a18d3da27e9438286c26735ea4b463b25745794de21c5f5e38204",
+          "bytes": 507962
+        }
+      ]
+    },
+    {
+      "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/somu/2022/0415jimusyorimisu.html",
+      "inputFile": "municipal-38ed0ec9173d98.html",
+      "sha256": "12d6e443a158a0cea9e24563cfda3c68c1a8a44b7935035ac1474739b2c5d6c4",
+      "bytes": 54570,
+      "kind": "yokohama-bulletin",
+      "publisher": "横浜市",
+      "documents": [
+        {
+          "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/somu/2022/0415jimusyorimisu.files/0040_20220414.pdf",
+          "inputFile": "municipal-bf73c12816d05a.pdf",
+          "sha256": "0d96265868c1ee9bd1997eb172e58a8cda844ce91a7fe859541525da0cd504b0",
+          "bytes": 534124
+        }
+      ]
+    },
+    {
+      "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/somu/2022/0516jimusyorimisu.html",
+      "inputFile": "municipal-5a64767772e6d1.html",
+      "sha256": "056d2707bc6b091c2e966270c6d950acafc6bb5715bffb9ccbdf42389a3e55fe",
+      "bytes": 54570,
+      "kind": "yokohama-bulletin",
+      "publisher": "横浜市",
+      "documents": [
+        {
+          "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/somu/2022/0516jimusyorimisu.files/0041_20220513.pdf",
+          "inputFile": "municipal-f3f2a2b48fdde5.pdf",
+          "sha256": "47c8a77e47062afe7076f4e834a742a9bfd063fd80a0647e5d5f218524ce6e36",
+          "bytes": 543107
+        }
+      ]
+    },
+    {
+      "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/somu/2022/0615jimusyorimisu.html",
+      "inputFile": "municipal-f27a0d9d88b470.html",
+      "sha256": "eb577617d17e0c41308dd0644a6fa9d2fad95019b08b39a6e41f66d9027867ea",
+      "bytes": 54570,
+      "kind": "yokohama-bulletin",
+      "publisher": "横浜市",
+      "documents": [
+        {
+          "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/somu/2022/0615jimusyorimisu.files/0042_20220614.pdf",
+          "inputFile": "municipal-01d56e8fbbe779.pdf",
+          "sha256": "4d337e86113da5bd6af2a0b0b63aa7d8ca72400b6e2b59b3cfd243c567d60c5b",
+          "bytes": 532049
+        }
+      ]
+    },
+    {
+      "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/somu/2022/0715jimusyorimisu.html",
+      "inputFile": "municipal-7b1937e32cd3c9.html",
+      "sha256": "96c7ada2c9df791c3ff98ccc5cc4ab65a184af5006d333d8d0c076fe38b9d4b7",
+      "bytes": 54570,
+      "kind": "yokohama-bulletin",
+      "publisher": "横浜市",
+      "documents": [
+        {
+          "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/somu/2022/0715jimusyorimisu.files/0044_20220713.pdf",
+          "inputFile": "municipal-cb143d09f056d3.pdf",
+          "sha256": "2bb8b8417b083052a6f2345a1df1de5fc114391f591f1f1dd7d18513792ac4f6",
+          "bytes": 545844
+        }
+      ]
+    },
+    {
+      "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/somu/2022/0815jimusyorimisu.html",
+      "inputFile": "municipal-c7de56491851e6.html",
+      "sha256": "390e02bf8438a732e67b2e0c1f8288114fe4156a86754f6e9fe3c74171e0d913",
+      "bytes": 54570,
+      "kind": "yokohama-bulletin",
+      "publisher": "横浜市",
+      "documents": [
+        {
+          "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/somu/2022/0815jimusyorimisu.files/0045_20220810.pdf",
+          "inputFile": "municipal-8c724899e2666f.pdf",
+          "sha256": "f762dd96dd8015793381634f32da2aea4cbadb5cf4a66ca5c7b7686781f9fa73",
+          "bytes": 512136
+        }
+      ]
+    },
+    {
+      "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/somu/2022/0915jimusyorimisu.html",
+      "inputFile": "municipal-3d96bb0daccccc.html",
+      "sha256": "4db10bdb55a2aa95fb7a307f204e26cd15f327bffa68ebf1a600dcf356e40f0d",
+      "bytes": 54570,
+      "kind": "yokohama-bulletin",
+      "publisher": "横浜市",
+      "documents": [
+        {
+          "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/somu/2022/0915jimusyorimisu.files/0046_20220914.pdf",
+          "inputFile": "municipal-08037d8fde1058.pdf",
+          "sha256": "34cdb1d84c0dbd2f89c3485df00a30a2a73bfc74f4578ea9132975ce5c44251c",
+          "bytes": 521655
+        }
+      ]
+    },
+    {
+      "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/somu/2022/1017jimusyorimisu.html",
+      "inputFile": "municipal-570c10df09ca2b.html",
+      "sha256": "f5748cb4697f570b83e0fea00ad9f7c0d392fb11eac8ff0ee7f522b656472c30",
+      "bytes": 54570,
+      "kind": "yokohama-bulletin",
+      "publisher": "横浜市",
+      "documents": [
+        {
+          "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/somu/2022/1017jimusyorimisu.files/0047_20221013.pdf",
+          "inputFile": "municipal-12885ae7887fd5.pdf",
+          "sha256": "57d93dbae5cc764f87e0814a81fe831906299796dd8c16a01d9c002054477c98",
+          "bytes": 529225
+        }
+      ]
+    },
+    {
+      "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/somu/2022/1115jimusyorimisu.html",
+      "inputFile": "municipal-e845a9eb1a39c7.html",
+      "sha256": "f294f51f5991f93df9bc54967be9c2739768bed4feae01e4f1e8e42eb344466d",
+      "bytes": 54569,
+      "kind": "yokohama-bulletin",
+      "publisher": "横浜市",
+      "documents": [
+        {
+          "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/somu/2022/1115jimusyorimisu.files/0048_20221114.pdf",
+          "inputFile": "municipal-eab183b6f6010d.pdf",
+          "sha256": "cbcfdf206bd7a948020ad0aed9ec15dad362b4b45b41d1b4e1d56f6e7861baeb",
+          "bytes": 511192
+        }
+      ]
+    },
+    {
+      "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/somu/2022/1215jimusyorimisu.html",
+      "inputFile": "municipal-8a99abe985ae83.html",
+      "sha256": "ee870752620ed96f823c5052d2e965435863a2e179e1ac83c736a78fb30c9988",
+      "bytes": 54569,
+      "kind": "yokohama-bulletin",
+      "publisher": "横浜市",
+      "documents": [
+        {
+          "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/somu/2022/1215jimusyorimisu.files/0049_20221213.pdf",
+          "inputFile": "municipal-5e94c75fc1a63a.pdf",
+          "sha256": "110d7549a6ab4ab9f289a051f977aae51604e22e61b0dfec0d5a5733a68b130e",
+          "bytes": 524944
+        }
+      ]
+    },
+    {
+      "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/somu/2023/0115jimusyorimisu.html",
+      "inputFile": "municipal-d77a45fd6bb6ba.html",
+      "sha256": "51892e0ab149262586adce13990913c37fe77128c26c21864c842df0c2485ec0",
+      "bytes": 55895,
+      "kind": "yokohama-bulletin",
+      "publisher": "横浜市",
+      "documents": [
+        {
+          "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/somu/2023/0115jimusyorimisu.files/0061_20240112.pdf",
+          "inputFile": "municipal-c7a618d9598766.pdf",
+          "sha256": "f5204c5c48892d4bdd7cd60cffb58f61192ffeb2ff2355d14205e564b6adc444",
+          "bytes": 516767
+        }
+      ]
+    },
+    {
+      "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/somu/2023/0215jimusyorimisu.html",
+      "inputFile": "municipal-8857da2998e7be.html",
+      "sha256": "0a5d5e4fc361f3d7af4d27769811a1ce455d9ce75009b33c25c708b8663c80dd",
+      "bytes": 55896,
+      "kind": "yokohama-bulletin",
+      "publisher": "横浜市",
+      "documents": [
+        {
+          "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/somu/2023/0215jimusyorimisu.files/0062_20240214.pdf",
+          "inputFile": "municipal-ad26fdb7317bb8.pdf",
+          "sha256": "69bc0a3d4784e91adee9eb291b3c8378bd39a69b7b37ee105cb7d10409c41cfb",
+          "bytes": 495853
+        }
+      ]
+    },
+    {
+      "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/somu/2023/0315jimusyorimisu.html",
+      "inputFile": "municipal-b671a56cb8eab5.html",
+      "sha256": "fddd2066d863d5aee4775b056dd3a72a907025062a6be5640c576febfaf158c5",
+      "bytes": 55896,
+      "kind": "yokohama-bulletin",
+      "publisher": "横浜市",
+      "documents": [
+        {
+          "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/somu/2023/0315jimusyorimisu.files/0063_20240314.pdf",
+          "inputFile": "municipal-7fb27f68d2abf1.pdf",
+          "sha256": "73606eb826ac0f31b68da557cdd4c6bb06010a7814da242e774b5df3ad950595",
+          "bytes": 506308
+        }
+      ]
+    },
+    {
+      "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/somu/2023/0417jimusyorimisu.html",
+      "inputFile": "municipal-54f58791cb0921.html",
+      "sha256": "262076e867f0fa7501cafedfcc4637ec2e8c7d66fdec0fec55d20107fcaac3cc",
+      "bytes": 55896,
+      "kind": "yokohama-bulletin",
+      "publisher": "横浜市",
+      "documents": [
+        {
+          "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/somu/2023/0417jimusyorimisu.files/0053_20230414.pdf",
+          "inputFile": "municipal-c70459bfea54a1.pdf",
+          "sha256": "905f0f441e5898e3512131c1e8663d6ca16ad12d2c7c79881896bd70eca162ef",
+          "bytes": 519527
+        }
+      ]
+    },
+    {
+      "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/somu/2023/0515jimusyorimisu.html",
+      "inputFile": "municipal-310b7955d69215.html",
+      "sha256": "98f9ced2bcf1846b9572e588c0be83c31e729adf77ed6715bc75812c5a443040",
+      "bytes": 55896,
+      "kind": "yokohama-bulletin",
+      "publisher": "横浜市",
+      "documents": [
+        {
+          "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/somu/2023/0515jimusyorimisu.files/0055_20230530.pdf",
+          "inputFile": "municipal-f55c6b766e4495.pdf",
+          "sha256": "87492933246b46a7e719572c2bac57e7b3ea84e853e1627723b0eea6f4795bc8",
+          "bytes": 513309
+        }
+      ]
+    },
+    {
+      "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/somu/2023/0615jimusyorimisu.html",
+      "inputFile": "municipal-ad9ddb4f1cc3f0.html",
+      "sha256": "966242070cff267ca90cc143cf5658cbf7625398f7ef71ccb6f3b2cf3a95666e",
+      "bytes": 55896,
+      "kind": "yokohama-bulletin",
+      "publisher": "横浜市",
+      "documents": [
+        {
+          "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/somu/2023/0615jimusyorimisu.files/0054_20230614.pdf",
+          "inputFile": "municipal-0681a02c54c955.pdf",
+          "sha256": "362bf605262ba330f3878145e0c06273f89fa12913e10762277f5bbca28256b7",
+          "bytes": 517897
+        }
+      ]
+    },
+    {
+      "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/somu/2023/0718jimusyorimisu.html",
+      "inputFile": "municipal-c38700d6aa2fb1.html",
+      "sha256": "8a281fa1292defd522fde95a258260cfd17c60f375e5e88a9050d9413745b730",
+      "bytes": 55896,
+      "kind": "yokohama-bulletin",
+      "publisher": "横浜市",
+      "documents": [
+        {
+          "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/somu/2023/0718jimusyorimisu.files/0055_20230714.pdf",
+          "inputFile": "municipal-b691e48971b72b.pdf",
+          "sha256": "48f179f1bce8d9c3bc30c715e75a0314ffcb3a556aa56286f6085d9f8076d173",
+          "bytes": 529502
+        }
+      ]
+    },
+    {
+      "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/somu/2023/0815jimusyorimisu.html",
+      "inputFile": "municipal-42d9f3d3f3764b.html",
+      "sha256": "653a0034baa5ab713f01d6ada5d6d838540d7f0940b037a06fde6929844755be",
+      "bytes": 55896,
+      "kind": "yokohama-bulletin",
+      "publisher": "横浜市",
+      "documents": [
+        {
+          "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/somu/2023/0815jimusyorimisu.files/0056_20230814.pdf",
+          "inputFile": "municipal-939e838735ca90.pdf",
+          "sha256": "5dde1ff3280e59d9c34d240e8b45347ef5279388ecbba14da8115dbcb4ce755c",
+          "bytes": 518029
+        }
+      ]
+    },
+    {
+      "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/somu/2023/0915jimusyorimisu.html",
+      "inputFile": "municipal-793b9833200e8c.html",
+      "sha256": "bfefe66a3f2b88b1ff90a7d30ea96adfee1bde5c410cd61c642005b8783489de",
+      "bytes": 55896,
+      "kind": "yokohama-bulletin",
+      "publisher": "横浜市",
+      "documents": [
+        {
+          "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/somu/2023/0915jimusyorimisu.files/0057_20230913.pdf",
+          "inputFile": "municipal-877213bb0bb2e9.pdf",
+          "sha256": "5bc176d302e54b9e6f04585ba5a85eea1e8713ec7192c2734f7f6c6964e8e940",
+          "bytes": 517295
+        }
+      ]
+    },
+    {
+      "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/somu/2023/1016jimusyorimisu.html",
+      "inputFile": "municipal-f2e9a068734db6.html",
+      "sha256": "62818e1fc54be838f7c9d9d69dd0c3d827f77891da3c37f1abd79a9594c3c655",
+      "bytes": 55896,
+      "kind": "yokohama-bulletin",
+      "publisher": "横浜市",
+      "documents": [
+        {
+          "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/somu/2023/1016jimusyorimisu.files/0058_20231012.pdf",
+          "inputFile": "municipal-57901995b8adbb.pdf",
+          "sha256": "90326493625c8ccb591058fe8f83abcb63aa02c173acd56da98e3d6826a1077b",
+          "bytes": 527436
+        }
+      ]
+    },
+    {
+      "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/somu/2023/1115jimusyorimisu.html",
+      "inputFile": "municipal-180adeacf63b53.html",
+      "sha256": "2906caeb7735262d700a84504095ac12e2b626f24e503768eeb7baa97e130eb8",
+      "bytes": 55895,
+      "kind": "yokohama-bulletin",
+      "publisher": "横浜市",
+      "documents": [
+        {
+          "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/somu/2023/1115jimusyorimisu.files/0059_20231114.pdf",
+          "inputFile": "municipal-07f5baad2b2f15.pdf",
+          "sha256": "43d9f6438959e7e6012f862147e141c42cd49372d94f987b6f69200f853d280a",
+          "bytes": 529957
+        }
+      ]
+    },
+    {
+      "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/somu/2023/1215jimusyorimisu.html",
+      "inputFile": "municipal-74923d14822379.html",
+      "sha256": "b180211a51bd8146428bf1aa8de5cf2af97d1134090eaa161c4ef593acef5981",
+      "bytes": 55895,
+      "kind": "yokohama-bulletin",
+      "publisher": "横浜市",
+      "documents": [
+        {
+          "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/somu/2023/1215jimusyorimisu.files/0060_20231214.pdf",
+          "inputFile": "municipal-4647362dc5c79a.pdf",
+          "sha256": "ba72c60a0849092bc13f4584425fe5c66042d553a505ae8f87c0ffe5769fc173",
+          "bytes": 500774
+        }
+      ]
+    },
+    {
+      "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/somu/2024/0115jimusyorimisu.html",
+      "inputFile": "municipal-a5c5fb42fc2527.html",
+      "sha256": "270fd00f4031cf6922d9ebce2d9c7fe3e424c44b9fce2c5e756c9e3b41f38295",
+      "bytes": 54451,
+      "kind": "yokohama-bulletin",
+      "publisher": "横浜市",
+      "documents": [
+        {
+          "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/somu/2024/0115jimusyorimisu.files/0079_20250114.pdf",
+          "inputFile": "municipal-1f43b421ff7ed5.pdf",
+          "sha256": "02db25af706fa42725a6f67d972fe35219827886a376690603cbfffcd9917464",
+          "bytes": 514588
+        }
+      ]
+    },
+    {
+      "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/somu/2024/0217jimusyorimisu.html",
+      "inputFile": "municipal-1dd057c74345d3.html",
+      "sha256": "c17fded7527b43b5bf5274f2606d51a21968b3a4648872638fad3bae0359947e",
+      "bytes": 54452,
+      "kind": "yokohama-bulletin",
+      "publisher": "横浜市",
+      "documents": [
+        {
+          "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/somu/2024/0217jimusyorimisu.files/0080_20250214.pdf",
+          "inputFile": "municipal-2bdf1572b6186c.pdf",
+          "sha256": "eef4cc022d9aba413db7753c9a4c65d8ac6de24b4a505c866a6ee37a836ba61a",
+          "bytes": 490176
+        }
+      ]
+    },
+    {
+      "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/somu/2024/0317jimusyorimisu.html",
+      "inputFile": "municipal-87a17ec8f22b08.html",
+      "sha256": "70aa25447591cafc031b8f1e2dd0e4939db3228e244730e33b3232a0e1e1a6bd",
+      "bytes": 54452,
+      "kind": "yokohama-bulletin",
+      "publisher": "横浜市",
+      "documents": [
+        {
+          "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/somu/2024/0317jimusyorimisu.files/0081_20250313.pdf",
+          "inputFile": "municipal-48d34f5edd285f.pdf",
+          "sha256": "f1e5d66eac03888efa38ee3d65215f9fb1cc02d7e29d8a0f1dc2e2f9bf0359a6",
+          "bytes": 518433
+        }
+      ]
+    },
+    {
+      "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/somu/2024/0415jimusyorimisu.html",
+      "inputFile": "municipal-cc8bef499606bd.html",
+      "sha256": "e05c3b58811c3c2209b8d7e68ba78fa42e78ffb667f68bf3cc46e13649e8687c",
+      "bytes": 54452,
+      "kind": "yokohama-bulletin",
+      "publisher": "横浜市",
+      "documents": [
+        {
+          "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/somu/2024/0415jimusyorimisu.files/0065_20240411.pdf",
+          "inputFile": "municipal-71838fcf56912c.pdf",
+          "sha256": "1fac47964e498f1578d016face3e83cbdc9f64b1f19ae0091f3c51582d572d75",
+          "bytes": 505268
+        }
+      ]
+    },
+    {
+      "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/somu/2024/0515jimusyorimisu.html",
+      "inputFile": "municipal-987f00b694a133.html",
+      "sha256": "8179d5173b9138ac906a1b43e9abaa102ae1e783a07bd2301a286b0f6e9b36d7",
+      "bytes": 54452,
+      "kind": "yokohama-bulletin",
+      "publisher": "横浜市",
+      "documents": [
+        {
+          "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/somu/2024/0515jimusyorimisu.files/0067_20240513.pdf",
+          "inputFile": "municipal-347c0824c4c6b3.pdf",
+          "sha256": "005290764298b2fe855dd641b9f4b3f8e8947aefdd3625ac43a087d44c2604ec",
+          "bytes": 506755
+        }
+      ]
+    },
+    {
+      "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/somu/2024/0617jimusyorimisu.html",
+      "inputFile": "municipal-b10f2d3aa44926.html",
+      "sha256": "f24f8e9fa5e93bd02b4a186a263365951b338548506407c364aaacb2a0fbc7fe",
+      "bytes": 54452,
+      "kind": "yokohama-bulletin",
+      "publisher": "横浜市",
+      "documents": [
+        {
+          "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/somu/2024/0617jimusyorimisu.files/0068_20240613.pdf",
+          "inputFile": "municipal-816f97af1f40c3.pdf",
+          "sha256": "dee1d4ead1f4984e88dc4b009a7d5e10f756474c3dacf29b9d3d97342a2de1ec",
+          "bytes": 519227
+        }
+      ]
+    },
+    {
+      "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/somu/2024/0716jimusyorimisu.html",
+      "inputFile": "municipal-d63531b33d3918.html",
+      "sha256": "350aa3772834e9a72ee0fe398c90c7ea52ff4e79e2876a57eec7224ef2875171",
+      "bytes": 54452,
+      "kind": "yokohama-bulletin",
+      "publisher": "横浜市",
+      "documents": [
+        {
+          "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/somu/2024/0716jimusyorimisu.files/0069_20240711.pdf",
+          "inputFile": "municipal-3818f622f514a7.pdf",
+          "sha256": "b856e96df76a1fb421f118bd901d42c68c13a44d57978bb7a36fc2b5a32bbc00",
+          "bytes": 518274
+        }
+      ]
+    },
+    {
+      "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/somu/2024/0815jimusyorimisu.html",
+      "inputFile": "municipal-61db468363f2ce.html",
+      "sha256": "12abf88c7a0c30823b5ffacd139c4b0f16965a5466e5448ce7d9470a60c5849b",
+      "bytes": 54452,
+      "kind": "yokohama-bulletin",
+      "publisher": "横浜市",
+      "documents": [
+        {
+          "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/somu/2024/0815jimusyorimisu.files/0070_20240814.pdf",
+          "inputFile": "municipal-ac5686bb68b784.pdf",
+          "sha256": "6eeb9a761fb40da69beffdb41cf68b9f44eabc47be8d3208e1d3653529c0d9ac",
+          "bytes": 529426
+        }
+      ]
+    },
+    {
+      "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/somu/2024/0917jimusyorimisu.html",
+      "inputFile": "municipal-b8573d3fb817ad.html",
+      "sha256": "019642eb1c3eeb4ad5adf22f4424b745c77eb51cc6d77d845c2ed2faeeca25df",
+      "bytes": 54452,
+      "kind": "yokohama-bulletin",
+      "publisher": "横浜市",
+      "documents": [
+        {
+          "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/somu/2024/0917jimusyorimisu.files/0072_20240912.pdf",
+          "inputFile": "municipal-c5c63dd5584056.pdf",
+          "sha256": "6f4bb6a30908addef04628e4aceb85e5204738a30134fd7048b4dcad10b74aef",
+          "bytes": 538689
+        }
+      ]
+    },
+    {
+      "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/somu/2024/1015jimusyorimisu.html",
+      "inputFile": "municipal-de183c0e3a71ca.html",
+      "sha256": "37c43dbf9e58e296b79b4d7cfe202ba80551ce64392be2cb86d65581ae27f176",
+      "bytes": 54452,
+      "kind": "yokohama-bulletin",
+      "publisher": "横浜市",
+      "documents": [
+        {
+          "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/somu/2024/1015jimusyorimisu.files/0073_20241010.pdf",
+          "inputFile": "municipal-c09b80fd159578.pdf",
+          "sha256": "1b1f103bf270fbcc3acd3e97393471ab160399ceb8310c7c326bdb736742b596",
+          "bytes": 525606
+        }
+      ]
+    },
+    {
+      "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/somu/2024/1115jimusyorimisu.html",
+      "inputFile": "municipal-150852f0ab4a74.html",
+      "sha256": "3b372b2b62dc3acae3974f7bbd0c9c148b5bcd6992c2a850c30a56da42b3742a",
+      "bytes": 54451,
+      "kind": "yokohama-bulletin",
+      "publisher": "横浜市",
+      "documents": [
+        {
+          "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/somu/2024/1115jimusyorimisu.files/0074_20241114.pdf",
+          "inputFile": "municipal-6cf531d4c266b5.pdf",
+          "sha256": "babf30e6a38bf313c82926ed13798e2960cd15a4284102fd73dc0109dd024985",
+          "bytes": 519397
+        }
+      ]
+    },
+    {
+      "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/somu/2024/1216jimusyorimisu.html",
+      "inputFile": "municipal-b8c1e2c2a56255.html",
+      "sha256": "c749b09c52342ddffb9d2038b3dd1fbeb8cebed41c2af89c8f5f4dceeb92486a",
+      "bytes": 54451,
+      "kind": "yokohama-bulletin",
+      "publisher": "横浜市",
+      "documents": [
+        {
+          "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/somu/2024/1216jimusyorimisu.files/0076_20241212.pdf",
+          "inputFile": "municipal-3fd48f3c5144f7.pdf",
+          "sha256": "997b454a495f182a5a9939004791673ac4c7bb9748d4fee47e2e41842bd3df93",
+          "bytes": 518526
+        }
+      ]
+    },
+    {
+      "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/somu/2025/0115jimusyorimisu.html",
+      "inputFile": "municipal-71acdd8886dafc.html",
+      "sha256": "10ffb0304b1f4a4797788efbf648a96f242515e28ee986bfaab3494fc0f9f0a2",
+      "bytes": 55071,
+      "kind": "yokohama-bulletin",
+      "publisher": "横浜市",
+      "documents": [
+        {
+          "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/somu/2025/0115jimusyorimisu.files/0097_20260114.pdf",
+          "inputFile": "municipal-163c7830960a78.pdf",
+          "sha256": "094a4d39b4115b2b0110eee07c27d5337c57a2e51432176da4c2e6a96e41a86f",
+          "bytes": 522141
+        }
+      ]
+    },
+    {
+      "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/somu/2025/0216jimusyorimisu.html",
+      "inputFile": "municipal-b53827d915e2b2.html",
+      "sha256": "1e4c977ff6920339ba4b42e354b7f40b43a1f6bea777dd5f552ed2a6c49f288e",
+      "bytes": 55072,
+      "kind": "yokohama-bulletin",
+      "publisher": "横浜市",
+      "documents": [
+        {
+          "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/somu/2025/0216jimusyorimisu.files/0100_20260213.pdf",
+          "inputFile": "municipal-01cd106050b378.pdf",
+          "sha256": "216fcca08ef8db1519de1738ab3afa569eea9db06c9867eb6aaa5e9c5704144e",
+          "bytes": 504424
+        }
+      ]
+    },
+    {
+      "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/somu/2025/0316jimusyorimisu.html",
+      "inputFile": "municipal-55b241456ab3ff.html",
+      "sha256": "7554bf568518d94a823f044b709d68f1776b1cd1b13ccb15106f105b8edb1d9a",
+      "bytes": 55072,
+      "kind": "yokohama-bulletin",
+      "publisher": "横浜市",
+      "documents": [
+        {
+          "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/somu/2025/0316jimusyorimisu.files/0103_20260312.pdf",
+          "inputFile": "municipal-7d31d1e325e615.pdf",
+          "sha256": "cb0865ef302d0358f85e2811f970739c43f924e96a607c0d6a95ab6ed2a6b78e",
+          "bytes": 493056
+        }
+      ]
+    },
+    {
+      "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/somu/2025/0415jimusyorimisu.html",
+      "inputFile": "municipal-ed92c760e8e548.html",
+      "sha256": "0aaf9341dc6ea6e3f7b1833a9f2ba58c9a3ca77130afd5c37b4d5928f7d2df81",
+      "bytes": 55072,
+      "kind": "yokohama-bulletin",
+      "publisher": "横浜市",
+      "documents": [
+        {
+          "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/somu/2025/0415jimusyorimisu.files/0083_20250415.pdf",
+          "inputFile": "municipal-c03ce097edd31b.pdf",
+          "sha256": "f63198c7bdab9e80f54f3e34926b78280803b2c6daf9ffcc02f79aa2e3a8afd9",
+          "bytes": 532103
+        }
+      ]
+    },
+    {
+      "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/somu/2025/0515jimusyorimisu.html",
+      "inputFile": "municipal-7aa8823108241b.html",
+      "sha256": "9f367f68e6cb18bdaa65c4a2c6bd780778a81cd301b1f819bd3004631a4314b4",
+      "bytes": 55072,
+      "kind": "yokohama-bulletin",
+      "publisher": "横浜市",
+      "documents": [
+        {
+          "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/somu/2025/0515jimusyorimisu.files/0084_20250514.pdf",
+          "inputFile": "municipal-4c6e3db0736ee8.pdf",
+          "sha256": "23481e343bc6700c7b5ab1c882ced24a09927e7c4cb0d1d0931de5eab3256615",
+          "bytes": 514623
+        }
+      ]
+    },
+    {
+      "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/somu/2025/0616jimusyorimisu.html",
+      "inputFile": "municipal-e7234d3bc77b61.html",
+      "sha256": "048795863cb5911cb6650a99a09d991c5d0b0c87e047563b9efea8761d95cc18",
+      "bytes": 55072,
+      "kind": "yokohama-bulletin",
+      "publisher": "横浜市",
+      "documents": [
+        {
+          "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/somu/2025/0616jimusyorimisu.files/0085_20250613.pdf",
+          "inputFile": "municipal-229447afef5921.pdf",
+          "sha256": "14c921a2239ad1d8c0329037e6798630eefe93d4a106219e00dbdc787c6e53ec",
+          "bytes": 532104
+        }
+      ]
+    },
+    {
+      "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/somu/2025/0715jimusyorimisu.html",
+      "inputFile": "municipal-5480dcc1884e4c.html",
+      "sha256": "46fea79048b7bc9c5a99633e6fc35c9d965ea7554d724d0cd025fe9738cbb676",
+      "bytes": 55072,
+      "kind": "yokohama-bulletin",
+      "publisher": "横浜市",
+      "documents": [
+        {
+          "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/somu/2025/0715jimusyorimisu.files/0086_20250714.pdf",
+          "inputFile": "municipal-e5e25cf8bfb4b1.pdf",
+          "sha256": "9d8b0429dbbf93a3c6552229db9531e02092717315754e61742e1b6411c62b4d",
+          "bytes": 513301
+        }
+      ]
+    },
+    {
+      "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/somu/2025/0815jimusyorimisu.html",
+      "inputFile": "municipal-0288df6c3a97b2.html",
+      "sha256": "042f7fbfd71563149193bcdd613c0abd5e93f893556f90b446682d7a301ebfd7",
+      "bytes": 55072,
+      "kind": "yokohama-bulletin",
+      "publisher": "横浜市",
+      "documents": [
+        {
+          "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/somu/2025/0815jimusyorimisu.files/0087_20250814.pdf",
+          "inputFile": "municipal-c274b755f53b58.pdf",
+          "sha256": "36ef674fb3fbd7d787a9700f21c9d612d34761c48e69bdd681aa9c45ef65ce4a",
+          "bytes": 507989
+        }
+      ]
+    },
+    {
+      "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/somu/2025/0916jimusyorimisu.html",
+      "inputFile": "municipal-f094b10fe3705d.html",
+      "sha256": "588c161108a83c6bf950ac7d7e5b640f91b87ffae485b71788838138f047b138",
+      "bytes": 55072,
+      "kind": "yokohama-bulletin",
+      "publisher": "横浜市",
+      "documents": [
+        {
+          "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/somu/2025/0916jimusyorimisu.files/0088_20250911.pdf",
+          "inputFile": "municipal-5de2aab0c5fbb7.pdf",
+          "sha256": "363bb33862ba6b80c492d4a30e03b4d7536f8650d54f951e620b2f029199d95a",
+          "bytes": 502416
+        }
+      ]
+    },
+    {
+      "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/somu/2025/1015jimusyorimisu.html",
+      "inputFile": "municipal-2e1c49a237de94.html",
+      "sha256": "8b45b0feea2d502de6961a91373e4c967cee194c4a46cf02fd3f8768f93fbf6d",
+      "bytes": 55072,
+      "kind": "yokohama-bulletin",
+      "publisher": "横浜市",
+      "documents": [
+        {
+          "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/somu/2025/1015jimusyorimisu.files/0091_20251014.pdf",
+          "inputFile": "municipal-acd881d8a6b33b.pdf",
+          "sha256": "5de144c24115297fb770b78383d0ae12a912ef5a3aac4808df465e77a36cc4d7",
+          "bytes": 531107
+        }
+      ]
+    },
+    {
+      "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/somu/2025/1117jimusyorimisu.html",
+      "inputFile": "municipal-fdf30a1ca5ce07.html",
+      "sha256": "0a138bee2a5aeb97c786d4dea7ffdb61513b6bef88fd6bb9f8c521faca731169",
+      "bytes": 55071,
+      "kind": "yokohama-bulletin",
+      "publisher": "横浜市",
+      "documents": [
+        {
+          "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/somu/2025/1117jimusyorimisu.files/0093_20251114.pdf",
+          "inputFile": "municipal-2c2221bf1f5fbf.pdf",
+          "sha256": "e9babf0081e6a2044fc0b837edba84e78a4a71aa86ec52e36a381617a69c4077",
+          "bytes": 529548
+        }
+      ]
+    },
+    {
+      "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/somu/2025/1215jimusyorimisu.html",
+      "inputFile": "municipal-2388af2526ba15.html",
+      "sha256": "f12270a2a5f7c693d5f0a16e4ecab77f0adff874a74eac03aa92ebb868db52fa",
+      "bytes": 55071,
+      "kind": "yokohama-bulletin",
+      "publisher": "横浜市",
+      "documents": [
+        {
+          "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/somu/2025/1215jimusyorimisu.files/0095_20251212.pdf",
+          "inputFile": "municipal-dfdfff0e4a82b1.pdf",
+          "sha256": "e80871ab4e15f1313625c9f880e1e0fc3d879b696b923156a8eab6714f3eff1a",
+          "bytes": 509772
+        }
+      ]
+    },
+    {
+      "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/somu/2026/0415jimusyorimisu.html",
+      "inputFile": "municipal-08539dd2f67d00.html",
+      "sha256": "5eb06c2e8183b40a8883b0d88704f576f9eab876a0bfe7c83b4281cbcb2d550c",
+      "bytes": 43582,
+      "kind": "yokohama-bulletin",
+      "publisher": "横浜市",
+      "documents": [
+        {
+          "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/somu/2026/0415jimusyorimisu.files/0107_20260414.pdf",
+          "inputFile": "municipal-1c27a6b43b10cc.pdf",
+          "sha256": "3cd574f57553a56299ea67aeba981cb72950f13bca23d5a21c448baf1334548e",
+          "bytes": 525851
+        }
+      ]
+    },
+    {
+      "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/somu/2026/0515jimusyorimisu.html",
+      "inputFile": "municipal-ab3eedff581fc6.html",
+      "sha256": "0fa0082113b9b99c416e378184473b16fc9e4bd709d0108389184e705fc738a0",
+      "bytes": 43582,
+      "kind": "yokohama-bulletin",
+      "publisher": "横浜市",
+      "documents": [
+        {
+          "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/somu/2026/0515jimusyorimisu.files/0109_20260514.pdf",
+          "inputFile": "municipal-f2740098e33dd2.pdf",
+          "sha256": "acff905a947ec0c7e7f8a0a69015960a1b26b0ec18566762e1b9336e8b88b813",
+          "bytes": 528436
+        }
+      ]
+    },
+    {
+      "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/somu/2026/0615jimusyorimisu.html",
+      "inputFile": "municipal-4fcfc087f1aed2.html",
+      "sha256": "2518e8a4a95a2a018ae11d4b7a4bd9d751ecf8fa4fa74a15d51c0dd3f8c10b46",
+      "bytes": 43582,
+      "kind": "yokohama-bulletin",
+      "publisher": "横浜市",
+      "documents": [
+        {
+          "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/somu/2026/0615jimusyorimisu.files/0114_20260611.pdf",
+          "inputFile": "municipal-9611d9028996ca.pdf",
+          "sha256": "791af6d70699ee7febd3cc5a2840ff07da229d293bc08a7b6067a4aba2d6462b",
+          "bytes": 511092
+        }
+      ]
+    },
+    {
+      "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/somu/2026/0715jimusyorimisu.html",
+      "inputFile": "municipal-2f073366104514.html",
+      "sha256": "1b06dd40c986367e24ff867adbc8c5f7aab68104c8aec7b3c3b55c42457a1ee3",
+      "bytes": 43582,
+      "kind": "yokohama-bulletin",
+      "publisher": "横浜市",
+      "documents": [
+        {
+          "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/somu/2026/0715jimusyorimisu.files/0122_20260714.pdf",
+          "inputFile": "municipal-441a4d69cd969d.pdf",
+          "sha256": "8aa9c70b54972b279a6e7f706bf38caa6f374cdabd53ac4e2dd3247c5374fd94",
+          "bytes": 363068
+        }
+      ]
+    },
+    {
+      "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/somu/2026/0817jimusyorimisu.html",
+      "inputFile": "municipal-16c2642004bb58.html",
+      "sha256": "b54b0a5da050e2611041c46b7850227f470af933fd6dc68447a078bf11cb8a68",
+      "bytes": 43582,
+      "kind": "yokohama-bulletin",
+      "publisher": "横浜市",
+      "documents": [
+        {
+          "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/somu/2026/0817jimusyorimisu.files/0125_20260814.pdf",
+          "inputFile": "municipal-40095086ed50cf.pdf",
+          "sha256": "9e6df5ad5dac8608fcd829cae2baa06492eec92d657c52fdda8324cb2a157efd",
+          "bytes": 251822
+        }
+      ]
+    },
+    {
+      "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/somu/2026/0915jimusyorimisu.html",
+      "inputFile": "municipal-81ae13bbc64d04.html",
+      "sha256": "b8741590715894e17044064aa9c7f9907f7fba01c18bbeca37f2e9180a9b651f",
+      "bytes": 43582,
+      "kind": "yokohama-bulletin",
+      "publisher": "横浜市",
+      "documents": [
+        {
+          "url": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/somu/2026/0915jimusyorimisu.files/0129_20260914.pdf",
+          "inputFile": "municipal-4d2075b2de9ef3.pdf",
+          "sha256": "f0b5d17b25947eb0c00a79d4893a629c7cfdefc49d5f09f18129356dc3f0b9db",
+          "bytes": 242318
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,687 @@
+{
+  "incidents": [
+    {
+      "id": "ipa-narrative-2022-09-cc015b6c",
+      "company": "ニトリホールディングス",
+      "shortName": "ニトリホールディングス",
+      "aliases": [],
+      "sector": "other",
+      "cause": "intrusion",
+      "year": 2022,
+      "announcedAt": "2022-09",
+      "sourceUpdatedAt": "2022-09",
+      "datePrecision": "month",
+      "status": "possible",
+      "scale": {
+        "value": 132000,
+        "unit": "accounts",
+        "qualifier": "approximate",
+        "label": "約13.2万アカウント"
+      },
+      "summary": "ニトリアプリの会員認証へのリスト型攻撃で、会員情報が閲覧された可能性が公表されました。",
+      "informationTypes": [
+        "氏名",
+        "住所",
+        "生年月日",
+        "カード番号の一部"
+      ],
+      "scopeNote": "IPA白書の本文で紹介された国内の個別事例です。企業グループ・委託先の関与や閲覧可能範囲は、下記の資料で確認できます。別事例と対象が重複する可能性があるため累計にしません。",
+      "countNote": "白書が記載した対象区分と公表規模を保持しています。公表日は資料で確定できる月までを表示し、日付を推測していません。閲覧可能数・紛失対象数は流出確認数とは異なります。資料後の続報を網羅した値ではありません。",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "IPA 白書2023・情報漏えいの本文事例（PDF 52ページ）",
+          "url": "https://www.ipa.go.jp/publish/wp-security/t6hhco00000014r1-att/2023_Chap1.pdf#page=52",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ipa-narrative-2022-10-48ff5b53",
+      "company": "ショーケース",
+      "shortName": "ショーケース",
+      "aliases": [],
+      "sector": "other",
+      "cause": "intrusion",
+      "year": 2022,
+      "announcedAt": "2022-10",
+      "sourceUpdatedAt": "2022-10",
+      "datePrecision": "month",
+      "status": "possible",
+      "scale": {
+        "value": null,
+        "unit": "unknown",
+        "qualifier": "undisclosed",
+        "label": "規模はこの本文では未公表"
+      },
+      "summary": "フォーム支援サービスのコードが改ざんされ、利用企業の入力情報が外部へ送られた可能性が公表されました。",
+      "informationTypes": [
+        "入力フォームの情報"
+      ],
+      "scopeNote": "IPA白書の本文で紹介された国内の個別事例です。企業グループ・委託先の関与や閲覧可能範囲は、下記の資料で確認できます。別事例と対象が重複する可能性があるため累計にしません。",
+      "countNote": "白書が記載した対象区分と公表規模を保持しています。公表日は資料で確定できる月までを表示し、日付を推測していません。閲覧可能数・紛失対象数は流出確認数とは異なります。資料後の続報を網羅した値ではありません。",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "IPA 白書2023・情報漏えいの本文事例（PDF 52ページ）",
+          "url": "https://www.ipa.go.jp/publish/wp-security/t6hhco00000014r1-att/2023_Chap1.pdf#page=52",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ipa-narrative-2022-10-475986be",
+      "company": "ユーキャン",
+      "shortName": "ユーキャン",
+      "aliases": [],
+      "sector": "other",
+      "cause": "intrusion",
+      "year": 2022,
+      "announcedAt": "2022-10-26",
+      "sourceUpdatedAt": "2022-10-26",
+      "status": "possible",
+      "scale": {
+        "value": 200,
+        "unit": "people",
+        "qualifier": "exact",
+        "label": "カード決済利用者200人（企業発表の定義）"
+      },
+      "summary": "フォーム支援サービスを利用するサイトで、入力したカード情報が流出した可能性が公表されました。",
+      "informationTypes": [
+        "カード番号",
+        "有効期限",
+        "セキュリティコード"
+      ],
+      "scopeNote": "IPA白書の本文で紹介された国内の個別事例です。企業グループ・委託先の関与や閲覧可能範囲は、下記の資料で確認できます。別事例と対象が重複する可能性があるため累計にしません。",
+      "countNote": "企業の原文はカード決済をしたお客様200名と記載しているため、白書の「200件」表記から対象人数に修正しています。全数の流出確認ではありません。",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "IPA 白書2023・情報漏えいの本文事例（PDF 52ページ）",
+          "url": "https://www.ipa.go.jp/publish/wp-security/t6hhco00000014r1-att/2023_Chap1.pdf#page=52",
+          "publishedAt": null
+        },
+        {
+          "title": "生涯学習のユーキャンサイトの個人情報漏えいに関するお知らせ",
+          "url": "https://www.u-can.co.jp/info/release.html",
+          "publishedAt": "2022-10-26"
+        }
+      ]
+    },
+    {
+      "id": "ipa-narrative-2022-10-7d272777",
+      "company": "エービーシー・マート",
+      "shortName": "エービーシー・マート",
+      "aliases": [
+        "ABC-MART"
+      ],
+      "sector": "other",
+      "cause": "intrusion",
+      "year": 2022,
+      "announcedAt": "2022-10",
+      "sourceUpdatedAt": "2022-10",
+      "datePrecision": "month",
+      "status": "possible",
+      "scale": {
+        "value": 2298,
+        "unit": "records",
+        "qualifier": "exact",
+        "label": "カード情報2,298件"
+      },
+      "summary": "フォーム支援サービスを利用するサイトで、入力したカード情報が流出した可能性が公表されました。",
+      "informationTypes": [
+        "カード番号",
+        "有効期限",
+        "セキュリティコード"
+      ],
+      "scopeNote": "IPA白書の本文で紹介された国内の個別事例です。企業グループ・委託先の関与や閲覧可能範囲は、下記の資料で確認できます。別事例と対象が重複する可能性があるため累計にしません。",
+      "countNote": "白書が記載した対象区分と公表規模を保持しています。公表日は資料で確定できる月までを表示し、日付を推測していません。閲覧可能数・紛失対象数は流出確認数とは異なります。資料後の続報を網羅した値ではありません。公表月はNTT DATA INTELLILINKの時系列調査で確認した2022年10月です。",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "IPA 白書2023・情報漏えいの本文事例（PDF 52ページ）",
+          "url": "https://www.ipa.go.jp/publish/wp-security/t6hhco00000014r1-att/2023_Chap1.pdf#page=52",
+          "publishedAt": null
+        },
+        {
+          "title": "NTT DATA INTELLILINK・入力支援サービス被害の時系列（2023年調査）",
+          "url": "https://www.intellilink.co.jp/-/media/ndil/ndil-jp/column/security/2023/072800/security_report-202303-3.pdf",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ipa-narrative-2022-11-4c52387b",
+      "company": "カクヤス",
+      "shortName": "カクヤス",
+      "aliases": [],
+      "sector": "other",
+      "cause": "intrusion",
+      "year": 2022,
+      "announcedAt": "2022-11",
+      "sourceUpdatedAt": "2022-11",
+      "datePrecision": "month",
+      "status": "confirmed",
+      "scale": {
+        "value": 8094,
+        "unit": "records",
+        "qualifier": "exact",
+        "label": "カード情報8,094件"
+      },
+      "summary": "フォーム支援サービスを利用するサイトで、カード情報の漏えいが確認されました。",
+      "informationTypes": [
+        "カード番号",
+        "有効期限",
+        "セキュリティコード"
+      ],
+      "scopeNote": "IPA白書の本文で紹介された国内の個別事例です。企業グループ・委託先の関与や閲覧可能範囲は、下記の資料で確認できます。別事例と対象が重複する可能性があるため累計にしません。",
+      "countNote": "白書が記載した対象区分と公表規模を保持しています。公表日は資料で確定できる月までを表示し、日付を推測していません。閲覧可能数・紛失対象数は流出確認数とは異なります。資料後の続報を網羅した値ではありません。公表月はNTT DATA INTELLILINKの時系列調査で確認した2022年11月です。",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "IPA 白書2023・情報漏えいの本文事例（PDF 52ページ）",
+          "url": "https://www.ipa.go.jp/publish/wp-security/t6hhco00000014r1-att/2023_Chap1.pdf#page=52",
+          "publishedAt": null
+        },
+        {
+          "title": "NTT DATA INTELLILINK・入力支援サービス被害の時系列（2023年調査）",
+          "url": "https://www.intellilink.co.jp/-/media/ndil/ndil-jp/column/security/2023/072800/security_report-202303-3.pdf",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ipa-narrative-2022-10-32ff3e96",
+      "company": "JTB",
+      "shortName": "JTB",
+      "aliases": [
+        "ジェイティービー"
+      ],
+      "sector": "other",
+      "cause": "exposure",
+      "year": 2022,
+      "announcedAt": "2022-10",
+      "sourceUpdatedAt": "2022-10",
+      "datePrecision": "month",
+      "status": "possible",
+      "scale": {
+        "value": 11483,
+        "unit": "people",
+        "qualifier": "maximum",
+        "label": "最大11,483人分"
+      },
+      "summary": "補助事業の事務局が管理するクラウドの権限設定により、他事業者が書類を閲覧できる状態になりました。",
+      "informationTypes": [
+        "担当者氏名",
+        "組織名",
+        "電話番号"
+      ],
+      "scopeNote": "IPA白書の本文で紹介された国内の個別事例です。企業グループ・委託先の関与や閲覧可能範囲は、下記の資料で確認できます。別事例と対象が重複する可能性があるため累計にしません。",
+      "countNote": "白書が記載した対象区分と公表規模を保持しています。公表日は資料で確定できる月までを表示し、日付を推測していません。閲覧可能数・紛失対象数は流出確認数とは異なります。資料後の続報を網羅した値ではありません。",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "IPA 白書2023・情報漏えいの本文事例（PDF 53ページ）",
+          "url": "https://www.ipa.go.jp/publish/wp-security/t6hhco00000014r1-att/2023_Chap1.pdf#page=53",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ipa-narrative-2023-01-8281f06c",
+      "company": "アフラック生命保険",
+      "shortName": "アフラック生命保険",
+      "aliases": [],
+      "sector": "other",
+      "cause": "intrusion",
+      "year": 2023,
+      "announcedAt": "2023-01",
+      "sourceUpdatedAt": "2023-01",
+      "datePrecision": "month",
+      "status": "confirmed",
+      "scale": {
+        "value": 1320000,
+        "unit": "people",
+        "qualifier": "approximate",
+        "label": "約132万人"
+      },
+      "summary": "海外の委託先への不正アクセスに関連して、顧客情報が外部サイトへ掲載されました。",
+      "informationTypes": [
+        "氏名（姓）",
+        "年齢",
+        "性別"
+      ],
+      "scopeNote": "IPA白書の本文で紹介された国内の個別事例です。企業グループ・委託先の関与や閲覧可能範囲は、下記の資料で確認できます。別事例と対象が重複する可能性があるため累計にしません。",
+      "countNote": "白書が記載した対象区分と公表規模を保持しています。公表日は資料で確定できる月までを表示し、日付を推測していません。閲覧可能数・紛失対象数は流出確認数とは異なります。資料後の続報を網羅した値ではありません。",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "IPA 白書2023・情報漏えいの本文事例（PDF 53ページ）",
+          "url": "https://www.ipa.go.jp/publish/wp-security/t6hhco00000014r1-att/2023_Chap1.pdf#page=53",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ipa-narrative-2023-01-6dec870b",
+      "company": "チューリッヒ保険",
+      "shortName": "チューリッヒ保険",
+      "aliases": [],
+      "sector": "other",
+      "cause": "intrusion",
+      "year": 2023,
+      "announcedAt": "2023-01",
+      "sourceUpdatedAt": "2023-01",
+      "datePrecision": "month",
+      "status": "confirmed",
+      "scale": {
+        "value": 750000,
+        "unit": "people",
+        "qualifier": "approximate",
+        "label": "約75万人"
+      },
+      "summary": "海外の委託先への不正アクセスに関連して、顧客情報が外部サイトへ掲載されました。",
+      "informationTypes": [
+        "氏名（姓）",
+        "生年月日",
+        "性別"
+      ],
+      "scopeNote": "IPA白書の本文で紹介された国内の個別事例です。企業グループ・委託先の関与や閲覧可能範囲は、下記の資料で確認できます。別事例と対象が重複する可能性があるため累計にしません。",
+      "countNote": "白書が記載した対象区分と公表規模を保持しています。公表日は資料で確定できる月までを表示し、日付を推測していません。閲覧可能数・紛失対象数は流出確認数とは異なります。資料後の続報を網羅した値ではありません。",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "IPA 白書2023・情報漏えいの本文事例（PDF 53ページ）",
+          "url": "https://www.ipa.go.jp/publish/wp-security/t6hhco00000014r1-att/2023_Chap1.pdf#page=53",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ipa-narrative-2022-06-c42ebaae",
+      "company": "尼崎市（委託先BIPROGY関係会社）",
+      "shortName": "尼崎市（委託先BIPROGY関係会社）",
+      "aliases": [],
+      "sector": "other",
+      "cause": "loss",
+      "year": 2022,
+      "announcedAt": "2022-06",
+      "sourceUpdatedAt": "2022-11",
+      "datePrecision": "month",
+      "status": "possible",
+      "scale": {
+        "value": 460000,
+        "unit": "people",
+        "qualifier": "approximate",
+        "label": "約46万人分の紛失対象（流出は未確認）"
+      },
+      "summary": "市民情報を保存したUSBメモリーを委託先の関係会社社員が紛失しました。回収後の調査では個人情報の漏えいは確認されませんでした。",
+      "informationTypes": [
+        "住民基本台帳",
+        "税情報",
+        "給付金",
+        "口座情報"
+      ],
+      "scopeNote": "IPA白書の本文で紹介された国内の個別事例です。企業グループ・委託先の関与や閲覧可能範囲は、下記の資料で確認できます。別事例と対象が重複する可能性があるため累計にしません。",
+      "countNote": "白書が記載した対象区分と公表規模を保持しています。公表日は資料で確定できる月までを表示し、日付を推測していません。閲覧可能数・紛失対象数は流出確認数とは異なります。資料後の続報を網羅した値ではありません。",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "IPA 白書2023・情報漏えいの本文事例（PDF 54ページ）",
+          "url": "https://www.ipa.go.jp/publish/wp-security/t6hhco00000014r1-att/2023_Chap1.pdf#page=54",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ipa-narrative-2022-06-810caad3",
+      "company": "杏林大学医学部付属病院",
+      "shortName": "杏林大学医学部付属病院",
+      "aliases": [],
+      "sector": "other",
+      "cause": "loss",
+      "year": 2022,
+      "announcedAt": "2022-06",
+      "sourceUpdatedAt": "2022-06",
+      "datePrecision": "month",
+      "status": "possible",
+      "scale": {
+        "value": 27,
+        "unit": "people",
+        "qualifier": "exact",
+        "label": "患者27人分の紛失対象"
+      },
+      "summary": "院外へ持ち出したUSBメモリーが紛失し、患者の検査データ等が対象になりました。",
+      "informationTypes": [
+        "氏名",
+        "患者ID",
+        "検査データ",
+        "睡眠時動画"
+      ],
+      "scopeNote": "IPA白書の本文で紹介された国内の個別事例です。企業グループ・委託先の関与や閲覧可能範囲は、下記の資料で確認できます。別事例と対象が重複する可能性があるため累計にしません。",
+      "countNote": "白書が記載した対象区分と公表規模を保持しています。公表日は資料で確定できる月までを表示し、日付を推測していません。閲覧可能数・紛失対象数は流出確認数とは異なります。資料後の続報を網羅した値ではありません。",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "IPA 白書2023・情報漏えいの本文事例（PDF 54ページ）",
+          "url": "https://www.ipa.go.jp/publish/wp-security/t6hhco00000014r1-att/2023_Chap1.pdf#page=54",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ipa-narrative-2022-09-2b1c113c",
+      "company": "イトーヨーカ堂",
+      "shortName": "イトーヨーカ堂",
+      "aliases": [],
+      "sector": "other",
+      "cause": "loss",
+      "year": 2022,
+      "announcedAt": "2022-09",
+      "sourceUpdatedAt": "2022-09",
+      "datePrecision": "month",
+      "status": "possible",
+      "scale": {
+        "value": 1056,
+        "unit": "people",
+        "qualifier": "exact",
+        "label": "購入者1,056人分の紛失対象"
+      },
+      "summary": "自転車購入者の登録書類が見当たらず、店舗間の引き継ぎ後に廃棄した可能性が公表されました。",
+      "informationTypes": [
+        "氏名",
+        "住所",
+        "電話番号"
+      ],
+      "scopeNote": "IPA白書の本文で紹介された国内の個別事例です。企業グループ・委託先の関与や閲覧可能範囲は、下記の資料で確認できます。別事例と対象が重複する可能性があるため累計にしません。",
+      "countNote": "白書が記載した対象区分と公表規模を保持しています。公表日は資料で確定できる月までを表示し、日付を推測していません。閲覧可能数・紛失対象数は流出確認数とは異なります。資料後の続報を網羅した値ではありません。",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "IPA 白書2023・情報漏えいの本文事例（PDF 55ページ）",
+          "url": "https://www.ipa.go.jp/publish/wp-security/t6hhco00000014r1-att/2023_Chap1.pdf#page=55",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ipa-narrative-2023-11-e1b16899",
+      "company": "JCOM",
+      "shortName": "JCOM",
+      "aliases": [
+        "J:COM",
+        "ジェイコム"
+      ],
+      "sector": "other",
+      "cause": "intrusion",
+      "year": 2023,
+      "announcedAt": "2023-11",
+      "sourceUpdatedAt": "2023-11",
+      "datePrecision": "month",
+      "status": "confirmed",
+      "scale": {
+        "value": 230000,
+        "unit": "records",
+        "qualifier": "approximate",
+        "label": "約23万件（白書掲載値）"
+      },
+      "summary": "メッシュWi-Fiの提携先サーバーへの不正アクセスにより、顧客の氏名等が漏えいしました。",
+      "informationTypes": [
+        "氏名",
+        "メールアドレス"
+      ],
+      "scopeNote": "IPA白書の本文で紹介された国内の個別事例です。企業グループ・委託先の関与や閲覧可能範囲は、下記の資料で確認できます。別事例と対象が重複する可能性があるため累計にしません。",
+      "countNote": "白書が記載した対象区分と公表規模を保持しています。公表日は資料で確定できる月までを表示し、日付を推測していません。閲覧可能数・紛失対象数は流出確認数とは異なります。資料後の続報を網羅した値ではありません。",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "IPA 白書2024・情報漏えいの本文事例（PDF 50ページ）",
+          "url": "https://www.ipa.go.jp/publish/wp-security/eid2eo0000007gv4-att/2024_Chap1.pdf#page=50",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ipa-narrative-2023-04-5676d866",
+      "company": "ひまわりネットワーク",
+      "shortName": "ひまわりネットワーク",
+      "aliases": [],
+      "sector": "other",
+      "cause": "mistake",
+      "year": 2023,
+      "announcedAt": "2023-04",
+      "sourceUpdatedAt": "2023-04",
+      "datePrecision": "month",
+      "status": "confirmed",
+      "scale": {
+        "value": 652,
+        "unit": "records",
+        "qualifier": "exact",
+        "label": "メールアドレス652件"
+      },
+      "summary": "宛先をBCCへ変換する機能が停止し、同時送信したメールのアドレスが受信者に見える状態になりました。",
+      "informationTypes": [
+        "メールアドレス"
+      ],
+      "scopeNote": "IPA白書の本文で紹介された国内の個別事例です。企業グループ・委託先の関与や閲覧可能範囲は、下記の資料で確認できます。別事例と対象が重複する可能性があるため累計にしません。",
+      "countNote": "白書が記載した対象区分と公表規模を保持しています。公表日は資料で確定できる月までを表示し、日付を推測していません。閲覧可能数・紛失対象数は流出確認数とは異なります。資料後の続報を網羅した値ではありません。",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "IPA 白書2024・情報漏えいの本文事例（PDF 51ページ）",
+          "url": "https://www.ipa.go.jp/publish/wp-security/eid2eo0000007gv4-att/2024_Chap1.pdf#page=51",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ipa-narrative-2023-06-3e361083",
+      "company": "出前館",
+      "shortName": "出前館",
+      "aliases": [
+        "demaecan"
+      ],
+      "sector": "other",
+      "cause": "mistake",
+      "year": 2023,
+      "announcedAt": "2023-06",
+      "sourceUpdatedAt": "2023-06",
+      "datePrecision": "month",
+      "status": "possible",
+      "scale": {
+        "value": 9244553,
+        "unit": "accounts",
+        "qualifier": "exact",
+        "label": "対象アカウント9,244,553件"
+      },
+      "summary": "アカウント連携の不備により、端末を共有した別の利用者がログイン情報を閲覧できる状態になりました。",
+      "informationTypes": [
+        "アカウント情報"
+      ],
+      "scopeNote": "IPA白書の本文で紹介された国内の個別事例です。企業グループ・委託先の関与や閲覧可能範囲は、下記の資料で確認できます。別事例と対象が重複する可能性があるため累計にしません。",
+      "countNote": "白書が記載した対象区分と公表規模を保持しています。公表日は資料で確定できる月までを表示し、日付を推測していません。閲覧可能数・紛失対象数は流出確認数とは異なります。資料後の続報を網羅した値ではありません。",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "IPA 白書2024・情報漏えいの本文事例（PDF 51ページ）",
+          "url": "https://www.ipa.go.jp/publish/wp-security/eid2eo0000007gv4-att/2024_Chap1.pdf#page=51",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ipa-narrative-2023-11-c869506b",
+      "company": "九州電力",
+      "shortName": "九州電力",
+      "aliases": [],
+      "sector": "other",
+      "cause": "exposure",
+      "year": 2023,
+      "announcedAt": "2023-11",
+      "sourceUpdatedAt": "2023-11",
+      "datePrecision": "month",
+      "status": "possible",
+      "scale": {
+        "value": 2900000,
+        "unit": "records",
+        "qualifier": "approximate",
+        "label": "約290万件の閲覧可能な情報"
+      },
+      "summary": "帳票システムの権限設定により、顧客情報が送配電子会社から閲覧できる状態になっていました。",
+      "informationTypes": [
+        "氏名",
+        "料金プラン",
+        "電気料金"
+      ],
+      "scopeNote": "IPA白書の本文で紹介された国内の個別事例です。企業グループ・委託先の関与や閲覧可能範囲は、下記の資料で確認できます。別事例と対象が重複する可能性があるため累計にしません。",
+      "countNote": "白書が記載した対象区分と公表規模を保持しています。公表日は資料で確定できる月までを表示し、日付を推測していません。閲覧可能数・紛失対象数は流出確認数とは異なります。資料後の続報を網羅した値ではありません。",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "IPA 白書2024・情報漏えいの本文事例（PDF 51ページ）",
+          "url": "https://www.ipa.go.jp/publish/wp-security/eid2eo0000007gv4-att/2024_Chap1.pdf#page=51",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ipa-narrative-2023-12-74ece0a3",
+      "company": "エイチーム",
+      "shortName": "エイチーム",
+      "aliases": [
+        "Ateam"
+      ],
+      "sector": "other",
+      "cause": "exposure",
+      "year": 2023,
+      "announcedAt": "2023-12",
+      "sourceUpdatedAt": "2023-12",
+      "datePrecision": "month",
+      "status": "possible",
+      "scale": {
+        "value": 940000,
+        "unit": "records",
+        "qualifier": "approximate",
+        "label": "約94万件（白書掲載値）"
+      },
+      "summary": "クラウド上のファイルが、リンクを知る外部の人から閲覧できる設定になっていました。",
+      "informationTypes": [
+        "個人情報"
+      ],
+      "scopeNote": "IPA白書の本文で紹介された国内の個別事例です。企業グループ・委託先の関与や閲覧可能範囲は、下記の資料で確認できます。別事例と対象が重複する可能性があるため累計にしません。",
+      "countNote": "白書が記載した対象区分と公表規模を保持しています。公表日は資料で確定できる月までを表示し、日付を推測していません。閲覧可能数・紛失対象数は流出確認数とは異なります。資料後の続報を網羅した値ではありません。",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "IPA 白書2024・情報漏えいの本文事例（PDF 52ページ）",
+          "url": "https://www.ipa.go.jp/publish/wp-security/eid2eo0000007gv4-att/2024_Chap1.pdf#page=52",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ipa-narrative-2023-11-a52fa0eb",
+      "company": "プラスワン教育",
+      "shortName": "プラスワン教育",
+      "aliases": [],
+      "sector": "other",
+      "cause": "mistake",
+      "year": 2023,
+      "announcedAt": "2023-11",
+      "sourceUpdatedAt": "2023-11",
+      "datePrecision": "month",
+      "status": "confirmed",
+      "scale": {
+        "value": 3732,
+        "unit": "people",
+        "qualifier": "exact",
+        "label": "3,732人分（受信者約2,000人とは加算しない）"
+      },
+      "summary": "子供や保護者の情報を含むCSVファイルを、会員への電子メールに誤って添付して送信しました。",
+      "informationTypes": [
+        "氏名",
+        "生年月日",
+        "住所"
+      ],
+      "scopeNote": "IPA白書の本文で紹介された国内の個別事例です。企業グループ・委託先の関与や閲覧可能範囲は、下記の資料で確認できます。別事例と対象が重複する可能性があるため累計にしません。",
+      "countNote": "白書が記載した対象区分と公表規模を保持しています。公表日は資料で確定できる月までを表示し、日付を推測していません。閲覧可能数・紛失対象数は流出確認数とは異なります。資料後の続報を網羅した値ではありません。",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "IPA 白書2024・情報漏えいの本文事例（PDF 52ページ）",
+          "url": "https://www.ipa.go.jp/publish/wp-security/eid2eo0000007gv4-att/2024_Chap1.pdf#page=52",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ipa-narrative-2024-06-4dcbb9fb",
+      "company": "筑波大学",
+      "shortName": "筑波大学",
+      "aliases": [],
+      "sector": "other",
+      "cause": "mistake",
+      "year": 2024,
+      "announcedAt": "2024-06",
+      "sourceUpdatedAt": "2024-06",
+      "datePrecision": "month",
+      "status": "confirmed",
+      "scale": {
+        "value": 1200,
+        "unit": "records",
+        "qualifier": "approximate",
+        "label": "個人情報等を含むメール約1,200件"
+      },
+      "summary": "教員が私用アドレスへの転送先を誤り、第三者へメールを転送していました。",
+      "informationTypes": [
+        "個人情報を含む電子メール"
+      ],
+      "scopeNote": "IPA白書の本文で紹介された国内の個別事例です。企業グループ・委託先の関与や閲覧可能範囲は、下記の資料で確認できます。別事例と対象が重複する可能性があるため累計にしません。",
+      "countNote": "白書が記載した対象区分と公表規模を保持しています。公表日は資料で確定できる月までを表示し、日付を推測していません。閲覧可能数・紛失対象数は流出確認数とは異なります。資料後の続報を網羅した値ではありません。全メール約1万件のうち個人情報等を含む約1,200件を採用し、両者を加算しません。この表の日付は企業の初回公表日ではなく「報道時期」です。",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "IPA 白書2025・情報漏えいの本文事例（PDF 57ページ）",
+          "url": "https://www.ipa.go.jp/publish/wp-security/j5u9nn0000004wk0-att/ISWP2025_Chap1.pdf#page=57",
+          "publishedAt": null
+        }
+      ],
+      "dateKind": "reported"
+    },
+    {
+      "id": "ipa-narrative-2024-08-a63843c0",
+      "company": "東急リバブル",
+      "shortName": "東急リバブル",
+      "aliases": [],
+      "sector": "other",
+      "cause": "insider",
+      "year": 2024,
+      "announcedAt": "2024-08",
+      "sourceUpdatedAt": "2024-08",
+      "datePrecision": "month",
+      "status": "confirmed",
+      "scale": {
+        "value": 25000,
+        "unit": "people",
+        "qualifier": "approximate",
+        "label": "25,000人超分",
+        "bound": "minimum"
+      },
+      "summary": "退職した従業員が社内資料を持ち出し、一部を転職先のダイレクトメールに利用していました。",
+      "informationTypes": [
+        "不動産登記簿に基づく顧客情報"
+      ],
+      "scopeNote": "IPA白書の本文で紹介された国内の個別事例です。企業グループ・委託先の関与や閲覧可能範囲は、下記の資料で確認できます。別事例と対象が重複する可能性があるため累計にしません。",
+      "countNote": "白書が記載した対象区分と公表規模を保持しています。公表日は資料で確定できる月までを表示し、日付を推測していません。閲覧可能数・紛失対象数は流出確認数とは異なります。資料後の続報を網羅した値ではありません。この表の日付は企業の初回公表日ではなく「報道時期」です。",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "IPA 白書2025・情報漏えいの本文事例（PDF 57ページ）",
+          "url": "https://www.ipa.go.jp/publish/wp-security/j5u9nn0000004wk0-att/ISWP2025_Chap1.pdf#page=57",
+          "publishedAt": null
+        }
+      ],
+      "dateKind": "reported"
+    }
+  ]
+}

@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f5f7f8">
+  <title>漏洩の地図 | 過去の記録から、これからの備えへ — Day64</title>
+  <meta name="description" content="日本4,652・全18,001の公表記録を検索・地図で確かめ、IPAなどの公的資料から備えを学ぶ。">
+  <link rel="canonical" href="https://hundred-days.pages.dev/day-064-breach-atlas/">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="漏洩の地図">
+  <meta property="og:description" content="日本の公表・報道記録と米国政府の公開台帳を確かめ、原因別に備えを学ぶ。日本4,652・全18,001公表記録。">
+  <meta property="og:url" content="https://hundred-days.pages.dev/day-064-breach-atlas/">
+  <meta property="og:image" content="https://hundred-days.pages.dev/day-064-breach-atlas/og.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="漏洩の地図 | Day64">
+  <meta name="twitter:description" content="日本の事例と米国政府の漏えい公開台帳を、年代と規模からたどる。">
+  <meta name="twitter:image" content="https://hundred-days.pages.dev/day-064-breach-atlas/og.png">
+  <link rel="icon" type="image/svg+xml" href="./favicon.svg">
+  <link rel="stylesheet" href="./shared/share.css">
+</head>
+<body>
+  <a class="skip-link" href="#map-title">記録一覧へ移動</a>
+  <header class="masthead">
+    <div class="brand"><span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 40 40"><path d="m20 3 15 10v15L20 37 5 28V13Z M5 13l15 10 15-10 M20 23v14 M20 3v20"/></svg></span><div><p class="eyebrow">DAY 064 / BREACH ATLAS</p><h1>漏洩の地図</h1></div></div>
+    <div class="header-actions"><span class="as-of">出典確認 <time id="as-of">2026.10.12</time></span><button class="quiet-button" id="open-method">読み方</button><button class="quiet-button" id="open-coverage">収録範囲・資料</button></div>
+  </header>
+  <section class="overview" aria-labelledby="overview-title">
+    <div class="overview-layout">
+      <div class="overview-story">
+        <div class="overview-intro"><p class="eyebrow">PUBLIC RECORDS → LEARNING</p><h2 id="overview-title">過去の記録から、<br>これからの備えへ。</h2><p>公表内容を確かめ、個人や組織の備えに役立てる。</p></div>
+        <div class="archive-total"><span>収録した公表記録</span><p><strong id="total-incidents">—</strong><span>記録</span></p><small>日本の事例＋米国の届出。複数の記録が同じ事故を指す場合があります。</small></div>
+        <div class="summary-grid">
+          <div class="summary-card"><span>企業・組織の名称</span><strong id="total-companies">—</strong></div>
+          <div class="summary-card"><span>収録期間</span><span class="year-range" id="year-range">—</span></div>
+          <div class="summary-card"><span>参照資料</span><span><strong id="total-sources">—</strong> 資料</span></div>
+        </div>
+        <section class="search-entry" aria-labelledby="search-entry-title">
+          <h3 id="search-entry-title">企業・サービス名から探す</h3>
+          <form class="quick-search-form" id="quick-search-form" role="search"><label class="quick-search-field"><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="10" cy="10" r="6.5"/><path d="m15 15 5 5"/></svg><input id="quick-search" type="search" placeholder="例：KDDI、ベネッセ、NTTドコモ" aria-label="企業・サービス名から記録を探す" autocomplete="off" maxlength="100"><kbd aria-hidden="true">/</kbd></label><button class="primary-button" type="submit">検索</button></form>
+          <div class="search-examples"><span>すぐに見る</span><button type="button" data-search-example="KDDI">KDDI</button><button type="button" data-search-example="ベネッセ">ベネッセ</button><button type="button" data-search-example="NTTドコモ">NTTドコモ</button><button type="button" id="show-japan-intrusions">日本の外部侵入 →</button><button type="button" id="clear-search" hidden>検索語を消す ×</button></div>
+        </section>
+      </div>
+      <details class="overview-charts" id="overview-charts">
+        <summary><span>年代・原因から探す<small>グラフを押すと記録を絞れます</small></span><span class="details-chevron" aria-hidden="true">⌄</span></summary>
+        <div class="distribution-grid">
+          <section class="chart-panel" aria-labelledby="year-chart-title"><div class="chart-heading"><h3 id="year-chart-title">資料の年ごとの記録数</h3><span>年を選ぶ →</span></div><div class="year-chart-scroll"><div class="year-chart" id="year-chart" aria-label="年別の公表記録数"></div></div><p class="chart-caption">資料に収録した記録数。事故の発生件数とは異なります。</p></section>
+          <section class="chart-panel causes-panel" aria-labelledby="cause-chart-title"><div class="chart-heading"><h3 id="cause-chart-title">公表された原因</h3><span>原因を選ぶ →</span></div><div class="cause-chart" id="cause-chart"></div><p class="chart-caption">資料に記載のない原因は「不明」のまま表示します。</p></section>
+        </div>
+      </details>
+    </div>
+  </section>
+  <nav class="scope-bar" aria-label="収録地域"><span class="scope-caption">どの地域を見る？</span><div id="region-tabs" class="region-tabs"></div><p>数字は現在の条件に合う記録数</p></nav>
+  <nav class="unit-bar" aria-label="表示する事例の単位"><div><span class="unit-caption">規模の単位</span><div class="unit-tabs" id="unit-tabs"></div></div><p class="unit-note" id="unit-note">異なる単位の数字を合計・順位付けしません。</p></nav>
+  <main class="workspace" data-view="timeline">
+    <aside class="explorer" id="explorer" aria-labelledby="explorer-title">
+      <div class="panel-heading"><h2 id="explorer-title">詳しい条件</h2><button class="icon-button" id="close-explorer" aria-label="絞り込みを閉じる">×</button></div>
+      <div class="filter-controls"><label class="search-box"><span aria-hidden="true">⌕</span><input id="search" type="search" placeholder="企業名・サービス名" aria-label="企業名・サービス名で検索" autocomplete="off" maxlength="100"><kbd aria-hidden="true">/</kbd></label>
+        <label>資料・台帳<select id="registry"><option value="all">すべての資料</option></select></label>
+        <label>原因<select id="cause"><option value="all">すべての原因</option></select></label>
+        <label>資料に関連する地域<select id="location"><option value="all">すべての地域</option></select></label>
+        <div class="filter-grid"><label>記録の年<select id="period"><option value="all">すべての年</option><option value="recent">2025–2026年</option><option value="historical">2024年以前</option></select></label><label>確認状況<select id="status"><option value="all">すべての状況</option><option value="confirmed">流出・第三者提供の確認あり</option><option value="possible">可能性・流出未確認</option><option value="reported">当局への届出</option><option value="notice">公表・報道の記録</option></select></label></div>
+      </div>
+      <div class="list-heading"><h3 id="list-count">—事例</h3><button id="reset-filters" class="text-button">リセット</button></div><p class="list-subtitle" id="list-subtitle">公表日の新しい順</p>
+      <ol class="company-list" id="company-list" tabindex="-1" aria-label="条件に合う公表事例一覧"></ol>
+      <div class="list-empty" id="list-empty" hidden><p>条件に合う事例が<br>見つかりませんでした。</p><p id="other-units"></p><div id="other-unit-buttons"></div><button class="quiet-button" id="empty-reset">条件をリセット</button></div>
+      <div class="explorer-foot"><button class="primary-button" id="apply-filters">この条件で記録を見る →</button></div>
+    </aside>
+    <section class="map-panel" aria-labelledby="map-title">
+      <div class="map-toolbar"><div><p class="eyebrow">EXPLORE / 公表された記録</p><h2 id="map-title" tabindex="-1">公表記録の一覧</h2><p id="visible-count">—記録</p></div><button class="quiet-button" id="open-explorer" aria-expanded="false" aria-controls="explorer">詳しい条件</button></div>
+      <nav class="view-tabs" aria-label="目的に合わせて表示"><button id="view-globe" data-view="globe" aria-pressed="true"><span aria-hidden="true">◎</span> 地図で見る</button><button id="view-timeline" data-view="timeline" aria-pressed="false"><span aria-hidden="true">≡</span> 一覧で読む</button><button id="view-learn" data-view="learn" aria-pressed="false"><span aria-hidden="true">▤</span> 備えを学ぶ</button><details class="analysis-menu" id="analysis-menu"><summary aria-label="分析ツールを開く"><span class="analysis-label">分析ツール ⌄</span><span class="analysis-more" aria-hidden="true">⋯</span></summary><div><button id="view-compare" data-view="compare" aria-pressed="false">規模を比較</button><button id="view-map" data-view="map" aria-pressed="false">原因マップ</button></div></details></nav>
+      <div class="active-filters" id="active-filters"></div>
+      <section class="globe-view" id="globe-view" aria-label="資料に関連する地域の地球儀" hidden>
+        <div class="globe-controls"><div class="globe-location-field"><label for="globe-location">地域から探す</label><select id="globe-location"><option value="all">すべての地域</option></select></div><div class="globe-actions"><div class="view-switch" aria-label="地球儀の表示"><button id="globe-3d" aria-pressed="true">3D</button><button id="globe-2d" aria-pressed="false">平面</button></div><button class="icon-button" id="globe-zoom-in" aria-label="地球儀を拡大">＋</button><button class="icon-button" id="globe-zoom-out" aria-label="地球儀を縮小">−</button><button class="icon-button" id="globe-fit" aria-label="地球儀の表示を戻す">⛶</button></div></div>
+        <div class="globe-stage" id="globe-stage"><div class="globe-mount" id="globe-mount"></div><div class="globe-labels" id="globe-labels"></div><div class="globe-caption"><span class="globe-snapshot">PUBLIC RECORDS / 公表資料</span><p id="globe-summary">地球儀を準備しています…</p></div><p class="globe-error" id="globe-error" hidden></p><p class="globe-empty" id="globe-empty" hidden>条件に合う記録がありません。条件を解除して探し直せます。</p><p class="globe-hint" id="globe-hint">ドラッグで回転 · 光点で地域を選択</p></div><details class="globe-legend"><summary>原因の色・絞り込み <span aria-hidden="true">⌄</span></summary><div class="globe-causes" id="globe-causes" aria-label="原因の色と絞り込み"></div></details>
+        <div class="globe-period"><button class="quiet-button" id="globe-play" aria-pressed="false">▷ 年代を再生</button><label class="globe-year-control" for="globe-year"><span>記録の年 <strong id="globe-year-label">全期間</strong></span><input id="globe-year" type="range" min="2000" max="2026" value="2026" step="1" aria-label="公表資料に記載された年で絞り込み"></label><button class="quiet-button" id="globe-all-years">全期間</button></div>
+        <p class="globe-definition" id="globe-definition">光点は地域の代表点です。資料の関連地域を集約し、事故地点・攻撃経路は示しません。年代再生は過去の公表記録です。</p>
+        <div class="globe-record-heading"><h3>この条件の記録</h3><span id="globe-record-count">—</span><button class="text-button" data-view="timeline">一覧で読む →</button></div><div class="globe-records" id="globe-records"></div>
+        <p class="map-credit">地形・代表点: <a href="https://www.naturalearthdata.com/" target="_blank" rel="noopener noreferrer">Natural Earth</a> · 国・地域が未特定のものは国単位で表示</p>
+      </section>
+      <section class="learning-view" id="learning-view" aria-labelledby="learning-title" hidden><div id="learning-content"></div></section>
+      <section class="timeline-view" id="timeline-view" aria-label="年代順の公表履歴"><div class="content-heading"><p id="timeline-description">個々の事故を、年代順にたどる</p><label class="sort-label">順序<select id="sort"><option value="newest">新しい順</option><option value="oldest">古い順</option></select></label></div><div class="history-content" id="history-content"></div></section>
+      <section class="comparison-view" id="comparison-view" aria-label="同じ単位の公表規模の比較" hidden><div class="content-heading"><p id="comparison-description"></p></div><div class="comparison-content" id="comparison-content"></div><p class="comparison-foot">棒の長さは掲載規模に比例します。対象範囲・推計・最大値は各事例のノートで確認してください。</p></section>
+      <section class="map-view" id="map-view" aria-label="原因でつながる事例マップ" hidden><div class="graph-controls"><p id="map-scale-note"></p><div class="map-actions"><div class="view-switch" aria-label="マップの表示モード"><button id="mode-3d" aria-pressed="true">3D</button><button id="mode-2d" aria-pressed="false">2D</button></div><button class="icon-button" id="fit-map" aria-label="マップ全体を表示" title="マップ全体を表示">⛶</button></div></div>
+        <div class="graph-stage" id="graph-stage"><div class="graph-mount" id="graph-mount"></div><div class="graph-labels" id="graph-labels"></div><p class="graph-empty" id="graph-empty" hidden>条件に合う事例はありません。</p><p class="graph-fallback" id="graph-fallback" hidden>3Dを表示できないため、2Dマップに切り替えました。</p><p class="graph-hint" id="graph-instruction">ドラッグで回転・スクロールで拡大・球を選択</p></div>
+        <div class="map-legend"><div class="cause-legend" id="cause-legend" aria-label="原因の凡例"></div><p>線は共通の原因を示します。企業間の関係や攻撃経路ではありません。混雑時は一部のラベルを表示し、マップは最新120記録まで。全記録は一覧・時系列で選べます。</p></div>
+      </section>
+      <nav id="pagination" class="pagination" aria-label="記録のページ送り"><button id="page-first" aria-label="最初のページ">«</button><button id="page-prev" aria-label="前のページ">‹</button><span id="page-range">読み込み中…</span><button id="page-next" aria-label="次のページ">›</button><button id="page-last" aria-label="最後のページ">»</button></nav>
+    </section>
+    <aside class="company-note" id="company-note" aria-labelledby="note-panel-title"><div class="panel-heading note-heading"><h2 id="note-panel-title">公表内容と出典</h2><span class="note-index" id="note-index">—</span><button class="text-button mobile-only" id="back-to-records">一覧へ ↑</button></div><div class="note-content" id="note-content"></div></aside>
+  </main>
+  <footer class="page-footer"><p>公表資料と政府の届出記録 · 世界中の全事故を保証する台帳ではありません。</p><div><button class="text-button" data-open-coverage>収録範囲</button><a class="data-link" href="./data/incidents.json.gz" download="breach-atlas.json.gz">収録データ JSON（gzip）↓</a><a href="./licenses/THIRD_PARTY_NOTICES.txt" target="_blank" rel="noopener">出典・ライセンス ↗</a><a href="./licenses/rust/COPYRIGHT-library.html" target="_blank" rel="noopener">Rustの許諾 ↗</a><time id="footer-asof">出典確認 2026.10.12</time></div></footer>
+  <div class="drawer-backdrop" id="drawer-backdrop" hidden></div><div class="sr-only" id="announcer" role="status" aria-live="polite"></div><div class="toast" id="toast" role="status" hidden></div>
+  <dialog id="method-dialog" aria-labelledby="method-title"><div class="dialog-header"><p class="eyebrow">HOW TO READ</p><button class="icon-button" id="close-method" aria-label="読み方を閉じる">×</button></div><h2 id="method-title">確かめて、備えにつなげる。</h2><div class="method-item"><span>01</span><div><h3>企業名・地域から記録を探す</h3><p>検索・地図・一覧から記録を選ぶと、公表内容と出典を読めます。「年代・原因から探す」を開くと、グラフからも絞り込めます。資料に記載された年を示します。企業の公表日、当局への届出日、事例一覧の発生・報道日をノートで区別しています。</p></div></div><div class="method-item"><span>02</span><div><h3>同じ単位の規模を比べる</h3><p>「件」「人」「アカウント」は別の単位です。規模比較では一つの単位だけを表示し、別事故や情報項目の数を加算しません。「合計不明」をゼロとして扱いません。</p></div></div><div class="method-item"><span>03</span><div><h3>確認状況と原資料を見る</h3><p>紛失した人数、閲覧可能だった件数、実際に流出した数は異なります。ノートに数値の定義・対象範囲・推計を残しています。政府の年度表は最大の対象規模を掲載しており、企業の後の続報を全て反映した値ではありません。</p></div></div><div class="method-item"><span>04</span><div><h3>備えを学ぶ・分析ツールを使う</h3><p>「備えを学ぶ」で、原因別に見直す問いと公的資料を確認できます。地図の光点は関連地域の代表点です。分析ツールの原因マップでは、「全記録」の球は同じ大きさです。同じ数値単位を選ぶと球は対数尺度の公表規模になります。球の面積・直径は数値の比そのものではありません。中抜きは可能性・当局への届出・公表記録・規模不明。マップは最新120記録まで表示します。線は共通の原因だけを示します。</p></div></div><p class="method-privacy">検索・絞り込みは端末内で処理し、検索語をURLや解析サービスへ送信しません。本アプリは閲覧履歴を記録せず、解析・広告機能を設けていません。ページ・データの読み込みは配信サービスへ通信します。同サービスによるアクセス情報の処理は<a href="https://www.cloudflare.com/privacypolicy/" target="_blank" rel="noopener noreferrer">Cloudflareの方針</a>をご確認ください。共有リンクには公表記録のIDを含めます。漏えいした個人情報の実データは扱いません。</p><button class="primary-button" id="method-done">探索に戻る →</button></dialog>
+  <dialog class="coverage-dialog" id="coverage-dialog" aria-labelledby="coverage-title"><div class="dialog-header"><p class="eyebrow">SOURCE COVERAGE</p><button class="icon-button" id="close-coverage" aria-label="収録範囲を閉じる">×</button></div><h2 id="coverage-title">どこまで収録したか。</h2><p class="dialog-intro" id="coverage-explanation"></p><div id="coverage-content"></div><p class="method-privacy">同一企業の別事故は残し、国内の同一事故の続報・複数省庁による重複掲載は整理しています。海外台帳間の同じ事故は残るため、公表記録数を独立した事故数として扱いません。資料ごとの行と取込・除外理由は<a href="./data/coverage.json" download>取込記録JSON</a>でも確認できます。自動更新はしません。</p><button class="primary-button" id="coverage-done">探索に戻る →</button></dialog>
+  <dialog id="share-dialog" aria-labelledby="share-title"><div class="dialog-header"><p class="eyebrow">SHARE THIS RECORD</p><button class="icon-button" id="close-share" aria-label="共有を閉じる">×</button></div><h2 id="share-title">事例のリンクを共有</h2><p class="dialog-intro">検索語や絞り込み条件は含みません。</p><input id="share-link" aria-label="この事例へのリンク" readonly class="share-link-input"></dialog>
+  <noscript><p class="noscript">このアプリにはJavaScriptが必要です。公表事例のデータは<a href="./data/incidents.json.gz">こちらのJSON（gzip圧縮）</a>で確認できます。</p></noscript><script type="module" src="./src/app.js"></script>
+  <script src="./shared/share.js" defer></script>
+</body>
+</html>
