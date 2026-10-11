@@ -5,12 +5,14 @@ on:
     branches: [main]
     paths:
       - 'day-064-breach-atlas/**'
+      - 'docs/day064/research/**'
       - 'tests/e2e/day-064*'
       - '.github/workflows/day064.yml'
   push:
     branches: [main]
     paths:
       - 'day-064-breach-atlas/**'
+      - 'docs/day064/research/**'
       - 'tests/e2e/day-064*'
       - '.github/workflows/day064.yml'
   workflow_dispatch:
