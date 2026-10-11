@@ -282,7 +282,9 @@ const FRAME_BY_APP = {
 
 const appCsp = (dir) => [
   "default-src 'self'",
-  "script-src 'self'",
+  // Day64 compiles its local Rust module in a same-origin Worker.
+  // Permit Wasm compilation for this app without permitting JavaScript eval.
+  `script-src 'self'${dir === 'day-064-breach-atlas' ? " 'wasm-unsafe-eval'" : ''}`,
   "style-src 'self' 'unsafe-inline'",
   `img-src 'self' data: blob:${IMG_BY_APP[dir] || ''}`,
   `media-src 'self'${MEDIA_BY_APP[dir] || ''}`,

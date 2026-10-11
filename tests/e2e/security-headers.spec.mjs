@@ -167,6 +167,24 @@ test('外部への接続を許すのは、それが必要なDayだけ', () => {
   expect(day001).not.toContain('wikipedia.org');
 });
 
+test('Day64の本番CSPでもRust/Wasm検索が動き、他のDayの権限を増やさない', async ({ page, context }) => {
+  const line = (rules.get('/day-064-breach-atlas/*') || []).find(value => value.startsWith('Content-Security-Policy:'));
+  const csp = line?.replace(/^Content-Security-Policy:\s*/, '');
+  expect(csp).toContain("'wasm-unsafe-eval'");
+  expect(csp).not.toContain("'unsafe-eval'");
+  expect((rules.get('/day-001-focus-timer/*') || []).join('\n')).not.toContain('wasm-unsafe-eval');
+  await context.route('**/day-064-breach-atlas/**', async route => {
+    const response = await route.fetch();
+    await route.fulfill({ response, headers: { ...response.headers(), 'content-security-policy': csp } });
+  });
+  await page.goto('/day-064-breach-atlas/?view=timeline');
+  await expect(page.locator('html')).toHaveAttribute('data-ready', 'true');
+  await expect(page.locator('html')).toHaveAttribute('data-engine', 'rust-wasm-worker');
+  await expect(page.locator('#visible-count')).toContainText('18,001記録');
+  await page.locator('#quick-search').fill('KDDI');
+  await expect(page.locator('#visible-count')).toContainText('3記録');
+});
+
 test('一覧ページにCSPを付けていないことを、意図として固定する', () => {
   // インラインscriptとGA4があるためハッシュ化が必要で、まだ付けていない。
   // 付けたらこのテストを消す（枠内表示の禁止は /* の X-Frame-Options で掛かっている）
