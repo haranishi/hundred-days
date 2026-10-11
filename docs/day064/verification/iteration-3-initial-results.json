@@ -1,0 +1,706 @@
+{
+  "config": {
+    "argv": [
+      "/usr/local/bin/node",
+      "./node_modules/.bin/playwright",
+      "test",
+      "--config",
+      "tests/e2e/day-064.config.mjs"
+    ],
+    "configFile": "./tests/e2e/day-064.config.mjs",
+    "rootDir": "./tests/e2e",
+    "failOnFlakyTests": false,
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "./test-results/day064",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "",
+        "name": "",
+        "testDir": "./tests/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "day-064.spec.mjs"
+        ],
+        "timeout": 30000
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "list",
+        null
+      ],
+      [
+        "json",
+        {
+          "outputFile": "docs/day064/verification/browser-results.json"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.62.1",
+    "workers": 1,
+    "webServer": {
+      "command": "npm run preview",
+      "cwd": "./day-064-breach-atlas/source/",
+      "url": "http://127.0.0.1:5464/day-064-breach-atlas/",
+      "reuseExistingServer": true,
+      "timeout": 30000
+    }
+  },
+  "suites": [
+    {
+      "title": "day-064.spec.mjs",
+      "file": "day-064.spec.mjs",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "initial map renders real WebGL, selects companies and rotates without changing the data",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2045,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-11T00:56:14.447Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "6741d29c963c3821e915-9962e6ed7abc34b6d47d",
+          "file": "day-064.spec.mjs",
+          "line": 11,
+          "column": 1
+        },
+        {
+          "title": "company and service search leads from fullwidth input to corrected official sources",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 725,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-11T00:56:16.576Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "6741d29c963c3821e915-5b90855dfafd4103db3d",
+          "file": "day-064.spec.mjs",
+          "line": 44,
+          "column": 1
+        },
+        {
+          "title": "a company in a different unit is discoverable with a visible count",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 772,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-11T00:56:17.304Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "6741d29c963c3821e915-0546790867b5c154e6a0",
+          "file": "day-064.spec.mjs",
+          "line": 56,
+          "column": 1
+        },
+        {
+          "title": "cause, period and confirmation filters stay synchronized with the graph legend",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1692,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-11T00:56:18.080Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "6741d29c963c3821e915-f3c939d560965af6c7fa",
+          "file": "day-064.spec.mjs",
+          "line": 68,
+          "column": 1
+        },
+        {
+          "title": "unknown totals are visible without inventing a zero or adding overlapping categories",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 753,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-11T00:56:19.776Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "6741d29c963c3821e915-686ae9bc17e6378898e0",
+          "file": "day-064.spec.mjs",
+          "line": 82,
+          "column": 1
+        },
+        {
+          "title": "empty search and combined filters preserve inputs and recover through reset",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 799,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-11T00:56:20.536Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "6741d29c963c3821e915-fa98d2cffcb4ae3e97b0",
+          "file": "day-064.spec.mjs",
+          "line": 94,
+          "column": 1
+        },
+        {
+          "title": "selection links round-trip to their unit and never share search input",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1446,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-11T00:56:21.338Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "6741d29c963c3821e915-bd6b2994a098ea8fe2ee",
+          "file": "day-064.spec.mjs",
+          "line": 106,
+          "column": 1
+        },
+        {
+          "title": "keyboard operation and reading dialog return focus to the origin",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1020,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-11T00:56:22.788Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "6741d29c963c3821e915-39294d0cd967a3d2ac81",
+          "file": "day-064.spec.mjs",
+          "line": 128,
+          "column": 1
+        },
+        {
+          "title": "WebGL failure offers a functioning SVG map, list and official sources",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 389,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-11T00:56:23.813Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "6741d29c963c3821e915-e95f9c45e85a5ffd5acd",
+          "file": "day-064.spec.mjs",
+          "line": 145,
+          "column": 1
+        },
+        {
+          "title": "mobile filtering is operable, traps focus, closes to a useful company note",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 828,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-11T00:56:24.205Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "6741d29c963c3821e915-fb7848cb190916f9e255",
+          "file": "day-064.spec.mjs",
+          "line": 169,
+          "column": 1
+        },
+        {
+          "title": "mobile empty search can switch units inside the drawer and reach a source",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 725,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-11T00:56:25.037Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "6741d29c963c3821e915-434543e87030f5dc28e7",
+          "file": "day-064.spec.mjs",
+          "line": 188,
+          "column": 1
+        },
+        {
+          "title": "mobile SVG pinch zooms without choosing a company on finger release",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 434,
+                  "error": {
+                    "message": "TypeError: Cannot read properties of null (reading 'timeout')",
+                    "stack": "TypeError: Cannot read properties of null (reading 'timeout')\n    at ./tests/e2e/day-064.spec.mjs:211:51",
+                    "location": {
+                      "file": "./tests/e2e/day-064.spec.mjs",
+                      "column": 51,
+                      "line": 211
+                    },
+                    "snippet": "  209 |   await session.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ id: 1, x: 165, y }, { id: 2, x: 225, y }] });\n  210 |   await session.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: [{ id: 1, x: 120, y }, { id: 2, x: 270, y }] });\n> 211 |   await expect(page.locator('.svg-fallback')).not.toHaveAttribute('viewBox', before);\n      |                                                   ^\n  212 |   await session.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });\n  213 |   await expect(page.locator('.note-company')).toHaveText('ベネッセ');\n  214 | });"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "./tests/e2e/day-064.spec.mjs",
+                        "column": 51,
+                        "line": 211
+                      },
+                      "message": "TypeError: Cannot read properties of null (reading 'timeout')\n\n  209 |   await session.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ id: 1, x: 165, y }, { id: 2, x: 225, y }] });\n  210 |   await session.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: [{ id: 1, x: 120, y }, { id: 2, x: 270, y }] });\n> 211 |   await expect(page.locator('.svg-fallback')).not.toHaveAttribute('viewBox', before);\n      |                                                   ^\n  212 |   await session.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });\n  213 |   await expect(page.locator('.note-company')).toHaveText('ベネッセ');\n  214 | });\n    at ./tests/e2e/day-064.spec.mjs:211:51"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-11T00:56:25.765Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "./test-results/day064/day-064-mobile-SVG-pinch-z-5cbc5-a-company-on-finger-release/error-context.md"
+                    },
+                    {
+                      "name": "trace",
+                      "contentType": "application/zip",
+                      "path": "./test-results/day064/day-064-mobile-SVG-pinch-z-5cbc5-a-company-on-finger-release/trace.zip"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "./tests/e2e/day-064.spec.mjs",
+                    "column": 51,
+                    "line": 211
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "6741d29c963c3821e915-5632f4526f99ce2f041b",
+          "file": "day-064.spec.mjs",
+          "line": 200,
+          "column": 1
+        },
+        {
+          "title": "tablet retains every filter and the mobile skip link reaches a usable list",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1548,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-11T00:56:26.402Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "6741d29c963c3821e915-d4559df0f8d1cd53655d",
+          "file": "day-064.spec.mjs",
+          "line": 216,
+          "column": 1
+        },
+        {
+          "title": "layout and actual screenshot at 390px",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 760,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-11T00:56:28.023Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "6741d29c963c3821e915-b3202e07895cafd87cbb",
+          "file": "day-064.spec.mjs",
+          "line": 230,
+          "column": 3
+        },
+        {
+          "title": "layout and actual screenshot at 768px",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 801,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-11T00:56:28.788Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "6741d29c963c3821e915-ebaa47c6cdaa4ebd1668",
+          "file": "day-064.spec.mjs",
+          "line": 230,
+          "column": 3
+        },
+        {
+          "title": "layout and actual screenshot at 1440px",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 616,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-11T00:56:29.592Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "6741d29c963c3821e915-88ce2c996359282fe4e2",
+          "file": "day-064.spec.mjs",
+          "line": 230,
+          "column": 3
+        },
+        {
+          "title": "prepare an OGP image from the original vector card",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 639,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-11T00:56:30.216Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "6741d29c963c3821e915-1e604a2d755f340be150",
+          "file": "day-064.spec.mjs",
+          "line": 255,
+          "column": 1
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-10-11T00:56:14.251Z",
+    "duration": 16635.843999999997,
+    "expected": 16,
+    "skipped": 0,
+    "unexpected": 1,
+    "flaky": 0
+  }
+}

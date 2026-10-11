@@ -1,0 +1,216 @@
+{
+  "config": {
+    "argv": [
+      "/usr/local/bin/node",
+      "./node_modules/.bin/playwright",
+      "test",
+      "--config",
+      "tests/e2e/day-064.config.mjs",
+      "--project",
+      "checks",
+      "--grep",
+      "flat geographic points|dataset coverage"
+    ],
+    "configFile": "./tests/e2e/day-064.config.mjs",
+    "rootDir": "./tests/e2e",
+    "failOnFlakyTests": false,
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "./test-results/day064",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "checks",
+        "name": "checks",
+        "testDir": "./tests/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "day-064.spec.mjs"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "./test-results/day064",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "experience",
+        "name": "experience",
+        "testDir": "./tests/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "day-064.spec.mjs"
+        ],
+        "timeout": 30000
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "list",
+        null
+      ],
+      [
+        "json",
+        {
+          "outputFile": "./docs/day064/verification/additional-japan/browser-targeted-results.json"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.62.1",
+    "workers": 1,
+    "webServer": {
+      "command": "npm run preview",
+      "cwd": "./day-064-breach-atlas/source/",
+      "url": "http://127.0.0.1:5464/day-064-breach-atlas/",
+      "reuseExistingServer": true,
+      "timeout": 30000
+    }
+  },
+  "suites": [
+    {
+      "title": "day-064.spec.mjs",
+      "file": "day-064.spec.mjs",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "flat geographic points, drag and pinch retain distinct notification and reported-state evidence",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "checks",
+              "projectName": "checks",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 9015,
+                  "error": {
+                    "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: locator('#active-filters')\nExpected substring: \u001b[32m\"California\"\u001b[39m\nReceived string:    \u001b[31m\"米国の公的台帳×米国・HHS医療情報台帳×カリフォルニア州×すべて解除\"\u001b[39m\nTimeout: 5000ms\n\nCall log:\n\u001b[2m  - Expect \"toContainText\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('#active-filters')\u001b[22m\n\u001b[2m    14 × locator resolved to <div id=\"active-filters\" class=\"active-filters\">…</div>\u001b[22m\n\u001b[2m       - unexpected value \"米国の公的台帳×米国・HHS医療情報台帳×カリフォルニア州×すべて解除\"\u001b[22m\n",
+                    "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: locator('#active-filters')\nExpected substring: \u001b[32m\"California\"\u001b[39m\nReceived string:    \u001b[31m\"米国の公的台帳×米国・HHS医療情報台帳×カリフォルニア州×すべて解除\"\u001b[39m\nTimeout: 5000ms\n\nCall log:\n\u001b[2m  - Expect \"toContainText\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('#active-filters')\u001b[22m\n\u001b[2m    14 × locator resolved to <div id=\"active-filters\" class=\"active-filters\">…</div>\u001b[22m\n\u001b[2m       - unexpected value \"米国の公的台帳×米国・HHS医療情報台帳×カリフォルニア州×すべて解除\"\u001b[22m\n\n    at ./tests/e2e/day-064.spec.mjs:191:49",
+                    "location": {
+                      "file": "./tests/e2e/day-064.spec.mjs",
+                      "column": 49,
+                      "line": 191
+                    },
+                    "snippet": "  189 |   await page.locator('#globe-location').selectOption('US-CA');\n  190 |   await settled(page);\n> 191 |   await expect(page.locator('#active-filters')).toContainText('California');\n      |                                                 ^\n  192 |   await expect(page.locator('.geographic-note')).toContainText('HHSへ報告された組織の州・地域');\n  193 |   const svg = page.locator('#globe-mount svg');\n  194 |   const bounds = await svg.boundingBox(), before = await svg.getAttribute('viewBox');"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "./tests/e2e/day-064.spec.mjs",
+                        "column": 49,
+                        "line": 191
+                      },
+                      "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: locator('#active-filters')\nExpected substring: \u001b[32m\"California\"\u001b[39m\nReceived string:    \u001b[31m\"米国の公的台帳×米国・HHS医療情報台帳×カリフォルニア州×すべて解除\"\u001b[39m\nTimeout: 5000ms\n\nCall log:\n\u001b[2m  - Expect \"toContainText\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('#active-filters')\u001b[22m\n\u001b[2m    14 × locator resolved to <div id=\"active-filters\" class=\"active-filters\">…</div>\u001b[22m\n\u001b[2m       - unexpected value \"米国の公的台帳×米国・HHS医療情報台帳×カリフォルニア州×すべて解除\"\u001b[22m\n\n\n  189 |   await page.locator('#globe-location').selectOption('US-CA');\n  190 |   await settled(page);\n> 191 |   await expect(page.locator('#active-filters')).toContainText('California');\n      |                                                 ^\n  192 |   await expect(page.locator('.geographic-note')).toContainText('HHSへ報告された組織の州・地域');\n  193 |   const svg = page.locator('#globe-mount svg');\n  194 |   const bounds = await svg.boundingBox(), before = await svg.getAttribute('viewBox');\n    at ./tests/e2e/day-064.spec.mjs:191:49"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-11T16:08:55.886Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "./test-results/day064/day-064-flat-geographic-po-145e7-and-reported-state-evidence-checks/error-context.md"
+                    },
+                    {
+                      "name": "trace",
+                      "contentType": "application/zip",
+                      "path": "./test-results/day064/day-064-flat-geographic-po-145e7-and-reported-state-evidence-checks/trace.zip"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "./tests/e2e/day-064.spec.mjs",
+                    "column": 49,
+                    "line": 191
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "6741d29c963c3821e915-5fdaa93e05c39515dd29",
+          "file": "day-064.spec.mjs",
+          "line": 174,
+          "column": 1
+        },
+        {
+          "title": "dataset coverage accounts for every register export and its exclusions",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "checks",
+              "projectName": "checks",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1160,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-11T16:09:05.455Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "6741d29c963c3821e915-401ad6922001a52855cf",
+          "file": "day-064.spec.mjs",
+          "line": 383,
+          "column": 1
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-10-11T16:08:55.616Z",
+    "duration": 11116.814,
+    "expected": 1,
+    "skipped": 0,
+    "unexpected": 1,
+    "flaky": 0
+  }
+}

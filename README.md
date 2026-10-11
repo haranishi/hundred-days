@@ -97,6 +97,7 @@ Day 051「ハコニワ」も外部公開アプリです。本体は独立リポ�
 | 061 | くみまえ | [day-061-kumimae/](day-061-kumimae/) | [アプリを開く](https://hundred-days.pages.dev/day-061-kumimae/) |
 | 062 | 終電サドンデス | [day-062-last-train/](day-062-last-train/) | [アプリを開く](https://hundred-days.pages.dev/day-062-last-train/) |
 | 063 | 解約ボタンは、どれ？ | [day-063-dark-patterns/](day-063-dark-patterns/) | [アプリを開く](https://hundred-days.pages.dev/day-063-dark-patterns/) |
+| 064 | 漏洩の地図 | [day-064-breach-atlas/](day-064-breach-atlas/) | [アプリを開く](https://hundred-days.pages.dev/day-064-breach-atlas/) |
 <!-- day-index:end -->
 
 ## 1日アプリのルール
@@ -138,6 +139,8 @@ npx wrangler pages deploy dist --project-name=hundred-days
 
 ## ライセンス
 
-ソースコードは [MIT](LICENSE) です。**`day-*/data/` 配下の第三者データは対象外**で、
+独自のソースコードは原則 [MIT](LICENSE) です。Day64のPyMuPDFを使うオフラインPDF抽出ツールとそのテストは [AGPL-3.0-or-later](day-064-breach-atlas/source/tools/LICENSE-AGPL-3.0.txt)（対象は同DayのREADME参照）。**第三者データ・資料・ライブラリは、配置場所にかかわらずMITの対象外**で、
 ODbL 1.0 や CC BY-SA 3.0（継承あり）など、それぞれ別の条件が付きます。
 使っているデータの出どころ・ライセンス・加工した内容は [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) にまとめてあります。
+
+Day64「漏洩の地図」は[公開アプリ](https://hundred-days.pages.dev/day-064-breach-atlas/)として登録しています。[ローカル起動・収録範囲](day-064-breach-atlas/README.md)：日本の公表・報道4,652件と米国政府の届出記録13,349件、計18,001記録。国内は201件から約23.1倍へ拡充し、自治体の公式一括公表から2,130記録を追加。Obsidianのデザインメモを参考に、企業検索・一覧・詳細を見分けやすい明るいUIへ改善。年代・原因・規模の探索とRust/WebAssemblyによる検索・集計を実装しています。地球儀を残し、検索・一覧・備えの学習に入口を整理。原因別の確認の問いとIPAなどの公的資料から、個人の確認や組織の学習に役立てる構成へ改善しています。

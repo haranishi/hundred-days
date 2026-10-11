@@ -1,0 +1,1617 @@
+{
+  "incidents": [
+    {
+      "id": "ipa-2017-04-13-f21f7c9f",
+      "company": "総務省",
+      "shortName": "総務省",
+      "aliases": [],
+      "sector": "other",
+      "cause": "intrusion",
+      "year": 2017,
+      "announcedAt": "2017-04-13",
+      "sourceUpdatedAt": "2017-04-13",
+      "status": "possible",
+      "scale": {
+        "value": 23000,
+        "unit": "records",
+        "qualifier": "approximate",
+        "label": "約23,000件"
+      },
+      "summary": "外部からの不正アクセスによる情報漏えいの公表事案として、IPAの白書に掲載されています。",
+      "informationTypes": [
+        "個人情報（資料記載の対象区分）"
+      ],
+      "scopeNote": "2018年版のIPA白書に記載された総務省の対象区分です。国内外や利用者・登録者の範囲が事例ごとに異なるため、他事例と合計しません。",
+      "countNote": "IPAの事例表に記載された公表規模です。可能性を含む値は全数の流出確認ではありません。個人情報、カード情報、情報項目など複数の数がある場合は、対象の定義を保ち、重複する数を加算しません。企業の後の続報を網羅した値ではありません。",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "IPA 白書2018・情報漏えい事例表（PDF 21ページ）",
+          "url": "https://www.ipa.go.jp/archive/publish/wp-security/qv6pgp0000000v1y-att/000070313.pdf#page=21",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ipa-2017-05-02-330f5b2c",
+      "company": "国立研究開発法人情報通信研究機構",
+      "shortName": "情報通信研究機構",
+      "aliases": [],
+      "sector": "other",
+      "cause": "intrusion",
+      "year": 2017,
+      "announcedAt": "2017-05-02",
+      "sourceUpdatedAt": "2017-05-02",
+      "status": "possible",
+      "scale": {
+        "value": 378,
+        "unit": "records",
+        "qualifier": "maximum",
+        "label": "最大378件",
+        "bound": "maximum"
+      },
+      "summary": "外部からの不正アクセスによる情報漏えいの公表事案として、IPAの白書に掲載されています。",
+      "informationTypes": [
+        "メールアドレス等",
+        "パスワード等",
+        "ID・会員番号等"
+      ],
+      "scopeNote": "2018年版のIPA白書に記載された情報通信研究機構の対象区分です。国内外や利用者・登録者の範囲が事例ごとに異なるため、他事例と合計しません。",
+      "countNote": "IPAの事例表に記載された公表規模です。可能性を含む値は全数の流出確認ではありません。個人情報、カード情報、情報項目など複数の数がある場合は、対象の定義を保ち、重複する数を加算しません。企業の後の続報を網羅した値ではありません。",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "IPA 白書2018・情報漏えい事例表（PDF 21ページ）",
+          "url": "https://www.ipa.go.jp/archive/publish/wp-security/qv6pgp0000000v1y-att/000070313.pdf#page=21",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ipa-2017-06-06-9283cafc",
+      "company": "国土交通省",
+      "shortName": "国土交通省",
+      "aliases": [],
+      "sector": "other",
+      "cause": "intrusion",
+      "year": 2017,
+      "announcedAt": "2017-06-06",
+      "sourceUpdatedAt": "2017-06-06",
+      "status": "possible",
+      "scale": {
+        "value": null,
+        "unit": "unknown",
+        "qualifier": "undisclosed",
+        "label": "最大4,335件の回答者情報・最大194,834件の登記情報（合算しない）"
+      },
+      "summary": "外部からの不正アクセスによる情報漏えいの公表事案として、IPAの白書に掲載されています。",
+      "informationTypes": [
+        "取引・利用情報等"
+      ],
+      "scopeNote": "2018年版のIPA白書に記載された国土交通省の対象区分です。国内外や利用者・登録者の範囲が事例ごとに異なるため、他事例と合計しません。",
+      "countNote": "IPAの事例表に記載された公表規模です。可能性を含む値は全数の流出確認ではありません。個人情報、カード情報、情報項目など複数の数がある場合は、対象の定義を保ち、重複する数を加算しません。企業の後の続報を網羅した値ではありません。複数の区分の総数を確定できないため、合計を数値化していません。",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "IPA 白書2018・情報漏えい事例表（PDF 21ページ）",
+          "url": "https://www.ipa.go.jp/archive/publish/wp-security/qv6pgp0000000v1y-att/000070313.pdf#page=21",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ipa-2017-06-26-7719d108",
+      "company": "大阪大学医学部附属病院",
+      "shortName": "大阪大学医学部附属病院",
+      "aliases": [],
+      "sector": "other",
+      "cause": "intrusion",
+      "year": 2017,
+      "announcedAt": "2017-06-26",
+      "sourceUpdatedAt": "2017-06-26",
+      "status": "possible",
+      "scale": {
+        "value": 220,
+        "unit": "records",
+        "qualifier": "maximum",
+        "label": "最大220件",
+        "bound": "maximum"
+      },
+      "summary": "外部からの不正アクセスによる情報漏えいの公表事案として、IPAの白書に掲載されています。",
+      "informationTypes": [
+        "氏名",
+        "メールアドレス等",
+        "医療関連情報等",
+        "ID・会員番号等"
+      ],
+      "scopeNote": "2018年版のIPA白書に記載された大阪大学医学部附属病院の対象区分です。国内外や利用者・登録者の範囲が事例ごとに異なるため、他事例と合計しません。",
+      "countNote": "IPAの事例表に記載された公表規模です。可能性を含む値は全数の流出確認ではありません。個人情報、カード情報、情報項目など複数の数がある場合は、対象の定義を保ち、重複する数を加算しません。企業の後の続報を網羅した値ではありません。",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "IPA 白書2018・情報漏えい事例表（PDF 21ページ）",
+          "url": "https://www.ipa.go.jp/archive/publish/wp-security/qv6pgp0000000v1y-att/000070313.pdf#page=21",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ipa-2017-07-17-3fef186b",
+      "company": "株式会社マネースクウェア・ジャパン",
+      "shortName": "マネースクウェア・ジャパン",
+      "aliases": [],
+      "sector": "other",
+      "cause": "intrusion",
+      "year": 2017,
+      "announcedAt": "2017-07-17",
+      "sourceUpdatedAt": "2017-07-17",
+      "status": "possible",
+      "scale": {
+        "value": 2500,
+        "unit": "records",
+        "qualifier": "approximate",
+        "label": "最大2,500件",
+        "bound": "maximum"
+      },
+      "summary": "外部からの不正アクセスによる情報漏えいの公表事案として、IPAの白書に掲載されています。",
+      "informationTypes": [
+        "氏名",
+        "メールアドレス等",
+        "ID・会員番号等"
+      ],
+      "scopeNote": "2018年版のIPA白書に記載されたマネースクウェア・ジャパンの対象区分です。国内外や利用者・登録者の範囲が事例ごとに異なるため、他事例と合計しません。",
+      "countNote": "IPAの事例表に記載された公表規模です。可能性を含む値は全数の流出確認ではありません。個人情報、カード情報、情報項目など複数の数がある場合は、対象の定義を保ち、重複する数を加算しません。企業の後の続報を網羅した値ではありません。",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "IPA 白書2018・情報漏えい事例表（PDF 21ページ）",
+          "url": "https://www.ipa.go.jp/archive/publish/wp-security/qv6pgp0000000v1y-att/000070313.pdf#page=21",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ipa-2017-10-04-9ad35141",
+      "company": "東京メトロポリタンテレビジョン株式会社",
+      "shortName": "東京メトロポリタンテレビジョン",
+      "aliases": [
+        "TOKYO MX"
+      ],
+      "sector": "other",
+      "cause": "intrusion",
+      "year": 2017,
+      "announcedAt": "2017-10-04",
+      "sourceUpdatedAt": "2017-10-04",
+      "status": "possible",
+      "scale": {
+        "value": 370000,
+        "unit": "records",
+        "qualifier": "approximate",
+        "label": "最大370,000件",
+        "bound": "maximum"
+      },
+      "summary": "外部からの不正アクセスによる情報漏えいの公表事案として、IPAの白書に掲載されています。",
+      "informationTypes": [
+        "氏名",
+        "メールアドレス等",
+        "ニックネーム"
+      ],
+      "scopeNote": "2018年版のIPA白書に記載された東京メトロポリタンテレビジョンの対象区分です。国内外や利用者・登録者の範囲が事例ごとに異なるため、他事例と合計しません。",
+      "countNote": "IPAの事例表に記載された公表規模です。可能性を含む値は全数の流出確認ではありません。個人情報、カード情報、情報項目など複数の数がある場合は、対象の定義を保ち、重複する数を加算しません。企業の後の続報を網羅した値ではありません。",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "IPA 白書2018・情報漏えい事例表（PDF 21ページ）",
+          "url": "https://www.ipa.go.jp/archive/publish/wp-security/qv6pgp0000000v1y-att/000070313.pdf#page=21",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ipa-2017-10-11-b977da5e",
+      "company": "株式会社ほくやく・竹山ホールディングス",
+      "shortName": "ほくやく・竹山ホールディングス",
+      "aliases": [
+        "アドウイック",
+        "シマフクロウ"
+      ],
+      "sector": "other",
+      "cause": "intrusion",
+      "year": 2017,
+      "announcedAt": "2017-10-11",
+      "sourceUpdatedAt": "2017-10-11",
+      "status": "possible",
+      "scale": {
+        "value": 597452,
+        "unit": "records",
+        "qualifier": "approximate",
+        "label": "最大597,452件",
+        "bound": "maximum"
+      },
+      "summary": "外部からの不正アクセスによる情報漏えいの公表事案として、IPAの白書に掲載されています。",
+      "informationTypes": [
+        "氏名",
+        "生年月日",
+        "電話番号等",
+        "メールアドレス等",
+        "医療関連情報等"
+      ],
+      "scopeNote": "2018年版のIPA白書に記載されたほくやく・竹山ホールディングスの対象区分です。国内外や利用者・登録者の範囲が事例ごとに異なるため、他事例と合計しません。",
+      "countNote": "IPAの事例表に記載された公表規模です。可能性を含む値は全数の流出確認ではありません。個人情報、カード情報、情報項目など複数の数がある場合は、対象の定義を保ち、重複する数を加算しません。企業の後の続報を網羅した値ではありません。",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "IPA 白書2018・情報漏えい事例表（PDF 21ページ）",
+          "url": "https://www.ipa.go.jp/archive/publish/wp-security/qv6pgp0000000v1y-att/000070313.pdf#page=21",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ipa-2018-04-27-0232b53c",
+      "company": "宝塚山本ガーデン・クリエイティブ株式会社",
+      "shortName": "宝塚山本ガーデン・クリエイティブ",
+      "aliases": [],
+      "sector": "other",
+      "cause": "intrusion",
+      "year": 2018,
+      "announcedAt": "2018-04-27",
+      "sourceUpdatedAt": "2018-04-27",
+      "status": "possible",
+      "scale": {
+        "value": 609,
+        "unit": "records",
+        "qualifier": "maximum",
+        "label": "最大609件",
+        "bound": "maximum"
+      },
+      "summary": "外部からの不正アクセスによる情報漏えいの公表事案として、IPAの白書に掲載されています。",
+      "informationTypes": [
+        "氏名",
+        "性別",
+        "メールアドレス等",
+        "パスワード等"
+      ],
+      "scopeNote": "2019年版のIPA白書に記載された宝塚山本ガーデン・クリエイティブの対象区分です。国内外や利用者・登録者の範囲が事例ごとに異なるため、他事例と合計しません。",
+      "countNote": "IPAの事例表に記載された公表規模です。可能性を含む値は全数の流出確認ではありません。個人情報、カード情報、情報項目など複数の数がある場合は、対象の定義を保ち、重複する数を加算しません。企業の後の続報を網羅した値ではありません。",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "IPA 白書2019・情報漏えい事例表（PDF 43ページ）",
+          "url": "https://www.ipa.go.jp/archive/publish/wp-security/qv6pgp0000000v5l-att/000079041.pdf#page=43",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ipa-2018-06-04-c0428498",
+      "company": "森永乳業株式会社",
+      "shortName": "森永乳業",
+      "aliases": [],
+      "sector": "other",
+      "cause": "intrusion",
+      "year": 2018,
+      "announcedAt": "2018-06-04",
+      "sourceUpdatedAt": "2018-06-04",
+      "status": "possible",
+      "scale": {
+        "value": 92822,
+        "unit": "records",
+        "qualifier": "maximum",
+        "label": "最大92,822件",
+        "bound": "maximum"
+      },
+      "summary": "外部からの不正アクセスによる情報漏えいの公表事案として、IPAの白書に掲載されています。",
+      "informationTypes": [
+        "氏名",
+        "住所",
+        "電話番号等",
+        "クレジットカード情報等"
+      ],
+      "scopeNote": "2019年版のIPA白書に記載された森永乳業の対象区分です。国内外や利用者・登録者の範囲が事例ごとに異なるため、他事例と合計しません。",
+      "countNote": "IPAの事例表に記載された公表規模です。可能性を含む値は全数の流出確認ではありません。個人情報、カード情報、情報項目など複数の数がある場合は、対象の定義を保ち、重複する数を加算しません。企業の後の続報を網羅した値ではありません。",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "IPA 白書2019・情報漏えい事例表（PDF 43ページ）",
+          "url": "https://www.ipa.go.jp/archive/publish/wp-security/qv6pgp0000000v5l-att/000079041.pdf#page=43",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ipa-2018-06-16-902811ed",
+      "company": "ラッシュ株式会社",
+      "shortName": "ラッシュ",
+      "aliases": [
+        "キルフェボン"
+      ],
+      "sector": "other",
+      "cause": "intrusion",
+      "year": 2018,
+      "announcedAt": "2018-06-16",
+      "sourceUpdatedAt": "2018-06-16",
+      "status": "confirmed",
+      "scale": {
+        "value": 37149,
+        "unit": "records",
+        "qualifier": "exact",
+        "label": "37,149件"
+      },
+      "summary": "外部からの不正アクセスによる情報漏えいの公表事案として、IPAの白書に掲載されています。",
+      "informationTypes": [
+        "メールアドレス等",
+        "パスワード等"
+      ],
+      "scopeNote": "2019年版のIPA白書に記載されたラッシュの対象区分です。国内外や利用者・登録者の範囲が事例ごとに異なるため、他事例と合計しません。",
+      "countNote": "IPAの事例表に記載された公表規模です。可能性を含む値は全数の流出確認ではありません。個人情報、カード情報、情報項目など複数の数がある場合は、対象の定義を保ち、重複する数を加算しません。企業の後の続報を網羅した値ではありません。",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "IPA 白書2019・情報漏えい事例表（PDF 43ページ）",
+          "url": "https://www.ipa.go.jp/archive/publish/wp-security/qv6pgp0000000v5l-att/000079041.pdf#page=43",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ipa-2018-08-02-87a01ce1",
+      "company": "アサヒ軽金属工業株式会社",
+      "shortName": "アサヒ軽金属工業",
+      "aliases": [],
+      "sector": "other",
+      "cause": "intrusion",
+      "year": 2018,
+      "announcedAt": "2018-08-02",
+      "sourceUpdatedAt": "2018-08-02",
+      "status": "possible",
+      "scale": {
+        "value": 77198,
+        "unit": "records",
+        "qualifier": "maximum",
+        "label": "最大77,198件",
+        "bound": "maximum"
+      },
+      "summary": "外部からの不正アクセスによる情報漏えいの公表事案として、IPAの白書に掲載されています。",
+      "informationTypes": [
+        "クレジットカード情報等"
+      ],
+      "scopeNote": "2019年版のIPA白書に記載されたアサヒ軽金属工業の対象区分です。国内外や利用者・登録者の範囲が事例ごとに異なるため、他事例と合計しません。",
+      "countNote": "IPAの事例表に記載された公表規模です。可能性を含む値は全数の流出確認ではありません。個人情報、カード情報、情報項目など複数の数がある場合は、対象の定義を保ち、重複する数を加算しません。企業の後の続報を網羅した値ではありません。",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "IPA 白書2019・情報漏えい事例表（PDF 43ページ）",
+          "url": "https://www.ipa.go.jp/archive/publish/wp-security/qv6pgp0000000v5l-att/000079041.pdf#page=43",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ipa-2018-11-26-15436c94",
+      "company": "株式会社リガク",
+      "shortName": "リガク",
+      "aliases": [],
+      "sector": "other",
+      "cause": "intrusion",
+      "year": 2018,
+      "announcedAt": "2018-11-26",
+      "sourceUpdatedAt": "2018-11-26",
+      "status": "possible",
+      "scale": {
+        "value": 9885,
+        "unit": "records",
+        "qualifier": "maximum",
+        "label": "最大9,885件",
+        "bound": "maximum"
+      },
+      "summary": "外部からの不正アクセスによる情報漏えいの公表事案として、IPAの白書に掲載されています。",
+      "informationTypes": [
+        "氏名",
+        "電話番号等",
+        "メールアドレス等",
+        "パスワード等"
+      ],
+      "scopeNote": "2019年版のIPA白書に記載されたリガクの対象区分です。国内外や利用者・登録者の範囲が事例ごとに異なるため、他事例と合計しません。",
+      "countNote": "IPAの事例表に記載された公表規模です。可能性を含む値は全数の流出確認ではありません。個人情報、カード情報、情報項目など複数の数がある場合は、対象の定義を保ち、重複する数を加算しません。企業の後の続報を網羅した値ではありません。",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "IPA 白書2019・情報漏えい事例表（PDF 43ページ）",
+          "url": "https://www.ipa.go.jp/archive/publish/wp-security/qv6pgp0000000v5l-att/000079041.pdf#page=43",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ipa-2018-12-25-b783afad",
+      "company": "ディー・エル・マーケット株式会社",
+      "shortName": "ディー・エル・マーケット",
+      "aliases": [],
+      "sector": "other",
+      "cause": "intrusion",
+      "year": 2018,
+      "announcedAt": "2018-12-25",
+      "sourceUpdatedAt": "2018-12-25",
+      "status": "possible",
+      "scale": {
+        "value": 7741,
+        "unit": "records",
+        "qualifier": "maximum",
+        "label": "最大7,741件",
+        "bound": "maximum"
+      },
+      "summary": "外部からの不正アクセスによる情報漏えいの公表事案として、IPAの白書に掲載されています。",
+      "informationTypes": [
+        "クレジットカード情報等"
+      ],
+      "scopeNote": "2019年版のIPA白書に記載されたディー・エル・マーケットの対象区分です。国内外や利用者・登録者の範囲が事例ごとに異なるため、他事例と合計しません。",
+      "countNote": "IPAの事例表に記載された公表規模です。可能性を含む値は全数の流出確認ではありません。個人情報、カード情報、情報項目など複数の数がある場合は、対象の定義を保ち、重複する数を加算しません。企業の後の続報を網羅した値ではありません。",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "IPA 白書2019・情報漏えい事例表（PDF 43ページ）",
+          "url": "https://www.ipa.go.jp/archive/publish/wp-security/qv6pgp0000000v5l-att/000079041.pdf#page=43",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ipa-2019-04-23-f5bbac63",
+      "company": "株式会社エーデルワイン",
+      "shortName": "エーデルワイン",
+      "aliases": [],
+      "sector": "other",
+      "cause": "intrusion",
+      "year": 2019,
+      "announcedAt": "2019-04-23",
+      "sourceUpdatedAt": "2019-04-23",
+      "status": "possible",
+      "scale": {
+        "value": 31231,
+        "unit": "records",
+        "qualifier": "maximum",
+        "label": "最大31,231件",
+        "bound": "maximum"
+      },
+      "summary": "外部からの不正アクセスによる情報漏えいの公表事案として、IPAの白書に掲載されています。",
+      "informationTypes": [
+        "個人情報（資料記載の対象区分）"
+      ],
+      "scopeNote": "2020年版のIPA白書に記載されたエーデルワインの対象区分です。国内外や利用者・登録者の範囲が事例ごとに異なるため、他事例と合計しません。",
+      "countNote": "IPAの事例表に記載された公表規模です。可能性を含む値は全数の流出確認ではありません。個人情報、カード情報、情報項目など複数の数がある場合は、対象の定義を保ち、重複する数を加算しません。企業の後の続報を網羅した値ではありません。",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "IPA 白書2020・情報漏えい事例表（PDF 43ページ）",
+          "url": "https://www.ipa.go.jp/archive/publish/wp-security/qv6pgp0000000v98-att/000087026.pdf#page=43",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ipa-2019-05-13-561e741f",
+      "company": "株式会社ファーストリテイリング",
+      "shortName": "ファーストリテイリング",
+      "aliases": [
+        "ユニクロ",
+        "UNIQLO",
+        "GU",
+        "ジーユー"
+      ],
+      "sector": "other",
+      "cause": "intrusion",
+      "year": 2019,
+      "announcedAt": "2019-05-13",
+      "sourceUpdatedAt": "2019-05-13",
+      "status": "possible",
+      "scale": {
+        "value": 461091,
+        "unit": "records",
+        "qualifier": "exact",
+        "label": "461,091件"
+      },
+      "summary": "外部からの不正アクセスによる情報漏えいの公表事案として、IPAの白書に掲載されています。",
+      "informationTypes": [
+        "パスワード等",
+        "クレジットカード情報等"
+      ],
+      "scopeNote": "2020年版のIPA白書に記載されたファーストリテイリングの対象区分です。国内外や利用者・登録者の範囲が事例ごとに異なるため、他事例と合計しません。",
+      "countNote": "IPAの事例表に記載された公表規模です。可能性を含む値は全数の流出確認ではありません。個人情報、カード情報、情報項目など複数の数がある場合は、対象の定義を保ち、重複する数を加算しません。企業の後の続報を網羅した値ではありません。",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "IPA 白書2020・情報漏えい事例表（PDF 43ページ）",
+          "url": "https://www.ipa.go.jp/archive/publish/wp-security/qv6pgp0000000v98-att/000087026.pdf#page=43",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ipa-2019-05-29-639adf69",
+      "company": "株式会社ヤマダ電機",
+      "shortName": "ヤマダ電機",
+      "aliases": [],
+      "sector": "other",
+      "cause": "intrusion",
+      "year": 2019,
+      "announcedAt": "2019-05-29",
+      "sourceUpdatedAt": "2019-05-29",
+      "status": "possible",
+      "scale": {
+        "value": 37832,
+        "unit": "records",
+        "qualifier": "maximum",
+        "label": "最大37,832件",
+        "bound": "maximum"
+      },
+      "summary": "外部からの不正アクセスによる情報漏えいの公表事案として、IPAの白書に掲載されています。",
+      "informationTypes": [
+        "クレジットカード情報等"
+      ],
+      "scopeNote": "2020年版のIPA白書に記載されたヤマダ電機の対象区分です。国内外や利用者・登録者の範囲が事例ごとに異なるため、他事例と合計しません。",
+      "countNote": "IPAの事例表に記載された公表規模です。可能性を含む値は全数の流出確認ではありません。個人情報、カード情報、情報項目など複数の数がある場合は、対象の定義を保ち、重複する数を加算しません。企業の後の続報を網羅した値ではありません。",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "IPA 白書2020・情報漏えい事例表（PDF 43ページ）",
+          "url": "https://www.ipa.go.jp/archive/publish/wp-security/qv6pgp0000000v98-att/000087026.pdf#page=43",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ipa-2019-06-04-bf62bae3",
+      "company": "株式会社サンポークリエイト",
+      "shortName": "サンポークリエイト",
+      "aliases": [
+        "アネモネ"
+      ],
+      "sector": "other",
+      "cause": "intrusion",
+      "year": 2019,
+      "announcedAt": "2019-06-04",
+      "sourceUpdatedAt": "2019-06-04",
+      "status": "possible",
+      "scale": {
+        "value": null,
+        "unit": "unknown",
+        "qualifier": "undisclosed",
+        "label": "規模はこの表では未公表"
+      },
+      "summary": "外部からの不正アクセスによる情報漏えいの公表事案として、IPAの白書に掲載されています。",
+      "informationTypes": [
+        "クレジットカード情報等"
+      ],
+      "scopeNote": "2020年版のIPA白書に記載されたサンポークリエイトの対象区分です。国内外や利用者・登録者の範囲が事例ごとに異なるため、他事例と合計しません。",
+      "countNote": "IPAの事例表に記載された公表規模です。可能性を含む値は全数の流出確認ではありません。個人情報、カード情報、情報項目など複数の数がある場合は、対象の定義を保ち、重複する数を加算しません。企業の後の続報を網羅した値ではありません。複数の区分の総数を確定できないため、合計を数値化していません。",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "IPA 白書2020・情報漏えい事例表（PDF 43ページ）",
+          "url": "https://www.ipa.go.jp/archive/publish/wp-security/qv6pgp0000000v98-att/000087026.pdf#page=43",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ipa-2019-07-03-31e5aa19",
+      "company": "株式会社DigiBook",
+      "shortName": "DigiBook",
+      "aliases": [
+        "デジブック"
+      ],
+      "sector": "other",
+      "cause": "intrusion",
+      "year": 2019,
+      "announcedAt": "2019-07-03",
+      "sourceUpdatedAt": "2019-07-03",
+      "status": "possible",
+      "scale": {
+        "value": 15370,
+        "unit": "records",
+        "qualifier": "exact",
+        "label": "15,370件"
+      },
+      "summary": "外部からの不正アクセスによる情報漏えいの公表事案として、IPAの白書に掲載されています。",
+      "informationTypes": [
+        "クレジットカード情報等"
+      ],
+      "scopeNote": "2020年版のIPA白書に記載されたDigiBookの対象区分です。国内外や利用者・登録者の範囲が事例ごとに異なるため、他事例と合計しません。",
+      "countNote": "IPAの事例表に記載された公表規模です。可能性を含む値は全数の流出確認ではありません。個人情報、カード情報、情報項目など複数の数がある場合は、対象の定義を保ち、重複する数を加算しません。企業の後の続報を網羅した値ではありません。",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "IPA 白書2020・情報漏えい事例表（PDF 43ページ）",
+          "url": "https://www.ipa.go.jp/archive/publish/wp-security/qv6pgp0000000v98-att/000087026.pdf#page=43",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ipa-2019-07-04-4a0a3413",
+      "company": "J.フロントリテイリング株式会社・(株式会社ディンプル)",
+      "shortName": "ディンプル（J.フロントリテイリング）",
+      "aliases": [],
+      "sector": "other",
+      "cause": "intrusion",
+      "year": 2019,
+      "announcedAt": "2019-07-04",
+      "sourceUpdatedAt": "2019-07-04",
+      "status": "possible",
+      "scale": {
+        "value": 120000,
+        "unit": "records",
+        "qualifier": "approximate",
+        "label": "約120,000件"
+      },
+      "summary": "外部からの不正アクセスによる情報漏えいの公表事案として、IPAの白書に掲載されています。",
+      "informationTypes": [
+        "個人情報（資料記載の対象区分）"
+      ],
+      "scopeNote": "2020年版のIPA白書に記載されたディンプル（J.フロントリテイリング）の対象区分です。国内外や利用者・登録者の範囲が事例ごとに異なるため、他事例と合計しません。",
+      "countNote": "IPAの事例表に記載された公表規模です。可能性を含む値は全数の流出確認ではありません。個人情報、カード情報、情報項目など複数の数がある場合は、対象の定義を保ち、重複する数を加算しません。企業の後の続報を網羅した値ではありません。",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "IPA 白書2020・情報漏えい事例表（PDF 43ページ）",
+          "url": "https://www.ipa.go.jp/archive/publish/wp-security/qv6pgp0000000v98-att/000087026.pdf#page=43",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ipa-2019-07-23-a66024f4",
+      "company": "株式会社金剛堂",
+      "shortName": "金剛堂",
+      "aliases": [],
+      "sector": "other",
+      "cause": "intrusion",
+      "year": 2019,
+      "announcedAt": "2019-07-23",
+      "sourceUpdatedAt": "2019-07-23",
+      "status": "confirmed",
+      "scale": {
+        "value": 30830,
+        "unit": "records",
+        "qualifier": "exact",
+        "label": "30,830件"
+      },
+      "summary": "外部からの不正アクセスによる情報漏えいの公表事案として、IPAの白書に掲載されています。",
+      "informationTypes": [
+        "クレジットカード情報等"
+      ],
+      "scopeNote": "2020年版のIPA白書に記載された金剛堂の対象区分です。国内外や利用者・登録者の範囲が事例ごとに異なるため、他事例と合計しません。",
+      "countNote": "IPAの事例表に記載された公表規模です。可能性を含む値は全数の流出確認ではありません。個人情報、カード情報、情報項目など複数の数がある場合は、対象の定義を保ち、重複する数を加算しません。企業の後の続報を網羅した値ではありません。",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "IPA 白書2020・情報漏えい事例表（PDF 43ページ）",
+          "url": "https://www.ipa.go.jp/archive/publish/wp-security/qv6pgp0000000v98-att/000087026.pdf#page=43",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ipa-2019-08-05-ef5f878a",
+      "company": "株式会社おもちゃ箱",
+      "shortName": "おもちゃ箱",
+      "aliases": [],
+      "sector": "other",
+      "cause": "intrusion",
+      "year": 2019,
+      "announcedAt": "2019-08-05",
+      "sourceUpdatedAt": "2019-08-05",
+      "status": "possible",
+      "scale": {
+        "value": null,
+        "unit": "unknown",
+        "qualifier": "undisclosed",
+        "label": "流出証跡210件・流出可能性40,233件（合算しない）"
+      },
+      "summary": "外部からの不正アクセスによる情報漏えいの公表事案として、IPAの白書に掲載されています。",
+      "informationTypes": [
+        "クレジットカード情報等"
+      ],
+      "scopeNote": "2020年版のIPA白書に記載されたおもちゃ箱の対象区分です。国内外や利用者・登録者の範囲が事例ごとに異なるため、他事例と合計しません。",
+      "countNote": "IPAの事例表に記載された公表規模です。可能性を含む値は全数の流出確認ではありません。個人情報、カード情報、情報項目など複数の数がある場合は、対象の定義を保ち、重複する数を加算しません。企業の後の続報を網羅した値ではありません。複数の区分の総数を確定できないため、合計を数値化していません。",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "IPA 白書2020・情報漏えい事例表（PDF 43ページ）",
+          "url": "https://www.ipa.go.jp/archive/publish/wp-security/qv6pgp0000000v98-att/000087026.pdf#page=43",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ipa-2019-08-07-40f57019",
+      "company": "株式会社アルペン",
+      "shortName": "アルペン",
+      "aliases": [],
+      "sector": "other",
+      "cause": "intrusion",
+      "year": 2019,
+      "announcedAt": "2019-08-07",
+      "sourceUpdatedAt": "2019-08-07",
+      "status": "possible",
+      "scale": {
+        "value": 38954,
+        "unit": "records",
+        "qualifier": "maximum",
+        "label": "最大38,954件",
+        "bound": "maximum"
+      },
+      "summary": "外部からの不正アクセスによる情報漏えいの公表事案として、IPAの白書に掲載されています。",
+      "informationTypes": [
+        "パスワード等"
+      ],
+      "scopeNote": "2020年版のIPA白書に記載されたアルペンの対象区分です。国内外や利用者・登録者の範囲が事例ごとに異なるため、他事例と合計しません。",
+      "countNote": "IPAの事例表に記載された公表規模です。可能性を含む値は全数の流出確認ではありません。個人情報、カード情報、情報項目など複数の数がある場合は、対象の定義を保ち、重複する数を加算しません。企業の後の続報を網羅した値ではありません。",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "IPA 白書2020・情報漏えい事例表（PDF 43ページ）",
+          "url": "https://www.ipa.go.jp/archive/publish/wp-security/qv6pgp0000000v98-att/000087026.pdf#page=43",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ipa-2019-08-23-0a8b8e17",
+      "company": "三井住友カード株式会社",
+      "shortName": "三井住友カード",
+      "aliases": [],
+      "sector": "other",
+      "cause": "intrusion",
+      "year": 2019,
+      "announcedAt": "2019-08-23",
+      "sourceUpdatedAt": "2019-08-23",
+      "status": "possible",
+      "scale": {
+        "value": 16756,
+        "unit": "records",
+        "qualifier": "maximum",
+        "label": "最大16,756件",
+        "bound": "maximum"
+      },
+      "summary": "外部からの不正アクセスによる情報漏えいの公表事案として、IPAの白書に掲載されています。",
+      "informationTypes": [
+        "パスワード等",
+        "ID・会員番号等"
+      ],
+      "scopeNote": "2020年版のIPA白書に記載された三井住友カードの対象区分です。国内外や利用者・登録者の範囲が事例ごとに異なるため、他事例と合計しません。",
+      "countNote": "IPAの事例表に記載された公表規模です。可能性を含む値は全数の流出確認ではありません。個人情報、カード情報、情報項目など複数の数がある場合は、対象の定義を保ち、重複する数を加算しません。企業の後の続報を網羅した値ではありません。",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "IPA 白書2020・情報漏えい事例表（PDF 43ページ）",
+          "url": "https://www.ipa.go.jp/archive/publish/wp-security/qv6pgp0000000v98-att/000087026.pdf#page=43",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ipa-2019-09-04-e2eb893e",
+      "company": "株式会社みずほ銀行",
+      "shortName": "みずほ銀行",
+      "aliases": [],
+      "sector": "other",
+      "cause": "intrusion",
+      "year": 2019,
+      "announcedAt": "2019-09-04",
+      "sourceUpdatedAt": "2019-09-04",
+      "status": "possible",
+      "scale": {
+        "value": null,
+        "unit": "unknown",
+        "qualifier": "undisclosed",
+        "label": "規模はこの表では未公表"
+      },
+      "summary": "外部からの不正アクセスによる情報漏えいの公表事案として、IPAの白書に掲載されています。",
+      "informationTypes": [
+        "個人情報（資料記載の対象区分）"
+      ],
+      "scopeNote": "2020年版のIPA白書に記載されたみずほ銀行の対象区分です。国内外や利用者・登録者の範囲が事例ごとに異なるため、他事例と合計しません。",
+      "countNote": "IPAの事例表に記載された公表規模です。可能性を含む値は全数の流出確認ではありません。個人情報、カード情報、情報項目など複数の数がある場合は、対象の定義を保ち、重複する数を加算しません。企業の後の続報を網羅した値ではありません。複数の区分の総数を確定できないため、合計を数値化していません。",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "IPA 白書2020・情報漏えい事例表（PDF 43ページ）",
+          "url": "https://www.ipa.go.jp/archive/publish/wp-security/qv6pgp0000000v98-att/000087026.pdf#page=43",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ipa-2019-09-10-792fcbb7",
+      "company": "株式会社スープレックス",
+      "shortName": "スープレックス",
+      "aliases": [
+        "ラーメンデータベース"
+      ],
+      "sector": "other",
+      "cause": "intrusion",
+      "year": 2019,
+      "announcedAt": "2019-09-10",
+      "sourceUpdatedAt": "2019-09-10",
+      "status": "possible",
+      "scale": {
+        "value": 169843,
+        "unit": "records",
+        "qualifier": "exact",
+        "label": "169,843件"
+      },
+      "summary": "外部からの不正アクセスによる情報漏えいの公表事案として、IPAの白書に掲載されています。",
+      "informationTypes": [
+        "メールアドレス等",
+        "パスワード等"
+      ],
+      "scopeNote": "2020年版のIPA白書に記載されたスープレックスの対象区分です。国内外や利用者・登録者の範囲が事例ごとに異なるため、他事例と合計しません。",
+      "countNote": "IPAの事例表に記載された公表規模です。可能性を含む値は全数の流出確認ではありません。個人情報、カード情報、情報項目など複数の数がある場合は、対象の定義を保ち、重複する数を加算しません。企業の後の続報を網羅した値ではありません。",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "IPA 白書2020・情報漏えい事例表（PDF 43ページ）",
+          "url": "https://www.ipa.go.jp/archive/publish/wp-security/qv6pgp0000000v98-att/000087026.pdf#page=43",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ipa-2019-09-19-dff8d575",
+      "company": "有限会社フィセル",
+      "shortName": "フィセル",
+      "aliases": [
+        "10mois"
+      ],
+      "sector": "other",
+      "cause": "intrusion",
+      "year": 2019,
+      "announcedAt": "2019-09-19",
+      "sourceUpdatedAt": "2019-09-19",
+      "status": "possible",
+      "scale": {
+        "value": 108131,
+        "unit": "records",
+        "qualifier": "exact",
+        "label": "個人情報108,131件の流出可能性（カード情報11,913件とは合算しない）"
+      },
+      "summary": "外部からの不正アクセスによる情報漏えいの公表事案として、IPAの白書に掲載されています。",
+      "informationTypes": [
+        "クレジットカード情報等",
+        "家族・保証人関連情報等"
+      ],
+      "scopeNote": "2020年版のIPA白書に記載されたフィセルの対象区分です。国内外や利用者・登録者の範囲が事例ごとに異なるため、他事例と合計しません。",
+      "countNote": "IPAの事例表に記載された公表規模です。可能性を含む値は全数の流出確認ではありません。個人情報、カード情報、情報項目など複数の数がある場合は、対象の定義を保ち、重複する数を加算しません。企業の後の続報を網羅した値ではありません。",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "IPA 白書2020・情報漏えい事例表（PDF 43ページ）",
+          "url": "https://www.ipa.go.jp/archive/publish/wp-security/qv6pgp0000000v98-att/000087026.pdf#page=43",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ipa-2019-10-08-32eb4c26",
+      "company": "株式会社京都一の傳",
+      "shortName": "京都一の傳",
+      "aliases": [],
+      "sector": "other",
+      "cause": "intrusion",
+      "year": 2019,
+      "announcedAt": "2019-10-08",
+      "sourceUpdatedAt": "2019-10-08",
+      "status": "possible",
+      "scale": {
+        "value": null,
+        "unit": "unknown",
+        "qualifier": "undisclosed",
+        "label": "カード18,855件・会員72,738件（重複を推定しない）"
+      },
+      "summary": "外部からの不正アクセスによる情報漏えいの公表事案として、IPAの白書に掲載されています。",
+      "informationTypes": [
+        "クレジットカード情報等"
+      ],
+      "scopeNote": "2020年版のIPA白書に記載された京都一の傳の対象区分です。国内外や利用者・登録者の範囲が事例ごとに異なるため、他事例と合計しません。",
+      "countNote": "IPAの事例表に記載された公表規模です。可能性を含む値は全数の流出確認ではありません。個人情報、カード情報、情報項目など複数の数がある場合は、対象の定義を保ち、重複する数を加算しません。企業の後の続報を網羅した値ではありません。複数の区分の総数を確定できないため、合計を数値化していません。",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "IPA 白書2020・情報漏えい事例表（PDF 43ページ）",
+          "url": "https://www.ipa.go.jp/archive/publish/wp-security/qv6pgp0000000v98-att/000087026.pdf#page=43",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ipa-2019-10-15-dc23e416",
+      "company": "株式会社JIMOS",
+      "shortName": "JIMOS",
+      "aliases": [
+        "マキアレイベル",
+        "Coyori"
+      ],
+      "sector": "other",
+      "cause": "intrusion",
+      "year": 2019,
+      "announcedAt": "2019-10-15",
+      "sourceUpdatedAt": "2019-10-15",
+      "status": "possible",
+      "scale": {
+        "value": 107661,
+        "unit": "records",
+        "qualifier": "exact",
+        "label": "107,661件"
+      },
+      "summary": "外部からの不正アクセスによる情報漏えいの公表事案として、IPAの白書に掲載されています。",
+      "informationTypes": [
+        "クレジットカード情報等"
+      ],
+      "scopeNote": "2020年版のIPA白書に記載されたJIMOSの対象区分です。国内外や利用者・登録者の範囲が事例ごとに異なるため、他事例と合計しません。",
+      "countNote": "IPAの事例表に記載された公表規模です。可能性を含む値は全数の流出確認ではありません。個人情報、カード情報、情報項目など複数の数がある場合は、対象の定義を保ち、重複する数を加算しません。企業の後の続報を網羅した値ではありません。",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "IPA 白書2020・情報漏えい事例表（PDF 43ページ）",
+          "url": "https://www.ipa.go.jp/archive/publish/wp-security/qv6pgp0000000v98-att/000087026.pdf#page=43",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ipa-2019-10-24-06fd39fd",
+      "company": "株式会社スタジオライン",
+      "shortName": "スタジオライン",
+      "aliases": [],
+      "sector": "other",
+      "cause": "intrusion",
+      "year": 2019,
+      "announcedAt": "2019-10-24",
+      "sourceUpdatedAt": "2019-10-24",
+      "status": "possible",
+      "scale": {
+        "value": 16109,
+        "unit": "records",
+        "qualifier": "exact",
+        "label": "16,109件"
+      },
+      "summary": "外部からの不正アクセスによる情報漏えいの公表事案として、IPAの白書に掲載されています。",
+      "informationTypes": [
+        "クレジットカード情報等"
+      ],
+      "scopeNote": "2020年版のIPA白書に記載されたスタジオラインの対象区分です。国内外や利用者・登録者の範囲が事例ごとに異なるため、他事例と合計しません。",
+      "countNote": "IPAの事例表に記載された公表規模です。可能性を含む値は全数の流出確認ではありません。個人情報、カード情報、情報項目など複数の数がある場合は、対象の定義を保ち、重複する数を加算しません。企業の後の続報を網羅した値ではありません。",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "IPA 白書2020・情報漏えい事例表（PDF 43ページ）",
+          "url": "https://www.ipa.go.jp/archive/publish/wp-security/qv6pgp0000000v98-att/000087026.pdf#page=43",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ipa-2019-12-05-2cd7ef4a",
+      "company": "象印マホービン株式会社",
+      "shortName": "象印マホービン",
+      "aliases": [],
+      "sector": "other",
+      "cause": "intrusion",
+      "year": 2019,
+      "announcedAt": "2019-12-05",
+      "sourceUpdatedAt": "2019-12-05",
+      "status": "possible",
+      "scale": {
+        "value": 280052,
+        "unit": "records",
+        "qualifier": "maximum",
+        "label": "最大280,052件",
+        "bound": "maximum"
+      },
+      "summary": "外部からの不正アクセスによる情報漏えいの公表事案として、IPAの白書に掲載されています。",
+      "informationTypes": [
+        "個人情報（資料記載の対象区分）"
+      ],
+      "scopeNote": "2020年版のIPA白書に記載された象印マホービンの対象区分です。国内外や利用者・登録者の範囲が事例ごとに異なるため、他事例と合計しません。",
+      "countNote": "IPAの事例表に記載された公表規模です。可能性を含む値は全数の流出確認ではありません。個人情報、カード情報、情報項目など複数の数がある場合は、対象の定義を保ち、重複する数を加算しません。企業の後の続報を網羅した値ではありません。",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "IPA 白書2020・情報漏えい事例表（PDF 43ページ）",
+          "url": "https://www.ipa.go.jp/archive/publish/wp-security/qv6pgp0000000v98-att/000087026.pdf#page=43",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ipa-2019-12-25-32d8cd72",
+      "company": "株式会社ビーグリー",
+      "shortName": "ビーグリー",
+      "aliases": [
+        "ノベルバ"
+      ],
+      "sector": "other",
+      "cause": "intrusion",
+      "year": 2019,
+      "announcedAt": "2019-12-25",
+      "sourceUpdatedAt": "2019-12-25",
+      "status": "possible",
+      "scale": {
+        "value": 33715,
+        "unit": "records",
+        "qualifier": "exact",
+        "label": "33,715件"
+      },
+      "summary": "外部からの不正アクセスによる情報漏えいの公表事案として、IPAの白書に掲載されています。",
+      "informationTypes": [
+        "口座・金融情報等"
+      ],
+      "scopeNote": "2020年版のIPA白書に記載されたビーグリーの対象区分です。国内外や利用者・登録者の範囲が事例ごとに異なるため、他事例と合計しません。",
+      "countNote": "IPAの事例表に記載された公表規模です。可能性を含む値は全数の流出確認ではありません。個人情報、カード情報、情報項目など複数の数がある場合は、対象の定義を保ち、重複する数を加算しません。企業の後の続報を網羅した値ではありません。",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "IPA 白書2020・情報漏えい事例表（PDF 43ページ）",
+          "url": "https://www.ipa.go.jp/archive/publish/wp-security/qv6pgp0000000v98-att/000087026.pdf#page=43",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ipa-2020-04-13-d6c108fa",
+      "company": "Classi株式会社",
+      "shortName": "Classi",
+      "aliases": [],
+      "sector": "other",
+      "cause": "intrusion",
+      "year": 2020,
+      "announcedAt": "2020-04-13",
+      "sourceUpdatedAt": "2020-04-13",
+      "status": "possible",
+      "scale": {
+        "value": 1220000,
+        "unit": "records",
+        "qualifier": "approximate",
+        "label": "最大1,220,000件",
+        "bound": "maximum"
+      },
+      "summary": "外部からの不正アクセスによる情報漏えいの公表事案として、IPAの白書に掲載されています。",
+      "informationTypes": [
+        "パスワード等",
+        "ID・会員番号等"
+      ],
+      "scopeNote": "2021年版のIPA白書に記載されたClassiの対象区分です。国内外や利用者・登録者の範囲が事例ごとに異なるため、他事例と合計しません。",
+      "countNote": "IPAの事例表に記載された公表規模です。可能性を含む値は全数の流出確認ではありません。個人情報、カード情報、情報項目など複数の数がある場合は、対象の定義を保ち、重複する数を加算しません。企業の後の続報を網羅した値ではありません。",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "IPA 白書2021・情報漏えい事例表（PDF 51ページ）",
+          "url": "https://www.ipa.go.jp/archive/publish/wp-security/qv6pgp0000000vcv-att/000094183.pdf#page=51",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ipa-2020-04-13-6111b9f5",
+      "company": "ナカバヤシ株式会社",
+      "shortName": "ナカバヤシ",
+      "aliases": [
+        "フエルモール"
+      ],
+      "sector": "other",
+      "cause": "intrusion",
+      "year": 2020,
+      "announcedAt": "2020-04-13",
+      "sourceUpdatedAt": "2020-04-13",
+      "status": "possible",
+      "scale": {
+        "value": 120000,
+        "unit": "records",
+        "qualifier": "exact",
+        "label": "顧客情報12万件の流出可能性（カード情報94名分とは合算しない）"
+      },
+      "summary": "外部からの不正アクセスによる情報漏えいの公表事案として、IPAの白書に掲載されています。",
+      "informationTypes": [
+        "氏名",
+        "住所",
+        "メールアドレス等",
+        "クレジットカード情報等",
+        "取引・利用情報等"
+      ],
+      "scopeNote": "2021年版のIPA白書に記載されたナカバヤシの対象区分です。国内外や利用者・登録者の範囲が事例ごとに異なるため、他事例と合計しません。",
+      "countNote": "IPAの事例表に記載された公表規模です。可能性を含む値は全数の流出確認ではありません。個人情報、カード情報、情報項目など複数の数がある場合は、対象の定義を保ち、重複する数を加算しません。企業の後の続報を網羅した値ではありません。",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "IPA 白書2021・情報漏えい事例表（PDF 51ページ）",
+          "url": "https://www.ipa.go.jp/archive/publish/wp-security/qv6pgp0000000vcv-att/000094183.pdf#page=51",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ipa-2020-04-19-5547692c",
+      "company": "株式会社リジョブ",
+      "shortName": "リジョブ",
+      "aliases": [
+        "REJOB"
+      ],
+      "sector": "other",
+      "cause": "intrusion",
+      "year": 2020,
+      "announcedAt": "2020-04-19",
+      "sourceUpdatedAt": "2020-04-19",
+      "status": "possible",
+      "scale": {
+        "value": 206991,
+        "unit": "records",
+        "qualifier": "maximum",
+        "label": "最大206,991件",
+        "bound": "maximum"
+      },
+      "summary": "外部からの不正アクセスによる情報漏えいの公表事案として、IPAの白書に掲載されています。",
+      "informationTypes": [
+        "氏名",
+        "住所",
+        "生年月日",
+        "電話番号等",
+        "メールアドレス等",
+        "パスワード等"
+      ],
+      "scopeNote": "2021年版のIPA白書に記載されたリジョブの対象区分です。国内外や利用者・登録者の範囲が事例ごとに異なるため、他事例と合計しません。",
+      "countNote": "IPAの事例表に記載された公表規模です。可能性を含む値は全数の流出確認ではありません。個人情報、カード情報、情報項目など複数の数がある場合は、対象の定義を保ち、重複する数を加算しません。企業の後の続報を網羅した値ではありません。",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "IPA 白書2021・情報漏えい事例表（PDF 51ページ）",
+          "url": "https://www.ipa.go.jp/archive/publish/wp-security/qv6pgp0000000vcv-att/000094183.pdf#page=51",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ipa-2020-06-15-05489592",
+      "company": "株式会社キタムラ",
+      "shortName": "キタムラ",
+      "aliases": [
+        "カメラのキタムラ"
+      ],
+      "sector": "other",
+      "cause": "intrusion",
+      "year": 2020,
+      "announcedAt": "2020-06-15",
+      "sourceUpdatedAt": "2020-06-15",
+      "status": "possible",
+      "scale": {
+        "value": 400000,
+        "unit": "records",
+        "qualifier": "approximate",
+        "label": "最大400,000件",
+        "bound": "maximum"
+      },
+      "summary": "外部からの不正アクセスによる情報漏えいの公表事案として、IPAの白書に掲載されています。",
+      "informationTypes": [
+        "氏名",
+        "住所",
+        "生年月日",
+        "性別",
+        "電話番号等",
+        "メールアドレス等",
+        "口座・金融情報等",
+        "取引・利用情報等",
+        "ニックネーム"
+      ],
+      "scopeNote": "2021年版のIPA白書に記載されたキタムラの対象区分です。国内外や利用者・登録者の範囲が事例ごとに異なるため、他事例と合計しません。",
+      "countNote": "IPAの事例表に記載された公表規模です。可能性を含む値は全数の流出確認ではありません。個人情報、カード情報、情報項目など複数の数がある場合は、対象の定義を保ち、重複する数を加算しません。企業の後の続報を網羅した値ではありません。",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "IPA 白書2021・情報漏えい事例表（PDF 51ページ）",
+          "url": "https://www.ipa.go.jp/archive/publish/wp-security/qv6pgp0000000vcv-att/000094183.pdf#page=51",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ipa-2020-07-24-a474d5bf",
+      "company": "株式会社キッチハイク",
+      "shortName": "キッチハイク",
+      "aliases": [],
+      "sector": "other",
+      "cause": "intrusion",
+      "year": 2020,
+      "announcedAt": "2020-07-24",
+      "sourceUpdatedAt": "2020-07-24",
+      "status": "possible",
+      "scale": {
+        "value": 116863,
+        "unit": "records",
+        "qualifier": "maximum",
+        "label": "最大116,863件",
+        "bound": "maximum"
+      },
+      "summary": "外部からの不正アクセスによる情報漏えいの公表事案として、IPAの白書に掲載されています。",
+      "informationTypes": [
+        "氏名",
+        "電話番号等",
+        "メールアドレス等",
+        "パスワード等"
+      ],
+      "scopeNote": "2021年版のIPA白書に記載されたキッチハイクの対象区分です。国内外や利用者・登録者の範囲が事例ごとに異なるため、他事例と合計しません。",
+      "countNote": "IPAの事例表に記載された公表規模です。可能性を含む値は全数の流出確認ではありません。個人情報、カード情報、情報項目など複数の数がある場合は、対象の定義を保ち、重複する数を加算しません。企業の後の続報を網羅した値ではありません。",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "IPA 白書2021・情報漏えい事例表（PDF 51ページ）",
+          "url": "https://www.ipa.go.jp/archive/publish/wp-security/qv6pgp0000000vcv-att/000094183.pdf#page=51",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ipa-2020-11-16-89dadc6d",
+      "company": "QUOINE株式会社",
+      "shortName": "QUOINE",
+      "aliases": [],
+      "sector": "other",
+      "cause": "intrusion",
+      "year": 2020,
+      "announcedAt": "2020-11-16",
+      "sourceUpdatedAt": "2020-11-16",
+      "status": "possible",
+      "scale": {
+        "value": 169782,
+        "unit": "records",
+        "qualifier": "exact",
+        "label": "169,782件"
+      },
+      "summary": "外部からの不正アクセスによる情報漏えいの公表事案として、IPAの白書に掲載されています。",
+      "informationTypes": [
+        "氏名",
+        "メールアドレス等",
+        "パスワード等",
+        "口座・金融情報等",
+        "取引・利用情報等"
+      ],
+      "scopeNote": "2021年版のIPA白書に記載されたQUOINEの対象区分です。国内外や利用者・登録者の範囲が事例ごとに異なるため、他事例と合計しません。",
+      "countNote": "IPAの事例表に記載された公表規模です。可能性を含む値は全数の流出確認ではありません。個人情報、カード情報、情報項目など複数の数がある場合は、対象の定義を保ち、重複する数を加算しません。企業の後の続報を網羅した値ではありません。",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "IPA 白書2021・情報漏えい事例表（PDF 51ページ）",
+          "url": "https://www.ipa.go.jp/archive/publish/wp-security/qv6pgp0000000vcv-att/000094183.pdf#page=51",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ipa-2020-11-17-b076b017",
+      "company": "PeatixJapan",
+      "shortName": "PeatixJapan",
+      "aliases": [],
+      "sector": "other",
+      "cause": "intrusion",
+      "year": 2020,
+      "announcedAt": "2020-11-17",
+      "sourceUpdatedAt": "2020-11-17",
+      "status": "possible",
+      "scale": {
+        "value": 6770000,
+        "unit": "records",
+        "qualifier": "maximum",
+        "label": "最大6,770,000件",
+        "bound": "maximum"
+      },
+      "summary": "外部からの不正アクセスによる情報漏えいの公表事案として、IPAの白書に掲載されています。",
+      "informationTypes": [
+        "氏名",
+        "メールアドレス等",
+        "パスワード等"
+      ],
+      "scopeNote": "2021年版のIPA白書に記載されたPeatixJapanの対象区分です。国内外や利用者・登録者の範囲が事例ごとに異なるため、他事例と合計しません。",
+      "countNote": "IPAの事例表に記載された公表規模です。可能性を含む値は全数の流出確認ではありません。個人情報、カード情報、情報項目など複数の数がある場合は、対象の定義を保ち、重複する数を加算しません。企業の後の続報を網羅した値ではありません。",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "IPA 白書2021・情報漏えい事例表（PDF 51ページ）",
+          "url": "https://www.ipa.go.jp/archive/publish/wp-security/qv6pgp0000000vcv-att/000094183.pdf#page=51",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ipa-2020-11-19-8c75cb9f",
+      "company": "東建コーポレーション株式会社",
+      "shortName": "東建コーポレーション",
+      "aliases": [],
+      "sector": "other",
+      "cause": "intrusion",
+      "year": 2020,
+      "announcedAt": "2020-11-19",
+      "sourceUpdatedAt": "2020-11-19",
+      "status": "possible",
+      "scale": {
+        "value": 655488,
+        "unit": "records",
+        "qualifier": "exact",
+        "label": "655,488件"
+      },
+      "summary": "外部からの不正アクセスによる情報漏えいの公表事案として、IPAの白書に掲載されています。",
+      "informationTypes": [
+        "氏名",
+        "住所",
+        "生年月日",
+        "性別",
+        "電話番号等",
+        "メールアドレス等",
+        "パスワード等"
+      ],
+      "scopeNote": "2021年版のIPA白書に記載された東建コーポレーションの対象区分です。国内外や利用者・登録者の範囲が事例ごとに異なるため、他事例と合計しません。",
+      "countNote": "IPAの事例表に記載された公表規模です。可能性を含む値は全数の流出確認ではありません。個人情報、カード情報、情報項目など複数の数がある場合は、対象の定義を保ち、重複する数を加算しません。企業の後の続報を網羅した値ではありません。",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "IPA 白書2021・情報漏えい事例表（PDF 51ページ）",
+          "url": "https://www.ipa.go.jp/archive/publish/wp-security/qv6pgp0000000vcv-att/000094183.pdf#page=51",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ipa-2020-12-07-eac4ee51",
+      "company": "PayPay株式会社",
+      "shortName": "PayPay",
+      "aliases": [],
+      "sector": "other",
+      "cause": "intrusion",
+      "year": 2020,
+      "announcedAt": "2020-12-07",
+      "sourceUpdatedAt": "2020-12-07",
+      "status": "possible",
+      "scale": {
+        "value": 20076016,
+        "unit": "records",
+        "qualifier": "approximate",
+        "label": "最大20,076,016件",
+        "bound": "maximum"
+      },
+      "summary": "外部からの不正アクセスによる情報漏えいの公表事案として、IPAの白書に掲載されています。",
+      "informationTypes": [
+        "氏名",
+        "住所",
+        "生年月日",
+        "クレジットカード情報等",
+        "口座・金融情報等"
+      ],
+      "scopeNote": "2021年版のIPA白書に記載されたPayPayの対象区分です。国内外や利用者・登録者の範囲が事例ごとに異なるため、他事例と合計しません。",
+      "countNote": "IPAの事例表に記載された公表規模です。可能性を含む値は全数の流出確認ではありません。個人情報、カード情報、情報項目など複数の数がある場合は、対象の定義を保ち、重複する数を加算しません。企業の後の続報を網羅した値ではありません。",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "IPA 白書2021・情報漏えい事例表（PDF 51ページ）",
+          "url": "https://www.ipa.go.jp/archive/publish/wp-security/qv6pgp0000000vcv-att/000094183.pdf#page=51",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ipa-2020-12-11-18ba9403",
+      "company": "株式会社駅レンタカーシステム",
+      "shortName": "駅レンタカーシステム",
+      "aliases": [],
+      "sector": "other",
+      "cause": "intrusion",
+      "year": 2020,
+      "announcedAt": "2020-12-11",
+      "sourceUpdatedAt": "2020-12-11",
+      "status": "possible",
+      "scale": {
+        "value": 253979,
+        "unit": "records",
+        "qualifier": "exact",
+        "label": "253,979件"
+      },
+      "summary": "外部からの不正アクセスによる情報漏えいの公表事案として、IPAの白書に掲載されています。",
+      "informationTypes": [
+        "電話番号等",
+        "メールアドレス等"
+      ],
+      "scopeNote": "2021年版のIPA白書に記載された駅レンタカーシステムの対象区分です。国内外や利用者・登録者の範囲が事例ごとに異なるため、他事例と合計しません。",
+      "countNote": "IPAの事例表に記載された公表規模です。可能性を含む値は全数の流出確認ではありません。個人情報、カード情報、情報項目など複数の数がある場合は、対象の定義を保ち、重複する数を加算しません。企業の後の続報を網羅した値ではありません。",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "IPA 白書2021・情報漏えい事例表（PDF 51ページ）",
+          "url": "https://www.ipa.go.jp/archive/publish/wp-security/qv6pgp0000000vcv-att/000094183.pdf#page=51",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ipa-2020-12-23-d1f51f6d",
+      "company": "株式会社TIMERS",
+      "shortName": "TIMERS",
+      "aliases": [
+        "Famm",
+        "ファム"
+      ],
+      "sector": "other",
+      "cause": "intrusion",
+      "year": 2020,
+      "announcedAt": "2020-12-23",
+      "sourceUpdatedAt": "2020-12-23",
+      "status": "possible",
+      "scale": {
+        "value": 1430000,
+        "unit": "records",
+        "qualifier": "maximum",
+        "label": "最大143万件のユーザーテーブル（各情報項目の件数は加算しない）",
+        "bound": "maximum"
+      },
+      "summary": "外部からの不正アクセスによる情報漏えいの公表事案として、IPAの白書に掲載されています。",
+      "informationTypes": [
+        "氏名",
+        "生年月日",
+        "メールアドレス等",
+        "パスワード等"
+      ],
+      "scopeNote": "2021年版のIPA白書に記載されたTIMERSの対象区分です。国内外や利用者・登録者の範囲が事例ごとに異なるため、他事例と合計しません。",
+      "countNote": "IPAの事例表に記載された公表規模です。可能性を含む値は全数の流出確認ではありません。個人情報、カード情報、情報項目など複数の数がある場合は、対象の定義を保ち、重複する数を加算しません。企業の後の続報を網羅した値ではありません。",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "IPA 白書2021・情報漏えい事例表（PDF 51ページ）",
+          "url": "https://www.ipa.go.jp/archive/publish/wp-security/qv6pgp0000000vcv-att/000094183.pdf#page=51",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ipa-2021-02-12-78bbf04a",
+      "company": "株式会社マイナビ",
+      "shortName": "マイナビ",
+      "aliases": [
+        "マイナビ転職"
+      ],
+      "sector": "other",
+      "cause": "intrusion",
+      "year": 2021,
+      "announcedAt": "2021-02-12",
+      "sourceUpdatedAt": "2021-02-12",
+      "status": "possible",
+      "scale": {
+        "value": 212816,
+        "unit": "people",
+        "qualifier": "exact",
+        "label": "212,816人"
+      },
+      "summary": "外部からの不正アクセスによる情報漏えいの公表事案として、IPAの白書に掲載されています。",
+      "informationTypes": [
+        "パスワード等"
+      ],
+      "scopeNote": "2021年版のIPA白書に記載されたマイナビの対象区分です。国内外や利用者・登録者の範囲が事例ごとに異なるため、他事例と合計しません。",
+      "countNote": "IPAの事例表に記載された公表規模です。可能性を含む値は全数の流出確認ではありません。個人情報、カード情報、情報項目など複数の数がある場合は、対象の定義を保ち、重複する数を加算しません。企業の後の続報を網羅した値ではありません。",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "IPA 白書2021・情報漏えい事例表（PDF 51ページ）",
+          "url": "https://www.ipa.go.jp/archive/publish/wp-security/qv6pgp0000000vcv-att/000094183.pdf#page=51",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ipa-2021-03-05-39ee923c",
+      "company": "全日本空輸株式会社",
+      "shortName": "ANA",
+      "aliases": [
+        "全日空"
+      ],
+      "sector": "other",
+      "cause": "intrusion",
+      "year": 2021,
+      "announcedAt": "2021-03-05",
+      "sourceUpdatedAt": "2021-03-05",
+      "status": "possible",
+      "scale": {
+        "value": 1000000,
+        "unit": "people",
+        "qualifier": "approximate",
+        "label": "約100万人"
+      },
+      "summary": "外部からの不正アクセスによる情報漏えいの公表事案として、IPAの白書に掲載されています。",
+      "informationTypes": [
+        "氏名",
+        "ID・会員番号等"
+      ],
+      "scopeNote": "2021年版のIPA白書に記載されたANAの対象区分です。国内外や利用者・登録者の範囲が事例ごとに異なるため、他事例と合計しません。",
+      "countNote": "IPAの事例表に記載された公表規模です。可能性を含む値は全数の流出確認ではありません。個人情報、カード情報、情報項目など複数の数がある場合は、対象の定義を保ち、重複する数を加算しません。企業の後の続報を網羅した値ではありません。",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "IPA 白書2021・情報漏えい事例表（PDF 51ページ）",
+          "url": "https://www.ipa.go.jp/archive/publish/wp-security/qv6pgp0000000vcv-att/000094183.pdf#page=51",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ipa-2021-03-05-2ba0b7b1",
+      "company": "日本航空株式会社",
+      "shortName": "JAL",
+      "aliases": [
+        "日本航空"
+      ],
+      "sector": "other",
+      "cause": "intrusion",
+      "year": 2021,
+      "announcedAt": "2021-03-05",
+      "sourceUpdatedAt": "2021-03-05",
+      "status": "possible",
+      "scale": {
+        "value": 919685,
+        "unit": "people",
+        "qualifier": "exact",
+        "label": "919,685人"
+      },
+      "summary": "外部からの不正アクセスによる情報漏えいの公表事案として、IPAの白書に掲載されています。",
+      "informationTypes": [
+        "氏名",
+        "ID・会員番号等"
+      ],
+      "scopeNote": "2021年版のIPA白書に記載されたJALの対象区分です。国内外や利用者・登録者の範囲が事例ごとに異なるため、他事例と合計しません。",
+      "countNote": "IPAの事例表に記載された公表規模です。可能性を含む値は全数の流出確認ではありません。個人情報、カード情報、情報項目など複数の数がある場合は、対象の定義を保ち、重複する数を加算しません。企業の後の続報を網羅した値ではありません。",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "IPA 白書2021・情報漏えい事例表（PDF 51ページ）",
+          "url": "https://www.ipa.go.jp/archive/publish/wp-security/qv6pgp0000000vcv-att/000094183.pdf#page=51",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ipa-2021-03-10-60b90a7a",
+      "company": "株式会社アーバンリサーチ",
+      "shortName": "アーバンリサーチ",
+      "aliases": [
+        "URBAN RESEARCH",
+        "UR CLUB"
+      ],
+      "sector": "other",
+      "cause": "intrusion",
+      "year": 2021,
+      "announcedAt": "2021-03-10",
+      "sourceUpdatedAt": "2021-03-10",
+      "status": "possible",
+      "scale": {
+        "value": 317326,
+        "unit": "people",
+        "qualifier": "exact",
+        "label": "317,326人"
+      },
+      "summary": "外部からの不正アクセスによる情報漏えいの公表事案として、IPAの白書に掲載されています。",
+      "informationTypes": [
+        "氏名",
+        "住所",
+        "生年月日",
+        "性別",
+        "電話番号等",
+        "メールアドレス等",
+        "ID・会員番号等"
+      ],
+      "scopeNote": "2021年版のIPA白書に記載されたアーバンリサーチの対象区分です。国内外や利用者・登録者の範囲が事例ごとに異なるため、他事例と合計しません。",
+      "countNote": "IPAの事例表に記載された公表規模です。可能性を含む値は全数の流出確認ではありません。個人情報、カード情報、情報項目など複数の数がある場合は、対象の定義を保ち、重複する数を加算しません。企業の後の続報を網羅した値ではありません。",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "IPA 白書2021・情報漏えい事例表（PDF 51ページ）",
+          "url": "https://www.ipa.go.jp/archive/publish/wp-security/qv6pgp0000000vcv-att/000094183.pdf#page=51",
+          "publishedAt": null
+        }
+      ]
+    }
+  ]
+}

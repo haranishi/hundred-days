@@ -1,0 +1,533 @@
+{
+  "reports": [
+    {
+      "year": 2018,
+      "title": "IPA 情報セキュリティ白書2018",
+      "url": "https://www.ipa.go.jp/archive/publish/wp-security/qv6pgp0000000v1y-att/000070313.pdf",
+      "sha256": "cf77d86c722cbbd0210df6b4465e3575f64b5001e10ad5d0c66b247288091b33",
+      "casePages": [
+        21
+      ],
+      "rows": [
+        {
+          "company": "総務省",
+          "announcedAt": "2017-04-13",
+          "page": 21,
+          "action": "imported",
+          "incidentIds": [
+            "ipa-2017-04-13-f21f7c9f"
+          ]
+        },
+        {
+          "company": "国立研究開発法人情報通信研究機構",
+          "announcedAt": "2017-05-02",
+          "page": 21,
+          "action": "imported",
+          "incidentIds": [
+            "ipa-2017-05-02-330f5b2c"
+          ]
+        },
+        {
+          "company": "国土交通省",
+          "announcedAt": "2017-06-06",
+          "page": 21,
+          "action": "imported",
+          "incidentIds": [
+            "ipa-2017-06-06-9283cafc"
+          ]
+        },
+        {
+          "company": "大阪大学医学部附属病院",
+          "announcedAt": "2017-06-26",
+          "page": 21,
+          "action": "imported",
+          "incidentIds": [
+            "ipa-2017-06-26-7719d108"
+          ]
+        },
+        {
+          "company": "株式会社マネースクウェア・ジャパン",
+          "announcedAt": "2017-07-17",
+          "page": 21,
+          "action": "imported",
+          "incidentIds": [
+            "ipa-2017-07-17-3fef186b"
+          ]
+        },
+        {
+          "company": "東京メトロポリタンテレビジョン株式会社",
+          "announcedAt": "2017-10-04",
+          "page": 21,
+          "action": "imported",
+          "incidentIds": [
+            "ipa-2017-10-04-9ad35141"
+          ]
+        },
+        {
+          "company": "株式会社ほくやく・竹山ホールディングス",
+          "announcedAt": "2017-10-11",
+          "page": 21,
+          "action": "imported",
+          "incidentIds": [
+            "ipa-2017-10-11-b977da5e"
+          ]
+        }
+      ],
+      "selection": "企業・組織名と公表日を持つ、外部からの不正アクセスによる情報漏えいの主な事例表を全行確認。外国組織のみの事例は除外。その他の本文事例・別表を全て収録したものではありません。",
+      "status": "case-table",
+      "sourceRows": 7,
+      "imported": 7,
+      "excluded": 0
+    },
+    {
+      "year": 2019,
+      "title": "IPA 情報セキュリティ白書2019",
+      "url": "https://www.ipa.go.jp/archive/publish/wp-security/qv6pgp0000000v5l-att/000079041.pdf",
+      "sha256": "ed6d27d0120cb6082637f56e4c9900fc3414748232e855f476c21f436899da0b",
+      "casePages": [
+        43
+      ],
+      "rows": [
+        {
+          "company": "宝塚山本ガーデン・クリエイティブ株式会社",
+          "announcedAt": "2018-04-27",
+          "page": 43,
+          "action": "imported",
+          "incidentIds": [
+            "ipa-2018-04-27-0232b53c"
+          ]
+        },
+        {
+          "company": "森永乳業株式会社",
+          "announcedAt": "2018-06-04",
+          "page": 43,
+          "action": "imported",
+          "incidentIds": [
+            "ipa-2018-06-04-c0428498"
+          ]
+        },
+        {
+          "company": "ラッシュ株式会社",
+          "announcedAt": "2018-06-16",
+          "page": 43,
+          "action": "imported",
+          "incidentIds": [
+            "ipa-2018-06-16-902811ed"
+          ]
+        },
+        {
+          "company": "FASTBOOKING",
+          "announcedAt": "2018-06-26",
+          "page": 43,
+          "action": "excluded",
+          "reason": "外国企業の事例。本アプリの企業・組織の収録範囲から除外"
+        },
+        {
+          "company": "アサヒ軽金属工業株式会社",
+          "announcedAt": "2018-08-02",
+          "page": 43,
+          "action": "imported",
+          "incidentIds": [
+            "ipa-2018-08-02-87a01ce1"
+          ]
+        },
+        {
+          "company": "株式会社リガク",
+          "announcedAt": "2018-11-26",
+          "page": 43,
+          "action": "imported",
+          "incidentIds": [
+            "ipa-2018-11-26-15436c94"
+          ]
+        },
+        {
+          "company": "ディー・エル・マーケット株式会社",
+          "announcedAt": "2018-12-25",
+          "page": 43,
+          "action": "imported",
+          "incidentIds": [
+            "ipa-2018-12-25-b783afad"
+          ]
+        }
+      ],
+      "selection": "企業・組織名と公表日を持つ、外部からの不正アクセスによる情報漏えいの主な事例表を全行確認。外国組織のみの事例は除外。その他の本文事例・別表を全て収録したものではありません。",
+      "status": "case-table",
+      "sourceRows": 7,
+      "imported": 6,
+      "excluded": 1
+    },
+    {
+      "year": 2020,
+      "title": "IPA 情報セキュリティ白書2020",
+      "url": "https://www.ipa.go.jp/archive/publish/wp-security/qv6pgp0000000v98-att/000087026.pdf",
+      "sha256": "7611310bcf20748fb4a2dce7dff75ac9fdd0c045f296fdd7f35c1aef41ba8749",
+      "casePages": [
+        43
+      ],
+      "rows": [
+        {
+          "company": "株式会社エーデルワイン",
+          "announcedAt": "2019-04-23",
+          "page": 43,
+          "action": "imported",
+          "incidentIds": [
+            "ipa-2019-04-23-f5bbac63"
+          ]
+        },
+        {
+          "company": "株式会社ファーストリテイリング",
+          "announcedAt": "2019-05-13",
+          "page": 43,
+          "action": "imported",
+          "incidentIds": [
+            "ipa-2019-05-13-561e741f"
+          ]
+        },
+        {
+          "company": "株式会社ヤマダ電機",
+          "announcedAt": "2019-05-29",
+          "page": 43,
+          "action": "imported",
+          "incidentIds": [
+            "ipa-2019-05-29-639adf69"
+          ]
+        },
+        {
+          "company": "株式会社サンポークリエイト",
+          "announcedAt": "2019-06-04",
+          "page": 43,
+          "action": "imported",
+          "incidentIds": [
+            "ipa-2019-06-04-bf62bae3"
+          ]
+        },
+        {
+          "company": "株式会社DigiBook",
+          "announcedAt": "2019-07-03",
+          "page": 43,
+          "action": "imported",
+          "incidentIds": [
+            "ipa-2019-07-03-31e5aa19"
+          ]
+        },
+        {
+          "company": "J.フロントリテイリング株式会社・(株式会社ディンプル)",
+          "announcedAt": "2019-07-04",
+          "page": 43,
+          "action": "imported",
+          "incidentIds": [
+            "ipa-2019-07-04-4a0a3413"
+          ]
+        },
+        {
+          "company": "株式会社金剛堂",
+          "announcedAt": "2019-07-23",
+          "page": 43,
+          "action": "imported",
+          "incidentIds": [
+            "ipa-2019-07-23-a66024f4"
+          ]
+        },
+        {
+          "company": "株式会社おもちゃ箱",
+          "announcedAt": "2019-08-05",
+          "page": 43,
+          "action": "imported",
+          "incidentIds": [
+            "ipa-2019-08-05-ef5f878a"
+          ]
+        },
+        {
+          "company": "株式会社アルペン",
+          "announcedAt": "2019-08-07",
+          "page": 43,
+          "action": "imported",
+          "incidentIds": [
+            "ipa-2019-08-07-40f57019"
+          ]
+        },
+        {
+          "company": "三井住友カード株式会社",
+          "announcedAt": "2019-08-23",
+          "page": 43,
+          "action": "imported",
+          "incidentIds": [
+            "ipa-2019-08-23-0a8b8e17"
+          ]
+        },
+        {
+          "company": "株式会社みずほ銀行",
+          "announcedAt": "2019-09-04",
+          "page": 43,
+          "action": "imported",
+          "incidentIds": [
+            "ipa-2019-09-04-e2eb893e"
+          ]
+        },
+        {
+          "company": "株式会社スープレックス",
+          "announcedAt": "2019-09-10",
+          "page": 43,
+          "action": "imported",
+          "incidentIds": [
+            "ipa-2019-09-10-792fcbb7"
+          ]
+        },
+        {
+          "company": "有限会社フィセル",
+          "announcedAt": "2019-09-19",
+          "page": 43,
+          "action": "imported",
+          "incidentIds": [
+            "ipa-2019-09-19-dff8d575"
+          ]
+        },
+        {
+          "company": "株式会社京都一の傳",
+          "announcedAt": "2019-10-08",
+          "page": 43,
+          "action": "imported",
+          "incidentIds": [
+            "ipa-2019-10-08-32eb4c26"
+          ]
+        },
+        {
+          "company": "株式会社JIMOS",
+          "announcedAt": "2019-10-15",
+          "page": 43,
+          "action": "imported",
+          "incidentIds": [
+            "ipa-2019-10-15-dc23e416"
+          ]
+        },
+        {
+          "company": "株式会社スタジオライン",
+          "announcedAt": "2019-10-24",
+          "page": 43,
+          "action": "imported",
+          "incidentIds": [
+            "ipa-2019-10-24-06fd39fd"
+          ]
+        },
+        {
+          "company": "象印マホービン株式会社",
+          "announcedAt": "2019-12-05",
+          "page": 43,
+          "action": "imported",
+          "incidentIds": [
+            "ipa-2019-12-05-2cd7ef4a"
+          ]
+        },
+        {
+          "company": "株式会社ビーグリー",
+          "announcedAt": "2019-12-25",
+          "page": 43,
+          "action": "imported",
+          "incidentIds": [
+            "ipa-2019-12-25-32d8cd72"
+          ]
+        }
+      ],
+      "selection": "企業・組織名と公表日を持つ、外部からの不正アクセスによる情報漏えいの主な事例表を全行確認。外国組織のみの事例は除外。その他の本文事例・別表を全て収録したものではありません。",
+      "status": "case-table",
+      "sourceRows": 18,
+      "imported": 18,
+      "excluded": 0
+    },
+    {
+      "year": 2021,
+      "title": "IPA 情報セキュリティ白書2021",
+      "url": "https://www.ipa.go.jp/archive/publish/wp-security/qv6pgp0000000vcv-att/000094183.pdf",
+      "sha256": "42bd22ca8042fa3167cd5401fc9b5932b068e070c132f8fc4af0c3c97f60adf2",
+      "casePages": [
+        51
+      ],
+      "rows": [
+        {
+          "company": "Classi株式会社",
+          "announcedAt": "2020-04-13",
+          "page": 51,
+          "action": "imported",
+          "incidentIds": [
+            "ipa-2020-04-13-d6c108fa"
+          ]
+        },
+        {
+          "company": "ナカバヤシ株式会社",
+          "announcedAt": "2020-04-13",
+          "page": 51,
+          "action": "imported",
+          "incidentIds": [
+            "ipa-2020-04-13-6111b9f5"
+          ]
+        },
+        {
+          "company": "株式会社リジョブ",
+          "announcedAt": "2020-04-19",
+          "page": 51,
+          "action": "imported",
+          "incidentIds": [
+            "ipa-2020-04-19-5547692c"
+          ]
+        },
+        {
+          "company": "株式会社キタムラ",
+          "announcedAt": "2020-06-15",
+          "page": 51,
+          "action": "imported",
+          "incidentIds": [
+            "ipa-2020-06-15-05489592"
+          ]
+        },
+        {
+          "company": "株式会社キッチハイク",
+          "announcedAt": "2020-07-24",
+          "page": 51,
+          "action": "imported",
+          "incidentIds": [
+            "ipa-2020-07-24-a474d5bf"
+          ]
+        },
+        {
+          "company": "QUOINE株式会社",
+          "announcedAt": "2020-11-16",
+          "page": 51,
+          "action": "imported",
+          "incidentIds": [
+            "ipa-2020-11-16-89dadc6d"
+          ]
+        },
+        {
+          "company": "PeatixJapan",
+          "announcedAt": "2020-11-17",
+          "page": 51,
+          "action": "imported",
+          "incidentIds": [
+            "ipa-2020-11-17-b076b017"
+          ]
+        },
+        {
+          "company": "東建コーポレーション株式会社",
+          "announcedAt": "2020-11-19",
+          "page": 51,
+          "action": "imported",
+          "incidentIds": [
+            "ipa-2020-11-19-8c75cb9f"
+          ]
+        },
+        {
+          "company": "PayPay株式会社",
+          "announcedAt": "2020-12-07",
+          "page": 51,
+          "action": "imported",
+          "incidentIds": [
+            "ipa-2020-12-07-eac4ee51"
+          ]
+        },
+        {
+          "company": "株式会社駅レンタカーシステム",
+          "announcedAt": "2020-12-11",
+          "page": 51,
+          "action": "imported",
+          "incidentIds": [
+            "ipa-2020-12-11-18ba9403"
+          ]
+        },
+        {
+          "company": "株式会社TIMERS",
+          "announcedAt": "2020-12-23",
+          "page": 51,
+          "action": "imported",
+          "incidentIds": [
+            "ipa-2020-12-23-d1f51f6d"
+          ]
+        },
+        {
+          "company": "株式会社マイナビ",
+          "announcedAt": "2021-02-12",
+          "page": 51,
+          "action": "imported",
+          "incidentIds": [
+            "ipa-2021-02-12-78bbf04a"
+          ]
+        },
+        {
+          "company": "全日本空輸株式会社(ANA:AllNipponAirways)日本航空株式会社(JAL:JapanAirlines)",
+          "announcedAt": "2021-03-05",
+          "page": 51,
+          "action": "split-row",
+          "incidentIds": [
+            "ipa-2021-03-05-39ee923c",
+            "ipa-2021-03-05-2ba0b7b1"
+          ]
+        },
+        {
+          "company": "株式会社アーバンリサーチ",
+          "announcedAt": "2021-03-10",
+          "page": 51,
+          "action": "imported",
+          "incidentIds": [
+            "ipa-2021-03-10-60b90a7a"
+          ]
+        }
+      ],
+      "selection": "企業・組織名と公表日を持つ、外部からの不正アクセスによる情報漏えいの主な事例表を全行確認。外国組織のみの事例は除外。その他の本文事例・別表を全て収録したものではありません。",
+      "status": "case-table",
+      "sourceRows": 14,
+      "imported": 15,
+      "excluded": 0
+    },
+    {
+      "year": 2022,
+      "title": "IPA 情報セキュリティ白書2022",
+      "url": "https://www.ipa.go.jp/archive/publish/wp-security/qv6pgp0000000vgi-att/000100473.pdf",
+      "sha256": "463e9d623d59269e8afa7d0a0f833a095164ae8b04523d7ec8d21171e09adfb2",
+      "casePages": [],
+      "rows": [],
+      "selection": "本文の個別事例はありますが、同形式の公表日・組織名付き事例表はありません。補完事例は企業の公式発表から別途収録しています。",
+      "status": "narrative-only",
+      "sourceRows": 0,
+      "imported": 0,
+      "excluded": 0
+    },
+    {
+      "year": 2023,
+      "title": "IPA 情報セキュリティ白書2023",
+      "url": "https://www.ipa.go.jp/publish/wp-security/t6hhco00000014r1-att/2023_Chap1.pdf",
+      "sha256": "df6add8ac628c408dd37e5bd195b92bdab428939d24284589a978cbf1c33623b",
+      "casePages": [],
+      "rows": [],
+      "selection": "本文の個別事例はありますが、同形式の公表日・組織名付き事例表はありません。補完事例は企業の公式発表から別途収録しています。",
+      "status": "narrative-only",
+      "sourceRows": 0,
+      "imported": 0,
+      "excluded": 0
+    },
+    {
+      "year": 2024,
+      "title": "IPA 情報セキュリティ白書2024",
+      "url": "https://www.ipa.go.jp/publish/wp-security/eid2eo0000007gv4-att/2024_Chap1.pdf",
+      "sha256": "323392a2978819fc6f196f34cafcdaebcfe43e53533844788685ebf07d64951b",
+      "casePages": [],
+      "rows": [],
+      "selection": "本文の個別事例はありますが、同形式の公表日・組織名付き事例表はありません。補完事例は企業の公式発表から別途収録しています。",
+      "status": "narrative-only",
+      "sourceRows": 0,
+      "imported": 0,
+      "excluded": 0
+    },
+    {
+      "year": 2025,
+      "title": "IPA 情報セキュリティ白書2025",
+      "url": "https://www.ipa.go.jp/publish/wp-security/j5u9nn0000004wk0-att/ISWP2025_Chap1.pdf",
+      "sha256": "5e0b0ff4bf6df34bb276033ab66aae34e9b75706687c2e96d320ee0b83644188",
+      "casePages": [],
+      "rows": [],
+      "selection": "本文の個別事例はありますが、同形式の公表日・組織名付き事例表はありません。補完事例は企業の公式発表から別途収録しています。",
+      "status": "narrative-only",
+      "sourceRows": 0,
+      "imported": 0,
+      "excluded": 0
+    }
+  ]
+}

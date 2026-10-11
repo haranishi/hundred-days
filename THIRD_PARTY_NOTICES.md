@@ -104,6 +104,24 @@
 | 060 | 解説の文章（`day-060-prize-explained/data/commentary.json`） | リポジトリ作成者が、論文・研究機関のページなどの事実から自分の言葉で書いた | 第三者の文章を含まない。ライセンスはコードと同じMIT。出典はリンクで示し、本文は転載しない | 公式サイトの文章は、写さず・訳さず・言い換えない。受賞理由の原文だけ、公式のデータ（CC0）の値のまま画面に出す（根拠は[`COMMENTARY_RULES.md`](day-060-prize-explained/COMMENTARY_RULES.md)） |
 | 063 | 手口の解説と「知っておきたいルール」の文章（`day-063-dark-patterns/lib/stages.js`） | 消費者庁、OECD、国民生活センターの公開資料（一覧は[アプリREADME](day-063-dark-patterns/README.md)） | [公共データ利用規約 第1.0版](https://www.digital.go.jp/resources/open_data/public_data_license_v1.0)（消費者庁）、[OECD Terms and Conditions](https://www.oecd.org/en/about/terms-conditions.html)、[国民生活センターの利用規約・著作権](https://www.kokusen.go.jp/info/data/copyright.html) | 題名と機関名を挙げ、内容を制作者の言葉で要約。文章・図・画像は転載せず、各機関の見解ではないと画面とREADMEに明記（確認の経緯は[`day063-rights.md`](.agent-harness/runs/day063-rights.md)） |
 
+## Day64「漏洩の地図」の出典と描画依存
+
+PDFの調査・抽出にのみPyMuPDF 1.27.2.3（Artifex、[AGPLまたは商用ライセンス](https://pymupdf.readthedocs.io/en/latest/about.html#license-and-copyright)）を使います。これを読み込む3つのオフライン抽出ツールと対応する取込テストは AGPL-3.0-or-later とし、[対象ファイル](day-064-breach-atlas/README.md#ライセンス)・[完全な許諾本文](day-064-breach-atlas/source/tools/LICENSE-AGPL-3.0.txt)・対応ソースを公開します。本体のパッケージ・PDF資料・Pythonサービスは配信しません。WebアプリのMITコードへPyMuPDFを組み込みません。
+
+Day64「漏洩の地図」は、企業・グループの公式発表、公的機関の公開資料、国内の公表アーカイブ・事例索引から事実項目を抽出して短い独自説明に整理しています。各資料は企業ノートと同梱JSONの `sources` にリンクし、原文・画像・ロゴや漏洩した個人情報の実データは転載していません。Three.js 0.186.1、OrbitControls、Vite・Rolldownの配布コードに含む補助の著作権表示と許諾全文は[同梱ライセンス](day-064-breach-atlas/licenses/THIRD_PARTY_NOTICES.txt)と[Three.jsの許諾](day-064-breach-atlas/licenses/three-LICENSE.txt)にあります。ノード・線・背景・アイコン・OGPの図形はコードで作成しています。
+
+追加の公表記録13,349件は、[カリフォルニア州司法長官の全件CSV](https://www.oag.ca.gov/privacy/databreach/list-export) と [米国HHS OCRのHIPAA Breach Portal](https://ocrportal.hhs.gov/ocr/breach/breach_report_hip.jsf) の事実メタデータから取得しています。CAは5,350行から全列一致の重複12行と通知元空欄2行を除き5,336記録、HHSは調査中754行の重複2行を除いた752記録とアーカイブ7,261記録。組織名・日付・対象人数・分類等を正規化し、日本語の独自説明を付けています。通知文PDF、HHSの長文Web Description、画像やロゴは配布しません。CAの [Conditions of Use](https://www.oag.ca.gov/conditions) のOwnershipも確認しています。台帳間の同じ事故は照合しておらず、記録数を独立した事故数や人数の総計と同一視しません。
+
+日本の追加資料はPPCの年度資料とIPAの情報セキュリティ白書。各資料と全行の取込・重複・除外理由は [調査データ](docs/day064/research/) と同梱 `data/coverage.json` にあります。全国・世界の全事故を網羅する資料ではありません。いずれも公式の発表主体が作成・監修したアプリではありません。
+
+さらに [piyokango・国内インシデント公表アーカイブ](https://github.com/piyokango/SecurityIncidentArchive) の固定コミット `17fb7a537b6afa106f509a5ad77cbed7712cd3c2` と、サイバーセキュリティ.comの [2020年代](https://cybersecurity-jp.com/leakage-of-personal-information)・[2010年代](https://cybersecurity-jp.com/leakage-of-personal-information/2010-2019)・[2000年代](https://cybersecurity-jp.com/leakage-of-personal-information/2000-2009) の索引を参照。組織名・日付・分類・参照URL等の事実項目だけを抽出し、独自の順序・データ構造と説明で収録しています。保存された公表原文、ニュース本文・見出し・写真、リポジトリのコードは同梱しません。原発表と保存版、事例索引と参照記事を個別に明記しています。サイバーセキュリティ.comの [二次利用の案内](https://cybersecurity-jp.com/topics/32835) を確認し、該当記録の本文とリンク付近に媒体名と参照URLを表示しています。公表・報道の存在を情報流出の確認へ置き換えず、人数を推定しません。
+
+Rust検索エンジンは外部Cargo依存を追加せず、Rust 1.99.0の標準ライブラリ・アロケータ・コンパイラ実行時部品をWasmへリンクしています。Rustは主にMIT OR Apache-2.0。ツールチェーン付属のライブラリ著作権通知（dlmalloc等を含む）と各許諾全文を [Rustの同梱通知](day-064-breach-atlas/licenses/rust/COPYRIGHT-library.html) と `licenses/rust/licenses/` に保持しています。
+
+2026-10-12に、[横浜市の記者発表資料](https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/archive/)から「事務処理ミス等の一括公表」66資料と、[さいたま市の一括公表一覧](https://www.city.saitama.lg.jp/006/006/004/001/p052387.html)に掲載された29資料を追加確認。個別表の自治体・所管課・掲載No.・日付・分類・対象人数・参照URLという事実項目を独自の構造で収録しています。公表本文・記者発表PDF・連絡先・担当者名は配布しません。人数には漏えいのおそれがある対象も含まれ、実際の流出確認人数へ置き換えません。所管自治体の地域は事故地点や攻撃元ではありません。全入力のURLとSHA-256は [取得マニフェスト](docs/day064/research/municipal-input-manifest.json)、全行の判断は [取込台帳](docs/day064/research/municipal-notice-coverage.json) に保持しています。[横浜市のサイトポリシー](https://www.city.yokohama.lg.jp/aboutweb/sitepolicy.html)に従い、本文の転載ではなく事実項目と独自説明を使用します。原典の権利は各自治体に帰属し、公式アプリではありません。
+
+地球儀と平面地図の地形・地域代表点は、[Natural Earthのパブリックドメインデータ](https://www.naturalearthdata.com/about/terms-of-use/) から生成しています。固定コミット `ca96624a56bd078437bca8184e78163e5039ad19` の入力URL・SHA-256は [地理データのマニフェスト](docs/day064/research/geo-manifest.json) に記録し、画面と同梱通知にクレジットを表示しています。資料に関連する国・地域の代表点で、事故・サーバー・攻撃元の位置ではありません。[Kasperskyの地球儀](https://cybermap.kaspersky.com/ja) を見た目の参考にしていますが、同サイトのコード・画像・ブランド・検知データは使用しません。
+
 ## Day56「夕暮れ破壊紀行」の描画依存
 
 three.js 0.186.1（MIT）、postprocessing 6.39.5（Zlib）、n8ao 2.0.1（配布LICENSEはCC0）、
@@ -126,3 +144,5 @@ Stephen HillのACES fitted実装のGLSL移植（BakingLab・MIT）を含みま�
 React、React DOM、React Three Fiber、Drei、Three.jsなど、実際の配布コードに入る依存を検査して通知を生成します。
 著作権表示・MIT許諾全文は[同梱通知](day-061-kumimae/legal/THIRD_PARTY_NOTICES.txt)、版と出典は[マニフェスト](day-061-kumimae/legal/THIRD_PARTY_MANIFEST.json)を参照してください。
 製品カタログ、価格・性能値、写真、外部3D素材は同梱しません。作例は架空の値、模式図は汎用形状をコードで生成したものです。
+
+学習用の問いと短い説明は、IPA「中小企業の情報セキュリティ対策ガイドライン」第4.0版、同「組織における内部不正防止ガイドライン」と個人情報保護委員会の対応案内を確認して独自編集したものです。各テーマに資料へのリンクを表示し、原文全文・図表・ロゴは収録しません。公的機関の公式の自己診断・推奨アプリではありません。資料確認: 2026-10-11。

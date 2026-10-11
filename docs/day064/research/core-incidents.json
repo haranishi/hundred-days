@@ -1,0 +1,104 @@
+{
+  "asOf": "2026-10-11",
+  "incidents": [
+    {
+      "id": "benesse-customer-2014",
+      "company": "株式会社ベネッセコーポレーション",
+      "shortName": "ベネッセ",
+      "aliases": ["Benesse", "進研ゼミ", "こどもちゃれんじ", "ベネッセホールディングス"],
+      "sector": "education",
+      "cause": "insider",
+      "year": 2014,
+      "announcedAt": "2014-07-09",
+      "sourceUpdatedAt": "2014-09-25",
+      "status": "confirmed",
+      "scale": {"value": 28950000, "unit": "records", "qualifier": "estimated", "label": "約2,895万件（推計）"},
+      "summary": "システム運用の委託先元社員が顧客データを持ち出し、名簿業者に売却。重複を含む売却件数と、会社が推計した実態の件数を分けて公表した。",
+      "informationTypes": ["氏名", "性別・生年月日", "住所・電話番号", "家族の登録情報", "一部のメールアドレス"],
+      "scopeNote": "進研ゼミやこどもちゃれんじなど、同社の教育・生活関連サービスの登録情報。過去の利用者や資料請求者なども含む。",
+      "countNote": "約3,504万件という売却データの延べ件数とは別に、会社が実態の件数として推計した約2,895万件を表示。登録者と家族の情報を含むため、2,895万人とは表記しない。",
+      "sources": [
+        {"title": "事故の概要（会社による件数・情報項目の説明）", "url": "https://www.benesse.co.jp/customer/bcinfo/01", "publishedAt": null},
+        {"title": "個人情報漏えい事故調査委員会による調査結果のお知らせ", "url": "https://www.benesse.co.jp/customer/dl/incident_20140925_release.pdf", "publishedAt": "2014-09-25"}
+      ]
+    },
+    {
+      "id": "docomo-plala-2023",
+      "company": "株式会社NTTドコモ（ぷらら・ひかりTV）",
+      "shortName": "NTTドコモ",
+      "aliases": ["ぷらら", "ひかりTV", "Plala", "NTTネクシア", "ドコモ"],
+      "sector": "telecom",
+      "cause": "insider",
+      "year": 2023,
+      "announcedAt": "2023-03-31",
+      "sourceUpdatedAt": "2024-04-01",
+      "status": "confirmed",
+      "scale": {"value": 5960000, "unit": "records", "qualifier": "approximate", "label": "約596万件"},
+      "summary": "販売支援を委託したNTTネクシアの元派遣社員が、業務用パソコンから私用の外部ストレージへ顧客情報を不正に持ち出した。",
+      "informationTypes": ["氏名", "住所・電話番号", "一部のメールアドレス・生年月日", "回線ID・顧客番号の一部"],
+      "scopeNote": "ぷらら約165万件、ひかりTV約431万件。両サービスを使う顧客はぷらら側に含めたと会社が説明。解約済み情報も対象。",
+      "countNote": "2023年7月21日の調査結果で、初報の最大約529万件から約596万件へ訂正。件数の単位を保持する。決済関連情報や各種パスワードは対象に含まれない。2024年4月の更新は問い合わせ窓口の変更。",
+      "sources": [{"title": "ぷらら・ひかりTVのお客さま情報流出（調査結果・更新履歴）", "url": "https://www.docomo.ne.jp/info/notice/page/230721_00_m.html", "publishedAt": "2023-07-21"}]
+    },
+    {
+      "id": "lycorp-network-2023",
+      "company": "LINEヤフー株式会社",
+      "shortName": "LINEヤフー",
+      "aliases": ["LINE", "LY Corporation", "ラインヤフー", "NAVER"],
+      "sector": "telecom",
+      "cause": "intrusion",
+      "year": 2023,
+      "announcedAt": "2023-11-27",
+      "sourceUpdatedAt": "2024-02-14",
+      "status": "possible",
+      "scale": {"value": 519506, "unit": "records", "qualifier": "estimated", "label": "519,506件（可能性・推計を含む）"},
+      "summary": "委託先のパソコンのマルウェア感染を起点に、関係会社のネットワークと共通の認証基盤を経由して社内システムへ不正アクセスが発生。追加調査の最終結果を収録した。",
+      "informationTypes": ["サービス利用履歴・内部識別子", "取引先のメールアドレス", "従業者の氏名・識別情報等"],
+      "scopeNote": "日本企業が公表した国内外の情報。ユーザー302,980件のうち日本ユーザーは130,192件。取引先・従業者情報にはグループやNAVER側の情報も含む。",
+      "countNote": "最終公表のユーザー302,980件・取引先86,211件・従業者130,315件を足したレコード数。推計と漏えいの可能性を含む。従業者のアカウントは重複するため人数ではない。トーク内容・口座・クレジットカード情報は含まれない。",
+      "sources": [{"title": "不正アクセスによる情報漏えい（2024年2月14日最終更新）", "url": "https://www.lycorp.co.jp/ja/news/announcements/007712/", "publishedAt": "2023-11-27"}]
+    },
+    {
+      "id": "toyota-cloud-2023",
+      "company": "トヨタ自動車株式会社／トヨタコネクティッド株式会社",
+      "shortName": "トヨタ自動車",
+      "aliases": ["Toyota", "T-Connect", "G-Link", "G-BOOK", "トヨタコネクティッド"],
+      "sector": "manufacturing",
+      "cause": "exposure",
+      "year": 2023,
+      "announcedAt": "2023-05-12",
+      "sourceUpdatedAt": "2023-07-12",
+      "status": "possible",
+      "scale": {"value": 2150000, "unit": "people", "qualifier": "approximate", "label": "約215万人（閲覧の可能性）"},
+      "summary": "管理を委託していたクラウドの公開設定により、車両に関するデータが外部からアクセスできる状態になっていた。実際の外部流出を確認した人数とは区別する。",
+      "informationTypes": ["車載端末ID", "車台番号", "車両の位置情報・時刻"],
+      "scopeNote": "対象期間にT-Connect等を契約した国内の顧客。車両データだけで利用者個人を特定できるものではないと会社が説明。",
+      "countNote": "約215万人は公開状態のデータに対応する顧客の概数。2023年5月31日に追加公表した別の事案は合算しない。外部での二次利用やコピーの残存は5月12日時点で確認されていない。",
+      "sources": [
+        {"title": "クラウド環境の誤設定による情報漏洩の可能性（対象約215万人）", "url": "https://global.toyota/jp/newsroom/corporate/39174380.html", "publishedAt": "2023-05-12"},
+        {"title": "再発防止策と原因調査の報告", "url": "https://global.toyota/jp/newsroom/corporate/39529198.html", "publishedAt": "2023-07-12"}
+      ]
+    },
+    {
+      "id": "capcom-ransomware-2020",
+      "company": "株式会社カプコン",
+      "shortName": "カプコン",
+      "aliases": ["Capcom", "モンスターハンター", "バイオハザード"],
+      "sector": "entertainment",
+      "cause": "ransomware",
+      "year": 2020,
+      "announcedAt": "2020-11-16",
+      "sourceUpdatedAt": "2021-04-13",
+      "status": "confirmed",
+      "scale": {"value": 15649, "unit": "people", "qualifier": "exact", "label": "15,649人（流出確認）"},
+      "summary": "北米の旧型VPN機器への侵入後、日本と米国の社内ネットワークにランサムウェアが拡大。最終調査で流出を確認した個人情報の人数を表示する。",
+      "informationTypes": ["従業員・元従業員の情報", "一部の取引先情報"],
+      "scopeNote": "国内外のグループ会社を含む社内システムの事例。ゲームの購入・ダウンロードに使うシステムは今回の攻撃対象と別。",
+      "countNote": "2021年4月13日の確定更新で、前報から766人減り15,649人。別枠の最大約39万人は漏えいの可能性を示す保有情報の上限で、ここには足さない。決済用のカード情報は同社が保有していない。",
+      "sources": [
+        {"title": "不正アクセスに関する調査結果のご報告・第4報（最終調査）", "url": "https://www.capcom.co.jp/ir/news/html/210413.html", "publishedAt": "2021-04-13"},
+        {"title": "不正アクセスによる情報流出・第3報（対象情報の内訳）", "url": "https://www.capcom.co.jp/ir/news/html/210112.html", "publishedAt": "2021-01-12"}
+      ]
+    }
+  ]
+}

@@ -1,0 +1,4408 @@
+{
+  "incidents": [
+    {
+      "id": "ppc-2009-07-27-2927177e",
+      "companyId": "アストモスエネルギー",
+      "company": "アストモスエネルギー株式会社",
+      "shortName": "アストモスエネルギー",
+      "aliases": [],
+      "sector": "other",
+      "cause": "loss",
+      "year": 2009,
+      "announcedAt": "2009-07-27",
+      "sourceUpdatedAt": "2009-07-27",
+      "status": "possible",
+      "scale": {
+        "value": 430000,
+        "unit": "people",
+        "qualifier": "approximate",
+        "bound": "maximum",
+        "label": "約43万人（年度表の掲載規模）"
+      },
+      "summary": "情報を含む書類・機器・記録媒体の紛失、盗難や廃棄などが報告された事案です。",
+      "informationTypes": [
+        "氏名",
+        "住所",
+        "電話番号等",
+        "クレジットカード情報等",
+        "取引・利用情報等"
+      ],
+      "scopeNote": "2009年度の政府公表資料に掲載されたアストモスエネルギーの事案。年度資料では漏えい・紛失・滅失等をまとめて扱っています。対象者や情報区分が他事例と重なる可能性があるため、全体で加算しません。",
+      "countNote": "政府の年度資料にある「漏えい人数（最大）」欄の掲載規模です。「件」と「人・名」の原表記を区別しています。流出確認数・閲覧可能数・紛失対象などの定義は事案により異なり、被害者の総数には換算しません。資料後の企業の続報を網羅した値ではありません。",
+      "causeNote": "・バックアップ用磁気テープの紛失",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "2009年度 施行状況概要・主な事案表（PDF 38ページ）",
+          "url": "https://www.ppc.go.jp/files/pdf/personal_sekou_21caa.pdf#page=38",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ppc-2009-11-18-9f00720a",
+      "companyId": "西日本電信電話",
+      "company": "西日本電信電話株式会社",
+      "shortName": "西日本電信電話",
+      "aliases": [],
+      "sector": "other",
+      "cause": "insider",
+      "year": 2009,
+      "announcedAt": "2009-11-18",
+      "sourceUpdatedAt": "2009-11-18",
+      "status": "confirmed",
+      "scale": {
+        "value": 350000,
+        "unit": "people",
+        "qualifier": "approximate",
+        "bound": "maximum",
+        "label": "約35万人（年度表の掲載規模）"
+      },
+      "summary": "従業者や関係者による情報の持ち出し・第三者への提供などが報告された事案です。",
+      "informationTypes": [
+        "個人情報（資料記載の対象区分）"
+      ],
+      "scopeNote": "2009年度の政府公表資料に掲載された西日本電信電話の事案。年度資料では漏えい・紛失・滅失等をまとめて扱っています。対象者や情報区分が他事例と重なる可能性があるため、全体で加算しません。",
+      "countNote": "政府の年度資料にある「漏えい人数（最大）」欄の掲載規模です。「件」と「人・名」の原表記を区別しています。流出確認数・閲覧可能数・紛失対象などの定義は事案により異なり、被害者の総数には換算しません。資料後の企業の続報を網羅した値ではありません。",
+      "causeNote": "・委託先従業員による第三者提供・他事業者情報が本来の利用目的以外でもシステムから抽出可能であったこと・従業員の規範意識が不十分であったこと",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "2009年度 施行状況概要・主な事案表（PDF 38ページ）",
+          "url": "https://www.ppc.go.jp/files/pdf/personal_sekou_21caa.pdf#page=38",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ppc-2009-07-22-92c7f9c5",
+      "companyId": "りそな銀行",
+      "company": "株式会社りそな銀行",
+      "shortName": "りそな銀行",
+      "aliases": [],
+      "sector": "finance",
+      "cause": "loss",
+      "year": 2009,
+      "announcedAt": "2009-07-22",
+      "sourceUpdatedAt": "2009-07-22",
+      "status": "possible",
+      "scale": {
+        "value": 330000,
+        "unit": "people",
+        "qualifier": "approximate",
+        "bound": "maximum",
+        "label": "約33万人（年度表の掲載規模）"
+      },
+      "summary": "情報を含む書類・機器・記録媒体の紛失、盗難や廃棄などが報告された事案です。",
+      "informationTypes": [
+        "氏名",
+        "住所",
+        "生年月日",
+        "口座・金融情報等",
+        "取引・利用情報等"
+      ],
+      "scopeNote": "2009年度の政府公表資料に掲載されたりそな銀行の事案。年度資料では漏えい・紛失・滅失等をまとめて扱っています。対象者や情報区分が他事例と重なる可能性があるため、全体で加算しません。",
+      "countNote": "政府の年度資料にある「漏えい人数（最大）」欄の掲載規模です。「件」と「人・名」の原表記を区別しています。流出確認数・閲覧可能数・紛失対象などの定義は事案により異なり、被害者の総数には換算しません。資料後の企業の続報を網羅した値ではありません。",
+      "causeNote": "・保管期間を経過した書類に混入する等して、社内で誤って廃棄",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "2009年度 施行状況概要・主な事案表（PDF 38ページ）",
+          "url": "https://www.ppc.go.jp/files/pdf/personal_sekou_21caa.pdf#page=38",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ppc-2009-08-06-b6f63960",
+      "companyId": "三菱ufjニコス",
+      "company": "三菱UFJニコス株式会社",
+      "shortName": "三菱UFJニコス",
+      "aliases": [],
+      "sector": "other",
+      "cause": "loss",
+      "year": 2009,
+      "announcedAt": "2009-08-06",
+      "sourceUpdatedAt": "2009-08-06",
+      "status": "possible",
+      "scale": {
+        "value": 200000,
+        "unit": "people",
+        "qualifier": "approximate",
+        "bound": "maximum",
+        "label": "約20万人（年度表の掲載規模）"
+      },
+      "summary": "情報を含む書類・機器・記録媒体の紛失、盗難や廃棄などが報告された事案です。",
+      "informationTypes": [
+        "氏名",
+        "住所",
+        "口座・金融情報等",
+        "取引・利用情報等"
+      ],
+      "scopeNote": "2009年度の政府公表資料に掲載された三菱UFJニコスの事案。年度資料では漏えい・紛失・滅失等をまとめて扱っています。対象者や情報区分が他事例と重なる可能性があるため、全体で加算しません。",
+      "countNote": "政府の年度資料にある「漏えい人数（最大）」欄の掲載規模です。「件」と「人・名」の原表記を区別しています。流出確認数・閲覧可能数・紛失対象などの定義は事案により異なり、被害者の総数には換算しません。資料後の企業の続報を網羅した値ではありません。",
+      "causeNote": "・情報セキュリティ態勢が不十分であったことから、合併前の旧会社において、コムフィッシュ(マイクロフィルム状の記録媒体)を誤って廃棄した可能性",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "2009年度 施行状況概要・主な事案表（PDF 38ページ）",
+          "url": "https://www.ppc.go.jp/files/pdf/personal_sekou_21caa.pdf#page=38",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ppc-2010-03-29-c51844d7",
+      "companyId": "熊谷商工信用組合",
+      "company": "熊谷商工信用組合",
+      "shortName": "熊谷商工信用組合",
+      "aliases": [],
+      "sector": "finance",
+      "cause": "loss",
+      "year": 2010,
+      "announcedAt": "2010-03-29",
+      "sourceUpdatedAt": "2010-03-29",
+      "status": "possible",
+      "scale": {
+        "value": 173000,
+        "unit": "people",
+        "qualifier": "approximate",
+        "bound": "maximum",
+        "label": "約17万3千人（年度表の掲載規模）"
+      },
+      "summary": "情報を含む書類・機器・記録媒体の紛失、盗難や廃棄などが報告された事案です。",
+      "informationTypes": [
+        "氏名",
+        "口座・金融情報等",
+        "取引・利用情報等"
+      ],
+      "scopeNote": "2009年度の政府公表資料に掲載された熊谷商工信用組合の事案。年度資料では漏えい・紛失・滅失等をまとめて扱っています。対象者や情報区分が他事例と重なる可能性があるため、全体で加算しません。",
+      "countNote": "政府の年度資料にある「漏えい人数（最大）」欄の掲載規模です。「件」と「人・名」の原表記を区別しています。流出確認数・閲覧可能数・紛失対象などの定義は事案により異なり、被害者の総数には換算しません。資料後の企業の続報を網羅した値ではありません。",
+      "causeNote": "・店内で誤って廃棄",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "2009年度 施行状況概要・主な事案表（PDF 38ページ）",
+          "url": "https://www.ppc.go.jp/files/pdf/personal_sekou_21caa.pdf#page=38",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ppc-2009-04-10-c70aa8a3",
+      "companyId": "ソニー生命",
+      "company": "ソニー生命株式会社",
+      "shortName": "ソニー生命",
+      "aliases": [],
+      "sector": "finance",
+      "cause": "loss",
+      "year": 2009,
+      "announcedAt": "2009-04-10",
+      "sourceUpdatedAt": "2009-04-10",
+      "status": "possible",
+      "scale": {
+        "value": 140000,
+        "unit": "people",
+        "qualifier": "approximate",
+        "bound": "maximum",
+        "label": "約14万人（年度表の掲載規模）"
+      },
+      "summary": "情報を含む書類・機器・記録媒体の紛失、盗難や廃棄などが報告された事案です。",
+      "informationTypes": [
+        "生年月日",
+        "保険関連情報等"
+      ],
+      "scopeNote": "2009年度の政府公表資料に掲載されたソニー生命の事案。年度資料では漏えい・紛失・滅失等をまとめて扱っています。対象者や情報区分が他事例と重なる可能性があるため、全体で加算しません。",
+      "countNote": "政府の年度資料にある「漏えい人数（最大）」欄の掲載規模です。「件」と「人・名」の原表記を区別しています。流出確認数・閲覧可能数・紛失対象などの定義は事案により異なり、被害者の総数には換算しません。資料後の企業の続報を網羅した値ではありません。",
+      "causeNote": "・フロア移転等に伴う引越しの際に誤って廃棄",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "2009年度 施行状況概要・主な事案表（PDF 38ページ）",
+          "url": "https://www.ppc.go.jp/files/pdf/personal_sekou_21caa.pdf#page=38",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ppc-2009-08-14-df6044f8",
+      "companyId": "アミューズ",
+      "company": "株式会社アミューズ",
+      "shortName": "アミューズ",
+      "aliases": [],
+      "sector": "other",
+      "cause": "intrusion",
+      "year": 2009,
+      "announcedAt": "2009-08-14",
+      "sourceUpdatedAt": "2009-08-14",
+      "status": "possible",
+      "scale": {
+        "value": 110000,
+        "unit": "people",
+        "qualifier": "approximate",
+        "bound": "maximum",
+        "label": "約11万人（年度表の掲載規模）"
+      },
+      "summary": "システムへの侵入や不正ログインなどによって、情報が対象になった事案です。",
+      "informationTypes": [
+        "メールアドレス等",
+        "クレジットカード情報等"
+      ],
+      "scopeNote": "2009年度の政府公表資料に掲載されたアミューズの事案。年度資料では漏えい・紛失・滅失等をまとめて扱っています。対象者や情報区分が他事例と重なる可能性があるため、全体で加算しません。",
+      "countNote": "政府の年度資料にある「漏えい人数（最大）」欄の掲載規模です。「件」と「人・名」の原表記を区別しています。流出確認数・閲覧可能数・紛失対象などの定義は事案により異なり、被害者の総数には換算しません。資料後の企業の続報を網羅した値ではありません。",
+      "causeNote": "・不正アクセス(SQLインジェクション)",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "2009年度 施行状況概要・主な事案表（PDF 38ページ）",
+          "url": "https://www.ppc.go.jp/files/pdf/personal_sekou_21caa.pdf#page=38",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ppc-2009-12-03-00ee5a31",
+      "companyId": "ゆうちょ銀行",
+      "company": "株式会社ゆうちょ銀行",
+      "shortName": "ゆうちょ銀行",
+      "aliases": [],
+      "sector": "finance",
+      "cause": "loss",
+      "year": 2009,
+      "announcedAt": "2009-12-03",
+      "sourceUpdatedAt": "2009-12-03",
+      "status": "possible",
+      "scale": {
+        "value": 110000,
+        "unit": "people",
+        "qualifier": "approximate",
+        "bound": "maximum",
+        "label": "約11万人（年度表の掲載規模）"
+      },
+      "summary": "情報を含む書類・機器・記録媒体の紛失、盗難や廃棄などが報告された事案です。",
+      "informationTypes": [
+        "氏名",
+        "住所",
+        "生年月日",
+        "口座・金融情報等",
+        "取引・利用情報等"
+      ],
+      "scopeNote": "2009年度の政府公表資料に掲載されたゆうちょ銀行の事案。年度資料では漏えい・紛失・滅失等をまとめて扱っています。対象者や情報区分が他事例と重なる可能性があるため、全体で加算しません。",
+      "countNote": "政府の年度資料にある「漏えい人数（最大）」欄の掲載規模です。「件」と「人・名」の原表記を区別しています。流出確認数・閲覧可能数・紛失対象などの定義は事案により異なり、被害者の総数には換算しません。資料後の企業の続報を網羅した値ではありません。",
+      "causeNote": "・郵便局内で保存期間満了後に廃棄した可能性",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "2009年度 施行状況概要・主な事案表（PDF 38ページ）",
+          "url": "https://www.ppc.go.jp/files/pdf/personal_sekou_21caa.pdf#page=38",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ppc-2009-06-05-d7ad4f1d",
+      "companyId": "ダイエー",
+      "company": "株式会社ダイエー",
+      "shortName": "ダイエー",
+      "aliases": [],
+      "sector": "other",
+      "cause": "exposure",
+      "year": 2009,
+      "announcedAt": "2009-06-05",
+      "sourceUpdatedAt": "2009-06-05",
+      "status": "possible",
+      "scale": {
+        "value": 90000,
+        "unit": "people",
+        "qualifier": "approximate",
+        "bound": "maximum",
+        "label": "約9万人（年度表の掲載規模）"
+      },
+      "summary": "情報を外部から閲覧できる状態などが報告された事案です。",
+      "informationTypes": [
+        "メールアドレス等"
+      ],
+      "scopeNote": "2009年度の政府公表資料に掲載されたダイエーの事案。年度資料では漏えい・紛失・滅失等をまとめて扱っています。対象者や情報区分が他事例と重なる可能性があるため、全体で加算しません。",
+      "countNote": "政府の年度資料にある「漏えい人数（最大）」欄の掲載規模です。「件」と「人・名」の原表記を区別しています。流出確認数・閲覧可能数・紛失対象などの定義は事案により異なり、被害者の総数には換算しません。資料後の企業の続報を網羅した値ではありません。",
+      "causeNote": "・管理サーバに置かれたまま、外部から閲覧可能な状態となっていた",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "2009年度 施行状況概要・主な事案表（PDF 39ページ）",
+          "url": "https://www.ppc.go.jp/files/pdf/personal_sekou_21caa.pdf#page=39",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ppc-2010-03-26-00ee5a31",
+      "companyId": "ゆうちょ銀行",
+      "company": "株式会社ゆうちょ銀行",
+      "shortName": "ゆうちょ銀行",
+      "aliases": [],
+      "sector": "finance",
+      "cause": "loss",
+      "year": 2010,
+      "announcedAt": "2010-03-26",
+      "sourceUpdatedAt": "2010-03-26",
+      "status": "possible",
+      "scale": {
+        "value": 90000,
+        "unit": "people",
+        "qualifier": "approximate",
+        "bound": "maximum",
+        "label": "約9万人（年度表の掲載規模）"
+      },
+      "summary": "情報を含む書類・機器・記録媒体の紛失、盗難や廃棄などが報告された事案です。",
+      "informationTypes": [
+        "口座・金融情報等",
+        "取引・利用情報等"
+      ],
+      "scopeNote": "2009年度の政府公表資料に掲載されたゆうちょ銀行の事案。年度資料では漏えい・紛失・滅失等をまとめて扱っています。対象者や情報区分が他事例と重なる可能性があるため、全体で加算しません。",
+      "countNote": "政府の年度資料にある「漏えい人数（最大）」欄の掲載規模です。「件」と「人・名」の原表記を区別しています。流出確認数・閲覧可能数・紛失対象などの定義は事案により異なり、被害者の総数には換算しません。資料後の企業の続報を網羅した値ではありません。",
+      "causeNote": "・店内で誤って廃棄した可能性",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "2009年度 施行状況概要・主な事案表（PDF 39ページ）",
+          "url": "https://www.ppc.go.jp/files/pdf/personal_sekou_21caa.pdf#page=39",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ppc-2010-01-26-7e665691",
+      "companyId": "あらた監査法人",
+      "company": "あらた監査法人",
+      "shortName": "あらた監査法人",
+      "aliases": [],
+      "sector": "other",
+      "cause": "loss",
+      "year": 2010,
+      "announcedAt": "2010-01-26",
+      "sourceUpdatedAt": "2010-01-26",
+      "status": "possible",
+      "scale": {
+        "value": 70000,
+        "unit": "people",
+        "qualifier": "approximate",
+        "bound": "maximum",
+        "label": "約7万人（年度表の掲載規模）"
+      },
+      "summary": "情報を含む書類・機器・記録媒体の紛失、盗難や廃棄などが報告された事案です。",
+      "informationTypes": [
+        "氏名",
+        "性別",
+        "保険関連情報等"
+      ],
+      "scopeNote": "2009年度の政府公表資料に掲載されたあらた監査法人の事案。年度資料では漏えい・紛失・滅失等をまとめて扱っています。対象者や情報区分が他事例と重なる可能性があるため、全体で加算しません。",
+      "countNote": "政府の年度資料にある「漏えい人数（最大）」欄の掲載規模です。「件」と「人・名」の原表記を区別しています。流出確認数・閲覧可能数・紛失対象などの定義は事案により異なり、被害者の総数には換算しません。資料後の企業の続報を網羅した値ではありません。",
+      "causeNote": "・パソコンの盗難",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "2009年度 施行状況概要・主な事案表（PDF 39ページ）",
+          "url": "https://www.ppc.go.jp/files/pdf/personal_sekou_21caa.pdf#page=39",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ppc-2010-03-09-5ed3f62d",
+      "companyId": "三井情報",
+      "company": "三井情報株式会社",
+      "shortName": "三井情報",
+      "aliases": [],
+      "sector": "other",
+      "cause": "loss",
+      "year": 2010,
+      "announcedAt": "2010-03-09",
+      "sourceUpdatedAt": "2010-03-09",
+      "status": "possible",
+      "scale": {
+        "value": 60000,
+        "unit": "people",
+        "qualifier": "approximate",
+        "bound": "maximum",
+        "label": "約6万人（年度表の掲載規模）"
+      },
+      "summary": "情報を含む書類・機器・記録媒体の紛失、盗難や廃棄などが報告された事案です。",
+      "informationTypes": [
+        "氏名",
+        "生年月日",
+        "性別"
+      ],
+      "scopeNote": "2009年度の政府公表資料に掲載された三井情報の事案。年度資料では漏えい・紛失・滅失等をまとめて扱っています。対象者や情報区分が他事例と重なる可能性があるため、全体で加算しません。",
+      "countNote": "政府の年度資料にある「漏えい人数（最大）」欄の掲載規模です。「件」と「人・名」の原表記を区別しています。流出確認数・閲覧可能数・紛失対象などの定義は事案により異なり、被害者の総数には換算しません。資料後の企業の続報を網羅した値ではありません。",
+      "causeNote": "・ノートPCの紛失",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "2009年度 施行状況概要・主な事案表（PDF 39ページ）",
+          "url": "https://www.ppc.go.jp/files/pdf/personal_sekou_21caa.pdf#page=39",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ppc-2009-12-04-12d26b08",
+      "companyId": "半田信用金庫",
+      "company": "半田信用金庫",
+      "shortName": "半田信用金庫",
+      "aliases": [],
+      "sector": "finance",
+      "cause": "loss",
+      "year": 2009,
+      "announcedAt": "2009-12-04",
+      "sourceUpdatedAt": "2009-12-04",
+      "status": "possible",
+      "scale": {
+        "value": 56000,
+        "unit": "people",
+        "qualifier": "approximate",
+        "bound": "maximum",
+        "label": "約5万6千人（年度表の掲載規模）"
+      },
+      "summary": "情報を含む書類・機器・記録媒体の紛失、盗難や廃棄などが報告された事案です。",
+      "informationTypes": [
+        "氏名",
+        "口座・金融情報等",
+        "取引・利用情報等"
+      ],
+      "scopeNote": "2009年度の政府公表資料に掲載された半田信用金庫の事案。年度資料では漏えい・紛失・滅失等をまとめて扱っています。対象者や情報区分が他事例と重なる可能性があるため、全体で加算しません。",
+      "countNote": "政府の年度資料にある「漏えい人数（最大）」欄の掲載規模です。「件」と「人・名」の原表記を区別しています。流出確認数・閲覧可能数・紛失対象などの定義は事案により異なり、被害者の総数には換算しません。資料後の企業の続報を網羅した値ではありません。",
+      "causeNote": "・内部資料の保管管理や廃棄時における確認が不十分であったため、紛失・誤って廃棄",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "2009年度 施行状況概要・主な事案表（PDF 39ページ）",
+          "url": "https://www.ppc.go.jp/files/pdf/personal_sekou_21caa.pdf#page=39",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ppc-2010-02-23-00ee5a31",
+      "companyId": "ゆうちょ銀行",
+      "company": "株式会社ゆうちょ銀行",
+      "shortName": "ゆうちょ銀行",
+      "aliases": [],
+      "sector": "finance",
+      "cause": "loss",
+      "year": 2010,
+      "announcedAt": "2010-02-23",
+      "sourceUpdatedAt": "2010-02-23",
+      "status": "possible",
+      "scale": {
+        "value": 51000,
+        "unit": "people",
+        "qualifier": "approximate",
+        "bound": "maximum",
+        "label": "約5万1千人（年度表の掲載規模）"
+      },
+      "summary": "情報を含む書類・機器・記録媒体の紛失、盗難や廃棄などが報告された事案です。",
+      "informationTypes": [
+        "口座・金融情報等",
+        "取引・利用情報等"
+      ],
+      "scopeNote": "2009年度の政府公表資料に掲載されたゆうちょ銀行の事案。年度資料では漏えい・紛失・滅失等をまとめて扱っています。対象者や情報区分が他事例と重なる可能性があるため、全体で加算しません。",
+      "countNote": "政府の年度資料にある「漏えい人数（最大）」欄の掲載規模です。「件」と「人・名」の原表記を区別しています。流出確認数・閲覧可能数・紛失対象などの定義は事案により異なり、被害者の総数には換算しません。資料後の企業の続報を網羅した値ではありません。",
+      "causeNote": "・郵便局内で保存期間満了後に廃棄した可能性",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "2009年度 施行状況概要・主な事案表（PDF 39ページ）",
+          "url": "https://www.ppc.go.jp/files/pdf/personal_sekou_21caa.pdf#page=39",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ppc-2009-04-08-248a5fd2",
+      "companyId": "三菱ufj証券",
+      "company": "三菱UFJ証券",
+      "shortName": "三菱UFJ証券",
+      "aliases": [],
+      "sector": "finance",
+      "cause": "insider",
+      "year": 2009,
+      "announcedAt": "2009-04-08",
+      "sourceUpdatedAt": "2009-04-08",
+      "status": "possible",
+      "scale": {
+        "value": 50000,
+        "unit": "people",
+        "qualifier": "approximate",
+        "bound": "maximum",
+        "label": "約5万人（年度表の掲載規模）"
+      },
+      "summary": "従業者や関係者による情報の持ち出し・第三者への提供などが報告された事案です。",
+      "informationTypes": [
+        "氏名",
+        "住所",
+        "生年月日",
+        "性別",
+        "電話番号等"
+      ],
+      "scopeNote": "2009年度の政府公表資料に掲載された三菱UFJ証券の事案。年度資料では漏えい・紛失・滅失等をまとめて扱っています。対象者や情報区分が他事例と重なる可能性があるため、全体で加算しません。",
+      "countNote": "政府の年度資料にある「漏えい人数（最大）」欄の掲載規模です。「件」と「人・名」の原表記を区別しています。流出確認数・閲覧可能数・紛失対象などの定義は事案により異なり、被害者の総数には換算しません。資料後の企業の続報を網羅した値ではありません。",
+      "causeNote": "・職員の不正行為(情報セキュリティ管理態勢が十分ではなかったため)",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "2009年度 施行状況概要・主な事案表（PDF 39ページ）",
+          "url": "https://www.ppc.go.jp/files/pdf/personal_sekou_21caa.pdf#page=39",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ppc-2013-05-13-42720c19",
+      "companyId": "三菱東京ufj銀行",
+      "company": "株式会社三菱東京UFJ銀行",
+      "shortName": "三菱東京UFJ銀行",
+      "aliases": [],
+      "sector": "finance",
+      "cause": "loss",
+      "year": 2013,
+      "announcedAt": "2013-05-13",
+      "sourceUpdatedAt": "2013-05-13",
+      "status": "possible",
+      "scale": {
+        "value": 67000,
+        "unit": "people",
+        "qualifier": "approximate",
+        "bound": "maximum",
+        "label": "約6万7千人（年度表の掲載規模）"
+      },
+      "summary": "情報を含む書類・機器・記録媒体の紛失、盗難や廃棄などが報告された事案です。",
+      "informationTypes": [
+        "氏名",
+        "住所",
+        "電話番号等",
+        "口座・金融情報等"
+      ],
+      "scopeNote": "2013年度の政府公表資料に掲載された三菱東京UFJ銀行の事案。年度資料では漏えい・紛失・滅失等をまとめて扱っています。対象者や情報区分が他事例と重なる可能性があるため、全体で加算しません。",
+      "countNote": "政府の年度資料にある「漏えい人数（最大）」欄の掲載規模です。「件」と「人・名」の原表記を区別しています。流出確認数・閲覧可能数・紛失対象などの定義は事案により異なり、被害者の総数には換算しません。資料後の企業の続報を網羅した値ではありません。",
+      "causeNote": "誤廃棄",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "2013年度 施行状況概要・主な事案表（PDF 41ページ）",
+          "url": "https://www.ppc.go.jp/files/pdf/personal_sekou_25caa.pdf#page=41",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ppc-2013-05-31-1cac8796",
+      "companyId": "関西アーバン銀行",
+      "company": "株式会社関西アーバン銀行",
+      "shortName": "関西アーバン銀行",
+      "aliases": [],
+      "sector": "finance",
+      "cause": "loss",
+      "year": 2013,
+      "announcedAt": "2013-05-31",
+      "sourceUpdatedAt": "2013-05-31",
+      "status": "possible",
+      "scale": {
+        "value": 56000,
+        "unit": "records",
+        "qualifier": "approximate",
+        "bound": "maximum",
+        "label": "約5万6千件（年度表の掲載規模）"
+      },
+      "summary": "情報を含む書類・機器・記録媒体の紛失、盗難や廃棄などが報告された事案です。",
+      "informationTypes": [
+        "氏名",
+        "電話番号等",
+        "口座・金融情報等",
+        "取引・利用情報等"
+      ],
+      "scopeNote": "2013年度の政府公表資料に掲載された関西アーバン銀行の事案。年度資料では漏えい・紛失・滅失等をまとめて扱っています。対象者や情報区分が他事例と重なる可能性があるため、全体で加算しません。",
+      "countNote": "政府の年度資料にある「漏えい人数（最大）」欄の掲載規模です。「件」と「人・名」の原表記を区別しています。流出確認数・閲覧可能数・紛失対象などの定義は事案により異なり、被害者の総数には換算しません。資料後の企業の続報を網羅した値ではありません。",
+      "causeNote": "誤廃棄",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "2013年度 施行状況概要・主な事案表（PDF 41ページ）",
+          "url": "https://www.ppc.go.jp/files/pdf/personal_sekou_25caa.pdf#page=41",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ppc-2013-06-14-c8a171bc",
+      "companyId": "住友生命保険相互会社",
+      "company": "住友生命保険相互会社",
+      "shortName": "住友生命保険相互会社",
+      "aliases": [],
+      "sector": "finance",
+      "cause": "loss",
+      "year": 2013,
+      "announcedAt": "2013-06-14",
+      "sourceUpdatedAt": "2013-06-14",
+      "status": "possible",
+      "scale": {
+        "value": 58000,
+        "unit": "records",
+        "qualifier": "approximate",
+        "bound": "maximum",
+        "label": "約5万8千件（年度表の掲載規模）"
+      },
+      "summary": "情報を含む書類・機器・記録媒体の紛失、盗難や廃棄などが報告された事案です。",
+      "informationTypes": [
+        "氏名",
+        "住所",
+        "生年月日",
+        "電話番号等",
+        "保険関連情報等"
+      ],
+      "scopeNote": "2013年度の政府公表資料に掲載された住友生命保険相互会社の事案。年度資料では漏えい・紛失・滅失等をまとめて扱っています。対象者や情報区分が他事例と重なる可能性があるため、全体で加算しません。",
+      "countNote": "政府の年度資料にある「漏えい人数（最大）」欄の掲載規模です。「件」と「人・名」の原表記を区別しています。流出確認数・閲覧可能数・紛失対象などの定義は事案により異なり、被害者の総数には換算しません。資料後の企業の続報を網羅した値ではありません。",
+      "causeNote": "個人情報が記載された帳票を紛失及び誤廃棄",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "2013年度 施行状況概要・主な事案表（PDF 41ページ）",
+          "url": "https://www.ppc.go.jp/files/pdf/personal_sekou_25caa.pdf#page=41",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ppc-2013-09-11-b27345a0",
+      "companyId": "東邦銀行",
+      "company": "株式会社東邦銀行",
+      "shortName": "東邦銀行",
+      "aliases": [],
+      "sector": "finance",
+      "cause": "loss",
+      "year": 2013,
+      "announcedAt": "2013-09-11",
+      "sourceUpdatedAt": "2013-09-11",
+      "status": "possible",
+      "scale": {
+        "value": 130000,
+        "unit": "records",
+        "qualifier": "approximate",
+        "bound": "maximum",
+        "label": "約13万件（年度表の掲載規模）"
+      },
+      "summary": "情報を含む書類・機器・記録媒体の紛失、盗難や廃棄などが報告された事案です。",
+      "informationTypes": [
+        "氏名",
+        "クレジットカード情報等",
+        "口座・金融情報等",
+        "取引・利用情報等"
+      ],
+      "scopeNote": "2013年度の政府公表資料に掲載された東邦銀行の事案。年度資料では漏えい・紛失・滅失等をまとめて扱っています。対象者や情報区分が他事例と重なる可能性があるため、全体で加算しません。",
+      "countNote": "政府の年度資料にある「漏えい人数（最大）」欄の掲載規模です。「件」と「人・名」の原表記を区別しています。流出確認数・閲覧可能数・紛失対象などの定義は事案により異なり、被害者の総数には換算しません。資料後の企業の続報を網羅した値ではありません。",
+      "causeNote": "誤廃棄",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "2013年度 施行状況概要・主な事案表（PDF 41ページ）",
+          "url": "https://www.ppc.go.jp/files/pdf/personal_sekou_25caa.pdf#page=41",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ppc-2013-05-27-dca0babc",
+      "companyId": "エクスコムグローバル",
+      "company": "エクスコムグローバル株式会社",
+      "shortName": "エクスコムグローバル",
+      "aliases": [],
+      "sector": "other",
+      "cause": "intrusion",
+      "year": 2013,
+      "announcedAt": "2013-05-27",
+      "sourceUpdatedAt": "2013-05-27",
+      "status": "possible",
+      "scale": {
+        "value": 100000,
+        "unit": "people",
+        "qualifier": "approximate",
+        "bound": "maximum",
+        "label": "約10万人（年度表の掲載規模）"
+      },
+      "summary": "システムへの侵入や不正ログインなどによって、情報が対象になった事案です。",
+      "informationTypes": [
+        "住所",
+        "クレジットカード情報等",
+        "ID・会員番号等"
+      ],
+      "scopeNote": "2013年度の政府公表資料に掲載されたエクスコムグローバルの事案。年度資料では漏えい・紛失・滅失等をまとめて扱っています。対象者や情報区分が他事例と重なる可能性があるため、全体で加算しません。",
+      "countNote": "政府の年度資料にある「漏えい人数（最大）」欄の掲載規模です。「件」と「人・名」の原表記を区別しています。流出確認数・閲覧可能数・紛失対象などの定義は事案により異なり、被害者の総数には換算しません。資料後の企業の続報を網羅した値ではありません。",
+      "causeNote": "不正アクセス",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "2013年度 施行状況概要・主な事案表（PDF 41ページ）",
+          "url": "https://www.ppc.go.jp/files/pdf/personal_sekou_25caa.pdf#page=41",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ppc-2013-07-24-7eaf8b23",
+      "companyId": "エヌティティコミュニケーションズ",
+      "company": "エヌ・ティ・ティ・コミュニケーションズ株式会社",
+      "shortName": "エヌ・ティ・ティ・コミュニケーションズ",
+      "aliases": [
+        "NTTコミュニケーションズ",
+        "OCN"
+      ],
+      "sector": "other",
+      "cause": "intrusion",
+      "year": 2013,
+      "announcedAt": "2013-07-24",
+      "sourceUpdatedAt": "2013-07-24",
+      "status": "possible",
+      "scale": {
+        "value": 4000000,
+        "unit": "people",
+        "qualifier": "approximate",
+        "bound": "maximum",
+        "label": "約400万人（年度表の掲載規模）"
+      },
+      "summary": "システムへの侵入や不正ログインなどによって、情報が対象になった事案です。",
+      "informationTypes": [
+        "メールアドレス等",
+        "パスワード等",
+        "ID・会員番号等"
+      ],
+      "scopeNote": "2013年度の政府公表資料に掲載されたエヌ・ティ・ティ・コミュニケーションズの事案。年度資料では漏えい・紛失・滅失等をまとめて扱っています。対象者や情報区分が他事例と重なる可能性があるため、全体で加算しません。",
+      "countNote": "政府の年度資料にある「漏えい人数（最大）」欄の掲載規模です。「件」と「人・名」の原表記を区別しています。流出確認数・閲覧可能数・紛失対象などの定義は事案により異なり、被害者の総数には換算しません。資料後の企業の続報を網羅した値ではありません。",
+      "causeNote": "不正アクセス",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "2013年度 施行状況概要・主な事案表（PDF 41ページ）",
+          "url": "https://www.ppc.go.jp/files/pdf/personal_sekou_25caa.pdf#page=41",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ppc-2013-09-20-f6f911e4",
+      "companyId": "テレコムスクエア",
+      "company": "株式会社テレコムスクエア",
+      "shortName": "テレコムスクエア",
+      "aliases": [],
+      "sector": "other",
+      "cause": "intrusion",
+      "year": 2013,
+      "announcedAt": "2013-09-20",
+      "sourceUpdatedAt": "2013-09-20",
+      "status": "possible",
+      "scale": {
+        "value": 97000,
+        "unit": "people",
+        "qualifier": "approximate",
+        "bound": "maximum",
+        "label": "約9万7千人（年度表の掲載規模）"
+      },
+      "summary": "システムへの侵入や不正ログインなどによって、情報が対象になった事案です。",
+      "informationTypes": [
+        "氏名",
+        "住所",
+        "電話番号等",
+        "メールアドレス等",
+        "クレジットカード情報等"
+      ],
+      "scopeNote": "2013年度の政府公表資料に掲載されたテレコムスクエアの事案。年度資料では漏えい・紛失・滅失等をまとめて扱っています。対象者や情報区分が他事例と重なる可能性があるため、全体で加算しません。",
+      "countNote": "政府の年度資料にある「漏えい人数（最大）」欄の掲載規模です。「件」と「人・名」の原表記を区別しています。流出確認数・閲覧可能数・紛失対象などの定義は事案により異なり、被害者の総数には換算しません。資料後の企業の続報を網羅した値ではありません。",
+      "causeNote": "不正アクセス",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "2013年度 施行状況概要・主な事案表（PDF 41ページ）",
+          "url": "https://www.ppc.go.jp/files/pdf/personal_sekou_25caa.pdf#page=41",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ppc-2013-08-12-054c8052",
+      "companyId": "サイバーエージェント",
+      "company": "株式会社サイバーエージェント",
+      "shortName": "サイバーエージェント",
+      "aliases": [
+        "CyberAgent",
+        "Ameba",
+        "アメーバ"
+      ],
+      "sector": "other",
+      "cause": "intrusion",
+      "year": 2013,
+      "announcedAt": "2013-08-12",
+      "sourceUpdatedAt": "2013-08-12",
+      "status": "possible",
+      "scale": {
+        "value": 240000,
+        "unit": "people",
+        "qualifier": "approximate",
+        "bound": "maximum",
+        "label": "約24万人（年度表の掲載規模）"
+      },
+      "summary": "システムへの侵入や不正ログインなどによって、情報が対象になった事案です。",
+      "informationTypes": [
+        "生年月日",
+        "性別",
+        "メールアドレス等",
+        "ニックネーム"
+      ],
+      "scopeNote": "2013年度の政府公表資料に掲載されたサイバーエージェントの事案。年度資料では漏えい・紛失・滅失等をまとめて扱っています。対象者や情報区分が他事例と重なる可能性があるため、全体で加算しません。",
+      "countNote": "政府の年度資料にある「漏えい人数（最大）」欄の掲載規模です。「件」と「人・名」の原表記を区別しています。流出確認数・閲覧可能数・紛失対象などの定義は事案により異なり、被害者の総数には換算しません。資料後の企業の続報を網羅した値ではありません。",
+      "causeNote": "不正ログイン",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "2013年度 施行状況概要・主な事案表（PDF 42ページ）",
+          "url": "https://www.ppc.go.jp/files/pdf/personal_sekou_25caa.pdf#page=42",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ppc-2014-03-14-99dada11",
+      "companyId": "軽自動車検査協会",
+      "company": "軽自動車検査協会",
+      "shortName": "軽自動車検査協会",
+      "aliases": [],
+      "sector": "other",
+      "cause": "loss",
+      "year": 2014,
+      "announcedAt": "2014-03-14",
+      "sourceUpdatedAt": "2014-03-14",
+      "status": "possible",
+      "scale": {
+        "value": 72000,
+        "unit": "people",
+        "qualifier": "approximate",
+        "bound": "maximum",
+        "label": "約7万2千人（年度表の掲載規模）"
+      },
+      "summary": "情報を含む書類・機器・記録媒体の紛失、盗難や廃棄などが報告された事案です。",
+      "informationTypes": [
+        "個人情報（資料記載の対象区分）"
+      ],
+      "scopeNote": "2013年度の政府公表資料に掲載された軽自動車検査協会の事案。年度資料では漏えい・紛失・滅失等をまとめて扱っています。対象者や情報区分が他事例と重なる可能性があるため、全体で加算しません。",
+      "countNote": "政府の年度資料にある「漏えい人数（最大）」欄の掲載規模です。「件」と「人・名」の原表記を区別しています。流出確認数・閲覧可能数・紛失対象などの定義は事案により異なり、被害者の総数には換算しません。資料後の企業の続報を網羅した値ではありません。",
+      "causeNote": "誤廃棄",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "2013年度 施行状況概要・主な事案表（PDF 42ページ）",
+          "url": "https://www.ppc.go.jp/files/pdf/personal_sekou_25caa.pdf#page=42",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ppc-2013-04-03-4624103c",
+      "companyId": "エヌティティレゾナント",
+      "company": "エヌ・ティ・ティレゾナント株式会社",
+      "shortName": "エヌ・ティ・ティレゾナント",
+      "aliases": [
+        "NTTレゾナント",
+        "goo"
+      ],
+      "sector": "other",
+      "cause": "intrusion",
+      "year": 2013,
+      "announcedAt": "2013-04-03",
+      "sourceUpdatedAt": "2013-04-03",
+      "status": "possible",
+      "scale": {
+        "value": 110000,
+        "unit": "records",
+        "qualifier": "approximate",
+        "bound": "maximum",
+        "label": "約11万件（年度表の掲載規模）"
+      },
+      "summary": "システムへの侵入や不正ログインなどによって、情報が対象になった事案です。",
+      "informationTypes": [
+        "パスワード等",
+        "ID・会員番号等"
+      ],
+      "scopeNote": "2013年度の政府公表資料に掲載されたエヌ・ティ・ティレゾナントの事案。年度資料では漏えい・紛失・滅失等をまとめて扱っています。対象者や情報区分が他事例と重なる可能性があるため、全体で加算しません。",
+      "countNote": "政府の年度資料にある「漏えい人数（最大）」欄の掲載規模です。「件」と「人・名」の原表記を区別しています。流出確認数・閲覧可能数・紛失対象などの定義は事案により異なり、被害者の総数には換算しません。資料後の企業の続報を網羅した値ではありません。",
+      "causeNote": "不正アクセス",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "2013年度 施行状況概要・主な事案表（PDF 42ページ）",
+          "url": "https://www.ppc.go.jp/files/pdf/personal_sekou_25caa.pdf#page=42",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ppc-2013-06-24-5b1c5c6e",
+      "companyId": "ムサシ",
+      "company": "株式会社ムサシ",
+      "shortName": "ムサシ",
+      "aliases": [],
+      "sector": "other",
+      "cause": "loss",
+      "year": 2013,
+      "announcedAt": "2013-06-24",
+      "sourceUpdatedAt": "2013-06-24",
+      "status": "possible",
+      "scale": {
+        "value": 420000,
+        "unit": "records",
+        "qualifier": "approximate",
+        "bound": "maximum",
+        "label": "約42万件（年度表の掲載規模）"
+      },
+      "summary": "情報を含む書類・機器・記録媒体の紛失、盗難や廃棄などが報告された事案です。",
+      "informationTypes": [
+        "氏名",
+        "住所",
+        "生年月日"
+      ],
+      "scopeNote": "2013年度の政府公表資料に掲載されたムサシの事案。年度資料では漏えい・紛失・滅失等をまとめて扱っています。対象者や情報区分が他事例と重なる可能性があるため、全体で加算しません。",
+      "countNote": "政府の年度資料にある「漏えい人数（最大）」欄の掲載規模です。「件」と「人・名」の原表記を区別しています。流出確認数・閲覧可能数・紛失対象などの定義は事案により異なり、被害者の総数には換算しません。資料後の企業の続報を網羅した値ではありません。資料は記録媒体の回収済みを記載しています。第三者への流出確認とは区別します。",
+      "causeNote": "CDの紛失(回収済み)",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "2013年度 施行状況概要・主な事案表（PDF 42ページ）",
+          "url": "https://www.ppc.go.jp/files/pdf/personal_sekou_25caa.pdf#page=42",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ppc-2013-07-19-38a9c1e7",
+      "companyId": "line",
+      "company": "LINE株式会社",
+      "shortName": "LINE",
+      "aliases": [],
+      "sector": "other",
+      "cause": "intrusion",
+      "year": 2013,
+      "announcedAt": "2013-07-19",
+      "sourceUpdatedAt": "2013-07-19",
+      "status": "possible",
+      "scale": {
+        "value": 1700000,
+        "unit": "records",
+        "qualifier": "approximate",
+        "bound": "maximum",
+        "label": "約170万件（年度表の掲載規模）"
+      },
+      "summary": "システムへの侵入や不正ログインなどによって、情報が対象になった事案です。",
+      "informationTypes": [
+        "メールアドレス等",
+        "パスワード等",
+        "ニックネーム"
+      ],
+      "scopeNote": "2013年度の政府公表資料に掲載されたLINEの事案。年度資料では漏えい・紛失・滅失等をまとめて扱っています。対象者や情報区分が他事例と重なる可能性があるため、全体で加算しません。",
+      "countNote": "政府の年度資料にある「漏えい人数（最大）」欄の掲載規模です。「件」と「人・名」の原表記を区別しています。流出確認数・閲覧可能数・紛失対象などの定義は事案により異なり、被害者の総数には換算しません。資料後の企業の続報を網羅した値ではありません。",
+      "causeNote": "不正アクセス",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "2013年度 施行状況概要・主な事案表（PDF 42ページ）",
+          "url": "https://www.ppc.go.jp/files/pdf/personal_sekou_25caa.pdf#page=42",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ppc-2013-08-01-1e598c80",
+      "companyId": "オリエンタルモーター",
+      "company": "オリエンタルモーター株式会社",
+      "shortName": "オリエンタルモーター",
+      "aliases": [],
+      "sector": "other",
+      "cause": "intrusion",
+      "year": 2013,
+      "announcedAt": "2013-08-01",
+      "sourceUpdatedAt": "2013-08-01",
+      "status": "possible",
+      "scale": {
+        "value": 270000,
+        "unit": "records",
+        "qualifier": "approximate",
+        "bound": "maximum",
+        "label": "約27万件（年度表の掲載規模）"
+      },
+      "summary": "システムへの侵入や不正ログインなどによって、情報が対象になった事案です。",
+      "informationTypes": [
+        "氏名",
+        "住所",
+        "電話番号等",
+        "メールアドレス等",
+        "パスワード等",
+        "取引・利用情報等"
+      ],
+      "scopeNote": "2013年度の政府公表資料に掲載されたオリエンタルモーターの事案。年度資料では漏えい・紛失・滅失等をまとめて扱っています。対象者や情報区分が他事例と重なる可能性があるため、全体で加算しません。",
+      "countNote": "政府の年度資料にある「漏えい人数（最大）」欄の掲載規模です。「件」と「人・名」の原表記を区別しています。流出確認数・閲覧可能数・紛失対象などの定義は事案により異なり、被害者の総数には換算しません。資料後の企業の続報を網羅した値ではありません。",
+      "causeNote": "不正アクセス",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "2013年度 施行状況概要・主な事案表（PDF 42ページ）",
+          "url": "https://www.ppc.go.jp/files/pdf/personal_sekou_25caa.pdf#page=42",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ppc-2013-07-23-6256d3db",
+      "companyId": "あきばんぐ",
+      "company": "有限会社あきばんぐ",
+      "shortName": "あきばんぐ",
+      "aliases": [],
+      "sector": "other",
+      "cause": "intrusion",
+      "year": 2013,
+      "announcedAt": "2013-07-23",
+      "sourceUpdatedAt": "2013-07-23",
+      "status": "possible",
+      "scale": {
+        "value": 59000,
+        "unit": "records",
+        "qualifier": "approximate",
+        "bound": "maximum",
+        "label": "約5万9千件（年度表の掲載規模）"
+      },
+      "summary": "システムへの侵入や不正ログインなどによって、情報が対象になった事案です。",
+      "informationTypes": [
+        "氏名",
+        "住所",
+        "電話番号等",
+        "メールアドレス等",
+        "パスワード等"
+      ],
+      "scopeNote": "2013年度の政府公表資料に掲載されたあきばんぐの事案。年度資料では漏えい・紛失・滅失等をまとめて扱っています。対象者や情報区分が他事例と重なる可能性があるため、全体で加算しません。",
+      "countNote": "政府の年度資料にある「漏えい人数（最大）」欄の掲載規模です。「件」と「人・名」の原表記を区別しています。流出確認数・閲覧可能数・紛失対象などの定義は事案により異なり、被害者の総数には換算しません。資料後の企業の続報を網羅した値ではありません。",
+      "causeNote": "不正アクセス",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "2013年度 施行状況概要・主な事案表（PDF 42ページ）",
+          "url": "https://www.ppc.go.jp/files/pdf/personal_sekou_25caa.pdf#page=42",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ppc-2013-08-14-e3771132",
+      "companyId": "ジークレスト",
+      "company": "株式会社ジークレスト",
+      "shortName": "ジークレスト",
+      "aliases": [],
+      "sector": "other",
+      "cause": "intrusion",
+      "year": 2013,
+      "announcedAt": "2013-08-14",
+      "sourceUpdatedAt": "2013-08-14",
+      "status": "possible",
+      "scale": {
+        "value": 83000,
+        "unit": "records",
+        "qualifier": "approximate",
+        "bound": "maximum",
+        "label": "約8万3千件（年度表の掲載規模）"
+      },
+      "summary": "システムへの侵入や不正ログインなどによって、情報が対象になった事案です。",
+      "informationTypes": [
+        "性別",
+        "メールアドレス等",
+        "ニックネーム"
+      ],
+      "scopeNote": "2013年度の政府公表資料に掲載されたジークレストの事案。年度資料では漏えい・紛失・滅失等をまとめて扱っています。対象者や情報区分が他事例と重なる可能性があるため、全体で加算しません。",
+      "countNote": "政府の年度資料にある「漏えい人数（最大）」欄の掲載規模です。「件」と「人・名」の原表記を区別しています。流出確認数・閲覧可能数・紛失対象などの定義は事案により異なり、被害者の総数には換算しません。資料後の企業の続報を網羅した値ではありません。",
+      "causeNote": "不正ログイン",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "2013年度 施行状況概要・主な事案表（PDF 42ページ）",
+          "url": "https://www.ppc.go.jp/files/pdf/personal_sekou_25caa.pdf#page=42",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ppc-2013-11-22-da147c43",
+      "companyId": "ソニーコンピュータエンタテインメント",
+      "company": "株式会社ソニー・コンピュータエンタテインメント",
+      "shortName": "ソニー・コンピュータエンタテインメント",
+      "aliases": [],
+      "sector": "other",
+      "cause": "intrusion",
+      "year": 2013,
+      "announcedAt": "2013-11-22",
+      "sourceUpdatedAt": "2013-11-22",
+      "status": "possible",
+      "scale": {
+        "value": null,
+        "unit": "unknown",
+        "qualifier": "undisclosed",
+        "label": "約1千2百万件（数値の対象定義を保留）"
+      },
+      "summary": "システムへの侵入や不正ログインなどによって、情報が対象になった事案です。",
+      "informationTypes": [
+        "氏名",
+        "住所",
+        "性別",
+        "取引・利用情報等"
+      ],
+      "scopeNote": "2013年度の政府公表資料に掲載されたソニー・コンピュータエンタテインメントの事案。年度資料では漏えい・紛失・滅失等をまとめて扱っています。対象者や情報区分が他事例と重なる可能性があるため、全体で加算しません。",
+      "countNote": "政府の年度資料にある「漏えい人数（最大）」欄の掲載規模です。「件」と「人・名」の原表記を区別しています。流出確認数・閲覧可能数・紛失対象などの定義は事案により異なり、被害者の総数には換算しません。資料後の企業の続報を網羅した値ではありません。年度表は約1,200万件と記載していますが、この資料だけでは流出確認数と通知・ログイン対象数を区別できないため、規模比較の数値には使いません。",
+      "causeNote": "不正ログイン",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "2013年度 施行状況概要・主な事案表（PDF 43ページ）",
+          "url": "https://www.ppc.go.jp/files/pdf/personal_sekou_25caa.pdf#page=43",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ppc-2014-01-30-fa717c56",
+      "companyId": "ストリーム",
+      "company": "株式会社ストリーム",
+      "shortName": "ストリーム",
+      "aliases": [],
+      "sector": "other",
+      "cause": "intrusion",
+      "year": 2014,
+      "announcedAt": "2014-01-30",
+      "sourceUpdatedAt": "2014-01-30",
+      "status": "possible",
+      "scale": {
+        "value": 61000,
+        "unit": "records",
+        "qualifier": "approximate",
+        "bound": "maximum",
+        "label": "約6万1千件（年度表の掲載規模）"
+      },
+      "summary": "システムへの侵入や不正ログインなどによって、情報が対象になった事案です。",
+      "informationTypes": [
+        "氏名",
+        "クレジットカード情報等"
+      ],
+      "scopeNote": "2013年度の政府公表資料に掲載されたストリームの事案。年度資料では漏えい・紛失・滅失等をまとめて扱っています。対象者や情報区分が他事例と重なる可能性があるため、全体で加算しません。",
+      "countNote": "政府の年度資料にある「漏えい人数（最大）」欄の掲載規模です。「件」と「人・名」の原表記を区別しています。流出確認数・閲覧可能数・紛失対象などの定義は事案により異なり、被害者の総数には換算しません。資料後の企業の続報を網羅した値ではありません。",
+      "causeNote": "不正アクセス",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "2013年度 施行状況概要・主な事案表（PDF 43ページ）",
+          "url": "https://www.ppc.go.jp/files/pdf/personal_sekou_25caa.pdf#page=43",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ppc-2010-11-10-66499b35",
+      "companyId": "サミーネットワークス",
+      "company": "株式会社サミーネットワークス",
+      "shortName": "サミーネットワークス",
+      "aliases": [
+        "Sammy",
+        "777town.net"
+      ],
+      "sector": "other",
+      "cause": "intrusion",
+      "year": 2010,
+      "announcedAt": "2010-11-10",
+      "sourceUpdatedAt": "2010-11-10",
+      "status": "possible",
+      "scale": {
+        "value": 1700000,
+        "unit": "people",
+        "qualifier": "approximate",
+        "bound": "maximum",
+        "label": "約170万人（年度表の掲載規模）"
+      },
+      "summary": "システムへの侵入や不正ログインなどによって、情報が対象になった事案です。",
+      "informationTypes": [
+        "メールアドレス等",
+        "パスワード等",
+        "ID・会員番号等"
+      ],
+      "scopeNote": "2010年度の政府公表資料に掲載されたサミーネットワークスの事案。年度資料では漏えい・紛失・滅失等をまとめて扱っています。対象者や情報区分が他事例と重なる可能性があるため、全体で加算しません。",
+      "countNote": "政府の年度資料にある「漏えい人数（最大）」欄の掲載規模です。「件」と「人・名」の原表記を区別しています。流出確認数・閲覧可能数・紛失対象などの定義は事案により異なり、被害者の総数には換算しません。資料後の企業の続報を網羅した値ではありません。",
+      "causeNote": "・不正アクセス(SQLインジェクション)",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "2010年度 施行状況概要・主な事案表（PDF 35ページ）",
+          "url": "https://www.ppc.go.jp/files/pdf/personal_sekou_22caa.pdf#page=35",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ppc-2010-11-01-45cf58f0",
+      "companyId": "ルーク19",
+      "company": "株式会社ルーク19",
+      "shortName": "ルーク19",
+      "aliases": [],
+      "sector": "other",
+      "cause": "insider",
+      "year": 2010,
+      "announcedAt": "2010-11-01",
+      "sourceUpdatedAt": "2010-11-01",
+      "status": "confirmed",
+      "scale": {
+        "value": 460000,
+        "unit": "people",
+        "qualifier": "approximate",
+        "bound": "maximum",
+        "label": "約46万人（年度表の掲載規模）"
+      },
+      "summary": "従業者や関係者による情報の持ち出し・第三者への提供などが報告された事案です。",
+      "informationTypes": [
+        "氏名",
+        "住所",
+        "生年月日",
+        "性別",
+        "電話番号等",
+        "メールアドレス等",
+        "家族・保証人関連情報等"
+      ],
+      "scopeNote": "2010年度の政府公表資料に掲載されたルーク19の事案。年度資料では漏えい・紛失・滅失等をまとめて扱っています。対象者や情報区分が他事例と重なる可能性があるため、全体で加算しません。",
+      "countNote": "政府の年度資料にある「漏えい人数（最大）」欄の掲載規模です。「件」と「人・名」の原表記を区別しています。流出確認数・閲覧可能数・紛失対象などの定義は事案により異なり、被害者の総数には換算しません。資料後の企業の続報を網羅した値ではありません。",
+      "causeNote": "・元派遣職員が、会員情報を持ち出し11社に売却",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "2010年度 施行状況概要・主な事案表（PDF 35ページ）",
+          "url": "https://www.ppc.go.jp/files/pdf/personal_sekou_22caa.pdf#page=35",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ppc-2010-09-22-363e82e0",
+      "companyId": "リロケーションジャパン",
+      "company": "株式会社リロケーション・ジャパン",
+      "shortName": "リロケーション・ジャパン",
+      "aliases": [],
+      "sector": "other",
+      "cause": "insider",
+      "year": 2010,
+      "announcedAt": "2010-09-22",
+      "sourceUpdatedAt": "2010-09-22",
+      "status": "confirmed",
+      "scale": {
+        "value": 200000,
+        "unit": "people",
+        "qualifier": "approximate",
+        "bound": "maximum",
+        "label": "約20万人（年度表の掲載規模）"
+      },
+      "summary": "従業者や関係者による情報の持ち出し・第三者への提供などが報告された事案です。",
+      "informationTypes": [
+        "氏名",
+        "住所"
+      ],
+      "scopeNote": "2010年度の政府公表資料に掲載されたリロケーション・ジャパンの事案。年度資料では漏えい・紛失・滅失等をまとめて扱っています。対象者や情報区分が他事例と重なる可能性があるため、全体で加算しません。",
+      "countNote": "政府の年度資料にある「漏えい人数（最大）」欄の掲載規模です。「件」と「人・名」の原表記を区別しています。流出確認数・閲覧可能数・紛失対象などの定義は事案により異なり、被害者の総数には換算しません。資料後の企業の続報を網羅した値ではありません。",
+      "causeNote": "・退職者がデータを社外に持ち出し、ファイル交換ネットワーク上にアップロードしたため",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "2010年度 施行状況概要・主な事案表（PDF 35ページ）",
+          "url": "https://www.ppc.go.jp/files/pdf/personal_sekou_22caa.pdf#page=35",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ppc-2010-11-17-885321c9",
+      "companyId": "プリントパック",
+      "company": "株式会社プリントパック",
+      "shortName": "プリントパック",
+      "aliases": [],
+      "sector": "other",
+      "cause": "exposure",
+      "year": 2010,
+      "announcedAt": "2010-11-17",
+      "sourceUpdatedAt": "2010-11-17",
+      "status": "possible",
+      "scale": {
+        "value": 200000,
+        "unit": "people",
+        "qualifier": "approximate",
+        "bound": "maximum",
+        "label": "約20万人（年度表の掲載規模）"
+      },
+      "summary": "情報を外部から閲覧できる状態などが報告された事案です。",
+      "informationTypes": [
+        "氏名",
+        "住所",
+        "電話番号等",
+        "メールアドレス等"
+      ],
+      "scopeNote": "2010年度の政府公表資料に掲載されたプリントパックの事案。年度資料では漏えい・紛失・滅失等をまとめて扱っています。対象者や情報区分が他事例と重なる可能性があるため、全体で加算しません。",
+      "countNote": "政府の年度資料にある「漏えい人数（最大）」欄の掲載規模です。「件」と「人・名」の原表記を区別しています。流出確認数・閲覧可能数・紛失対象などの定義は事案により異なり、被害者の総数には換算しません。資料後の企業の続報を網羅した値ではありません。",
+      "causeNote": "・プログラムミスにより試験サーバを本番サーバに掲載",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "2010年度 施行状況概要・主な事案表（PDF 35ページ）",
+          "url": "https://www.ppc.go.jp/files/pdf/personal_sekou_22caa.pdf#page=35",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ppc-2010-09-27-87bed27c",
+      "companyId": "ユニットコム",
+      "company": "株式会社ユニットコム",
+      "shortName": "ユニットコム",
+      "aliases": [
+        "パソコン工房",
+        "Unitcom"
+      ],
+      "sector": "other",
+      "cause": "intrusion",
+      "year": 2010,
+      "announcedAt": "2010-09-27",
+      "sourceUpdatedAt": "2010-09-27",
+      "status": "possible",
+      "scale": {
+        "value": 180000,
+        "unit": "people",
+        "qualifier": "approximate",
+        "bound": "maximum",
+        "label": "約18万人（年度表の掲載規模）"
+      },
+      "summary": "システムへの侵入や不正ログインなどによって、情報が対象になった事案です。",
+      "informationTypes": [
+        "クレジットカード情報等"
+      ],
+      "scopeNote": "2010年度の政府公表資料に掲載されたユニットコムの事案。年度資料では漏えい・紛失・滅失等をまとめて扱っています。対象者や情報区分が他事例と重なる可能性があるため、全体で加算しません。",
+      "countNote": "政府の年度資料にある「漏えい人数（最大）」欄の掲載規模です。「件」と「人・名」の原表記を区別しています。流出確認数・閲覧可能数・紛失対象などの定義は事案により異なり、被害者の総数には換算しません。資料後の企業の続報を網羅した値ではありません。",
+      "causeNote": "・不正アクセス(SQLインジェクション)",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "2010年度 施行状況概要・主な事案表（PDF 35ページ）",
+          "url": "https://www.ppc.go.jp/files/pdf/personal_sekou_22caa.pdf#page=35",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ppc-2010-08-31-f1fdbf69",
+      "companyId": "さくら観光",
+      "company": "株式会社さくら観光",
+      "shortName": "さくら観光",
+      "aliases": [],
+      "sector": "other",
+      "cause": "intrusion",
+      "year": 2010,
+      "announcedAt": "2010-08-31",
+      "sourceUpdatedAt": "2010-08-31",
+      "status": "possible",
+      "scale": {
+        "value": 170000,
+        "unit": "people",
+        "qualifier": "approximate",
+        "bound": "maximum",
+        "label": "約17万人（年度表の掲載規模）"
+      },
+      "summary": "システムへの侵入や不正ログインなどによって、情報が対象になった事案です。",
+      "informationTypes": [
+        "氏名",
+        "メールアドレス等",
+        "クレジットカード情報等",
+        "ID・会員番号等"
+      ],
+      "scopeNote": "2010年度の政府公表資料に掲載されたさくら観光の事案。年度資料では漏えい・紛失・滅失等をまとめて扱っています。対象者や情報区分が他事例と重なる可能性があるため、全体で加算しません。",
+      "countNote": "政府の年度資料にある「漏えい人数（最大）」欄の掲載規模です。「件」と「人・名」の原表記を区別しています。流出確認数・閲覧可能数・紛失対象などの定義は事案により異なり、被害者の総数には換算しません。資料後の企業の続報を網羅した値ではありません。",
+      "causeNote": "・不正アクセス",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "2010年度 施行状況概要・主な事案表（PDF 36ページ）",
+          "url": "https://www.ppc.go.jp/files/pdf/personal_sekou_22caa.pdf#page=36",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ppc-2011-02-10-51879b79",
+      "companyId": "瀧野川信用金庫",
+      "company": "瀧野川信用金庫",
+      "shortName": "瀧野川信用金庫",
+      "aliases": [],
+      "sector": "finance",
+      "cause": "unknown",
+      "year": 2011,
+      "announcedAt": "2011-02-10",
+      "sourceUpdatedAt": "2011-02-10",
+      "status": "possible",
+      "scale": {
+        "value": 130000,
+        "unit": "records",
+        "qualifier": "approximate",
+        "bound": "maximum",
+        "label": "約13万件（年度表の掲載規模）"
+      },
+      "summary": "公表資料では原因の特定ができない事案です。",
+      "informationTypes": [
+        "氏名",
+        "住所",
+        "生年月日",
+        "電話番号等"
+      ],
+      "scopeNote": "2010年度の政府公表資料に掲載された瀧野川信用金庫の事案。年度資料では漏えい・紛失・滅失等をまとめて扱っています。対象者や情報区分が他事例と重なる可能性があるため、全体で加算しません。",
+      "countNote": "政府の年度資料にある「漏えい人数（最大）」欄の掲載規模です。「件」と「人・名」の原表記を区別しています。流出確認数・閲覧可能数・紛失対象などの定義は事案により異なり、被害者の総数には換算しません。資料後の企業の続報を網羅した値ではありません。",
+      "causeNote": "・CD-Rの取り扱いに関し、規定で定められた管理やダブルチェック等を怠ったもの。",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "2010年度 施行状況概要・主な事案表（PDF 36ページ）",
+          "url": "https://www.ppc.go.jp/files/pdf/personal_sekou_22caa.pdf#page=36",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ppc-2010-11-19-00ee5a31",
+      "companyId": "ゆうちょ銀行",
+      "company": "株式会社ゆうちょ銀行",
+      "shortName": "ゆうちょ銀行",
+      "aliases": [],
+      "sector": "finance",
+      "cause": "loss",
+      "year": 2010,
+      "announcedAt": "2010-11-19",
+      "sourceUpdatedAt": "2010-11-19",
+      "status": "possible",
+      "scale": {
+        "value": 93000,
+        "unit": "people",
+        "qualifier": "approximate",
+        "bound": "maximum",
+        "label": "約9万3千人（年度表の掲載規模）"
+      },
+      "summary": "情報を含む書類・機器・記録媒体の紛失、盗難や廃棄などが報告された事案です。",
+      "informationTypes": [
+        "氏名",
+        "住所",
+        "生年月日",
+        "電話番号等",
+        "取引・利用情報等"
+      ],
+      "scopeNote": "2010年度の政府公表資料に掲載されたゆうちょ銀行の事案。年度資料では漏えい・紛失・滅失等をまとめて扱っています。対象者や情報区分が他事例と重なる可能性があるため、全体で加算しません。",
+      "countNote": "政府の年度資料にある「漏えい人数（最大）」欄の掲載規模です。「件」と「人・名」の原表記を区別しています。流出確認数・閲覧可能数・紛失対象などの定義は事案により異なり、被害者の総数には換算しません。資料後の企業の続報を網羅した値ではありません。",
+      "causeNote": "・保管期間を経過した書類に混入する等して、社内で誤って廃棄",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "2010年度 施行状況概要・主な事案表（PDF 36ページ）",
+          "url": "https://www.ppc.go.jp/files/pdf/personal_sekou_22caa.pdf#page=36",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ppc-2010-11-11-b5baa401",
+      "companyId": "学研ロジスティクス",
+      "company": "株式会社学研ロジスティクス",
+      "shortName": "学研ロジスティクス",
+      "aliases": [],
+      "sector": "other",
+      "cause": "loss",
+      "year": 2010,
+      "announcedAt": "2010-11-11",
+      "sourceUpdatedAt": "2010-11-11",
+      "status": "possible",
+      "scale": {
+        "value": 67000,
+        "unit": "people",
+        "qualifier": "approximate",
+        "bound": "maximum",
+        "label": "約6万7千人（年度表の掲載規模）"
+      },
+      "summary": "情報を含む書類・機器・記録媒体の紛失、盗難や廃棄などが報告された事案です。",
+      "informationTypes": [
+        "氏名",
+        "住所",
+        "電話番号等"
+      ],
+      "scopeNote": "2010年度の政府公表資料に掲載された学研ロジスティクスの事案。年度資料では漏えい・紛失・滅失等をまとめて扱っています。対象者や情報区分が他事例と重なる可能性があるため、全体で加算しません。",
+      "countNote": "政府の年度資料にある「漏えい人数（最大）」欄の掲載規模です。「件」と「人・名」の原表記を区別しています。流出確認数・閲覧可能数・紛失対象などの定義は事案により異なり、被害者の総数には換算しません。資料後の企業の続報を網羅した値ではありません。",
+      "causeNote": "・従業員が使用する業務用ノートパソコンの入ったバッグの盗難",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "2010年度 施行状況概要・主な事案表（PDF 36ページ）",
+          "url": "https://www.ppc.go.jp/files/pdf/personal_sekou_22caa.pdf#page=36",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ppc-2010-12-03-00ee5a31",
+      "companyId": "ゆうちょ銀行",
+      "company": "株式会社ゆうちょ銀行",
+      "shortName": "ゆうちょ銀行",
+      "aliases": [],
+      "sector": "finance",
+      "cause": "loss",
+      "year": 2010,
+      "announcedAt": "2010-12-03",
+      "sourceUpdatedAt": "2010-12-03",
+      "status": "possible",
+      "scale": {
+        "value": 66000,
+        "unit": "people",
+        "qualifier": "approximate",
+        "bound": "maximum",
+        "label": "約6万6千人（年度表の掲載規模）"
+      },
+      "summary": "情報を含む書類・機器・記録媒体の紛失、盗難や廃棄などが報告された事案です。",
+      "informationTypes": [
+        "氏名",
+        "住所",
+        "生年月日",
+        "電話番号等",
+        "取引・利用情報等"
+      ],
+      "scopeNote": "2010年度の政府公表資料に掲載されたゆうちょ銀行の事案。年度資料では漏えい・紛失・滅失等をまとめて扱っています。対象者や情報区分が他事例と重なる可能性があるため、全体で加算しません。",
+      "countNote": "政府の年度資料にある「漏えい人数（最大）」欄の掲載規模です。「件」と「人・名」の原表記を区別しています。流出確認数・閲覧可能数・紛失対象などの定義は事案により異なり、被害者の総数には換算しません。資料後の企業の続報を網羅した値ではありません。",
+      "causeNote": "・端末機の盗難被害によるもの",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "2010年度 施行状況概要・主な事案表（PDF 36ページ）",
+          "url": "https://www.ppc.go.jp/files/pdf/personal_sekou_22caa.pdf#page=36",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ppc-2010-07-21-00ee5a31",
+      "companyId": "ゆうちょ銀行",
+      "company": "株式会社ゆうちょ銀行",
+      "shortName": "ゆうちょ銀行",
+      "aliases": [],
+      "sector": "finance",
+      "cause": "loss",
+      "year": 2010,
+      "announcedAt": "2010-07-21",
+      "sourceUpdatedAt": "2010-07-21",
+      "status": "possible",
+      "scale": {
+        "value": 58000,
+        "unit": "people",
+        "qualifier": "approximate",
+        "bound": "maximum",
+        "label": "約5万8千人（年度表の掲載規模）"
+      },
+      "summary": "情報を含む書類・機器・記録媒体の紛失、盗難や廃棄などが報告された事案です。",
+      "informationTypes": [
+        "氏名",
+        "住所",
+        "生年月日",
+        "電話番号等",
+        "取引・利用情報等"
+      ],
+      "scopeNote": "2010年度の政府公表資料に掲載されたゆうちょ銀行の事案。年度資料では漏えい・紛失・滅失等をまとめて扱っています。対象者や情報区分が他事例と重なる可能性があるため、全体で加算しません。",
+      "countNote": "政府の年度資料にある「漏えい人数（最大）」欄の掲載規模です。「件」と「人・名」の原表記を区別しています。流出確認数・閲覧可能数・紛失対象などの定義は事案により異なり、被害者の総数には換算しません。資料後の企業の続報を網羅した値ではありません。",
+      "causeNote": "・保管期間を経過した書類に混入する等して、社内で誤って廃棄",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "2010年度 施行状況概要・主な事案表（PDF 36ページ）",
+          "url": "https://www.ppc.go.jp/files/pdf/personal_sekou_22caa.pdf#page=36",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ppc-2010-07-21-6ff15a39",
+      "companyId": "かんぽ生命保険",
+      "company": "株式会社かんぽ生命保険",
+      "shortName": "かんぽ生命保険",
+      "aliases": [],
+      "sector": "finance",
+      "cause": "loss",
+      "year": 2010,
+      "announcedAt": "2010-07-21",
+      "sourceUpdatedAt": "2010-07-21",
+      "status": "possible",
+      "scale": {
+        "value": 58000,
+        "unit": "people",
+        "qualifier": "approximate",
+        "bound": "maximum",
+        "label": "約5万8千人（年度表の掲載規模）"
+      },
+      "summary": "情報を含む書類・機器・記録媒体の紛失、盗難や廃棄などが報告された事案です。",
+      "informationTypes": [
+        "氏名",
+        "住所",
+        "生年月日",
+        "電話番号等",
+        "取引・利用情報等",
+        "保険関連情報等"
+      ],
+      "scopeNote": "2010年度の政府公表資料に掲載されたかんぽ生命保険の事案。年度資料では漏えい・紛失・滅失等をまとめて扱っています。対象者や情報区分が他事例と重なる可能性があるため、全体で加算しません。",
+      "countNote": "政府の年度資料にある「漏えい人数（最大）」欄の掲載規模です。「件」と「人・名」の原表記を区別しています。流出確認数・閲覧可能数・紛失対象などの定義は事案により異なり、被害者の総数には換算しません。資料後の企業の続報を網羅した値ではありません。",
+      "causeNote": "・保管期間を経過した書類に混入する等して、社内で誤って廃棄",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "2010年度 施行状況概要・主な事案表（PDF 36ページ）",
+          "url": "https://www.ppc.go.jp/files/pdf/personal_sekou_22caa.pdf#page=36",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ppc-2011-08-11-a33aefbf",
+      "companyId": "山陰合同銀行",
+      "company": "株式会社山陰合同銀行",
+      "shortName": "山陰合同銀行",
+      "aliases": [],
+      "sector": "finance",
+      "cause": "insider",
+      "year": 2011,
+      "announcedAt": "2011-08-11",
+      "sourceUpdatedAt": "2011-08-11",
+      "status": "possible",
+      "scale": {
+        "value": 1700000,
+        "unit": "records",
+        "qualifier": "approximate",
+        "bound": "maximum",
+        "label": "約170万件（年度表の掲載規模）"
+      },
+      "summary": "従業者や関係者による情報の持ち出し・第三者への提供などが報告された事案です。",
+      "informationTypes": [
+        "氏名",
+        "住所",
+        "生年月日",
+        "電話番号等",
+        "取引・利用情報等"
+      ],
+      "scopeNote": "2011年度の政府公表資料に掲載された山陰合同銀行の事案。年度資料では漏えい・紛失・滅失等をまとめて扱っています。対象者や情報区分が他事例と重なる可能性があるため、全体で加算しません。",
+      "countNote": "政府の年度資料にある「漏えい人数（最大）」欄の掲載規模です。「件」と「人・名」の原表記を区別しています。流出確認数・閲覧可能数・紛失対象などの定義は事案により異なり、被害者の総数には換算しません。資料後の企業の続報を網羅した値ではありません。",
+      "causeNote": "再委託先の社員が、システム保守作業を行った際、許可無く持ち込んだUSBメモリに、顧客情報を含むデータを、当該システムのサーバーからコピーし持ち出した",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "2011年度 施行状況概要・主な事案表（PDF 40ページ）",
+          "url": "https://www.ppc.go.jp/files/pdf/personal_sekou_23caa.pdf#page=40",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ppc-2011-06-08-f59b532e",
+      "companyId": "ゲオ",
+      "company": "株式会社ゲオ",
+      "shortName": "ゲオ",
+      "aliases": [],
+      "sector": "other",
+      "cause": "intrusion",
+      "year": 2011,
+      "announcedAt": "2011-06-08",
+      "sourceUpdatedAt": "2011-06-08",
+      "status": "possible",
+      "scale": {
+        "value": 1000000,
+        "unit": "people",
+        "qualifier": "approximate",
+        "bound": "maximum",
+        "label": "約100万人（年度表の掲載規模）"
+      },
+      "summary": "システムへの侵入や不正ログインなどによって、情報が対象になった事案です。",
+      "informationTypes": [
+        "氏名",
+        "住所",
+        "生年月日",
+        "電話番号等",
+        "メールアドレス等",
+        "クレジットカード情報等",
+        "口座・金融情報等"
+      ],
+      "scopeNote": "2011年度の政府公表資料に掲載されたゲオの事案。年度資料では漏えい・紛失・滅失等をまとめて扱っています。対象者や情報区分が他事例と重なる可能性があるため、全体で加算しません。",
+      "countNote": "政府の年度資料にある「漏えい人数（最大）」欄の掲載規模です。「件」と「人・名」の原表記を区別しています。流出確認数・閲覧可能数・紛失対象などの定義は事案により異なり、被害者の総数には換算しません。資料後の企業の続報を網羅した値ではありません。",
+      "causeNote": "不正アクセス",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "2011年度 施行状況概要・主な事案表（PDF 40ページ）",
+          "url": "https://www.ppc.go.jp/files/pdf/personal_sekou_23caa.pdf#page=40",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ppc-2011-08-08-d2c3be8e",
+      "companyId": "阿波銀行",
+      "company": "株式会社阿波銀行",
+      "shortName": "阿波銀行",
+      "aliases": [],
+      "sector": "finance",
+      "cause": "loss",
+      "year": 2011,
+      "announcedAt": "2011-08-08",
+      "sourceUpdatedAt": "2011-08-08",
+      "status": "possible",
+      "scale": {
+        "value": 490000,
+        "unit": "people",
+        "qualifier": "approximate",
+        "bound": "maximum",
+        "label": "約49万人（年度表の掲載規模）"
+      },
+      "summary": "情報を含む書類・機器・記録媒体の紛失、盗難や廃棄などが報告された事案です。",
+      "informationTypes": [
+        "氏名",
+        "住所",
+        "取引・利用情報等"
+      ],
+      "scopeNote": "2011年度の政府公表資料に掲載された阿波銀行の事案。年度資料では漏えい・紛失・滅失等をまとめて扱っています。対象者や情報区分が他事例と重なる可能性があるため、全体で加算しません。",
+      "countNote": "政府の年度資料にある「漏えい人数（最大）」欄の掲載規模です。「件」と「人・名」の原表記を区別しています。流出確認数・閲覧可能数・紛失対象などの定義は事案により異なり、被害者の総数には換算しません。資料後の企業の続報を網羅した値ではありません。",
+      "causeNote": "行員の不注意により保存期限の書かれたラベルを誤貼付、また廃棄準備時および廃棄時に廃棄箱の中身の確認が不十分であったため廃棄",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "2011年度 施行状況概要・主な事案表（PDF 40ページ）",
+          "url": "https://www.ppc.go.jp/files/pdf/personal_sekou_23caa.pdf#page=40",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ppc-2011-05-02-00ee5a31",
+      "companyId": "ゆうちょ銀行",
+      "company": "株式会社ゆうちょ銀行",
+      "shortName": "ゆうちょ銀行",
+      "aliases": [],
+      "sector": "finance",
+      "cause": "loss",
+      "year": 2011,
+      "announcedAt": "2011-05-02",
+      "sourceUpdatedAt": "2011-05-02",
+      "status": "possible",
+      "scale": {
+        "value": 310000,
+        "unit": "people",
+        "qualifier": "approximate",
+        "bound": "maximum",
+        "label": "約31万人（年度表の掲載規模）"
+      },
+      "summary": "情報を含む書類・機器・記録媒体の紛失、盗難や廃棄などが報告された事案です。",
+      "informationTypes": [
+        "氏名",
+        "住所",
+        "電話番号等",
+        "口座・金融情報等"
+      ],
+      "scopeNote": "2011年度の政府公表資料に掲載されたゆうちょ銀行の事案。年度資料では漏えい・紛失・滅失等をまとめて扱っています。対象者や情報区分が他事例と重なる可能性があるため、全体で加算しません。",
+      "countNote": "政府の年度資料にある「漏えい人数（最大）」欄の掲載規模です。「件」と「人・名」の原表記を区別しています。流出確認数・閲覧可能数・紛失対象などの定義は事案により異なり、被害者の総数には換算しません。資料後の企業の続報を網羅した値ではありません。",
+      "causeNote": "保管期間を経過した書類等に混入する等して、社内で誤って廃棄した可能性",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "2011年度 施行状況概要・主な事案表（PDF 40ページ）",
+          "url": "https://www.ppc.go.jp/files/pdf/personal_sekou_23caa.pdf#page=40",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ppc-2011-08-25-77aca891",
+      "companyId": "ゲームポット",
+      "company": "株式会社ゲームポット",
+      "shortName": "ゲームポット",
+      "aliases": [],
+      "sector": "other",
+      "cause": "intrusion",
+      "year": 2011,
+      "announcedAt": "2011-08-25",
+      "sourceUpdatedAt": "2011-08-25",
+      "status": "possible",
+      "scale": {
+        "value": 203000,
+        "unit": "people",
+        "qualifier": "approximate",
+        "bound": "maximum",
+        "label": "約20万3千人（年度表の掲載規模）"
+      },
+      "summary": "システムへの侵入や不正ログインなどによって、情報が対象になった事案です。",
+      "informationTypes": [
+        "メールアドレス等",
+        "パスワード等",
+        "ID・会員番号等"
+      ],
+      "scopeNote": "2011年度の政府公表資料に掲載されたゲームポットの事案。年度資料では漏えい・紛失・滅失等をまとめて扱っています。対象者や情報区分が他事例と重なる可能性があるため、全体で加算しません。",
+      "countNote": "政府の年度資料にある「漏えい人数（最大）」欄の掲載規模です。「件」と「人・名」の原表記を区別しています。流出確認数・閲覧可能数・紛失対象などの定義は事案により異なり、被害者の総数には換算しません。資料後の企業の続報を網羅した値ではありません。",
+      "causeNote": "不正アクセス(SQLインジェクション)",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "2011年度 施行状況概要・主な事案表（PDF 40ページ）",
+          "url": "https://www.ppc.go.jp/files/pdf/personal_sekou_23caa.pdf#page=40",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ppc-2012-02-09-1c01d921",
+      "companyId": "デジタルブティック",
+      "company": "株式会社デジタルブティック",
+      "shortName": "デジタルブティック",
+      "aliases": [],
+      "sector": "other",
+      "cause": "intrusion",
+      "year": 2012,
+      "announcedAt": "2012-02-09",
+      "sourceUpdatedAt": "2012-02-09",
+      "status": "possible",
+      "scale": {
+        "value": 170000,
+        "unit": "people",
+        "qualifier": "approximate",
+        "bound": "maximum",
+        "label": "約17万人（年度表の掲載規模）"
+      },
+      "summary": "システムへの侵入や不正ログインなどによって、情報が対象になった事案です。",
+      "informationTypes": [
+        "生年月日",
+        "メールアドレス等",
+        "パスワード等"
+      ],
+      "scopeNote": "2011年度の政府公表資料に掲載されたデジタルブティックの事案。年度資料では漏えい・紛失・滅失等をまとめて扱っています。対象者や情報区分が他事例と重なる可能性があるため、全体で加算しません。",
+      "countNote": "政府の年度資料にある「漏えい人数（最大）」欄の掲載規模です。「件」と「人・名」の原表記を区別しています。流出確認数・閲覧可能数・紛失対象などの定義は事案により異なり、被害者の総数には換算しません。資料後の企業の続報を網羅した値ではありません。",
+      "causeNote": "不正アクセス",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "2011年度 施行状況概要・主な事案表（PDF 40ページ）",
+          "url": "https://www.ppc.go.jp/files/pdf/personal_sekou_23caa.pdf#page=40",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ppc-2011-08-16-3ca84ffc",
+      "companyId": "セディナ",
+      "company": "株式会社セディナ",
+      "shortName": "セディナ",
+      "aliases": [],
+      "sector": "other",
+      "cause": "insider",
+      "year": 2011,
+      "announcedAt": "2011-08-16",
+      "sourceUpdatedAt": "2011-08-16",
+      "status": "confirmed",
+      "scale": {
+        "value": 158000,
+        "unit": "people",
+        "qualifier": "approximate",
+        "bound": "maximum",
+        "label": "約15万8千人（年度表の掲載規模）"
+      },
+      "summary": "従業者や関係者による情報の持ち出し・第三者への提供などが報告された事案です。",
+      "informationTypes": [
+        "氏名",
+        "住所",
+        "生年月日",
+        "性別",
+        "電話番号等"
+      ],
+      "scopeNote": "2011年度の政府公表資料に掲載されたセディナの事案。年度資料では漏えい・紛失・滅失等をまとめて扱っています。対象者や情報区分が他事例と重なる可能性があるため、全体で加算しません。",
+      "countNote": "政府の年度資料にある「漏えい人数（最大）」欄の掲載規模です。「件」と「人・名」の原表記を区別しています。流出確認数・閲覧可能数・紛失対象などの定義は事案により異なり、被害者の総数には換算しません。資料後の企業の続報を網羅した値ではありません。",
+      "causeNote": "過去に保険代理店事務に関わる委託をしていた関係者より不正に持ち出され、売却された",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "2011年度 施行状況概要・主な事案表（PDF 40ページ）",
+          "url": "https://www.ppc.go.jp/files/pdf/personal_sekou_23caa.pdf#page=40",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ppc-2011-08-10-743e9479",
+      "companyId": "滋賀銀行",
+      "company": "株式会社滋賀銀行",
+      "shortName": "滋賀銀行",
+      "aliases": [],
+      "sector": "finance",
+      "cause": "loss",
+      "year": 2011,
+      "announcedAt": "2011-08-10",
+      "sourceUpdatedAt": "2011-08-10",
+      "status": "possible",
+      "scale": {
+        "value": 120000,
+        "unit": "people",
+        "qualifier": "approximate",
+        "bound": "maximum",
+        "label": "約12万人（年度表の掲載規模）"
+      },
+      "summary": "情報を含む書類・機器・記録媒体の紛失、盗難や廃棄などが報告された事案です。",
+      "informationTypes": [
+        "氏名",
+        "口座・金融情報等"
+      ],
+      "scopeNote": "2011年度の政府公表資料に掲載された滋賀銀行の事案。年度資料では漏えい・紛失・滅失等をまとめて扱っています。対象者や情報区分が他事例と重なる可能性があるため、全体で加算しません。",
+      "countNote": "政府の年度資料にある「漏えい人数（最大）」欄の掲載規模です。「件」と「人・名」の原表記を区別しています。流出確認数・閲覧可能数・紛失対象などの定義は事案により異なり、被害者の総数には換算しません。資料後の企業の続報を網羅した値ではありません。",
+      "causeNote": "本来保管しておくべき書類を、作業にあたり行員が保管期限を十分に確認せず、廃棄すべきものと誤認し廃棄",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "2011年度 施行状況概要・主な事案表（PDF 41ページ）",
+          "url": "https://www.ppc.go.jp/files/pdf/personal_sekou_23caa.pdf#page=41",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ppc-2011-08-05-76273c7a",
+      "companyId": "シティカードジャパン",
+      "company": "シティカードジャパン株式会社",
+      "shortName": "シティカードジャパン",
+      "aliases": [],
+      "sector": "finance",
+      "cause": "insider",
+      "year": 2011,
+      "announcedAt": "2011-08-05",
+      "sourceUpdatedAt": "2011-08-05",
+      "status": "confirmed",
+      "scale": {
+        "value": 92000,
+        "unit": "people",
+        "qualifier": "approximate",
+        "bound": "maximum",
+        "label": "約9万2千人（年度表の掲載規模）"
+      },
+      "summary": "従業者や関係者による情報の持ち出し・第三者への提供などが報告された事案です。",
+      "informationTypes": [
+        "氏名",
+        "住所",
+        "生年月日",
+        "性別",
+        "電話番号等",
+        "クレジットカード情報等"
+      ],
+      "scopeNote": "2011年度の政府公表資料に掲載されたシティカードジャパンの事案。年度資料では漏えい・紛失・滅失等をまとめて扱っています。対象者や情報区分が他事例と重なる可能性があるため、全体で加算しません。",
+      "countNote": "政府の年度資料にある「漏えい人数（最大）」欄の掲載規模です。「件」と「人・名」の原表記を区別しています。流出確認数・閲覧可能数・紛失対象などの定義は事案により異なり、被害者の総数には換算しません。資料後の企業の続報を網羅した値ではありません。",
+      "causeNote": "不正に取得され第三者に売却された",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "2011年度 施行状況概要・主な事案表（PDF 41ページ）",
+          "url": "https://www.ppc.go.jp/files/pdf/personal_sekou_23caa.pdf#page=41",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ppc-2011-04-19-1feeb898",
+      "companyId": "愛媛日産自動車",
+      "company": "愛媛日産自動車株式会社",
+      "shortName": "愛媛日産自動車",
+      "aliases": [],
+      "sector": "other",
+      "cause": "intrusion",
+      "year": 2011,
+      "announcedAt": "2011-04-19",
+      "sourceUpdatedAt": "2011-04-19",
+      "status": "possible",
+      "scale": {
+        "value": 73000,
+        "unit": "people",
+        "qualifier": "approximate",
+        "bound": "maximum",
+        "label": "約7万3千人（年度表の掲載規模）"
+      },
+      "summary": "システムへの侵入や不正ログインなどによって、情報が対象になった事案です。",
+      "informationTypes": [
+        "氏名",
+        "住所",
+        "電話番号等"
+      ],
+      "scopeNote": "2011年度の政府公表資料に掲載された愛媛日産自動車の事案。年度資料では漏えい・紛失・滅失等をまとめて扱っています。対象者や情報区分が他事例と重なる可能性があるため、全体で加算しません。",
+      "countNote": "政府の年度資料にある「漏えい人数（最大）」欄の掲載規模です。「件」と「人・名」の原表記を区別しています。流出確認数・閲覧可能数・紛失対象などの定義は事案により異なり、被害者の総数には換算しません。資料後の企業の続報を網羅した値ではありません。",
+      "causeNote": "元従業員が自宅に持ち出し個人所有パソコンからウイルスにより流出。",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "2011年度 施行状況概要・主な事案表（PDF 41ページ）",
+          "url": "https://www.ppc.go.jp/files/pdf/personal_sekou_23caa.pdf#page=41",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ppc-2011-10-05-3a9215a4",
+      "companyId": "インフィニトラベルインフォメーション",
+      "company": "株式会社インフィニトラベルインフォメーション",
+      "shortName": "インフィニトラベルインフォメーション",
+      "aliases": [],
+      "sector": "other",
+      "cause": "mistake",
+      "year": 2011,
+      "announcedAt": "2011-10-05",
+      "sourceUpdatedAt": "2011-10-05",
+      "status": "possible",
+      "scale": {
+        "value": 66000,
+        "unit": "people",
+        "qualifier": "approximate",
+        "bound": "maximum",
+        "label": "約6万6千人（年度表の掲載規模）"
+      },
+      "summary": "情報の送付先やシステム処理などの誤りが報告された事案です。",
+      "informationTypes": [
+        "氏名",
+        "性別",
+        "クレジットカード情報等"
+      ],
+      "scopeNote": "2011年度の政府公表資料に掲載されたインフィニトラベルインフォメーションの事案。年度資料では漏えい・紛失・滅失等をまとめて扱っています。対象者や情報区分が他事例と重なる可能性があるため、全体で加算しません。",
+      "countNote": "政府の年度資料にある「漏えい人数（最大）」欄の掲載規模です。「件」と「人・名」の原表記を区別しています。流出確認数・閲覧可能数・紛失対象などの定義は事案により異なり、被害者の総数には換算しません。資料後の企業の続報を網羅した値ではありません。",
+      "causeNote": "委託元へ返却する際、他の委託元へ誤って送付",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "2011年度 施行状況概要・主な事案表（PDF 41ページ）",
+          "url": "https://www.ppc.go.jp/files/pdf/personal_sekou_23caa.pdf#page=41",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ppc-2011-11-19-58c487b8",
+      "companyId": "横浜銀行",
+      "company": "株式会社横浜銀行",
+      "shortName": "横浜銀行",
+      "aliases": [],
+      "sector": "finance",
+      "cause": "loss",
+      "year": 2011,
+      "announcedAt": "2011-11-19",
+      "sourceUpdatedAt": "2011-11-19",
+      "status": "possible",
+      "scale": {
+        "value": 63000,
+        "unit": "people",
+        "qualifier": "approximate",
+        "bound": "maximum",
+        "label": "約6万3千人（年度表の掲載規模）"
+      },
+      "summary": "情報を含む書類・機器・記録媒体の紛失、盗難や廃棄などが報告された事案です。",
+      "informationTypes": [
+        "氏名",
+        "住所",
+        "生年月日"
+      ],
+      "scopeNote": "2011年度の政府公表資料に掲載された横浜銀行の事案。年度資料では漏えい・紛失・滅失等をまとめて扱っています。対象者や情報区分が他事例と重なる可能性があるため、全体で加算しません。",
+      "countNote": "政府の年度資料にある「漏えい人数（最大）」欄の掲載規模です。「件」と「人・名」の原表記を区別しています。流出確認数・閲覧可能数・紛失対象などの定義は事案により異なり、被害者の総数には換算しません。資料後の企業の続報を網羅した値ではありません。",
+      "causeNote": "保存すべき書類の誤廃棄",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "2011年度 施行状況概要・主な事案表（PDF 41ページ）",
+          "url": "https://www.ppc.go.jp/files/pdf/personal_sekou_23caa.pdf#page=41",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ppc-2012-11-13-42720c19",
+      "companyId": "三菱東京ufj銀行",
+      "company": "株式会社三菱東京UFJ銀行",
+      "shortName": "三菱東京UFJ銀行",
+      "aliases": [],
+      "sector": "finance",
+      "cause": "loss",
+      "year": 2012,
+      "announcedAt": "2012-11-13",
+      "sourceUpdatedAt": "2012-12-25",
+      "status": "possible",
+      "scale": {
+        "value": null,
+        "unit": "unknown",
+        "qualifier": "undisclosed",
+        "label": "約560万名(追加公表)約112万名"
+      },
+      "summary": "情報を含む書類・機器・記録媒体の紛失、盗難や廃棄などが報告された事案です。",
+      "informationTypes": [
+        "氏名",
+        "口座・金融情報等",
+        "取引・利用情報等"
+      ],
+      "scopeNote": "2012年度の政府公表資料に掲載された三菱東京UFJ銀行の事案。年度資料では漏えい・紛失・滅失等をまとめて扱っています。対象者や情報区分が他事例と重なる可能性があるため、全体で加算しません。",
+      "countNote": "政府の年度資料にある「漏えい人数（最大）」欄の掲載規模です。「件」と「人・名」の原表記を区別しています。流出確認数・閲覧可能数・紛失対象などの定義は事案により異なり、被害者の総数には換算しません。資料後の企業の続報を網羅した値ではありません。資料が複数の数値を併記しているため、合計を推定せず、原表記を残しています。",
+      "causeNote": "誤廃棄",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "2012年度 施行状況概要・主な事案表（PDF 41ページ）",
+          "url": "https://www.ppc.go.jp/files/pdf/personal_sekou_24caa.pdf#page=41",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ppc-2012-06-01-26990303",
+      "companyId": "リンクステーション",
+      "company": "株式会社リンクステーション",
+      "shortName": "リンクステーション",
+      "aliases": [],
+      "sector": "other",
+      "cause": "intrusion",
+      "year": 2012,
+      "announcedAt": "2012-06-01",
+      "sourceUpdatedAt": "2012-06-01",
+      "status": "possible",
+      "scale": {
+        "value": 1280000,
+        "unit": "records",
+        "qualifier": "approximate",
+        "bound": "maximum",
+        "label": "約128万件（年度表の掲載規模）"
+      },
+      "summary": "システムへの侵入や不正ログインなどによって、情報が対象になった事案です。",
+      "informationTypes": [
+        "氏名",
+        "住所",
+        "生年月日",
+        "性別",
+        "電話番号等",
+        "メールアドレス等",
+        "クレジットカード情報等",
+        "ID・会員番号等"
+      ],
+      "scopeNote": "2012年度の政府公表資料に掲載されたリンクステーションの事案。年度資料では漏えい・紛失・滅失等をまとめて扱っています。対象者や情報区分が他事例と重なる可能性があるため、全体で加算しません。",
+      "countNote": "政府の年度資料にある「漏えい人数（最大）」欄の掲載規模です。「件」と「人・名」の原表記を区別しています。流出確認数・閲覧可能数・紛失対象などの定義は事案により異なり、被害者の総数には換算しません。資料後の企業の続報を網羅した値ではありません。",
+      "causeNote": "不正アクセス",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "2012年度 施行状況概要・主な事案表（PDF 41ページ）",
+          "url": "https://www.ppc.go.jp/files/pdf/personal_sekou_24caa.pdf#page=41",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ppc-2012-06-21-e2420903",
+      "companyId": "損害保険ジャパン",
+      "company": "損害保険ジャパン株式会社",
+      "shortName": "損害保険ジャパン",
+      "aliases": [],
+      "sector": "finance",
+      "cause": "loss",
+      "year": 2012,
+      "announcedAt": "2012-06-21",
+      "sourceUpdatedAt": "2012-06-21",
+      "status": "possible",
+      "scale": {
+        "value": 400000,
+        "unit": "people",
+        "qualifier": "approximate",
+        "bound": "maximum",
+        "label": "約40万人（年度表の掲載規模）"
+      },
+      "summary": "情報を含む書類・機器・記録媒体の紛失、盗難や廃棄などが報告された事案です。",
+      "informationTypes": [
+        "氏名",
+        "口座・金融情報等",
+        "取引・利用情報等",
+        "保険関連情報等"
+      ],
+      "scopeNote": "2012年度の政府公表資料に掲載された損害保険ジャパンの事案。年度資料では漏えい・紛失・滅失等をまとめて扱っています。対象者や情報区分が他事例と重なる可能性があるため、全体で加算しません。",
+      "countNote": "政府の年度資料にある「漏えい人数（最大）」欄の掲載規模です。「件」と「人・名」の原表記を区別しています。流出確認数・閲覧可能数・紛失対象などの定義は事案により異なり、被害者の総数には換算しません。資料後の企業の続報を網羅した値ではありません。",
+      "causeNote": "管理不足による紛失",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "2012年度 施行状況概要・主な事案表（PDF 41ページ）",
+          "url": "https://www.ppc.go.jp/files/pdf/personal_sekou_24caa.pdf#page=41",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ppc-2012-07-23-31625b46",
+      "companyId": "福岡銀行",
+      "company": "株式会社福岡銀行",
+      "shortName": "福岡銀行",
+      "aliases": [],
+      "sector": "finance",
+      "cause": "loss",
+      "year": 2012,
+      "announcedAt": "2012-07-23",
+      "sourceUpdatedAt": "2012-07-23",
+      "status": "possible",
+      "scale": {
+        "value": 250000,
+        "unit": "records",
+        "qualifier": "approximate",
+        "bound": "maximum",
+        "label": "約25万件（年度表の掲載規模）"
+      },
+      "summary": "情報を含む書類・機器・記録媒体の紛失、盗難や廃棄などが報告された事案です。",
+      "informationTypes": [
+        "氏名",
+        "住所",
+        "生年月日",
+        "電話番号等",
+        "口座・金融情報等"
+      ],
+      "scopeNote": "2012年度の政府公表資料に掲載された福岡銀行の事案。年度資料では漏えい・紛失・滅失等をまとめて扱っています。対象者や情報区分が他事例と重なる可能性があるため、全体で加算しません。",
+      "countNote": "政府の年度資料にある「漏えい人数（最大）」欄の掲載規模です。「件」と「人・名」の原表記を区別しています。流出確認数・閲覧可能数・紛失対象などの定義は事案により異なり、被害者の総数には換算しません。資料後の企業の続報を網羅した値ではありません。",
+      "causeNote": "事務取扱及び保存年限の誤認等による誤廃棄",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "2012年度 施行状況概要・主な事案表（PDF 41ページ）",
+          "url": "https://www.ppc.go.jp/files/pdf/personal_sekou_24caa.pdf#page=41",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ppc-2012-05-13-6a68c92b",
+      "companyId": "レアジョブ",
+      "company": "株式会社レアジョブ",
+      "shortName": "レアジョブ",
+      "aliases": [],
+      "sector": "other",
+      "cause": "intrusion",
+      "year": 2012,
+      "announcedAt": "2012-05-13",
+      "sourceUpdatedAt": "2012-05-13",
+      "status": "possible",
+      "scale": {
+        "value": 120000,
+        "unit": "records",
+        "qualifier": "approximate",
+        "bound": "maximum",
+        "label": "約12万件（年度表の掲載規模）"
+      },
+      "summary": "システムへの侵入や不正ログインなどによって、情報が対象になった事案です。",
+      "informationTypes": [
+        "氏名",
+        "メールアドレス等",
+        "パスワード等",
+        "ニックネーム"
+      ],
+      "scopeNote": "2012年度の政府公表資料に掲載されたレアジョブの事案。年度資料では漏えい・紛失・滅失等をまとめて扱っています。対象者や情報区分が他事例と重なる可能性があるため、全体で加算しません。",
+      "countNote": "政府の年度資料にある「漏えい人数（最大）」欄の掲載規模です。「件」と「人・名」の原表記を区別しています。流出確認数・閲覧可能数・紛失対象などの定義は事案により異なり、被害者の総数には換算しません。資料後の企業の続報を網羅した値ではありません。",
+      "causeNote": "不正アクセス",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "2012年度 施行状況概要・主な事案表（PDF 41ページ）",
+          "url": "https://www.ppc.go.jp/files/pdf/personal_sekou_24caa.pdf#page=41",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ppc-2012-12-07-5b72f5e8",
+      "companyId": "イオン銀行",
+      "company": "株式会社イオン銀行",
+      "shortName": "イオン銀行",
+      "aliases": [],
+      "sector": "finance",
+      "cause": "loss",
+      "year": 2012,
+      "announcedAt": "2012-12-07",
+      "sourceUpdatedAt": "2012-12-07",
+      "status": "possible",
+      "scale": {
+        "value": 96000,
+        "unit": "people",
+        "qualifier": "approximate",
+        "bound": "maximum",
+        "label": "約9万6千人（年度表の掲載規模）"
+      },
+      "summary": "情報を含む書類・機器・記録媒体の紛失、盗難や廃棄などが報告された事案です。",
+      "informationTypes": [
+        "氏名",
+        "住所"
+      ],
+      "scopeNote": "2012年度の政府公表資料に掲載されたイオン銀行の事案。年度資料では漏えい・紛失・滅失等をまとめて扱っています。対象者や情報区分が他事例と重なる可能性があるため、全体で加算しません。",
+      "countNote": "政府の年度資料にある「漏えい人数（最大）」欄の掲載規模です。「件」と「人・名」の原表記を区別しています。流出確認数・閲覧可能数・紛失対象などの定義は事案により異なり、被害者の総数には換算しません。資料後の企業の続報を網羅した値ではありません。",
+      "causeNote": "CD-ROMの紛失",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "2012年度 施行状況概要・主な事案表（PDF 41ページ）",
+          "url": "https://www.ppc.go.jp/files/pdf/personal_sekou_24caa.pdf#page=41",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ppc-2012-07-13-6d925a08",
+      "companyId": "カルピス",
+      "company": "カルピス株式会社",
+      "shortName": "カルピス",
+      "aliases": [],
+      "sector": "other",
+      "cause": "loss",
+      "year": 2012,
+      "announcedAt": "2012-07-13",
+      "sourceUpdatedAt": "2012-07-13",
+      "status": "confirmed",
+      "scale": {
+        "value": 96000,
+        "unit": "people",
+        "qualifier": "approximate",
+        "bound": "maximum",
+        "label": "約9万6千人（年度表の掲載規模）"
+      },
+      "summary": "情報を含む書類・機器・記録媒体の紛失、盗難や廃棄などが報告された事案です。",
+      "informationTypes": [
+        "氏名",
+        "住所",
+        "性別",
+        "電話番号等",
+        "メールアドレス等"
+      ],
+      "scopeNote": "2012年度の政府公表資料に掲載されたカルピスの事案。年度資料では漏えい・紛失・滅失等をまとめて扱っています。対象者や情報区分が他事例と重なる可能性があるため、全体で加算しません。",
+      "countNote": "政府の年度資料にある「漏えい人数（最大）」欄の掲載規模です。「件」と「人・名」の原表記を区別しています。流出確認数・閲覧可能数・紛失対象などの定義は事案により異なり、被害者の総数には換算しません。資料後の企業の続報を網羅した値ではありません。",
+      "causeNote": "個人情報を管理していた外部委託先の担当者がデータを決められた手順どおりに廃棄処分せず、所有するノートパソコン(会社貸与)にデータをコピーして不正に保有、その後、インターネット上で閲覧できる状況になっていた。",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "2012年度 施行状況概要・主な事案表（PDF 42ページ）",
+          "url": "https://www.ppc.go.jp/files/pdf/personal_sekou_24caa.pdf#page=42",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ppc-2012-10-30-6878c1df",
+      "companyId": "ウェブシャーク",
+      "company": "株式会社ウェブシャーク",
+      "shortName": "ウェブシャーク",
+      "aliases": [],
+      "sector": "other",
+      "cause": "intrusion",
+      "year": 2012,
+      "announcedAt": "2012-10-30",
+      "sourceUpdatedAt": "2012-10-30",
+      "status": "possible",
+      "scale": {
+        "value": 94000,
+        "unit": "records",
+        "qualifier": "approximate",
+        "bound": "maximum",
+        "label": "約9万4千件（年度表の掲載規模）"
+      },
+      "summary": "システムへの侵入や不正ログインなどによって、情報が対象になった事案です。",
+      "informationTypes": [
+        "氏名",
+        "クレジットカード情報等"
+      ],
+      "scopeNote": "2012年度の政府公表資料に掲載されたウェブシャークの事案。年度資料では漏えい・紛失・滅失等をまとめて扱っています。対象者や情報区分が他事例と重なる可能性があるため、全体で加算しません。",
+      "countNote": "政府の年度資料にある「漏えい人数（最大）」欄の掲載規模です。「件」と「人・名」の原表記を区別しています。流出確認数・閲覧可能数・紛失対象などの定義は事案により異なり、被害者の総数には換算しません。資料後の企業の続報を網羅した値ではありません。",
+      "causeNote": "不正アクセス",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "2012年度 施行状況概要・主な事案表（PDF 42ページ）",
+          "url": "https://www.ppc.go.jp/files/pdf/personal_sekou_24caa.pdf#page=42",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ppc-2012-05-22-3d2c0fb5",
+      "companyId": "郵便事業",
+      "company": "郵便事業株式会社(現日本郵便株式会社)",
+      "shortName": "郵便事業",
+      "aliases": [],
+      "sector": "other",
+      "cause": "unknown",
+      "year": 2012,
+      "announcedAt": "2012-05-22",
+      "sourceUpdatedAt": "2012-05-22",
+      "status": "possible",
+      "scale": {
+        "value": 80000,
+        "unit": "records",
+        "qualifier": "approximate",
+        "bound": "maximum",
+        "label": "約8万件（年度表の掲載規模）"
+      },
+      "summary": "公表資料では原因の特定ができない事案です。",
+      "informationTypes": [
+        "氏名",
+        "住所",
+        "家族・保証人関連情報等"
+      ],
+      "scopeNote": "2012年度の政府公表資料に掲載された郵便事業の事案。年度資料では漏えい・紛失・滅失等をまとめて扱っています。対象者や情報区分が他事例と重なる可能性があるため、全体で加算しません。",
+      "countNote": "政府の年度資料にある「漏えい人数（最大）」欄の掲載規模です。「件」と「人・名」の原表記を区別しています。流出確認数・閲覧可能数・紛失対象などの定義は事案により異なり、被害者の総数には換算しません。資料後の企業の続報を網羅した値ではありません。",
+      "causeNote": "不明",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "2012年度 施行状況概要・主な事案表（PDF 42ページ）",
+          "url": "https://www.ppc.go.jp/files/pdf/personal_sekou_24caa.pdf#page=42",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ppc-2012-09-27-23928507",
+      "companyId": "学情",
+      "company": "株式会社学情",
+      "shortName": "学情",
+      "aliases": [],
+      "sector": "other",
+      "cause": "intrusion",
+      "year": 2012,
+      "announcedAt": "2012-09-27",
+      "sourceUpdatedAt": "2012-09-27",
+      "status": "possible",
+      "scale": {
+        "value": 72000,
+        "unit": "records",
+        "qualifier": "approximate",
+        "bound": "maximum",
+        "label": "約7万2千件（年度表の掲載規模）"
+      },
+      "summary": "システムへの侵入や不正ログインなどによって、情報が対象になった事案です。",
+      "informationTypes": [
+        "メールアドレス等"
+      ],
+      "scopeNote": "2012年度の政府公表資料に掲載された学情の事案。年度資料では漏えい・紛失・滅失等をまとめて扱っています。対象者や情報区分が他事例と重なる可能性があるため、全体で加算しません。",
+      "countNote": "政府の年度資料にある「漏えい人数（最大）」欄の掲載規模です。「件」と「人・名」の原表記を区別しています。流出確認数・閲覧可能数・紛失対象などの定義は事案により異なり、被害者の総数には換算しません。資料後の企業の続報を網羅した値ではありません。",
+      "causeNote": "不正アクセス",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "2012年度 施行状況概要・主な事案表（PDF 42ページ）",
+          "url": "https://www.ppc.go.jp/files/pdf/personal_sekou_24caa.pdf#page=42",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ppc-2013-02-28-896287c8",
+      "companyId": "キャリアインデックス",
+      "company": "株式会社キャリアインデックス",
+      "shortName": "キャリアインデックス",
+      "aliases": [],
+      "sector": "other",
+      "cause": "intrusion",
+      "year": 2013,
+      "announcedAt": "2013-02-28",
+      "sourceUpdatedAt": "2013-02-28",
+      "status": "possible",
+      "scale": {
+        "value": 53000,
+        "unit": "records",
+        "qualifier": "approximate",
+        "bound": "maximum",
+        "label": "約5万3千件（年度表の掲載規模）"
+      },
+      "summary": "システムへの侵入や不正ログインなどによって、情報が対象になった事案です。",
+      "informationTypes": [
+        "メールアドレス等",
+        "パスワード等"
+      ],
+      "scopeNote": "2012年度の政府公表資料に掲載されたキャリアインデックスの事案。年度資料では漏えい・紛失・滅失等をまとめて扱っています。対象者や情報区分が他事例と重なる可能性があるため、全体で加算しません。",
+      "countNote": "政府の年度資料にある「漏えい人数（最大）」欄の掲載規模です。「件」と「人・名」の原表記を区別しています。流出確認数・閲覧可能数・紛失対象などの定義は事案により異なり、被害者の総数には換算しません。資料後の企業の続報を網羅した値ではありません。",
+      "causeNote": "不正アクセス",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "2012年度 施行状況概要・主な事案表（PDF 42ページ）",
+          "url": "https://www.ppc.go.jp/files/pdf/personal_sekou_24caa.pdf#page=42",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ppc-2012-09-14-6d193da7",
+      "companyId": "スクウェアエニックス",
+      "company": "株式会社スクウェア・エニックス",
+      "shortName": "スクウェア・エニックス",
+      "aliases": [
+        "Square Enix",
+        "スクエニ"
+      ],
+      "sector": "other",
+      "cause": "intrusion",
+      "year": 2012,
+      "announcedAt": "2012-09-14",
+      "sourceUpdatedAt": "2012-09-14",
+      "status": "possible",
+      "scale": {
+        "value": 52000,
+        "unit": "records",
+        "qualifier": "approximate",
+        "bound": "maximum",
+        "label": "約5万2千件（年度表の掲載規模）"
+      },
+      "summary": "システムへの侵入や不正ログインなどによって、情報が対象になった事案です。",
+      "informationTypes": [
+        "氏名",
+        "住所",
+        "生年月日",
+        "性別",
+        "電話番号等",
+        "メールアドレス等",
+        "クレジットカード情報等"
+      ],
+      "scopeNote": "2012年度の政府公表資料に掲載されたスクウェア・エニックスの事案。年度資料では漏えい・紛失・滅失等をまとめて扱っています。対象者や情報区分が他事例と重なる可能性があるため、全体で加算しません。",
+      "countNote": "政府の年度資料にある「漏えい人数（最大）」欄の掲載規模です。「件」と「人・名」の原表記を区別しています。流出確認数・閲覧可能数・紛失対象などの定義は事案により異なり、被害者の総数には換算しません。資料後の企業の続報を網羅した値ではありません。",
+      "causeNote": "不正アクセス",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "2012年度 施行状況概要・主な事案表（PDF 42ページ）",
+          "url": "https://www.ppc.go.jp/files/pdf/personal_sekou_24caa.pdf#page=42",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ppc-2014-06-17-4aa6bc04",
+      "companyId": "ミクシィ",
+      "company": "株式会社ミクシィ",
+      "shortName": "ミクシィ",
+      "aliases": [],
+      "sector": "other",
+      "cause": "intrusion",
+      "year": 2014,
+      "announcedAt": "2014-06-17",
+      "sourceUpdatedAt": "2014-06-17",
+      "status": "possible",
+      "scale": {
+        "value": 260000,
+        "unit": "records",
+        "qualifier": "approximate",
+        "bound": "maximum",
+        "label": "約26万件（年度表の掲載規模）"
+      },
+      "summary": "システムへの侵入や不正ログインなどによって、情報が対象になった事案です。",
+      "informationTypes": [
+        "氏名",
+        "生年月日",
+        "性別"
+      ],
+      "scopeNote": "2014年度の政府公表資料に掲載されたミクシィの事案。年度資料では漏えい・紛失・滅失等をまとめて扱っています。対象者や情報区分が他事例と重なる可能性があるため、全体で加算しません。",
+      "countNote": "政府の年度資料にある「漏えい人数（最大）」欄の掲載規模です。「件」と「人・名」の原表記を区別しています。流出確認数・閲覧可能数・紛失対象などの定義は事案により異なり、被害者の総数には換算しません。資料後の企業の続報を網羅した値ではありません。",
+      "causeNote": "不正アクセス",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "2014年度 施行状況概要・主な事案表（PDF 42ページ）",
+          "url": "https://www.ppc.go.jp/files/pdf/personal_sekou_26caa.pdf#page=42",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ppc-2014-09-08-b56803db",
+      "companyId": "リクルートホールディングス",
+      "company": "株式会社リクルートホールディングス",
+      "shortName": "リクルートホールディングス",
+      "aliases": [],
+      "sector": "other",
+      "cause": "intrusion",
+      "year": 2014,
+      "announcedAt": "2014-09-08",
+      "sourceUpdatedAt": "2014-09-08",
+      "status": "possible",
+      "scale": {
+        "value": 72000,
+        "unit": "records",
+        "qualifier": "approximate",
+        "bound": "maximum",
+        "label": "約7万2,000件（年度表の掲載規模）"
+      },
+      "summary": "システムへの侵入や不正ログインなどによって、情報が対象になった事案です。",
+      "informationTypes": [
+        "氏名",
+        "住所",
+        "電話番号等",
+        "メールアドレス等",
+        "取引・利用情報等"
+      ],
+      "scopeNote": "2014年度の政府公表資料に掲載されたリクルートホールディングスの事案。年度資料では漏えい・紛失・滅失等をまとめて扱っています。対象者や情報区分が他事例と重なる可能性があるため、全体で加算しません。",
+      "countNote": "政府の年度資料にある「漏えい人数（最大）」欄の掲載規模です。「件」と「人・名」の原表記を区別しています。流出確認数・閲覧可能数・紛失対象などの定義は事案により異なり、被害者の総数には換算しません。資料後の企業の続報を網羅した値ではありません。",
+      "causeNote": "不正アクセス(不正ログイン)",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "2014年度 施行状況概要・主な事案表（PDF 42ページ）",
+          "url": "https://www.ppc.go.jp/files/pdf/personal_sekou_26caa.pdf#page=42",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ppc-2014-12-10-f84e213a",
+      "companyId": "ドワンゴ",
+      "company": "株式会社ドワンゴ",
+      "shortName": "ドワンゴ",
+      "aliases": [
+        "DWANGO",
+        "niconico",
+        "ニコニコ"
+      ],
+      "sector": "other",
+      "cause": "intrusion",
+      "year": 2014,
+      "announcedAt": "2014-12-10",
+      "sourceUpdatedAt": "2014-12-10",
+      "status": "possible",
+      "scale": {
+        "value": 300000,
+        "unit": "records",
+        "qualifier": "approximate",
+        "bound": "maximum",
+        "label": "約30万件（年度表の掲載規模）"
+      },
+      "summary": "システムへの侵入や不正ログインなどによって、情報が対象になった事案です。",
+      "informationTypes": [
+        "生年月日",
+        "性別"
+      ],
+      "scopeNote": "2014年度の政府公表資料に掲載されたドワンゴの事案。年度資料では漏えい・紛失・滅失等をまとめて扱っています。対象者や情報区分が他事例と重なる可能性があるため、全体で加算しません。",
+      "countNote": "政府の年度資料にある「漏えい人数（最大）」欄の掲載規模です。「件」と「人・名」の原表記を区別しています。流出確認数・閲覧可能数・紛失対象などの定義は事案により異なり、被害者の総数には換算しません。資料後の企業の続報を網羅した値ではありません。",
+      "causeNote": "不正アクセス(不正ログイン)",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "2014年度 施行状況概要・主な事案表（PDF 42ページ）",
+          "url": "https://www.ppc.go.jp/files/pdf/personal_sekou_26caa.pdf#page=42",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ppc-2014-09-25-bfa80e4f",
+      "companyId": "gmoメイクショップ",
+      "company": "GMOメイクショップ株式会社",
+      "shortName": "GMOメイクショップ",
+      "aliases": [],
+      "sector": "other",
+      "cause": "intrusion",
+      "year": 2014,
+      "announcedAt": "2014-09-25",
+      "sourceUpdatedAt": "2014-09-25",
+      "status": "possible",
+      "scale": {
+        "value": 100000,
+        "unit": "records",
+        "qualifier": "approximate",
+        "bound": "maximum",
+        "label": "約10万件（年度表の掲載規模）"
+      },
+      "summary": "システムへの侵入や不正ログインなどによって、情報が対象になった事案です。",
+      "informationTypes": [
+        "氏名",
+        "住所",
+        "生年月日",
+        "性別",
+        "電話番号等",
+        "メールアドレス等",
+        "取引・利用情報等"
+      ],
+      "scopeNote": "2014年度の政府公表資料に掲載されたGMOメイクショップの事案。年度資料では漏えい・紛失・滅失等をまとめて扱っています。対象者や情報区分が他事例と重なる可能性があるため、全体で加算しません。",
+      "countNote": "政府の年度資料にある「漏えい人数（最大）」欄の掲載規模です。「件」と「人・名」の原表記を区別しています。流出確認数・閲覧可能数・紛失対象などの定義は事案により異なり、被害者の総数には換算しません。資料後の企業の続報を網羅した値ではありません。",
+      "causeNote": "不正アクセス",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "2014年度 施行状況概要・主な事案表（PDF 42ページ）",
+          "url": "https://www.ppc.go.jp/files/pdf/personal_sekou_26caa.pdf#page=42",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ppc-2014-04-26-e209759e",
+      "companyId": "もち吉",
+      "company": "株式会社もち吉",
+      "shortName": "もち吉",
+      "aliases": [],
+      "sector": "other",
+      "cause": "intrusion",
+      "year": 2014,
+      "announcedAt": "2014-04-26",
+      "sourceUpdatedAt": "2014-04-26",
+      "status": "possible",
+      "scale": {
+        "value": 132000,
+        "unit": "records",
+        "qualifier": "approximate",
+        "bound": "maximum",
+        "label": "約13万2,000件（年度表の掲載規模）"
+      },
+      "summary": "システムへの侵入や不正ログインなどによって、情報が対象になった事案です。",
+      "informationTypes": [
+        "氏名",
+        "住所",
+        "生年月日",
+        "性別",
+        "電話番号等",
+        "メールアドレス等",
+        "パスワード等"
+      ],
+      "scopeNote": "2014年度の政府公表資料に掲載されたもち吉の事案。年度資料では漏えい・紛失・滅失等をまとめて扱っています。対象者や情報区分が他事例と重なる可能性があるため、全体で加算しません。",
+      "countNote": "政府の年度資料にある「漏えい人数（最大）」欄の掲載規模です。「件」と「人・名」の原表記を区別しています。流出確認数・閲覧可能数・紛失対象などの定義は事案により異なり、被害者の総数には換算しません。資料後の企業の続報を網羅した値ではありません。",
+      "causeNote": "不正アクセス",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "2014年度 施行状況概要・主な事案表（PDF 42ページ）",
+          "url": "https://www.ppc.go.jp/files/pdf/personal_sekou_26caa.pdf#page=42",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ppc-2014-04-23-dd439e1b",
+      "companyId": "パナソニック",
+      "company": "パナソニック株式会社",
+      "shortName": "パナソニック",
+      "aliases": [],
+      "sector": "other",
+      "cause": "intrusion",
+      "year": 2014,
+      "announcedAt": "2014-04-23",
+      "sourceUpdatedAt": "2014-04-23",
+      "status": "possible",
+      "scale": {
+        "value": 78000,
+        "unit": "records",
+        "qualifier": "approximate",
+        "bound": "maximum",
+        "label": "約7万8,000件（年度表の掲載規模）"
+      },
+      "summary": "システムへの侵入や不正ログインなどによって、情報が対象になった事案です。",
+      "informationTypes": [
+        "氏名",
+        "住所",
+        "生年月日",
+        "性別",
+        "電話番号等",
+        "メールアドレス等",
+        "ID・会員番号等",
+        "ニックネーム"
+      ],
+      "scopeNote": "2014年度の政府公表資料に掲載されたパナソニックの事案。年度資料では漏えい・紛失・滅失等をまとめて扱っています。対象者や情報区分が他事例と重なる可能性があるため、全体で加算しません。",
+      "countNote": "政府の年度資料にある「漏えい人数（最大）」欄の掲載規模です。「件」と「人・名」の原表記を区別しています。流出確認数・閲覧可能数・紛失対象などの定義は事案により異なり、被害者の総数には換算しません。資料後の企業の続報を網羅した値ではありません。",
+      "causeNote": "不正アクセス(不正ログイン)",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "2014年度 施行状況概要・主な事案表（PDF 42ページ）",
+          "url": "https://www.ppc.go.jp/files/pdf/personal_sekou_26caa.pdf#page=42",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ppc-2014-06-04-fd5166c4",
+      "companyId": "ターゲットメディア",
+      "company": "ターゲットメディア株式会社",
+      "shortName": "ターゲットメディア",
+      "aliases": [],
+      "sector": "other",
+      "cause": "intrusion",
+      "year": 2014,
+      "announcedAt": "2014-06-04",
+      "sourceUpdatedAt": "2014-06-04",
+      "status": "possible",
+      "scale": {
+        "value": 75000,
+        "unit": "records",
+        "qualifier": "approximate",
+        "bound": "maximum",
+        "label": "約7万5,000件（年度表の掲載規模）"
+      },
+      "summary": "システムへの侵入や不正ログインなどによって、情報が対象になった事案です。",
+      "informationTypes": [
+        "氏名",
+        "メールアドレス等"
+      ],
+      "scopeNote": "2014年度の政府公表資料に掲載されたターゲットメディアの事案。年度資料では漏えい・紛失・滅失等をまとめて扱っています。対象者や情報区分が他事例と重なる可能性があるため、全体で加算しません。",
+      "countNote": "政府の年度資料にある「漏えい人数（最大）」欄の掲載規模です。「件」と「人・名」の原表記を区別しています。流出確認数・閲覧可能数・紛失対象などの定義は事案により異なり、被害者の総数には換算しません。資料後の企業の続報を網羅した値ではありません。",
+      "causeNote": "不正アクセス",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "2014年度 施行状況概要・主な事案表（PDF 42ページ）",
+          "url": "https://www.ppc.go.jp/files/pdf/personal_sekou_26caa.pdf#page=42",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ppc-2014-07-01-4067a3a3",
+      "companyId": "ホットマン",
+      "company": "株式会社ホットマン",
+      "shortName": "ホットマン",
+      "aliases": [],
+      "sector": "other",
+      "cause": "intrusion",
+      "year": 2014,
+      "announcedAt": "2014-07-01",
+      "sourceUpdatedAt": "2014-07-01",
+      "status": "possible",
+      "scale": {
+        "value": 62000,
+        "unit": "records",
+        "qualifier": "approximate",
+        "bound": "maximum",
+        "label": "約6万2,000件（年度表の掲載規模）"
+      },
+      "summary": "システムへの侵入や不正ログインなどによって、情報が対象になった事案です。",
+      "informationTypes": [
+        "氏名",
+        "住所",
+        "生年月日",
+        "電話番号等",
+        "メールアドレス等",
+        "クレジットカード情報等"
+      ],
+      "scopeNote": "2014年度の政府公表資料に掲載されたホットマンの事案。年度資料では漏えい・紛失・滅失等をまとめて扱っています。対象者や情報区分が他事例と重なる可能性があるため、全体で加算しません。",
+      "countNote": "政府の年度資料にある「漏えい人数（最大）」欄の掲載規模です。「件」と「人・名」の原表記を区別しています。流出確認数・閲覧可能数・紛失対象などの定義は事案により異なり、被害者の総数には換算しません。資料後の企業の続報を網羅した値ではありません。",
+      "causeNote": "不正アクセス",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "2014年度 施行状況概要・主な事案表（PDF 43ページ）",
+          "url": "https://www.ppc.go.jp/files/pdf/personal_sekou_26caa.pdf#page=43",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ppc-2015-01-23-636ad4bc",
+      "companyId": "横河医療ソリューションズ",
+      "company": "横河医療ソリューションズ株式会社",
+      "shortName": "横河医療ソリューションズ",
+      "aliases": [],
+      "sector": "other",
+      "cause": "loss",
+      "year": 2015,
+      "announcedAt": "2015-01-23",
+      "sourceUpdatedAt": "2015-01-23",
+      "status": "possible",
+      "scale": {
+        "value": 50000,
+        "unit": "records",
+        "qualifier": "approximate",
+        "bound": "maximum",
+        "label": "約5万件（年度表の掲載規模）"
+      },
+      "summary": "情報を含む書類・機器・記録媒体の紛失、盗難や廃棄などが報告された事案です。",
+      "informationTypes": [
+        "氏名",
+        "生年月日",
+        "性別",
+        "医療関連情報等"
+      ],
+      "scopeNote": "2014年度の政府公表資料に掲載された横河医療ソリューションズの事案。年度資料では漏えい・紛失・滅失等をまとめて扱っています。対象者や情報区分が他事例と重なる可能性があるため、全体で加算しません。",
+      "countNote": "政府の年度資料にある「漏えい人数（最大）」欄の掲載規模です。「件」と「人・名」の原表記を区別しています。流出確認数・閲覧可能数・紛失対象などの定義は事案により異なり、被害者の総数には換算しません。資料後の企業の続報を網羅した値ではありません。",
+      "causeNote": "データ紛失",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "2014年度 施行状況概要・主な事案表（PDF 43ページ）",
+          "url": "https://www.ppc.go.jp/files/pdf/personal_sekou_26caa.pdf#page=43",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ppc-2015-03-12-cfc38253",
+      "companyId": "エヌシーマック",
+      "company": "株式会社エヌシーマック",
+      "shortName": "エヌシーマック",
+      "aliases": [],
+      "sector": "other",
+      "cause": "unknown",
+      "year": 2015,
+      "announcedAt": "2015-03-12",
+      "sourceUpdatedAt": "2015-03-12",
+      "status": "possible",
+      "scale": {
+        "value": 84000,
+        "unit": "records",
+        "qualifier": "approximate",
+        "bound": "maximum",
+        "label": "約8万4,000件（年度表の掲載規模）"
+      },
+      "summary": "公表資料では原因の特定ができない事案です。",
+      "informationTypes": [
+        "氏名",
+        "住所",
+        "生年月日",
+        "性別",
+        "電話番号等",
+        "メールアドレス等",
+        "ID・会員番号等"
+      ],
+      "scopeNote": "2014年度の政府公表資料に掲載されたエヌシーマックの事案。年度資料では漏えい・紛失・滅失等をまとめて扱っています。対象者や情報区分が他事例と重なる可能性があるため、全体で加算しません。",
+      "countNote": "政府の年度資料にある「漏えい人数（最大）」欄の掲載規模です。「件」と「人・名」の原表記を区別しています。流出確認数・閲覧可能数・紛失対象などの定義は事案により異なり、被害者の総数には換算しません。資料後の企業の続報を網羅した値ではありません。",
+      "causeNote": "原因不明",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "2014年度 施行状況概要・主な事案表（PDF 43ページ）",
+          "url": "https://www.ppc.go.jp/files/pdf/personal_sekou_26caa.pdf#page=43",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ppc-2015-06-25-9ca06fda",
+      "companyId": "岐阜商工信用組合",
+      "company": "岐阜商工信用組合",
+      "shortName": "岐阜商工信用組合",
+      "aliases": [],
+      "sector": "finance",
+      "cause": "loss",
+      "year": 2015,
+      "announcedAt": "2015-06-25",
+      "sourceUpdatedAt": "2015-06-25",
+      "status": "possible",
+      "scale": {
+        "value": 430000,
+        "unit": "records",
+        "qualifier": "approximate",
+        "bound": "maximum",
+        "label": "約43万件（年度表の掲載規模）"
+      },
+      "summary": "情報を含む書類・機器・記録媒体の紛失、盗難や廃棄などが報告された事案です。",
+      "informationTypes": [
+        "氏名",
+        "口座・金融情報等",
+        "取引・利用情報等"
+      ],
+      "scopeNote": "2015年度の政府公表資料に掲載された岐阜商工信用組合の事案。年度資料では漏えい・紛失・滅失等をまとめて扱っています。対象者や情報区分が他事例と重なる可能性があるため、全体で加算しません。",
+      "countNote": "政府の年度資料にある「漏えい人数（最大）」欄の掲載規模です。「件」と「人・名」の原表記を区別しています。流出確認数・閲覧可能数・紛失対象などの定義は事案により異なり、被害者の総数には換算しません。資料後の企業の続報を網羅した値ではありません。",
+      "causeNote": "紛失(誤廃棄の可能性)",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "2015年度 施行状況概要・主な事案表（PDF 46ページ）",
+          "url": "https://www.ppc.go.jp/files/pdf/personal_sekougaiyou_27ppc.pdf#page=46",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ppc-2015-05-13-2b1b2e6c",
+      "companyId": "三井住友海上あいおい生命保険",
+      "company": "三井住友海上あいおい生命保険株式会社",
+      "shortName": "三井住友海上あいおい生命保険",
+      "aliases": [],
+      "sector": "finance",
+      "cause": "loss",
+      "year": 2015,
+      "announcedAt": "2015-05-13",
+      "sourceUpdatedAt": "2015-05-13",
+      "status": "possible",
+      "scale": {
+        "value": 750000,
+        "unit": "records",
+        "qualifier": "approximate",
+        "bound": "maximum",
+        "label": "約75万件（年度表の掲載規模）"
+      },
+      "summary": "情報を含む書類・機器・記録媒体の紛失、盗難や廃棄などが報告された事案です。",
+      "informationTypes": [
+        "氏名",
+        "保険関連情報等"
+      ],
+      "scopeNote": "2015年度の政府公表資料に掲載された三井住友海上あいおい生命保険の事案。年度資料では漏えい・紛失・滅失等をまとめて扱っています。対象者や情報区分が他事例と重なる可能性があるため、全体で加算しません。",
+      "countNote": "政府の年度資料にある「漏えい人数（最大）」欄の掲載規模です。「件」と「人・名」の原表記を区別しています。流出確認数・閲覧可能数・紛失対象などの定義は事案により異なり、被害者の総数には換算しません。資料後の企業の続報を網羅した値ではありません。",
+      "causeNote": "データ(CD-ROM)紛失",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "2015年度 施行状況概要・主な事案表（PDF 46ページ）",
+          "url": "https://www.ppc.go.jp/files/pdf/personal_sekougaiyou_27ppc.pdf#page=46",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ppc-2016-02-02-0dd531fc",
+      "companyId": "ワイジェイfx",
+      "company": "ワイジェイFX株式会社",
+      "shortName": "ワイジェイFX",
+      "aliases": [
+        "YJFX"
+      ],
+      "sector": "finance",
+      "cause": "insider",
+      "year": 2016,
+      "announcedAt": "2016-02-02",
+      "sourceUpdatedAt": "2016-02-02",
+      "status": "possible",
+      "scale": {
+        "value": 180000,
+        "unit": "records",
+        "qualifier": "approximate",
+        "bound": "maximum",
+        "label": "約18万件（年度表の掲載規模）"
+      },
+      "summary": "従業者や関係者による情報の持ち出し・第三者への提供などが報告された事案です。",
+      "informationTypes": [
+        "氏名",
+        "住所",
+        "生年月日",
+        "口座・金融情報等",
+        "取引・利用情報等",
+        "ID・会員番号等"
+      ],
+      "scopeNote": "2015年度の政府公表資料に掲載されたワイジェイFXの事案。年度資料では漏えい・紛失・滅失等をまとめて扱っています。対象者や情報区分が他事例と重なる可能性があるため、全体で加算しません。",
+      "countNote": "政府の年度資料にある「漏えい人数（最大）」欄の掲載規模です。「件」と「人・名」の原表記を区別しています。流出確認数・閲覧可能数・紛失対象などの定義は事案により異なり、被害者の総数には換算しません。資料後の企業の続報を網羅した値ではありません。",
+      "causeNote": "元従業員が無断で顧客情報および営業秘密を社外に持ち出し、インターネット上で保存",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "2015年度 施行状況概要・主な事案表（PDF 46ページ）",
+          "url": "https://www.ppc.go.jp/files/pdf/personal_sekougaiyou_27ppc.pdf#page=46",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ppc-2015-09-06-ba2710e6",
+      "companyId": "ヤフー",
+      "company": "ヤフー株式会社",
+      "shortName": "ヤフー",
+      "aliases": [
+        "Yahoo! JAPAN",
+        "Yahooメール"
+      ],
+      "sector": "other",
+      "cause": "loss",
+      "year": 2015,
+      "announcedAt": "2015-09-06",
+      "sourceUpdatedAt": "2015-09-06",
+      "status": "possible",
+      "scale": {
+        "value": 970000,
+        "unit": "records",
+        "qualifier": "approximate",
+        "bound": "maximum",
+        "label": "約97万件（年度表の掲載規模）"
+      },
+      "summary": "情報を含む書類・機器・記録媒体の紛失、盗難や廃棄などが報告された事案です。",
+      "informationTypes": [
+        "メールアドレス等"
+      ],
+      "scopeNote": "2015年度の政府公表資料に掲載されたヤフーの事案。年度資料では漏えい・紛失・滅失等をまとめて扱っています。対象者や情報区分が他事例と重なる可能性があるため、全体で加算しません。",
+      "countNote": "政府の年度資料にある「漏えい人数（最大）」欄の掲載規模です。「件」と「人・名」の原表記を区別しています。流出確認数・閲覧可能数・紛失対象などの定義は事案により異なり、被害者の総数には換算しません。資料後の企業の続報を網羅した値ではありません。対象は電子メールで、システム処理による消失等の区分です。外部への情報流出が確認された人数として扱いません。",
+      "causeNote": "システムバグ",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "2015年度 施行状況概要・主な事案表（PDF 46ページ）",
+          "url": "https://www.ppc.go.jp/files/pdf/personal_sekougaiyou_27ppc.pdf#page=46",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ppc-2015-12-11-238f64b2",
+      "companyId": "関西大学",
+      "company": "学校法人関西大学関西大学",
+      "shortName": "関西大学",
+      "aliases": [],
+      "sector": "other",
+      "cause": "loss",
+      "year": 2015,
+      "announcedAt": "2015-12-11",
+      "sourceUpdatedAt": "2015-12-11",
+      "status": "possible",
+      "scale": {
+        "value": 62000,
+        "unit": "records",
+        "qualifier": "exact",
+        "bound": "maximum",
+        "label": "6万2,000件（年度表の掲載規模）"
+      },
+      "summary": "情報を含む書類・機器・記録媒体の紛失、盗難や廃棄などが報告された事案です。",
+      "informationTypes": [
+        "氏名",
+        "住所",
+        "生年月日",
+        "性別",
+        "電話番号等",
+        "ID・会員番号等",
+        "家族・保証人関連情報等"
+      ],
+      "scopeNote": "2015年度の政府公表資料に掲載された関西大学の事案。年度資料では漏えい・紛失・滅失等をまとめて扱っています。対象者や情報区分が他事例と重なる可能性があるため、全体で加算しません。",
+      "countNote": "政府の年度資料にある「漏えい人数（最大）」欄の掲載規模です。「件」と「人・名」の原表記を区別しています。流出確認数・閲覧可能数・紛失対象などの定義は事案により異なり、被害者の総数には換算しません。資料後の企業の続報を網羅した値ではありません。",
+      "causeNote": "USBメモリの紛失",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "2015年度 施行状況概要・主な事案表（PDF 46ページ）",
+          "url": "https://www.ppc.go.jp/files/pdf/personal_sekougaiyou_27ppc.pdf#page=46",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ppc-2015-07-30-9dbfede9",
+      "companyId": "シャトレーゼ",
+      "company": "株式会社シャトレーゼ",
+      "shortName": "シャトレーゼ",
+      "aliases": [],
+      "sector": "other",
+      "cause": "intrusion",
+      "year": 2015,
+      "announcedAt": "2015-07-30",
+      "sourceUpdatedAt": "2015-07-30",
+      "status": "possible",
+      "scale": {
+        "value": 210000,
+        "unit": "records",
+        "qualifier": "approximate",
+        "bound": "maximum",
+        "label": "約21万件（年度表の掲載規模）"
+      },
+      "summary": "システムへの侵入や不正ログインなどによって、情報が対象になった事案です。",
+      "informationTypes": [
+        "生年月日",
+        "電話番号等",
+        "メールアドレス等",
+        "パスワード等",
+        "ID・会員番号等"
+      ],
+      "scopeNote": "2015年度の政府公表資料に掲載されたシャトレーゼの事案。年度資料では漏えい・紛失・滅失等をまとめて扱っています。対象者や情報区分が他事例と重なる可能性があるため、全体で加算しません。",
+      "countNote": "政府の年度資料にある「漏えい人数（最大）」欄の掲載規模です。「件」と「人・名」の原表記を区別しています。流出確認数・閲覧可能数・紛失対象などの定義は事案により異なり、被害者の総数には換算しません。資料後の企業の続報を網羅した値ではありません。",
+      "causeNote": "不正アクセス",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "2015年度 施行状況概要・主な事案表（PDF 46ページ）",
+          "url": "https://www.ppc.go.jp/files/pdf/personal_sekougaiyou_27ppc.pdf#page=46",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ppc-2016-03-07-c930ccfc",
+      "companyId": "江崎グリコ",
+      "company": "江崎グリコ株式会社",
+      "shortName": "江崎グリコ",
+      "aliases": [],
+      "sector": "other",
+      "cause": "intrusion",
+      "year": 2016,
+      "announcedAt": "2016-03-07",
+      "sourceUpdatedAt": "2016-03-07",
+      "status": "possible",
+      "scale": {
+        "value": 83000,
+        "unit": "records",
+        "qualifier": "approximate",
+        "bound": "maximum",
+        "label": "約8万3,000件（年度表の掲載規模）"
+      },
+      "summary": "システムへの侵入や不正ログインなどによって、情報が対象になった事案です。",
+      "informationTypes": [
+        "氏名",
+        "クレジットカード情報等"
+      ],
+      "scopeNote": "2015年度の政府公表資料に掲載された江崎グリコの事案。年度資料では漏えい・紛失・滅失等をまとめて扱っています。対象者や情報区分が他事例と重なる可能性があるため、全体で加算しません。",
+      "countNote": "政府の年度資料にある「漏えい人数（最大）」欄の掲載規模です。「件」と「人・名」の原表記を区別しています。流出確認数・閲覧可能数・紛失対象などの定義は事案により異なり、被害者の総数には換算しません。資料後の企業の続報を網羅した値ではありません。",
+      "causeNote": "不正アクセス",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "2015年度 施行状況概要・主な事案表（PDF 46ページ）",
+          "url": "https://www.ppc.go.jp/files/pdf/personal_sekougaiyou_27ppc.pdf#page=46",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ppc-2015-12-24-773dcf57",
+      "companyId": "サンリオデジタル",
+      "company": "株式会社サンリオデジタル",
+      "shortName": "サンリオデジタル",
+      "aliases": [
+        "SanrioTown"
+      ],
+      "sector": "other",
+      "cause": "exposure",
+      "year": 2015,
+      "announcedAt": "2015-12-24",
+      "sourceUpdatedAt": "2015-12-24",
+      "status": "possible",
+      "scale": {
+        "value": 3300000,
+        "unit": "records",
+        "qualifier": "approximate",
+        "bound": "maximum",
+        "label": "約330万件（年度表の掲載規模）"
+      },
+      "summary": "情報を外部から閲覧できる状態などが報告された事案です。",
+      "informationTypes": [
+        "氏名",
+        "生年月日",
+        "性別",
+        "メールアドレス等"
+      ],
+      "scopeNote": "2015年度の政府公表資料に掲載されたサンリオデジタルの事案。年度資料では漏えい・紛失・滅失等をまとめて扱っています。対象者や情報区分が他事例と重なる可能性があるため、全体で加算しません。",
+      "countNote": "政府の年度資料にある「漏えい人数（最大）」欄の掲載規模です。「件」と「人・名」の原表記を区別しています。流出確認数・閲覧可能数・紛失対象などの定義は事案により異なり、被害者の総数には換算しません。資料後の企業の続報を網羅した値ではありません。",
+      "causeNote": "設定ミス",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "2015年度 施行状況概要・主な事案表（PDF 46ページ）",
+          "url": "https://www.ppc.go.jp/files/pdf/personal_sekougaiyou_27ppc.pdf#page=46",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ppc-2015-06-10-f84e213a",
+      "companyId": "ドワンゴ",
+      "company": "株式会社ドワンゴ",
+      "shortName": "ドワンゴ",
+      "aliases": [
+        "DWANGO",
+        "niconico",
+        "ニコニコ"
+      ],
+      "sector": "other",
+      "cause": "intrusion",
+      "year": 2015,
+      "announcedAt": "2015-06-10",
+      "sourceUpdatedAt": "2015-06-10",
+      "status": "possible",
+      "scale": {
+        "value": 290000,
+        "unit": "records",
+        "qualifier": "approximate",
+        "bound": "maximum",
+        "label": "約29万件（年度表の掲載規模）"
+      },
+      "summary": "システムへの侵入や不正ログインなどによって、情報が対象になった事案です。",
+      "informationTypes": [
+        "生年月日",
+        "性別"
+      ],
+      "scopeNote": "2015年度の政府公表資料に掲載されたドワンゴの事案。年度資料では漏えい・紛失・滅失等をまとめて扱っています。対象者や情報区分が他事例と重なる可能性があるため、全体で加算しません。",
+      "countNote": "政府の年度資料にある「漏えい人数（最大）」欄の掲載規模です。「件」と「人・名」の原表記を区別しています。流出確認数・閲覧可能数・紛失対象などの定義は事案により異なり、被害者の総数には換算しません。資料後の企業の続報を網羅した値ではありません。",
+      "causeNote": "リスト型攻撃による不正アタック",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "2015年度 施行状況概要・主な事案表（PDF 46ページ）",
+          "url": "https://www.ppc.go.jp/files/pdf/personal_sekougaiyou_27ppc.pdf#page=46",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ppc-2015-07-21-8936e27c",
+      "companyId": "タミヤ",
+      "company": "株式会社タミヤ",
+      "shortName": "タミヤ",
+      "aliases": [],
+      "sector": "other",
+      "cause": "intrusion",
+      "year": 2015,
+      "announcedAt": "2015-07-21",
+      "sourceUpdatedAt": "2015-07-21",
+      "status": "possible",
+      "scale": {
+        "value": 110000,
+        "unit": "records",
+        "qualifier": "approximate",
+        "bound": "maximum",
+        "label": "約11万件（年度表の掲載規模）"
+      },
+      "summary": "システムへの侵入や不正ログインなどによって、情報が対象になった事案です。",
+      "informationTypes": [
+        "氏名",
+        "住所",
+        "生年月日",
+        "性別",
+        "電話番号等",
+        "メールアドレス等",
+        "取引・利用情報等"
+      ],
+      "scopeNote": "2015年度の政府公表資料に掲載されたタミヤの事案。年度資料では漏えい・紛失・滅失等をまとめて扱っています。対象者や情報区分が他事例と重なる可能性があるため、全体で加算しません。",
+      "countNote": "政府の年度資料にある「漏えい人数（最大）」欄の掲載規模です。「件」と「人・名」の原表記を区別しています。流出確認数・閲覧可能数・紛失対象などの定義は事案により異なり、被害者の総数には換算しません。資料後の企業の続報を網羅した値ではありません。",
+      "causeNote": "不正アクセス(SQLインジェクション)",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "2015年度 施行状況概要・主な事案表（PDF 46ページ）",
+          "url": "https://www.ppc.go.jp/files/pdf/personal_sekougaiyou_27ppc.pdf#page=46",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ppc-2015-09-15-fb553347",
+      "companyId": "セキ",
+      "company": "セキ株式会社",
+      "shortName": "セキ",
+      "aliases": [],
+      "sector": "other",
+      "cause": "intrusion",
+      "year": 2015,
+      "announcedAt": "2015-09-15",
+      "sourceUpdatedAt": "2015-09-15",
+      "status": "possible",
+      "scale": {
+        "value": 260000,
+        "unit": "records",
+        "qualifier": "approximate",
+        "bound": "maximum",
+        "label": "約26万件（年度表の掲載規模）"
+      },
+      "summary": "システムへの侵入や不正ログインなどによって、情報が対象になった事案です。",
+      "informationTypes": [
+        "氏名",
+        "住所",
+        "生年月日",
+        "性別",
+        "電話番号等",
+        "メールアドレス等",
+        "クレジットカード情報等",
+        "家族・保証人関連情報等"
+      ],
+      "scopeNote": "2015年度の政府公表資料に掲載されたセキの事案。年度資料では漏えい・紛失・滅失等をまとめて扱っています。対象者や情報区分が他事例と重なる可能性があるため、全体で加算しません。",
+      "countNote": "政府の年度資料にある「漏えい人数（最大）」欄の掲載規模です。「件」と「人・名」の原表記を区別しています。流出確認数・閲覧可能数・紛失対象などの定義は事案により異なり、被害者の総数には換算しません。資料後の企業の続報を網羅した値ではありません。",
+      "causeNote": "不正アクセス(SQLインジェクション)",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "2015年度 施行状況概要・主な事案表（PDF 47ページ）",
+          "url": "https://www.ppc.go.jp/files/pdf/personal_sekougaiyou_27ppc.pdf#page=47",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ppc-2015-09-15-7fe7db02",
+      "companyId": "ベルネージュダイレクト",
+      "company": "株式会社ベルネージュダイレクト",
+      "shortName": "ベルネージュダイレクト",
+      "aliases": [],
+      "sector": "other",
+      "cause": "intrusion",
+      "year": 2015,
+      "announcedAt": "2015-09-15",
+      "sourceUpdatedAt": "2015-09-15",
+      "status": "possible",
+      "scale": {
+        "value": 130000,
+        "unit": "records",
+        "qualifier": "approximate",
+        "bound": "maximum",
+        "label": "約13万件（年度表の掲載規模）"
+      },
+      "summary": "システムへの侵入や不正ログインなどによって、情報が対象になった事案です。",
+      "informationTypes": [
+        "氏名",
+        "住所",
+        "生年月日",
+        "性別",
+        "電話番号等",
+        "メールアドレス等",
+        "クレジットカード情報等",
+        "取引・利用情報等",
+        "家族・保証人関連情報等"
+      ],
+      "scopeNote": "2015年度の政府公表資料に掲載されたベルネージュダイレクトの事案。年度資料では漏えい・紛失・滅失等をまとめて扱っています。対象者や情報区分が他事例と重なる可能性があるため、全体で加算しません。",
+      "countNote": "政府の年度資料にある「漏えい人数（最大）」欄の掲載規模です。「件」と「人・名」の原表記を区別しています。流出確認数・閲覧可能数・紛失対象などの定義は事案により異なり、被害者の総数には換算しません。資料後の企業の続報を網羅した値ではありません。",
+      "causeNote": "不正アクセス(SQLインジェクション)",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "2015年度 施行状況概要・主な事案表（PDF 47ページ）",
+          "url": "https://www.ppc.go.jp/files/pdf/personal_sekougaiyou_27ppc.pdf#page=47",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ppc-2016-01-28-05bb78db",
+      "companyId": "東京電力",
+      "company": "東京電力株式会社",
+      "shortName": "東京電力",
+      "aliases": [],
+      "sector": "other",
+      "cause": "loss",
+      "year": 2016,
+      "announcedAt": "2016-01-28",
+      "sourceUpdatedAt": "2016-01-28",
+      "status": "possible",
+      "scale": {
+        "value": 810000,
+        "unit": "records",
+        "qualifier": "approximate",
+        "bound": "maximum",
+        "label": "約81万件（年度表の掲載規模）"
+      },
+      "summary": "情報を含む書類・機器・記録媒体の紛失、盗難や廃棄などが報告された事案です。",
+      "informationTypes": [
+        "氏名",
+        "住所",
+        "電話番号等",
+        "取引・利用情報等"
+      ],
+      "scopeNote": "2015年度の政府公表資料に掲載された東京電力の事案。年度資料では漏えい・紛失・滅失等をまとめて扱っています。対象者や情報区分が他事例と重なる可能性があるため、全体で加算しません。",
+      "countNote": "政府の年度資料にある「漏えい人数（最大）」欄の掲載規模です。「件」と「人・名」の原表記を区別しています。流出確認数・閲覧可能数・紛失対象などの定義は事案により異なり、被害者の総数には換算しません。資料後の企業の続報を網羅した値ではありません。",
+      "causeNote": "バックアップ用USBの紛失",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "2015年度 施行状況概要・主な事案表（PDF 47ページ）",
+          "url": "https://www.ppc.go.jp/files/pdf/personal_sekougaiyou_27ppc.pdf#page=47",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ppc-2016-05-11-054c8052",
+      "companyId": "サイバーエージェント",
+      "company": "株式会社サイバーエージェント",
+      "shortName": "サイバーエージェント",
+      "aliases": [
+        "CyberAgent",
+        "Ameba",
+        "アメーバ"
+      ],
+      "sector": "other",
+      "cause": "intrusion",
+      "year": 2016,
+      "announcedAt": "2016-05-11",
+      "sourceUpdatedAt": "2016-05-11",
+      "status": "possible",
+      "scale": {
+        "value": 50000,
+        "unit": "records",
+        "qualifier": "approximate",
+        "bound": "maximum",
+        "label": "約5万件（年度表の掲載規模）"
+      },
+      "summary": "システムへの侵入や不正ログインなどによって、情報が対象になった事案です。",
+      "informationTypes": [
+        "生年月日",
+        "性別",
+        "メールアドレス等",
+        "ニックネーム"
+      ],
+      "scopeNote": "2016年度の政府公表資料に掲載されたサイバーエージェントの事案。年度資料では漏えい・紛失・滅失等をまとめて扱っています。対象者や情報区分が他事例と重なる可能性があるため、全体で加算しません。",
+      "countNote": "政府の年度資料にある「漏えい人数（最大）」欄の掲載規模です。「件」と「人・名」の原表記を区別しています。流出確認数・閲覧可能数・紛失対象などの定義は事案により異なり、被害者の総数には換算しません。資料後の企業の続報を網羅した値ではありません。",
+      "causeNote": "不正アクセス",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "2016年度 施行状況概要・主な事案表（PDF 50ページ）",
+          "url": "https://www.ppc.go.jp/files/pdf/personal_sekougaiyou_28ppc.pdf#page=50",
+          "publishedAt": null
+        },
+        {
+          "title": "2016年度 施行状況概要・主な事案表（PDF 53ページ）",
+          "url": "https://www.ppc.go.jp/files/pdf/personal_sekougaiyou_28ppc.pdf#page=53",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ppc-2016-06-21-bfa80e4f",
+      "companyId": "gmoメイクショップ",
+      "company": "GMOメイクショップ株式会社",
+      "shortName": "GMOメイクショップ",
+      "aliases": [],
+      "sector": "other",
+      "cause": "intrusion",
+      "year": 2016,
+      "announcedAt": "2016-06-21",
+      "sourceUpdatedAt": "2016-06-21",
+      "status": "possible",
+      "scale": {
+        "value": 620000,
+        "unit": "records",
+        "qualifier": "approximate",
+        "bound": "maximum",
+        "label": "約62万件（年度表の掲載規模）"
+      },
+      "summary": "システムへの侵入や不正ログインなどによって、情報が対象になった事案です。",
+      "informationTypes": [
+        "氏名",
+        "住所",
+        "生年月日",
+        "性別",
+        "電話番号等",
+        "メールアドレス等",
+        "パスワード等",
+        "ID・会員番号等"
+      ],
+      "scopeNote": "2016年度の政府公表資料に掲載されたGMOメイクショップの事案。年度資料では漏えい・紛失・滅失等をまとめて扱っています。対象者や情報区分が他事例と重なる可能性があるため、全体で加算しません。",
+      "countNote": "政府の年度資料にある「漏えい人数（最大）」欄の掲載規模です。「件」と「人・名」の原表記を区別しています。流出確認数・閲覧可能数・紛失対象などの定義は事案により異なり、被害者の総数には換算しません。資料後の企業の続報を網羅した値ではありません。",
+      "causeNote": "不正アクセス",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "2016年度 施行状況概要・主な事案表（PDF 50ページ）",
+          "url": "https://www.ppc.go.jp/files/pdf/personal_sekougaiyou_28ppc.pdf#page=50",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ppc-2016-06-14-bb647797",
+      "companyId": "nttドコモ",
+      "company": "株式会社NTTドコモ",
+      "shortName": "NTTドコモ",
+      "aliases": [],
+      "sector": "other",
+      "cause": "intrusion",
+      "year": 2016,
+      "announcedAt": "2016-06-14",
+      "sourceUpdatedAt": "2016-06-14",
+      "status": "possible",
+      "scale": {
+        "value": 330000,
+        "unit": "records",
+        "qualifier": "approximate",
+        "bound": "maximum",
+        "label": "約33万件（年度表の掲載規模）"
+      },
+      "summary": "システムへの侵入や不正ログインなどによって、情報が対象になった事案です。",
+      "informationTypes": [
+        "氏名",
+        "住所",
+        "生年月日",
+        "性別",
+        "電話番号等",
+        "メールアドレス等",
+        "パスポート情報等"
+      ],
+      "scopeNote": "2016年度の政府公表資料に掲載されたNTTドコモの事案。年度資料では漏えい・紛失・滅失等をまとめて扱っています。対象者や情報区分が他事例と重なる可能性があるため、全体で加算しません。",
+      "countNote": "政府の年度資料にある「漏えい人数（最大）」欄の掲載規模です。「件」と「人・名」の原表記を区別しています。流出確認数・閲覧可能数・紛失対象などの定義は事案により異なり、被害者の総数には換算しません。資料後の企業の続報を網羅した値ではありません。",
+      "causeNote": "不正アクセス",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "2016年度 施行状況概要・主な事案表（PDF 50ページ）",
+          "url": "https://www.ppc.go.jp/files/pdf/personal_sekougaiyou_28ppc.pdf#page=50",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ppc-2016-06-22-dfe838ed",
+      "companyId": "パイプドビッツ",
+      "company": "株式会社パイプドビッツ",
+      "shortName": "パイプドビッツ",
+      "aliases": [],
+      "sector": "other",
+      "cause": "intrusion",
+      "year": 2016,
+      "announcedAt": "2016-06-22",
+      "sourceUpdatedAt": "2016-06-22",
+      "status": "possible",
+      "scale": {
+        "value": 980000,
+        "unit": "records",
+        "qualifier": "approximate",
+        "bound": "maximum",
+        "label": "約98万件（年度表の掲載規模）"
+      },
+      "summary": "システムへの侵入や不正ログインなどによって、情報が対象になった事案です。",
+      "informationTypes": [
+        "氏名",
+        "住所",
+        "電話番号等",
+        "メールアドレス等",
+        "取引・利用情報等"
+      ],
+      "scopeNote": "2016年度の政府公表資料に掲載されたパイプドビッツの事案。年度資料では漏えい・紛失・滅失等をまとめて扱っています。対象者や情報区分が他事例と重なる可能性があるため、全体で加算しません。",
+      "countNote": "政府の年度資料にある「漏えい人数（最大）」欄の掲載規模です。「件」と「人・名」の原表記を区別しています。流出確認数・閲覧可能数・紛失対象などの定義は事案により異なり、被害者の総数には換算しません。資料後の企業の続報を網羅した値ではありません。",
+      "causeNote": "不正アクセス",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "2016年度 施行状況概要・主な事案表（PDF 50ページ）",
+          "url": "https://www.ppc.go.jp/files/pdf/personal_sekougaiyou_28ppc.pdf#page=50",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ppc-2016-08-26-f2f4070a",
+      "companyId": "軒先",
+      "company": "軒先株式会社",
+      "shortName": "軒先",
+      "aliases": [],
+      "sector": "other",
+      "cause": "intrusion",
+      "year": 2016,
+      "announcedAt": "2016-08-26",
+      "sourceUpdatedAt": "2016-08-26",
+      "status": "possible",
+      "scale": {
+        "value": 110000,
+        "unit": "records",
+        "qualifier": "approximate",
+        "bound": "maximum",
+        "label": "約11万件（年度表の掲載規模）"
+      },
+      "summary": "システムへの侵入や不正ログインなどによって、情報が対象になった事案です。",
+      "informationTypes": [
+        "氏名",
+        "住所",
+        "電話番号等",
+        "メールアドレス等",
+        "パスワード等",
+        "クレジットカード情報等"
+      ],
+      "scopeNote": "2016年度の政府公表資料に掲載された軒先の事案。年度資料では漏えい・紛失・滅失等をまとめて扱っています。対象者や情報区分が他事例と重なる可能性があるため、全体で加算しません。",
+      "countNote": "政府の年度資料にある「漏えい人数（最大）」欄の掲載規模です。「件」と「人・名」の原表記を区別しています。流出確認数・閲覧可能数・紛失対象などの定義は事案により異なり、被害者の総数には換算しません。資料後の企業の続報を網羅した値ではありません。",
+      "causeNote": "不正アクセス",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "2016年度 施行状況概要・主な事案表（PDF 50ページ）",
+          "url": "https://www.ppc.go.jp/files/pdf/personal_sekougaiyou_28ppc.pdf#page=50",
+          "publishedAt": null
+        },
+        {
+          "title": "2016年度 施行状況概要・主な事案表（PDF 53ページ）",
+          "url": "https://www.ppc.go.jp/files/pdf/personal_sekougaiyou_28ppc.pdf#page=53",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ppc-2016-11-29-054c8052",
+      "companyId": "サイバーエージェント",
+      "company": "株式会社サイバーエージェント",
+      "shortName": "サイバーエージェント",
+      "aliases": [
+        "CyberAgent",
+        "Ameba",
+        "アメーバ"
+      ],
+      "sector": "other",
+      "cause": "intrusion",
+      "year": 2016,
+      "announcedAt": "2016-11-29",
+      "sourceUpdatedAt": "2016-11-29",
+      "status": "possible",
+      "scale": {
+        "value": 580000,
+        "unit": "records",
+        "qualifier": "approximate",
+        "bound": "maximum",
+        "label": "約58万件（年度表の掲載規模）"
+      },
+      "summary": "システムへの侵入や不正ログインなどによって、情報が対象になった事案です。",
+      "informationTypes": [
+        "生年月日",
+        "性別",
+        "メールアドレス等",
+        "ニックネーム"
+      ],
+      "scopeNote": "2016年度の政府公表資料に掲載されたサイバーエージェントの事案。年度資料では漏えい・紛失・滅失等をまとめて扱っています。対象者や情報区分が他事例と重なる可能性があるため、全体で加算しません。",
+      "countNote": "政府の年度資料にある「漏えい人数（最大）」欄の掲載規模です。「件」と「人・名」の原表記を区別しています。流出確認数・閲覧可能数・紛失対象などの定義は事案により異なり、被害者の総数には換算しません。資料後の企業の続報を網羅した値ではありません。",
+      "causeNote": "不正アクセス",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "2016年度 施行状況概要・主な事案表（PDF 50ページ）",
+          "url": "https://www.ppc.go.jp/files/pdf/personal_sekougaiyou_28ppc.pdf#page=50",
+          "publishedAt": null
+        },
+        {
+          "title": "2016年度 施行状況概要・主な事案表（PDF 53ページ）",
+          "url": "https://www.ppc.go.jp/files/pdf/personal_sekougaiyou_28ppc.pdf#page=53",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ppc-2016-04-21-73657fcd",
+      "companyId": "日本テレビ放送網",
+      "company": "日本テレビ放送網株式会社",
+      "shortName": "日本テレビ放送網",
+      "aliases": [],
+      "sector": "other",
+      "cause": "intrusion",
+      "year": 2016,
+      "announcedAt": "2016-04-21",
+      "sourceUpdatedAt": "2016-04-21",
+      "status": "possible",
+      "scale": {
+        "value": 430000,
+        "unit": "records",
+        "qualifier": "approximate",
+        "bound": "maximum",
+        "label": "約43万件（年度表の掲載規模）"
+      },
+      "summary": "システムへの侵入や不正ログインなどによって、情報が対象になった事案です。",
+      "informationTypes": [
+        "氏名",
+        "住所",
+        "電話番号等",
+        "メールアドレス等"
+      ],
+      "scopeNote": "2016年度の政府公表資料に掲載された日本テレビ放送網の事案。年度資料では漏えい・紛失・滅失等をまとめて扱っています。対象者や情報区分が他事例と重なる可能性があるため、全体で加算しません。",
+      "countNote": "政府の年度資料にある「漏えい人数（最大）」欄の掲載規模です。「件」と「人・名」の原表記を区別しています。流出確認数・閲覧可能数・紛失対象などの定義は事案により異なり、被害者の総数には換算しません。資料後の企業の続報を網羅した値ではありません。",
+      "causeNote": "・不正アクセス(OSコマンドインジェクション)",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "2016年度 施行状況概要・主な事案表（PDF 50ページ）",
+          "url": "https://www.ppc.go.jp/files/pdf/personal_sekougaiyou_28ppc.pdf#page=50",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ppc-2016-04-22-5ecc35f6",
+      "companyId": "jwave",
+      "company": "株式会社J-WAVE",
+      "shortName": "J-WAVE",
+      "aliases": [],
+      "sector": "other",
+      "cause": "intrusion",
+      "year": 2016,
+      "announcedAt": "2016-04-22",
+      "sourceUpdatedAt": "2016-04-22",
+      "status": "possible",
+      "scale": {
+        "value": 640000,
+        "unit": "records",
+        "qualifier": "approximate",
+        "bound": "maximum",
+        "label": "約64万件（年度表の掲載規模）"
+      },
+      "summary": "システムへの侵入や不正ログインなどによって、情報が対象になった事案です。",
+      "informationTypes": [
+        "氏名",
+        "住所",
+        "性別",
+        "電話番号等",
+        "メールアドレス等"
+      ],
+      "scopeNote": "2016年度の政府公表資料に掲載されたJ-WAVEの事案。年度資料では漏えい・紛失・滅失等をまとめて扱っています。対象者や情報区分が他事例と重なる可能性があるため、全体で加算しません。",
+      "countNote": "政府の年度資料にある「漏えい人数（最大）」欄の掲載規模です。「件」と「人・名」の原表記を区別しています。流出確認数・閲覧可能数・紛失対象などの定義は事案により異なり、被害者の総数には換算しません。資料後の企業の続報を網羅した値ではありません。",
+      "causeNote": "・不正アクセス(OSコマンドインジェクション)",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "2016年度 施行状況概要・主な事案表（PDF 51ページ）",
+          "url": "https://www.ppc.go.jp/files/pdf/personal_sekougaiyou_28ppc.pdf#page=51",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ppc-2016-07-25-cfb9851f",
+      "companyId": "エフエム愛知",
+      "company": "株式会社エフエム愛知",
+      "shortName": "エフエム愛知",
+      "aliases": [],
+      "sector": "other",
+      "cause": "intrusion",
+      "year": 2016,
+      "announcedAt": "2016-07-25",
+      "sourceUpdatedAt": "2016-07-25",
+      "status": "possible",
+      "scale": {
+        "value": 120000,
+        "unit": "records",
+        "qualifier": "approximate",
+        "bound": "maximum",
+        "label": "約12万件（年度表の掲載規模）"
+      },
+      "summary": "システムへの侵入や不正ログインなどによって、情報が対象になった事案です。",
+      "informationTypes": [
+        "氏名",
+        "住所",
+        "生年月日",
+        "電話番号等",
+        "メールアドレス等",
+        "パスワード等"
+      ],
+      "scopeNote": "2016年度の政府公表資料に掲載されたエフエム愛知の事案。年度資料では漏えい・紛失・滅失等をまとめて扱っています。対象者や情報区分が他事例と重なる可能性があるため、全体で加算しません。",
+      "countNote": "政府の年度資料にある「漏えい人数（最大）」欄の掲載規模です。「件」と「人・名」の原表記を区別しています。流出確認数・閲覧可能数・紛失対象などの定義は事案により異なり、被害者の総数には換算しません。資料後の企業の続報を網羅した値ではありません。",
+      "causeNote": "・不正アクセス(SQLインジェクション)",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "2016年度 施行状況概要・主な事案表（PDF 51ページ）",
+          "url": "https://www.ppc.go.jp/files/pdf/personal_sekougaiyou_28ppc.pdf#page=51",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ppc-2016-06-14-0c36f850",
+      "companyId": "ジェイティービー",
+      "company": "株式会社ジェイティービー",
+      "shortName": "ジェイティービー",
+      "aliases": [
+        "JTB",
+        "i.JTB"
+      ],
+      "sector": "other",
+      "cause": "intrusion",
+      "year": 2016,
+      "announcedAt": "2016-06-14",
+      "sourceUpdatedAt": "2016-06-14",
+      "status": "possible",
+      "scale": {
+        "value": 6780000,
+        "unit": "records",
+        "qualifier": "approximate",
+        "bound": "maximum",
+        "label": "約678万件（年度表の掲載規模）"
+      },
+      "summary": "システムへの侵入や不正ログインなどによって、情報が対象になった事案です。",
+      "informationTypes": [
+        "氏名",
+        "住所",
+        "生年月日",
+        "性別",
+        "電話番号等",
+        "メールアドレス等",
+        "パスポート情報等"
+      ],
+      "scopeNote": "2016年度の政府公表資料に掲載されたジェイティービーの事案。年度資料では漏えい・紛失・滅失等をまとめて扱っています。対象者や情報区分が他事例と重なる可能性があるため、全体で加算しません。",
+      "countNote": "政府の年度資料にある「漏えい人数（最大）」欄の掲載規模です。「件」と「人・名」の原表記を区別しています。流出確認数・閲覧可能数・紛失対象などの定義は事案により異なり、被害者の総数には換算しません。資料後の企業の続報を網羅した値ではありません。",
+      "causeNote": "外部からの不正アクセス",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "2016年度 施行状況概要・主な事案表（PDF 51ページ）",
+          "url": "https://www.ppc.go.jp/files/pdf/personal_sekougaiyou_28ppc.pdf#page=51",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ppc-2017-02-17-cb070346",
+      "companyId": "全国健康保険協会",
+      "company": "全国健康保険協会",
+      "shortName": "全国健康保険協会",
+      "aliases": [],
+      "sector": "finance",
+      "cause": "loss",
+      "year": 2017,
+      "announcedAt": "2017-02-17",
+      "sourceUpdatedAt": "2017-02-17",
+      "status": "possible",
+      "scale": {
+        "value": 190000,
+        "unit": "people",
+        "qualifier": "approximate",
+        "bound": "maximum",
+        "label": "約19万人分（年度表の掲載規模）"
+      },
+      "summary": "情報を含む書類・機器・記録媒体の紛失、盗難や廃棄などが報告された事案です。",
+      "informationTypes": [
+        "氏名",
+        "保険関連情報等",
+        "医療関連情報等"
+      ],
+      "scopeNote": "2016年度の政府公表資料に掲載された全国健康保険協会の事案。年度資料では漏えい・紛失・滅失等をまとめて扱っています。対象者や情報区分が他事例と重なる可能性があるため、全体で加算しません。",
+      "countNote": "政府の年度資料にある「漏えい人数（最大）」欄の掲載規模です。「件」と「人・名」の原表記を区別しています。流出確認数・閲覧可能数・紛失対象などの定義は事案により異なり、被害者の総数には換算しません。資料後の企業の続報を網羅した値ではありません。",
+      "causeNote": "紛失(誤廃棄の可能性)",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "2016年度 施行状況概要・主な事案表（PDF 51ページ）",
+          "url": "https://www.ppc.go.jp/files/pdf/personal_sekougaiyou_28ppc.pdf#page=51",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ppc-2016-12-02-ddaab842",
+      "companyId": "イプサ",
+      "company": "株式会社イプサ",
+      "shortName": "イプサ",
+      "aliases": [
+        "IPSA"
+      ],
+      "sector": "other",
+      "cause": "intrusion",
+      "year": 2016,
+      "announcedAt": "2016-12-02",
+      "sourceUpdatedAt": "2016-12-02",
+      "status": "possible",
+      "scale": {
+        "value": 420000,
+        "unit": "records",
+        "qualifier": "approximate",
+        "bound": "maximum",
+        "label": "約42万件（年度表の掲載規模）"
+      },
+      "summary": "システムへの侵入や不正ログインなどによって、情報が対象になった事案です。",
+      "informationTypes": [
+        "氏名",
+        "住所",
+        "生年月日",
+        "性別",
+        "電話番号等",
+        "メールアドレス等",
+        "パスワード等",
+        "クレジットカード情報等",
+        "取引・利用情報等"
+      ],
+      "scopeNote": "2016年度の政府公表資料に掲載されたイプサの事案。年度資料では漏えい・紛失・滅失等をまとめて扱っています。対象者や情報区分が他事例と重なる可能性があるため、全体で加算しません。",
+      "countNote": "政府の年度資料にある「漏えい人数（最大）」欄の掲載規模です。「件」と「人・名」の原表記を区別しています。流出確認数・閲覧可能数・紛失対象などの定義は事案により異なり、被害者の総数には換算しません。資料後の企業の続報を網羅した値ではありません。",
+      "causeNote": "不正アクセス",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "2016年度 施行状況概要・主な事案表（PDF 51ページ）",
+          "url": "https://www.ppc.go.jp/files/pdf/personal_sekougaiyou_28ppc.pdf#page=51",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ppc-2017-04-25-7bad4310",
+      "companyId": "bleague",
+      "company": "公益社団法人ジャパン・プロフェッショナル・バスケットボールリーグ",
+      "shortName": "B.LEAGUE",
+      "aliases": [],
+      "sector": "other",
+      "cause": "intrusion",
+      "year": 2017,
+      "announcedAt": "2017-04-25",
+      "sourceUpdatedAt": "2017-04-25",
+      "status": "possible",
+      "scale": {
+        "value": 150000,
+        "unit": "records",
+        "qualifier": "approximate",
+        "bound": "maximum",
+        "label": "約15万件（年度表の掲載規模）"
+      },
+      "summary": "システムへの侵入や不正ログインなどによって、情報が対象になった事案です。",
+      "informationTypes": [
+        "氏名",
+        "住所",
+        "生年月日",
+        "電話番号等",
+        "メールアドレス等",
+        "パスワード等",
+        "クレジットカード情報等",
+        "ID・会員番号等"
+      ],
+      "scopeNote": "2016年度の政府公表資料に掲載されたB.LEAGUEの事案。年度資料では漏えい・紛失・滅失等をまとめて扱っています。対象者や情報区分が他事例と重なる可能性があるため、全体で加算しません。",
+      "countNote": "政府の年度資料にある「漏えい人数（最大）」欄の掲載規模です。「件」と「人・名」の原表記を区別しています。流出確認数・閲覧可能数・紛失対象などの定義は事案により異なり、被害者の総数には換算しません。資料後の企業の続報を網羅した値ではありません。",
+      "causeNote": "不正アクセス",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "2016年度 施行状況概要・主な事案表（PDF 51ページ）",
+          "url": "https://www.ppc.go.jp/files/pdf/personal_sekougaiyou_28ppc.pdf#page=51",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ppc-2017-03-23-81dba261",
+      "companyId": "ジンズ",
+      "company": "株式会社ジンズ",
+      "shortName": "ジンズ",
+      "aliases": [
+        "JINS"
+      ],
+      "sector": "other",
+      "cause": "intrusion",
+      "year": 2017,
+      "announcedAt": "2017-03-23",
+      "sourceUpdatedAt": "2017-03-23",
+      "status": "possible",
+      "scale": {
+        "value": 1180000,
+        "unit": "records",
+        "qualifier": "approximate",
+        "bound": "maximum",
+        "label": "約118万件（年度表の掲載規模）"
+      },
+      "summary": "システムへの侵入や不正ログインなどによって、情報が対象になった事案です。",
+      "informationTypes": [
+        "氏名",
+        "住所",
+        "生年月日",
+        "性別",
+        "電話番号等",
+        "メールアドレス等"
+      ],
+      "scopeNote": "2016年度の政府公表資料に掲載されたジンズの事案。年度資料では漏えい・紛失・滅失等をまとめて扱っています。対象者や情報区分が他事例と重なる可能性があるため、全体で加算しません。",
+      "countNote": "政府の年度資料にある「漏えい人数（最大）」欄の掲載規模です。「件」と「人・名」の原表記を区別しています。流出確認数・閲覧可能数・紛失対象などの定義は事案により異なり、被害者の総数には換算しません。資料後の企業の続報を網羅した値ではありません。",
+      "causeNote": "不正アクセス",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "2016年度 施行状況概要・主な事案表（PDF 51ページ）",
+          "url": "https://www.ppc.go.jp/files/pdf/personal_sekougaiyou_28ppc.pdf#page=51",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ppc-2017-03-10-c57031f7",
+      "companyId": "gmoペイメントゲートウェイ",
+      "company": "GMOペイメントゲートウェイ株式会社",
+      "shortName": "GMOペイメントゲートウェイ",
+      "aliases": [],
+      "sector": "other",
+      "cause": "intrusion",
+      "year": 2017,
+      "announcedAt": "2017-03-10",
+      "sourceUpdatedAt": "2017-03-10",
+      "status": "possible",
+      "scale": {
+        "value": 400000,
+        "unit": "records",
+        "qualifier": "approximate",
+        "bound": "maximum",
+        "label": "約40万件（年度表の掲載規模）"
+      },
+      "summary": "システムへの侵入や不正ログインなどによって、情報が対象になった事案です。",
+      "informationTypes": [
+        "氏名",
+        "住所",
+        "生年月日",
+        "電話番号等",
+        "メールアドレス等",
+        "クレジットカード情報等"
+      ],
+      "scopeNote": "2016年度の政府公表資料に掲載されたGMOペイメントゲートウェイの事案。年度資料では漏えい・紛失・滅失等をまとめて扱っています。対象者や情報区分が他事例と重なる可能性があるため、全体で加算しません。",
+      "countNote": "政府の年度資料にある「漏えい人数（最大）」欄の掲載規模です。「件」と「人・名」の原表記を区別しています。流出確認数・閲覧可能数・紛失対象などの定義は事案により異なり、被害者の総数には換算しません。資料後の企業の続報を網羅した値ではありません。",
+      "causeNote": "不正アクセス",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "2016年度 施行状況概要・主な事案表（PDF 52ページ）",
+          "url": "https://www.ppc.go.jp/files/pdf/personal_sekougaiyou_28ppc.pdf#page=52",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ppc-2017-03-10-2d3bcb3e",
+      "companyId": "トヨタファイナンス",
+      "company": "トヨタファイナンス株式会社",
+      "shortName": "トヨタファイナンス",
+      "aliases": [],
+      "sector": "other",
+      "cause": "intrusion",
+      "year": 2017,
+      "announcedAt": "2017-03-10",
+      "sourceUpdatedAt": "2017-03-10",
+      "status": "possible",
+      "scale": {
+        "value": 360000,
+        "unit": "records",
+        "qualifier": "exact",
+        "bound": "maximum",
+        "label": "36万件（年度表の掲載規模）"
+      },
+      "summary": "システムへの侵入や不正ログインなどによって、情報が対象になった事案です。",
+      "informationTypes": [
+        "メールアドレス等",
+        "クレジットカード情報等"
+      ],
+      "scopeNote": "2016年度の政府公表資料に掲載されたトヨタファイナンスの事案。年度資料では漏えい・紛失・滅失等をまとめて扱っています。対象者や情報区分が他事例と重なる可能性があるため、全体で加算しません。",
+      "countNote": "政府の年度資料にある「漏えい人数（最大）」欄の掲載規模です。「件」と「人・名」の原表記を区別しています。流出確認数・閲覧可能数・紛失対象などの定義は事案により異なり、被害者の総数には換算しません。資料後の企業の続報を網羅した値ではありません。",
+      "causeNote": "不正アクセス(ApacheStruts2ぜい弱性)",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "2016年度 施行状況概要・主な事案表（PDF 52ページ）",
+          "url": "https://www.ppc.go.jp/files/pdf/personal_sekougaiyou_28ppc.pdf#page=52",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ppc-2016-04-11-2ac29a1e",
+      "companyId": "ザキッス",
+      "company": "株式会社ザ・キッス",
+      "shortName": "ザ・キッス",
+      "aliases": [],
+      "sector": "other",
+      "cause": "intrusion",
+      "year": 2016,
+      "announcedAt": "2016-04-11",
+      "sourceUpdatedAt": "2016-04-11",
+      "status": "possible",
+      "scale": {
+        "value": 200000,
+        "unit": "records",
+        "qualifier": "approximate",
+        "bound": "maximum",
+        "label": "約20万件（年度表の掲載規模）"
+      },
+      "summary": "システムへの侵入や不正ログインなどによって、情報が対象になった事案です。",
+      "informationTypes": [
+        "氏名",
+        "住所",
+        "生年月日",
+        "電話番号等",
+        "メールアドレス等",
+        "パスワード等",
+        "クレジットカード情報等",
+        "ID・会員番号等"
+      ],
+      "scopeNote": "2016年度の政府公表資料に掲載されたザ・キッスの事案。年度資料では漏えい・紛失・滅失等をまとめて扱っています。対象者や情報区分が他事例と重なる可能性があるため、全体で加算しません。",
+      "countNote": "政府の年度資料にある「漏えい人数（最大）」欄の掲載規模です。「件」と「人・名」の原表記を区別しています。流出確認数・閲覧可能数・紛失対象などの定義は事案により異なり、被害者の総数には換算しません。資料後の企業の続報を網羅した値ではありません。",
+      "causeNote": "不正アクセス",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "2016年度 施行状況概要・主な事案表（PDF 52ページ）",
+          "url": "https://www.ppc.go.jp/files/pdf/personal_sekougaiyou_28ppc.pdf#page=52",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ppc-2016-04-28-0f441ef1",
+      "companyId": "エイベックスミュージッククリエイティヴ",
+      "company": "エイベックス・ミュージック・クリエイティヴ株式会社",
+      "shortName": "エイベックス・ミュージック・クリエイティヴ",
+      "aliases": [],
+      "sector": "other",
+      "cause": "intrusion",
+      "year": 2016,
+      "announcedAt": "2016-04-28",
+      "sourceUpdatedAt": "2016-04-28",
+      "status": "possible",
+      "scale": {
+        "value": 640000,
+        "unit": "records",
+        "qualifier": "approximate",
+        "bound": "maximum",
+        "label": "約64万件（年度表の掲載規模）"
+      },
+      "summary": "システムへの侵入や不正ログインなどによって、情報が対象になった事案です。",
+      "informationTypes": [
+        "個人情報（企業による詳細項目は未公表）"
+      ],
+      "scopeNote": "2016年度の政府公表資料に掲載されたエイベックス・ミュージック・クリエイティヴの事案。年度資料では漏えい・紛失・滅失等をまとめて扱っています。対象者や情報区分が他事例と重なる可能性があるため、全体で加算しません。",
+      "countNote": "政府の年度資料にある「漏えい人数（最大）」欄の掲載規模です。「件」と「人・名」の原表記を区別しています。流出確認数・閲覧可能数・紛失対象などの定義は事案により異なり、被害者の総数には換算しません。資料後の企業の続報を網羅した値ではありません。",
+      "causeNote": "不正アクセス",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "2016年度 施行状況概要・主な事案表（PDF 52ページ）",
+          "url": "https://www.ppc.go.jp/files/pdf/personal_sekougaiyou_28ppc.pdf#page=52",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ppc-2016-04-27-66db874f",
+      "companyId": "netsea",
+      "company": "株式会社NETSEA",
+      "shortName": "NETSEA",
+      "aliases": [
+        "ネッシー"
+      ],
+      "sector": "other",
+      "cause": "intrusion",
+      "year": 2016,
+      "announcedAt": "2016-04-27",
+      "sourceUpdatedAt": "2016-04-27",
+      "status": "possible",
+      "scale": {
+        "value": 130000,
+        "unit": "records",
+        "qualifier": "approximate",
+        "bound": "maximum",
+        "label": "約13万件（年度表の掲載規模）"
+      },
+      "summary": "システムへの侵入や不正ログインなどによって、情報が対象になった事案です。",
+      "informationTypes": [
+        "氏名",
+        "住所",
+        "電話番号等",
+        "メールアドレス等",
+        "パスワード等",
+        "クレジットカード情報等",
+        "ID・会員番号等"
+      ],
+      "scopeNote": "2016年度の政府公表資料に掲載されたNETSEAの事案。年度資料では漏えい・紛失・滅失等をまとめて扱っています。対象者や情報区分が他事例と重なる可能性があるため、全体で加算しません。",
+      "countNote": "政府の年度資料にある「漏えい人数（最大）」欄の掲載規模です。「件」と「人・名」の原表記を区別しています。流出確認数・閲覧可能数・紛失対象などの定義は事案により異なり、被害者の総数には換算しません。資料後の企業の続報を網羅した値ではありません。",
+      "causeNote": "不正アクセス",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "2016年度 施行状況概要・主な事案表（PDF 53ページ）",
+          "url": "https://www.ppc.go.jp/files/pdf/personal_sekougaiyou_28ppc.pdf#page=53",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ppc-2016-08-23-704962d5",
+      "companyId": "東京電力パワーグリッド",
+      "company": "東京電力パワーグリッド株式会社",
+      "shortName": "東京電力パワーグリッド",
+      "aliases": [],
+      "sector": "other",
+      "cause": "loss",
+      "year": 2016,
+      "announcedAt": "2016-08-23",
+      "sourceUpdatedAt": "2016-08-23",
+      "status": "possible",
+      "scale": {
+        "value": 210000,
+        "unit": "records",
+        "qualifier": "approximate",
+        "bound": "maximum",
+        "label": "約21万件（年度表の掲載規模）"
+      },
+      "summary": "情報を含む書類・機器・記録媒体の紛失、盗難や廃棄などが報告された事案です。",
+      "informationTypes": [
+        "個人情報（企業による詳細項目は未公表）"
+      ],
+      "scopeNote": "2016年度の政府公表資料に掲載された東京電力パワーグリッドの事案。年度資料では漏えい・紛失・滅失等をまとめて扱っています。対象者や情報区分が他事例と重なる可能性があるため、全体で加算しません。",
+      "countNote": "政府の年度資料にある「漏えい人数（最大）」欄の掲載規模です。「件」と「人・名」の原表記を区別しています。流出確認数・閲覧可能数・紛失対象などの定義は事案により異なり、被害者の総数には換算しません。資料後の企業の続報を網羅した値ではありません。",
+      "causeNote": "外付けハードディスクの紛失",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "2016年度 施行状況概要・主な事案表（PDF 53ページ）",
+          "url": "https://www.ppc.go.jp/files/pdf/personal_sekougaiyou_28ppc.pdf#page=53",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ppc-2017-01-01-66331561",
+      "companyId": "ネルケプランニング",
+      "company": "株式会社ネルケプランニング",
+      "shortName": "ネルケプランニング",
+      "aliases": [],
+      "sector": "other",
+      "cause": "intrusion",
+      "year": 2017,
+      "announcedAt": "2017-01-01",
+      "sourceUpdatedAt": "2017-01-01",
+      "status": "possible",
+      "scale": {
+        "value": 59000,
+        "unit": "records",
+        "qualifier": "approximate",
+        "bound": "maximum",
+        "label": "約5万9千件（年度表の掲載規模）"
+      },
+      "summary": "システムへの侵入や不正ログインなどによって、情報が対象になった事案です。",
+      "informationTypes": [
+        "氏名",
+        "住所",
+        "生年月日",
+        "性別",
+        "電話番号等",
+        "メールアドレス等"
+      ],
+      "scopeNote": "2016年度の政府公表資料に掲載されたネルケプランニングの事案。年度資料では漏えい・紛失・滅失等をまとめて扱っています。対象者や情報区分が他事例と重なる可能性があるため、全体で加算しません。",
+      "countNote": "政府の年度資料にある「漏えい人数（最大）」欄の掲載規模です。「件」と「人・名」の原表記を区別しています。流出確認数・閲覧可能数・紛失対象などの定義は事案により異なり、被害者の総数には換算しません。資料後の企業の続報を網羅した値ではありません。",
+      "causeNote": "不正アクセス",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "2016年度 施行状況概要・主な事案表（PDF 53ページ）",
+          "url": "https://www.ppc.go.jp/files/pdf/personal_sekougaiyou_28ppc.pdf#page=53",
+          "publishedAt": null
+        }
+      ]
+    },
+    {
+      "id": "ppc-2017-02-27-8d1a37ec",
+      "companyId": "ハミューレ",
+      "company": "ハミューレ株式会社",
+      "shortName": "ハミューレ",
+      "aliases": [],
+      "sector": "other",
+      "cause": "loss",
+      "year": 2017,
+      "announcedAt": "2017-02-27",
+      "sourceUpdatedAt": "2017-02-27",
+      "status": "possible",
+      "scale": {
+        "value": 1200000,
+        "unit": "records",
+        "qualifier": "approximate",
+        "bound": "maximum",
+        "label": "約120万件（年度表の掲載規模）"
+      },
+      "summary": "情報を含む書類・機器・記録媒体の紛失、盗難や廃棄などが報告された事案です。",
+      "informationTypes": [
+        "氏名",
+        "住所",
+        "生年月日",
+        "性別",
+        "電話番号等",
+        "メールアドレス等",
+        "クレジットカード情報等"
+      ],
+      "scopeNote": "2016年度の政府公表資料に掲載されたハミューレの事案。年度資料では漏えい・紛失・滅失等をまとめて扱っています。対象者や情報区分が他事例と重なる可能性があるため、全体で加算しません。",
+      "countNote": "政府の年度資料にある「漏えい人数（最大）」欄の掲載規模です。「件」と「人・名」の原表記を区別しています。流出確認数・閲覧可能数・紛失対象などの定義は事案により異なり、被害者の総数には換算しません。資料後の企業の続報を網羅した値ではありません。",
+      "causeNote": "バックアップストレージの盗難",
+      "sourceKind": "government-report",
+      "sources": [
+        {
+          "title": "2016年度 施行状況概要・主な事案表（PDF 54ページ）",
+          "url": "https://www.ppc.go.jp/files/pdf/personal_sekougaiyou_28ppc.pdf#page=54",
+          "publishedAt": null
+        }
+      ]
+    }
+  ],
+  "supplements": [
+    {
+      "incidentId": "sony-psn-2011",
+      "source": {
+        "title": "2011年度 施行状況概要・主な事案表（PDF 40ページ）",
+        "url": "https://www.ppc.go.jp/files/pdf/personal_sekou_23caa.pdf#page=40",
+        "publishedAt": null
+      }
+    },
+    {
+      "incidentId": "benesse-customer-2014",
+      "source": {
+        "title": "2014年度 施行状況概要・主な事案表（PDF 43ページ）",
+        "url": "https://www.ppc.go.jp/files/pdf/personal_sekou_26caa.pdf#page=43",
+        "publishedAt": null
+      }
+    }
+  ]
+}

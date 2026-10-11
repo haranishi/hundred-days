@@ -1,0 +1,137 @@
+{
+  "date": "2026-10-11",
+  "method": "Changed-flow real Chromium operations and primary-agent visual self-review; not independent evaluation or a user study.",
+  "elapsedSeconds": 67.2,
+  "stages": [
+    {
+      "name": "初期画面から目的・検索・入口を読む",
+      "elapsedSeconds": 10.6,
+      "snapshot": {
+        "view": "globe",
+        "engine": "rust-wasm-worker",
+        "query": "",
+        "count": "15,871記録 · 12,972組織",
+        "cause": "all",
+        "company": "リゾートトラスト",
+        "focus": "BODY",
+        "width": 1440,
+        "overflow": false
+      },
+      "screenshot": "purpose-experience-01.png"
+    },
+    {
+      "name": "キーボードで学習へ進み公的資料を確認",
+      "elapsedSeconds": 18.7,
+      "snapshot": {
+        "view": "learn",
+        "engine": "rust-wasm-worker",
+        "query": "",
+        "count": "15,871記録 · 12,972組織",
+        "cause": "all",
+        "company": "リゾートトラスト",
+        "focus": "view-learn",
+        "width": 1440,
+        "overflow": false
+      },
+      "screenshot": "purpose-experience-02.png"
+    },
+    {
+      "name": "国内の侵入記録から要旨・原資料・補足を読む",
+      "elapsedSeconds": 26.8,
+      "snapshot": {
+        "view": "timeline",
+        "engine": "rust-wasm-worker",
+        "query": "",
+        "count": "1,622記録 · 1,466組織",
+        "cause": "intrusion",
+        "company": "リゾートトラスト",
+        "focus": "SUMMARY",
+        "width": 1440,
+        "overflow": false
+      },
+      "screenshot": "purpose-experience-03.png"
+    },
+    {
+      "name": "同じ学習テーマへ戻り内部持ち出しの事例を探す",
+      "elapsedSeconds": 34.9,
+      "snapshot": {
+        "view": "timeline",
+        "engine": "rust-wasm-worker",
+        "query": "ベネッセ",
+        "count": "2記録 · 2組織",
+        "cause": "insider",
+        "company": "ベネッセ",
+        "focus": "BUTTON",
+        "width": 1440,
+        "overflow": false
+      },
+      "screenshot": "purpose-experience-04.png"
+    },
+    {
+      "name": "ゼロ件を理解し条件を解除して戻る",
+      "elapsedSeconds": 43,
+      "snapshot": {
+        "view": "timeline",
+        "engine": "rust-wasm-worker",
+        "query": "",
+        "count": "15,871記録 · 12,972組織",
+        "cause": "all",
+        "company": "リゾートトラスト",
+        "focus": "BODY",
+        "width": 1440,
+        "overflow": false
+      },
+      "screenshot": "purpose-experience-05.png"
+    },
+    {
+      "name": "米国の地図から日本企業検索へ移動",
+      "elapsedSeconds": 51.1,
+      "snapshot": {
+        "view": "globe",
+        "engine": "rust-wasm-worker",
+        "query": "KDDI",
+        "count": "3記録 · 1組織",
+        "cause": "all",
+        "company": "KDDI",
+        "focus": "globe-2d",
+        "width": 1440,
+        "overflow": false
+      },
+      "screenshot": "purpose-experience-06.png"
+    },
+    {
+      "name": "390pxで公表規模・出典から学習へ進む",
+      "elapsedSeconds": 59.1,
+      "snapshot": {
+        "view": "learn",
+        "engine": "rust-wasm-worker",
+        "query": "KDDI",
+        "count": "3記録 · 1組織",
+        "cause": "all",
+        "company": "KDDI / DION",
+        "focus": "learning-title",
+        "width": 390,
+        "overflow": false
+      },
+      "screenshot": "purpose-experience-07.png"
+    },
+    {
+      "name": "スマホで別テーマ・条件パネル・一覧へ戻る",
+      "elapsedSeconds": 67.2,
+      "snapshot": {
+        "view": "timeline",
+        "engine": "rust-wasm-worker",
+        "query": "",
+        "count": "280記録 · 260組織",
+        "cause": "ransomware",
+        "company": "学校法人八王子学園",
+        "focus": "open-explorer",
+        "width": 390,
+        "overflow": false
+      },
+      "screenshot": "purpose-experience-08.png"
+    }
+  ],
+  "errors": [],
+  "completed": true
+}

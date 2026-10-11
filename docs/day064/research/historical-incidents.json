@@ -1,0 +1,315 @@
+{
+  "asOf": "2026-10-11",
+  "incidents": [
+    {
+      "id": "ntt-business-solutions-2023",
+      "company": "NTTビジネスソリューションズ",
+      "shortName": "NTTビジネス",
+      "aliases": [
+        "NTTBS",
+        "NTTマーケティングアクトProCX",
+        "NTT Marketing Act ProCX"
+      ],
+      "sector": "telecom",
+      "cause": "insider",
+      "year": 2023,
+      "announcedAt": "2023-10-17",
+      "sourceUpdatedAt": "2026-04-24",
+      "status": "confirmed",
+      "scale": {
+        "value": 9280000,
+        "unit": "records",
+        "qualifier": "approximate",
+        "label": "928万件"
+      },
+      "summary": "コールセンタシステムの運用保守に従事した元派遣社員が管理権限を悪用し、委託元から預かった顧客情報を不正に持ち出して第三者へ渡した。",
+      "informationTypes": [
+        "氏名",
+        "住所",
+        "電話番号",
+        "一部の性別・年齢など"
+      ],
+      "scopeNote": "NTTマーケティングアクトProCXへ業務を委託した69クライアントの顧客情報。NTT西日本自身が保有する別の顧客情報とは合算しない。",
+      "countNote": "初報の約900万件から2023年12月19日に928万件へ更新。2026年4月更新の公式続報でもこの値を掲載。「件」を人数に変換せず、委託元未特定の117万件も内数として扱う。",
+      "sources": [
+        {
+          "title": "元派遣社員によるお客さま情報の不正流出について（続報・2026年4月更新）",
+          "url": "https://www.nttdata-act.com/info/detail/231219.html",
+          "publishedAt": "2023-12-19"
+        },
+        {
+          "title": "元派遣社員によるお客さま情報の不正流出について（初報）",
+          "url": "https://www.nttdata-act.com/info/detail/231017.html",
+          "publishedAt": "2023-10-17"
+        },
+        {
+          "title": "お客さま情報の不正流出に関するお詫びとお知らせ（2026年4月更新）",
+          "url": "https://www.nttdata-act.com/info/detail/240209.html",
+          "publishedAt": "2024-02-09"
+        }
+      ]
+    },
+    {
+      "id": "rakuten-market-2020",
+      "company": "楽天（楽天市場）",
+      "shortName": "楽天市場",
+      "aliases": [
+        "楽天",
+        "Rakuten",
+        "楽天グループ"
+      ],
+      "sector": "retail",
+      "cause": "exposure",
+      "year": 2020,
+      "announcedAt": "2020-12-25",
+      "sourceUpdatedAt": "2021-01-26",
+      "status": "confirmed",
+      "scale": {
+        "value": 208,
+        "unit": "records",
+        "qualifier": "exact",
+        "label": "208件（アクセス確認）"
+      },
+      "summary": "外部の営業管理システムの設定不備により、楽天市場への法人向け資料請求者や店舗の情報が閲覧可能となり、208件への第三者アクセスが確認された。",
+      "informationTypes": [
+        "企業名・店舗名",
+        "代表者名・担当者名",
+        "住所",
+        "電話番号・FAX番号",
+        "メールアドレス",
+        "営業対応情報"
+      ],
+      "scopeNote": "楽天市場の出店見込・契約済事業者に関する情報を収録。楽天カード会員情報は対象外で、同時発表のビジネスローンとEdyの情報はこの値に含めない。",
+      "countNote": "確認済み208件を採用。閲覧の可能性があった最大1,381,735件とは区別する。2021年1月26日の訂正は楽天カードの可能性数を16,895件に更新したもので、市場の確認数は208件のまま。",
+      "sources": [
+        {
+          "title": "クラウド型営業管理システムへの社外の第三者によるアクセスについて（2021年1月26日更新）",
+          "url": "https://corp.rakuten.co.jp/news/update/2020/1225_01.html",
+          "publishedAt": "2020-12-25"
+        }
+      ]
+    },
+    {
+      "id": "softbank-bb-2004",
+      "company": "ソフトバンクBB",
+      "shortName": "ソフトバンクBB",
+      "aliases": [
+        "SoftBank BB",
+        "Yahoo! BB",
+        "ヤフーBB",
+        "ソフトバンク"
+      ],
+      "sector": "telecom",
+      "cause": "intrusion",
+      "year": 2004,
+      "announcedAt": "2004-01-23",
+      "sourceUpdatedAt": "2004-11-30",
+      "status": "confirmed",
+      "scale": {
+        "value": 4517039,
+        "unit": "people",
+        "qualifier": "exact",
+        "label": "4,517,039人"
+      },
+      "summary": "Yahoo! BBの顧客情報が不正に取得され、恐喝未遂事件に使われた。警察から提供された資料との照合で、重複を除いた4,517,039人分の流出を確認した。",
+      "informationTypes": [
+        "氏名",
+        "申込住所",
+        "電話番号",
+        "メールアドレス",
+        "Yahoo! JAPAN ID",
+        "申込日"
+      ],
+      "scopeNote": "Yahoo! BBの加入者、手続き中の申込者、無料体験申込者、解約者。2004年11月に発表された別の資料900件とは合算しない。",
+      "countNote": "日本語公式表の「人数（人）」と英語公式版で単位を照合。押収資料の5,167,081件ではなく重複除外後の人数。660万人との供述は確認不能、約670万人は可能性の上限。通話発信記録の別集計も加算しない。",
+      "sources": [
+        {
+          "title": "お客様情報流出問題に関する調査結果と今後の対策",
+          "url": "https://www.softbank.jp/corp/group/sbb/news/press/2004/20040227_01/",
+          "publishedAt": "2004-02-27"
+        },
+        {
+          "title": "Results to Date in Authentication of Leaked Customer Information and Measures for the Future",
+          "url": "https://www.softbank.jp/en/corp/group/sbb/news/press/2004/20040227_01/",
+          "publishedAt": "2004-02-27"
+        },
+        {
+          "title": "本日の一部報道に関するコメント（続報）",
+          "url": "https://www.softbank.jp/corp/group/sbb/news/press/2004/20040618_02/",
+          "publishedAt": "2004-06-18"
+        },
+        {
+          "title": "Yahoo! BBの顧客情報に関するお知らせ",
+          "url": "https://www.softbank.jp/corp/group/sbb/news/press/2004/20041130_01/",
+          "publishedAt": "2004-11-30"
+        },
+        {
+          "title": "お客様情報の流出について（初報）",
+          "url": "https://www.softbank.jp/corp/group/sbb/news/press/2004/20040123_01/",
+          "publishedAt": "2004-01-23"
+        }
+      ]
+    },
+    {
+      "id": "yahoo-japan-2013",
+      "company": "ヤフー（Yahoo! JAPAN）",
+      "shortName": "Yahoo! JAPAN",
+      "aliases": [
+        "ヤフー",
+        "Yahoo Japan",
+        "Yahoo! JAPAN",
+        "旧ヤフー"
+      ],
+      "sector": "other",
+      "cause": "intrusion",
+      "year": 2013,
+      "announcedAt": "2013-05-17",
+      "sourceUpdatedAt": "2013-05-23",
+      "status": "possible",
+      "scale": {
+        "value": 22000000,
+        "unit": "accounts",
+        "qualifier": "maximum",
+        "label": "最大2,200万ID（可能性）"
+      },
+      "summary": "ID管理サーバへの不正アクセスで、最大2,200万IDを抽出したファイルが作られた。外部への流出は確認できず、通信量から可能性を否定できないと公表した。",
+      "informationTypes": [
+        "Yahoo! JAPAN ID",
+        "一部のハッシュ化された認証情報",
+        "一部の再設定に必要な情報"
+      ],
+      "scopeNote": "日本のYahoo! JAPANの2013年5月事案。海外Yahooの別事件や、2013年4月に遮断した別の不正アクセスとは合算しない。",
+      "countNote": "2,200万は最大ID数で、確認済みの漏洩人数ではない。5月23日には、そのうち148.6万件の追加情報が流出した可能性が高いと更新。内数なので加算しない。",
+      "sources": [
+        {
+          "title": "当社サーバへの不正なアクセスについて",
+          "url": "https://www.lycorp.co.jp/news/archive/Y/ja/ja20130517_A.pdf",
+          "publishedAt": "2013-05-17"
+        },
+        {
+          "title": "当社サーバへの不正なアクセスについて（5月17日発表）の追加発表",
+          "url": "https://www.lycorp.co.jp/news/archive/Y/ja/ja20130523_A.pdf",
+          "publishedAt": "2013-05-23"
+        }
+      ]
+    },
+    {
+      "id": "kadokawa-2024",
+      "company": "KADOKAWA",
+      "shortName": "KADOKAWA",
+      "aliases": [
+        "角川",
+        "カドカワ",
+        "ドワンゴ",
+        "Dwango",
+        "ニコニコ",
+        "N高",
+        "S高"
+      ],
+      "sector": "entertainment",
+      "cause": "ransomware",
+      "year": 2024,
+      "announcedAt": "2024-06-28",
+      "sourceUpdatedAt": "2024-08-05",
+      "status": "confirmed",
+      "scale": {
+        "value": 254241,
+        "unit": "people",
+        "qualifier": "exact",
+        "label": "254,241人"
+      },
+      "summary": "グループのサーバーがランサムウェア攻撃を受け、取引先、従業員、学校の生徒や保護者などの個人情報が外部へ漏洩した。8月の調査公表で254,241人を確認した。",
+      "informationTypes": [
+        "氏名",
+        "生年月日",
+        "住所",
+        "電話番号",
+        "メールアドレス",
+        "口座情報",
+        "人事・選考情報",
+        "学歴・学生情報"
+      ],
+      "scopeNote": "主にドワンゴと関係会社、角川ドワンゴ学園の対象者。ニコニコの全会員数ではなく、ユーザーのログイン用アカウント情報やカード情報の漏洩は確認されていない。",
+      "countNote": "2024年8月5日の公式調査結果にある「個人情報 合計254,241人」を採用。企業文書や情報拡散投稿の件数を加算しない。",
+      "sources": [
+        {
+          "title": "ランサムウェア攻撃による情報漏洩に関するお知らせ",
+          "url": "https://www.kadokawa.co.jp/topics/12088/",
+          "publishedAt": "2024-08-05"
+        },
+        {
+          "title": "ランサムウェア攻撃による情報漏洩に関するお知らせとお詫び（初報）",
+          "url": "https://group.kadokawa.co.jp/information/media-download/1343/e2b5094df625852a/",
+          "publishedAt": "2024-06-28"
+        }
+      ]
+    },
+    {
+      "id": "sony-psn-2011",
+      "company": "ソニー（SCE・SNEI）",
+      "shortName": "ソニー PSN",
+      "aliases": [
+        "Sony",
+        "ソニー",
+        "PlayStation Network",
+        "PSN",
+        "Qriocity",
+        "プレイステーション"
+      ],
+      "sector": "entertainment",
+      "cause": "intrusion",
+      "year": 2011,
+      "announcedAt": "2011-04-26",
+      "sourceUpdatedAt": "2011-09-29",
+      "status": "possible",
+      "scale": {
+        "value": 77000000,
+        "unit": "accounts",
+        "qualifier": "approximate",
+        "label": "約7,700万ID（通知対象）"
+      },
+      "summary": "米国のデータセンターへの不正侵入で、PSNとQriocityの利用者情報が侵害された。同社は全登録アカウントへ通知し、個人情報が取得された可能性を案内した。",
+      "informationTypes": [
+        "氏名",
+        "住所・国",
+        "メールアドレス",
+        "生年月日",
+        "オンラインID",
+        "ハッシュ化された認証情報",
+        "一部の購入・請求情報の可能性"
+      ],
+      "scopeNote": "世界全体のPSN・Qriocityの登録アカウントが対象。日本国内だけの件数ではない。Sony Online Entertainmentの別の被害は含めない。",
+      "countNote": "約7,700万は公式FAQで示された通知対象の登録アカウント数。全件の外部流出を個別に確認した人数ではないため可能性として表示。後の公式訂正で認証情報は平文でなくハッシュ化と説明され、カード情報の取得も確認されていない。",
+      "sources": [
+        {
+          "title": "Update on PlayStation Network and Qriocity",
+          "url": "https://blog.playstation.com/2011/04/26/update-on-playstation-network-and-qriocity/",
+          "publishedAt": "2011-04-26"
+        },
+        {
+          "title": "PlayStation Network and Qriocity Outage FAQ",
+          "url": "https://blog.playstation.com/archive/2011/04/28/playstation-network-and-qriocity-outage-faq",
+          "publishedAt": "2011-04-28"
+        },
+        {
+          "title": "PlayStation Network Security Update（5月11日更新）",
+          "url": "https://blog.playstation.com/2011/05/02/playstation-network-security-update/",
+          "publishedAt": "2011-05-02"
+        },
+        {
+          "title": "Sony PlayStation Network/Qriocity: own motion investigation report（豪州OAIC）",
+          "url": "https://www.oaic.gov.au/privacy/privacy-assessments-and-decisions/privacy-decisions/Investigation-inquiry-reports/sony-playstation-network-qriocity-own-motion-investigation-report",
+          "publishedAt": "2011-09-29"
+        }
+      ]
+    }
+  ],
+  "notes": [
+    "2026年10月11日までに公表された公式資料を確認した歴史的事例の選択集。全国の総件数や企業ごとの累計ではない。",
+    "人数、記録の件数、アカウント数を変換せずに保持する。確認できた規模と可能性のある範囲はcountNoteで区別する。",
+    "yearは初めて公表された年。sourceUpdatedAtは採用した続報・訂正または規制当局報告の最終日で、数値が変更された日とは限らない。",
+    "ソニーPSNの約7,700万は世界全体の通知対象。日本国内の漏洩人数として扱わない。",
+    "楽天は確かめられた市場の208件を表示値に採用し、グループ全体の可能性数を自己集計していない。",
+    "JTB2016は今回の確認で読める公式の事故公表資料に到達できなかったため採用していない。"
+  ]
+}

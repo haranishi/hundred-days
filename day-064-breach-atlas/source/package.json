@@ -1,0 +1,22 @@
+{
+  "name": "day064-breach-atlas",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1 --port 5464",
+    "preview": "vite preview --host 127.0.0.1 --port 5464",
+    "data": "node tools/assemble-data.mjs",
+    "test": "node --test tests/*.test.mjs",
+    "build": "npm run rust:build && node tools/og-card.mjs && vite build",
+    "release": "npm test && npm run build && node tools/release.mjs",
+    "rust:build": "node tools/build-rust.mjs",
+    "rust:test": "~/.cargo/bin/cargo test --offline --manifest-path rust/Cargo.toml"
+  },
+  "dependencies": {
+    "three": "0.186.1"
+  },
+  "devDependencies": {
+    "vite": "8.3.1"
+  }
+}

@@ -98,8 +98,13 @@ const CONNECT_PATTERNS = [
 
 /* 接続ではないと分かっているURL。React の本番ビルドは、エラーの説明ページのURL（https://react.dev/errors/番号）を
    変数に入れて例外の文に足すだけで、通信はしない（Day 059 が React を同梱したときに、この網に掛かった） */
-const TEXT_ONLY_URLS = [{ host: 'react.dev', path: /^\/errors\// }];
-const textOnly = (host, path) => TEXT_ONLY_URLS.some((url) => url.host === host && url.path.test(path));
+const TEXT_ONLY_URLS = [
+  { host: 'react.dev', path: /^\/errors\// },
+  // Day64's guide constants become outbound anchors, not fetch requests.
+  // Its learning browser test also verifies there are no external requests.
+  { app: 'day-064-breach-atlas', host: 'www.ipa.go.jp', path: /^\/security\/guide\/sme\/(?:about\.html|ug65p90000019cbk-att\/sme_guideline_v4\.0\.pdf)$/ },
+];
+const textOnly = (host, path, app) => TEXT_ONLY_URLS.some((url) => (!url.app || url.app === app) && url.host === host && url.path.test(path));
 
 const connectSources = (dir) => {
   const csp = (rules.get(`/${dir}/*`) || []).find((line) => line.startsWith('Content-Security-Policy:')) ?? '';
@@ -141,7 +146,7 @@ test('コードに書いてある接続先が、そのDayのCSPで許されて�
       const code = readFileSync(file, 'utf8');
       for (const pattern of CONNECT_PATTERNS) {
         for (const [, host, path] of code.matchAll(pattern)) {
-          if (textOnly(host, path)) continue;
+          if (textOnly(host, path, dir)) continue;
           checked += 1;
           expect(allows(sources, host), `${dir} は ${host} に繋ぐのに connect-src が許していない`).toBe(true);
         }

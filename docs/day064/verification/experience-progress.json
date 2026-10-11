@@ -1,0 +1,65 @@
+{
+  "startedAt": "2026-10-11T01:09:34.784Z",
+  "log": [
+    {
+      "at": "2026-10-11T01:09:36.428Z",
+      "name": "overview",
+      "company": "ベネッセ",
+      "unit": "records"
+    },
+    {
+      "at": "2026-10-11T01:10:07.007Z",
+      "name": "rotate",
+      "company": "ベネッセ",
+      "unit": "records"
+    },
+    {
+      "at": "2026-10-11T01:10:37.422Z",
+      "name": "source",
+      "company": "NTTドコモ",
+      "unit": "records"
+    },
+    {
+      "at": "2026-10-11T01:11:08.117Z",
+      "name": "people",
+      "company": "KDDI",
+      "unit": "people"
+    },
+    {
+      "at": "2026-10-11T01:11:38.522Z",
+      "name": "accounts",
+      "company": "ソニー PSN",
+      "unit": "accounts"
+    },
+    {
+      "at": "2026-10-11T01:12:08.923Z",
+      "name": "unknown",
+      "company": "リゾートトラスト",
+      "unit": "unknown"
+    },
+    {
+      "at": "2026-10-11T01:12:39.400Z",
+      "name": "flat",
+      "company": "NTTドコモ",
+      "unit": "records"
+    },
+    {
+      "at": "2026-10-11T01:13:09.685Z",
+      "name": "empty",
+      "company": null,
+      "unit": "records"
+    },
+    {
+      "at": "2026-10-11T01:13:39.974Z",
+      "name": "mobile",
+      "company": "KDDI",
+      "unit": "people"
+    },
+    {
+      "at": "2026-10-11T01:14:10.313Z",
+      "name": "reading",
+      "company": "KDDI",
+      "unit": "people"
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "asOf": "2026-10-11",
+  "browserName": "chromium",
+  "mode": "rust-wasm-worker",
+  "records": 13550,
+  "samples": 72,
+  "engineMedianMs": 0.4,
+  "engineP95Ms": 0.5,
+  "workerRoundTripMedianMs": 0.4,
+  "workerRoundTripP95Ms": 0.7,
+  "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/151.0.7922.34 Safari/537.36",
+  "inputToResult": {
+    "samples": 12,
+    "medianMs": 187,
+    "p95Ms": 195,
+    "debounceMs": 90
+  },
+  "limitation": "Local desktop Chromium. Worker measurements include filtering, sorting and contextual aggregates; UI measurements include input debounce and DOM updates. Not measured on physical phones or a production deployment."
+}

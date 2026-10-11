@@ -4,6 +4,9 @@ const port = Number(process.env.PLAYWRIGHT_PORT || 4173);
 
 export default defineConfig({
   testDir: './tests/e2e',
+  // Day64's source/Wasm checks use their own build and preview server.
+  // Cross-app tests still cover its published files here.
+  testIgnore: 'day-064.spec.mjs',
   timeout: 30_000,
   fullyParallel: false,
   retries: 0,

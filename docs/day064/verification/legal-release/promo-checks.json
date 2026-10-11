@@ -1,0 +1,78 @@
+{
+  "asOf": "2026-10-12",
+  "seconds": 32,
+  "width": 1080,
+  "height": 1920,
+  "fps": "30/1",
+  "codec": "h264",
+  "audioCodec": "aac",
+  "fileBytes": 3629691,
+  "trimOffset": 1.44,
+  "scenes": [
+    {
+      "scene": "scene-0",
+      "view": "globe",
+      "engine": "rust-wasm-worker",
+      "query": "",
+      "count": "18,001記録 · 12,974組織",
+      "company": "リゾートトラスト",
+      "source": "https://www.resorttrust.co.jp/wp_api/wp-content/uploads/2026/10/20261009.pdf",
+      "horizontalOverflow": false
+    },
+    {
+      "scene": "scene-1",
+      "view": "globe",
+      "engine": "rust-wasm-worker",
+      "query": "",
+      "count": "4,652記録 · 2,206組織",
+      "company": "リゾートトラスト",
+      "source": "https://www.resorttrust.co.jp/wp_api/wp-content/uploads/2026/10/20261009.pdf",
+      "horizontalOverflow": false
+    },
+    {
+      "scene": "scene-2",
+      "view": "timeline",
+      "engine": "rust-wasm-worker",
+      "query": "横浜市（神奈川県）",
+      "count": "2,039記録 · 1組織",
+      "company": "横浜市 · 青葉区 福祉保健課 指定管理者:(福)横浜市社会福祉協議会",
+      "source": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/somu/2026/0915jimusyorimisu.files/0129_20260914.pdf#page=2",
+      "horizontalOverflow": false
+    },
+    {
+      "scene": "scene-3",
+      "view": "timeline",
+      "engine": "rust-wasm-worker",
+      "query": "横浜市（神奈川県）",
+      "count": "2,039記録 · 1組織",
+      "company": "横浜市 · 青葉区 福祉保健課 指定管理者:(福)横浜市社会福祉協議会",
+      "source": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/somu/2026/0915jimusyorimisu.files/0129_20260914.pdf#page=2",
+      "horizontalOverflow": false
+    },
+    {
+      "scene": "scene-4",
+      "view": "learn",
+      "engine": "rust-wasm-worker",
+      "query": "横浜市（神奈川県）",
+      "count": "2,039記録 · 1組織",
+      "company": "横浜市 · 青葉区 福祉保健課 指定管理者:(福)横浜市社会福祉協議会",
+      "source": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/somu/2026/0915jimusyorimisu.files/0129_20260914.pdf#page=2",
+      "horizontalOverflow": false
+    },
+    {
+      "scene": "scene-5",
+      "view": "learn",
+      "engine": "rust-wasm-worker",
+      "query": "横浜市（神奈川県）",
+      "count": "2,039記録 · 1組織",
+      "company": "横浜市 · 青葉区 福祉保健課 指定管理者:(福)横浜市社会福祉協議会",
+      "source": "https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/somu/2026/0915jimusyorimisu.files/0129_20260914.pdf#page=2",
+      "horizontalOverflow": false
+    }
+  ],
+  "browserErrors": [],
+  "video": "Actual local release application; product values were not changed for filming.",
+  "overlays": "Original captions, tap highlights, progress bar and end card.",
+  "music": "Original synthesized oscillators; no third-party recordings or samples.",
+  "font": "Zen Kaku Gothic New Bold (SIL OFL 1.1), rendered into the video; font file is not distributed."
+}

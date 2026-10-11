@@ -1,0 +1,379 @@
+{
+  "asOf": "2026-10-11",
+  "incidents": [
+    {
+      "id": "kddi-isp-mail-2026",
+      "company": "KDDI株式会社",
+      "shortName": "KDDI",
+      "aliases": [
+        "ケーディーディーアイ",
+        "ISP向けメールシステム",
+        "インターネットサービスプロバイダー",
+        "@nifty",
+        "BIGLOBE"
+      ],
+      "sector": "telecom",
+      "cause": "intrusion",
+      "year": 2026,
+      "announcedAt": "2026-06-23",
+      "sourceUpdatedAt": "2026-08-19",
+      "status": "confirmed",
+      "scale": {
+        "value": 12231954,
+        "unit": "people",
+        "qualifier": "exact",
+        "label": "12,231,954人"
+      },
+      "summary": "ISP事業者向けメール基盤のソフトウェアの脆弱性を悪用した不正アクセスで、利用者のメールアドレスなどが流出。7月21日の人数訂正と8月19日の規制当局の確認を反映。",
+      "informationTypes": [
+        "メールアドレス",
+        "メールアカウント情報"
+      ],
+      "scopeNote": "KDDIが提供するISP向けメール基盤が対象。auメール、UQ mobileメール、au one netメールは対象外。ニフティなど各ISP側の公表数は本事件の内数として扱い、別の合計に加えない。",
+      "countNote": "規制当局は本人の数として12,231,954人を確認。別公表のパスワード漏えい7,616,173人は内数であり合算しない。メールボックス内の情報を閲覧できる状態と、実際の閲覧確認も区別する。",
+      "sources": [
+        {
+          "title": "ISP事業者向けメールシステムに対する不正アクセスについてのお詫びとご報告（2026年7月21日訂正）",
+          "url": "https://newsroom.kddi.com/news/assets/2026/kddi_nr_s-73_4619/kddi_nr_s-73_4619_pdf_01.pdf",
+          "publishedAt": "2026-07-06"
+        },
+        {
+          "title": "KDDI及びISPに対する行政上の対応並びにメールサービス利用者に対する注意喚起",
+          "url": "https://www.ppc.go.jp/files/pdf/260819_01_houdou.pdf",
+          "publishedAt": "2026-08-19"
+        }
+      ]
+    },
+    {
+      "id": "estore-shopserve-2026",
+      "company": "株式会社Eストアー",
+      "shortName": "Eストアー",
+      "aliases": [
+        "イーストアー",
+        "ショップサーブ",
+        "Shopserve",
+        "Estore"
+      ],
+      "sector": "other",
+      "cause": "intrusion",
+      "year": 2026,
+      "announcedAt": "2026-08-01",
+      "sourceUpdatedAt": "2026-08-02",
+      "status": "confirmed",
+      "scale": {
+        "value": 8853839,
+        "unit": "records",
+        "qualifier": "maximum",
+        "label": "最大8,853,839件（延べ）"
+      },
+      "summary": "EC基盤「ショップサーブ」への不正アクセスで、購入者・会員・店舗に関する情報が外部へ送信された。第2報で対象期間と情報項目が追加された。",
+      "informationTypes": [
+        "氏名",
+        "住所",
+        "電話・FAX番号",
+        "メールアドレス",
+        "勤務先",
+        "会員情報",
+        "カード名義・番号の一部・有効期限",
+        "店舗情報",
+        "振込先口座情報"
+      ],
+      "scopeNote": "EストアーのEC基盤を利用する店舗の購入者や会員等が対象。ショップサーブ全体の公表数であり、個別店舗の公表数と重ねて合計しない。",
+      "countNote": "初報は最大で延べ8,853,839件、第2報も同じ公表件数を維持して調査継続中。同じ購入者の複数登録データを含み得るため、人数ではない。期間と情報項目は第2報に合わせる。",
+      "sources": [
+        {
+          "title": "不正アクセスによる個人情報漏えいに関するお知らせ（第2報）",
+          "url": "https://estore.jp/press/20260802/",
+          "publishedAt": "2026-08-02"
+        },
+        {
+          "title": "不正アクセスによる個人情報漏えいに関するお詫びとお知らせについて",
+          "url": "https://estore.jp/press/20260801/",
+          "publishedAt": "2026-08-01"
+        }
+      ]
+    },
+    {
+      "id": "universal-music-store-2025",
+      "company": "ユニバーサル ミュージック合同会社",
+      "shortName": "ユニバーサル ミュージック",
+      "aliases": [
+        "UNIVERSAL MUSIC JAPAN",
+        "UNIVERSAL MUSIC STORE",
+        "UNIVERSAL MUSIC STORE ANNEX",
+        "THE BEATLES STORE",
+        "UMストア",
+        "ユニバ"
+      ],
+      "sector": "entertainment",
+      "cause": "intrusion",
+      "year": 2025,
+      "announcedAt": "2025-10-31",
+      "sourceUpdatedAt": "2026-05-18",
+      "status": "confirmed",
+      "scale": {
+        "value": 3105585,
+        "unit": "records",
+        "qualifier": "exact",
+        "label": "3,105,585件"
+      },
+      "summary": "国内向けの音楽ECサイトへの不正アクセスについて、外部専門機関による調査後に顧客情報の流出を確認。初報の「可能性・件数調査中」から確認済みに更新された。",
+      "informationTypes": [
+        "氏名",
+        "住所",
+        "電話番号",
+        "メールアドレス",
+        "生年月日",
+        "性別",
+        "購入履歴",
+        "配送先・請求先情報"
+      ],
+      "scopeNote": "日本法人が運営するUNIVERSAL MUSIC STOREとTHE BEATLES STOREが対象。旧サイトと新サイトで対象期間・項目が異なり、海外のUniversal Music Group全体の事案を示す数字ではない。",
+      "countNote": "会社が2つのストアについて合計3,105,585件と公表。人数への換算はしない。ログイン用パスワードや決済情報は当該システムに保持しておらず、流出確認の対象ではない。",
+      "sources": [
+        {
+          "title": "ECサイトにおける不正アクセスに関する調査結果のお知らせとお詫び",
+          "url": "https://www.universal-music.co.jp/press-releases/2026-05-18/",
+          "publishedAt": "2026-05-18"
+        },
+        {
+          "title": "不正アクセス発生によるお客様の個人情報流出の可能性のお知らせとお詫びについて",
+          "url": "https://www.universal-music.co.jp/press-releases/2025-10-31/",
+          "publishedAt": "2025-10-31"
+        }
+      ]
+    },
+    {
+      "id": "askul-ransomware-2025",
+      "company": "アスクル株式会社",
+      "shortName": "アスクル",
+      "aliases": [
+        "ASKUL",
+        "LOHACO",
+        "ロハコ",
+        "ソロエルアリーナ",
+        "ASKUL LOGIST"
+      ],
+      "sector": "retail",
+      "cause": "ransomware",
+      "year": 2025,
+      "announcedAt": "2025-10-31",
+      "sourceUpdatedAt": "2026-08-04",
+      "status": "confirmed",
+      "scale": {
+        "value": 739700,
+        "unit": "records",
+        "qualifier": "approximate",
+        "label": "約74万件（流出確認）"
+      },
+      "summary": "ランサムウェア攻撃により、通販サービスの顧客・取引先・従業員等の情報が流出。2026年7月には別途、漏えいのおそれが残る約60万件の追加通知を公表した。",
+      "informationTypes": [
+        "顧客情報",
+        "取引先情報",
+        "役員・社員等の情報"
+      ],
+      "scopeNote": "ASKUL・ソロエルアリーナ・LOHACO等の顧客と、取引先・グループ会社を含む役員や社員等。流出確認の詳細項目は2025年12月の資料では二次被害防止のため非公表。",
+      "countNote": "流出確認の公表区分は約59万件・約13.2万件・約1.5万件・約2,700件。表示値はその概数合計739,700件であり、重複を除いた人数ではない。7月30日追加の約60万件は外部流出未確認のため、確認済み規模には足さない。",
+      "sources": [
+        {
+          "title": "ランサムウェア攻撃の影響調査結果および安全性強化に向けた取り組みのご報告（第13報）",
+          "url": "https://pdf.irpocket.com/C0032/PDLX/O3bg/N4O3.pdf",
+          "publishedAt": "2025-12-12"
+        },
+        {
+          "title": "ランサムウェア攻撃に伴う情報漏えいのおそれに関する本人通知の追加実施について（第19報）",
+          "url": "https://pdf.irpocket.com/C0032/xoA3/Ef45/bBPr/O98H.pdf",
+          "publishedAt": "2026-07-30"
+        },
+        {
+          "title": "アスクルのサイバーセキュリティ（2026年8月4日更新）",
+          "url": "https://www.askul.co.jp/corp/security/",
+          "publishedAt": "2026-08-04"
+        }
+      ]
+    },
+    {
+      "id": "asahi-ransomware-2025",
+      "company": "アサヒグループホールディングス株式会社",
+      "shortName": "アサヒグループ",
+      "aliases": [
+        "アサヒビール",
+        "アサヒ飲料",
+        "アサヒグループ食品",
+        "ASAHI GROUP"
+      ],
+      "sector": "manufacturing",
+      "cause": "ransomware",
+      "year": 2025,
+      "announcedAt": "2025-10-14",
+      "sourceUpdatedAt": "2026-07-17",
+      "status": "confirmed",
+      "scale": {
+        "value": 115513,
+        "unit": "records",
+        "qualifier": "exact",
+        "label": "115,513件（流出確認）"
+      },
+      "summary": "2025年のランサムウェア攻撃で、一部の従業員用パソコンに保管された個人情報の流出を確認。漏えいのおそれがある範囲は2026年7月に別途訂正された。",
+      "informationTypes": [
+        "氏名",
+        "性別",
+        "住所",
+        "電話番号",
+        "メールアドレス"
+      ],
+      "scopeNote": "攻撃の影響は日本で管理するシステムに限定。確認済み対象は従業員・退職者と取引先関係者等。相談室への問い合わせ者などに関する「おそれ」の範囲とは分けて読む。",
+      "countNote": "確認済みの従業員等5,117件と取引先等110,396件の合計115,513件を表示。7月17日の訂正でもこの確認済み区分に変更はない。「おそれ」の別表は相談室152.5万件、慶弔関係11.7万件、従業員10.7万件、家族16.2万件、取引先37.8万件。確認済み情報との重複を含むので合算しない。",
+      "sources": [
+        {
+          "title": "サイバー攻撃に係る漏えいのおそれがある個人情報について",
+          "url": "https://www.asahigroup-holdings.com/newsroom/detail/20260717-0101.html",
+          "publishedAt": "2026-07-17"
+        },
+        {
+          "title": "サイバー攻撃被害の再発防止策とガバナンス体制の強化について",
+          "url": "https://www.asahigroup-holdings.com/newsroom/detail/20260218-0101.html",
+          "publishedAt": "2026-02-18"
+        },
+        {
+          "title": "サイバー攻撃によるシステム障害発生について（第4報）",
+          "url": "https://www.asahigroup-holdings.com/en/newsroom/detail/20251014-0103.html",
+          "publishedAt": "2025-10-14"
+        }
+      ]
+    },
+    {
+      "id": "his-thailand-fileserver-2026",
+      "company": "株式会社エイチ・アイ・エス（タイ現地法人 H.I.S. TOURS CO., LTD.）",
+      "shortName": "HIS（タイ現地法人）",
+      "aliases": [
+        "エイチ・アイ・エス",
+        "H.I.S.",
+        "H.I.S. TOURS",
+        "HISタイ"
+      ],
+      "sector": "travel",
+      "cause": "intrusion",
+      "year": 2026,
+      "announcedAt": "2026-10-07",
+      "sourceUpdatedAt": "2026-10-07",
+      "status": "possible",
+      "scale": {
+        "value": 627,
+        "unit": "people",
+        "qualifier": "maximum",
+        "label": "最大627人（流出の可能性）"
+      },
+      "summary": "タイ現地法人のファイルサーバへの不正アクセスについて、日本で取得した旅行者情報が不正に引き出された可能性を公表。海外法人のサーバに置かれていた情報が対象。",
+      "informationTypes": [
+        "パスポート情報",
+        "氏名",
+        "性別",
+        "生年月日",
+        "アレルギー情報"
+      ],
+      "scopeNote": "国内親会社が公表した海外子会社の事例。2017年、2019〜2020年、2024〜2025年に日本からタイへ出発した旅行者の一部が対象。世界全体のHIS利用者数ではない。",
+      "countNote": "最大627人分のパスポート情報などが対象になり得るという上限であり、627人全員の外部流出を確認した数字ではない。発生は2025年12月、ホームページでの初回公表は2026年10月。10月7日19:30の追記を反映。",
+      "sources": [
+        {
+          "title": "子会社ファイルサーバへの不正アクセスによる個人情報流出の可能性に関するお詫びとお知らせ（同日19:30追記）",
+          "url": "https://www.his.co.jp/assets/20261007.pdf",
+          "publishedAt": "2026-10-07"
+        }
+      ]
+    },
+    {
+      "id": "resorttrust-web-2026",
+      "company": "リゾートトラスト株式会社",
+      "shortName": "リゾートトラスト",
+      "aliases": [
+        "Resorttrust",
+        "ザ・カハラホテル＆リゾート横浜",
+        "カハラ横浜",
+        "エクシブ"
+      ],
+      "sector": "travel",
+      "cause": "intrusion",
+      "year": 2026,
+      "announcedAt": "2026-10-09",
+      "sourceUpdatedAt": "2026-10-09",
+      "status": "confirmed",
+      "scale": {
+        "value": null,
+        "unit": "unknown",
+        "qualifier": "undisclosed",
+        "label": "会員約2.6万件 / 予約者約3.6万件"
+      },
+      "summary": "管理するウェブサイトへの不正アクセスで、グループ会員と横浜のホテル予約者に関する情報の流出を確認。詳細な原因と影響範囲は調査中。",
+      "informationTypes": [
+        "顧客情報（詳細項目未公表）"
+      ],
+      "scopeNote": "国内グループの一部会員とザ・カハラホテル＆リゾート横浜の予約者情報。海外ホテル全体の予約者を示す公表ではない。",
+      "countNote": "会員約26,000件とホテル予約者約36,000件を別々に公表。両区分の重複関係や全体合計は確認できないため、62,000件とは合計せず、全体の規模は不明として扱います。メールアドレス、決済・口座情報、医療情報、本人確認書類等は対象システムに含まれない。",
+      "sources": [
+        {
+          "title": "当社ウェブサイトへの一部不正アクセスによる個人情報漏洩に関するお詫びとご報告",
+          "url": "https://www.resorttrust.co.jp/wp_api/wp-content/uploads/2026/10/20261009.pdf",
+          "publishedAt": "2026-10-09"
+        }
+      ]
+    },
+    {
+      "id": "lashinbang-service-2026",
+      "company": "株式会社らしんばん",
+      "shortName": "らしんばん",
+      "aliases": [
+        "Lashinbang",
+        "らしんばんオンライン",
+        "アニメグッズ"
+      ],
+      "sector": "retail",
+      "cause": "intrusion",
+      "year": 2026,
+      "announcedAt": "2026-10-01",
+      "sourceUpdatedAt": "2026-10-01",
+      "status": "possible",
+      "scale": {
+        "value": null,
+        "unit": "unknown",
+        "qualifier": "undisclosed",
+        "label": "件数・人数未公表"
+      },
+      "summary": "運営サービスへの不正アクセスで、利用者や配送先の情報が外部に漏えいした可能性を公表。総件数・対象人数は公式発表に記載されていない。",
+      "informationTypes": [
+        "氏名",
+        "郵便番号・住所",
+        "メールアドレス",
+        "電話番号",
+        "生年月日",
+        "性別",
+        "本人確認書類の種別・番号",
+        "会員番号",
+        "買取時の銀行口座情報",
+        "配送情報"
+      ],
+      "scopeNote": "利用サービスや利用状況によって対象項目が異なる。2026年9月14〜16日の不正アクセス期間より前に利用した顧客の一部も対象に含まれる。",
+      "countNote": "公表で対象件数・人数を確認できないためnull。本人確認書類の番号と画像は区別されており、同社は画像・クレジットカード情報・パスワードの漏えいはないとしている。",
+      "sources": [
+        {
+          "title": "【重要】不正アクセスによる個人情報漏えい可能性に関するお知らせとお詫び",
+          "url": "https://www.lashinbang.com/info/26357/",
+          "publishedAt": "2026-10-01"
+        },
+        {
+          "title": "不正アクセスおよび個人情報漏えいの可能性に関するQ&A",
+          "url": "https://www.lashinbang.com/info/26363/",
+          "publishedAt": "2026-10-01"
+        }
+      ]
+    }
+  ],
+  "notes": [
+    "2026年10月11日時点で公開一次資料を確認した選択事例集。全国の網羅的な漏えい件数や企業の現在の安全性を示すものではない。",
+    "yearは初回公表年。発生年と異なる場合はcountNoteに記載する。",
+    "scaleは表示対象の区分に限定する。漏えい確認とおそれ、件数と人数、上限と概数を区別し、単位を勝手に換算しない。",
+    "同じ事件の提供会社側と利用会社側の対象者、確認済み区分とおそれの区分は重複し得るため合算しない。",
+    "リゾートトラストは漏えい自体を確認済みだが、区分間の重複と全体合計が不明なためscale.valueはnull。件数がゼロという意味ではない。",
+    "漏えい原データ・被害者の個人情報・ダークウェブ・実際の認証情報は調査対象外。公表された情報項目名のみを記録した。"
+  ]
+}

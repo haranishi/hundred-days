@@ -1,0 +1,184 @@
+{
+  "asOf": "2026-10-12",
+  "checks": 32,
+  "passed": 32,
+  "initial": {
+    "startTime": "2026-10-11T16:04:25.926Z",
+    "duration": 110080.101,
+    "expected": 30,
+    "skipped": 0,
+    "unexpected": 2,
+    "flaky": 0
+  },
+  "targetedFinal": {
+    "startTime": "2026-10-11T16:11:37.092Z",
+    "duration": 20210.763,
+    "expected": 2,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  },
+  "method": "30 successful initial checks plus 2 successful targeted rechecks. Original failed attempts are retained separately; this is not a fresh full-suite run.",
+  "checksByTitle": [
+    {
+      "title": "geographic globe accounts for the whole archive and Tokyo selection reaches the source",
+      "status": "passed",
+      "durationMs": 12552
+    },
+    {
+      "title": "globe labels, keyboard controls and actual WebGL loss preserve geographic browsing",
+      "status": "passed",
+      "durationMs": 7867
+    },
+    {
+      "title": "flat geographic points, drag and pinch retain distinct notification and reported-state evidence",
+      "status": "passed",
+      "durationMs": 15370
+    },
+    {
+      "title": "historical year playback has explicit start, stop, reset and reduced-motion idle behavior",
+      "status": "passed",
+      "durationMs": 12602
+    },
+    {
+      "title": "failed globe land download offers a retry while records and sources remain usable",
+      "status": "passed",
+      "durationMs": 2384
+    },
+    {
+      "title": "globe screens expose legible controls, counts and sources across desktop, tablet and phones",
+      "status": "passed",
+      "durationMs": 11684
+    },
+    {
+      "title": "18,001 actual records load with Rust/Wasm, a bounded page, and no eager 3D",
+      "status": "passed",
+      "durationMs": 1008
+    },
+    {
+      "title": "screens at desktop, tablet and mobile show the new archive and selected source",
+      "status": "passed",
+      "durationMs": 11356
+    },
+    {
+      "title": "regions, years and causes link to the same searchable history",
+      "status": "passed",
+      "durationMs": 877
+    },
+    {
+      "title": "fullwidth search retains all three KDDI incidents and correct source units",
+      "status": "passed",
+      "durationMs": 1277
+    },
+    {
+      "title": "service aliases lead to revised corporate sources; unknown totals stay unknown",
+      "status": "passed",
+      "durationMs": 900
+    },
+    {
+      "title": "same-unit proportional comparison and government-notice definitions remain explicit",
+      "status": "passed",
+      "durationMs": 2398
+    },
+    {
+      "title": "CA notices preserve report dates, original breach dates and no guessed victim counts",
+      "status": "passed",
+      "durationMs": 1219
+    },
+    {
+      "title": "dataset coverage accounts for every register export and its exclusions",
+      "status": "passed",
+      "durationMs": 1283
+    },
+    {
+      "title": "lazy 3D is capped; actual context loss recovers focus, selection and exploration",
+      "status": "passed",
+      "durationMs": 3665
+    },
+    {
+      "title": "Wasm download failure keeps identical searchable records in the Worker",
+      "status": "passed",
+      "durationMs": 609
+    },
+    {
+      "title": "Worker startup failure preserves browsing with the main-thread fallback",
+      "status": "passed",
+      "durationMs": 636
+    },
+    {
+      "title": "failed detail loads offer a working retry without losing the index",
+      "status": "passed",
+      "durationMs": 482
+    },
+    {
+      "title": "mobile keyboard drawer, focus trap, dialogs and reduced motion remain usable",
+      "status": "passed",
+      "durationMs": 896
+    },
+    {
+      "title": "deep links find old records and sharing omits search and filter state",
+      "status": "passed",
+      "durationMs": 697
+    },
+    {
+      "title": "unavailable WebGL starts an operable SVG map with the same records",
+      "status": "passed",
+      "durationMs": 988
+    },
+    {
+      "title": "an unavailable archive has a working reload and medium-width filters stay accessible",
+      "status": "passed",
+      "durationMs": 2215
+    },
+    {
+      "title": "keyboard chart controls keep focus when their selected state updates",
+      "status": "passed",
+      "durationMs": 624
+    },
+    {
+      "title": "OG metadata and rendered preview use the current public-record count",
+      "status": "passed",
+      "durationMs": 926
+    },
+    {
+      "title": "browser performance uses all 18,001 real records and records Worker and UI latency",
+      "status": "passed",
+      "durationMs": 2721
+    },
+    {
+      "title": "a visible search and removable conditions lead to the matching record and source",
+      "status": "passed",
+      "durationMs": 1394
+    },
+    {
+      "title": "mobile search stays visible while charts open on demand and details return to the list",
+      "status": "passed",
+      "durationMs": 1119
+    },
+    {
+      "title": "Japanese intrusion entry, publication status and original-source checks remain distinct",
+      "status": "passed",
+      "durationMs": 2628
+    },
+    {
+      "title": "municipal disclosure rows show departments, original pages and separate publication and awareness dates",
+      "status": "passed",
+      "durationMs": 2121
+    },
+    {
+      "title": "learning connects public guidance, Japanese records and the same reading theme",
+      "status": "passed",
+      "durationMs": 1860
+    },
+    {
+      "title": "desktop conditions open as a dialog and disclosure preserves full source definitions",
+      "status": "passed",
+      "durationMs": 780
+    },
+    {
+      "title": "search and reset align the geographic view after exploring the United States",
+      "status": "passed",
+      "durationMs": 1987
+    }
+  ]
+}

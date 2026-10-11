@@ -1,0 +1,109 @@
+{
+  "asOf": "2026-10-11",
+  "method": "Automated real Chromium operations with primary-agent screenshot and source-note self-review; not an independent evaluation or a user study.",
+  "elapsedSeconds": 310.3,
+  "stages": [
+    {
+      "name": "全記録と未特定地域の定義",
+      "elapsedSeconds": 3.7,
+      "summary": "15,871記録 / 92地域 · 国単位 2,324",
+      "count": "15,871記録 · 12,972組織",
+      "selected": "リゾートトラスト",
+      "location": "all",
+      "renderer": "webgl",
+      "source": "https://www.resorttrust.co.jp/wp_api/wp-content/uploads/2026/10/20261009.pdf"
+    },
+    {
+      "name": "日本と地域未特定の記録",
+      "elapsedSeconds": 34.8,
+      "summary": "2,301記録 / 1地域 · 国単位 2,301",
+      "count": "2,301記録 · 2,017組織",
+      "selected": "リゾートトラスト",
+      "location": "JP",
+      "renderer": "webgl",
+      "source": "https://www.resorttrust.co.jp/wp_api/wp-content/uploads/2026/10/20261009.pdf"
+    },
+    {
+      "name": "東京都から組織名の根拠と原資料へ",
+      "elapsedSeconds": 65.4,
+      "summary": "55記録 / 1地域 · 国単位 0",
+      "count": "55記録 · 39組織",
+      "selected": "東京都中小企業振興公社",
+      "location": "JP-13",
+      "renderer": "webgl",
+      "source": "https://www.tokyo-kosha.or.jp/topics/2608/0009.html"
+    },
+    {
+      "name": "3Dの回転と拡大縮小",
+      "elapsedSeconds": 96,
+      "summary": "55記録 / 1地域 · 国単位 0",
+      "count": "55記録 · 39組織",
+      "selected": "東京都中小企業振興公社",
+      "location": "JP-13",
+      "renderer": "webgl",
+      "source": "https://www.tokyo-kosha.or.jp/topics/2608/0009.html"
+    },
+    {
+      "name": "平面地図の実際の地域点を選択",
+      "elapsedSeconds": 126.8,
+      "summary": "55記録 / 1地域 · 国単位 0",
+      "count": "55記録 · 39組織",
+      "selected": "東京都中小企業振興公社",
+      "location": "JP-13",
+      "renderer": "svg",
+      "source": "https://www.tokyo-kosha.or.jp/topics/2608/0009.html"
+    },
+    {
+      "name": "2014年の記録を原因と企業名で探す",
+      "elapsedSeconds": 157.7,
+      "summary": "2記録 / 1地域 · 国単位 2",
+      "count": "2記録 · 2組織",
+      "selected": "ベネッセ",
+      "location": "all",
+      "renderer": "svg",
+      "source": "https://www.benesse.co.jp/customer/bcinfo/01"
+    },
+    {
+      "name": "過去資料の年代再生と停止",
+      "elapsedSeconds": 188.4,
+      "summary": "0記録 / 0地域 · 国単位 0",
+      "count": "0記録 · 0組織",
+      "selected": null,
+      "location": "all",
+      "renderer": "svg",
+      "source": null
+    },
+    {
+      "name": "California通知州とHHS報告州の違い",
+      "elapsedSeconds": 219,
+      "summary": "786記録 / 1地域 · 国単位 0",
+      "count": "786記録 · 679組織",
+      "selected": "Alma Family Services",
+      "location": "US-CA",
+      "renderer": "svg",
+      "source": "https://ocrportal.hhs.gov/ocr/breach/breach_report_hip.jsf"
+    },
+    {
+      "name": "スマホで企業検索から原資料・地図へ戻る",
+      "elapsedSeconds": 249.7,
+      "summary": "3記録 / 1地域 · 国単位 3",
+      "count": "3記録 · 1組織",
+      "selected": "KDDI / DION",
+      "location": "all",
+      "renderer": "svg",
+      "source": "https://www.kddi.com/corporate/news_release/2006/0613/"
+    },
+    {
+      "name": "ゼロ件から復帰し収録の範囲を確認",
+      "elapsedSeconds": 280.3,
+      "summary": "15,871記録 / 92地域 · 国単位 2,324",
+      "count": "15,871記録 · 12,972組織",
+      "selected": "リゾートトラスト",
+      "location": "all",
+      "renderer": "svg",
+      "source": "https://www.resorttrust.co.jp/wp_api/wp-content/uploads/2026/10/20261009.pdf"
+    }
+  ],
+  "errors": [],
+  "completed": true
+}

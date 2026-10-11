@@ -1,0 +1,1233 @@
+{
+  "config": {
+    "argv": [
+      "/usr/local/bin/node",
+      "./node_modules/.bin/playwright",
+      "test",
+      "--config",
+      "tests/e2e/day-064.config.mjs",
+      "--project",
+      "checks"
+    ],
+    "configFile": "./tests/e2e/day-064.config.mjs",
+    "rootDir": "./tests/e2e",
+    "failOnFlakyTests": false,
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "./test-results/day064",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "checks",
+        "name": "checks",
+        "testDir": "./tests/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "day-064.spec.mjs"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "./test-results/day064",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "experience",
+        "name": "experience",
+        "testDir": "./tests/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "day-064.spec.mjs"
+        ],
+        "timeout": 30000
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "list",
+        null
+      ],
+      [
+        "json",
+        {
+          "outputFile": "./docs/day064/verification/legal-release/browser-results.json"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.62.1",
+    "workers": 1,
+    "webServer": {
+      "command": "npm run preview",
+      "cwd": "./day-064-breach-atlas/source/",
+      "url": "http://127.0.0.1:5464/day-064-breach-atlas/",
+      "reuseExistingServer": true,
+      "timeout": 30000
+    }
+  },
+  "suites": [
+    {
+      "title": "day-064.spec.mjs",
+      "file": "day-064.spec.mjs",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "record details show media copyright and official-source processing credits",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "checks",
+              "projectName": "checks",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1952,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-11T17:04:17.721Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "6741d29c963c3821e915-8eaba4d9afca37f50672",
+          "file": "day-064.spec.mjs",
+          "line": 49,
+          "column": 1
+        },
+        {
+          "title": "geographic globe accounts for the whole archive and Tokyo selection reaches the source",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "checks",
+              "projectName": "checks",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3543,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-11T17:04:19.929Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "6741d29c963c3821e915-aa07f34c6e8f8d6dc100",
+          "file": "day-064.spec.mjs",
+          "line": 135,
+          "column": 1
+        },
+        {
+          "title": "globe labels, keyboard controls and actual WebGL loss preserve geographic browsing",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "checks",
+              "projectName": "checks",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3008,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-11T17:04:23.476Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "6741d29c963c3821e915-2ec980624a76eb3a394f",
+          "file": "day-064.spec.mjs",
+          "line": 161,
+          "column": 1
+        },
+        {
+          "title": "flat geographic points, drag and pinch retain distinct notification and reported-state evidence",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "checks",
+              "projectName": "checks",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3202,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-11T17:04:26.492Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "6741d29c963c3821e915-5fdaa93e05c39515dd29",
+          "file": "day-064.spec.mjs",
+          "line": 186,
+          "column": 1
+        },
+        {
+          "title": "historical year playback has explicit start, stop, reset and reduced-motion idle behavior",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "checks",
+              "projectName": "checks",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 4395,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-11T17:04:29.698Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "6741d29c963c3821e915-5234e10ae9919419bce8",
+          "file": "day-064.spec.mjs",
+          "line": 225,
+          "column": 1
+        },
+        {
+          "title": "failed globe land download offers a retry while records and sources remain usable",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "checks",
+              "projectName": "checks",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1453,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-11T17:04:34.097Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "6741d29c963c3821e915-c44d627376d7eb2c013f",
+          "file": "day-064.spec.mjs",
+          "line": 247,
+          "column": 1
+        },
+        {
+          "title": "globe screens expose legible controls, counts and sources across desktop, tablet and phones",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "checks",
+              "projectName": "checks",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 7078,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-11T17:04:35.554Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "6741d29c963c3821e915-810732bac7b698e7b1a1",
+          "file": "day-064.spec.mjs",
+          "line": 260,
+          "column": 1
+        },
+        {
+          "title": "18,001 actual records load with Rust/Wasm, a bounded page, and no eager 3D",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "checks",
+              "projectName": "checks",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 807,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-11T17:04:42.636Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "6741d29c963c3821e915-d103bc4afb50a48888f0",
+          "file": "day-064.spec.mjs",
+          "line": 279,
+          "column": 1
+        },
+        {
+          "title": "screens at desktop, tablet and mobile show the new archive and selected source",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "checks",
+              "projectName": "checks",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3427,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-11T17:04:43.447Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "6741d29c963c3821e915-f35b3cb06865ee15fc8a",
+          "file": "day-064.spec.mjs",
+          "line": 308,
+          "column": 1
+        },
+        {
+          "title": "regions, years and causes link to the same searchable history",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "checks",
+              "projectName": "checks",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 863,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-11T17:04:46.879Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "6741d29c963c3821e915-430503f7be4f57986801",
+          "file": "day-064.spec.mjs",
+          "line": 322,
+          "column": 1
+        },
+        {
+          "title": "fullwidth search retains all three KDDI incidents and correct source units",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "checks",
+              "projectName": "checks",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1080,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-11T17:04:47.746Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "6741d29c963c3821e915-c9536b2c8a6452310faf",
+          "file": "day-064.spec.mjs",
+          "line": 337,
+          "column": 1
+        },
+        {
+          "title": "service aliases lead to revised corporate sources; unknown totals stay unknown",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "checks",
+              "projectName": "checks",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 973,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-11T17:04:48.830Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "6741d29c963c3821e915-79916dcf2d1505b9ac5f",
+          "file": "day-064.spec.mjs",
+          "line": 353,
+          "column": 1
+        },
+        {
+          "title": "same-unit proportional comparison and government-notice definitions remain explicit",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "checks",
+              "projectName": "checks",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1566,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-11T17:04:49.808Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "6741d29c963c3821e915-8a9950a6489c5011318e",
+          "file": "day-064.spec.mjs",
+          "line": 367,
+          "column": 1
+        },
+        {
+          "title": "CA notices preserve report dates, original breach dates and no guessed victim counts",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "checks",
+              "projectName": "checks",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 845,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-11T17:04:51.378Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "6741d29c963c3821e915-d4664be29ce03a0df69c",
+          "file": "day-064.spec.mjs",
+          "line": 386,
+          "column": 1
+        },
+        {
+          "title": "dataset coverage accounts for every register export and its exclusions",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "checks",
+              "projectName": "checks",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 812,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-11T17:04:52.227Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "6741d29c963c3821e915-401ad6922001a52855cf",
+          "file": "day-064.spec.mjs",
+          "line": 396,
+          "column": 1
+        },
+        {
+          "title": "lazy 3D is capped; actual context loss recovers focus, selection and exploration",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "checks",
+              "projectName": "checks",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3460,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-11T17:04:53.043Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "6741d29c963c3821e915-7139bef6ba78fcc02497",
+          "file": "day-064.spec.mjs",
+          "line": 410,
+          "column": 1
+        },
+        {
+          "title": "Wasm download failure keeps identical searchable records in the Worker",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "checks",
+              "projectName": "checks",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 890,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-11T17:04:56.509Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "6741d29c963c3821e915-e31670edbb65c2e3f28c",
+          "file": "day-064.spec.mjs",
+          "line": 435,
+          "column": 1
+        },
+        {
+          "title": "Worker startup failure preserves browsing with the main-thread fallback",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "checks",
+              "projectName": "checks",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 740,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-11T17:04:57.407Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "6741d29c963c3821e915-e1241f1eaf10bbbd4644",
+          "file": "day-064.spec.mjs",
+          "line": 441,
+          "column": 1
+        },
+        {
+          "title": "failed detail loads offer a working retry without losing the index",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "checks",
+              "projectName": "checks",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 767,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-11T17:04:58.153Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "6741d29c963c3821e915-bb5f038ff8568bd4262c",
+          "file": "day-064.spec.mjs",
+          "line": 447,
+          "column": 1
+        },
+        {
+          "title": "mobile keyboard drawer, focus trap, dialogs and reduced motion remain usable",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "checks",
+              "projectName": "checks",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1047,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-11T17:04:58.924Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "6741d29c963c3821e915-4e56a283b393c7fe630f",
+          "file": "day-064.spec.mjs",
+          "line": 454,
+          "column": 1
+        },
+        {
+          "title": "deep links find old records and sharing omits search and filter state",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "checks",
+              "projectName": "checks",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 745,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-11T17:04:59.976Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "6741d29c963c3821e915-7c95316f7049b1c66d75",
+          "file": "day-064.spec.mjs",
+          "line": 469,
+          "column": 1
+        },
+        {
+          "title": "unavailable WebGL starts an operable SVG map with the same records",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "checks",
+              "projectName": "checks",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1517,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-11T17:05:00.726Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "6741d29c963c3821e915-bd886b7f0fdba5bb1717",
+          "file": "day-064.spec.mjs",
+          "line": 478,
+          "column": 1
+        },
+        {
+          "title": "an unavailable archive has a working reload and medium-width filters stay accessible",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "checks",
+              "projectName": "checks",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2340,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-11T17:05:02.255Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "6741d29c963c3821e915-7ea41c2a04c52154a2fa",
+          "file": "day-064.spec.mjs",
+          "line": 487,
+          "column": 1
+        },
+        {
+          "title": "keyboard chart controls keep focus when their selected state updates",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "checks",
+              "projectName": "checks",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1028,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-11T17:05:04.601Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "6741d29c963c3821e915-c2c840cc36ff45080d0d",
+          "file": "day-064.spec.mjs",
+          "line": 497,
+          "column": 1
+        },
+        {
+          "title": "OG metadata and rendered preview use the current public-record count",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "checks",
+              "projectName": "checks",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 950,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-11T17:05:05.636Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "6741d29c963c3821e915-b0031f41fdbe2bb04e6f",
+          "file": "day-064.spec.mjs",
+          "line": 505,
+          "column": 1
+        },
+        {
+          "title": "browser performance uses all 18,001 real records and records Worker and UI latency",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "checks",
+              "projectName": "checks",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2973,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-11T17:05:06.596Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "6741d29c963c3821e915-89124bfd8fb9bba71628",
+          "file": "day-064.spec.mjs",
+          "line": 514,
+          "column": 1
+        },
+        {
+          "title": "a visible search and removable conditions lead to the matching record and source",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "checks",
+              "projectName": "checks",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1624,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-11T17:05:09.573Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "6741d29c963c3821e915-99b77a776b970abcfdb2",
+          "file": "day-064.spec.mjs",
+          "line": 539,
+          "column": 1
+        },
+        {
+          "title": "mobile search stays visible while charts open on demand and details return to the list",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "checks",
+              "projectName": "checks",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1177,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-11T17:05:11.202Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "6741d29c963c3821e915-fe1f0cc34ba55793936b",
+          "file": "day-064.spec.mjs",
+          "line": 570,
+          "column": 1
+        },
+        {
+          "title": "Japanese intrusion entry, publication status and original-source checks remain distinct",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "checks",
+              "projectName": "checks",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2707,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-11T17:05:12.383Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "6741d29c963c3821e915-3041f55f3b4fc1174272",
+          "file": "day-064.spec.mjs",
+          "line": 599,
+          "column": 1
+        },
+        {
+          "title": "municipal disclosure rows show departments, original pages and separate publication and awareness dates",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "checks",
+              "projectName": "checks",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2555,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-11T17:05:15.095Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "6741d29c963c3821e915-f885ef2bf3f786da51ab",
+          "file": "day-064.spec.mjs",
+          "line": 633,
+          "column": 1
+        },
+        {
+          "title": "learning connects public guidance, Japanese records and the same reading theme",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "checks",
+              "projectName": "checks",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1916,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-11T17:05:17.654Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "6741d29c963c3821e915-bf7808dd651a62e3a4df",
+          "file": "day-064.spec.mjs",
+          "line": 686,
+          "column": 1
+        },
+        {
+          "title": "desktop conditions open as a dialog and disclosure preserves full source definitions",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "checks",
+              "projectName": "checks",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 743,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-11T17:05:19.574Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "6741d29c963c3821e915-3aaddf47ec59e63f4e4a",
+          "file": "day-064.spec.mjs",
+          "line": 717,
+          "column": 1
+        },
+        {
+          "title": "search and reset align the geographic view after exploring the United States",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "checks",
+              "projectName": "checks",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1960,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-11T17:05:20.321Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "6741d29c963c3821e915-4c500a6f686e9e1741f7",
+          "file": "day-064.spec.mjs",
+          "line": 740,
+          "column": 1
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-10-11T17:04:17.437Z",
+    "duration": 71376.551,
+    "expected": 33,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  }
+}

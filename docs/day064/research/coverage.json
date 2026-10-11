@@ -1,0 +1,1060 @@
+{
+  "index": "https://www.ppc.go.jp/personalinfo/sekoujyoukyou/",
+  "asOf": "2026-10-11",
+  "reports": [
+    {
+      "year": 2006,
+      "title": "2006年度 個人情報保護法施行状況の概要",
+      "url": "https://www.ppc.go.jp/files/pdf/personal_sekou_18caa.pdf",
+      "sha256": "2903666b14447074899affd9feb28153d5f68cf9f42358449a6dc65be2e4a99b",
+      "casePages": [],
+      "rows": [],
+      "status": "aggregate-only",
+      "sourceRows": 0,
+      "imported": 0,
+      "duplicate": 0,
+      "merged-existing": 0,
+      "excluded": 0,
+      "selection": "統計は掲載されていますが、企業名・公表日付きの個別事例表は掲載されていません。"
+    },
+    {
+      "year": 2009,
+      "title": "2009年度 個人情報保護法施行状況の概要",
+      "url": "https://www.ppc.go.jp/files/pdf/personal_sekou_21caa.pdf",
+      "sha256": "eab50b56a315957774fb740c747e48ff43eadc7b4f1c0f0291793d6456c24f0a",
+      "casePages": [
+        38,
+        39
+      ],
+      "rows": [
+        {
+          "company": "アストモスエネルギー株式会社(委託先:伊藤忠テクノソリューションズ株式会社)",
+          "announcedAt": "2009-07-27",
+          "page": 38,
+          "action": "imported",
+          "incidentId": "ppc-2009-07-27-2927177e"
+        },
+        {
+          "company": "西日本電信電話株式会社",
+          "announcedAt": "2009-11-18",
+          "page": 38,
+          "action": "imported",
+          "incidentId": "ppc-2009-11-18-9f00720a"
+        },
+        {
+          "company": "株式会社りそな銀行",
+          "announcedAt": "2009-07-22",
+          "page": 38,
+          "action": "imported",
+          "incidentId": "ppc-2009-07-22-92c7f9c5"
+        },
+        {
+          "company": "三菱UFJニコス株式会社",
+          "announcedAt": "2009-08-06",
+          "page": 38,
+          "action": "imported",
+          "incidentId": "ppc-2009-08-06-b6f63960"
+        },
+        {
+          "company": "熊谷商工信用組合",
+          "announcedAt": "2010-03-29",
+          "page": 38,
+          "action": "imported",
+          "incidentId": "ppc-2010-03-29-c51844d7"
+        },
+        {
+          "company": "ソニー生命株式会社",
+          "announcedAt": "2009-04-10",
+          "page": 38,
+          "action": "imported",
+          "incidentId": "ppc-2009-04-10-c70aa8a3"
+        },
+        {
+          "company": "株式会社アミューズ(委託先:テイパーズ)",
+          "announcedAt": "2009-08-14",
+          "page": 38,
+          "action": "imported",
+          "incidentId": "ppc-2009-08-14-df6044f8"
+        },
+        {
+          "company": "株式会社ゆうちょ銀行",
+          "announcedAt": "2009-12-03",
+          "page": 38,
+          "action": "imported",
+          "incidentId": "ppc-2009-12-03-00ee5a31"
+        },
+        {
+          "company": "株式会社ダイエー",
+          "announcedAt": "2009-06-05",
+          "page": 39,
+          "action": "imported",
+          "incidentId": "ppc-2009-06-05-d7ad4f1d"
+        },
+        {
+          "company": "株式会社ゆうちょ銀行",
+          "announcedAt": "2010-03-26",
+          "page": 39,
+          "action": "imported",
+          "incidentId": "ppc-2010-03-26-00ee5a31"
+        },
+        {
+          "company": "あらた監査法人",
+          "announcedAt": "2010-01-26",
+          "page": 39,
+          "action": "imported",
+          "incidentId": "ppc-2010-01-26-7e665691"
+        },
+        {
+          "company": "三井情報株式会社",
+          "announcedAt": "2010-03-09",
+          "page": 39,
+          "action": "imported",
+          "incidentId": "ppc-2010-03-09-5ed3f62d"
+        },
+        {
+          "company": "半田信用金庫",
+          "announcedAt": "2009-12-04",
+          "page": 39,
+          "action": "imported",
+          "incidentId": "ppc-2009-12-04-12d26b08"
+        },
+        {
+          "company": "株式会社ゆうちょ銀行",
+          "announcedAt": "2010-02-23",
+          "page": 39,
+          "action": "imported",
+          "incidentId": "ppc-2010-02-23-00ee5a31"
+        },
+        {
+          "company": "三菱UFJ証券",
+          "announcedAt": "2009-04-08",
+          "page": 39,
+          "action": "imported",
+          "incidentId": "ppc-2009-04-08-248a5fd2"
+        }
+      ],
+      "status": "case-table",
+      "sourceRows": 15,
+      "imported": 15,
+      "duplicate": 0,
+      "merged-existing": 0,
+      "excluded": 0,
+      "selection": "主な公表事案の年度表。原資料の規模・所管省庁による掲載条件があり、全国の全事案を列挙した資料ではありません。"
+    },
+    {
+      "year": 2013,
+      "title": "2013年度 個人情報保護法施行状況の概要",
+      "url": "https://www.ppc.go.jp/files/pdf/personal_sekou_25caa.pdf",
+      "sha256": "0b201a23eac42dd373dad3afc782abfe2b10b61024ecec5923fb174d01826b29",
+      "casePages": [
+        41,
+        42,
+        43
+      ],
+      "rows": [
+        {
+          "company": "株式会社三菱東京UFJ銀行",
+          "announcedAt": "2013-05-13",
+          "page": 41,
+          "action": "imported",
+          "incidentId": "ppc-2013-05-13-42720c19"
+        },
+        {
+          "company": "株式会社関西アーバン銀行",
+          "announcedAt": "2013-05-31",
+          "page": 41,
+          "action": "imported",
+          "incidentId": "ppc-2013-05-31-1cac8796"
+        },
+        {
+          "company": "住友生命保険相互会社",
+          "announcedAt": "2013-06-14",
+          "page": 41,
+          "action": "imported",
+          "incidentId": "ppc-2013-06-14-c8a171bc"
+        },
+        {
+          "company": "株式会社東邦銀行",
+          "announcedAt": "2013-09-11",
+          "page": 41,
+          "action": "imported",
+          "incidentId": "ppc-2013-09-11-b27345a0"
+        },
+        {
+          "company": "エクスコムグローバル株式会社",
+          "announcedAt": "2013-05-27",
+          "page": 41,
+          "action": "imported",
+          "incidentId": "ppc-2013-05-27-dca0babc"
+        },
+        {
+          "company": "エヌ・ティ・ティ・コミュニケーションズ株式会社",
+          "announcedAt": "2013-07-24",
+          "page": 41,
+          "action": "imported",
+          "incidentId": "ppc-2013-07-24-7eaf8b23"
+        },
+        {
+          "company": "株式会社テレコムスクエア",
+          "announcedAt": "2013-09-20",
+          "page": 41,
+          "action": "imported",
+          "incidentId": "ppc-2013-09-20-f6f911e4"
+        },
+        {
+          "company": "株式会社サイバーエージェント",
+          "announcedAt": "2013-08-12",
+          "page": 42,
+          "action": "imported",
+          "incidentId": "ppc-2013-08-12-054c8052"
+        },
+        {
+          "company": "軽自動車検査協会",
+          "announcedAt": "2014-03-14",
+          "page": 42,
+          "action": "imported",
+          "incidentId": "ppc-2014-03-14-99dada11"
+        },
+        {
+          "company": "エヌ・ティ・ティレゾナント株式会社",
+          "announcedAt": "2013-04-03",
+          "page": 42,
+          "action": "imported",
+          "incidentId": "ppc-2013-04-03-4624103c"
+        },
+        {
+          "company": "株式会社ムサシ",
+          "announcedAt": "2013-06-24",
+          "page": 42,
+          "action": "imported",
+          "incidentId": "ppc-2013-06-24-5b1c5c6e"
+        },
+        {
+          "company": "LINE株式会社",
+          "announcedAt": "2013-07-19",
+          "page": 42,
+          "action": "imported",
+          "incidentId": "ppc-2013-07-19-38a9c1e7"
+        },
+        {
+          "company": "オリエンタルモーター株式会社",
+          "announcedAt": "2013-08-01",
+          "page": 42,
+          "action": "imported",
+          "incidentId": "ppc-2013-08-01-1e598c80"
+        },
+        {
+          "company": "有限会社あきばんぐ",
+          "announcedAt": "2013-07-23",
+          "page": 42,
+          "action": "imported",
+          "incidentId": "ppc-2013-07-23-6256d3db"
+        },
+        {
+          "company": "株式会社ジークレスト",
+          "announcedAt": "2013-08-14",
+          "page": 42,
+          "action": "imported",
+          "incidentId": "ppc-2013-08-14-e3771132"
+        },
+        {
+          "company": "株式会社ソニー・コンピュータエンタテインメント",
+          "announcedAt": "2013-11-22",
+          "page": 43,
+          "action": "imported",
+          "incidentId": "ppc-2013-11-22-da147c43"
+        },
+        {
+          "company": "株式会社ストリーム",
+          "announcedAt": "2014-01-30",
+          "page": 43,
+          "action": "imported",
+          "incidentId": "ppc-2014-01-30-fa717c56"
+        }
+      ],
+      "status": "case-table",
+      "sourceRows": 17,
+      "imported": 17,
+      "duplicate": 0,
+      "merged-existing": 0,
+      "excluded": 0,
+      "selection": "主な公表事案の年度表。原資料の規模・所管省庁による掲載条件があり、全国の全事案を列挙した資料ではありません。"
+    },
+    {
+      "year": 2005,
+      "title": "2005年度 個人情報保護法施行状況の概要",
+      "url": "https://www.ppc.go.jp/files/pdf/personal_sekou_17caa.pdf",
+      "sha256": "dfc22d4a9d536450fd71968461d82d1b8e23efdc261eb0baf4209b595b2ec2cf",
+      "casePages": [],
+      "rows": [],
+      "status": "aggregate-only",
+      "sourceRows": 0,
+      "imported": 0,
+      "duplicate": 0,
+      "merged-existing": 0,
+      "excluded": 0,
+      "selection": "統計は掲載されていますが、企業名・公表日付きの個別事例表は掲載されていません。"
+    },
+    {
+      "year": 2007,
+      "title": "2007年度 個人情報保護法施行状況の概要",
+      "url": "https://www.ppc.go.jp/files/pdf/personal_sekou_19caa.pdf",
+      "sha256": "05a948514a47fe728a6d556353fb9dc81c3290f0434f2365be9e53347cd3f1e1",
+      "casePages": [],
+      "rows": [],
+      "status": "aggregate-only",
+      "sourceRows": 0,
+      "imported": 0,
+      "duplicate": 0,
+      "merged-existing": 0,
+      "excluded": 0,
+      "selection": "統計は掲載されていますが、企業名・公表日付きの個別事例表は掲載されていません。"
+    },
+    {
+      "year": 2008,
+      "title": "2008年度 個人情報保護法施行状況の概要",
+      "url": "https://www.ppc.go.jp/files/pdf/personal_sekou_20caa.pdf",
+      "sha256": "f555d92d407383cab07b02bf6c3dde631c0513ec471aed3f4525032ebdb3ad80",
+      "casePages": [],
+      "rows": [],
+      "status": "aggregate-only",
+      "sourceRows": 0,
+      "imported": 0,
+      "duplicate": 0,
+      "merged-existing": 0,
+      "excluded": 0,
+      "selection": "統計は掲載されていますが、企業名・公表日付きの個別事例表は掲載されていません。"
+    },
+    {
+      "year": 2010,
+      "title": "2010年度 個人情報保護法施行状況の概要",
+      "url": "https://www.ppc.go.jp/files/pdf/personal_sekou_22caa.pdf",
+      "sha256": "352f3819d4380bf0d034f7f2aef673fb72c08768d1f2b82026c052387f95063e",
+      "casePages": [
+        35,
+        36
+      ],
+      "rows": [
+        {
+          "company": "株式会社サミーネットワークス(委託先:株式会社エルテックス)",
+          "announcedAt": "2010-11-10",
+          "page": 35,
+          "action": "imported",
+          "incidentId": "ppc-2010-11-10-66499b35"
+        },
+        {
+          "company": "株式会社ルーク19",
+          "announcedAt": "2010-11-01",
+          "page": 35,
+          "action": "imported",
+          "incidentId": "ppc-2010-11-01-45cf58f0"
+        },
+        {
+          "company": "株式会社リロケーション・ジャパン",
+          "announcedAt": "2010-09-22",
+          "page": 35,
+          "action": "imported",
+          "incidentId": "ppc-2010-09-22-363e82e0"
+        },
+        {
+          "company": "株式会社プリントパック",
+          "announcedAt": "2010-11-17",
+          "page": 35,
+          "action": "imported",
+          "incidentId": "ppc-2010-11-17-885321c9"
+        },
+        {
+          "company": "株式会社ユニットコム",
+          "announcedAt": "2010-09-27",
+          "page": 35,
+          "action": "imported",
+          "incidentId": "ppc-2010-09-27-87bed27c"
+        },
+        {
+          "company": "株式会社さくら観光",
+          "announcedAt": "2010-08-31",
+          "page": 36,
+          "action": "imported",
+          "incidentId": "ppc-2010-08-31-f1fdbf69"
+        },
+        {
+          "company": "瀧野川信用金庫",
+          "announcedAt": "2011-02-10",
+          "page": 36,
+          "action": "imported",
+          "incidentId": "ppc-2011-02-10-51879b79"
+        },
+        {
+          "company": "株式会社ゆうちょ銀行",
+          "announcedAt": "2010-11-19",
+          "page": 36,
+          "action": "imported",
+          "incidentId": "ppc-2010-11-19-00ee5a31"
+        },
+        {
+          "company": "株式会社学研ロジスティクス",
+          "announcedAt": "2010-11-11",
+          "page": 36,
+          "action": "imported",
+          "incidentId": "ppc-2010-11-11-b5baa401"
+        },
+        {
+          "company": "株式会社ゆうちょ銀行",
+          "announcedAt": "2010-12-03",
+          "page": 36,
+          "action": "imported",
+          "incidentId": "ppc-2010-12-03-00ee5a31"
+        },
+        {
+          "company": "株式会社ゆうちょ銀行",
+          "announcedAt": "2010-07-21",
+          "page": 36,
+          "action": "imported",
+          "incidentId": "ppc-2010-07-21-00ee5a31"
+        },
+        {
+          "company": "株式会社かんぽ生命保険",
+          "announcedAt": "2010-07-21",
+          "page": 36,
+          "action": "imported",
+          "incidentId": "ppc-2010-07-21-6ff15a39"
+        }
+      ],
+      "status": "case-table",
+      "sourceRows": 12,
+      "imported": 12,
+      "duplicate": 0,
+      "merged-existing": 0,
+      "excluded": 0,
+      "selection": "主な公表事案の年度表。原資料の規模・所管省庁による掲載条件があり、全国の全事案を列挙した資料ではありません。"
+    },
+    {
+      "year": 2011,
+      "title": "2011年度 個人情報保護法施行状況の概要",
+      "url": "https://www.ppc.go.jp/files/pdf/personal_sekou_23caa.pdf",
+      "sha256": "9ac9bf8d337ba6a3ce31daa27882a66c8969d711edf914e297e8566757713ae0",
+      "casePages": [
+        40,
+        41
+      ],
+      "rows": [
+        {
+          "company": "株式会社ソニー・コンピュータエンタテインメント",
+          "announcedAt": "2011-04-27",
+          "page": 40,
+          "action": "merged-existing",
+          "incidentId": "sony-psn-2011",
+          "reason": "既存事例と同じ事故。既存の続報・対象範囲と単位を優先"
+        },
+        {
+          "company": "株式会社山陰合同銀行",
+          "announcedAt": "2011-08-11",
+          "page": 40,
+          "action": "imported",
+          "incidentId": "ppc-2011-08-11-a33aefbf"
+        },
+        {
+          "company": "株式会社ゲオ",
+          "announcedAt": "2011-06-08",
+          "page": 40,
+          "action": "imported",
+          "incidentId": "ppc-2011-06-08-f59b532e"
+        },
+        {
+          "company": "株式会社阿波銀行",
+          "announcedAt": "2011-08-08",
+          "page": 40,
+          "action": "imported",
+          "incidentId": "ppc-2011-08-08-d2c3be8e"
+        },
+        {
+          "company": "株式会社ゆうちょ銀行",
+          "announcedAt": "2011-05-02",
+          "page": 40,
+          "action": "imported",
+          "incidentId": "ppc-2011-05-02-00ee5a31"
+        },
+        {
+          "company": "株式会社ゲームポット",
+          "announcedAt": "2011-08-25",
+          "page": 40,
+          "action": "imported",
+          "incidentId": "ppc-2011-08-25-77aca891"
+        },
+        {
+          "company": "株式会社デジタルブティック",
+          "announcedAt": "2012-02-09",
+          "page": 40,
+          "action": "imported",
+          "incidentId": "ppc-2012-02-09-1c01d921"
+        },
+        {
+          "company": "株式会社セディナ",
+          "announcedAt": "2011-08-16",
+          "page": 40,
+          "action": "imported",
+          "incidentId": "ppc-2011-08-16-3ca84ffc"
+        },
+        {
+          "company": "株式会社滋賀銀行",
+          "announcedAt": "2011-08-10",
+          "page": 41,
+          "action": "imported",
+          "incidentId": "ppc-2011-08-10-743e9479"
+        },
+        {
+          "company": "シティカードジャパン株式会社",
+          "announcedAt": "2011-08-05",
+          "page": 41,
+          "action": "imported",
+          "incidentId": "ppc-2011-08-05-76273c7a"
+        },
+        {
+          "company": "愛媛日産自動車株式会社",
+          "announcedAt": "2011-04-19",
+          "page": 41,
+          "action": "imported",
+          "incidentId": "ppc-2011-04-19-1feeb898"
+        },
+        {
+          "company": "株式会社インフィニトラベルインフォメーション",
+          "announcedAt": "2011-10-05",
+          "page": 41,
+          "action": "imported",
+          "incidentId": "ppc-2011-10-05-3a9215a4"
+        },
+        {
+          "company": "株式会社横浜銀行",
+          "announcedAt": "2011-11-19",
+          "page": 41,
+          "action": "imported",
+          "incidentId": "ppc-2011-11-19-58c487b8"
+        }
+      ],
+      "status": "case-table",
+      "sourceRows": 13,
+      "imported": 12,
+      "duplicate": 0,
+      "merged-existing": 1,
+      "excluded": 0,
+      "selection": "主な公表事案の年度表。原資料の規模・所管省庁による掲載条件があり、全国の全事案を列挙した資料ではありません。"
+    },
+    {
+      "year": 2012,
+      "title": "2012年度 個人情報保護法施行状況の概要",
+      "url": "https://www.ppc.go.jp/files/pdf/personal_sekou_24caa.pdf",
+      "sha256": "09116473ff78541c22b59e5b8a8b439ca74850ab719aa8e7e032c391877386bc",
+      "casePages": [
+        41,
+        42
+      ],
+      "rows": [
+        {
+          "company": "株式会社三菱東京UFJ銀行",
+          "announcedAt": "2012-11-13",
+          "page": 41,
+          "action": "imported",
+          "incidentId": "ppc-2012-11-13-42720c19"
+        },
+        {
+          "company": "株式会社リンクステーション",
+          "announcedAt": "2012-06-01",
+          "page": 41,
+          "action": "imported",
+          "incidentId": "ppc-2012-06-01-26990303"
+        },
+        {
+          "company": "損害保険ジャパン株式会社",
+          "announcedAt": "2012-06-21",
+          "page": 41,
+          "action": "imported",
+          "incidentId": "ppc-2012-06-21-e2420903"
+        },
+        {
+          "company": "株式会社福岡銀行",
+          "announcedAt": "2012-07-23",
+          "page": 41,
+          "action": "imported",
+          "incidentId": "ppc-2012-07-23-31625b46"
+        },
+        {
+          "company": "株式会社レアジョブ",
+          "announcedAt": "2012-05-13",
+          "page": 41,
+          "action": "imported",
+          "incidentId": "ppc-2012-05-13-6a68c92b"
+        },
+        {
+          "company": "株式会社イオン銀行",
+          "announcedAt": "2012-12-07",
+          "page": 41,
+          "action": "imported",
+          "incidentId": "ppc-2012-12-07-5b72f5e8"
+        },
+        {
+          "company": "カルピス株式会社(委託先:株式会社博報堂)",
+          "announcedAt": "2012-07-13",
+          "page": 42,
+          "action": "imported",
+          "incidentId": "ppc-2012-07-13-6d925a08"
+        },
+        {
+          "company": "株式会社ウェブシャーク",
+          "announcedAt": "2012-10-30",
+          "page": 42,
+          "action": "imported",
+          "incidentId": "ppc-2012-10-30-6878c1df"
+        },
+        {
+          "company": "郵便事業株式会社(現日本郵便株式会社)",
+          "announcedAt": "2012-05-22",
+          "page": 42,
+          "action": "imported",
+          "incidentId": "ppc-2012-05-22-3d2c0fb5"
+        },
+        {
+          "company": "株式会社学情",
+          "announcedAt": "2012-09-27",
+          "page": 42,
+          "action": "imported",
+          "incidentId": "ppc-2012-09-27-23928507"
+        },
+        {
+          "company": "株式会社キャリアインデックス",
+          "announcedAt": "2013-02-28",
+          "page": 42,
+          "action": "imported",
+          "incidentId": "ppc-2013-02-28-896287c8"
+        },
+        {
+          "company": "株式会社スクウェア・エニックス",
+          "announcedAt": "2012-09-14",
+          "page": 42,
+          "action": "imported",
+          "incidentId": "ppc-2012-09-14-6d193da7"
+        }
+      ],
+      "status": "case-table",
+      "sourceRows": 12,
+      "imported": 12,
+      "duplicate": 0,
+      "merged-existing": 0,
+      "excluded": 0,
+      "selection": "主な公表事案の年度表。原資料の規模・所管省庁による掲載条件があり、全国の全事案を列挙した資料ではありません。"
+    },
+    {
+      "year": 2014,
+      "title": "2014年度 個人情報保護法施行状況の概要",
+      "url": "https://www.ppc.go.jp/files/pdf/personal_sekou_26caa.pdf",
+      "sha256": "49e5edab4870e58361a218110d1b00518b282bc5ec1e270c01e3d6708999a82b",
+      "casePages": [
+        42,
+        43
+      ],
+      "rows": [
+        {
+          "company": "株式会社ミクシィ",
+          "announcedAt": "2014-06-17",
+          "page": 42,
+          "action": "imported",
+          "incidentId": "ppc-2014-06-17-4aa6bc04"
+        },
+        {
+          "company": "株式会社リクルートホールディングス",
+          "announcedAt": "2014-09-08",
+          "page": 42,
+          "action": "imported",
+          "incidentId": "ppc-2014-09-08-b56803db"
+        },
+        {
+          "company": "株式会社ドワンゴ",
+          "announcedAt": "2014-12-10",
+          "page": 42,
+          "action": "imported",
+          "incidentId": "ppc-2014-12-10-f84e213a"
+        },
+        {
+          "company": "GMOメイクショップ株式会社",
+          "announcedAt": "2014-09-25",
+          "page": 42,
+          "action": "imported",
+          "incidentId": "ppc-2014-09-25-bfa80e4f"
+        },
+        {
+          "company": "株式会社もち吉",
+          "announcedAt": "2014-04-26",
+          "page": 42,
+          "action": "imported",
+          "incidentId": "ppc-2014-04-26-e209759e"
+        },
+        {
+          "company": "パナソニック株式会社",
+          "announcedAt": "2014-04-23",
+          "page": 42,
+          "action": "imported",
+          "incidentId": "ppc-2014-04-23-dd439e1b"
+        },
+        {
+          "company": "ターゲットメディア株式会社",
+          "announcedAt": "2014-06-04",
+          "page": 42,
+          "action": "imported",
+          "incidentId": "ppc-2014-06-04-fd5166c4"
+        },
+        {
+          "company": "株式会社ホットマン(委託先:アクセルソリューションズ)",
+          "announcedAt": "2014-07-01",
+          "page": 43,
+          "action": "imported",
+          "incidentId": "ppc-2014-07-01-4067a3a3"
+        },
+        {
+          "company": "横河医療ソリューションズ株式会社",
+          "announcedAt": "2015-01-23",
+          "page": 43,
+          "action": "imported",
+          "incidentId": "ppc-2015-01-23-636ad4bc"
+        },
+        {
+          "company": "株式会社ベネッセコーポレーション",
+          "announcedAt": "2014-07-09",
+          "page": 43,
+          "action": "merged-existing",
+          "incidentId": "benesse-customer-2014",
+          "reason": "既存事例と同じ事故。既存の続報・対象範囲と単位を優先"
+        },
+        {
+          "company": "株式会社エヌシーマック",
+          "announcedAt": "2015-03-12",
+          "page": 43,
+          "action": "imported",
+          "incidentId": "ppc-2015-03-12-cfc38253"
+        }
+      ],
+      "status": "case-table",
+      "sourceRows": 11,
+      "imported": 10,
+      "duplicate": 0,
+      "merged-existing": 1,
+      "excluded": 0,
+      "selection": "主な公表事案の年度表。原資料の規模・所管省庁による掲載条件があり、全国の全事案を列挙した資料ではありません。"
+    },
+    {
+      "year": 2015,
+      "title": "2015年度 個人情報保護法施行状況の概要",
+      "url": "https://www.ppc.go.jp/files/pdf/personal_sekougaiyou_27ppc.pdf",
+      "sha256": "a5810e215d7568b9badd7dc43d4043d670fba5da74bcb420c0a067b99685b137",
+      "casePages": [
+        46,
+        47
+      ],
+      "rows": [
+        {
+          "company": "岐阜商工信用組合",
+          "announcedAt": "2015-06-25",
+          "page": 46,
+          "action": "imported",
+          "incidentId": "ppc-2015-06-25-9ca06fda"
+        },
+        {
+          "company": "三井住友海上あいおい生命保険株式会社",
+          "announcedAt": "2015-05-13",
+          "page": 46,
+          "action": "imported",
+          "incidentId": "ppc-2015-05-13-2b1b2e6c"
+        },
+        {
+          "company": "ワイジェイFX株式会社",
+          "announcedAt": "2016-02-02",
+          "page": 46,
+          "action": "imported",
+          "incidentId": "ppc-2016-02-02-0dd531fc"
+        },
+        {
+          "company": "ヤフー株式会社",
+          "announcedAt": "2015-09-06",
+          "page": 46,
+          "action": "imported",
+          "incidentId": "ppc-2015-09-06-ba2710e6"
+        },
+        {
+          "company": "学校法人関西大学関西大学",
+          "announcedAt": "2015-12-11",
+          "page": 46,
+          "action": "imported",
+          "incidentId": "ppc-2015-12-11-238f64b2"
+        },
+        {
+          "company": "株式会社シャトレーゼ",
+          "announcedAt": "2015-07-30",
+          "page": 46,
+          "action": "imported",
+          "incidentId": "ppc-2015-07-30-9dbfede9"
+        },
+        {
+          "company": "江崎グリコ株式会社",
+          "announcedAt": "2016-03-07",
+          "page": 46,
+          "action": "imported",
+          "incidentId": "ppc-2016-03-07-c930ccfc"
+        },
+        {
+          "company": "株式会社サンリオデジタル",
+          "announcedAt": "2015-12-24",
+          "page": 46,
+          "action": "imported",
+          "incidentId": "ppc-2015-12-24-773dcf57"
+        },
+        {
+          "company": "株式会社ドワンゴ",
+          "announcedAt": "2015-06-10",
+          "page": 46,
+          "action": "imported",
+          "incidentId": "ppc-2015-06-10-f84e213a"
+        },
+        {
+          "company": "株式会社タミヤ",
+          "announcedAt": "2015-07-21",
+          "page": 46,
+          "action": "imported",
+          "incidentId": "ppc-2015-07-21-8936e27c"
+        },
+        {
+          "company": "セキ株式会社",
+          "announcedAt": "2015-09-15",
+          "page": 47,
+          "action": "imported",
+          "incidentId": "ppc-2015-09-15-fb553347"
+        },
+        {
+          "company": "株式会社ベルネージュダイレクト",
+          "announcedAt": "2015-09-15",
+          "page": 47,
+          "action": "imported",
+          "incidentId": "ppc-2015-09-15-7fe7db02"
+        },
+        {
+          "company": "東京電力株式会社",
+          "announcedAt": "2016-01-28",
+          "page": 47,
+          "action": "imported",
+          "incidentId": "ppc-2016-01-28-05bb78db"
+        },
+        {
+          "company": "不明※1",
+          "announcedAt": null,
+          "page": 47,
+          "action": "excluded",
+          "reason": "企業名・公表日が資料で特定できない匿名事案"
+        }
+      ],
+      "status": "case-table",
+      "sourceRows": 14,
+      "imported": 13,
+      "duplicate": 0,
+      "merged-existing": 0,
+      "excluded": 1,
+      "selection": "主な公表事案の年度表。原資料の規模・所管省庁による掲載条件があり、全国の全事案を列挙した資料ではありません。"
+    },
+    {
+      "year": 2016,
+      "title": "2016年度 個人情報保護法施行状況の概要",
+      "url": "https://www.ppc.go.jp/files/pdf/personal_sekougaiyou_28ppc.pdf",
+      "sha256": "b8bd6f5ac91f623519fc2a1c807447ef5b79e8ecf9835f99b6f8135cf8b2b8de",
+      "casePages": [
+        50,
+        51,
+        52,
+        53,
+        54
+      ],
+      "rows": [
+        {
+          "company": "株式会社サイバーエージェント",
+          "announcedAt": "2016-05-11",
+          "page": 50,
+          "action": "imported",
+          "incidentId": "ppc-2016-05-11-054c8052"
+        },
+        {
+          "company": "GMOメイクショップ株式会社",
+          "announcedAt": "2016-06-21",
+          "page": 50,
+          "action": "imported",
+          "incidentId": "ppc-2016-06-21-bfa80e4f"
+        },
+        {
+          "company": "株式会社NTTドコモ",
+          "announcedAt": "2016-06-14",
+          "page": 50,
+          "action": "imported",
+          "incidentId": "ppc-2016-06-14-bb647797"
+        },
+        {
+          "company": "株式会社パイプドビッツ",
+          "announcedAt": "2016-06-22",
+          "page": 50,
+          "action": "imported",
+          "incidentId": "ppc-2016-06-22-dfe838ed"
+        },
+        {
+          "company": "軒先株式会社",
+          "announcedAt": "2016-08-26",
+          "page": 50,
+          "action": "imported",
+          "incidentId": "ppc-2016-08-26-f2f4070a"
+        },
+        {
+          "company": "株式会社サイバーエージェント",
+          "announcedAt": "2016-11-29",
+          "page": 50,
+          "action": "imported",
+          "incidentId": "ppc-2016-11-29-054c8052"
+        },
+        {
+          "company": "日本テレビ放送網株式会社",
+          "announcedAt": "2016-04-21",
+          "page": 50,
+          "action": "imported",
+          "incidentId": "ppc-2016-04-21-73657fcd"
+        },
+        {
+          "company": "株式会社J-WAVE",
+          "announcedAt": "2016-04-22",
+          "page": 51,
+          "action": "imported",
+          "incidentId": "ppc-2016-04-22-5ecc35f6"
+        },
+        {
+          "company": "株式会社エフエム愛知",
+          "announcedAt": "2016-07-25",
+          "page": 51,
+          "action": "imported",
+          "incidentId": "ppc-2016-07-25-cfb9851f"
+        },
+        {
+          "company": "株式会社ジェイティービー",
+          "announcedAt": "2016-06-14",
+          "page": 51,
+          "action": "imported",
+          "incidentId": "ppc-2016-06-14-0c36f850"
+        },
+        {
+          "company": "全国健康保険協会",
+          "announcedAt": "2017-02-17",
+          "page": 51,
+          "action": "imported",
+          "incidentId": "ppc-2017-02-17-cb070346"
+        },
+        {
+          "company": "株式会社イプサ",
+          "announcedAt": "2016-12-02",
+          "page": 51,
+          "action": "imported",
+          "incidentId": "ppc-2016-12-02-ddaab842"
+        },
+        {
+          "company": "公益社団法人ジャパン・プロフェッショナル・バスケットボールリーグ",
+          "announcedAt": "2017-04-25",
+          "page": 51,
+          "action": "imported",
+          "incidentId": "ppc-2017-04-25-7bad4310"
+        },
+        {
+          "company": "株式会社ジンズ",
+          "announcedAt": "2017-03-23",
+          "page": 51,
+          "action": "imported",
+          "incidentId": "ppc-2017-03-23-81dba261"
+        },
+        {
+          "company": "GMOペイメントゲートウェイ株式会社",
+          "announcedAt": "2017-03-10",
+          "page": 52,
+          "action": "imported",
+          "incidentId": "ppc-2017-03-10-c57031f7"
+        },
+        {
+          "company": "トヨタファイナンス株式会社",
+          "announcedAt": "2017-03-10",
+          "page": 52,
+          "action": "imported",
+          "incidentId": "ppc-2017-03-10-2d3bcb3e"
+        },
+        {
+          "company": "株式会社ザ・キッス",
+          "announcedAt": "2016-04-11",
+          "page": 52,
+          "action": "imported",
+          "incidentId": "ppc-2016-04-11-2ac29a1e"
+        },
+        {
+          "company": "エイベックス・ミュージック・クリエイティヴ株式会社",
+          "announcedAt": "2016-04-28",
+          "page": 52,
+          "action": "imported",
+          "incidentId": "ppc-2016-04-28-0f441ef1"
+        },
+        {
+          "company": "株式会社NETSEA",
+          "announcedAt": "2016-04-27",
+          "page": 53,
+          "action": "imported",
+          "incidentId": "ppc-2016-04-27-66db874f"
+        },
+        {
+          "company": "東京電力パワーグリッド株式会社",
+          "announcedAt": "2016-08-23",
+          "page": 53,
+          "action": "imported",
+          "incidentId": "ppc-2016-08-23-704962d5"
+        },
+        {
+          "company": "軒先株式会社",
+          "announcedAt": "2016-08-26",
+          "page": 53,
+          "action": "duplicate",
+          "incidentId": "ppc-2016-08-26-f2f4070a",
+          "reason": "複数省庁が掲載した同一事案"
+        },
+        {
+          "company": "株式会社サイバーエージェント",
+          "announcedAt": "2016-05-11",
+          "page": 53,
+          "action": "duplicate",
+          "incidentId": "ppc-2016-05-11-054c8052",
+          "reason": "複数省庁が掲載した同一事案"
+        },
+        {
+          "company": "株式会社サイバーエージェント",
+          "announcedAt": "2016-11-29",
+          "page": 53,
+          "action": "duplicate",
+          "incidentId": "ppc-2016-11-29-054c8052",
+          "reason": "複数省庁が掲載した同一事案"
+        },
+        {
+          "company": "株式会社ネルケプランニング",
+          "announcedAt": "2017-01-01",
+          "page": 53,
+          "action": "imported",
+          "incidentId": "ppc-2017-01-01-66331561"
+        },
+        {
+          "company": "ハミューレ株式会社",
+          "announcedAt": "2017-02-27",
+          "page": 54,
+          "action": "imported",
+          "incidentId": "ppc-2017-02-27-8d1a37ec"
+        }
+      ],
+      "status": "case-table",
+      "sourceRows": 25,
+      "imported": 22,
+      "duplicate": 3,
+      "merged-existing": 0,
+      "excluded": 0,
+      "selection": "主な公表事案の年度表。原資料の規模・所管省庁による掲載条件があり、全国の全事案を列挙した資料ではありません。"
+    }
+  ]
+}

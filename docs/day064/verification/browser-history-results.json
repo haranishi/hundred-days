@@ -1,0 +1,90 @@
+{
+  "asOf": "2026-10-11",
+  "scope": "13,550-record archive and Rust/Wasm UI",
+  "command": "npx playwright test --config tests/e2e/day-064.config.mjs --project checks --reporter list --output test-results/day064-checks",
+  "browser": "Chromium 151",
+  "passed": 19,
+  "failed": 0,
+  "skipped": 0,
+  "retries": 0,
+  "durationSeconds": 18.2,
+  "evidence": "Recorded from the completed terminal result. Tests use the local Vite production preview.",
+  "tests": [
+    {
+      "name": "13,550 actual records load with Rust/Wasm, a bounded page, and no eager 3D",
+      "status": "passed"
+    },
+    {
+      "name": "screens at desktop, tablet and mobile show the new archive and selected source",
+      "status": "passed"
+    },
+    {
+      "name": "regions, years and causes link to the same searchable history",
+      "status": "passed"
+    },
+    {
+      "name": "fullwidth search retains all three KDDI incidents and correct source units",
+      "status": "passed"
+    },
+    {
+      "name": "service aliases lead to revised corporate sources; unknown totals stay unknown",
+      "status": "passed"
+    },
+    {
+      "name": "same-unit proportional comparison and government-notice definitions remain explicit",
+      "status": "passed"
+    },
+    {
+      "name": "CA notices preserve report dates, original breach dates and no guessed victim counts",
+      "status": "passed"
+    },
+    {
+      "name": "dataset coverage accounts for every register export and its exclusions",
+      "status": "passed"
+    },
+    {
+      "name": "lazy 3D is capped; actual context loss recovers focus, selection and exploration",
+      "status": "passed"
+    },
+    {
+      "name": "Wasm download failure keeps identical searchable records in the Worker",
+      "status": "passed"
+    },
+    {
+      "name": "Worker startup failure preserves browsing with the main-thread fallback",
+      "status": "passed"
+    },
+    {
+      "name": "failed detail loads offer a working retry without losing the index",
+      "status": "passed"
+    },
+    {
+      "name": "mobile keyboard drawer, focus trap, dialogs and reduced motion remain usable",
+      "status": "passed"
+    },
+    {
+      "name": "deep links find old records and sharing omits search and filter state",
+      "status": "passed"
+    },
+    {
+      "name": "unavailable WebGL starts an operable SVG map with the same records",
+      "status": "passed"
+    },
+    {
+      "name": "an unavailable archive has a working reload and medium-width filters stay accessible",
+      "status": "passed"
+    },
+    {
+      "name": "keyboard chart controls keep focus when their selected state updates",
+      "status": "passed"
+    },
+    {
+      "name": "OG metadata and rendered preview use the current public-record count",
+      "status": "passed"
+    },
+    {
+      "name": "browser performance uses all 13,550 real records and records Worker and UI latency",
+      "status": "passed"
+    }
+  ]
+}

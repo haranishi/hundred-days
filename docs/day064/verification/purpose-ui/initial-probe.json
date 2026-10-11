@@ -1,0 +1,71 @@
+{
+  "measurements": [
+    {
+      "width": 1440,
+      "scrollWidth": 1440,
+      "scrollHeight": 1698,
+      "hero": "過去の記録から、これからの備えへ。",
+      "visibleViews": [
+        "◎ 地図で見る",
+        "≡ 一覧で読む",
+        "▤ 備えを学ぶ"
+      ],
+      "drawerHidden": true,
+      "stage": {
+        "x": 61,
+        "y": 574.265625,
+        "width": 972,
+        "height": 430,
+        "top": 574.265625,
+        "right": 1033,
+        "bottom": 1004.265625,
+        "left": 61
+      }
+    },
+    {
+      "width": 768,
+      "scrollWidth": 768,
+      "scrollHeight": 2789,
+      "hero": "過去の記録から、これからの備えへ。",
+      "visibleViews": [
+        "◎ 地図で見る",
+        "≡ 一覧で読む",
+        "▤ 備えを学ぶ"
+      ],
+      "drawerHidden": true,
+      "stage": {
+        "x": 17,
+        "y": 680.65625,
+        "width": 734,
+        "height": 360,
+        "top": 680.65625,
+        "right": 751,
+        "bottom": 1040.65625,
+        "left": 17
+      }
+    },
+    {
+      "width": 390,
+      "scrollWidth": 390,
+      "scrollHeight": 2955,
+      "hero": "過去の記録から、これからの備えへ。",
+      "visibleViews": [
+        "◎ 地図で見る",
+        "≡ 一覧で読む",
+        "▤ 備えを学ぶ"
+      ],
+      "drawerHidden": true,
+      "stage": {
+        "x": 17,
+        "y": 740.765625,
+        "width": 356,
+        "height": 360,
+        "top": 740.765625,
+        "right": 373,
+        "bottom": 1100.765625,
+        "left": 17
+      }
+    }
+  ],
+  "errors": []
+}

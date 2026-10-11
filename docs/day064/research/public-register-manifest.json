@@ -1,0 +1,28 @@
+[
+  {
+    "file": "california.csv",
+    "publisher": "California DOJ",
+    "sourceUrl": "https://www.oag.ca.gov/privacy/databreach/list-export",
+    "rows": 5350,
+    "sha256": "9e1424d094aa13327d421a2adb9a24d6a04ff685260dd09c32efe053fed33e8c",
+    "bytes": 344150
+  },
+  {
+    "file": "hhs-investigation.csv",
+    "publisher": "HHS OCR",
+    "sourceUrl": "https://ocrportal.hhs.gov/ocr/breach/breach_report_hip.jsf",
+    "rows": 754,
+    "tableCount": 754,
+    "sha256": "c953a910ce7ebf93d701455c375559daa55e7e97139cac06d6bfc09e5669a4ed",
+    "bytes": 97268
+  },
+  {
+    "file": "hhs-archive.csv",
+    "publisher": "HHS OCR",
+    "sourceUrl": "https://ocrportal.hhs.gov/ocr/breach/breach_report_hip.jsf",
+    "rows": 7261,
+    "tableCount": 7261,
+    "sha256": "26ca3661050996b669d12263544134823bccb43af5480a957842c2421d916def",
+    "bytes": 5516686
+  }
+]

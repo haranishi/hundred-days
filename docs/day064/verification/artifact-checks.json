@@ -1,0 +1,84 @@
+{
+  "asOf": "2026-10-11",
+  "distributionFilesCompared": 164,
+  "distributionByteMatches": true,
+  "unexpectedAssets": [],
+  "records": 13550,
+  "localHttp": [
+    {
+      "path": "index.html",
+      "status": 200,
+      "contentType": "text/html",
+      "bytes": 15406,
+      "sha256": "a26f52f09fe31bb98d6bcdcc663d55a8f6ab01219310b86c54f87d9426a6a9d6",
+      "matchesBuild": true
+    },
+    {
+      "path": "data/index.json",
+      "status": 200,
+      "contentType": "application/json",
+      "bytes": 2588559,
+      "sha256": "3931ff8bfadbc657f1f8550a2ca4769dde370bfb0fd5139f46944ac8ade6d836",
+      "matchesBuild": true
+    },
+    {
+      "path": "data/details/0.json",
+      "status": 200,
+      "contentType": "application/json",
+      "bytes": 144155,
+      "sha256": "5c93516f20a78518bdfdcead389278670c44774a4abaacf692691a9d2dfccff1",
+      "matchesBuild": true
+    },
+    {
+      "path": "data/details/135.json",
+      "status": 200,
+      "contentType": "application/json",
+      "bytes": 75709,
+      "sha256": "d25be3cfa68453a0651a78bbee45549d37e7047ba0ae0f03b13e730915a26842",
+      "matchesBuild": true
+    },
+    {
+      "path": "engine/search.wasm",
+      "status": 200,
+      "contentType": "application/wasm",
+      "bytes": 52572,
+      "sha256": "86f5821889cfdb2800a5e5513b83f3593396a2ece38a41e7a321b5ab75be022b",
+      "matchesBuild": true
+    },
+    {
+      "path": "licenses/rust/COPYRIGHT-library.html",
+      "status": 200,
+      "contentType": "text/html",
+      "bytes": 1499465,
+      "sha256": "5647be074c8edf7339fd863055923a8fc80bc5610a8d4661ec3b767b9d392c27",
+      "matchesBuild": true
+    },
+    {
+      "path": "licenses/THIRD_PARTY_NOTICES.txt",
+      "status": 200,
+      "contentType": "text/plain",
+      "bytes": 116246,
+      "sha256": "ca96bc642b1ed493106cb0e87edcc3711ac7b3775facb0d4af020c418ab3a4d9",
+      "matchesBuild": true
+    },
+    {
+      "path": "og.png",
+      "status": 200,
+      "contentType": "image/png",
+      "bytes": 212262,
+      "sha256": "ba94f99c1b9f0656da4538d04e8efbc83974533105dd159aa73cb12d54cb35c9",
+      "matchesBuild": true
+    }
+  ],
+  "draftExcludedFromSite": true,
+  "siteBuild": "passed; 63 published days; Day64 excluded as draft",
+  "screens": [
+    "1920x1080",
+    "1440x1000",
+    "768x1100",
+    "390x1000"
+  ],
+  "screenCheck": "1 passed in 4.4s",
+  "screenshotMatchesDesktopEvidence": true,
+  "published": false
+}
