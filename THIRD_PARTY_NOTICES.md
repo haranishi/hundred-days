@@ -102,6 +102,7 @@
 | 060 | 同梱の `day-060-prize-explained/data/laureates.json`（個人のべ1,001回・団体31回）、`tests/fixtures/` の実応答6本 | [Nobel Prize API 2.1](https://www.nobelprize.org/about/developer-zone-2/)（2026-10-07取得） | [CC0](https://www.nobelprize.org/about/terms-of-use-for-api-nobelprize-org-and-data-nobelprize-org/) | **加工あり**。生年月日と没年月日は配らず、発表日の年齢（`lib/age.js` で計算）と注記の印に置き換えた。表示に使う項目だけを残し、Wikidataの日本語ラベルを付けた。fixturesは2026-10-06 18:45・18:53と2026-10-07 18:57の実応答のまま（詳細は[`day-060-prize-explained/data/SOURCES.md`](day-060-prize-explained/data/SOURCES.md)） |
 | 060 | 受賞者の日本語ラベル（`data/laureates.json`） | [Wikidata](https://www.wikidata.org/) | [CC0](https://www.wikidata.org/wiki/Wikidata:Licensing) | 日本語ラベル、無い場合は日本語版記事名を使用 |
 | 060 | 解説の文章（`day-060-prize-explained/data/commentary.json`） | リポジトリ作成者が、論文・研究機関のページなどの事実から自分の言葉で書いた | 第三者の文章を含まない。ライセンスはコードと同じMIT。出典はリンクで示し、本文は転載しない | 公式サイトの文章は、写さず・訳さず・言い換えない。受賞理由の原文だけ、公式のデータ（CC0）の値のまま画面に出す（根拠は[`COMMENTARY_RULES.md`](day-060-prize-explained/COMMENTARY_RULES.md)） |
+| 063 | 手口の解説と「知っておきたいルール」の文章（`day-063-dark-patterns/lib/stages.js`） | 消費者庁、OECD、国民生活センターの公開資料（一覧は[アプリREADME](day-063-dark-patterns/README.md)） | [公共データ利用規約 第1.0版](https://www.digital.go.jp/resources/open_data/public_data_license_v1.0)（消費者庁）、[OECD Terms and Conditions](https://www.oecd.org/en/about/terms-conditions.html)、[国民生活センターの利用規約・著作権](https://www.kokusen.go.jp/info/data/copyright.html) | 題名と機関名を挙げ、内容を制作者の言葉で要約。文章・図・画像は転載せず、各機関の見解ではないと画面とREADMEに明記（確認の経緯は[`day063-rights.md`](.agent-harness/runs/day063-rights.md)） |
 
 ## Day56「夕暮れ破壊紀行」の描画依存
 
