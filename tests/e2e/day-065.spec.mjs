@@ -1308,33 +1308,38 @@ test('「焦げた！」の文字は、焦げて駅を出ていく列車より�
     await pickTrain(page, dish).click();
     for (let i = 0; i < 2; i++) await page.locator('.switch[data-node="J1"]').click();
   }
+  // 描く順：文字の層（m-fxtext）は、列車の層（m-trains）より後ろ（＝手前）にある。これが本体の保証で、字体や環境に左右されない
+  const layersOk = await page.evaluate(() => {
+    const trains = document.querySelector('#map-svg > .m-trains');
+    const fxtext = document.querySelector('#map-svg > .m-fxtext');
+    return Boolean(trains && fxtext && (trains.compareDocumentPosition(fxtext) & Node.DOCUMENT_POSITION_FOLLOWING));
+  });
+  expect(layersOk, '文字の層が、列車の層より手前（後ろ）にある').toBe(true);
   await page.getByRole('button', { name: '発車', exact: true }).click();
   // 「焦げた！」が出るまで進め、出ている間（焦げた列車が駅を出て、文字の横を通る）に何度か確かめる
   const text = page.locator('.station-fx-text[data-node="M"]');
   for (let i = 0; i < 400 && !(await text.getAttribute('class')).includes('is-burning'); i++) await page.clock.runFor(50);
   await expect(text).toHaveClass(/is-burning/);
+  // 列車の丸が文字の下にある点では、文字が上になっていること（積み重なりの順で見る）。
+  // 焦げた列車が文字の位置を通るかどうかは、字体の寸法で変わる（CI の Linux では通らなかった）ので、通らなくても失敗にはしない
   const covered = [];
-  let chipsNear = 0;
   for (let k = 0; k < 8; k++) {
     const r = await page.locator('.station-fx-text[data-node="M"] .fx__label--burn').evaluate((el) => {
       const b = el.getBoundingClientRect();
       const out = [];
-      let near = 0;
       for (let i = 1; i <= 7; i++) {
         const x = b.left + (b.width * i) / 8;
         const y = b.top + b.height / 2;
-        const top = document.elementFromPoint(x, y);
-        if (!top || !top.closest('.station-fx-text')) out.push(`${Math.round(x)},${Math.round(y)}: ${top?.closest('.chip')?.dataset.train ?? top?.tagName}`);
-        // 文字の下（同じ点）に列車の丸があるか（文字が上にあるから見えないだけで、重なってはいる）
-        if (document.elementsFromPoint(x, y).some((e) => e.closest('#map-svg .chip'))) near += 1;
+        const stack = document.elementsFromPoint(x, y); // 手前から奥の順
+        const chipAt = stack.findIndex((e) => e.closest('#map-svg .chip'));
+        const textAt = stack.findIndex((e) => e.closest('.station-fx-text'));
+        if (chipAt !== -1 && (textAt === -1 || textAt > chipAt)) out.push(`${Math.round(x)},${Math.round(y)}: ${stack[chipAt].closest('.chip').dataset.train}`);
       }
-      return { out, near };
+      return out;
     });
-    covered.push(...r.out);
-    chipsNear += r.near;
+    covered.push(...r);
     await page.clock.runFor(60);
   }
-  expect(chipsNear, '焦げた列車が文字の位置を通らなかった（確かめになっていない）').toBeGreaterThan(0);
   expect(covered, '「焦げた！」の上に列車が描かれている').toEqual([]);
   await expectClean(page, seen);
 });
