@@ -1,0 +1,1895 @@
+/* 定刻ごはん。色は CSS 変数（指定どおりの値）。インラインの style は使わず、class と属性で表す。
+   指定色のままでは文字が 4.5:1 に届かない組み合わせがある（白×焼く駅 4.29、--ok の文字 3.84、配膳×--ink 4.33）。
+   色の値は変えず、駅の文字は暗い帯の上に、成功の文字は --ok-ink、配膳の文字は --serve-ink で出す。 */
+
+:root {
+  --bg: #fff6e5;
+  --paper: #fffbf3;
+  --board: #fbecd0;
+  --ink: #2b2118;
+  --ink-soft: #5c4a3a;
+  --rail: #5c4a3a;
+  --tie: #b9976f;
+  --line: rgba(92, 74, 58, 0.22);
+  --line-strong: rgba(92, 74, 58, 0.5);
+  --navy: #1d2b4f;
+  --navy-deep: #0e1730;
+  --red: #c62828;
+  --cut: #2f6fd6;
+  --grill: #d9481c;
+  --simmer: #7a45c9;
+  --serve: #b7791f;
+  --serve-ink: #1d140c;
+  --ok: #1f8f4e;
+  --ok-ink: #176b3a;
+  --ng: #c62828;
+  --gold: #a86b00;
+  --t1: #e4572e;
+  --t2: #2e86ab;
+  --t3: #7b8f2a;
+  --t4: #a23b72;
+  --t5: #f2a900;
+  --tc: var(--rail);
+  --gutter: 16px;
+  --radius: 14px;
+  --font: system-ui, -apple-system, "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Noto Sans JP", "Yu Gothic UI", "Meiryo", sans-serif;
+}
+
+.tc-t1 { --tc: var(--t1); }
+.tc-t2 { --tc: var(--t2); }
+.tc-t3 { --tc: var(--t3); }
+.tc-t4 { --tc: var(--t4); }
+.tc-t5 { --tc: var(--t5); }
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  background: var(--bg);
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font);
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+button,
+a {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  -webkit-tap-highlight-color: transparent;
+}
+
+:focus-visible {
+  outline: 3px solid var(--navy);
+  outline-offset: 2px;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.nw {
+  white-space: nowrap;
+}
+
+.offscreen {
+  position: fixed;
+  top: -1000px;
+  left: 0;
+  opacity: 0;
+}
+
+/* ---------------------------------------------------------------- 帯 */
+
+.band {
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 max(var(--gutter), env(safe-area-inset-right)) 0 max(var(--gutter), env(safe-area-inset-left));
+  background: var(--navy);
+  color: #fff;
+}
+
+.band__home {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-decoration: none;
+}
+
+.band__share {
+  position: relative;
+  min-width: 44px;
+  height: 44px;
+  padding: 0 16px;
+  border: 0;
+  background: none;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+/* 見えている丸い枠は帯より小さく、押せる範囲は帯の高さ（44px）いっぱい */
+.band__share::before {
+  content: "";
+  position: absolute;
+  inset: 6px 0;
+  border: 1.5px solid rgba(255, 255, 255, 0.75);
+  border-radius: 999px;
+}
+
+.band__share:hover::before {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.band :focus-visible {
+  outline-color: #fff;
+}
+
+/* ---------------------------------------------------------------- 本体 */
+
+.app {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 10px var(--gutter) 116px;
+}
+
+.intro__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px 12px;
+}
+
+.intro h1 {
+  margin: 0;
+  padding-bottom: 3px;
+  font-size: 26px;
+  font-weight: 800;
+  line-height: 1.25;
+  letter-spacing: 0.06em;
+  background: linear-gradient(var(--red), var(--red)) left bottom / 100% 4px no-repeat;
+}
+
+/* 導入の説明は1行（地図を最初の画面に入れるため）。狭くて入らないときだけ末尾を省く */
+.intro__lead {
+  margin: 2px 0 0;
+  font-size: 14px;
+  color: var(--ink-soft);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.intro__tools {
+  display: flex;
+  gap: 6px;
+}
+
+.tool {
+  min-height: 44px;
+  min-width: 44px;
+  padding: 0 12px;
+  border: 1.5px solid var(--line-strong);
+  border-radius: 999px;
+  background: var(--paper);
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.tool--icon {
+  padding: 0;
+  width: 44px;
+  font-size: 19px;
+}
+
+/* 面チップ */
+.chips {
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(6, minmax(44px, 1fr));
+  gap: 6px;
+  max-width: 440px;
+}
+
+.chip {
+  width: 100%;
+  min-height: 44px;
+  padding: 3px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+  border: 1.5px solid var(--line-strong);
+  border-radius: 12px;
+  background: var(--paper);
+  cursor: pointer;
+}
+
+.chip__no {
+  font-size: 17px;
+  font-weight: 800;
+  line-height: 1.1;
+}
+
+.chip__stars {
+  font-size: 11px;
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+.star {
+  color: rgba(92, 74, 58, 0.26);
+}
+
+.star.is-on {
+  color: var(--gold);
+}
+
+.chip[aria-current="true"] {
+  background: var(--navy);
+  border-color: var(--navy);
+  color: #fff;
+}
+
+.chip[aria-current="true"] .star {
+  color: rgba(255, 255, 255, 0.35);
+}
+
+.chip[aria-current="true"] .star.is-on {
+  color: #ffd166;
+}
+
+.chip:disabled {
+  cursor: default;
+  opacity: 0.6;
+}
+
+/* 再生中も、いまの面のタブだけは紺のまま残す（どの面を再生しているかが分かる） */
+.chip[aria-current="true"]:disabled {
+  opacity: 1;
+}
+
+/* 面の見出しとヒント */
+.stage {
+  margin-top: 10px;
+}
+
+.stage__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px 12px;
+}
+
+.stage__title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  font-size: 19px;
+  font-weight: 800;
+  line-height: 1.3;
+}
+
+.stage__no {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--navy);
+  color: #fff;
+  font-size: 16px;
+}
+
+.stage__goal {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 12px;
+  margin: 0;
+  font-size: 13px;
+  color: var(--ink-soft);
+}
+
+.stage__goal-star {
+  color: var(--gold);
+  letter-spacing: -0.04em;
+}
+
+.stage__hint {
+  margin: 4px 0 0;
+  padding: 5px 12px;
+  border-radius: 10px;
+  background: var(--paper);
+  border: 1px dashed var(--line-strong);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* ---------------------------------------------------------------- 盤（地図・注文票・編成） */
+
+/* スマホは「地図→注文票→編成」の順。地図を面の見出しとヒントのすぐ下に置き、最初の画面に入れる */
+.board {
+  display: grid;
+  grid-template-areas: "map" "orders" "side";
+  grid-template-columns: minmax(0, 1fr);
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.orders {
+  grid-area: orders;
+  min-width: 0;
+}
+
+.board__map {
+  grid-area: map;
+  min-width: 0;
+}
+
+.board__side {
+  grid-area: side;
+  min-width: 0;
+}
+
+.section-title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 2px 10px;
+  margin: 0;
+  font-size: 15px;
+  font-weight: 800;
+  line-height: 1.35;
+}
+
+.section-title__sub {
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--ink-soft);
+}
+
+/* 注文票。折り返して全部見せる小さな札（スマホは2列） */
+.tickets {
+  list-style: none;
+  margin: 4px 0 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.tickets > .ticket:last-child:nth-child(odd) {
+  grid-column: 1 / -1;
+}
+
+.ticket {
+  min-width: 0;
+  padding: 4px 8px 4px 9px;
+  border: 1px solid var(--line);
+  border-left: 5px solid var(--tc);
+  border-radius: 10px;
+  background: var(--paper);
+}
+
+.ticket.is-selected {
+  box-shadow: 0 0 0 2px var(--tc);
+}
+
+.ticket__head {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  min-width: 0;
+}
+
+.ticket__emoji {
+  flex: none;
+  font-size: 16px;
+  line-height: 1.2;
+}
+
+.ticket__dish {
+  min-width: 0;
+  margin: 0;
+  font-size: 14px;
+  font-weight: 800;
+  line-height: 1.25;
+}
+
+.ticket__foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  margin-top: 1px;
+}
+
+.ticket__steps {
+  margin: 0;
+  font-size: 15px;
+  letter-spacing: 0.03em;
+}
+
+.ticket__due {
+  flex: none;
+  padding: 0 7px;
+  border-radius: 999px;
+  background: var(--navy);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1.65;
+  font-variant-numeric: tabular-nums;
+}
+
+.ticket__mark {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin: 4px 0 0;
+  font-size: 12.5px;
+  font-weight: 800;
+  line-height: 1.4;
+}
+
+.ticket__icon {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  color: #fff;
+  font-size: 11px;
+}
+
+.ticket.is-ok .ticket__mark { color: var(--ok-ink); }
+.ticket.is-ok .ticket__icon { background: var(--ok); }
+.ticket.is-ng .ticket__mark { color: var(--ng); }
+.ticket.is-ng .ticket__icon { background: var(--ng); }
+.ticket.is-overdue .ticket__due { background: var(--ng); }
+
+/* 地図。縦横比は盤（360×240）と同じに保つ（切替ボタンの位置を割合で置くため） */
+/* 縦横比は面ごと（幅360÷その面の地図の高さ）。app.js が --map-ratio に入れる */
+.map {
+  position: relative;
+  width: min(100%, calc((100vh - 150px) * var(--map-ratio, 1.5)));
+  width: min(100%, calc((100svh - 150px) * var(--map-ratio, 1.5)));
+  max-width: 600px;
+  aspect-ratio: var(--map-ratio, 1.5);
+  margin-inline: auto;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background:
+    radial-gradient(circle at 1px 1px, rgba(92, 74, 58, 0.12) 1px, transparent 1.5px) 0 0 / 18px 18px,
+    var(--board);
+  overflow: hidden;
+}
+
+.map__svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.map__legend {
+  margin: 4px 2px 0;
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: var(--ink-soft);
+  text-align: center;
+}
+
+.map-text {
+  font-size: 13.5px;
+  font-weight: 800;
+  text-anchor: middle;
+  dominant-baseline: central;
+}
+
+.map-emoji {
+  font-size: 16px;
+  text-anchor: middle;
+  dominant-baseline: central;
+}
+
+.rail__line {
+  fill: none;
+  stroke: var(--rail);
+  stroke-width: 1.7;
+  stroke-linejoin: round;
+}
+
+.rail__tie {
+  stroke: var(--tie);
+  stroke-width: 3.6;
+}
+
+.junction {
+  fill: var(--paper);
+  stroke: var(--rail);
+  stroke-width: 2;
+}
+
+.junction--branch {
+  fill: var(--rail);
+  stroke: var(--paper);
+}
+
+.station__body {
+  fill: var(--kind);
+  stroke: rgba(0, 0, 0, 0.18);
+  stroke-width: 1;
+}
+
+.st-cut { --kind: var(--cut); }
+.st-grill { --kind: var(--grill); }
+.st-simmer { --kind: var(--simmer); }
+
+/* 駅の文字の下の暗い帯（白文字を 4.5:1 以上にする） */
+.station__plate {
+  fill: rgba(0, 0, 0, 0.26);
+}
+
+.station__text {
+  fill: #fff;
+}
+
+.yard__body { fill: var(--rail); }
+.yard__roof { fill: #7a6450; }
+.yard__text { fill: #fff; }
+.serve__body { fill: var(--serve); stroke: rgba(0, 0, 0, 0.18); }
+.serve__text { fill: var(--serve-ink); }
+.serve__pole { stroke: var(--rail); stroke-width: 2; }
+.serve__flag { fill: var(--red); }
+
+.route {
+  fill: none;
+  stroke: var(--tc);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.route--on {
+  stroke-width: 7;
+  opacity: 0.88;
+}
+
+.route--off {
+  stroke-width: 3;
+  opacity: 0.3;
+}
+
+/* 経路の縁取り。黄色（5両目）だけはクリーム色の地で線が薄く見えるので、濃い縁を付ける（色だけに頼らない） */
+.route__case {
+  fill: none;
+  stroke: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.route__case.tc-t5 {
+  stroke: #5e4100;
+}
+
+.route__case.tc-t5.route--on {
+  stroke-width: 10.5;
+  opacity: 0.9;
+}
+
+.route__case.tc-t5.route--off {
+  stroke-width: 5;
+  opacity: 0.3;
+}
+
+.route.tc-t5.route--off {
+  opacity: 0.45;
+}
+
+/* 矢印は列車の色の太線の上に重なるので、色を変えて（濃い茶＋白い縁）見分けられるようにする */
+.arrow__line {
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 3;
+  stroke-linecap: round;
+}
+
+.arrow__head {
+  fill: var(--ink);
+  stroke: #fff;
+  stroke-width: 1.6;
+  stroke-linejoin: round;
+  paint-order: stroke;
+}
+
+.hit {
+  fill: transparent;
+  cursor: pointer;
+}
+
+/* 2分以上かかる線路の、分の札 */
+.len-tag__box {
+  fill: #fff;
+  stroke: var(--rail);
+  stroke-width: 1.3;
+}
+
+.len-tag__text {
+  fill: var(--ink);
+}
+
+.map[data-mode="play"] .hit {
+  pointer-events: none;
+}
+
+/* 地図の上の列車 */
+.chip__body {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.chip__disc {
+  fill: var(--tc);
+  stroke: #fff;
+  stroke-width: 2.5;
+}
+
+.chip__edge {
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 1.6;
+}
+
+.chip__ring {
+  fill: none;
+  stroke: var(--tc);
+  stroke-width: 2.4;
+  opacity: 0;
+}
+
+.chip__char {
+  fill: #1a120c;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.chip.is-selected .chip__ring { opacity: 1; }
+.chip.is-waiting .chip__ring { opacity: 0.9; animation: pulse 0.9s ease-in-out infinite; }
+.chip.is-burnt .chip__char { opacity: 0.5; }
+
+/* 焦げた列車は、黒くなるだけでなく ✖ も付く（色以外の手がかり） */
+.chip__burn {
+  fill: #fff;
+  font-size: 17px;
+  font-weight: 800;
+  text-anchor: middle;
+  dominant-baseline: central;
+  stroke: var(--ng);
+  stroke-width: 3px;
+  paint-order: stroke;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.chip.is-burnt .chip__burn { opacity: 1; }
+.chip.is-gone { display: none; }
+
+/* 出発の番号（編成のカードの番号と同じ紺の丸） */
+.chip__no-disc {
+  fill: var(--navy);
+  stroke: #fff;
+  stroke-width: 1.8;
+}
+
+.chip__no-text {
+  fill: #fff;
+}
+
+/* 地図の左端（車庫の上に並んで待つ列）では、番号を右の縁に出す（左に出すと地図の外で切れる）。
+   g には transform 属性が無いので、CSS の transform で動かしてよい */
+.chip.is-no-right .chip__no {
+  transform: translate(36px, 0);
+}
+
+/* 締切を過ぎてまだ着いていない列車：赤い輪と「遅れ」（置き場所は lib/render.js が重ならない所を探す） */
+.chip__late {
+  display: none;
+  fill: var(--ng);
+  stroke: #fff;
+  stroke-width: 4;
+  stroke-linejoin: round;
+  paint-order: stroke;
+}
+
+.chip.is-late .chip__ring { opacity: 1; stroke: var(--ng); stroke-width: 3.2; animation: none; }
+.chip.is-late .chip__late { display: inline; }
+.chip.is-cooking.is-cut .chip__body { animation: knock 0.3s steps(2, jump-none) infinite; }
+.chip.is-sizzle .chip__body,
+.chip.is-burning .chip__body { animation: jitter 0.14s linear infinite; }
+.chip.is-sizzle .chip__disc,
+.chip.is-burning .chip__disc { stroke: #ff3b1f; stroke-width: 3; }
+
+/* 駅の様子（炎・泡・煙・ジリジリ・焦げた！）。ふだんは見えない */
+.station-fx > * {
+  opacity: 0;
+}
+
+.fx__flame,
+.fx__bubbles circle,
+.fx__smoke circle {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.fx__flame {
+  font-size: 15px;
+  text-anchor: middle;
+  dominant-baseline: central;
+}
+
+.fx__bubbles circle {
+  fill: #fff;
+  stroke: var(--simmer);
+  stroke-width: 1.2;
+  animation: rise 0.9s ease-out infinite;
+}
+
+.fx__bubbles circle:nth-child(2) { animation-delay: 0.3s; }
+.fx__bubbles circle:nth-child(3) { animation-delay: 0.6s; }
+
+.fx__smoke circle {
+  fill: #3f3833;
+  animation: smoke 1.1s ease-out infinite;
+}
+
+.fx__smoke circle:nth-child(2) { animation-delay: 0.35s; }
+.fx__smoke circle:nth-child(3) { animation-delay: 0.7s; }
+
+.fx__label {
+  fill: var(--ng);
+  stroke: #fff;
+  stroke-width: 4;
+  stroke-linejoin: round;
+  paint-order: stroke;
+}
+
+.station-fx.is-cooking.fx-grill .fx__flame { opacity: 1; animation: flicker 0.4s ease-in-out infinite alternate; }
+.station-fx.is-sizzle.fx-grill .fx__flame { opacity: 1; animation: flicker 0.16s ease-in-out infinite alternate; }
+.station-fx.is-cooking.fx-simmer .fx__bubbles,
+.station-fx.is-sizzle.fx-simmer .fx__bubbles { opacity: 1; }
+.station-fx.is-burning .fx__smoke { opacity: 1; }
+
+/* 「ジリジリ」「焦げた！」の文字は列車より上の層（lib/render.js の fxtext）。列車の丸に「！」が隠れた */
+.station-fx-text > * {
+  opacity: 0;
+}
+
+.station-fx-text.is-sizzle .fx__label--sizzle,
+.station-fx-text.is-burning .fx__label--burn { opacity: 1; }
+
+/* 配膳で料理がはじける。大きさと濃さは JS が時刻から決める（opacity は属性で入れるので、CSS では触らない） */
+.pop { display: none; }
+.pop.is-on { display: inline; }
+.pop__emoji { font-size: 22px; text-anchor: middle; dominant-baseline: central; }
+.pop__mark { font-size: 15px; stroke: #fff; stroke-width: 3.5; paint-order: stroke; }
+.pop--ok .pop__mark { fill: var(--ok-ink); }
+.pop--ng .pop__mark { fill: var(--ng); }
+
+/* 分岐の切替ボタン（地図の上に重ねる HTML の button） */
+.map__switches {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.switch {
+  position: absolute;
+  width: 44px;
+  height: 44px;
+  margin: -22px 0 0 -22px;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  border: 3px solid var(--tc);
+  border-radius: 50%;
+  /* 狭い画面では車庫や隣のボタンに少しかかるので、下の文字が透けて読める濃さにする */
+  background: rgba(255, 251, 243, 0.78);
+  box-shadow: 0 2px 6px rgba(43, 33, 24, 0.28);
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+.switch:hover {
+  background: #fff;
+}
+
+.switch__icon {
+  width: 24px;
+  height: 24px;
+  overflow: visible;
+}
+
+.switch__icon path {
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 2.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.map__clock {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  margin: 0;
+  padding: 3px 12px;
+  border-radius: 999px;
+  background: rgba(29, 43, 79, 0.92);
+  color: #fff;
+  font-size: 15px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+/* 時計を置く隅は、再生のたびに lib/render.js が選ぶ（待つ列車や線路に重ならない隅） */
+.map__clock[data-corner="tr"] { left: auto; right: 8px; }
+.map__clock[data-corner="bl"] { top: auto; bottom: 8px; }
+.map__clock[data-corner="br"] { top: auto; left: auto; bottom: 8px; right: 8px; }
+
+/* 左右を0にして幅を中身に合わせる（left:50% と translate で中央に置くと、使える幅が半分になって早く折れる） */
+.map__toast {
+  position: fixed;
+  z-index: 25;
+  left: 0;
+  right: 0;
+  bottom: calc(92px + env(safe-area-inset-bottom));
+  width: fit-content;
+  max-width: calc(100% - 24px);
+  margin: 0 auto;
+  padding: 8px 16px;
+  border-radius: 999px;
+  background: rgba(43, 33, 24, 0.94);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+  text-align: center;
+  opacity: 0;
+  transition: opacity 0.2s;
+  pointer-events: none;
+}
+
+.map__toast.is-on {
+  opacity: 1;
+}
+
+/* 編成 */
+.formation__note,
+.formation__sample {
+  margin: 8px 2px 0;
+  font-size: 13px;
+  color: var(--ink-soft);
+}
+
+.formation__sample {
+  padding: 6px 10px;
+  border-radius: 10px;
+  background: #fff;
+  border: 1.5px solid var(--gold);
+  color: var(--ink);
+  font-weight: 700;
+}
+
+.formation__sample-btn {
+  margin-top: 10px;
+}
+
+/* 見本を出した直後の注意書きには「元に戻す」も置く（一言が消えても、組み方を変えるまで残る） */
+.formation__sample:has(.formation__undo) {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+}
+
+.formation__undo {
+  min-height: 44px;
+  padding: 0 14px;
+  font-size: 14px;
+}
+
+.cars {
+  list-style: none;
+  margin: 6px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+
+.car {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px;
+  border: 1.5px solid var(--line);
+  border-radius: 14px;
+  background: var(--paper);
+}
+
+/* 組み直した直後だけ出る、前回の結果の札。カードの右上の縁に重ねて、カードの高さを変えない */
+.car__prev {
+  position: absolute;
+  top: -8px;
+  right: 10px;
+  padding: 0 7px;
+  border: 1.5px solid currentColor;
+  border-radius: 999px;
+  background: #fff;
+  font-size: 11.5px;
+  font-weight: 800;
+  line-height: 1.45;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.car__prev.is-ok { color: var(--ok-ink); }
+.car__prev.is-ng { color: var(--ng); }
+
+.car.is-selected {
+  border-color: var(--tc);
+  box-shadow: 0 0 0 2px var(--tc);
+  background: #fff;
+}
+
+.car__pick {
+  flex: 1;
+  min-width: 0;
+  min-height: 50px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 6px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+}
+
+.car__pick:disabled {
+  cursor: default;
+}
+
+.car__no {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--navy);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.car__face {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--tc);
+  border: 2.5px solid #fff;
+  box-shadow: 0 0 0 1.5px var(--tc);
+  font-size: 17px;
+  line-height: 1;
+}
+
+/* 料理名の下に「注文 🔪→🔥 〜13分」「通る駅 🔪→🔥 ✔」。見出しの列をそろえて、工程のアイコンを縦に並べる */
+.car__text {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  column-gap: 5px;
+  min-width: 0;
+}
+
+.car__dish {
+  grid-column: 1 / -1;
+  font-size: 15.5px;
+  font-weight: 800;
+  line-height: 1.25;
+}
+
+.car__label {
+  font-size: 11.5px;
+  line-height: 1.4;
+  color: var(--ink-soft);
+  white-space: nowrap;
+}
+
+.car__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1px 4px;
+  min-width: 0;
+}
+
+.car__icons {
+  font-size: 13px;
+  line-height: 1.3;
+  letter-spacing: 0.03em;
+  color: var(--ink);
+  white-space: nowrap;
+}
+
+.car__due {
+  flex: none;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: var(--navy);
+  color: #fff;
+  font-size: 11.5px;
+  font-weight: 800;
+  line-height: 1.6;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.car.is-overdue .car__due {
+  background: var(--ng);
+}
+
+/* 今の進路の道のり（線路と駅の所要の合計）。分岐を切り替えると変わる */
+.car__route {
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.6;
+  color: var(--ink-soft);
+  white-space: nowrap;
+}
+
+/* 通る駅が注文どおりのときだけ付く小さな ✔（違うときは何も出さない） */
+.car__match {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 17px;
+  height: 17px;
+  border-radius: 50%;
+  background: var(--ok-ink);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.car__moves {
+  flex: none;
+  display: flex;
+  gap: 4px;
+}
+
+.car__move {
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 1.5px solid var(--line-strong);
+  border-radius: 10px;
+  background: #fff;
+  color: var(--navy);
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.car__move:disabled {
+  opacity: 0.32;
+  cursor: default;
+}
+
+/* 下に固定する発車ボタン */
+.actionbar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 20;
+  padding: 10px max(var(--gutter), env(safe-area-inset-right)) calc(10px + env(safe-area-inset-bottom)) max(var(--gutter), env(safe-area-inset-left));
+  border-top: 1px solid var(--line);
+  background: rgba(255, 246, 229, 0.95);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+}
+
+.actionbar__inner {
+  display: flex;
+  gap: 10px;
+  max-width: 520px;
+  margin: 0 auto;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  padding: 0 18px;
+  border-radius: 12px;
+  font-size: 15.5px;
+  font-weight: 800;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.btn--primary {
+  border: 2px solid var(--navy);
+  background: var(--navy);
+  color: #fff;
+}
+
+.btn--ghost {
+  border: 2px solid var(--navy);
+  background: #fff;
+  color: var(--navy);
+}
+
+.btn--depart {
+  flex: 1;
+  height: 56px;
+  border: 0;
+  border-radius: 16px;
+  background: var(--navy);
+  color: #fff;
+  font-size: 19px;
+  letter-spacing: 0.14em;
+  box-shadow: 0 4px 0 var(--navy-deep);
+}
+
+.btn--depart:active {
+  translate: 0 2px;
+  box-shadow: 0 2px 0 var(--navy-deep);
+}
+
+.btn--play {
+  flex: 1;
+  height: 56px;
+  border: 2px solid var(--navy);
+  border-radius: 16px;
+  background: #fff;
+  color: var(--navy);
+  font-size: 17px;
+}
+
+.btn--play[aria-pressed="true"] {
+  background: var(--navy);
+  color: #fff;
+}
+
+/* ---------------------------------------------------------------- 結果シート */
+
+.result {
+  padding: 14px;
+  border: 1.5px solid var(--line);
+  border-radius: 16px;
+  background: var(--paper);
+  scroll-margin-top: 12px;
+}
+
+.result__title {
+  margin: 0;
+  font-size: 30px;
+  line-height: 1.2;
+  letter-spacing: 0.12em;
+}
+
+.result__title:focus {
+  outline: none;
+}
+
+.result__title:focus-visible {
+  outline: 3px solid var(--navy);
+}
+
+.result__stars .star.is-on {
+  color: #b07a0c;
+}
+
+.result__fail {
+  color: var(--ng);
+  font-size: 26px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+
+.result__line {
+  margin: 6px 0 12px;
+  font-size: 17px;
+  font-weight: 800;
+  line-height: 1.45;
+}
+
+.result__loss {
+  margin: -6px 0 12px;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.55;
+  color: var(--ink);
+}
+
+.result__rows {
+  list-style: none;
+  margin: 0 0 14px;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+
+.result__row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 8px 10px;
+  border-left: 5px solid var(--tc);
+  border-radius: 12px;
+  background: #fff;
+}
+
+.result__mark {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  margin-top: 1px;
+  border-radius: 50%;
+  color: #fff;
+  font-weight: 800;
+}
+
+.result__row.is-ok .result__mark { background: var(--ok); }
+.result__row.is-ng .result__mark { background: var(--ng); }
+
+.result__body {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.result__dish {
+  font-weight: 800;
+}
+
+/* 出発の番号（地図の丸・編成のカード・運行図の帯と同じ） */
+.result__no {
+  display: inline-grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  margin-right: 5px;
+  border-radius: 50%;
+  background: var(--navy);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 800;
+  line-height: 1;
+  vertical-align: 1px;
+}
+
+.result__why {
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.chart {
+  margin: 0 0 14px;
+}
+
+.chart__cap {
+  margin-bottom: 4px;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.chart__wrap {
+  width: 100%;
+  min-height: 60px;
+}
+
+.chart__svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.chart__label {
+  font-size: 12px;
+  text-anchor: end;
+  dominant-baseline: central;
+  fill: var(--ink);
+}
+
+.chart__tick {
+  font-size: 11px;
+  text-anchor: middle;
+  fill: var(--ink-soft);
+}
+
+.chart__tick--end {
+  text-anchor: end;
+  font-weight: 800;
+  fill: var(--ink);
+}
+
+.grid { stroke: rgba(92, 74, 58, 0.12); stroke-width: 1; }
+.grid--major { stroke: rgba(92, 74, 58, 0.32); }
+.chart__base { stroke: rgba(92, 74, 58, 0.22); stroke-width: 1; }
+.bar--solid { fill: var(--tc); }
+.bar--wait { stroke: var(--tc); stroke-width: 1; }
+.run-line { stroke: var(--tc); stroke-width: 1.6; stroke-linecap: round; opacity: 0.9; }
+.wait-line { stroke: var(--tc); stroke-width: 2.5; stroke-dasharray: 2 3; stroke-linecap: round; }
+.hatch__bg { fill: #fff; }
+.hatch__fg { fill: var(--tc); }
+
+/* 帯の中の出発番号。地図の丸・カードと同じ紺の丸に白い数字（どの色の帯の上でも読める。運行図の文字は11px以上） */
+.chart__no-disc {
+  fill: var(--navy);
+  stroke: #fff;
+  stroke-width: 1px;
+}
+
+.chart__no-text {
+  fill: #fff;
+  font-size: 11px;
+  font-weight: 800;
+  text-anchor: middle;
+  dominant-baseline: central;
+  pointer-events: none;
+}
+
+.chart__burn {
+  fill: var(--ng);
+  font-size: 18px;
+  font-weight: 800;
+  text-anchor: middle;
+  dominant-baseline: central;
+  stroke: #fff;
+  stroke-width: 3;
+  paint-order: stroke;
+}
+
+.chart__legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 14px;
+  margin: 6px 0 0;
+  font-size: 12.5px;
+  color: var(--ink-soft);
+}
+
+.legend::before {
+  content: "";
+  display: inline-block;
+  width: 18px;
+  height: 10px;
+  margin-right: 5px;
+  border-radius: 2px;
+  vertical-align: -1px;
+}
+
+/* 見本は列車の色の帯（多色）。斜線・点線・細い線は色によらないので墨色で */
+.legend--solid::before { background: linear-gradient(90deg, var(--t1) 0 25%, var(--t2) 25% 50%, var(--t3) 50% 75%, var(--t4) 75%); }
+.legend--wait::before {
+  border: 1px solid var(--ink-soft);
+  background: repeating-linear-gradient(45deg, var(--ink-soft) 0 2px, #fff 2px 5px);
+}
+.legend--run::before {
+  border-radius: 0;
+  background: linear-gradient(to top right, transparent calc(50% - 1px), var(--ink-soft) calc(50% - 1px) calc(50% + 1px), transparent calc(50% + 1px));
+}
+.legend--before::before {
+  height: 0;
+  border-top: 2.5px dotted var(--ink-soft);
+  border-radius: 0;
+  vertical-align: 3px;
+}
+.legend--burn::before { display: none; }
+
+.chart__text summary {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--navy);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.chart__text-head {
+  margin: 6px 0 0;
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--ink-soft);
+}
+
+.chart__text ul {
+  margin: 2px 0 0;
+  padding-left: 18px;
+  font-size: 13.5px;
+}
+
+/* 2回失敗したあとの、見本の入口。結果シートの末尾に置くと、スマホではスクロールしないと見つからなかった */
+.result__sample {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  margin: 10px 0 12px;
+  padding: 10px 12px;
+  border: 1.5px solid var(--gold);
+  border-radius: 12px;
+  background: #fff8e6;
+}
+
+.result__sample-text {
+  flex: 1 1 190px;
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+.result__sample .btn {
+  flex: none;
+}
+
+.result__send {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px dashed var(--line-strong);
+}
+
+.result__send-title {
+  margin: 0 0 6px;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.result__send-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.result__send-row .btn {
+  flex: 1 1 150px;
+}
+
+.result__said {
+  min-height: 1.5em;
+  margin: 6px 0 0;
+  font-size: 13.5px;
+}
+
+/* ---------------------------------------------------------------- 窓（あそびかた・共有） */
+
+.sheet-dialog {
+  width: min(92vw, 460px);
+  max-height: 86vh;
+  padding: 18px;
+  border: 0;
+  border-radius: 18px;
+  background: var(--paper);
+  color: var(--ink);
+  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.3);
+}
+
+.sheet-dialog::backdrop {
+  background: rgba(29, 43, 79, 0.45);
+}
+
+.sheet-dialog h2 {
+  margin: 0 0 10px;
+  font-size: 19px;
+}
+
+.sheet-dialog > .btn {
+  margin-top: 14px;
+}
+
+.howto {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding-left: 1.4em;
+  font-size: 14.5px;
+}
+
+.howto__note {
+  margin: 12px 0 0;
+  font-size: 13.5px;
+  color: var(--ink-soft);
+}
+
+/* 共通のシェア欄は最低幅を持つので、窓の中では窓の幅に収める */
+.sheet-dialog .share {
+  min-width: 0;
+  max-width: 100%;
+  margin-top: 0;
+  padding-top: 0;
+  border-top: 0;
+}
+
+/* ---------------------------------------------------------------- 足元 */
+
+.foot {
+  margin-top: 28px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+  font-size: 13px;
+  color: var(--ink-soft);
+}
+
+.foot p {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.55;
+  color: var(--ink-soft);
+}
+
+.foot__nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 18px;
+}
+
+.foot__nav a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: var(--navy);
+  font-weight: 700;
+}
+
+/* ---------------------------------------------------------------- 狭い画面・広い画面 */
+
+/* 375px で題字と「あそびかた」「音」を1行に収める（2行になると地図が下がる） */
+@media (max-width: 389px) {
+  .intro h1 { font-size: 24px; letter-spacing: 0.04em; }
+  /* 375px で、2工程の注文（🔪→🔥）と締切、通る駅の行（🔪→🔥 ✔ 道のり12分）が1行に収まる幅をカードに作る。
+     ✔ が付くと「道のり」が次の行へ落ち、そのカードだけ1行高くなっていた */
+  .car__face { width: 30px; height: 30px; font-size: 16px; border-width: 2px; }
+  .car__pick { gap: 4px; padding: 4px; }
+  .car__no { width: 22px; height: 22px; font-size: 13px; }
+}
+
+/* 小さなスマホ（高さ700px以下）：最初の画面に1両目のカードが入るよう、縦の余白を詰める
+   （375×667 で、カードの下端が固定した発車の帯の下へ6px入り込んでいた） */
+@media (max-height: 700px) and (max-width: 639px) {
+  .app { padding-top: 4px; }
+  .chips { margin-top: 6px; }
+  .board { margin-top: 6px; gap: 4px; }
+}
+
+/* 320px でも、いちばん長い料理名（7文字）が編成カードで1行に収まる大きさ */
+@media (max-width: 360px) {
+  :root { --gutter: 12px; }
+  .intro h1 { font-size: 25px; }
+  .car__pick { gap: 4px; padding: 4px; }
+  .car__no { width: 22px; height: 22px; font-size: 13px; }
+  .car__face { width: 28px; height: 28px; font-size: 15px; border-width: 2px; }
+  .car__icons { font-size: 12.5px; }
+  .car__dish { font-size: 14px; }
+  .ticket__dish { font-size: 13.5px; }
+}
+
+/* 編集中と再生中は、地図を帯の下に固定する（結果シートの間と、画面の高さが450px未満では固定しない）。
+   固定した地図の下に隠れないよう、フォーカスや scrollIntoView の止まる位置を地図の高さぶん下げる */
+@media (min-height: 450px) {
+  .band {
+    position: sticky;
+    top: 0;
+    z-index: 30;
+  }
+
+  /* 地図の欄（地図と凡例）ごと固定する。sticky は親の範囲の中でしか動けないので、地図の本体だけを固定しても張り付かない */
+  .app[data-phase="edit"] .board__map,
+  .app[data-phase="play"] .board__map {
+    position: sticky;
+    top: 44px;
+    z-index: 15;
+    /* 地を画面の左右いっぱいまで広げる（下を流れるカードの枠の影が、地図の外にはみ出して見えないように） */
+    margin: -6px calc(-1 * var(--gutter)) 0;
+    padding: 6px var(--gutter) 2px;
+    background: var(--bg);
+    box-shadow: 0 10px 10px -12px rgba(43, 33, 24, 0.45);
+  }
+
+  html {
+    scroll-padding-top: calc(44px + min(100vw - 2 * var(--gutter), 600px) / var(--map-ratio, 1.5) + 58px);
+    scroll-padding-bottom: 90px;
+  }
+
+  /* 結果のあいだは地図を固定しないので、余白は帯の高さ（44px）と少しだけ。結果シートの先頭を、帯のすぐ下に出す */
+  html[data-phase="result"] {
+    scroll-padding-top: 52px;
+  }
+}
+
+/* 小さなスマホ（高さ450〜700px・幅639px以下）：縦の場所を、編成に回す。
+   ・帯は固定しない（上の44pxぶん）。地図は画面の上端に固定する
+   ・編集中の注文票は出さない（編成のカードに、同じ注文と締切がある。再生と結果のあいだは出す）。
+     面6では注文票だけで200px近くを取り、編成が1枚しか見えなかった */
+@media (min-height: 450px) and (max-height: 700px) and (max-width: 639px) {
+  .band {
+    position: static;
+  }
+
+  .app[data-phase="edit"] .board__map,
+  .app[data-phase="play"] .board__map {
+    top: 0;
+  }
+
+  .app[data-phase="edit"] .orders {
+    display: none;
+  }
+
+  html {
+    scroll-padding-top: calc(min(100vw - 2 * var(--gutter), 600px) / var(--map-ratio, 1.5) + 58px);
+  }
+
+  html[data-phase="result"] {
+    scroll-padding-top: 8px;
+  }
+}
+
+/* 2段組み：左に地図、右に注文票と編成（app.js の isWide と同じ条件） */
+@media (min-width: 900px), (min-width: 640px) and (orientation: landscape) {
+  .board {
+    grid-template-columns: minmax(0, 1.3fr) minmax(300px, 1fr);
+    grid-template-areas: "map orders" "map side";
+    grid-template-rows: auto 1fr;
+    align-items: start;
+    gap: 14px 22px;
+  }
+
+  .band {
+    position: static;
+  }
+
+  .app[data-phase] .board__map {
+    position: sticky;
+    top: 12px;
+    z-index: auto;
+    margin: 0;
+    padding: 0;
+    background: none;
+    box-shadow: none;
+  }
+
+  html,
+  html[data-phase] {
+    scroll-padding-top: 12px;
+    scroll-padding-bottom: 0;
+  }
+
+  .map {
+    max-width: none;
+  }
+
+  .tickets {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  }
+
+  /* 右の列の下に張り付く。列が画面より長いときは編成カードの上に重なるので、地の色で隠す（上の縁はぼかす）。
+     幅が広く高さもある画面では、下の @media で左の列（地図の下）へ移す */
+  .actionbar {
+    position: sticky;
+    bottom: 0;
+    margin-top: 6px;
+    padding: 16px 0 12px;
+    border: 0;
+    background: linear-gradient(rgba(255, 246, 229, 0), var(--bg) 16px);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+
+  .app {
+    padding-bottom: 40px;
+  }
+}
+
+@media (min-width: 900px) {
+  .app { padding-top: 20px; }
+  .intro h1 { font-size: 32px; }
+}
+
+/* 幅が広く高さもある画面：発車の帯を左の列（地図の下）に置く。右の列が画面より長い面（面6・1440×900）で、
+   右の列の下に張り付いた帯が5番目のカードに重なった。3行目（84px＝帯の高さ）を空けておき、帯は左の列の下端に張り付く
+   （地図が短い面でも地図に重ならない）。.board__side を display: contents にして子を直接並べるので、DOM の順（タブの順）は変わらない。
+   最初の位置（地図がまだ張り付く前）で地図に重ならないよう、地図の高さを「画面の高さ−380px」までに抑える。
+   高さが700px未満の画面と横向きのスマホは、地図が小さくなりすぎるので右の列のまま */
+@media (min-width: 900px) and (min-height: 700px) {
+  .map {
+    width: min(100%, calc((100vh - 380px) * var(--map-ratio, 1.5)));
+    width: min(100%, calc((100svh - 380px) * var(--map-ratio, 1.5)));
+  }
+
+  .board {
+    grid-template-areas: "map orders" "map side" ". side";
+    grid-template-rows: auto 1fr 84px;
+  }
+
+  .board__side {
+    display: contents;
+  }
+
+  .formation,
+  .result {
+    grid-area: side;
+  }
+
+  .actionbar {
+    grid-column: 1;
+    grid-row: 1 / -1;
+    align-self: end;
+    height: 84px;
+    margin-top: 0;
+    padding: 14px 0;
+    background: linear-gradient(rgba(255, 246, 229, 0), var(--bg) 14px);
+  }
+
+  /* 結果のあいだは、帯を結果シートと同じ右の列に置く（読んだ直後に「組み直す」「次の面へ」が目に入る。左の下端だと視線が遠い）。
+     帯は列の下端に張り付くので、結果シートの下に帯の高さ（84px）の空きを取って、シートの最後に重ならないようにする */
+  .app[data-phase="result"] .actionbar {
+    grid-column: 2;
+  }
+
+  .app[data-phase="result"] .result {
+    margin-bottom: 84px;
+  }
+}
+
+@media (max-height: 449px) {
+  .app[data-phase] .board__map {
+    position: static;
+  }
+}
+
+/* 横向きのスマホ（高さ450px未満）：右の列の中に置いた帯は、列の上端（編成の見出しの直後）に押し込まれて1番目のカードに重なり、
+   画面の下端からは上の20pxほどしか見えなかった。帯を右の列の「下端」に張り付く格子の部品にして、画面の下にいつも全部見えるようにする。
+   .board__side を display: contents にして子を直接並べるので、DOM の順（タブの順）は変わらない。
+   左の列（地図）は帯に隠れない。帯が列の最後でカードに重ならないよう、編成・結果の下に帯の高さ（84px）の空きを取る */
+@media (max-height: 449px) and (min-width: 640px) {
+  .board__side {
+    display: contents;
+  }
+
+  .formation,
+  .result {
+    grid-area: side;
+    margin-bottom: 84px;
+  }
+
+  .actionbar {
+    grid-column: 2;
+    grid-row: 1 / -1;
+    align-self: end;
+    margin-top: 0;
+  }
+}
+
+/* ---------------------------------------------------------------- 動き */
+
+@keyframes knock {
+  0% { transform: translateY(0); }
+  50% { transform: translateY(-2.5px); }
+}
+
+@keyframes jitter {
+  0% { transform: translate(0, 0); }
+  25% { transform: translate(1.3px, -0.6px); }
+  50% { transform: translate(-1.3px, 0.6px); }
+  75% { transform: translate(0.8px, 0.8px); }
+  100% { transform: translate(0, 0); }
+}
+
+@keyframes flicker {
+  from { transform: scale(0.85); opacity: 0.7; }
+  to { transform: scale(1.15); opacity: 1; }
+}
+
+@keyframes rise {
+  0% { transform: translateY(4px); opacity: 0; }
+  30% { opacity: 1; }
+  100% { transform: translateY(-10px); opacity: 0; }
+}
+
+@keyframes smoke {
+  0% { transform: translateY(3px) scale(0.6); opacity: 0; }
+  30% { opacity: 0.85; }
+  100% { transform: translateY(-14px) scale(1.4); opacity: 0; }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.25; }
+  50% { opacity: 0.95; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* 文の最後の行が1〜2文字だけにならないようにする（対応しているブラウザだけ） */
+.stage__hint,
+.result__line,
+.result__why,
+.result__sample-text,
+.formation__note,
+.formation__sample {
+  text-wrap: pretty;
+}
+
+/* 再生中は、編集のための案内を出さない（見るだけのとき、補助文が増えて散らかる） */
+.app[data-phase="play"] .formation__note {
+  display: none;
+}
+
+/* 縦長のタブレット（幅640〜899px）：地図の最大幅（600px）に、注文票と編成の幅をそろえる。
+   列車カードの文字と▲▼のあいだが大きく空いていた */
+@media (min-width: 640px) and (max-width: 899px) and (orientation: portrait) {
+  .orders,
+  .board__side {
+    max-width: 600px;
+    width: 100%;
+    margin-inline: auto;
+  }
+}
