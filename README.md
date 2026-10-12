@@ -98,6 +98,7 @@ Day 051「ハコニワ」も外部公開アプリです。本体は独立リポ�
 | 062 | 終電サドンデス | [day-062-last-train/](day-062-last-train/) | [アプリを開く](https://hundred-days.pages.dev/day-062-last-train/) |
 | 063 | 解約ボタンは、どれ？ | [day-063-dark-patterns/](day-063-dark-patterns/) | [アプリを開く](https://hundred-days.pages.dev/day-063-dark-patterns/) |
 | 064 | 漏洩の地図 | [day-064-breach-atlas/](day-064-breach-atlas/) | [アプリを開く](https://hundred-days.pages.dev/day-064-breach-atlas/) |
+| 065 | 定刻ごはん | [day-065-teikoku-gohan/](day-065-teikoku-gohan/) | [アプリを開く](https://hundred-days.pages.dev/day-065-teikoku-gohan/) |
 <!-- day-index:end -->
 
 ## 1日アプリのルール

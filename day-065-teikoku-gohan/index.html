@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="description" content="食材を積んだ列車の出発順と分岐の向きだけを決めて、切る・焼く・煮るの駅を通し、注文の料理を締切までに届ける1画面のパズル。全6面。">
+  <meta name="share:text" content="定刻ごはん — 出発順と分岐だけで、注文の料理を仕上げる列車パズル">
+  <meta name="theme-color" content="#1d2b4f">
+  <title>定刻ごはん — 出発順と分岐だけで料理をさばく列車パズル</title>
+  <link rel="icon" type="image/svg+xml" href="./favicon.svg">
+  <link rel="stylesheet" href="./app.css">
+  <link rel="stylesheet" href="./shared/share.css">
+  <script type="module" src="./app.js"></script>
+  <script src="./shared/share.js" defer></script>
+</head>
+<body>
+<header class="band">
+  <a class="band__home" href="../">100 DAYS / 065</a>
+  <button id="btn-share" class="band__share" type="button" aria-label="このアプリを共有する">共有する</button>
+</header>
+
+<main id="app" class="app" data-phase="edit">
+  <section class="intro" aria-labelledby="app-title">
+    <div class="intro__row">
+      <h1 id="app-title">定刻ごはん</h1>
+      <div class="intro__tools">
+        <button id="btn-howto" class="tool" type="button">あそびかた</button>
+        <button id="btn-sound" class="tool tool--icon" type="button" aria-label="音を消す"><span id="sound-icon" aria-hidden="true">🔊</span></button>
+      </div>
+    </div>
+    <p class="intro__lead">出発順と分岐だけで料理をさばく列車パズル</p>
+  </section>
+
+  <nav class="levels" aria-label="面をえらぶ">
+    <ol id="level-chips" class="chips"></ol>
+  </nav>
+
+  <section class="stage" aria-labelledby="stage-title">
+    <div class="stage__head">
+      <h2 id="stage-title" class="stage__title"></h2>
+      <p id="stage-goal" class="stage__goal"></p>
+    </div>
+    <p id="stage-hint" class="stage__hint"></p>
+  </section>
+
+  <div class="board">
+    <section class="board__map" aria-labelledby="map-title">
+      <h3 id="map-title" class="sr-only">線路の地図</h3>
+      <div id="map" class="map">
+        <svg id="map-svg" class="map__svg" viewBox="0 0 360 240" role="img" aria-labelledby="map-label"><title id="map-label">線路の地図</title></svg>
+        <div id="map-switches" class="map__switches"></div>
+        <p id="clock" class="map__clock" hidden></p>
+        <p id="toast" class="map__toast" role="status" aria-live="polite"></p>
+      </div>
+      <p id="live" class="sr-only" aria-live="polite"></p>
+      <p class="map__legend"><span class="nw">枕木1本＝1分</span>　<span class="nw">駅の数字＝調理にかかる分</span><span id="legend-len" hidden>　<span class="nw">線路の横の数字＝かかる分</span><span class="nw">（無いものは1分）</span></span></p>
+    </section>
+
+    <section class="orders" aria-labelledby="orders-title">
+      <h3 id="orders-title" class="section-title">注文票</h3>
+      <ul id="orders" class="tickets"></ul>
+    </section>
+
+    <div class="board__side">
+      <section id="formation" class="formation" aria-labelledby="formation-title">
+        <h3 id="formation-title" class="section-title">編成<span class="section-title__sub"><span class="nw">上から順に出発</span><span class="nw">（最短1分おき）</span></span></h3>
+        <ol id="cars" class="cars"></ol>
+        <p id="formation-note" class="formation__note">枠の付いた列車の行き先を、<span class="nw">地図の分岐ボタンで</span><span class="nw">切り替える。</span><span class="nw">ほかの列車は</span><span class="nw">カードをタップ。</span></p>
+        <p id="sample-note" class="formation__sample" hidden></p>
+        <button id="btn-sample-edit" class="btn btn--ghost formation__sample-btn" type="button" hidden>見本のダイヤを見る</button>
+      </section>
+
+      <section id="result" class="result" aria-labelledby="result-title" hidden></section>
+
+      <div id="actionbar" class="actionbar">
+        <div class="actionbar__inner">
+          <button id="btn-depart" class="btn btn--depart" type="button"><span aria-hidden="true">🚂</span> 発車</button>
+          <button id="btn-speed" class="btn btn--play" type="button" aria-pressed="false" hidden>2倍</button>
+          <button id="btn-skip" class="btn btn--play" type="button" hidden>スキップ</button>
+          <button id="btn-rebuild" class="btn btn--play" type="button" hidden>組み直す</button>
+          <button id="btn-next" class="btn btn--depart" type="button" hidden>次の面へ</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="foot">
+    <p>登録なし。<span class="nw">進み具合は端末の中だけに残り、</span><span class="nw">記録は送信しません。</span><span class="nw">共有ボタンを押したときだけ、</span><span class="nw">説明・結果・URLが</span><span class="nw">共有先へ渡ります。</span></p>
+    <nav class="foot__nav" aria-label="サイト内リンク">
+      <a href="../privacy.html">プライバシー</a>
+      <a href="../">100日チャレンジの一覧</a>
+    </nav>
+  </footer>
+</main>
+
+<dialog id="howto-dialog" class="sheet-dialog" aria-labelledby="howto-title">
+  <h2 id="howto-title">あそびかた</h2>
+  <ol class="howto">
+    <li><span class="nw">列車をタップして選び、</span><span class="nw">地図の分岐ボタンで</span><span class="nw">行き先を決める。</span></li>
+    <li><span class="nw">通った駅の順番がレシピ。</span><span class="nw">🔪→🔥 と 🔥→🔪 は</span><span class="nw">別の料理になる。</span></li>
+    <li><span class="nw">▲▼で出発順を入れ替える。</span><span class="nw">上の列車から</span><span class="nw">最短1分おきに出発する。</span><span class="nw">出庫線がふさがると、</span><span class="nw">車庫で待つ。</span></li>
+    <li><span class="nw">線路も駅も1両ずつ。</span><span class="nw">前がつかえると、</span><span class="nw">後ろはその場で待つ。</span><span class="nw">枕木1本が1分。</span></li>
+    <li><span class="nw">同じ場所に同時に</span><span class="nw">入りたい列車は、</span><span class="nw">先に出発した列車が</span><span class="nw">先に進む。</span></li>
+    <li><span class="nw">🔥🍲の駅で、</span><span class="nw">仕上がってから</span><span class="nw">1分を超えて待つと焦げる。</span><span class="nw">全部の料理を</span><span class="nw">締切までに届けたらクリア。</span></li>
+  </ol>
+  <p class="howto__note"><span class="nw">★★★は最短のダイヤ。</span><span class="nw">同じ面で2回失敗すると、</span><span class="nw">見本のダイヤが見られる</span><span class="nw">（見本どおりのクリアは★1）。</span></p>
+  <button id="btn-howto-close" class="btn btn--ghost" type="button">とじる</button>
+</dialog>
+
+<!-- アプリの共有（帯の「共有する」から開く）。#share に共通のシェア欄が据え付く -->
+<dialog id="share-dialog" class="sheet-dialog" aria-label="このアプリを共有する">
+  <div id="share"></div>
+  <button id="btn-share-close" class="btn btn--ghost" type="button">とじる</button>
+</dialog>
+</body>
+</html>
