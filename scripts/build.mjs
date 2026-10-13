@@ -125,6 +125,8 @@ const SOURCE_DIRS_BY_APP = {
   'day-059-kuchi-sanmai': ['source', 'tools'],
   'day-061-kumimae': ['source', 'tools'],
   'day-064-breach-atlas': ['source', 'tools'],
+  // day-066 は素のJSをそのまま配信する。tools/ は宣伝動画の道具で、配信には要らない
+  'day-066-hakokage-kaito': ['tools'],
   // day-060 は素のJSをそのまま配信する（source は無い）。tools/ はデータの作り直し・解説の検査・宣伝動画の道具で、配信には要らない
   'day-060-prize-explained': ['tools']
 };
