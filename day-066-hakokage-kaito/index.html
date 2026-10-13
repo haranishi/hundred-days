@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="description" content="押せる箱で見張りと警備員の光、レーザーをさえぎり、影を通って宝を盗み出す、1手ずつ進む忍び込みパズル。全8面。登録なし。">
+  <meta name="share:text" content="箱影の怪盗 — 頼れるのは押せる箱だけ。光をさえぎり、影を通って宝を盗む忍び込みパズル">
+  <meta name="theme-color" content="#0e1320">
+  <meta name="color-scheme" content="dark">
+  <title>箱影の怪盗 — 押せる箱で警備の光をかわす忍び込みパズル</title>
+  <link rel="icon" type="image/svg+xml" href="./favicon.svg">
+  <link rel="stylesheet" href="./app.css">
+  <link rel="stylesheet" href="./shared/share.css">
+  <script type="module" src="./app.js"></script>
+  <script src="./shared/share.js" defer></script>
+</head>
+<body>
+<!-- 絵の部品（記号を文字で出さず、SVG で描く）。各ボタンの中から <use> で呼ぶ -->
+<svg class="sprite" aria-hidden="true" focusable="false">
+  <symbol id="ic-arrow" viewBox="0 0 24 24"><path d="M12 20V5.5M5.5 11.5L12 5l6.5 6.5" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="ic-prev" viewBox="0 0 24 24"><path d="M17.5 4.8v14.4L5.8 12z" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></symbol>
+  <symbol id="ic-next" viewBox="0 0 24 24"><path d="M6.5 4.8v14.4L18.2 12z" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></symbol>
+  <symbol id="ic-sound-on" viewBox="0 0 24 24"><path d="M3.5 9.5h3.8L12.5 5v14l-5.2-4.5H3.5z" fill="currentColor" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M16 9a4.5 4.5 0 0 1 0 6M18.6 6.4a8.2 8.2 0 0 1 0 11.2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+  <symbol id="ic-sound-off" viewBox="0 0 24 24"><path d="M3.5 9.5h3.8L12.5 5v14l-5.2-4.5H3.5z" fill="currentColor" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M16.5 9.5l5 5M21.5 9.5l-5 5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></symbol>
+  <symbol id="ic-hint" viewBox="0 0 24 24"><path d="M9.3 17.4h5.4M10.1 20.5h3.8M12 3.5a6.2 6.2 0 0 0-3.7 11.2c.7.6 1.1 1.3 1.1 2.1v.6h5.2v-.6c0-.8.4-1.5 1.1-2.1A6.2 6.2 0 0 0 12 3.5z" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="ic-close" viewBox="0 0 24 24"><path d="M7 7l10 10M17 7L7 17" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></symbol>
+  <symbol id="ic-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9.2" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="M9.2 9.6a2.9 2.9 0 1 1 4.6 2.3c-1 .8-1.8 1.3-1.8 2.7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="17.6" r="1.4" fill="currentColor"/></symbol>
+  <symbol id="ic-share" viewBox="0 0 24 24"><path d="M12 15V4M8 7.5l4-4 4 4M6 11H5v9h14v-9h-1" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="ic-eye" viewBox="0 0 24 24"><path d="M2.5 12S6.2 5.8 12 5.8 21.5 12 21.5 12 17.8 18.2 12 18.2 2.5 12 2.5 12z" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/><circle cx="12" cy="12" r="3.2" fill="currentColor"/></symbol>
+  <symbol id="ic-lock" viewBox="0 0 24 24"><rect x="5" y="10.5" width="14" height="10" rx="2.2" fill="currentColor"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></symbol>
+  <symbol id="ic-star-on" viewBox="0 0 24 24"><path d="M12 2.8l2.8 5.9 6.4.9-4.7 4.5 1.2 6.4L12 17.4l-5.7 3.1 1.2-6.4L2.8 9.6l6.4-.9z" fill="currentColor" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></symbol>
+  <symbol id="ic-star-off" viewBox="0 0 24 24"><path d="M12 2.8l2.8 5.9 6.4.9-4.7 4.5 1.2 6.4L12 17.4l-5.7 3.1 1.2-6.4L2.8 9.6l6.4-.9z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+</svg>
+
+<header class="band" id="band">
+  <a class="band__home" href="../"><span class="band__home-long">100 DAYS / </span>066</a>
+  <button id="btn-share" class="btn btn--quiet tool tool--share" type="button" aria-label="このアプリを共有する"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-share"/></svg><span class="tool__text">共有する</span></button>
+</header>
+
+<main id="app" class="app" data-level="L1" data-status="play" data-steps="0" data-treasure="0" data-fails="0">
+  <noscript><p class="noscript">このゲームは JavaScript を使います。</p></noscript>
+
+  <div class="titlebar" id="titlebar">
+    <div class="titlebar__text" id="titlebar-text">
+      <h1 id="app-title" class="title">箱影の怪盗</h1>
+      <p class="lead">箱で<wbr>光をさえぎり、<wbr>影を<wbr>通って<wbr>宝を<wbr>盗み出す</p>
+    </div>
+    <div class="tools" id="tools">
+      <button id="btn-howto" class="btn btn--quiet tool tool--howto" type="button" aria-haspopup="dialog" aria-label="あそびかた"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-help"/></svg><span class="tool__text">あそびかた</span></button>
+      <button id="btn-sound" class="btn btn--quiet tool tool--icon" type="button" data-muted="0" aria-label="音を消す"><svg class="ic" aria-hidden="true" focusable="false"><use class="ic-on" href="#ic-sound-on"/><use class="ic-off" href="#ic-sound-off"/></svg></button>
+    </div>
+  </div>
+
+  <div class="levelwrap" id="levelwrap">
+  <nav class="levelbar" id="levelbar" aria-label="面をえらぶ">
+    <button id="btn-prev" class="btn btn--quiet levelbar__step" type="button" aria-label="前の面"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-prev"/></svg></button>
+    <button id="btn-levels" class="levelbar__now" type="button" aria-haspopup="dialog" aria-label="面1/8 はじめの影（まだ）。面をえらぶ">
+      <span class="levelbar__row"><span id="level-no">面1/8</span><span id="level-stars"></span></span>
+      <span class="levelbar__name" id="level-name">はじめの影</span>
+    </button>
+    <button id="btn-next-level" class="btn btn--quiet levelbar__step" type="button" aria-label="次の面"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-next"/></svg></button>
+    <button id="btn-hint" class="btn btn--quiet levelbar__hint" type="button" aria-label="ヒント" aria-expanded="false" aria-controls="hint" hidden><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-hint"/></svg><span class="levelbar__hint-text">ヒント</span></button>
+  </nav>
+  <div class="msgline" id="hintline" data-open="1">
+  <p id="hint" class="hint">光に<wbr>入ると<wbr><span class="nb">見つか</span>る。<wbr>箱を<wbr>光の<wbr>中へ<wbr>押すと、<wbr>その先に<wbr>影ができる。</p>
+  <button id="btn-hint-close" class="btn btn--quiet hintline__close" type="button" aria-label="ヒントをとじる" aria-controls="hint" hidden><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-close"/></svg></button>
+  <p id="toast" class="toast" role="status" aria-hidden="true"></p>
+  </div>
+  </div>
+
+  <h2 id="level-title" class="sr-only">面1 はじめの影</h2>
+  <div class="boardwrap" id="board-wrap">
+    <svg id="board" class="board" role="img" aria-label="盤を読み込み中" viewBox="0 0 600 400" width="336" height="224" data-cols="6" data-rows="4"></svg>
+    <details id="board-text" class="boardtext"><summary>盤を文で読む</summary><ul id="board-lines" class="boardtext__lines"></ul></details>
+  </div>
+
+  <div class="dock" id="dock">
+    <div class="status" id="status">
+      <p class="status__main" id="status-main"><span><span class="status__label">手数</span> <span class="num" id="steps">0</span></span><span class="status__sep" aria-hidden="true">／</span><span><span class="status__label">最少</span> <span class="num" id="par">10</span></span><span><span class="status__label">宝</span> <span id="treasure-state">まだ</span></span></p>
+      <button id="btn-demo" class="btn btn--quiet status__button" type="button" aria-label="お手本を見る" hidden>お手本</button>
+      <p class="status__demo" id="status-demo" hidden><span id="demo-progress" class="status__label">お手本 0/10手</span><button id="btn-demo-stop" class="btn btn--quiet status__button" type="button" aria-label="お手本をとめる">とめる</button></p>
+    </div>
+
+    <div class="controls" id="controls">
+      <button id="btn-undo" class="pad pad--small" type="button" data-action="undo" aria-label="ひとつ戻す" aria-keyshortcuts="Z Backspace">戻す</button>
+      <button id="btn-up" class="pad" type="button" data-action="U" aria-label="上へ" aria-keyshortcuts="ArrowUp W"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-arrow"/></svg></button>
+      <button id="btn-restart" class="pad pad--small" type="button" data-action="restart" aria-label="最初へ戻す" aria-keyshortcuts="R">最初へ</button>
+      <button id="btn-left" class="pad" type="button" data-action="L" aria-label="左へ" aria-keyshortcuts="ArrowLeft A"><svg class="ic ic--left" aria-hidden="true" focusable="false"><use href="#ic-arrow"/></svg></button>
+      <button id="btn-wait" class="pad pad--wait" type="button" data-action="." aria-label="その場で待つ" aria-keyshortcuts="Space">待つ</button>
+      <button id="btn-right" class="pad" type="button" data-action="R" aria-label="右へ" aria-keyshortcuts="ArrowRight D"><svg class="ic ic--right" aria-hidden="true" focusable="false"><use href="#ic-arrow"/></svg></button>
+      <button id="btn-down" class="pad" type="button" data-action="D" aria-label="下へ" aria-keyshortcuts="ArrowDown S"><svg class="ic ic--down" aria-hidden="true" focusable="false"><use href="#ic-arrow"/></svg></button>
+    </div>
+
+    <section id="panel-caught" class="panel panel--caught" role="region" aria-labelledby="caught-title" hidden>
+      <h2 id="caught-title" class="panel__title"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-eye"/></svg><span id="caught-title-text">見つかった！</span></h2>
+      <p id="caught-text" class="panel__text"></p>
+      <div class="panel__actions">
+        <button id="btn-caught-undo" class="btn btn--primary" type="button">ひとつ戻す</button>
+        <button id="btn-caught-restart" class="btn" type="button" aria-label="最初へ戻す">最初へ</button>
+        <button id="btn-caught-demo" class="btn" type="button" hidden>お手本を見る</button>
+      </div>
+    </section>
+
+    <section id="panel-dead" class="panel panel--dead" role="region" aria-labelledby="dead-title" hidden>
+      <h2 id="dead-title" class="panel__title"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-lock"/></svg><span id="dead-title-text">もう出られない</span></h2>
+      <p id="dead-text" class="panel__text"></p>
+      <div class="panel__actions">
+        <button id="btn-dead-undo" class="btn btn--primary" type="button">ひとつ戻す</button>
+        <button id="btn-dead-restart" class="btn" type="button" aria-label="最初へ戻す">最初へ</button>
+        <button id="btn-dead-demo" class="btn" type="button" hidden>お手本を見る</button>
+      </div>
+    </section>
+
+    <section id="panel-clear" class="panel panel--clear" role="region" aria-labelledby="clear-title" hidden>
+      <h2 id="clear-title" class="panel__title"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-star-on"/></svg><span id="clear-title-text">脱出成功！</span></h2>
+      <div class="clear__row">
+        <span id="clear-stars" class="clear__stars" data-stars="0"></span>
+        <span id="clear-stars-text" class="clear__word"></span>
+        <span id="clear-steps" class="clear__steps"></span>
+      </div>
+      <p id="clear-note" class="panel__text"></p>
+      <div class="panel__actions">
+        <button id="btn-next" class="btn btn--primary" type="button">次の面へ</button>
+        <button id="btn-again" class="btn" type="button">もう一度遊ぶ</button>
+      </div>
+      <div id="result-share" class="resultshare">
+        <p class="resultshare__label">結果を送る</p>
+        <div id="share-row" class="resultshare__row">
+          <a id="share-x" class="btn" href="https://x.com/intent/post" target="_blank" rel="noopener noreferrer">Xで投稿</a>
+          <a id="share-line" class="btn" href="https://social-plugins.line.me/lineit/share" target="_blank" rel="noopener noreferrer">LINEで送る</a>
+          <button id="share-copy" class="btn" type="button">リンクをコピー</button>
+          <button id="share-native" class="btn" type="button" hidden>ほかの<wbr>アプリで送る</button>
+        </div>
+        <p id="share-said" class="resultshare__said" role="status"></p>
+      </div>
+    </section>
+  </div>
+
+  <p class="keyhelp" id="keyhelp">矢印かWASDで移動・<wbr>スペースで待つ・<wbr>Zでひとつ戻す・<wbr>Rで最初へ</p>
+  <p id="live" class="sr-only" aria-live="polite"></p>
+
+  <footer class="foot">
+    <p>登録なし。<wbr>進み具合と<wbr>設定は、<wbr>この端末の<wbr>中だけに<wbr>保存し、<wbr>自動では<wbr>送りません。<wbr>共有を<wbr>押したときだけ、<wbr>説明か<wbr>結果<wbr>（面・星・手数）と<wbr>URLが<wbr>共有先へ<wbr>渡ります。</p>
+    <p class="foot__links"><a href="../privacy.html">プライバシー</a><a href="../">100日チャレンジの一覧</a></p>
+  </footer>
+</main>
+
+<dialog id="howto-dialog" class="dialog" aria-labelledby="howto-title">
+  <h2 id="howto-title" class="dialog__title">あそびかた</h2>
+  <div class="dialog__body">
+  <ol class="howto">
+    <li>白い覆面があなた。<wbr><span class="nb">見張り</span>と<wbr><span class="nb">警備員</span>の<wbr>光、<wbr><span class="nb">レーザー</span>が<wbr>自分の<wbr>マスに<wbr>当たると<wbr><span class="nb">見つか</span>る。<wbr>いま<span class="nb">光っている</span>マス<wbr>（縞）に<wbr>入ると、<wbr>光が<wbr>動く前に、<wbr>その場で<wbr><span class="nb">見つか</span>る。<wbr>点線の<wbr>枠は、<wbr><span class="nb">次の1手</span>で<wbr>光るマス。</li>
+    <li>箱で<wbr>光をさえぎると、<wbr>後ろに<wbr>影ができる。<wbr>影の<wbr>中なら<span class="nb">見つか</span>らない。<wbr>箱をどかすと、<wbr>光は<wbr>戻る。<wbr>箱は<wbr>押せるが、<wbr>引けない。</li>
+    <li>宝を<wbr>取ると<wbr>出口が<wbr>開く。<wbr><span class="nb">警備員</span>は<wbr>道を<wbr><span class="nb">行き来</span>し、<wbr>箱があると<wbr><span class="nb">引き返</span>す。<wbr><span class="nb">見張り</span>はその場で<wbr>向きを<wbr>変える。</li>
+  </ol>
+  <p id="howto-keys" class="howto__keys">矢印かWASDで移動・<wbr>スペースで待つ・<wbr>Zでひとつ戻す・<wbr>Rで最初へ</p>
+  <button id="opt-letter-keys" class="switch" type="button" role="switch" aria-checked="true"><span class="switch__track" aria-hidden="true"><span class="switch__knob"></span></span><span class="switch__label"><span class="nb">文字のキー</span><wbr><span class="nb">（WASD・Z・R）を使う</span></span></button>
+  </div>
+  <div class="dialog__actions"><button id="btn-howto-close" class="btn" type="button">とじる</button></div>
+</dialog>
+
+<dialog id="level-dialog" class="dialog" aria-labelledby="level-dialog-title">
+  <h2 id="level-dialog-title" class="dialog__title">面をえらぶ</h2>
+  <div class="dialog__body"><ul id="level-list" class="levellist"></ul></div>
+  <div class="dialog__actions"><button id="btn-levels-close" class="btn" type="button">とじる</button></div>
+</dialog>
+
+<!-- アプリの共有（帯の「共有する」から開く）。#share に共通のシェア欄が据え付く -->
+<dialog id="share-dialog" class="dialog" aria-label="このアプリを共有する">
+  <div class="dialog__body"><div id="share"></div></div>
+  <div class="dialog__actions"><button id="btn-share-close" class="btn" type="button">とじる</button></div>
+</dialog>
+</body>
+</html>

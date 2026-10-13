@@ -99,6 +99,7 @@ Day 051「ハコニワ」も外部公開アプリです。本体は独立リポ�
 | 063 | 解約ボタンは、どれ？ | [day-063-dark-patterns/](day-063-dark-patterns/) | [アプリを開く](https://hundred-days.pages.dev/day-063-dark-patterns/) |
 | 064 | 漏洩の地図 | [day-064-breach-atlas/](day-064-breach-atlas/) | [アプリを開く](https://hundred-days.pages.dev/day-064-breach-atlas/) |
 | 065 | 定刻ごはん | [day-065-teikoku-gohan/](day-065-teikoku-gohan/) | [アプリを開く](https://hundred-days.pages.dev/day-065-teikoku-gohan/) |
+| 066 | 箱影の怪盗 | [day-066-hakokage-kaito/](day-066-hakokage-kaito/) | [アプリを開く](https://hundred-days.pages.dev/day-066-hakokage-kaito/) |
 <!-- day-index:end -->
 
 ## 1日アプリのルール
