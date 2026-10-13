@@ -700,7 +700,7 @@ test('390×844：面3〜6で、全カードが見える位置のまま、各カ�
   await expectClean(page, seen);
 });
 
-// 画面の縦の位置が落ち着くまで待つ（結果を出すときのスクロールは、なめらかに動く）
+// 画面の縦の位置が落ち着くまで待つ（スクロールはすべて一瞬なので、ふつうは1回目の確認で落ち着いている。動いている途中を測らないための念押し）
 async function settledScroll(page) {
   let last = -1;
   for (let i = 0; i < 40; i++) {
@@ -1152,17 +1152,20 @@ test('編成のカード：通る駅の行に道のり。分岐を切り替え�
   await expectClean(page, seen);
 });
 
+// 選んでいる列車のカードが、固定した地図の下端から何px下か（top）と、下の帯の上端から何px上か（bottom）。どちらも0以上なら、全部見えている
+const cardGap = (page) => page.evaluate(() => {
+  const box = (el) => el.getBoundingClientRect();
+  const map = box(document.querySelector('.board__map'));
+  const bar = box(document.querySelector('#actionbar'));
+  const car = box(document.querySelector('.car.is-selected'));
+  return { top: car.top - map.bottom, bottom: bar.top - car.bottom };
+});
+
 for (const size of [{ width: 390, height: 844 }, { width: 375, height: 667 }]) {
   test(`${size.width}×${size.height}：面を切り替えた直後は面の名前と指示文が見え、組み直した直後は選んでいるカードが固定した地図と下の帯のあいだに全部見える（面4〜6）`, async ({ page }) => {
     await page.setViewportSize(size);
     const seen = await open(page);
-    const visible = () => page.evaluate(() => {
-      const box = (el) => el.getBoundingClientRect();
-      const map = box(document.querySelector('.board__map'));
-      const bar = box(document.querySelector('#actionbar'));
-      const car = box(document.querySelector('.car.is-selected'));
-      return { top: car.top - map.bottom, bottom: bar.top - car.bottom };
-    });
+    const visible = () => cardGap(page);
     for (const n of [4, 5, 6]) {
       await chipOf(page, n).click();
       // 面を切り替えたら、新しい面の名前と指示文が見える所（いちばん上）へ戻る。1両目のカードは、スクロールして出す
@@ -1181,6 +1184,53 @@ for (const size of [{ width: 390, height: 844 }, { width: 375, height: 667 }]) {
       const v = await visible();
       expect(v.top, `面${n} 組み直し：カードの上端が地図の下端より下`).toBeGreaterThanOrEqual(-0.5);
       expect(v.bottom, `面${n} 組み直し：カードの下端が帯の上端より上`).toBeGreaterThanOrEqual(-0.5);
+    }
+    await expectClean(page, seen);
+  });
+}
+
+// 結果が出た直後に押しても、画面が落ち着いたあとの位置は同じ。
+// 結果へのスクロールが「なめらか」だったとき、スキップの0.1秒前後に組み直すと、動く量が0の scrollIntoView は動いている最中のスクロールを止めず、
+// 結果のあった位置まで動き続けて、選んだカードが固定した地図の下に隠れたまま残った（main の CI で面6が落ちた）。
+// 面チップの scrollTo は動きを止めるが、動き終わりの数pxが残り、いちばん上（0）に止まらなかった。
+// 押すまでの間隔は、ページの中のタイマーで測る（Playwright の操作を挟むと、機械の速さで間隔がぶれ、手元では動く範囲に当たらない）。広く振って、どの速さの機械でも動いている最中に当たるようにする
+const DELAYS_AFTER_SKIP = [0, 40, 80, 120, 160, 200, 250, 320, 450];
+
+for (const size of [{ width: 375, height: 667 }, { width: 390, height: 844 }]) {
+  test(`${size.width}×${size.height}：スキップのあと何ミリ秒で組み直しても、画面が落ち着いたとき、選んだカードは固定した地図と下の帯のあいだに全部見える（面6）`, async ({ page }) => {
+    await page.setViewportSize(size);
+    const seen = await open(page);
+    await chipOf(page, 6).click();
+    for (const delay of DELAYS_AFTER_SKIP) {
+      await page.getByRole('button', { name: '発車', exact: true }).click();
+      await page.evaluate(async (ms) => {
+        document.querySelector('#btn-skip').click();
+        await new Promise((resolve) => setTimeout(resolve, ms));
+        document.querySelector('#btn-rebuild').click();
+      }, delay);
+      await settledScroll(page);
+      const gap = await cardGap(page);
+      expect(gap.top, `間隔${delay}ms：カードの上端が地図の下端より下`).toBeGreaterThanOrEqual(-0.5);
+      expect(gap.bottom, `間隔${delay}ms：カードの下端が帯の上端より上`).toBeGreaterThanOrEqual(-0.5);
+    }
+    await expectClean(page, seen);
+  });
+
+  test(`${size.width}×${size.height}：スキップのあと何ミリ秒で面を切り替えても、画面が落ち着いたとき、いちばん上に止まり、面の名前が見える`, async ({ page }) => {
+    await page.setViewportSize(size);
+    const seen = await open(page);
+    await chipOf(page, 6).click();
+    for (const delay of DELAYS_AFTER_SKIP) {
+      await page.getByRole('button', { name: '発車', exact: true }).click();
+      await page.evaluate(async (ms) => {
+        document.querySelector('#btn-skip').click();
+        await new Promise((resolve) => setTimeout(resolve, ms));
+        document.querySelector('#level-chips li:nth-child(5) .chip').click(); // 面5へ
+      }, delay);
+      const y = await settledScroll(page);
+      expect(y, `間隔${delay}ms：面を切り替えたあと、いちばん上に止まる`).toBe(0);
+      expect(await page.locator('#stage-title').evaluate((el) => el.getBoundingClientRect().top), `間隔${delay}ms：面の名前が画面の中`).toBeGreaterThanOrEqual(0);
+      await chipOf(page, 6).click(); // 次の周のために面6へ戻る
     }
     await expectClean(page, seen);
   });

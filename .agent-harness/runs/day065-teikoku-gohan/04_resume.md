@@ -1,7 +1,8 @@
-# Day065 再開メモ（最終更新 2026-10-12 深夜・公開PRの時点）
+# Day065 再開メモ（最終更新 2026-10-13 朝・公開後のCI修正の時点）
 
 ## いまの状態
 
+- **2026-10-13：PR #147 は本人がマージした（main b41910e）が、main の CI が Day65 の画面テスト1件で落ち、デプロイされていない。** 原因は、結果へなめらかに動いている途中に「組み直す」や面チップを押すと、画面の位置がずれる、アプリの不具合だった。結果へのスクロールを一瞬にして直し、再発防止の画面テスト4件を足した（ブランチ `fix/day-065-rebuild-scroll`。経緯は progress.md の「9周目」）。**このPRのマージと、そのあとの main の CI・デプロイが済み、公開URLが開くまでは、公開されていない。**
 - 作業ツリー ~/Projects/hundred-days-day065。ブランチは `feat/day-065-teikoku-gohan`（origin/main 2d37e61 から）。**2026-10-12 に、本人の指示（「PRを作成してマージまで」）で、このPRを出して公開する**（meta.json の status は published）。公開URLは https://hundred-days.pages.dev/day-065-teikoku-gohan/。**実装と検査は完了。残りは、公開後の本人の確認と、公開後に直す候補。**
 - 追加・変更：README.md（Day一覧に「| 065 | 定刻ごはん | … | 未公開 |」の1行。公開すると index:sync が公開の行に直す）、day-065-teikoku-gohan/、tests/e2e/day-065.spec.mjs、契約、このフォルダ。
 - 検査（2026-10-12 22時半・最終コード・公開状態で実施して draft に戻した）：全単体 2967件（失敗0・スキップ1は別Day）／Day65の単体 170／Day65のE2E 68件を3回続けて204／共通（shared-share・security-headers）257／precheck OK／verify-levels 全面OK／lib/sim.js は基準と一致。screenshot.webp は最終の画面で撮り直した（面4で焦げる瞬間・1200×750・メタデータなし）。
@@ -30,13 +31,11 @@ node .agent-harness/runs/day065-teikoku-gohan/reference/verify-levels.mjs       
 node --test day-065-teikoku-gohan/tests/                                                        # 単体（170件）
 ```
 
-画面を使うテスト（draft は共通検査の対象外なので、検査の間だけ published にして、必ず draft に戻す）：
+画面を使うテスト（meta.json は公開（published）のまま。draft に戻さない。公開前は draft にしていたが、公開後にその手順を踏むと、公開を取り下げた状態で build してしまう）：
 
 ```sh
-M=day-065-teikoku-gohan/meta.json
-sed -i '' 's/"status": "draft"/"status": "published"/' $M && npm run index:sync && npm run build
+npm run build
 PLAYWRIGHT_PORT=4566 npx playwright test tests/e2e/day-065.spec.mjs tests/e2e/shared-share.spec.mjs tests/e2e/security-headers.spec.mjs
-sed -i '' 's/"status": "published"/"status": "draft"/' $M && npm run index:sync && npm run build   # 終わったら必ず戻す
 ```
 
 全幅の撮影：`python3 -m http.server 4570 --bind 127.0.0.1 --directory ~/Projects/hundred-days-day065` を起こしてから、`node .agent-harness/runs/day065-teikoku-gohan/capture.mjs <出力先> 4570 --widths=390,375,320,844,768,1440`（出力は一時フォルダでよい）。

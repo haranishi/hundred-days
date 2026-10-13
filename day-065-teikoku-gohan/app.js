@@ -466,8 +466,8 @@ function depart() {
   const clockBox = els.clock.getBoundingClientRect();
   map.startPlayback(sim, state.plan, L.trains, pathsOf(L, state.plan), { w: clockBox.width + 12, h: clockBox.height });
   els.clock.dataset.corner = map.clockCorner();
-  // 地図は帯の下に固定してある。固定しない画面（高さ450px未満）だけ、地図が見える所まで送る
-  if (!media('(min-height: 450px)')) document.querySelector('.board__map').scrollIntoView({ block: 'start', behavior: 'smooth' });
+  // 地図は帯の下に固定してある。固定しない画面（高さ450px未満）だけ、地図が見える所まで送る（一瞬で。理由は finishPlay の中の注釈）
+  if (!media('(min-height: 450px)')) document.querySelector('.board__map').scrollIntoView({ block: 'start', behavior: 'auto' });
   state.play = { t: 0, last: null, nextMinute: 1, marked: new Set(), windows: sizzleWindows(L, sim), raf: requestAnimationFrame(tick) };
   announce('発車！');
 }
@@ -553,7 +553,10 @@ function finishPlay() {
   const title = $('result-title');
   if (title) {
     title.focus({ preventScroll: true });
-    els.result.scrollIntoView({ block: 'start', behavior: reduceMotion() ? 'auto' : 'smooth' });
+    // 結果の先頭へも一瞬で動く。なめらかに動かすと、動いている途中に押した「組み直す」の scrollIntoView は、選んだカードがもう
+    // 見えていて動く量が0だと、動いている最中のスクロールを止めず、結果の位置まで動き続けた（カードが固定した地図の下に隠れたまま残る）。
+    // 面チップの scrollTo は止めるが、動き終わりの数pxが残り、いちばん上に止まらなかった
+    els.result.scrollIntoView({ block: 'start', behavior: 'auto' });
   }
 }
 
