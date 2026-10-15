@@ -1,0 +1,23 @@
+{
+  "day": 67,
+  "season": 3,
+  "title": "輪切り",
+  "description": "日本語のサイトの広告を減らし、本文を読みやすくするChrome拡張。サイトごとのオン・オフと、残った広告を自分で消す機能つき。無料・登録不要。Chrome ウェブストアで公開中。",
+  "tags": [
+    "chrome-extension",
+    "adblock",
+    "privacy"
+  ],
+  "status": "external",
+  "externalUrl": "https://chromewebstore.google.com/detail/aalgejlgocflbdjlkoalkoolmcmednmn",
+  "publicUrl": "https://chromewebstore.google.com/detail/aalgejlgocflbdjlkoalkoolmcmednmn",
+  "startedAt": "2026-10-15",
+  "finishedAt": "2026-10-15",
+  "aiHandled": [
+    "公開済みの無料版と作業記録を照合し、紹介READMEと一覧表示用のメタデータを作成した"
+  ],
+  "humanHandled": [
+    "輪切りを100日チャレンジの1本として載せ、拡張本体のコードはこのリポジトリに含めない方針を決めた"
+  ],
+  "failuresAndFixes": []
+}
