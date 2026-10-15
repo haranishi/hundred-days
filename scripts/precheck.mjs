@@ -7,7 +7,8 @@
 import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
 
-const run = (cmd, args) => execFileSync(cmd, args, { encoding: 'utf8' }).trim();
+// NUL区切りのファイル名は、先頭の空白・改行も含めて保持する。
+const run = (cmd, args) => execFileSync(cmd, args, { encoding: 'utf8' });
 
 const args = process.argv.slice(2);
 if (args.some((arg) => arg !== '--public')) {
@@ -117,7 +118,7 @@ if (tracked.some((f) => f.startsWith('.wrangler/'))) {
   console.log('✖ .wrangler/ が追跡されている（gitignore漏れ）');
   fails++;
 }
-const email = run('git', ['config', 'user.email']);
+const email = run('git', ['config', 'user.email']).trim();
 if (!email.endsWith('@users.noreply.github.com')) {
   console.log('✖ コミット著者メールがnoreplyでない');
   fails++;

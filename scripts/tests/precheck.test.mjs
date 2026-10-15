@@ -79,3 +79,13 @@ test('filenames with newlines cannot bypass the public scan', (t) => {
   f.write('note\nwith-newline.txt', '/' + ['Users', 'fixture'].join('/'));
   assert.equal(f.run('precheck.mjs', '--public').status, 1);
 });
+
+test('leading whitespace in the first filename cannot bypass the public scan', async (t) => {
+  for (const filename of [' leading.txt', '\tleading.txt', '\nleading.txt']) {
+    await t.test(JSON.stringify(filename), (subtest) => {
+      const f = fixture(subtest);
+      f.write(filename, '/' + ['Users', 'fixture'].join('/'));
+      assert.equal(f.run('precheck.mjs', '--public').status, 1);
+    });
+  }
+});
