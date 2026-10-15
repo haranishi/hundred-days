@@ -10,3 +10,5 @@ Day Nの公開、コミット、push、デプロイ、SNS投稿文の作成を�
 6. X投稿は`npm run x:prepare -- --day <N> --video <path> --media-reviewed`で本文・リプライ・動画を検証する。生成後も、正しいXアカウント・添付動画・最終プレビューを人が確認してから公開する。
 
 実際の個人NGワードは、gitignoreされた`.precheck-ng.txt`だけに保存する。秘密値や非公開の運用情報を、このファイルを含む公開対象へ書かない。
+
+PR前の自動検査とマージ条件は [CI手順](docs/ci.md) を参照する。通常のローカル検査は `npm run check` にまとめてある。

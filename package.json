@@ -7,7 +7,9 @@
     "build": "node scripts/sync-day-index.mjs --check && node scripts/sync-shared.mjs --check && node scripts/build.mjs",
     "index:sync": "node scripts/sync-day-index.mjs",
     "precheck": "node scripts/precheck.mjs",
-    "test:unit": "node --test day-*/tests/",
+    "check:syntax": "node scripts/check-syntax.mjs",
+    "check": "npm run precheck && npm run check:syntax && npm run test:unit && npm run build",
+    "test:unit": "node --test scripts/tests/*.test.mjs day-*/tests/",
     "test:e2e": "playwright test",
     "x:prepare": "node scripts/prepare-x-post.mjs",
     "shared:sync": "node scripts/sync-shared.mjs"

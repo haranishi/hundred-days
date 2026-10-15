@@ -2,6 +2,8 @@
 
 日々の公開作業で使う内部向けスクリプトの手順。アプリ本体には影響しない。
 
+PR前の自動検査・マージ条件・失敗時の調べ方は [CI手順](ci.md) を参照する。
+
 ## Dayを1本追加する
 
 1. リポジトリ直下の `day-NNN-<name>/` にアプリ本体・`README.md`・`meta.json` を置き、`npm run index:sync` でREADMEのDay一覧を更新する
