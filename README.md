@@ -100,6 +100,7 @@ Day 051「ハコニワ」も外部公開アプリです。本体は独立リポ�
 | 064 | 漏洩の地図 | [day-064-breach-atlas/](day-064-breach-atlas/) | [アプリを開く](https://hundred-days.pages.dev/day-064-breach-atlas/) |
 | 065 | 定刻ごはん | [day-065-teikoku-gohan/](day-065-teikoku-gohan/) | [アプリを開く](https://hundred-days.pages.dev/day-065-teikoku-gohan/) |
 | 066 | 箱影の怪盗 | [day-066-hakokage-kaito/](day-066-hakokage-kaito/) | [アプリを開く](https://hundred-days.pages.dev/day-066-hakokage-kaito/) |
+| 067 | 輪切り | [制作記録のみ](day-067-wagiri/) | [紹介ページ](https://chromewebstore.google.com/detail/aalgejlgocflbdjlkoalkoolmcmednmn) |
 <!-- day-index:end -->
 
 ## 1日アプリのルール
