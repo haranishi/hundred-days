@@ -7,11 +7,19 @@
 import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
 
-const run = (cmd, args) => execFileSync(cmd, args, { encoding: 'utf8' }).trim();
+// NUL区切りのファイル名は、先頭の空白・改行も含めて保持する。
+const run = (cmd, args) => execFileSync(cmd, args, { encoding: 'utf8' });
 
-const files = run('git', ['ls-files', '-c', '-o', '--exclude-standard'])
-  .split('\n')
-  .filter(Boolean);
+const args = process.argv.slice(2);
+if (args.some((arg) => arg !== '--public')) {
+  console.error('使い方: npm run precheck -- [--public]');
+  process.exit(2);
+}
+// フォークPRにも共通の漏洩検査を適用し、非公開のNGワードだけを渡さずに済ませる。
+const publicOnly = args.includes('--public');
+const files = [...new Set(run('git', ['ls-files', '-z', '-c', '-o', '--exclude-standard'])
+  .split('\0')
+  .filter(Boolean))];
 
 const BINARY = /\.(png|jpe?g|gif|webp|ico|svg|mp4|mov|webm|mp3|wav|ogg|flac|glb|zip|gz|woff2?|ttf|otf|pdf|bin)$/i;
 
@@ -32,17 +40,24 @@ const NG_FILE = '.precheck-ng.txt';
 let fails = 0;
 let warns = 0;
 let ngPatterns = [];
-if (existsSync(NG_FILE)) {
+if (publicOnly) {
+  console.log('共通の漏洩検査を実行（個人NGワード検査は対象外）');
+} else if (existsSync(NG_FILE)) {
   const configuredPatterns = readFileSync(NG_FILE, 'utf8')
     .split('\n')
     .map((s) => s.trim())
     .filter((s) => s && !s.startsWith('#'));
 
+  if (!configuredPatterns.length) {
+    console.log(`✖ ${NG_FILE} にNGワードが設定されていない`);
+    fails++;
+  }
   for (const pattern of configuredPatterns) {
     try {
       ngPatterns.push(['NGワード', new RegExp(pattern, 'i')]);
     } catch {
-      console.log(`✖ ${NG_FILE} に不正な正規表現がある: ${pattern}`);
+      // パターン自体も非公開情報なので、エラーでも値をログへ出さない。
+      console.log(`✖ ${NG_FILE} に不正な正規表現がある`);
       fails++;
     }
   }
@@ -92,7 +107,7 @@ for (const [dir, list] of [...binaryByDir].sort(([a], [b]) => a.localeCompare(b)
 }
 
 // 不変条件：非公開ファイルが追跡されていないこと・コミット著者がnoreplyであること
-const tracked = run('git', ['ls-files']).split('\n');
+const tracked = run('git', ['ls-files', '-z']).split('\0');
 for (const secret of ['CLAUDE.md', NG_FILE]) {
   if (tracked.includes(secret)) {
     console.log(`✖ ${secret} が追跡されている（gitignore漏れ）`);
@@ -103,9 +118,9 @@ if (tracked.some((f) => f.startsWith('.wrangler/'))) {
   console.log('✖ .wrangler/ が追跡されている（gitignore漏れ）');
   fails++;
 }
-const email = run('git', ['config', 'user.email']);
-if (!email.includes('users.noreply.github.com')) {
-  console.log(`✖ コミット著者メールがnoreplyでない: ${email}`);
+const email = run('git', ['config', 'user.email']).trim();
+if (!email.endsWith('@users.noreply.github.com')) {
+  console.log('✖ コミット著者メールがnoreplyでない');
   fails++;
 }
 

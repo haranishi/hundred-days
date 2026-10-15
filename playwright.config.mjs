@@ -9,13 +9,17 @@ export default defineConfig({
   testIgnore: 'day-064.spec.mjs',
   timeout: 30_000,
   fullyParallel: false,
+  forbidOnly: !!process.env.CI,
   retries: 0,
   workers: 1,
-  reporter: process.env.CI ? 'github' : 'list',
+  reporter: process.env.CI
+    ? [['github'], ['html', { open: 'never' }]]
+    : 'list',
   use: {
     baseURL: `http://127.0.0.1:${port}`,
     headless: true,
     trace: 'retain-on-failure',
+    screenshot: 'only-on-failure',
   },
   webServer: {
     command: 'node scripts/serve-dist.mjs',
