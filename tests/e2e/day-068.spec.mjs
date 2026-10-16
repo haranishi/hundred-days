@@ -31,7 +31,7 @@ test('published path loads railway reconstruction, share links and only runtime 
  await expect(page.locator('.station-marker')).toHaveCount(5);
  await page.locator('#view-2d').click();await expect(page.locator('.flat-map')).toBeVisible();
  await expect(page.locator('#story-clock')).toHaveText('23:21');await page.keyboard.press('Escape');
- await page.locator('#share-button').click();await expect(page.locator('#share a[href*="x.com/intent"]')).toBeVisible();await expect(page.locator('#share a[href*="line.me"]')).toBeVisible();await page.keyboard.press('Escape');
+ await page.setViewportSize({width:390,height:844});await page.locator('#share-button').click();expect(await page.locator('#share-dialog').evaluate(d=>d.scrollWidth<=d.clientWidth)).toBe(true);await expect(page.locator('#share a[href*="x.com/intent"]')).toBeVisible();await expect(page.locator('#share a[href*="line.me"]')).toBeVisible();await page.keyboard.press('Escape');
  for(const path of ['tools/serve.mjs','tests/story-fixtures.mjs'])expect((await request.get(path)).status()).toBe(404);
  expect((await request.get('vendor/THREE-LICENSE.txt')).status()).toBe(200);
 });

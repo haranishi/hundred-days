@@ -190,9 +190,9 @@ blockquote{position:relative;margin:17px 0 6px;background:#e0e3d653;border-left:
 .journey-leg strong{font-weight:600;display:block;color:#30513f}
 .result-closing{color:#4d6351;font-family:var(--serif)}
 .result-again{width:100%;margin-top:7px}
-#share .share{border:0;margin:0;padding:0}
+#share .share{border:0;margin:0;padding:0;min-width:0;max-width:100%}
 #share .share__label{display:none}
-#share .share__button{background:#dce3d3;color:#214a3e;border:1px solid #aebfa5;font-size:12px;min-height:44px}
+#share .share__button{background:#dce3d3;color:#214a3e;border:1px solid #61785f;font-size:12px;min-height:44px}
 #share .share__note{font-size:11px;color:#4e6653}
 #share .share__said{color:#255950}
 .noscript{padding:24px;text-align:center}
