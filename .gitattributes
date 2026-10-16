@@ -2,3 +2,6 @@
 day-056-dragon-rush/game/assets/index-*.js -whitespace
 day-056-dragon-rush/game/licenses/BlueNoise.txt -whitespace
 day-056-dragon-rush/source/LICENSES/upstream/BlueNoise.txt -whitespace
+
+# Keep the bundled upstream three.js source byte-for-byte.
+day-068-timetable-alibi/vendor/three.core.js -whitespace

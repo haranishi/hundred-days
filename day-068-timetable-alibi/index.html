@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0b1e28">
+<meta name="description" content="23:47、一緒に帰るはずだった相棒が消えた。雨の駅で証拠を集め、写真の扱いと調査経路、乗る列車を選ぶ短編ミステリー。最後の嘘を崩し、自分の手で約束の一枚を撮る。">
+<meta name="share:text" content="23:47、一緒に帰る約束だった。時刻表アリバイ — 雨の駅で消えた相棒を探すWebミステリー。">
+<meta property="og:title" content="時刻表アリバイ — 23:47の約束">
+<meta property="og:description" content="写真を消すか、相棒と行くか。列車と証拠を選び、23:47の約束を果たす短編ミステリー。">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://hundred-days.pages.dev/day-068-timetable-alibi/">
+<meta property="og:image" content="https://hundred-days.pages.dev/day-068-timetable-alibi/og.png">
+<meta property="og:image:width" content="1440"><meta property="og:image:height" content="1000">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="canonical" href="https://hundred-days.pages.dev/day-068-timetable-alibi/">
+<link rel="icon" type="image/svg+xml" href="./favicon.svg">
+<link rel="stylesheet" href="./app.css"><link rel="stylesheet" href="./episode.css"><link rel="stylesheet" href="./continuation.css"><link rel="stylesheet" href="./shared/share.css">
+<link rel="preload" as="image" href="./assets/episode/concourse-night.webp">
+<title>時刻表アリバイ — 23:47の約束</title>
+<script type="module" src="./episode.js"></script><script src="./shared/share.js" defer></script>
+</head>
+<body class="episode-mode">
+<svg class="svg-sprite" aria-hidden="true">
+  <symbol id="ic-play" viewBox="0 0 24 24"><path d="m8 5 11 7-11 7Z" fill="currentColor"/></symbol>
+  <symbol id="ic-pause" viewBox="0 0 24 24"><path d="M8 5v14M16 5v14" fill="none" stroke="currentColor" stroke-width="4"/></symbol>
+  <symbol id="ic-back" viewBox="0 0 24 24"><path d="m15 6-8 6 8 6M6 6v12" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></symbol>
+  <symbol id="ic-forward" viewBox="0 0 24 24"><path d="m9 6 8 6-8 6M18 6v12" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></symbol>
+  <symbol id="ic-sound" viewBox="0 0 24 24"><path d="M4 9h4l5-4v14l-5-4H4ZM17 8q5 4 0 8" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></symbol>
+  <symbol id="ic-mute" viewBox="0 0 24 24"><path d="M4 9h4l5-4v14l-5-4H4ZM17 9l5 6m0-6-5 6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></symbol>
+  <symbol id="ic-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M9 9a3 3 0 1 1 5 2c-1.5 1-2 1.5-2 3m0 3v.2" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></symbol>
+  <symbol id="ic-share" viewBox="0 0 24 24"><path d="M12 15V3m-4 4 4-4 4 4M6 11H4v10h16V11h-2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="ic-close" viewBox="0 0 24 24"><path d="m6 6 12 12M6 18 18 6" fill="none" stroke="currentColor" stroke-width="1.5"/></symbol>
+  <symbol id="ic-arrow" viewBox="0 0 24 24"><path d="M4 12h15m-6-6 6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.5"/></symbol>
+  <symbol id="ic-hint" viewBox="0 0 24 24"><path d="M9 18h6m-5 3h4M8 14a6 6 0 1 1 8 0l-1 3H9Z" fill="none" stroke="currentColor" stroke-width="1.5"/></symbol>
+  <symbol id="ic-reset" viewBox="0 0 24 24"><path d="M4 10a8 8 0 1 1 1 8M4 4v6h6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></symbol>
+  <symbol id="ic-plus" viewBox="0 0 24 24"><path d="M5 12h14M12 5v14" fill="none" stroke="currentColor" stroke-width="1.5"/></symbol>
+  <symbol id="ic-minus" viewBox="0 0 24 24"><path d="M5 12h14" fill="none" stroke="currentColor" stroke-width="1.5"/></symbol>
+</svg>
+<a class="skip-link" href="#episode-main">物語へ進む</a>
+<header class="episode-header">
+ <div class="episode-brand"><a class="series" href="../">100 DAYS <span class="slash">/</span> 068</a><h1>時刻表アリバイ<span>23:47の約束</span></h1></div>
+ <div class="episode-header-right"><div class="departure-badge"><span>約束の最終列車</span><strong>23:47</strong></div><div class="header-actions">
+ <button id="sound-button" class="icon-button" type="button" aria-label="音をオンにする" aria-pressed="false"><svg class="icon" aria-hidden="true"><use href="#ic-mute"/></svg></button>
+ <button id="help-button" class="icon-button" type="button" aria-label="遊び方"><svg class="icon" aria-hidden="true"><use href="#ic-help"/></svg></button>
+ <button id="share-button" class="icon-button" type="button" aria-label="共有する"><svg class="icon" aria-hidden="true"><use href="#ic-share"/></svg></button>
+ </div></div>
+</header>
+<div class="episode-path"><p id="chapter-label">第1幕 <span>「映像の嘘」</span></p><ol class="chapter-steps" aria-label="物語の進み具合"><li>約束</li><li>伝言</li><li>調査</li><li>再会</li><li>23:47</li></ol></div>
+<main class="episode-layout">
+ <section id="episode-main" class="episode-main" tabindex="-1" aria-label="物語の現場">
+ <div id="episode-stage" class="episode-stage" data-mood="neutral" data-speaking="false">
+  <div class="scene-image">
+   <img id="scene-background" src="./assets/episode/concourse-night.webp" alt="雨の霧山駅。ベンチにカメラが残り、奥のホームの扉は閉まっている。" width="1672" height="941" fetchpriority="high">
+   <div class="scene-hud"><div class="scene-location"><small id="scene-location-en">04 / KIRIYAMA STATION</small><strong id="scene-location">霧山駅・待合室</strong></div><time id="story-clock" class="scene-time">22:30</time></div>
+   <div id="episode-actor" class="episode-actor" aria-hidden="true" hidden><div class="episode-actor-base episode-actor-sheet"></div><div class="episode-actor-talk episode-actor-sheet"></div></div>
+   <figure id="scene-inset" class="scene-inset" hidden><img src="./assets/episode/harbor-footage.webp" alt="灯台港23:14の記録。青い傘で顔が隠れた人物が急行に向かっている。" width="1672" height="941"><figcaption>栞が示した、港の記録映像 / 23:14</figcaption></figure>
+   <div id="episode-secondary" class="episode-actor episode-secondary" aria-hidden="true" hidden><div class="episode-actor-base episode-actor-sheet"></div></div>
+   <div id="viewfinder" class="viewfinder" hidden><span id="viewfinder-label" class="viewfinder-label"></span></div>
+   <div id="ticket-composition" class="ticket-composition" aria-hidden="true" hidden><span>帰りは、</span><span>一緒に。</span></div>
+   <div id="capture-flash" class="capture-flash" aria-hidden="true"></div>
+   <div id="scene-hotspots" class="scene-hotspots" aria-label="駅の調べられる場所" hidden></div>
+   <div id="discovery-banner" class="discovery-banner" hidden></div>
+  </div>
+  <div id="mobile-hotspots" class="mobile-hotspots" aria-label="駅の調べられる場所" hidden></div>
+  <div id="episode-dialogue" class="episode-dialogue">
+   <div class="ep-speaker-line"><div><strong id="episode-speaker"></strong><span id="episode-role"></span></div><span id="episode-dialogue-count"></span></div>
+   <p id="episode-text" class="episode-dialogue-text" aria-hidden="true"></p><p id="episode-announcement" class="sr-only" role="status" aria-atomic="true"></p>
+   <div id="episode-choices" class="episode-choices" hidden></div>
+   <div class="episode-dialogue-controls"><button id="episode-next" class="ep-next" type="button">続きを表示 <svg class="icon" aria-hidden="true"><use href="#ic-arrow"/></svg></button><button id="episode-log" class="ep-log" type="button">会話を読み返す</button></div>
+  </div>
+  <div id="scene-caption" class="scene-caption" hidden><p id="scene-description"></p><button id="open-message" class="message-incoming" type="button" hidden><span><small>朝倉 透 / 23:12</small><strong>途切れた伝言を読む</strong></span><svg class="icon" aria-hidden="true"><use href="#ic-arrow"/></svg></button></div>
+  <section id="continuation-panel" class="continuation-panel" aria-labelledby="journey-heading" hidden><p class="eyebrow">あなたが選ぶ、次の列車</p><h2 id="journey-heading"></h2><p id="journey-note"></p><button id="plan-trip" class="ct-primary" type="button">乗る列車を選ぶ</button></section>
+  <section id="camera-controls" class="camera-controls" aria-labelledby="camera-title" hidden><p class="eyebrow">23:47 / 一緒に帰る約束</p><h2 id="camera-title">最後の一枚は、あなたの手で。</h2><p>撮っていいと伝えた人と、帰りの約束。残したい構図を選ぼう。</p><fieldset class="camera-frames"><legend>写真に残すもの</legend><label><input type="radio" name="framing" value="people" checked><span>透と灯、港の灯り</span></label><label><input type="radio" name="framing" value="tickets"><span>合わせた半券と、最終列車</span></label></fieldset><button id="take-photo" class="shutter-button" type="button">シャッターを切る</button></section>
+  <section id="story-complete" class="ending-card" aria-labelledby="complete-title" hidden><p class="eyebrow">23:47の約束 / 完</p><h2 id="complete-title"></h2><p id="complete-description"></p><div id="decision-record" class="decision-record" aria-label="あなたの選択"></div><p id="complete-postscript" class="complete-postscript"></p><div class="ending-actions"><button id="review-photo" type="button">撮った一枚を見る</button><button id="final-notebook" type="button">会話の記録</button><button id="rewind-story" type="button">再会直後へ戻り、別の道を選ぶ</button></div></section>
+  <div id="ending-card" class="ending-card" hidden><p class="eyebrow">第1幕 / 相棒を発見</p><h2>相棒の、もう一つの秘密。</h2><p>透は、閉鎖ホームにいた。栞の嘘は、彼を守るためだった。<br>それなら港の映像に写った、透の傘を持つ人物は誰なのか。</p><div class="ending-actions"><button id="continue-story" type="button">透の話を聞く →</button><button id="ending-notebook" type="button">見つけた記録を振り返る</button><button id="ending-replay" type="button">別の言葉で、もう一度</button></div></div>
+ </div>
+ </section>
+ <aside class="episode-sidebar" aria-label="調査の手がかり">
+  <section class="objective-card"><p class="eyebrow">いま、確かめたいこと</p><h2 id="objective"></h2><p id="relationship" class="relationship-note"></p></section>
+  <section class="evidence-section" aria-labelledby="evidence-heading"><div class="evidence-section-head"><h2 id="evidence-heading">持っている手がかり</h2><span id="evidence-count">00</span></div><div id="evidence-list" class="episode-evidence-list"></div></section>
+  <div class="episode-actions">
+   <button id="present-button" class="episode-action primary" type="button" hidden>栞に証拠を示す <svg class="icon" aria-hidden="true"><use href="#ic-arrow"/></svg></button>
+   <button id="witness-button" class="episode-action" type="button" hidden>栞に話を聞く <span aria-hidden="true">↗</span></button>
+   <button id="rail-button" class="episode-action" type="button" hidden>列車の時刻表 <span aria-hidden="true">↗</span></button>
+   <button id="notebook-button" class="episode-action" type="button">会話の記録 <span aria-hidden="true">↗</span></button>
+  </div>
+  <div class="episode-small-actions"><button id="hint-button" type="button">次に調べること</button><button id="restart-button" type="button">最初から</button></div>
+ </aside>
+</main>
+<footer class="episode-footer"><span>時刻表アリバイ / DAY 068</span><span id="storage-label">会話を読んでいる間に、物語の時間は進みません。</span></footer>
+<p id="episode-toast" class="episode-toast" role="status" hidden></p>
+<dialog id="evidence-dialog" class="paper-dialog episode-modal" aria-labelledby="evidence-title">
+ <button class="dialog-close icon-button" data-close type="button" aria-label="手がかりを閉じる"><svg class="icon" aria-hidden="true"><use href="#ic-close"/></svg></button>
+ <p id="evidence-kind" class="eyebrow"></p><h2 id="evidence-title"></h2><div id="evidence-body"></div><button class="primary-button" data-close type="button">調査に戻る <svg class="icon" aria-hidden="true"><use href="#ic-arrow"/></svg></button>
+</dialog>
+<dialog id="trip-dialog" class="paper-dialog episode-modal trip-dialog" aria-labelledby="trip-title"><button class="dialog-close icon-button" data-close type="button" aria-label="乗車計画を閉じる"><svg class="icon" aria-hidden="true"><use href="#ic-close"/></svg></button><p class="eyebrow">時計を読む。その先へ、乗っていく。</p><h2 id="trip-title">港へ向かう列車を選ぶ。</h2><p id="trip-current" class="trip-current"></p><div id="trip-options" class="trip-options" role="group" aria-label="乗る列車"></div><p id="trip-preview" class="trip-preview"></p><div class="trip-actions"><button id="trip-board" class="primary-button" type="button" disabled>この列車に乗る <svg class="icon" aria-hidden="true"><use href="#ic-arrow"/></svg></button><button id="trip-map" class="ct-text" type="button">路線と全列車を確かめる</button></div><p id="trip-feedback" class="trip-feedback" role="status" tabindex="-1" hidden></p><button id="trip-reselect" class="ct-text" type="button" hidden>列車を選び直す</button></dialog>
+<dialog id="proof-dialog" class="paper-dialog episode-modal proof-dialog-v2" aria-labelledby="proof-title">
+ <button class="dialog-close icon-button" data-close type="button" aria-label="追及を閉じる"><svg class="icon" aria-hidden="true"><use href="#ic-close"/></svg></button>
+ <p class="eyebrow">言葉を、記録で確かめる</p><h2 id="proof-title">栞の証言に、矛盾がある。</h2>
+ <blockquote class="proof-testimony"><strong>水瀬 栞</strong>「透さんは23:15の急行で温泉へ。もう、ここにはいません」</blockquote>
+ <p class="modal-subtitle">手がかりを二つ選び、結び付く理由を示そう。</p><div id="proof-selection" class="proof-selection" role="group" aria-label="示す手がかりを二つ選ぶ"></div><p id="proof-selection-count" class="proof-selection-count" role="status">選択 0 / 2</p>
+ <fieldset id="proof-reasons" class="proof-reason-fieldset"><legend>この証言が成り立たない理由は？</legend></fieldset>
+ <button id="proof-submit" class="primary-button" type="button">この証拠で、栞に聞く <svg class="icon" aria-hidden="true"><use href="#ic-arrow"/></svg></button>
+ <p id="proof-feedback" class="proof-feedback" role="status" tabindex="-1" hidden></p>
+</dialog>
+<dialog id="log-dialog" class="paper-dialog episode-modal" aria-labelledby="log-title">
+ <button class="dialog-close icon-button" data-close type="button" aria-label="会話記録を閉じる"><svg class="icon" aria-hidden="true"><use href="#ic-close"/></svg></button>
+ <p class="eyebrow">聞いた言葉</p><h2 id="log-title">会話の記録</h2><ol id="episode-log-list" class="episode-log-list"></ol><button class="primary-button" data-close type="button">物語に戻る</button>
+</dialog>
+<dialog id="rail-dialog" class="paper-dialog episode-modal rail-dialog-v2" aria-labelledby="rail-title">
+ <button class="dialog-close icon-button" data-close type="button" aria-label="鉄道資料を閉じる"><svg class="icon" aria-hidden="true"><use href="#ic-close"/></svg></button>
+ <p class="eyebrow">汐見鉄道 / 夜の発車案内</p><h2 id="rail-title">その列車は、どこに停まる？</h2>
+ <p class="modal-subtitle">急行は、書かれた駅にだけ停車。列車の乗換えは2分。時刻表は映像や証言とは別に確かめられる記録です。</p>
+ <div class="rail-tabs" role="group" aria-label="鉄道資料の表示"><button id="rail-table-tab" type="button" aria-pressed="true">列車の時刻表</button><button id="rail-map-tab" type="button" aria-pressed="false">路線と列車を動かす</button></div>
+ <div id="rail-table-panel"><div id="episode-trains" class="episode-trains"></div></div>
+ <div id="rail-map-panel" hidden>
+  <div class="map-toolbar"><p id="station-caption">列車だけを動かして、経路を確かめられます。</p><div class="segmented" role="group" aria-label="地図の表示"><button id="view-3d" type="button" aria-pressed="true">3D</button><button id="view-2d" type="button" aria-pressed="false">路線図</button></div></div>
+  <div id="world" class="world" data-view="3d"><canvas aria-label="5つの駅を結ぶ鉄道ジオラマ"></canvas><div class="flat-map" hidden></div><div class="station-labels"></div></div>
+  <div class="time-console"><div class="console-main"><button id="play-button" class="play-button" type="button" aria-label="列車の動きを再生" aria-pressed="false"><svg class="icon" aria-hidden="true"><use href="#ic-play"/></svg></button><div class="clock"><span class="clock-label">列車の再現時刻</span><output id="clock" for="time-range">23:14</output></div><div class="timeline-wrap"><label class="sr-only" for="time-range">列車の再現時刻</label><input id="time-range" type="range" min="1380" max="1439" value="1394" step="0.1"><div class="time-ticks"><span>23:00</span><span>23:30</span><span>23:59</span></div></div></div><p class="console-note">ここで動くのは列車の記録です。物語の時刻は変わりません。</p></div>
+ </div>
+</dialog>
+<dialog id="help-dialog" class="paper-dialog episode-modal" aria-labelledby="help-title">
+ <button class="dialog-close icon-button" data-close type="button" aria-label="遊び方を閉じる"><svg class="icon" aria-hidden="true"><use href="#ic-close"/></svg></button>
+ <p class="eyebrow">23:47までに、相棒を探す</p><h2 id="help-title">小さな約束から、始まる謎。</h2>
+ <ol class="help-steps"><li><strong>透と、帰りの約束をする。</strong>会話の「次へ」で読み進め、返す言葉を選びます。</li><li><strong>雨の駅を調べる。</strong>ベンチのカメラ、発車案内、人の話。見つけた手がかりは、いつでも読み返せます。</li><li><strong>証言と記録を結び付ける。</strong>手がかりを二つ選び、矛盾の理由を示すと、栞から新しい話を聞けます。再会の先では写真の扱いと調査経路を選び、列車で港へ向かいます。</li></ol>
+ <p>会話中に時間は減りません。間違えても、手がかりを失うことはありません。</p><p class="help-keyboard">Tabで操作を選び、Enterで決定。Escで資料を閉じる。Hで次の手がかり。音は右上のボタンでオンにできます。</p><button class="primary-button" data-close type="button">物語に戻る</button>
+</dialog>
+<dialog id="restart-dialog" class="paper-dialog episode-modal" aria-labelledby="restart-title">
+ <button class="dialog-close icon-button" data-close type="button" aria-label="やり直しを閉じる"><svg class="icon" aria-hidden="true"><use href="#ic-close"/></svg></button><p class="eyebrow">もう一度、あの約束から</p><h2 id="restart-title">第1話を、最初から？</h2><p>この物語の会話と調査をやり直します。</p><button id="restart-confirm" class="primary-button" type="button">最初から始める</button><button class="text-button" data-close type="button">今の調査を続ける</button>
+</dialog>
+<dialog id="share-dialog" class="paper-dialog episode-modal" aria-labelledby="share-title"><button class="dialog-close icon-button" data-close type="button" aria-label="共有を閉じる"><svg class="icon" aria-hidden="true"><use href="#ic-close"/></svg></button><p class="eyebrow">あの夜を、誰かにも</p><h2 id="share-title">23:47の約束。</h2><div id="share"></div></dialog>
+<noscript><p class="noscript">この物語を遊ぶには、JavaScriptを有効にしてください。</p></noscript>
+</body></html>
