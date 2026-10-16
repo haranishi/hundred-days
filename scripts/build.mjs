@@ -120,6 +120,7 @@ const skipToolsCache = (source) => !isExcluded(source);
 /* ソースから組み立てたビルド結果を同じフォルダに置いているDayは、ソースと生成ツールを配信しない。
    見るのはDayのフォルダ直下の名前だけ（リポジトリを置いた場所の名前に source が含まれていても外さない） */
 const SOURCE_DIRS_BY_APP = {
+  'day-068-timetable-alibi': ['tools'],
   'day-056-dragon-rush': ['source', 'tools'],
   'day-058-meisho-kumitate': ['source', 'tools'],
   'day-059-kuchi-sanmai': ['source', 'tools'],

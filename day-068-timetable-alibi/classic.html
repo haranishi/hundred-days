@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#0b1e28">
+  <meta name="description" content="3人に話を聞き、時刻表の証拠を突きつける。表情の変わる人物と3D鉄道で遊ぶ、消えた青い切符の短編ミステリー。">
+  <meta name="share:text" content="列車は、嘘をつかない。時刻表アリバイ — 夜の鉄道を巻き戻して、証言の矛盾を見つけるWeb推理ゲーム。">
+  <meta property="og:title" content="時刻表アリバイ — 列車は、嘘をつかない。">
+  <meta property="og:description" content="5つの駅、3人の証言。夜の鉄道路線を巻き戻し、たったひとつの矛盾を見つけよう。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://hundred-days.pages.dev/day-068-timetable-alibi/">
+  <meta property="og:image" content="https://hundred-days.pages.dev/day-068-timetable-alibi/og.png">
+  <meta property="og:image:width" content="1440">
+  <meta property="og:image:height" content="1000">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="canonical" href="https://hundred-days.pages.dev/day-068-timetable-alibi/">
+  <link rel="icon" type="image/svg+xml" href="./favicon.svg">
+  <title>時刻表アリバイ — 列車は、嘘をつかない。</title>
+  <link rel="stylesheet" href="./app.css">
+  <link rel="stylesheet" href="./shared/share.css">
+  <script type="module" src="./app.js"></script>
+  <script src="./shared/share.js" defer></script>
+</head>
+<body>
+<svg class="svg-sprite" aria-hidden="true">
+  <symbol id="ic-play" viewBox="0 0 24 24"><path d="m8 5 11 7-11 7Z" fill="currentColor"/></symbol>
+  <symbol id="ic-pause" viewBox="0 0 24 24"><path d="M8 5v14M16 5v14" fill="none" stroke="currentColor" stroke-width="4"/></symbol>
+  <symbol id="ic-back" viewBox="0 0 24 24"><path d="m15 6-8 6 8 6M6 6v12" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></symbol>
+  <symbol id="ic-forward" viewBox="0 0 24 24"><path d="m9 6 8 6-8 6M18 6v12" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></symbol>
+  <symbol id="ic-sound" viewBox="0 0 24 24"><path d="M4 9h4l5-4v14l-5-4H4ZM17 8q5 4 0 8" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></symbol>
+  <symbol id="ic-mute" viewBox="0 0 24 24"><path d="M4 9h4l5-4v14l-5-4H4ZM17 9l5 6m0-6-5 6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></symbol>
+  <symbol id="ic-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M9 9a3 3 0 1 1 5 2c-1.5 1-2 1.5-2 3m0 3v.2" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></symbol>
+  <symbol id="ic-share" viewBox="0 0 24 24"><path d="M12 15V3m-4 4 4-4 4 4M6 11H4v10h16V11h-2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="ic-close" viewBox="0 0 24 24"><path d="m6 6 12 12M6 18 18 6" fill="none" stroke="currentColor" stroke-width="1.5"/></symbol>
+  <symbol id="ic-arrow" viewBox="0 0 24 24"><path d="M4 12h15m-6-6 6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.5"/></symbol>
+  <symbol id="ic-hint" viewBox="0 0 24 24"><path d="M9 18h6m-5 3h4M8 14a6 6 0 1 1 8 0l-1 3H9Z" fill="none" stroke="currentColor" stroke-width="1.5"/></symbol>
+  <symbol id="ic-reset" viewBox="0 0 24 24"><path d="M4 10a8 8 0 1 1 1 8M4 4v6h6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></symbol>
+  <symbol id="ic-plus" viewBox="0 0 24 24"><path d="M5 12h14M12 5v14" fill="none" stroke="currentColor" stroke-width="1.5"/></symbol>
+  <symbol id="ic-minus" viewBox="0 0 24 24"><path d="M5 12h14" fill="none" stroke="currentColor" stroke-width="1.5"/></symbol>
+</svg>
+<a class="skip-link" href="#dossier">捜査資料へ進む</a>
+<header class="topbar">
+  <a class="series" href="../"><svg class="series-mark" viewBox="0 0 18 22" aria-hidden="true"><path d="M2 1h14v20H2ZM5 4v14m4-14v14m4-14v14" stroke="currentColor" stroke-width="1"/></svg>100 DAYS<span class="slash">/</span><span>068</span></a>
+  <span class="topbar-center">SHIOMI RAILWAY ARCHIVES</span>
+  <div class="header-actions">
+    <button id="sound-button" class="icon-button" type="button" aria-label="音をオンにする" aria-pressed="false"><svg class="icon"><use href="#ic-mute"/></svg></button>
+    <button id="help-button" class="icon-button" type="button" aria-label="遊び方"><svg class="icon"><use href="#ic-help"/></svg></button>
+    <button id="share-button" class="icon-button" type="button" aria-label="このアプリを共有する"><svg class="icon"><use href="#ic-share"/></svg></button>
+  </div>
+</header>
+<main class="game-layout">
+  <section class="railway" aria-labelledby="game-title">
+    <div class="railway-heading">
+      <div><p class="eyebrow">A LITTLE RAILWAY MYSTERY</p><h1 id="game-title">時刻表<span>アリバイ</span><span class="title-dot">。</span></h1></div>
+      <p class="tagline">列車は、<br>嘘をつかない。</p>
+    </div>
+    <div class="world-wrap">
+      <div class="scene-meta"><span class="live-dot"></span><span>汐見鉄道 全線</span><span class="scene-meta-en">SHIOMI / NIGHTFALL</span></div>
+      <div id="world" class="world" data-view="3d">
+        <canvas aria-label="5つの駅を結ぶ鉄道ジオラマ"></canvas>
+        <div class="flat-map" hidden></div>
+        <div class="station-labels"></div>
+      </div>
+      <p id="world-loading" class="world-loading" role="status">夜の鉄道を準備しています<span class="loading-dots">…</span></p>
+      <div class="view-controls">
+        <div class="segmented view-switch" role="group" aria-label="地図の表示">
+          <button id="view-3d" type="button" aria-pressed="true">3D</button><button id="view-2d" type="button" aria-pressed="false">路線図</button>
+        </div>
+        <button id="zoom-in" class="icon-button" type="button" aria-label="地図を拡大"><svg class="icon"><use href="#ic-plus"/></svg></button>
+        <button id="zoom-out" class="icon-button" type="button" aria-label="地図を縮小"><svg class="icon"><use href="#ic-minus"/></svg></button>
+        <button id="reset-view" class="icon-button" type="button" aria-label="視点を戻す"><svg class="icon"><use href="#ic-reset"/></svg></button>
+      </div>
+      <div class="scene-footer"><p id="station-caption">駅を押すと、その場所を調べられます。</p><span class="drag-note">ドラッグで視点を回す</span><a class="mobile-link" href="#dossier">捜査資料へ ↓</a></div>
+    </div>
+    <section id="conversation" class="conversation" aria-labelledby="speaker-name" data-speaking="false" data-mood="neutral" data-speaker="person" data-state="listening">
+      <div class="conversation-top"><p><span class="live-dot"></span><span id="chapter-goal"></span></p><button id="log-button" type="button">会話記録</button></div>
+      <div class="conversation-body">
+        <div id="story-actor" class="story-actor" aria-hidden="true"><div class="actor-glow"></div><div class="actor-base actor-sheet"></div><div class="actor-talk actor-sheet"></div><span class="actor-shadow"></span></div>
+        <div class="dialogue-panel">
+          <div class="speaker-heading"><div><p id="speaker-role"></p><h2 id="speaker-name"></h2></div><span id="dialogue-step"></span></div>
+          <p id="dialogue-text" class="dialogue-text" aria-hidden="true"></p><p id="dialogue-announcement" class="sr-only" role="status" aria-atomic="true"></p>
+          <div id="dialogue-choices" class="dialogue-choices" hidden></div>
+          <div class="dialogue-controls"><button id="dialogue-next" class="dialogue-next" type="button">続きを表示</button><button id="investigate-link" class="investigate-link" type="button">時刻表で確かめる ↗</button></div>
+          <button id="reveal-skip" class="reveal-skip" type="button" hidden>会話を省略して解説へ</button>
+        </div>
+        <span id="reveal-impact" class="reveal-impact" hidden>その証言に、矛盾。</span>
+      </div>
+      <p id="conversation-clue" class="conversation-clue" role="status" hidden></p>
+      <div id="person-list" class="person-list cast-list" role="group" aria-label="話を聞く人物を選ぶ"></div>
+    </section>
+    <div class="time-console">
+      <div class="console-main">
+        <button id="play-button" class="play-button" type="button" aria-label="列車の動きを再生" aria-pressed="false"><svg class="icon"><use href="#ic-play"/></svg></button>
+        <div class="clock"><span class="clock-label">調査時刻</span><output id="clock" for="time-range">18:12</output></div>
+        <div class="timeline-wrap">
+          <label class="sr-only" for="time-range">調査する時刻</label>
+          <input id="time-range" type="range" min="1080" max="1135" value="1092" step="0.1" aria-valuetext="18時12分">
+          <div class="time-ticks"><span id="start-time">18:00</span><span id="middle-time">18:27</span><span id="end-time">18:55</span></div>
+        </div>
+        <div class="step-controls"><button id="minute-back" class="icon-button" type="button" aria-label="1分戻す"><svg class="icon"><use href="#ic-back"/></svg></button><button id="minute-forward" class="icon-button" type="button" aria-label="1分進める"><svg class="icon"><use href="#ic-forward"/></svg></button></div>
+      </div>
+      <p class="console-note">時間を動かして、列車の足取りを確かめよう。<span id="tracking-label"></span></p>
+    </div>
+    <div class="railway-bottom"><span><i class="line-swatch coast"></i>海岸線 <i class="line-swatch mountain"></i>山手線</span><span>架空の街と鉄道を舞台にした推理ゲーム</span></div>
+  </section>
+
+  <section id="dossier" class="dossier" aria-labelledby="case-title" tabindex="-1">
+    <div class="dossier-top"><span class="dossier-kicker">INVESTIGATION FILE</span><span id="progress-label" class="progress-label">解決 0 / 3</span></div>
+    <nav id="case-nav" class="case-nav" aria-label="事件を選ぶ"></nav>
+    <div class="case-heading"><p class="case-number" id="case-number">CASE 01<span>所要時間</span></p><span class="difficulty" id="difficulty">入門</span></div>
+    <h2 id="case-title">消えた青い切符</h2>
+    <p id="case-intro" class="case-intro"></p>
+    <div class="dossier-rule"><span>話を聞く → 時刻表で確かめる → 証拠で追及</span></div>
+    <div class="file-witness"><div><span class="file-label">選択中の証言</span><strong id="file-person"></strong></div><span id="heard-count">聴取 0 / 3</span></div>
+    <div class="dossier-tabs" role="tablist" aria-label="調査する資料">
+      <button id="tab-testimony" role="tab" aria-selected="true" aria-controls="panel-testimony" type="button">証言と記録</button>
+      <button id="tab-timetable" role="tab" aria-selected="false" aria-controls="panel-timetable" type="button" tabindex="-1">列車の時刻表<span class="tab-count">5</span></button>
+    </div>
+    <div id="panel-testimony" class="tab-panel" role="tabpanel" aria-labelledby="tab-testimony">
+      <div class="evidence-grid">
+        <div class="evidence record"><p><span class="evidence-dot"></span>確認記録</p><strong id="record-time">18:12</strong><span id="record-station">汐見中央</span></div>
+        <span class="evidence-arrow" aria-hidden="true">→</span>
+        <div class="evidence claim"><p><span class="evidence-dot"></span>本人の証言</p><strong id="claim-time">18:30</strong><span id="claim-station">霧山</span></div>
+      </div>
+      <blockquote id="person-words"></blockquote>
+      <p class="record-note">確認記録のあと、列車だけで移動したものとして調べます。</p>
+    </div>
+    <div id="panel-timetable" class="tab-panel" role="tabpanel" aria-labelledby="tab-timetable" hidden>
+      <p class="timetable-note"><strong>別の列車への乗換えは2分。</strong><br>同じ列車なら、そのまま乗り続けられます。</p>
+      <div id="train-list" class="train-list"></div>
+      <p class="timetable-footnote">着は到着、発は出発。「追う」で発車時刻から再生。</p>
+    </div>
+    <div id="answer-feedback" class="answer-feedback" role="status" tabindex="-1" hidden></div>
+    <div class="investigation-actions">
+      <button id="accuse-button" class="accuse-button" type="button"><span>証拠を選んで、追及する</span><svg class="icon"><use href="#ic-arrow"/></svg></button>
+      <div class="secondary-actions"><button id="hint-button" class="text-button" type="button"><svg class="icon"><use href="#ic-hint"/></svg>ヒント<span id="hint-count">0 / 3</span></button><button id="restart-button" class="text-button" type="button">調査をやり直す</button></div>
+      <p id="hint-text" class="hint-text" role="status" hidden></p>
+    </div>
+    <div class="dossier-bottom"><span id="case-subtitle">まずは、到着時刻を。</span><svg viewBox="0 0 80 16" aria-hidden="true"><path d="M1 8h78M5 2v12M14 2v12M23 2v12M32 2v12M41 2v12M50 2v12M59 2v12M68 2v12M77 2v12" fill="none" stroke="currentColor" stroke-width="1"/></svg></div>
+  </section>
+</main>
+<p id="app-notice" class="app-notice" role="status" hidden></p>
+<footer class="page-footer"><span>時刻表アリバイ / DAY 068</span><span id="storage-label">進み具合はこの端末に保存されます。</span></footer>
+
+<dialog id="proof-dialog" class="paper-dialog proof-dialog" aria-labelledby="proof-title">
+  <button class="dialog-close icon-button" data-close type="button" aria-label="追及を閉じる"><svg class="icon"><use href="#ic-close"/></svg></button>
+  <p class="eyebrow">PRESENT YOUR EVIDENCE</p><h2 id="proof-title">その証言を覆す、<br>証拠はどれ？</h2>
+  <div id="proof-witness" class="proof-witness" data-mood="neutral"><div id="proof-portrait" class="proof-portrait" aria-hidden="true"></div><div><strong id="proof-person"></strong><p id="proof-response"></p></div></div>
+  <p id="proof-claim" class="proof-claim"></p>
+  <div id="proof-list" class="proof-list"></div>
+  <div id="proof-feedback" class="answer-feedback" role="status" tabindex="-1" hidden></div>
+  <p class="proof-note">記録と時刻表を結びつけよう。間違えても、選び直せます。</p>
+  <button id="proof-back" class="text-button" type="button">いったん資料に戻る ↗</button>
+</dialog>
+<dialog id="log-dialog" class="paper-dialog log-dialog" aria-labelledby="log-title">
+  <button class="dialog-close icon-button" data-close type="button" aria-label="会話記録を閉じる"><svg class="icon"><use href="#ic-close"/></svg></button>
+  <p class="eyebrow">CONVERSATION LOG</p><h2 id="log-title">聞いた言葉を、<br>もう一度。</h2><ol id="conversation-log" class="conversation-log"></ol>
+  <button class="primary-button" data-close type="button">会話に戻る<svg class="icon"><use href="#ic-arrow"/></svg></button>
+</dialog>
+<dialog id="help-dialog" class="paper-dialog" aria-labelledby="help-title">
+  <button class="dialog-close icon-button" data-close type="button" aria-label="遊び方を閉じる"><svg class="icon"><use href="#ic-close"/></svg></button>
+  <p class="eyebrow">HOW TO INVESTIGATE</p><h2 id="help-title">その証言、<br>列車で間に合う？</h2>
+  <ol class="help-steps"><li><strong>人物に話を聞く。</strong>セリフを送り、気になる質問を選ぼう。聞いた話は「会話記録」で読み返せます。</li><li><strong>列車の時刻表を読む。</strong>乗換えには2分。急行は停車駅だけで乗り降りできます。</li><li><strong>人物と証拠を選んで追及する。</strong>「追及する」で3つの資料から証拠を選びます。正しく反証できたら、隠された事情を聞こう。</li></ol>
+  <p>早く着いたら待てます。間違えても大丈夫。時間制限はありません。</p>
+  <p class="help-keyboard">キーボード：Tabで操作を移動、Enterで会話を送る、時刻のつまみは矢印キー。Hでヒント、Escでこの画面を閉じる。音は右上で切り替えられます。</p>
+  <button class="primary-button" data-close type="button">捜査をはじめる<svg class="icon"><use href="#ic-arrow"/></svg></button>
+</dialog>
+<dialog id="result-dialog" class="paper-dialog result-dialog" aria-labelledby="result-title">
+  <button class="dialog-close icon-button" data-close type="button" aria-label="解説を閉じる"><svg class="icon"><use href="#ic-close"/></svg></button>
+  <p class="eyebrow">CONTRADICTION FOUND</p><div class="result-seal" aria-hidden="true">証言<br>矛盾</div>
+  <h2 id="result-title">時刻表が、<br>証言を覆した。</h2>
+  <p id="result-person" class="result-person"></p>
+  <div class="result-times"><div><span>本人の証言</span><strong id="result-claim"></strong></div><span aria-hidden="true">→</span><div><span>最も早い到着</span><strong id="result-arrival"></strong></div></div>
+  <p id="result-reason"></p>
+  <div id="result-journey" class="result-journey"></div>
+  <div id="ending-ticket" class="ending-ticket" hidden><span class="ticket-kicker">SHIOMI RAILWAY · FIRST JOURNEY</span><strong>汐見鐵道 開業乗車券</strong><div><span>灯台港</span><i>→</i><span>霧山</span></div><span class="ticket-serial">No. 0001</span><b class="ticket-stamp">発見</b><p>旅は、ここに戻る。</p></div>
+  <p id="result-closing" class="result-closing"></p><p id="result-save-note" class="save-note" hidden>このブラウザには保存できません。画面を閉じるまでは続けて遊べます。</p>
+  <button id="next-case" class="primary-button" type="button">次の事件へ<svg class="icon"><use href="#ic-arrow"/></svg></button>
+  <button class="result-again text-button" data-close type="button">この事件をもう一度調べる</button>
+</dialog>
+<dialog id="share-dialog" class="paper-dialog" aria-labelledby="share-title"><button class="dialog-close icon-button" data-close type="button" aria-label="共有を閉じる"><svg class="icon"><use href="#ic-close"/></svg></button><p class="eyebrow">INVITE ANOTHER DETECTIVE</p><h2 id="share-title">この路線を、<br>誰かにも。</h2><div id="share"></div></dialog>
+<noscript><p class="noscript">このゲームを遊ぶにはJavaScriptを有効にしてください。</p></noscript>
+</body>
+</html>
