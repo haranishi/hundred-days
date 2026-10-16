@@ -2,6 +2,7 @@
 'use strict';
 
 import { execFileSync } from 'node:child_process';
+import { verifyPublicPage } from './verify-public-page.mjs';
 import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { basename, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -160,7 +161,7 @@ execFileSync(process.execPath, [join(root, 'scripts', 'precheck.mjs')], { cwd: r
 console.log('ビルドを実行');
 execFileSync(process.execPath, [join(root, 'scripts', 'build.mjs')], { cwd: root, stdio: 'inherit' });
 
-const checkUrl = async (url, label) => {
+const checkUrl = async (url, label, app = false) => {
   let response;
   try {
     response = await fetch(url, { redirect: 'follow', signal: AbortSignal.timeout(15000) });
@@ -168,12 +169,21 @@ const checkUrl = async (url, label) => {
     fail(`${label}へ接続できない: ${error.cause?.code || error.message}`);
   }
   if (!response.ok) fail(`${label}がHTTP ${response.status}: ${url}`);
-  await response.body?.cancel();
-  return { url, status: response.status };
+  let identity = {};
+  if (app) {
+    try {
+      identity = verifyPublicPage(await response.text(), url);
+    } catch (error) {
+      fail(`${label}の公開確認に失敗: ${error.message}`);
+    }
+  } else {
+    await response.body?.cancel();
+  }
+  return { url, status: response.status, ...identity };
 };
 
 const urlChecks = [
-  await checkUrl(meta.publicUrl, '公開URL'),
+  await checkUrl(meta.publicUrl, '公開URL', true),
   await checkUrl(repoUrl, 'GitHubリポジトリ')
 ];
 
