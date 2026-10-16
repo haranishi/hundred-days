@@ -1,0 +1,19 @@
+{
+  "name": "day068-promo",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "capture": "node capture.mjs",
+    "audio": "node audio.mjs",
+    "stills": "node render.mjs --stills",
+    "render": "node render.mjs",
+    "audit": "node audit.mjs"
+  },
+  "dependencies": {
+    "@remotion/bundler": "4.0.535",
+    "@remotion/renderer": "4.0.535",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
+    "remotion": "4.0.535"
+  }
+}
