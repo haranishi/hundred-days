@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="アルバイトをしている学生が、2026年の年収の壁（住民税・親の控除・所得税・健康保険の扶養）まで、あと何円・何時間かを計算するアプリ。入力した数字は端末の外へ送りません。">
+  <meta name="share:text" content="年収の壁時計 — 学生バイトの年収の壁まで、2026年の基準で「あと何円・何時間」かを計算するアプリ。入力した数字は端末の外へ出ません">
+  <meta name="theme-color" content="#FBF7F0">
+  <title>年収の壁時計 — 学生バイトの年収の壁、あと何円・何時間？</title>
+  <link rel="icon" type="image/svg+xml" href="./favicon.svg">
+  <link rel="stylesheet" href="./app.css">
+  <script type="module" src="./app.js"></script>
+  <link rel="stylesheet" href="./shared/share.css">
+  <script src="./shared/share.js" defer></script>
+</head>
+<body>
+  <header class="site-header">
+    <a class="eyebrow home-link" href="../">100 DAYS / 069</a>
+    <h1>年収の壁時計</h1>
+    <p class="lead">学生バイトの年収の壁、あと何円・何時間？</p>
+    <p id="year-label" class="year-label"></p>
+  </header>
+  <main id="app">
+    <p id="year-banner" class="year-banner" hidden></p>
+    <section id="example-banner" class="example-banner" aria-label="計算中の数字について">
+      <div class="banner-copy"><strong id="banner-title">まずは、架空の例で。</strong><p id="banner-note">表示中の数字は、架空の給料です。</p></div>
+      <button id="use-own" type="button" class="button-primary">自分の数字を入れる</button>
+      <button id="use-example" type="button" class="button-quiet" hidden>例に戻す</button>
+    </section>
+    <div class="calculator-layout">
+      <section id="result-card" class="clock-panel" aria-labelledby="result-title" tabindex="-1">
+        <div class="section-head"><h2 id="result-title">いちばん近い壁</h2><span id="result-mode" class="mode-badge">架空の例</span></div>
+        <button id="invalid-result" type="button" class="invalid-return" hidden></button>
+        <div id="clock-result">
+          <p id="nearest-name" class="nearest-name"></p>
+          <p id="nearest-gloss" class="nearest-gloss" hidden></p>
+          <p id="nearest-threshold" class="nearest-threshold"></p>
+          <div id="nearest-status" class="status-rows"></div>
+          <div class="clock-face">
+            <svg id="clock" viewBox="0 0 320 320" role="img" aria-labelledby="clock-label">
+              <title id="clock-label">支払い済みの給料と、いちばん近い壁の割合</title>
+              <circle class="clock-track" cx="160" cy="160" r="143"></circle>
+              <circle id="clock-arc" class="clock-arc" cx="160" cy="160" r="143" pathLength="100" stroke-dasharray="0 100" transform="rotate(-90 160 160)"></circle>
+              <g id="clock-ticks" aria-hidden="true"></g>
+            </svg>
+            <div class="clock-center"><p id="nearest-main" class="nearest-main"></p><p id="nearest-money" class="nearest-money"></p></div>
+          </div>
+          <p id="clock-ratio" class="clock-ratio"></p>
+          <p id="projected-summary" class="projected-summary"></p>
+        </div>
+        <p id="clock-time-note" class="hint"></p>
+        <p id="result-disclaimer" class="disclaimer"></p>
+      </section>
+      <aside class="input-panel" aria-labelledby="input-title">
+        <h2 id="input-title">給料と、これからの予定</h2>
+        <p id="input-privacy" class="privacy-note"></p>
+        <form id="inputs" novalidate autocomplete="off">
+          <div class="field">
+            <label for="age-band"><span class="field-name">年齢区分</span></label>
+            <p id="age-band-hint" class="hint"></p>
+            <select id="age-band" name="ageBand" aria-describedby="age-band-hint ageBand-error"><option value="">年齢区分を選ぶ</option></select>
+            <p id="ageBand-error" class="field-error" hidden></p>
+          </div>
+          <div class="field">
+            <label class="check-label" for="student"><input id="student" name="student" type="checkbox" aria-describedby="student-hint student-error"><span class="field-name">学生である</span></label>
+            <p id="student-hint" class="hint">学校の種類などの条件は下の詳しい説明へ</p>
+            <p id="student-error" class="field-error" hidden></p>
+          </div>
+          <div class="field">
+            <label for="paid-so-far"><span class="field-name">今年、支払い済みの給料</span><span class="sr-only">（円）</span></label>
+            <p id="paid-so-far-hint" class="hint"><span class="nw">1〜12月</span>に振り込まれた分の支給額の合計（掛け持ちは合計する。通勤手当は除く）</p>
+            <div class="input-with-unit"><input id="paid-so-far" name="paidSoFar" type="text" inputmode="numeric" maxlength="24" aria-describedby="paid-so-far-hint paid-reading paidSoFar-error" spellcheck="false"><span aria-hidden="true">円</span></div>
+            <p id="paid-reading" class="paid-reading" hidden></p>
+            <p id="paidSoFar-error" class="field-error" hidden></p>
+          </div>
+          <div class="field">
+            <label for="hourly-wage"><span class="field-name">時給</span><span class="sr-only">（円）</span> <span class="field-unit">空欄可</span></label>
+            <p id="hourly-wage-hint" class="hint">労働条件通知書か給与明細の時給（空欄なら金額だけ表示）</p>
+            <div class="input-with-unit"><input id="hourly-wage" name="hourlyWage" type="text" inputmode="numeric" maxlength="24" aria-describedby="hourly-wage-hint hourlyWage-error" spellcheck="false"><span aria-hidden="true">円</span></div>
+            <p id="hourlyWage-error" class="field-error" hidden></p>
+          </div>
+          <div class="field">
+            <label for="remaining-paydays"><span class="field-name">年内に残っている給料日</span><span class="sr-only">（回）</span></label>
+            <p id="remaining-paydays-hint" class="hint">まだ受け取っていない支払日をカレンダーで数える（初期値は<span class="nw">月1回払い</span>）</p>
+            <div class="input-with-unit"><input id="remaining-paydays" name="remainingPaydays" type="text" inputmode="numeric" maxlength="24" aria-describedby="remaining-paydays-hint remainingPaydays-error" spellcheck="false"><span aria-hidden="true">回</span></div>
+            <p id="remainingPaydays-error" class="field-error" hidden></p>
+          </div>
+          <div class="field">
+            <label for="hours-per-payday"><span class="field-name">給料日<span class="nw">1回分</span>の予定の勤務時間</span><span class="sr-only">（時間）</span> <span class="field-unit">空欄可</span></label>
+            <p id="hours-per-payday-hint" class="hint">シフト表の合計。<span class="nw">小数第1位</span>まで</p>
+            <div class="input-with-unit"><input id="hours-per-payday" name="hoursPerPayday" type="text" inputmode="decimal" maxlength="24" aria-describedby="hours-per-payday-hint hoursPerPayday-error" spellcheck="false"><span aria-hidden="true">時間</span></div>
+            <p id="hoursPerPayday-error" class="field-error" hidden></p>
+          </div>
+        </form>
+        <details id="input-rules" class="input-rules">
+          <summary>入力の決まり（詳しく）</summary>
+          <p id="age-note"></p>
+          <p id="payday-note"></p>
+          <p>給与明細の支給額で、税金などが引かれる前の額を合計します。口座の入金額は明細と照合してください。時給は給与明細や労働条件通知書、給料日は支払日が載ったカレンダー、時間はシフト表で確認できます。</p>
+          <p>在籍している学校で、勤労学生控除の対象になる学校の種類などを確認できます。申告の方法と条件は、壁の一覧にあります。</p>
+          <p id="input-scope"></p>
+          <p id="scope-window"></p>
+        </details>
+      </aside>
+        <section class="walls-section" aria-labelledby="walls-title">
+          <h2 id="walls-title">年収の壁を、小さい順に</h2>
+          <p class="section-intro">税金は、年内に支払われる給料の合計で比べます。どの壁も、合計が基準ちょうどなら越えず、<span class="nw">1円</span>でも超えると越えます。</p>
+          <p id="walls-time-note" class="section-intro"></p>
+          <button id="walls-invalid" type="button" class="invalid-return" hidden></button>
+          <ol id="wall-timeline" class="wall-timeline"></ol>
+          <section id="parent-section" class="sub-panel" aria-labelledby="parent-title" hidden>
+            <h3 id="parent-title">親の控除は、段階ごとに変わります</h3>
+            <p id="parent-note"></p>
+            <div id="parent-table"></div>
+          </section>
+        </section>
+        <section class="content-panel health-panel" aria-labelledby="health-title">
+          <p class="eyebrow">こちらは、これからの見込みで判定</p>
+          <h2 id="health-title">健康保険の扶養</h2>
+          <div id="health-intro"></div>
+          <button id="health-invalid" type="button" class="invalid-return" hidden></button>
+          <div id="health-result"></div>
+          <div id="health-explanation"></div>
+        </section>
+      <section class="content-panel storage-panel" aria-labelledby="storage-title">
+        <h2 id="storage-title">端末への保存</h2>
+        <label class="check-label" for="save-inputs"><input id="save-inputs" type="checkbox" disabled aria-describedby="save-note save-status"><span>この端末に保存する</span></label>
+        <p id="save-status" class="save-status"></p>
+        <p id="save-note" class="hint"></p>
+        <button id="delete-inputs" type="button" class="button-quiet" disabled hidden>保存した入力を削除</button>
+      </section>
+    </div>
+    <p id="nearest-live" class="sr-only" aria-live="polite" aria-atomic="true"></p>
+    <div class="reading-sections">
+      <section class="content-panel" aria-labelledby="references-title"><h2 id="references-title">参考に、知っておきたいこと</h2><div id="references"></div></section>
+      <section class="content-panel" aria-labelledby="changes-title"><h2 id="changes-title"><span class="nw">2025年</span>からの変化</h2><p class="hint">照合できた前年の値がある基準だけを掲載しています。年齢や学生の区分によって、当てはまる壁が違います。</p><div id="changes-list"></div></section>
+      <section class="content-panel about-panel" aria-labelledby="about-title"><h2 id="about-title">このアプリについて</h2><div id="about"></div><details><summary>用語を確かめる</summary><dl id="glossary"></dl></details><details><summary>出典一覧と<span class="nw">確認日</span></summary><div id="all-sources"></div></details></section>
+    </div>
+    <noscript><p class="content-panel">計算にはJavaScriptが必要です。ブラウザの設定を確認してください。</p></noscript>
+  </main>
+  <button id="result-jump" class="result-jump" type="button" aria-controls="result-card" hidden><span id="result-jump-label">結果を見る ↑</span><span id="result-jump-summary"></span></button>
+  <footer class="site-footer">
+    <div id="share"></div>
+    <a href="../privacy.html">プライバシーポリシー</a>
+  </footer>
+</body>
+</html>
