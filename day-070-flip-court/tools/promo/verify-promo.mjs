@@ -1,0 +1,71 @@
+// Draft media checks only. Published URL checks remain the responsibility of x:prepare.
+import assert from 'node:assert/strict';
+import { execFileSync, spawnSync } from 'node:child_process';
+import { readFile, writeFile } from 'node:fs/promises';
+import { join } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { SCENES } from './stage.mjs';
+const here=fileURLToPath(new URL('./',import.meta.url)), app=fileURLToPath(new URL('../../',import.meta.url));
+const output=join(here,'output'), master=join(output,'Day070_flip_court_promo.mp4');
+const run=(command,args)=>execFileSync(command,args,{encoding:'utf8',maxBuffer:12*1024*1024});
+const probe=path=>JSON.parse(run('ffprobe',['-v','error','-show_format','-show_streams','-of','json',path]));
+const inspect=(path,filter,kind)=>{
+  const args=['-hide_banner','-i',path,kind==='audio'?'-af':'-vf',filter,kind==='audio'?'-vn':'-an','-f','null','-'];
+  const result=spawnSync('ffmpeg',args,{encoding:'utf8',maxBuffer:12*1024*1024});
+  assert.equal(result.status,0,`ffmpeg ${filter} failed`);return result.stderr;
+};
+const metadata=p=>{
+  const tags=[p.format?.tags,...p.streams.map(stream=>stream.tags)].filter(Boolean);
+  const forbidden=/^(artist|author|comment|copyright|description|location|make|model|title|creation_time)$/i;
+  for(const group of tags)for(const key of Object.keys(group))assert.ok(!forbidden.test(key),`Unexpected media metadata ${key}`);
+  return tags;
+};
+const masterProbe=probe(master), video=masterProbe.streams.find(s=>s.codec_type==='video'), audio=masterProbe.streams.find(s=>s.codec_type==='audio');
+assert.equal(video.codec_name,'h264');assert.equal(video.pix_fmt,'yuv420p');assert.equal(video.width,1080);assert.equal(video.height,1920);assert.equal(video.r_frame_rate,'30/1');assert.equal(Number(video.nb_frames),900);
+assert.equal(audio.codec_name,'aac');assert.equal(Number(audio.sample_rate),48000);assert.equal(audio.channels,2);assert.ok(Math.abs(Number(masterProbe.format.duration)-30)<.05);
+const tags=metadata(masterProbe);
+const loudLog=inspect(master,'loudnorm=I=-17:TP=-1.5:LRA=9:print_format=json','audio');
+const loudness=JSON.parse(loudLog.match(/\{[\s\S]*?\}/g).at(-1));
+assert.ok(Number(loudness.input_i)>=-18&&Number(loudness.input_i)<=-16,`Integrated loudness ${loudness.input_i}`);
+assert.ok(Number(loudness.input_tp)<=-1.5,`True peak ${loudness.input_tp}`);
+const blackLog=inspect(master,'blackdetect=d=0.05:pix_th=0.10:pic_th=0.98','video');
+const silenceLog=inspect(master,'silencedetect=n=-50dB:d=0.5','audio');
+const blackEvents=blackLog.split('\n').filter(line=>line.includes('black_start:'));
+const silenceEvents=silenceLog.split('\n').filter(line=>line.includes('silence_start:')||line.includes('silence_end:'));
+assert.equal(blackEvents.length,0,'Black interval detected');assert.equal(silenceEvents.length,0,'Silence of at least .5s detected');
+const evidence=JSON.parse(await readFile(join(output,'capture-evidence.json'),'utf8'));
+assert.equal(evidence.frameStats.count,900);assert.ok(evidence.frameStats.minGameJpegBytes>20000);assert.ok(evidence.frameStats.minStageJpegBytes>30000);
+assert.equal(evidence.sourceStats.errors.length,0);assert.ok(evidence.sourceStats.inputs>100);assert.ok(evidence.sourceStats.returns>3);
+assert.equal(evidence.sceneProof.length,SCENES.length);
+for(const scene of evidence.sceneProof) {
+  assert.ok(scene.textBounds.length>=4);
+  for(const b of scene.textBounds)assert.ok(b.left>=70&&b.right<=1010&&b.top>=90&&b.bottom<=1810);
+}
+assert.equal(evidence.records[0].frame,0);assert.equal(evidence.records[0].phase,'playing');
+assert.ok(evidence.records.some(r=>r.feedback.includes('自分の着地')));
+assert.ok(evidence.records.some(r=>/自分の着地・[1-9]\d*マス反転/.test(r.feedback)));
+assert.ok(evidence.records.some(r=>r.edit==='cut to final seconds'));
+assert.equal(evidence.finalState.phase,'result');assert.equal(evidence.finalState.timer,0);
+assert.equal(evidence.finalState.player,evidence.finalState.resultPlayer);assert.equal(evidence.finalState.cpu,evidence.finalState.resultCpu);
+const demo=join(app,'demo.mp4');
+run('ffmpeg',['-hide_banner','-loglevel','error','-y','-ss','3.2','-i',master,'-t','15','-vf','scale=540:960','-an','-c:v','libx264','-preset','medium','-crf','20','-pix_fmt','yuv420p','-map_metadata','-1','-metadata','encoder=','-movflags','+faststart',demo]);
+const demoProbe=probe(demo), dv=demoProbe.streams.find(s=>s.codec_type==='video');
+assert.equal(dv.width,540);assert.equal(dv.height,960);assert.equal(dv.codec_name,'h264');assert.equal(dv.pix_fmt,'yuv420p');assert.equal(dv.r_frame_rate,'30/1');assert.equal(demoProbe.streams.some(s=>s.codec_type==='audio'),false);assert.ok(Math.abs(Number(demoProbe.format.duration)-15)<.05);metadata(demoProbe);
+const frames=[['firstframe.png',0],['detail-landing.jpg',4.2],['detail-flip.jpg',9.7],['detail-aim.jpg',17.2],['detail-result.jpg',24.4],['detail-end.jpg',28.4]];
+for(const [name,time] of frames)run('ffmpeg',['-hide_banner','-loglevel','error','-y','-ss',String(time),'-i',master,'-frames:v','1','-update','1','-map_metadata','-1',join(output,name)]);
+run('ffmpeg',['-hide_banner','-loglevel','error','-y','-i',master,'-vf','select=eq(n\\,0)+eq(n\\,126)+eq(n\\,291)+eq(n\\,516)+eq(n\\,732)+eq(n\\,852),scale=360:640,tile=3x2','-frames:v','1','-update','1','-map_metadata','-1',join(output,'contactsheet.jpg')]);
+run('ffmpeg',['-hide_banner','-loglevel','error','-y','-i',master,'-vf','select=not(mod(n\\,30)),scale=216:384,tile=5x6','-frames:v','1','-update','1','-map_metadata','-1',join(output,'overview-1s.jpg')]);
+const meta=JSON.parse(await readFile(join(app,'meta.json'),'utf8')), x=meta.social.x;
+assert.ok(x.summary?.trim());assert.ok(x.ai?.trim());assert.ok(x.human?.trim());assert.ok(x.hashtags.length>=1&&x.hashtags.length<=2);assert.ok(x.hashtags.every(t=>/^#?[\p{L}\p{N}_]+$/u.test(t)));
+const plain=text=>Array.from(text).reduce((sum,c)=>sum+(c.codePointAt(0)<=0x7f?1:2),0);
+const weighted=text=>{let total=0,cursor=0;for(const match of text.matchAll(/https?:\/\/\S+/g)){total+=plain(text.slice(cursor,match.index))+23;cursor=match.index+match[0].length;}return total+plain(text.slice(cursor));};
+const plannedUrl='https://hundred-days.pages.dev/day-070-flip-court/';
+const linkReply=`👇 「フリップコート」はこちら\n${plannedUrl}\n\n1人でCPUと対戦する60秒の陣取りラリー。`;
+const drafts=[['x-post.txt',x.body],['x-reply-1-link.txt',linkReply],...x.replies.map((text,i)=>[`x-reply-${i+2}.txt`,text])];
+const draftCounts=[];
+for(const [file,text]of drafts){assert.ok(text.trim());const length=weighted(text);assert.ok(length<=280,`${file}: ${length}/280`);assert.ok(!/2人|二人|2P|オンライン|公開しました/.test(text));await writeFile(join(output,file),text+'\n');draftCounts.push({file,weightedLength:length});}
+const draftManifest={status:'draft',source:'meta.json social.x; link reply uses planned canonical URL',plannedUrl,publicUrlVerified:false,needsPublishedPageVerification:true,postingPerformed:false,counts:draftCounts};
+await writeFile(join(output,'x-draft-manifest.json'),JSON.stringify(draftManifest,null,2));
+const report={result:'PASS',master:{file:'Day070_flip_court_promo.mp4',width:video.width,height:video.height,fps:video.r_frame_rate,frames:Number(video.nb_frames),seconds:Number(masterProbe.format.duration),bytes:Number(masterProbe.format.size),videoCodec:video.codec_name,pixelFormat:video.pix_fmt,audioCodec:audio.codec_name,audioSampleRate:audio.sample_rate,metadata:tags},loudness:{integratedLUFS:Number(loudness.input_i),truePeakDBTP:Number(loudness.input_tp),loudnessRangeLU:Number(loudness.input_lra)},blackEvents,silenceEvents,demo:{file:'../../demo.mp4',width:dv.width,height:dv.height,seconds:Number(demoProbe.format.duration),bytes:Number(demoProbe.format.size),audio:false},captionChecks:{scenes:evidence.sceneProof.length,allSafe:true,firstFrameHasGameAndCaptions:true},gameChecks:{inputs:evidence.sourceStats.inputs,returnsObserved:evidence.sourceStats.returns,errors:evidence.sourceStats.errors.length,actualResult:evidence.finalState.result,player:evidence.finalState.resultPlayer,cpu:evidence.finalState.resultCpu},xDraft:draftManifest,frames:frames.map(([file,time])=>({file,time})),limitations:['Frame inspection is a separate review step; this JSON does not claim human visual or listening approval.','The game clock was controlled for filming; the middle of the match was cut.','Published-page verification and x:prepare are pending; no posting was performed.']};
+await writeFile(join(output,'qa.json'),JSON.stringify(report,null,2));
+console.log(JSON.stringify(report,null,2));

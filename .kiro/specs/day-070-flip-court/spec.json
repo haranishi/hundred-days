@@ -1,0 +1,69 @@
+{
+  "feature_name": "day-070-flip-court",
+  "created_at": "2026-10-18T11:03:48.464239+00:00",
+  "updated_at": "2026-10-18T15:49:31.938508+00:00",
+  "language": "ja",
+  "phase": "implementation-complete",
+  "approvals": {
+    "requirements": {
+      "generated": true,
+      "approved": true
+    },
+    "design": {
+      "generated": true,
+      "approved": true
+    },
+    "tasks": {
+      "generated": true,
+      "approved": true
+    }
+  },
+  "ready_for_implementation": true,
+  "approval_scope": {
+    "requirements": "本人が要件案を承認",
+    "downstream": "設計・タスク作成・実装・検証までの一括進行を本人が承認",
+    "additional_guidance": "最近追加した関連スキルも含めて進める"
+  },
+  "validation": {
+    "scope": "承認済みCPU版・6領域33条件",
+    "status": "verified",
+    "report": ".agent-harness/runs/day070-flip-court/cpu-validation.md",
+    "experience_ms": 316111,
+    "experience_score": 18,
+    "independent_ui_score": 19,
+    "public_status": "draft"
+  },
+  "pending_updates": [
+    {
+      "proposal": "local-versus.md",
+      "scope": "同じ端末で2人対戦する設定",
+      "status": "awaiting-user-approval",
+      "implemented": false
+    }
+  ],
+  "delivery": {
+    "repository": "haranishi/hundred-days",
+    "base": "main",
+    "requested_on": "2026-10-19",
+    "authorized_operations": [
+      "commit",
+      "push",
+      "PR",
+      "merge"
+    ],
+    "scope": "検証済みCPU版とプロモーション素材・X下書きをdraftのまま取り込む。対人モードは未実装の更新案。",
+    "record": ".agent-harness/runs/day070-flip-court/delivery.md",
+    "status": "ready-for-commit"
+  },
+  "promotion": {
+    "request_on": "2026-10-19",
+    "brief": "promotion.md",
+    "task": "9",
+    "status": "verified",
+    "publishing": "not authorized; content draft only",
+    "report": ".agent-harness/runs/day070-flip-court/task-9-promotion.md",
+    "duration_seconds": 30,
+    "x_status": "draft; published URL verification pending",
+    "archive": "Drive/100日チャレンジ/Day070_フリップコート"
+  }
+}

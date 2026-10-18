@@ -1,0 +1,18 @@
+export const WORLD = Object.freeze({
+  width: 600,
+  height: 760,
+  gridX: 42,
+  gridY: 122,
+  gridSize: 516,
+  rows: 6,
+  cellSize: 86,
+  cpuY: 56,
+  playerY: 704,
+  paddleWidth: 112,
+  ballRadius: 10,
+  matchMs: 60000,
+  countdownMs: 900,
+  serveDelayMs: 620,
+  playerSpeed: 690,
+  cpuSpeed: 300,
+});
