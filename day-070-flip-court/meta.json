@@ -11,11 +11,11 @@
     "Canvas",
     "vanilla-js"
   ],
-  "status": "draft",
-  "publicUrl": null,
+  "status": "published",
+  "publicUrl": "https://hundred-days.pages.dev/day-070-flip-court/",
   "screenshot": "og.png",
   "startedAt": "2026-10-18",
-  "finishedAt": null,
+  "finishedAt": "2026-10-19",
   "sourceOfIdea": "1人で遊べる今日のWebアプリとして再提案した案①を本人が選択した。球打ちと陣取りを組み合わせ、CPUと60秒で対戦するゲームに具体化した。",
   "aiHandled": [
     "Codexによる既存の企画メモとリポジトリの調査、要件・設計・タスクの作成",
@@ -28,7 +28,8 @@
     "再提案から企画①を選択",
     "要件と後続の設計・タスク・実装・検証を一括で承認",
     "最近追加したスキルも含めて進めるよう依頼",
-    "プロモーション動画とX投稿文の作成を追加依頼"
+    "プロモーション動画とX投稿文の作成を追加依頼",
+    "Day70の本番公開を依頼"
   ],
   "failuresAndFixes": [
     {
