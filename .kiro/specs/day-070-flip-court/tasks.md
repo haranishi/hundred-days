@@ -76,3 +76,10 @@
   - _Boundary: Repository Integration（紹介素材。ゲームの挙動は変更しない）_
   - _Depends: 8_
   - _Requirements: 6.5。追加制作ブリーフはpromotion.md_
+
+- [x] 10. 公開用の設定と検証を用意する
+  - 本人の公開依頼を受け、metaとREADMEを公開対象へ同期し、共有入口を既存規約へ合わせる。
+  - 公開用出力の主要操作・配信除外・正規URLと標準checkを確認する。
+  - _Boundary: Repository Integration（公開準備）_
+  - _Depends: 9_
+  - _Requirements: 5.6, 6.1, 6.5。公開手順と本番確認はpublication.md_

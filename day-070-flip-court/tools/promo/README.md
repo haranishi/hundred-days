@@ -43,6 +43,7 @@ node day-070-flip-court/tools/promo/verify-promo.mjs
 `capture-evidence.json` に入力回数、実際の得点・反転・結果と、シーン先頭の字幕位置を残す。
 X本文の正本は `meta.json` の `social.x`。本文と各返信を280換算字以内で検査する。
 `output/x-post.txt`、`x-reply-1-link.txt`、`x-reply-2.txt` は公開前の下書き。
-リンク返信のURLは公開予定先。現状は `draft`、`publicUrl: null` のため公開確認は未実施。
+リンク返信のURLは正規URL。制作時は `draft`、`publicUrl: null` で公開確認を保留した。
+2026-10-19の公開依頼後はpublication.mdに沿って本番URLを検査する。
 公開後は正規の `npm run x:prepare -- --day 70 --video <マスターのパス> --media-reviewed` と最終プレビュー確認が必要。
 この制作・検査ではSNS投稿や外部送信を行わない。完成品のDrive保存と保管場所の記録は親工程で行う。

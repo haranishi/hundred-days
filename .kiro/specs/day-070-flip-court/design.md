@@ -8,7 +8,8 @@ Goalsは開始・返球・反転・終了・再戦の完結、Non-Goalsはオン
 ### This Spec Owns
 新Dayの盤面、ラリー・CPU・時計、入力、描画、結果、ローカルpreview、検査。
 ### Out of Boundary
-既存Dayの遊び、共通共有機能の挙動、公開・SNS操作、他worktreeの変更。
+既存Dayの遊び、共通共有機能の挙動、SNS操作、他worktreeの変更。
+2026-10-19の本人の公開依頼により、既存配信手順への反映は[publication.md](publication.md)で扱う。
 ### Allowed Dependencies
 ブラウザ標準API、Node標準API、既存shared正本、既存Playwright 1.62.1のみ。
 ### Revalidation Triggers
@@ -36,7 +37,7 @@ FrontendはES Modules・Canvas 2D・DOM、RuntimeはNode 24、検査はNode test
 | Match | lib/match.js、tests/match.test.mjs | ラリー・CPU・時間・中断・結果 |
 | View | index.html、app.css、lib/view.js | UIの骨格、Canvas描画、画面幅と色・印 |
 | Runtime | app.js | Pointer/Key入力、単一RAF、DOM状態とdialog |
-| Repository | meta.json、README.md、shared/、og.png、tools/serve.mjs、tools/capture-og.mjs | 制作記録・既存共有・自作画像・draft preview |
+| Repository | meta.json、README.md、shared/、og.png、tools/serve.mjs、tools/capture-og.mjs | 制作記録・既存共有・自作画像・previewと公開設定 |
 | Validation | tests/index.js、ルートtests/e2e/day-070.spec.mjs | 単体入口・実ブラウザの主要フロー |
 既存の変更はscripts/build.mjsのtools除外と、READMEの一覧同期だけに限る。
 
@@ -46,7 +47,7 @@ FrontendはES Modules・Canvas 2D・DOM、RuntimeはNode 24、検査はNode test
 - Match: createMatch(seed=1)、beginMatch(match)、stepMatch(match,deltaMs,axis=0)、movePlayerTo(match,x)、pauseMatch(match)、resumeMatch(match)を公開する。
 - View: createRenderer(canvas)は{resize(),render(match,{reducedMotion})}を返す。context取得不可はnullを返す。モデルは変更しない。
 - Runtime: currentMatchを唯一の進行元とし、モデルとViewを接続する。開始/再戦では新しいモデルを作り、古い入力を破棄する。
-- Repository: draftを標準配信から除外したまま、公開ファイルだけを配るsource previewを使う。テストはworker専用portで起動する。
+- Repository: 制作中はdraftを標準配信から除外する。本人の公開依頼後はpublishedと正規URLを設定する。source previewは公開ファイルだけを配り、テストはworker専用portで起動する。
 
 ## Data Models
 Matchはphase、resumePhase、board、scores、elapsedMs、countdownMs、serveMs、playerX、cpuX、ball、lastLanding、lastEvent、result、乱数状態を持つ。
@@ -85,7 +86,7 @@ Rulesは8方向・空き/端・複数方向・非連鎖・入力不正・元盤�
 Matchは左右の打ち分け、CPUの移動上限、1打1着地、ミス再開、60秒直前/同時/直後、同点、pause/再戦を検証する。
 実ブラウザはChromium/WebKitで開始・キー/タッチ・終了・再戦・pause・共有・描画不可・幅360/390/768/1440を確認する。
 時計境界の制御と別に、5〜10分の実時間プレイと画像の独立評価を行う。UI判断は[ux.md](ux.md)を使う。
-標準check/buildはdraftを公開しないことも確認する。必要な検査が通れば、理由なく全件を繰り返さない。
+標準check/buildは制作中のdraft除外と、公開時のDay70配信・開発ファイル除外を確認する。必要な検査が通れば、理由なく全件を繰り返さない。
 
 ## Error Handling and Security
 入力値とdeltaの有限性、ownerとマス範囲を入口で確認する。HTTP previewは許可した静的ファイルだけを配る。

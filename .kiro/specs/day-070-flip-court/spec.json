@@ -1,9 +1,9 @@
 {
   "feature_name": "day-070-flip-court",
   "created_at": "2026-10-18T11:03:48.464239+00:00",
-  "updated_at": "2026-10-18T15:49:31.938508+00:00",
+  "updated_at": "2026-10-18T17:14:07.792919+00:00",
   "language": "ja",
-  "phase": "implementation-complete",
+  "phase": "publication-in-progress",
   "approvals": {
     "requirements": {
       "generated": true,
@@ -53,17 +53,36 @@
     ],
     "scope": "検証済みCPU版とプロモーション素材・X下書きをdraftのまま取り込む。対人モードは未実装の更新案。",
     "record": ".agent-harness/runs/day070-flip-court/delivery.md",
-    "status": "ready-for-commit"
+    "status": "source-merged",
+    "pr": 155,
+    "merge_commit": "f283fefc425f7275a98050e37b5cc3676a71e672"
   },
   "promotion": {
     "request_on": "2026-10-19",
     "brief": "promotion.md",
     "task": "9",
     "status": "verified",
-    "publishing": "not authorized; content draft only",
+    "publishing": "app publication authorized; X posting not requested",
     "report": ".agent-harness/runs/day070-flip-court/task-9-promotion.md",
     "duration_seconds": 30,
     "x_status": "draft; published URL verification pending",
     "archive": "Drive/100日チャレンジ/Day070_フリップコート"
+  },
+  "publication": {
+    "requested_on": "2026-10-19",
+    "authorized_operations": [
+      "commit",
+      "push",
+      "PR",
+      "merge",
+      "deploy",
+      "publish"
+    ],
+    "scope": "検証済みCPU版を既存の本番配信で公開し、X本文と公開URLを渡す",
+    "brief": "publication.md",
+    "preparation_task": "10",
+    "status": "ready-for-pr",
+    "public_url": "https://hundred-days.pages.dev/day-070-flip-court/",
+    "record": ".agent-harness/runs/day070-flip-court/publication.md"
   }
 }
