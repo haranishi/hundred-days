@@ -7,7 +7,7 @@
 - meta.jsonのstatusをpublished、publicUrlを正規URL、finishedAtを2026-10-19にする。
 - README一覧とアプリ説明を同期し、標準buildがDay70を含む70件を生成する。
 - 配信に必要なHTML・JS・CSS・共有・OG画像・demoを含み、tools/testsを配らない。
-- ゲーム13ファイルと最終動画・demoを変更しない。新依存・外部APIを追加しない。
+- ゲームの判定・CPU・入力・描画と動画・demoを変更しない。共有ボタンの読み上げ名と正式タイトルを含む共有文は既存の共通規約へ合わせる。新依存・外部APIを追加しない。
 - 正規URL、OGP、security headers、開始・入力・60秒の終了・再戦を公開用出力で確認する。
 - npm run checkと当該headの必須共通CIが成功した後にマージする。
 - mainの既存CI・Cloudflare Pagesのデプロイ完了後、本番URLで主要操作を確認する。
