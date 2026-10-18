@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#184e42">
+  <meta name="description" content="返す、塗る、挟んで反転。1人でCPUと60秒対戦する、球打ちと陣取りのフリップコート。">
+  <title>フリップコート — 60秒の陣取りラリー</title>
+  <meta name="share:text" content="フリップコート — 返す、塗る、挟んで反転。1人でCPUと60秒対戦。">
+  <link rel="canonical" href="https://hundred-days.pages.dev/day-070-flip-court/">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="ja_JP">
+  <meta property="og:title" content="フリップコート — 60秒の陣取りラリー">
+  <meta property="og:description" content="返す、塗る、挟んで反転。1人でCPUと60秒対戦する、球打ちと陣取りのフリップコート。">
+  <meta property="og:url" content="https://hundred-days.pages.dev/day-070-flip-court/">
+  <meta property="og:image" content="https://hundred-days.pages.dev/day-070-flip-court/og.png">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="フリップコートの6×6コート。丸は自分、菱形はCPU。">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="フリップコート — 60秒の陣取りラリー">
+  <meta name="twitter:description" content="返す、塗る、挟んで反転。1人でCPUと60秒対戦する、球打ちと陣取りのフリップコート。">
+  <meta name="twitter:image" content="https://hundred-days.pages.dev/day-070-flip-court/og.png">
+  <meta name="twitter:image:alt" content="フリップコートの6×6コート。丸は自分、菱形はCPU。">
+  <link rel="icon" type="image/png" href="./og.png">
+  <link rel="stylesheet" href="./shared/share.css">
+  <link rel="stylesheet" href="./app.css">
+  <script src="./shared/share.js" defer></script>
+  <script type="module" src="./app.js"></script>
+</head>
+<body>
+  <main id="app" class="app" data-phase="intro">
+    <header class="app-header">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+        <div><p class="eyebrow">FLIP COURT</p><h1>フリップコート</h1></div>
+      </div>
+      <p class="match-label">1 PLAYER <span>VS CPU</span></p>
+    </header>
+
+    <div class="play-layout">
+      <section class="game-column" aria-label="60秒の陣取りラリー">
+        <div class="scoreboard" aria-label="現在の陣地と残り時間">
+          <div class="score score-player"><span class="score-label"><i class="owner-mark player-mark" aria-hidden="true"></i>自分</span><strong id="player-score">18</strong><span class="score-unit">マス</span></div>
+          <div class="clock"><span>残り</span><strong id="timer">60</strong><span>秒</span></div>
+          <div class="score score-cpu"><span class="score-label"><i class="owner-mark cpu-mark" aria-hidden="true"></i>CPU</span><strong id="cpu-score">18</strong><span class="score-unit">マス</span></div>
+        </div>
+
+        <div class="court-frame">
+          <canvas id="court" width="600" height="760" tabindex="0" aria-label="対戦コート。下が自分、上がCPU。左右矢印またはA・Dキー、指の左右ドラッグでラケットを動かします。" aria-describedby="controls-note">このゲームはCanvasでコートを表示します。対応するブラウザーで開いてください。</canvas>
+
+          <section id="intro-panel" class="state-panel intro-panel" aria-labelledby="intro-title">
+            <p class="panel-kicker">1人でCPUと60秒</p>
+            <h2 id="intro-title">一打で、<br>コートを塗り替えろ。</h2>
+            <p class="rule-flow"><span>返す</span><b aria-hidden="true">→</b><span>塗る</span><b aria-hidden="true">→</b><span>挟んで反転</span></p>
+            <p class="panel-copy">着地したマスが自分の陣地に。<br>相手のマスを挟むと、まとめて反転！</p>
+            <p class="intro-controls">指で左右にドラッグ<br><span>PCは <kbd>←</kbd> <kbd>→</kbd> / <kbd>A</kbd> <kbd>D</kbd></span></p>
+            <button id="start" class="button button-primary" type="button">CPUと対戦する <span aria-hidden="true">↗</span></button>
+            <p class="panel-footnote">60秒後、陣地が多い方の勝ち</p>
+          </section>
+
+          <div id="countdown" class="countdown" aria-live="polite" hidden>READY</div>
+
+          <section id="pause-panel" class="state-panel pause-panel" aria-labelledby="pause-title" hidden>
+            <p class="panel-kicker">TIME OUT</p>
+            <h2 id="pause-title">ひと休み。</h2>
+            <p class="panel-copy">試合はここで止まっています。<br>準備ができたら続きをどうぞ。</p>
+            <button id="resume" class="button button-primary" type="button">つづける <span aria-hidden="true">→</span></button>
+          </section>
+
+          <section id="result-panel" class="state-panel result-panel" aria-labelledby="result-title" hidden>
+            <p class="panel-kicker">FULL TIME</p>
+            <h2 id="result-title">試合終了</h2>
+            <p class="panel-copy">60秒の陣取り、決着。</p>
+            <div class="result-scores" aria-label="最終陣地">
+              <div><span><i class="owner-mark player-mark" aria-hidden="true"></i>自分</span><strong id="result-player">18</strong><small>マス</small></div>
+              <span class="result-separator" aria-hidden="true">:</span>
+              <div><span><i class="owner-mark cpu-mark" aria-hidden="true"></i>CPU</span><strong id="result-cpu">18</strong><small>マス</small></div>
+            </div>
+            <button id="replay" class="button button-primary" type="button">もう一度遊ぶ <span aria-hidden="true">↻</span></button>
+            <button id="result-share" class="button button-secondary" type="button">ゲームを共有する</button>
+          </section>
+        </div>
+
+        <p id="feedback" class="feedback" role="status" aria-live="polite" aria-atomic="true">ラケットを左右に動かして返球</p>
+        <nav class="game-controls" aria-label="試合の操作">
+          <button id="pause" class="control-button" type="button"><span class="pause-icon" aria-hidden="true"></span>一時停止</button>
+          <button id="help" class="control-button" type="button"><span class="help-icon" aria-hidden="true">?</span>遊び方</button>
+          <button id="share-open" class="control-button" type="button"><span aria-hidden="true">↗</span>共有</button>
+        </nav>
+        <p id="controls-note" class="sr-only">指でコートを左右にドラッグ、または左右矢印・A・Dキーで移動します。ラケットの中央で返すと奥へ、端で返すと左右へ浅く飛びます。</p>
+        <section id="unsupported" class="unsupported" role="alert" hidden>
+          <h2>コートを表示できませんでした</h2>
+          <p>このブラウザーではゲームの描画を利用できません。ページを再読み込みするか、別のブラウザーで開いてください。</p>
+        </section>
+      </section>
+
+      <aside class="playbook" aria-label="遊び方のヒント">
+        <p class="eyebrow">A RALLY. A REVERSAL.</p>
+        <h2>返すたび、<br>逆転の一手。</h2>
+        <p class="playbook-lead">ラリーと陣取りがひとつに。<br>最後の一打まで、勝負は分からない。</p>
+        <ol class="rule-list">
+          <li><span class="step-number">01</span><div><h3>返す</h3><p>ラケットを左右に動かし、<br>飛んでくるボールを返そう。</p></div></li>
+          <li><span class="step-number">02</span><div><h3>着地を塗る</h3><p>ボールが着地した1マスが、<br>打った側の陣地になる。</p></div></li>
+          <li><span class="step-number">03</span><div><h3>挟んで反転</h3><p>縦・横・斜めに相手を挟むと、<br>その列をまとめて取り返せる。</p></div></li>
+        </ol>
+        <div class="shot-guide">
+          <h3>当てる位置で、狙いを変える。</h3>
+          <div class="paddle-guide" aria-hidden="true"><span>↖</span><span>↑</span><span>↗</span></div>
+          <div class="shot-labels"><span>左へ浅く</span><span>中央は奥へ</span><span>右へ浅く</span></div>
+        </div>
+        <div class="legend"><span><i class="owner-mark player-mark" aria-hidden="true"></i>自分</span><span><i class="owner-mark cpu-mark" aria-hidden="true"></i>CPU</span><span class="landing-key">実線：着地 / 破線：反転</span></div>
+        <p class="keyboard-note"><kbd>←</kbd> <kbd>→</kbd> または <kbd>A</kbd> <kbd>D</kbd> で移動</p>
+      </aside>
+    </div>
+  </main>
+
+  <dialog id="help-dialog" aria-labelledby="help-title">
+    <div class="dialog-content">
+      <div class="dialog-header"><div><p class="eyebrow">HOW TO PLAY</p><h2 id="help-title">60秒の陣取りラリー</h2></div><button class="close-button" type="button" data-close aria-label="遊び方を閉じる">×</button></div>
+      <p class="dialog-lead">1人でCPUと対戦。<br>60秒後、陣地が多い方の勝ちです。</p>
+      <ol class="help-rules">
+        <li><strong>返す</strong><span>指で左右にドラッグ。PCは左右矢印またはA・Dキーで、下のラケットを動かします。</span></li>
+        <li><strong>塗る</strong><span>打ったボールの着地マスが自分の陣地に。中央で返すと奥へ、端で返すと左右へ浅く飛びます。</span></li>
+        <li><strong>挟んで反転</strong><span>自分のマスで相手の列を縦・横・斜めに挟むと、その間のマスが反転します。</span></li>
+      </ol>
+      <p class="help-legend"><span><i class="owner-mark player-mark" aria-hidden="true"></i>丸は自分</span><span><i class="owner-mark cpu-mark" aria-hidden="true"></i>菱形はCPU</span></p>
+      <p class="dialog-note">実線の枠は着地、破線の枠は反転したマス。返球を逃しても陣地はそのまま、次のサーブへ進みます。</p>
+      <p class="dialog-note">説明や共有を開くと試合は一時停止します。閉じたあと「つづける」で再開できます。</p>
+    </div>
+  </dialog>
+
+  <dialog id="share-dialog" aria-labelledby="share-title">
+    <div class="dialog-content">
+      <div class="dialog-header"><div><p class="eyebrow">PASS THE GAME</p><h2 id="share-title">次は、友だちの番。</h2></div><button class="close-button" type="button" data-close aria-label="共有を閉じる">×</button></div>
+      <p class="dialog-lead">フリップコートを共有する</p>
+      <p class="dialog-note">返す、塗る、挟んで反転。<br>1人でCPUと遊べる、60秒の陣取りラリー。</p>
+      <div id="share"></div>
+      <div class="manual-copy"><label for="share-url">ゲームのURL</label><input id="share-url" type="url" value="https://hundred-days.pages.dev/day-070-flip-court/" readonly aria-describedby="manual-copy-note"><p id="manual-copy-note">コピーできない場合は、このURLを選択して手動でコピーできます。</p></div>
+    </div>
+  </dialog>
+</body>
+</html>
