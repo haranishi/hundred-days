@@ -149,9 +149,12 @@ test('推理：影を再現する前は2人以上残り、再現すると犯人�
     assert.equal(item.suspects.some((suspect) => suspect.id === item.witness.person), false, `${item.id}: 目撃者は容疑者にならない`);
     const culprit = suspects.find((suspect) => suspect.id === item.culprit);
     // アリバイで外れず残る人は、犯人と灯りの高さが4.5cm以上違う。成功後は灯りの読みを正解にそろえて整数cmで見せるので、
-    // これだけ離れていれば取り違えない（5件目の「5cmの差が決め手」が最小）。
+    // これだけ離れていれば取り違えない。例外は夜5（precision）：身長178cmと180cmの2人を、灯りの高さ108cmと106.8cmの
+    // 正確な読みで分ける。差は1.2cmで、読みは正解にそろった整数なので取り違えないが、1cm未満や2cm超にはしない。
     for (const other of before.filter((suspect) => suspect.id !== item.culprit)) {
-      assert.ok(Math.abs(other.lampHeight - culprit.lampHeight) >= 4.5, `${item.id}: ${other.name}と犯人の灯りの高さが近すぎる`);
+      const gap = Math.abs(other.lampHeight - culprit.lampHeight);
+      if (item.precision) assert.ok(gap >= 1 && gap <= 2, `${item.id}: ${other.name}との差${gap}cmは、正確な読みで分ける範囲（1〜2cm）にない`);
+      else assert.ok(gap >= 4.5, `${item.id}: ${other.name}と犯人の灯りの高さが近すぎる`);
     }
     assert.equal(culprit.lampHeight, item.stage.lamp.solution, `${item.id}: 犯人の灯りの高さが正解と一致`);
     assert.equal(heightFromLamp(item.stage.lamp.solution, item.stool), culprit.height);
@@ -192,5 +195,28 @@ test('判定：犯人は正解、ほかの人はどの手がかりと合わな�
       if (!result.correct) assert.ok(result.message.includes(suspect.name.split(' ')[0]));
     }
     assert.throws(() => judge(item, 'nobody'), RangeError);
+  }
+});
+
+// 灯りも道具も、少しずつずれたまま「合っている」と思って離したとき、合格に届く広さ。指のドラッグは1px≒0.75cmなので、
+// 全部が±3cm以内（約4px）なら、道具の多い夜でも大半は合格にする（夜4で全部が少しずつずれて、メーターを見ながら
+// 1cmずつ21回探る状態になった）。決まった乱数で、毎回同じ結果にする。
+test('全部が正解の±3cm以内でずれても、道具の多い夜は大半が合格し、灯りだけの夜は必ず合格する', () => {
+  let seed = 20261019;
+  const random = () => { seed = (seed * 1664525 + 1013904223) % 4294967296; return seed / 4294967296; };
+  const offset = (range) => (random() * 2 - 1) * range;
+  const required = { rack: 1, hat: 1, bag: 0.95, chair: 0.85, umbrella: 0.8 };
+  for (const item of CASES) {
+    const stage = stageOf(item);
+    const target = buildTarget(stage);
+    const solution = solutionArrangement(stage);
+    let passed = 0;
+    const trials = 150;
+    for (let i = 0; i < trials; i += 1) {
+      const arrangement = { ly: solution.ly + offset(3), xs: { ...solution.xs } };
+      for (const prop of movable(stage)) arrangement.xs[prop.id] = solution.xs[prop.id] + offset(3);
+      if (evaluate(stage, target, arrangement).success) passed += 1;
+    }
+    assert.ok(passed / trials >= required[item.id], `${item.id}: ±3cmの共同のずれで合格したのは${passed}/${trials}`);
   }
 });

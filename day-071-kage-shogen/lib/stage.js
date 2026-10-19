@@ -21,7 +21,7 @@ export function createSession(caseDef) {
   return {
     caseId: caseDef.id, caseDef, stage, target, arrangement, selected: 'lamp',
     assessment: evaluate(stage, target, arrangement), status: 'playing',
-    guideOn: caseDef.guide === 'on', usedGuide: false, hintsUsed: 0, hintIndex: 0,
+    guideOn: caseDef.guide === 'on', usedGuide: false, hintsUsed: 0, shownHints: [],
   };
 }
 
@@ -68,25 +68,29 @@ export function reset(session) {
   assess(session);
 }
 
+// 夜1のガイドは練習用なので、何度出し入れしても星を減らさない。夜2以降は、付けた時点で使用を記録する。
 export function toggleGuide(session) {
   session.guideOn = !session.guideOn;
-  if (session.guideOn) session.usedGuide = true;
+  if (session.guideOn && session.caseDef.guide !== 'on') session.usedGuide = true;
   return session.guideOn;
 }
 
-// ヒントは、押すたびに交互に出す。奇数回目は、いまの配置でいちばんずれているものの名指し（kind: 'diagnosis'）、
-// 偶数回目は、その夜の考え方（kind: 'principle'）。どちらも星は1回分しか減らない。index は何回目かの数（0から）。
+// ヒントは、押すたびに、まだ出していない文を1つ出す。いまの配置でいちばんずれているものの名指し（kind: 'diagnosis'。
+// 配置が変わって文が替わったときは、また最初に出す）→ その夜の考え方（kind: 'principle'）の順。全部出したら kind: 'end'。
+// 同じ文を番号だけ変えて出さない。星は、最初に使ったとき1回分だけ減る。index は何回目かの数（0から）。
+export const HINT_END = 'ヒントはここまで。灯りと道具を、1cmずつ動かして確かめよう。';
+
 export function useHint(session) {
-  const count = session.hintsUsed;
+  const index = session.hintsUsed;
   session.hintsUsed += 1;
-  if (count % 2 === 0) {
-    const { text } = diagnose(session.stage, session.target, session.assessment, session.arrangement);
-    return { index: count, kind: 'diagnosis', text };
-  }
-  const { hints } = session.caseDef;
-  const index = session.hintIndex;
-  session.hintIndex = (index + 1) % hints.length;
-  return { index: count, kind: 'principle', text: hints[index] };
+  const candidates = [
+    { kind: 'diagnosis', text: diagnose(session.stage, session.target, session.assessment, session.arrangement).text },
+    ...session.caseDef.hints.map((text) => ({ kind: 'principle', text })),
+  ];
+  const next = candidates.find((candidate) => !session.shownHints.includes(candidate.text));
+  if (!next) return { index, kind: 'end', text: HINT_END };
+  session.shownHints.push(next.text);
+  return { index, kind: next.kind, text: next.text };
 }
 
 // 合格が保たれたら、灯りと必要な道具を正解の位置へそろえる。邪魔な道具は、置いた位置のまま残す
@@ -110,15 +114,26 @@ function fillsOf({ iou, success }, { warm, near, union }) {
   return [part(0, warm), part(warm, near), part(near, union), 0];
 }
 
+// 灯りと道具が正解の位置からこれ以内なら、「合っている」とみなす（cm）。
+const CLOSE_ENOUGH = 3;
+
+// 近いのに合格しないとき、何が足りないかを、答えを言わずに大きく2つに分けて添える：
+// 邪魔な道具の影が残っている／灯りの高さがずれている／道具の横位置がずれている。どの道具かと向きは、ヒントで言う。
+function shortfall(session) {
+  const { assessment, stage, arrangement } = session;
+  if (!assessment.decoysOk) return '関係ない道具の影が残っている';
+  const movable = stage.props.filter((prop) => !prop.decoy && prop.x.min < prop.x.max);
+  if (Math.abs(arrangement.ly - stage.lamp.solution) > CLOSE_ENOUGH) return movable.length > 0 ? '灯りの高さがずれている' : '';
+  if (movable.some((prop) => Math.abs(arrangement.xs[prop.id] - prop.x.solution) > CLOSE_ENOUGH)) return '道具の横位置がずれている';
+  return 'ずれている道具がある';
+}
+
 export function describeAssessment(session) {
   const { assessment, stage } = session;
   const fills = fillsOf(assessment, stage.threshold);
   if (assessment.success) return { step: 4, label: '再現できた', detail: '', fills };
-  if (assessment.iou >= stage.threshold.union) {
-    const detail = assessment.decoysOk ? 'ずれている道具がある' : '関係ない道具の影が残っている';
-    return { step: 3, label: 'あと少し', detail, fills };
-  }
-  if (assessment.band === 'near') return { step: 3, label: '近い', detail: '', fills };
+  if (assessment.iou >= stage.threshold.union) return { step: 3, label: 'あと少し', detail: shortfall(session) || 'ずれている道具がある', fills };
+  if (assessment.band === 'near') return { step: 3, label: '近い', detail: shortfall(session), fills };
   if (assessment.band === 'warm') return { step: 2, label: 'すこし似ている', detail: '', fills };
   return { step: 1, label: '遠い', detail: '', fills };
 }

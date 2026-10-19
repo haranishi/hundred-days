@@ -10,10 +10,11 @@ const SCALE = 5;
 // 邪魔な道具の影が残っているときの重み。ずれ30cm分より先に言う。
 const DECOY_WEIGHT = 6;
 
+// ずれの大きさの言葉。近さの帯（「近い」は灯りで約8cm以内）と食い違わないよう、「だいぶ」は10cm以上にする。
 export function sizeWord(delta) {
   const size = Math.abs(delta);
-  if (size < 2.5) return 'ほんの少し';
-  return size < 7 ? '少し' : 'だいぶ';
+  if (size < 3) return 'ほんの少し';
+  return size < 10 ? '少し' : 'だいぶ';
 }
 
 const sideOf = (sign) => (sign < 0 ? '左' : '右');

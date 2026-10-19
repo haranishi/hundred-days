@@ -20,7 +20,7 @@ const candidates = [
   [['kuga', 'uno'], ['uno']],
   [['saeki', 'kuga'], ['kuga']],
   [['kiritani', 'hasumi'], ['kiritani']],
-  [['hiiragi', 'hasumi'], ['hiiragi']],
+  [['hinata', 'hiiragi'], ['hiiragi']],
 ];
 
 for (const [index, caseDef] of CASES.entries()) {
@@ -51,7 +51,7 @@ test('readingOf は、夜1だけ身長までの計算を見せ、夜2以降は�
   assert.deepEqual(CASES.map((item) => item.showsHeight === true), [true, false, false, false, false]);
 });
 
-test('夜3と夜5は、灯りの高さに合う身長の人が2人いて、アリバイが決め手になる。ほかの夜は身長だけで決まる', () => {
+test('夜3だけ、灯りの高さに合う身長の人が2人いて、アリバイが決め手になる。ほかの夜は身長だけで決まる', () => {
   const ambiguous = [];
   for (const item of CASES) {
     const byHeight = matchingByHeight(item).map((person) => person.id);
@@ -71,14 +71,25 @@ test('夜3と夜5は、灯りの高さに合う身長の人が2人いて、ア�
       assert.deepEqual(byHeight, [item.culprit], item.id);
     }
   }
-  assert.deepEqual(ambiguous, ['bag', 'umbrella']);
+  assert.deepEqual(ambiguous, ['bag']);
+});
+
+test('夜5は、身長178cmと180cmの2人を、灯りの高さの正確な読み（106.8cmと108cm）で分ける。アリバイが外すのはもう1人', () => {
+  const item = CASES[4];
+  assert.equal(item.precision, true);
+  assert.deepEqual(CASES.map((entry) => entry.precision === true), [false, false, false, false, true]);
+  assert.deepEqual(candidatesBeforeReproduction(item).map((person) => person.id), ['hinata', 'hiiragi']);
+  assert.deepEqual(candidatesAfterReproduction(item).map((person) => person.id), ['hiiragi']);
+  assert.equal(PEOPLE.hinata.height, 178);
+  assert.equal(PEOPLE.hiiragi.height, 180);
+  // 「約107cm」と丸めると108cmとの差が消えるので、小数1桁で見せる。
+  assert.equal(judge(item, 'hinata').message, '日向 悠は違う。身長178cmの6割は106.8cm。再現した灯りは108cmで、合わない。');
 });
 
 test('同じ身長の2人のうちアリバイで外れる人を選ぶと、アリバイの文を返す', () => {
   assert.equal(judge(CASES[2], 'tsubaki').message, `椿 みおは違う。${CASES[2].clues.find((clue) => clue.rulesOut).text}`);
-  assert.equal(judge(CASES[4], 'shirase').message, `白瀬 あきらは違う。${CASES[4].clues.find((clue) => clue.rulesOut).text}`);
+  assert.equal(judge(CASES[4], 'hasumi').message, `蓮見 渉は違う。${CASES[4].clues.find((clue) => clue.rulesOut).text}`);
   assert.equal(PEOPLE.tsubaki.height, PEOPLE.kuga.height);
-  assert.equal(PEOPLE.shirase.height, PEOPLE.hiiragi.height);
 });
 
 test('誤答には、その人を外すアリバイを返す', () => {
@@ -96,6 +107,6 @@ test('身長が合わない誤答には、灯りの高さと踏み台の計算�
   });
   assert.deepEqual(judge(CASES[3], 'hasumi'), {
     correct: false, suspectId: 'hasumi',
-    message: '蓮見 渉は違う。身長188cmの6割は約113cm。踏み台の20cmを足すと約133cm。再現した灯りは125cmで、合わない。',
+    message: '蓮見 渉は違う。身長188cmの6割は112.8cm。踏み台の20cmを足すと132.8cm。再現した灯りは125cmで、合わない。',
   });
 });

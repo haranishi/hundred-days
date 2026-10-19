@@ -14,7 +14,6 @@ export const PEOPLE = Object.freeze({
   kiritani: { name: '桐谷 恒一', role: '管理人', height: 175 },
   hinata: { name: '日向 悠', role: '書生', height: 178 },
   hiiragi: { name: '柊 悟', role: '大工', height: 180 },
-  shirase: { name: '白瀬 あきら', role: '運転手', height: 180 },
   hasumi: { name: '蓮見 渉', role: '郵便配達', height: 188 },
 });
 
@@ -44,7 +43,7 @@ export const CASES = Object.freeze([
     deductionHint: '身長が合う人を探す。アリバイが確かな人は、外してよい。',
     stage: {
       distance: 260,
-      lamp: { x: 150, ...LAMP_RANGE, start: 150, solution: 99 },
+      lamp: { x: 150, ...LAMP_RANGE, start: 135, solution: 99 },
       props: [
         { id: 'rack', shape: 'coatRack', label: '外套掛け', scale: 0.563, z: 97.5, y: 91, x: fixed(131.5) },
       ],
@@ -87,8 +86,8 @@ export const CASES = Object.freeze([
         { id: 'coat', shape: 'coat', label: '外套', scale: 0.533, z: 80, y: 89.5, x: fixed(116.5) },
         { id: 'hat', shape: 'hat', label: '帽子', scale: 0.414, z: 135.5, y: 114.5, x: fixed(114.5) },
       ],
-      // 夜1より少し厳しく：帽子と外套を、それぞれ75%以上重ねる（灯りの許容が約±4cmになり、夜1の約±5.5cmより狭い）。
-      threshold: { union: 0.8, part: 0.75, decoyArea: 0.05, near: 0.7, warm: 0.5 },
+      // 夜1より少し厳しく：帽子と外套を、それぞれ78%以上重ねる（灯りの許容が約±4cmになり、夜1の約±5.5cmより狭い）。
+      threshold: { union: 0.8, part: 0.78, decoyArea: 0.05, near: 0.7, warm: 0.5 },
     },
     clues: [
       { id: 'rule', kind: 'rule', text: '灯りは、胸の高さに提げる。月影荘の決まりで、高さは身長のちょうど6割。' },
@@ -129,6 +128,8 @@ export const CASES = Object.freeze([
         { id: 'coat', shape: 'coat', label: '外套', scale: 0.482, z: 115.5, y: 105.5, x: slide(205, 120) },
         { id: 'bag', shape: 'bag', label: '鞄', scale: 0.885, z: 64.5, y: 79, x: slide(70, 92.5) },
       ],
+      // 灯りと3つの道具が、どれも3cmほどずれていても合格に届くよう、全体の重なりの下限を少し下げる（全部が±3cm以内なら約99%）。
+      threshold: { union: 0.76, part: 0.6, decoyArea: 0.05, near: 0.66, warm: 0.46 },
     },
     clues: [
       { id: 'rule', kind: 'rule', text: '灯りは、胸の高さに提げる。月影荘の決まりで、高さは身長のちょうど6割。' },
@@ -170,10 +171,12 @@ export const CASES = Object.freeze([
         { id: 'coat', shape: 'coat', label: '外套', scale: 0.412, z: 103, y: 110.5, x: slide(40, 126) },
         { id: 'hat', shape: 'hat', label: '帽子', scale: 0.409, z: 136.5, y: 134, x: slide(215, 129) },
       ],
+      // 4つのずれが少しずつ重なって、合っているのに合格にならない状態を減らす（全部が±3cm以内なら約93%）。灯りの許容は変わらない。
+      threshold: { union: 0.72, part: 0.6, decoyArea: 0.05, near: 0.62, warm: 0.42 },
     },
     clues: [
       { id: 'rule', kind: 'rule', text: '灯りは、胸の高さに提げる。月影荘の決まりで、高さは身長のちょうど6割。' },
-      { id: 'stool', kind: 'stool', text: '犯人は、20cmの踏み台の上に立って灯りを提げた。灯りの高さは、身長の6割に、踏み台の20cmを足した高さになる。' },
+      { id: 'stool', kind: 'stool', text: '犯人は、20cmの踏み台の上に立って灯りを提げた。' },
       { id: 'alibi', kind: 'alibi', text: '佐伯は、停電のあいだ地下の食料庫で在庫を数えていた。台帳に時刻が残っている。', rulesOut: ['saeki'] },
     ],
     suspects: [
@@ -201,7 +204,8 @@ export const CASES = Object.freeze([
       '人影に関係のない道具の影は、壁の左右の端へ追い出そう。',
       '傘・外套・長靴の上下のつながりは、灯りの高さで決まる。そのあと、横をそろえよう。',
     ],
-    deductionHint: '灯り108cmに合う身長の人が、2人いる。アリバイが確かなほうを外そう。',
+    precision: true,
+    deductionHint: 'アリバイが確かな人を外すと、身長が近い2人が残る。それぞれの身長の6割を、小数まで計算して、灯りの高さと比べよう。',
     stool: 0,
     stage: {
       distance: 300,
@@ -213,20 +217,22 @@ export const CASES = Object.freeze([
         { id: 'bowler', shape: 'bowler', label: '山高帽', scale: 0.45, z: 150, y: 118, decoy: true, x: slide(140, 10) },
         { id: 'globe', shape: 'globe', label: '地球儀', scale: 0.531, z: 112.5, y: 78, decoy: true, x: slide(100, 230) },
       ],
-      threshold: { union: 0.84, part: 0.6, decoyArea: 0.05, near: 0.7, warm: 0.5 },
+      // 傘は大きいので、全体の重なりだけを下げると傘のずれを許しすぎる（12cmずれても合格する）。道具ごとの被覆を70%以上にして歯止めにし、
+      // 全体の重なりは0.84から0.8へ下げる（全部が±3cm以内なら約88%。以前は約64%）。
+      threshold: { union: 0.8, part: 0.7, decoyArea: 0.05, near: 0.7, warm: 0.5 },
     },
     clues: [
       { id: 'rule', kind: 'rule', text: '灯りは、胸の高さに提げる。月影荘の決まりで、高さは身長のちょうど6割。' },
-      { id: 'alibi', kind: 'alibi', text: '白瀬は、雨の夕方から主人の送迎で車を出していた。同乗した客が、それを覚えている。', rulesOut: ['shirase'] },
+      { id: 'alibi', kind: 'alibi', text: '蓮見は、雨の夕方から配達で、何軒もの家を回っていた。受け取った家々が、それを覚えている。', rulesOut: ['hasumi'] },
     ],
     suspects: [
-      { id: 'shirase', statement: '車で、お客さんを送っていました。' },
+      { id: 'hinata', statement: '書庫で、本の整理をしていました。' },
       { id: 'hiiragi', statement: '納屋で、棚の修理をしていました。' },
-      { id: 'hasumi', statement: '配達の帰りに、門のそばを通っただけです。' },
+      { id: 'hasumi', statement: '雨の中、あちこちへ配達に回っていました。' },
     ],
     culprit: 'hiiragi',
     reveal: '傘の人は、開いた傘・長い外套・長靴の影だった。山高帽と地球儀は関係ない。灯りは108cm。',
-    closing: '108cmは、身長180cmの人が提げる灯り。同じ180cmの白瀬には、客を乗せた車の記録がある。蓮見の188cmなら約113cmで、5cm高い。納屋にいたはずの柊が、門に立っていた。',
+    closing: '108cmは、身長180cmの人が提げる灯り。日向の178cmなら、灯りは106.8cmで、1.2cm低い。配達の蓮見は、家々に姿が残っている。納屋にいたはずの柊が、門に立っていた。',
   },
 ]);
 

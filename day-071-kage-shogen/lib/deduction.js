@@ -44,8 +44,8 @@ export function candidatesAfterReproduction(caseDef, lampHeight = caseDef.stage.
   return candidatesBeforeReproduction(caseDef).filter((suspect) => Math.abs(suspect.lampHeight - lampHeight) <= 0.5);
 }
 
-const cm = (value) => `${Math.round(value)}cm`;
-const approx = (value) => (Math.abs(value - Math.round(value)) > 0.05 ? `約${cm(value)}` : cm(value));
+// 整数なら整数で、そうでなければ小数1桁で書く（身長178cmの灯りは106.8cm。「約107cm」と丸めると、108cmとの差が消える）。
+const cm = (value) => `${Math.abs(value - Math.round(value)) > 0.05 ? value.toFixed(1) : Math.round(value)}cm`;
 
 // 再現した灯りの高さの読み（再現成功後の現場図と、推理の「再現」の手がかりに出す）。
 // 身長への計算は、夜1だけ見せて覚えてもらう。夜2以降は、灯りの高さまで。計算は自分でする。
@@ -54,8 +54,8 @@ export function readingOf(caseDef, lampHeight = caseDef.stage.lamp.solution) {
   const body = lampHeight - caseDef.stool;
   const height = heightFromLamp(lampHeight, caseDef.stool);
   return caseDef.stool > 0
-    ? `灯り${cm(lampHeight)} − 踏み台${cm(caseDef.stool)} ＝ ${cm(body)}。6割で割ると、身長は${approx(height)}。`
-    : `灯り${cm(lampHeight)}。6割で割ると、身長は${approx(height)}。`;
+    ? `灯り${cm(lampHeight)} − 踏み台${cm(caseDef.stool)} ＝ ${cm(body)}。6割で割ると、身長は${cm(height)}。`
+    : `灯り${cm(lampHeight)}。6割で割ると、身長は${cm(height)}。`;
 }
 
 // 選んだ容疑者への判定。誤りのときは、どの手がかりと合わないかを返す。
@@ -71,7 +71,7 @@ export function refutation(caseDef, suspect) {
   if (clue) return `${suspect.name}は違う。${clue.text}`;
   const reading = caseDef.stage.lamp.solution;
   const detail = caseDef.stool > 0
-    ? `身長${cm(suspect.height)}の6割は${approx(suspect.height * HEIGHT_RATIO)}。踏み台の${cm(caseDef.stool)}を足すと${approx(suspect.lampHeight)}`
-    : `身長${cm(suspect.height)}の6割は${approx(suspect.lampHeight)}`;
+    ? `身長${cm(suspect.height)}の6割は${cm(suspect.height * HEIGHT_RATIO)}。踏み台の${cm(caseDef.stool)}を足すと${cm(suspect.lampHeight)}`
+    : `身長${cm(suspect.height)}の6割は${cm(suspect.lampHeight)}`;
   return `${suspect.name}は違う。${detail}。再現した灯りは${cm(reading)}で、合わない。`;
 }
