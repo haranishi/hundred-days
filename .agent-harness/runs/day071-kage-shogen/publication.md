@@ -27,3 +27,10 @@
 - 試験は弱めていない。`index.html` の `share:text` を、題名を含む文「影証言 — 灯りの高さで、証言の嘘を暴く。影絵×推理の5つの夜、約10分。」に直した。
 - 直したあと、共有・セキュリティヘッダー・外部Dayの横断試験282件と、Day71のE2E 76件が、手元で成功した。
 - Day71は下書きのあいだ、この横断の試験に入っていなかった。公開対象にした時点で入るので、手元の検証でも見つからなかった。次のDayは、公開対象にする前に `npx playwright test tests/e2e/shared-share.spec.mjs` を流す。
+
+## 本番での確認（2026-10-20）
+- PR158を本人がマージ（main `2438bdd`・01:28 JST）。mainのCIが全件成功し、Cloudflare Pagesへのデプロイも成功した。
+- 本番URL：応答200。`verifyPublicPage`（canonicalで対象アプリを識別）が成功。題名・共有文・OGP・canonicalが想定どおり。`og.png`・`favicon.svg`・`app.js`・`lib/*.js`・`shared/*`・`meta.json` が200で、正しい種類で返る。`tools/` と `tests/` は、ファイルとしては配られない（一覧ページの代替応答が返る）。一覧ページにDay71が載っている。
+- 本番URLに対して、Day71のE2E 76件を実行：76件すべて成功（3.7分）。外部通信0・CSP違反0・コンソールエラー0。
+- `npm run x:prepare -- --day 71`（本番の公開URLとGitHubのHTTP 200を確認）：本文270/280、返信125・193・236、動画33.1秒。キットはDriveに置いた。Xへの投稿はしていない。
+
