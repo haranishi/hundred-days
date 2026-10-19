@@ -14,7 +14,7 @@
 - **触らない**：上記以外の `lib/*.js`（cases・deduction・diagnose・stage・score・geometry・game・config・hit・transform・shapes）とそのテスト、`shared/`、他のDay、`.kiro/`、`.agent-harness/`（読むだけ）、`scripts/`、ルートの README・package*.json。モデルの変更が必要だと思ったら、**変えずに**、理由と案を最終報告へ書く。
 - **Git は一切変えない**（add・commit・push・branch・stash・reset・checkout など）。設計側が行う。`git status`・`git diff` の閲覧だけはよい。
 - `rm -rf` は環境が拒否する。ファイルを消すときは `rm -f`、またはそのファイルを空にしない。
-- 一時ファイル・画像・ログは、スクラッチパッド配下の**自分専用の固有名のディレクトリ**（例：`<スクラッチパッド>/ui-fix-1/`）へ置く。リポジトリに残さない。リポジトリのファイルへ `/Users/` を含むパスを書かない。
+- 一時ファイル・画像・ログは、スクラッチパッド配下の**自分専用の固有名のディレクトリ**（例：`<スクラッチパッド>/ui-fix-1/`）へ置く。リポジトリに残さない。リポジトリのファイルへ、ホームディレクトリを含む絶対パスを書かない。
 - 依存を足さない。外部フォント・画像・通信なし。CSP は `script-src 'self'; style-src 'self'`：`style="…"` 属性と `<style>` は使えない（CSSOM の `el.style.setProperty()` は使える）。`innerHTML` を使わない。文は `textContent` か DOM API で作る。
 - 配信サーバーは Bash の `&` で起こさない（止まる）。`run_in_background: true` で起動するか、スクリプトの中で spawn して終わったら kill する。E2E は自分でサーバーを spawn する作りなので、そのまま動く。
 - 画面ロック中は Chromium が落ちることがある。落ちたら WebKit（後述の設定）で回す。

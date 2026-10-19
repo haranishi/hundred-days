@@ -28,13 +28,14 @@ stage: { distance, lamp: { x, min, max, start, solution },
          props: [{ id, shape, label, scale, z, y, rot?, decoy?, x: { min, max, start, solution } }], threshold? }
 ```
 `stageOf(caseDef)` が形（polygons）を結びつけた計算用の場面を返す。`start` は開始の配置、`solution` は正解。邪魔な道具の `solution` は壁の端（影が壁の外へ出る位置）。
-物語側は `title / place / summary / intro / witness / sceneNote / footprint / guide('on'|'off') / hints[2] / deductionHint / clues / suspects / culprit / stool / reveal / closing`。`PEOPLE` が名前・職・身長を持つ。
+物語側は `title / place / summary / intro / witness / sceneNote / footprint / guide('on'|'off') / coach / coachNoGuide?（guide が 'on' の夜だけ）/ showsHeight?（夜1だけ true）/ hints[2] / deductionHint / clues / suspects / culprit / stool / reveal / closing`。`PEOPLE` が名前・職・身長を持つ。
 
 ## 推理（`lib/deduction.js`）
 灯りの高さ ＝ 身長 × 0.6 ＋ 踏み台（cm）。
 - `candidatesBeforeReproduction(caseDef)`：アリバイで外れない容疑者（2人以上）。
-- `candidatesAfterReproduction(caseDef, lampHeight)`：灯りの高さが0.5cm以内で合う人（犯人だけ）。
-- `readingOf(caseDef)`：現場図に出す「灯りの高さ→身長」の文。`judge(caseDef, suspectId)`：正誤と文。
+- `matchingByHeight(caseDef, lampHeight)`：アリバイを見ずに、灯りの高さが0.5cm以内で合う人。夜3（椿・久我＝170cm）と夜5（白瀬・柊＝180cm）は2人、ほかは犯人だけ。
+- `candidatesAfterReproduction(caseDef, lampHeight)`：アリバイで外れず、灯りの高さも合う人（犯人だけ）。夜3・夜5は、身長だけでは決まらず、アリバイが決め手になる。
+- `readingOf(caseDef)`：再現した灯りの高さの文。`showsHeight` の夜（夜1）だけ「灯りの高さ→身長」の計算まで書き、夜2以降は「灯りの高さは96cm。これを提げた人の身長は？」で止める。`judge(caseDef, suspectId)`：正誤と文。
 
 ## セッション（`lib/stage.js`・実装する）
 1つの夜の操作の状態。DOMと時計に依存しない。
@@ -45,10 +46,17 @@ select(session, id)                  // 'lamp' か、すべれる道具のid。�
 setLamp(session, ly) / setPropX(session, id, x)   // 範囲に収め、評価を更新。固定の道具は無視
 nudge(session, direction, step)      // direction は -1 か +1。選択中が灯りなら高さ、道具なら横位置
 reset(session)                       // 開始の配置へ。guideOn・usedGuide・hintsUsed は変えない
-toggleGuide(session) / useHint(session)  // usedGuide（夜1の初期ガイドは数えない）・hintsUsed を更新
-confirmSolve(session)                // 評価が success のときだけ、正解の配置へそろえて status を 'solved' にする
+toggleGuide(session)                 // usedGuide（夜1の初期ガイドは数えない）を更新
+useHint(session) → { index, kind, text }  // hintsUsed を増やす。奇数回目は kind:'diagnosis'（diagnose の名指し）、偶数回目は kind:'principle'（hints[] を順に）
+confirmSolve(session)                // 評価が success のときだけ、灯りと必要な道具を正解の配置へそろえて status を 'solved' にする。邪魔な道具は置いた位置のまま
 movableIds(session)                  // ['lamp', ...すべれる道具のid]
+describeAssessment(session) → { step, label, detail, fills }  // fills：4つの目盛りの満ち具合（0〜1）。IoU が各段の範囲のどこにあるかで連続して伸びる
 ```
+
+## ヒントの名指し（`lib/diagnose.js`）
+`diagnose(stage, target, assessment, arrangement) → { kind:'lamp'|'prop'|'decoy'|'none', id, text }`。正解の配置との差で、いちばんずれているものを1つ選ぶ。
+灯りと道具のずれは同じ物差し（5cm）で比べ、邪魔な道具の影が壁に残っていれば、30cm分のずれより先に名指しする。文は向きと大きさの3段（ほんの少し・少し・だいぶ）で、cmの数字は言わない。
+例：「灯りが、だいぶ高い。下げてみよう。」「外套が、少し右にずれている。左へすべらせよう。」「山高帽の影が、壁に残っている。壁の右の端へすべらせよう。」
 評価は配置が変わるたびに更新する（`assessment = evaluate(...)`）。合格後に一定時間（`SOLVE_HOLD_MS`）保たれ、操作が止まっていることの判断はRuntimeが行い、`confirmSolve` を呼ぶ。
 
 ## 進行（`lib/game.js`・実装する）
