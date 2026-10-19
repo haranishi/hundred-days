@@ -1469,26 +1469,37 @@ for (const width of [360, 390]) {
     await expect(page.locator('#verdict-stars .stars-reason')).toHaveText('星1つ（ガイドを使った・ヒントを使った・誤った推理があった）');
     // 理由は1つずつ折り返さない範囲。
     await expect(page.locator('#verdict-stars .stars-reason > .nb')).toHaveText(['星1つ', 'ガイドを使った', 'ヒントを使った', '誤った推理があった']);
-    // 折り返しは「・」のあとか「（」の前だけ。
-    const breaks = await page.locator('#verdict-stars .stars-reason').evaluate((node) => {
-      const chars = [];
-      const walker = document.createTreeWalker(node, NodeFilter.SHOW_TEXT);
-      for (let text = walker.nextNode(); text; text = walker.nextNode()) {
-        for (let i = 0; i < text.data.length; i += 1) {
-          const range = document.createRange();
-          range.setStart(text, i);
-          range.setEnd(text, i + 1);
-          const rect = range.getClientRects()[0];
-          if (rect) chars.push({ ch: text.data[i], top: rect.top, height: rect.height });
+    // 折り返しは「・」のあとか「（」の前だけ。字体によって（CIのLinuxは日本語の字体が無く、字が細い）、この幅でも1行に収まるので、
+    // 折り返しが起きるまで幅を狭めてから測る（CSSOM。CSPに反しない）。
+    const { widthEm, breaks } = await page.locator('#verdict-stars .stars-reason').evaluate((node) => {
+      node.style.display = 'inline-block';
+      node.style.textAlign = 'left';
+      const measure = () => {
+        const chars = [];
+        const walker = document.createTreeWalker(node, NodeFilter.SHOW_TEXT);
+        for (let text = walker.nextNode(); text; text = walker.nextNode()) {
+          for (let i = 0; i < text.data.length; i += 1) {
+            const range = document.createRange();
+            range.setStart(text, i);
+            range.setEnd(text, i + 1);
+            const rect = range.getClientRects()[0];
+            if (rect) chars.push({ ch: text.data[i], top: rect.top, height: rect.height });
+          }
         }
+        const found = [];
+        for (let k = 1; k < chars.length; k += 1) {
+          if (chars[k].top >= chars[k - 1].top + chars[k - 1].height / 2) found.push(`${chars[k - 1].ch}｜${chars[k].ch}`);
+        }
+        return found;
+      };
+      for (const em of [10, 8, 6, 4, 3]) {
+        node.style.width = `${em}em`;
+        const found = measure();
+        if (found.length > 0) return { widthEm: em, breaks: found };
       }
-      const found = [];
-      for (let k = 1; k < chars.length; k += 1) {
-        if (chars[k].top >= chars[k - 1].top + chars[k - 1].height / 2) found.push(`${chars[k - 1].ch}｜${chars[k].ch}`);
-      }
-      return found;
+      return { widthEm: 0, breaks: [] };
     });
-    expect(breaks.length, 'the reasons wrap at this width').toBeGreaterThan(0);
+    expect(breaks.length, `the reasons wrap once the width is narrowed (${widthEm}em)`).toBeGreaterThan(0);
     for (const item of breaks) expect(item.startsWith('・') || item.endsWith('（'), item).toBe(true);
   });
 }
