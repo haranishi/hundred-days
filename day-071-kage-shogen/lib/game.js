@@ -31,9 +31,23 @@ export function loadProgress(storage) {
   }
 }
 
-export function saveProgress(storage, progress) {
+// 2つの進行を統合する：解決した夜は両方の和、星は夜ごとに高いほう、last は current を優先する。
+export function mergeProgress(stored, current) {
+  const merged = emptyProgress();
+  for (const id of caseIds) {
+    const stars = Math.max(stored.cleared[id]?.stars ?? 0, current.cleared[id]?.stars ?? 0);
+    if (stars > 0) merged.cleared[id] = { stars };
+  }
+  merged.last = current.last ?? stored.last;
+  return merged;
+}
+
+// 通常は、保存済みの進行と統合して書く。別のタブで解決した夜と最高の星を、このタブの古い進行で上書きして消さないため。
+// 進行のリセットだけは、統合せずに置き換える（{ replace: true }）。
+export function saveProgress(storage, progress, { replace = false } = {}) {
   try {
-    storage.setItem(STORAGE_KEY, JSON.stringify(cleanProgress(progress)));
+    const next = replace ? cleanProgress(progress) : mergeProgress(loadProgress(storage), cleanProgress(progress));
+    storage.setItem(STORAGE_KEY, JSON.stringify(next));
     return true;
   } catch {
     return false;

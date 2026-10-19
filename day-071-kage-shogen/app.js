@@ -133,8 +133,13 @@ function initializeRuntime() {
     return row;
   }
 
-  function persistProgress() {
-    if (!saveProgress(storage, progress)) byId('storage-note').hidden = false;
+  // 保存済みの進行と統合して書き、別のタブで進んだ分も取り込む。リセットだけは置き換える。
+  function persistProgress({ replace = false } = {}) {
+    if (!saveProgress(storage, progress, { replace })) {
+      byId('storage-note').hidden = false;
+      return;
+    }
+    progress = loadProgress(storage);
   }
 
   function requestRender() {
@@ -728,6 +733,20 @@ function initializeRuntime() {
     resumeActivity();
   }
 
+  // ドラッグの途中で壁の大きさが変わったら（端末の回転・ウィンドウの変更）、いまの位置と新しい倍率から基準を取り直す。
+  // 取り直さないと、描画は新しい倍率なのに、動きは開始時の倍率のままになり、指の動きと影の動きがずれる。
+  function rebaseDrag() {
+    if (!drag || !session) return;
+    const rect = wall.getBoundingClientRect();
+    if (rect.width <= 0 || rect.height <= 0) return;
+    const { scale } = createTransform(rect.width, rect.height);
+    if (scale === drag.scale) return;
+    drag.startValue = drag.id === 'lamp' ? session.arrangement.ly : session.arrangement.xs[drag.id];
+    drag.startX = drag.lastX;
+    drag.startY = drag.lastY;
+    drag.scale = scale;
+  }
+
   wall.addEventListener('pointerdown', (event) => {
     if (!playing() || drag || event.isPrimary === false || event.button !== 0) return;
     const rect = wall.getBoundingClientRect();
@@ -738,7 +757,7 @@ function initializeRuntime() {
     endNudge(false);
     select(session, id);
     drag = {
-      pointerId: event.pointerId, id, startX: event.clientX, startY: event.clientY,
+      pointerId: event.pointerId, id, startX: event.clientX, startY: event.clientY, lastX: event.clientX, lastY: event.clientY,
       startValue: id === 'lamp' ? session.arrangement.ly : session.arrangement.xs[id], scale: transform.scale,
     };
     wall.setPointerCapture(event.pointerId);
@@ -749,6 +768,8 @@ function initializeRuntime() {
   });
   wall.addEventListener('pointermove', (event) => {
     if (!playing() || !drag || drag.pointerId !== event.pointerId) return;
+    drag.lastX = event.clientX;
+    drag.lastY = event.clientY;
     if (drag.id === 'lamp') setLamp(session, drag.startValue - (event.clientY - drag.startY) / drag.scale);
     else setPropX(session, drag.id, drag.startValue + (event.clientX - drag.startX) / drag.scale);
     afterChange();
@@ -882,7 +903,7 @@ function initializeRuntime() {
     if (!byId('reset-dialog').open) return;
     stopActivity();
     progress = emptyProgress();
-    persistProgress();
+    persistProgress({ replace: true });
     usage.clear();
     goHome();
     closeDialog(byId('reset-dialog'));
@@ -902,6 +923,7 @@ function initializeRuntime() {
   });
   window.addEventListener('resize', () => {
     for (const renderer of renderers.values()) renderer?.resize();
+    rebaseDrag();
     requestRender();
     for (const dialog of document.querySelectorAll('dialog[open]')) updateMoreHint(dialog);
     if (phase === 'stage') {
@@ -912,6 +934,7 @@ function initializeRuntime() {
   if (typeof ResizeObserver === 'function') {
     const observer = new ResizeObserver((entries) => {
       for (const entry of entries) renderers.get(entry.target)?.resize();
+      rebaseDrag();
       requestRender();
     });
     for (const canvas of renderers.keys()) observer.observe(canvas);

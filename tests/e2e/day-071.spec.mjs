@@ -1773,3 +1773,61 @@ for (const [width, height] of [[640, 360], [844, 390], [1440, 900]]) {
     }
   });
 }
+
+// 別のタブ（古い進行を持ったまま開いている）が、保存のたびに、先のタブで解決した夜と最高の星を消さない。
+test('a stale tab never erases another tab\'s solved night or best stars', async ({ page, context }) => {
+  await open(page);
+  const stale = await context.newPage();
+  await open(stale);
+  const stored = async () => JSON.parse(await page.evaluate((key) => localStorage.getItem(key), STORAGE_KEY));
+  // タブA：夜1を星3で解決する。
+  await start(page, 0);
+  await reproduce(page, 0);
+  await finish(page, 0);
+  expect((await stored()).cleared.rack).toEqual({ stars: 3 });
+  // タブB（何も解決していない進行のまま）：夜1を開くだけで保存が走るが、記録は消えない。
+  await stale.locator('[data-case-id="rack"]').click();
+  await expectPhase(stale, 'briefing');
+  expect((await stored()).cleared.rack).toEqual({ stars: 3 });
+  // タブBが、ヒントと誤答つきの星1で夜1を解いても、最高の星は下がらない。
+  await stale.locator('#start-case').click();
+  await expectPhase(stale, 'stage');
+  await stale.locator('#hint').click();
+  await reproduce(stale, 0);
+  await stale.locator('#to-deduction').click();
+  await expectPhase(stale, 'deduction');
+  await stale.locator('[data-suspect-id="saeki"] .accuse').click();
+  await stale.locator(`[data-suspect-id="${CASES[0].culprit}"] .accuse`).click();
+  await expectPhase(stale, 'verdict');
+  await expect(stale.locator('#verdict-stars')).toContainText('星1つ');
+  expect((await stored()).cleared.rack).toEqual({ stars: 3 });
+  // タブBの事件簿は、保存済みの進行を取り込んで、最高の星を出す。
+  await stale.locator('#to-home').click();
+  await expect(stale.locator('#total-stars')).toHaveText('3');
+  await stale.close();
+});
+
+// ドラッグの途中で壁の大きさが変わっても（端末の回転・ウィンドウの変更）、指の動きと影の動きがずれない。
+test('a drag keeps following the finger at the new display scale when the wall is resized mid-drag', async ({ page }) => {
+  await open(page, { unlocked: 1 });
+  await start(page, 1);
+  const arrangement = startArrangement(1);
+  const stage = stageOf(CASES[1]);
+  const first = await wallSpace(page);
+  const point = first.transform.toScreen(stage.lamp.x, arrangement.ly);
+  await page.mouse.move(first.box.x + point.x, first.box.y + point.y);
+  await page.mouse.down();
+  await page.mouse.move(first.box.x + point.x, first.box.y + point.y - 10, { steps: 2 });
+  const before = await lampValue(page);
+  expect(before).toBeGreaterThan(arrangement.ly);
+  await page.setViewportSize({ width: 340, height: 640 });
+  await page.waitForFunction((width) => document.getElementById('wall').getBoundingClientRect().width < width - 20, first.box.width);
+  const resized = await wallSpace(page);
+  expect(resized.transform.scale).toBeLessThan(first.transform.scale - 0.05);
+  const last = (await page.evaluate(() => window.day071Test.pointer)).pointermove;
+  await page.mouse.move(last.x, last.y - 20, { steps: 2 });
+  await page.mouse.up();
+  const after = await lampValue(page);
+  // さらに20px上へ動かした分は、新しい倍率で換算した値（開始時の倍率なら約2cm少なくなる）。
+  expect(Math.abs((after - before) - 20 / resized.transform.scale)).toBeLessThanOrEqual(0.75);
+});

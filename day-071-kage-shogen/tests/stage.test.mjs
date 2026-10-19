@@ -478,3 +478,45 @@ test('近いのに合格しないとき、近さの文は「灯りの高さ」�
   setPropX(umbrella, 'bowler', 140);
   assert.equal(describeAssessment(umbrella).detail, '関係ない道具の影が残っている');
 });
+
+test('成功の確定は、そろえたあとの配置も合格のままにする（許容ぎりぎりで合格した邪魔な道具は、同じ側の端へ寄せる）', () => {
+  // 灯り109cmで、地球儀の影の面積が許容の上限に近い配置は、灯りを108cmへそろえると、影が大きくなって許容を超える。
+  const session = createSession(CASES[4]);
+  setLamp(session, 109);
+  for (const [id, x] of [['umbrella', 120], ['coat', 120], ['boots', 120], ['bowler', 10], ['globe', 196]]) setPropX(session, id, x);
+  assert.equal(session.assessment.success, true);
+  assert.equal(confirmSolve(session), true);
+  assert.equal(session.status, 'solved');
+  assert.equal(session.assessment.success, true, 'そろえたあとも合格');
+  assert.equal(session.assessment.decoysOk, true);
+  assert.equal(session.arrangement.ly, 108);
+  // 地球儀は右側にあったので、右の端へ。山高帽は、動かさない（左端のまま）。
+  assert.equal(session.arrangement.xs.globe, 232);
+  assert.equal(session.arrangement.xs.bowler, 10);
+});
+
+test('夜5：邪魔な道具の置き場所と灯りの高さをどう組み合わせても、合格した配置は、確定したあとも合格で、左右は入れ替わらない', () => {
+  const caseDef = CASES[4];
+  let confirmed = 0;
+  for (const ly of [104, 106, 108, 110, 112]) {
+    for (const bowler of [8, 10, 30, 50, 70]) {
+      for (const globe of [130, 150, 170, 190, 200, 210, 220, 232]) {
+        const session = createSession(caseDef);
+        setLamp(session, ly);
+        for (const id of ['umbrella', 'coat', 'boots']) setPropX(session, id, session.stage.props.find((prop) => prop.id === id).x.solution);
+        setPropX(session, 'bowler', bowler);
+        setPropX(session, 'globe', globe);
+        if (!session.assessment.success) continue;
+        const sideOf = (x, prop) => (x < (prop.x.min + prop.x.max) / 2 ? 'left' : 'right');
+        const before = Object.fromEntries(session.stage.props.filter((prop) => prop.decoy).map((prop) => [prop.id, sideOf(session.arrangement.xs[prop.id], prop)]));
+        assert.equal(confirmSolve(session), true);
+        confirmed += 1;
+        assert.equal(session.assessment.success, true, `lamp ${ly} bowler ${bowler} globe ${globe}`);
+        for (const prop of session.stage.props.filter((entry) => entry.decoy)) {
+          assert.equal(sideOf(session.arrangement.xs[prop.id], prop), before[prop.id], `${prop.id} 左右が入れ替わった`);
+        }
+      }
+    }
+  }
+  assert.ok(confirmed >= 20, `確かめた配置が少なすぎる: ${confirmed}`);
+});

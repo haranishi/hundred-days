@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import { CASES } from '../lib/cases.js';
 import {
-  STORAGE_KEY, clearedCount, emptyProgress, isUnlocked, loadProgress, nextIndex, recordClear, saveProgress, starsFor, totalStars,
+  STORAGE_KEY, clearedCount, emptyProgress, isUnlocked, loadProgress, mergeProgress, nextIndex, recordClear, saveProgress, starsFor, totalStars,
 } from '../lib/game.js';
 
 function memoryStorage() {
@@ -164,4 +164,43 @@ test('未知の夜・余分な保存データは捨て、last も既知の夜だ
   }
   storage.data.set(STORAGE_KEY, JSON.stringify({ v: 1, cleared: {}, last: 'hat' }));
   assert.deepEqual(loadProgress(storage), { v: 1, cleared: {}, last: 'hat' });
+});
+
+test('mergeProgress は、解決した夜を両方の和にし、星は夜ごとに高いほうを残し、last は新しいほうを優先する', () => {
+  const stored = recordClear(recordClear(emptyProgress(), 'rack', 3), 'hat', 2);
+  const current = recordClear(emptyProgress(), 'hat', 3);
+  const merged = mergeProgress(stored, current);
+  assert.deepEqual(merged, { v: 1, cleared: { rack: { stars: 3 }, hat: { stars: 3 } }, last: 'hat' });
+  assert.deepEqual(mergeProgress(stored, emptyProgress()).last, stored.last);
+  assert.deepEqual(mergeProgress(emptyProgress(), emptyProgress()), emptyProgress());
+  // 元の2つは変えない。
+  assert.deepEqual(stored.cleared.hat, { stars: 2 });
+});
+
+test('別のタブで解決した夜と星を、古い進行の保存で消さない（リセットだけが消す）', () => {
+  const storage = memoryStorage();
+  // タブA：夜1を星3で解決して保存。
+  assert.equal(saveProgress(storage, recordClear(emptyProgress(), 'rack', 3)), true);
+  // タブB：まだ空の進行のまま、夜1を開いて last を保存する。夜1の記録は消えない。
+  const stale = emptyProgress();
+  assert.equal(saveProgress(storage, { ...stale, last: 'rack' }), true);
+  assert.deepEqual(loadProgress(storage).cleared, { rack: { stars: 3 } });
+  // タブBが夜1を星1で解いても、最高の星は下がらない。
+  assert.equal(saveProgress(storage, recordClear(stale, 'rack', 1)), true);
+  assert.deepEqual(loadProgress(storage).cleared, { rack: { stars: 3 } });
+  // 別の夜は、足される。
+  assert.equal(saveProgress(storage, recordClear(stale, 'hat', 2)), true);
+  assert.deepEqual(loadProgress(storage).cleared, { rack: { stars: 3 }, hat: { stars: 2 } });
+  // 進行のリセットは、統合せずに置き換える。
+  assert.equal(saveProgress(storage, emptyProgress(), { replace: true }), true);
+  assert.deepEqual(loadProgress(storage), emptyProgress());
+});
+
+test('保存先が壊れた値でも、統合の保存は新しい進行を書き、保存できないときは false を返す', () => {
+  const storage = memoryStorage();
+  storage.setItem(STORAGE_KEY, '{broken');
+  assert.equal(saveProgress(storage, recordClear(emptyProgress(), 'rack', 2)), true);
+  assert.deepEqual(loadProgress(storage).cleared, { rack: { stars: 2 } });
+  assert.equal(saveProgress({ getItem: () => null, setItem() { throw new Error('quota'); } }, emptyProgress()), false);
+  assert.equal(saveProgress(null, emptyProgress()), false);
 });

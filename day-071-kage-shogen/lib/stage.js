@@ -2,6 +2,7 @@
 import { stageOf } from './cases.js';
 import { STEP } from './config.js';
 import { diagnose } from './diagnose.js';
+import { maskArea } from './geometry.js';
 import { buildTarget, evaluate, solutionArrangement } from './score.js';
 
 const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
@@ -94,14 +95,27 @@ export function useHint(session) {
 }
 
 // 合格が保たれたら、灯りと必要な道具を正解の位置へそろえる。邪魔な道具は、置いた位置のまま残す
-// （壁の外ならどちらの端でも合格なので、左右を入れ替えない）。
+// （壁の外ならどちらの端でも合格なので、左右を入れ替えない）。ただし、灯りの高さを変えると邪魔な道具の影の位置と大きさも
+// 変わるので、許容ぎりぎりで合格していた道具は、そろえたあとに壁へ残ることがある。そのときだけ、同じ側の壁の端へ寄せる
+// （寄せても合格する。そろえたあとの配置が不合格のまま「解決」にならないようにする）。
 export function confirmSolve(session) {
   if (!session.assessment.success) return false;
-  const solution = solutionArrangement(session.stage);
-  for (const prop of session.stage.props) {
+  const { stage, target } = session;
+  const solution = solutionArrangement(stage);
+  for (const prop of stage.props) {
     if (prop.decoy) solution.xs[prop.id] = session.arrangement.xs[prop.id];
   }
-  session.arrangement = solution;
+  let result = evaluate(stage, target, solution);
+  if (!result.decoysOk) {
+    const limit = stage.threshold.decoyArea * maskArea(target.union);
+    for (const prop of stage.props) {
+      if (!prop.decoy || !(result.parts[prop.id].area > limit)) continue;
+      solution.xs[prop.id] = solution.xs[prop.id] < (prop.x.min + prop.x.max) / 2 ? prop.x.min : prop.x.max;
+    }
+    result = evaluate(stage, target, solution);
+  }
+  // 端へ寄せても合格しないことはない（正解の配置は必ず合格する）が、念のため、全部を正解の配置にそろえる。
+  session.arrangement = result.success ? solution : solutionArrangement(stage);
   session.status = 'solved';
   assess(session);
   return true;
