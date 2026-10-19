@@ -4,7 +4,7 @@ import { CASES, stageOf } from '../lib/cases.js';
 import { castShadows } from '../lib/geometry.js';
 import { solutionArrangement } from '../lib/score.js';
 import { createTransform } from '../lib/transform.js';
-import { createSideRenderer, createSketchRenderer, createWallRenderer, placeTag } from '../lib/view.js';
+import { createSideRenderer, createSketchRenderer, createWallRenderer, placeTag, RULER_FONT_PX } from '../lib/view.js';
 
 // 呼び出しを記録するだけの2D context。プロパティの代入は無視して受け取る。
 function fakeContext() {
@@ -15,6 +15,8 @@ function fakeContext() {
       if (prop === 'calls') return calls;
       if (prop === 'measureText') return (text) => ({ width: String(text).length * 7 });
       if (prop === 'createRadialGradient') return () => ({ addColorStop() {} });
+      // 文字を描いた時点の字体と色も残す（呼び出しの5番目）。
+      if (prop === 'fillText') return (...args) => { calls.push([prop, ...args.slice(0, 3), { font: target.font, fillStyle: target.fillStyle }]); };
       if (prop in target) return target[prop];
       return (...args) => { calls.push([prop, ...args]); };
     },
@@ -89,6 +91,26 @@ test('壁：5夜の開始と正解を、入力を変えずに描き、影の数�
       assert.deepEqual(['50', '100', '150'].filter((text) => texts(canvas.context).includes(text)), ['50', '100', '150'], '身長計の数字');
     }
   }
+});
+
+test('壁：身長計の数字は12px・太さ600で、紙に対して4.5:1以上の濃い色（既定は道具の縁と同じ #6b4f2a）', () => {
+  const stage = stageOf(CASES[0]);
+  const canvas = fakeCanvas();
+  createWallRenderer(canvas).render({ stage, arrangement: startOf(stage), selected: 'lamp' });
+  const numbers = canvas.context.calls.filter(([call, text]) => call === 'fillText' && ['50', '100', '150'].includes(text));
+  assert.equal(numbers.length, 3);
+  for (const [, text, , , drawn] of numbers) {
+    assert.match(drawn.font, new RegExp(`^600 ${RULER_FONT_PX}px `), `${text}: 字の大きさと太さ`);
+    assert.equal(drawn.fillStyle, '#6b4f2a', `${text}: 色`);
+  }
+  assert.ok(RULER_FONT_PX >= 12);
+  // 紙（#efe6cf）に対するコントラスト比。
+  const luminance = (hex) => {
+    const [r, g, b] = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16) / 255).map((c) => (c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4));
+    return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+  };
+  const ratio = (luminance('#efe6cf') + 0.05) / (luminance('#6b4f2a') + 0.05);
+  assert.ok(ratio >= 4.5, `コントラスト比 ${ratio.toFixed(2)}`);
 });
 
 test('壁：選んだ道具の札は、身長計の数字・灯りの玉と重ならない（5夜・開始と途中と正解・3つの大きさ）', () => {
@@ -168,6 +190,19 @@ test('スケッチ：5夜のねらいを塗る', () => {
     createSketchRenderer(canvas).render(stage);
     assert.ok(count(canvas.context, 'rect') > 20, `${item.id}: ねらいの面`);
     assert.ok(count(canvas.context, 'fill') >= 1);
+  }
+});
+
+test('スケッチ：狭くて低い画面の証言ストリップ（72×54）でも描き、非表示（大きさ0）のときは描かない', () => {
+  for (const item of CASES) {
+    const stage = stageOf(item);
+    const small = fakeCanvas({ width: 72, height: 54 });
+    createSketchRenderer(small).render(stage);
+    assert.ok(count(small.context, 'rect') > 20, `${item.id}: 72×54でもねらいの面`);
+    assert.equal(count(small.context, 'strokeRect'), 1, `${item.id}: 枠`);
+    const hidden = fakeCanvas({ width: 0, height: 0 });
+    createSketchRenderer(hidden).render(stage);
+    assert.equal(hidden.context.calls.length, 0, `${item.id}: 非表示のときは何も描かない`);
   }
 });
 

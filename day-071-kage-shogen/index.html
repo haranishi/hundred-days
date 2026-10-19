@@ -48,6 +48,7 @@
     <section id="unsupported" class="notice notice-error" role="alert" hidden>
       <h2>壁を表示できませんでした</h2>
       <p>このブラウザーでは、ゲームの描画を利用できません。ページを再読み込みするか、別のブラウザーで開いてください。</p>
+      <button id="reload" class="button button-secondary notice-action" type="button">再読み込み</button>
     </section>
     <p id="storage-note" class="notice" hidden>このブラウザーでは進行を保存できません。画面を開いている間は、最後まで遊べます。</p>
 
@@ -58,7 +59,7 @@
       <ol id="case-list" class="case-list"></ol>
       <p class="total"><span>合計</span> <strong id="total-stars">0</strong> <span>/ 15</span></p>
       <div class="home-actions">
-        <button id="reset-progress" class="text-button" type="button">進行をリセット</button>
+        <button id="reset-progress" class="button button-secondary button-small" type="button">進行をリセット</button>
       </div>
     </section>
 
@@ -85,7 +86,7 @@
             <div class="witness-text">
               <div class="witness-head">
                 <p class="witness-label">証言のスケッチ</p>
-                <button id="strip-toggle" class="strip-toggle" type="button" aria-expanded="false" aria-controls="strip-quote"><span class="strip-toggle-label">全文を読む</span><span class="strip-toggle-mark" aria-hidden="true">▾</span></button>
+                <button id="strip-toggle" class="strip-toggle" type="button" aria-expanded="false" aria-controls="strip-quote"><span class="strip-pill"><span class="strip-toggle-label">全文を読む</span><span class="strip-toggle-mark" aria-hidden="true">▾</span></span></button>
               </div>
               <p id="strip-quote" class="witness-quote"></p>
             </div>
@@ -115,7 +116,7 @@
           <div class="assist-row">
             <button id="hint" class="button button-secondary" type="button">ヒント</button>
             <button id="guide-toggle" class="button button-secondary" type="button" aria-pressed="false">ガイドを重ねる</button>
-            <button id="reset-stage" class="text-button" type="button">はじめから</button>
+            <button id="reset-stage" class="button button-secondary" type="button">はじめから</button>
           </div>
         </div>
         <aside class="stage-side">
@@ -142,7 +143,7 @@
 
     <section id="deduction-panel" class="panel deduction-panel" aria-labelledby="deduction-title" data-panel="deduction" hidden>
       <p class="eyebrow">DEDUCTION</p>
-      <h2 id="deduction-title" tabindex="-1">灯りを提げていたのは、誰か。</h2>
+      <h2 id="deduction-title" tabindex="-1">灯りを提げたのは、誰か。</h2>
       <ul id="deduction-clues" class="clue-list"></ul>
       <ul id="suspect-list" class="suspect-list"></ul>
       <p id="deduction-message" class="message" role="status" hidden></p>
@@ -184,12 +185,13 @@
       <div class="dialog-header"><div><p class="eyebrow">HOW TO PLAY</p><h2 id="help-title">影を動かして、嘘を暴く</h2></div><button class="close-button" type="button" data-close aria-label="遊び方を閉じる">×</button></div>
       <ol class="help-rules">
         <li><strong>スケッチに重ねる</strong><span>目撃者のスケッチと同じ形になるよう、壁に落ちる影を動かします。</span></li>
-        <li><strong>灯りは上下、道具は左右</strong><span>灯りは足跡の位置で上下にだけ動きます。棚の上の道具は、左右にすべらせられます。</span></li>
+        <li><strong>灯りは上下、道具は左右</strong><span>灯りは足跡の位置で上下にだけ動きます。灯りを上げると影は下がり、下げると影は上がります。棚の上の道具は、左右にすべらせられます。</span></li>
         <li><strong>近い物ほど、大きく動く</strong><span>灯りに近い道具ほど、影は大きく、速く動きます。</span></li>
         <li><strong>身長を読む</strong><span>再現できたら、灯りの<span class="nb">高さを6割で</span>割ります。それが、灯りを提げた人の身長です。</span></li>
       </ol>
       <p class="dialog-note">灯りの玉や道具をつかんでドラッグ、画面の『上げる・下げる』ボタン、パソコンでは壁をクリックしてから矢印キー（<span class="nb">Shiftで5cm</span>）のどれでもできます。</p>
-      <p class="dialog-note">ガイド・ヒント・誤った推理を使うと、星が減ります。<span class="nb">夜1の</span>最初のガイドは減りません。</p>
+      <p class="dialog-note">ガイド・ヒント・誤った推理を使うと、星が減ります。<span class="nb">夜1の</span>ガイドは練習用なので、何度出し入れしても減りません。</p>
+      <p class="more-hint" aria-hidden="true" hidden>↓ 続きがあります</p>
     </div>
   </dialog>
 
@@ -199,7 +201,8 @@
       <p class="dialog-lead">影証言を共有する</p>
       <p class="dialog-note">灯りを動かして影を再現し、灯りの高さから犯人の身長を割り<span class="nb">出す。5つの</span>夜の影絵×推理パズル。</p>
       <div id="share"></div>
-      <div class="manual-copy"><label for="share-url">アプリのURL</label><input id="share-url" type="url" value="https://hundred-days.pages.dev/day-071-kage-shogen/" readonly aria-describedby="manual-copy-note"><p id="manual-copy-note">コピーできない場合は、このURLを選択して手動でコピーできます。</p></div>
+      <div class="manual-copy"><label for="share-url">アプリのURL</label><textarea id="share-url" rows="2" readonly spellcheck="false" aria-describedby="manual-copy-note">https://hundred-days.pages.dev/day-071-kage-shogen/</textarea><p id="manual-copy-note">コピーできない場合は、このURLを選択して手動でコピーできます。</p></div>
+      <p class="more-hint" aria-hidden="true" hidden>↓ 続きがあります</p>
     </div>
   </dialog>
 

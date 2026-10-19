@@ -48,8 +48,15 @@ function initializeRuntime() {
   let visual = null;
   let flash = 0;
   let announcedBand = '';
-  // 注記の欄に出しているヒントの文（空ならその夜の一言）。操作しても消さず、次のヒント・はじめから・夜の出入りで替わる。
-  let hintText = '';
+  // 注記の欄に出しているヒント（null ならその夜の一言）。{ tag: 「ヒントN：」（「ここまで」には付けない）, text }。
+  // 操作しても消さず、次のヒント・はじめから・夜の出入りで替わる。
+  let noteHint = null;
+  // 動かない向きの矢印キーを押したときの案内（4秒だけ注記の欄に出す。ヒントが出ているときは出さない）。
+  let axisNotice = '';
+  let axisTimer = null;
+  // 夜ごとの補助の使用歴（ガイド・ヒント・誤答・考え方）。夜を出て入り直しても、解決するまで星の計算に使う。
+  // ページを開いている間だけ（端末には保存しない）。解決したとき・進行をリセットしたときに消す。
+  const usage = new Map();
   const dialogOrigins = new Map();
   const hasDialog = () => document.querySelector('dialog[open]') !== null;
   const active = () => !windowBlurred && !document.hidden && !hasDialog();
@@ -59,6 +66,16 @@ function initializeRuntime() {
   const setText = (id, value) => {
     const node = byId(id);
     if (node.textContent !== String(value)) node.textContent = String(value);
+  };
+  // ボタンの文言（折り返してよい所で区切った配列）と、星の代償「（★−1）」（少し小さい字）。textContent は「ヒント（★−1）」のまま。
+  // 狭い列でボタンが縮むときは、代償を次の行へ送り、文言は区切りの所（<wbr>）でだけ折り返す。
+  const setLabel = (id, parts, cost = '') => {
+    const node = byId(id);
+    const text = parts.join('');
+    if (node.textContent === text + cost && node.firstElementChild?.className === 'label') return;
+    const label = element('span', 'label');
+    parts.forEach((part, index) => label.append(...(index > 0 ? [document.createElement('wbr')] : []), part));
+    node.replaceChildren(label, ...(cost ? [element('span', 'cost', cost)] : []));
   };
 
   function element(tag, className = '', text) {
@@ -249,6 +266,14 @@ function initializeRuntime() {
     showPhase('home');
   }
 
+  // 使用歴を覚える（補助を使うたびに呼ぶ）。
+  function rememberUsage() {
+    if (!session) return;
+    usage.set(session.caseId, {
+      usedGuide: session.usedGuide, hintsUsed: session.hintsUsed, shownHints: [...session.shownHints], wrongAnswers, deductionHintUsed,
+    });
+  }
+
   function startBriefing(index) {
     if (!supported || !isUnlocked(progress, index) || hasDialog()) return;
     stopActivity();
@@ -257,13 +282,23 @@ function initializeRuntime() {
     session = createSession(caseDef);
     wrongAnswers = 0;
     deductionHintUsed = false;
+    // 入り直した夜：画面は初めからにするが、使った補助は星の計算と「次のヒント」・ヒントの重複防止に引き継ぐ。
+    const saved = usage.get(caseDef.id);
+    if (saved) {
+      session.usedGuide = saved.usedGuide;
+      session.hintsUsed = saved.hintsUsed;
+      session.shownHints = [...saved.shownHints];
+      wrongAnswers = saved.wrongAnswers;
+      deductionHintUsed = saved.deductionHintUsed;
+    }
     announcedBand = '';
     restoreDeductionMessage();
     byId('suspect-list').replaceChildren();
-    byId('deduction-hint').disabled = false;
+    byId('deduction-hint').disabled = deductionHintUsed;
     setText('deduction-hint', '考え方を見る（★−1）');
-    setText('deduction-hint-text', '');
-    byId('deduction-hint-text').hidden = true;
+    if (deductionHintUsed) setRich('deduction-hint-text', caseDef.deductionHint);
+    else setText('deduction-hint-text', '');
+    byId('deduction-hint-text').hidden = !deductionHintUsed;
     const witness = witnessOf(caseDef);
     setText('briefing-place', caseDef.place);
     setText('briefing-title', caseTitle());
@@ -306,6 +341,35 @@ function initializeRuntime() {
       });
       return button;
     }));
+    revealedChip = null;
+    updateChipOverflow();
+  }
+
+  // 狭い画面のチップは1段の横スクロール。続きがある側を data-more で示し（CSS が端をぼかす）、選んだチップは見える所まで送る。
+  // ページは縦にスクロールさせない（scrollIntoView を使わず、列の scrollLeft だけを動かす）。
+  let revealedChip = null;
+  function updateChipOverflow() {
+    const row = byId('item-select');
+    const more = [];
+    if (row.scrollLeft > 1) more.push('left');
+    if (row.scrollLeft + row.clientWidth < row.scrollWidth - 1) more.push('right');
+    const value = more.join(' ');
+    if (row.dataset.more !== value) row.dataset.more = value;
+  }
+
+  function revealSelectedChip() {
+    if (!session || revealedChip === session.selected) return;
+    revealedChip = session.selected;
+    const row = byId('item-select');
+    const chip = row.querySelector(`[data-item="${session.selected}"]`);
+    if (chip && row.scrollWidth > row.clientWidth + 1) {
+      const area = row.getBoundingClientRect();
+      const box = chip.getBoundingClientRect();
+      const margin = 28; // 端のぼかしの幅より内側に入れる
+      if (box.left < area.left + margin) row.scrollLeft -= area.left + margin - box.left;
+      else if (box.right > area.right - margin) row.scrollLeft += box.right - (area.right - margin);
+    }
+    updateChipOverflow();
   }
 
   function startStage() {
@@ -320,10 +384,38 @@ function initializeRuntime() {
       ...ruleClues(caseDef).map((clue) => clueElement(clue.kind, clue.text)),
     );
     byId('clues').open = caseDef.no === 1;
-    hintText = '';
+    noteHint = null;
+    clearAxisNotice();
     buildChips();
+    byId('item-select').scrollLeft = 0;
     showPhase('stage');
     afterChange();
+    updateChipOverflow();
+  }
+
+  function clearAxisNotice() {
+    clearTimeout(axisTimer);
+    axisTimer = null;
+    axisNotice = '';
+  }
+
+  // 動かない向きの矢印キー：何も起きないままにせず、動く向きと選び方を4秒だけ伝える。ヒントが出ているときは読み上げだけ。
+  function showAxisNotice() {
+    const onlyLamp = movableIds(session).length === 1;
+    const message = session.selected !== 'lamp'
+      ? '道具は左右だけ動きます。灯りは、選ぶ札から選べます。'
+      : onlyLamp ? '灯りは上下だけ動きます。↑↓キーで動かそう。' : '灯りは上下だけ動きます。道具は、選ぶ札（←→キー）から選べます。';
+    setText('feedback', message);
+    if (noteHint) return;
+    clearAxisNotice();
+    axisNotice = message;
+    updateNote();
+    const current = session;
+    axisTimer = setTimeout(() => {
+      axisTimer = null;
+      axisNotice = '';
+      if (session === current && phase === 'stage') updateNote();
+    }, 4000);
   }
 
   // 証言ストリップの開閉。開くと引用の全文と、大きいスケッチ。夜に入るたびに閉じる。
@@ -337,19 +429,20 @@ function initializeRuntime() {
     requestRender();
   }
 
-  // 注記の欄：ヒントを押したあとはヒントの文、それ以外はその夜の一言（ガイドを消している夜1は、消したとき用の一言）。
+  // 注記の欄：ヒントを押したあとはヒントの文、矢印キーの案内（4秒）、それ以外はその夜の一言
+  // （ガイドを消している夜1は、消したとき用の一言）。文は内側の span に入れ、欄の縦の中央に置く。
   function updateNote() {
     const caseDef = session.caseDef;
     const note = byId('note-text');
-    const kind = hintText ? 'hint' : 'coach';
     const coach = caseDef.guide === 'on' && !session.guideOn && caseDef.coachNoGuide ? caseDef.coachNoGuide : caseDef.coach;
-    const text = hintText || coach;
-    if (note.dataset.kind === kind && note.textContent === text) return;
+    const kind = noteHint ? 'hint' : axisNotice ? 'notice' : 'coach';
+    const tag = noteHint?.tag ?? '';
+    const text = noteHint?.text ?? (axisNotice || coach);
+    if (note.dataset.kind === kind && note.textContent === tag + text) return;
     note.dataset.kind = kind;
-    if (kind === 'hint') {
-      const [, tag, body] = /^(ヒント\d+：)(.*)$/su.exec(text) ?? [null, '', text];
-      note.replaceChildren(...(tag ? [element('strong', 'note-tag', tag)] : []), ...richNodes(body));
-    } else note.replaceChildren(...richNodes(text));
+    const body = element('span', 'note-body');
+    body.append(...(tag ? [element('strong', 'note-tag', tag)] : []), ...richNodes(text));
+    note.replaceChildren(body);
   }
 
   function chooseItem(id) {
@@ -398,6 +491,7 @@ function initializeRuntime() {
       chip.tabIndex = selected ? 0 : -1;
       chip.disabled = session.status !== 'playing';
     }
+    revealSelectedChip();
     for (const [id, label, icon] of [
       ['nudge-minus', isLamp ? '下げる' : '左へ', isLamp ? 'nudge-down' : 'nudge-left'],
       ['nudge-plus', isLamp ? '上げる' : '右へ', isLamp ? 'nudge-up' : 'nudge-right'],
@@ -407,12 +501,25 @@ function initializeRuntime() {
       button.querySelector('.nudge-icon').className = `nudge-icon ${icon}`;
       button.disabled = session.status !== 'playing';
     }
+    // ガイド：夜1は練習用で星を減らさないので「ガイドを重ねる」、夜2以降は代償を書いて短く「ガイド（★−1）」。
     byId('guide-toggle').setAttribute('aria-pressed', String(session.guideOn));
-    setText('guide-toggle', session.guideOn ? 'ガイドを消す'
-      : CASES[caseIndex].no === 1 && !session.usedGuide ? 'ガイドを重ねる' : 'ガイドを重ねる（★−1）');
-    setText('hint', session.hintsUsed > 0 ? '次のヒント' : 'ヒント（★−1）');
+    const practice = session.caseDef.guide === 'on';
+    setLabel('guide-toggle', session.guideOn ? ['ガイドを', '消す'] : practice ? ['ガイドを', '重ねる'] : ['ガイド'], session.guideOn || practice ? '' : '（★−1）');
+    // 2回目以降のヒントは星を追加で減らさない。見た目は「次のヒント」のまま、説明を title と読み上げに持たせる。
+    const hintButton = byId('hint');
+    setLabel('hint', session.hintsUsed > 0 ? ['次の', 'ヒント'] : ['ヒント'], session.hintsUsed > 0 ? '' : '（★−1）');
+    if (session.hintsUsed > 0) {
+      const note = 'ヒントは最初の1回で星が1つ減ります。2回目以降は追加で減りません';
+      if (hintButton.title !== note) {
+        hintButton.title = note;
+        hintButton.setAttribute('aria-label', `次のヒント。${note}`);
+      }
+    } else if (hintButton.hasAttribute('title')) {
+      hintButton.removeAttribute('title');
+      hintButton.removeAttribute('aria-label');
+    }
     byId('guide-toggle').disabled = session.status !== 'playing';
-    byId('hint').disabled = session.status !== 'playing';
+    hintButton.disabled = session.status !== 'playing';
     return text;
   }
 
@@ -525,6 +632,7 @@ function initializeRuntime() {
           return;
         }
         wrongAnswers += 1;
+        rememberUsage();
         card.classList.add('is-wrong');
         badge.hidden = false;
         accuse.disabled = true;
@@ -548,11 +656,18 @@ function initializeRuntime() {
     const stars = starsFor({ usedGuide: session.usedGuide, hintsUsed, wrongAnswers });
     progress = recordClear(progress, caseDef.id, stars);
     persistProgress();
+    // 星を決めたので、この夜の使用歴は消す（遊び直すときは、補助なしから始まる）。
+    usage.delete(caseDef.id);
     setText('verdict-title', caseTitle());
     setRich('verdict-text', caseDef.closing);
+    // 理由は1つずつ折り返さない範囲にし、あいだの「・」でだけ折り返す（「誤った推理があ／った」と割れない）。
     const reasons = [session.usedGuide && 'ガイドを使った', hintsUsed > 0 && 'ヒントを使った', wrongAnswers > 0 && '誤った推理があった'].filter(Boolean);
-    const detail = reasons.length ? reasons.join('・') : 'ガイド・ヒント・誤答なし';
-    byId('verdict-stars').replaceChildren(starsElement(stars), richElement('span', '', `星${stars}つ（${detail}）`));
+    const reasonNodes = reasons.length
+      ? reasons.flatMap((reason, index) => [...(index > 0 ? ['・'] : []), element('span', 'nb', reason)])
+      : [element('span', 'nb', 'ガイド・ヒント・誤答なし')];
+    const summary = element('span', 'stars-reason');
+    summary.append(...richNodes(`星${stars}つ`), '（', ...reasonNodes, '）');
+    byId('verdict-stars').replaceChildren(starsElement(stars), summary);
     setText('next-case', caseIndex === CASES.length - 1 ? 'エピローグへ →' : '次の夜へ →');
     showPhase('verdict');
   }
@@ -590,6 +705,15 @@ function initializeRuntime() {
     if (phase === 'stage' && session?.status === 'solved') enterSolved();
     dialogOrigins.set(dialog, event.currentTarget);
     dialog.showModal();
+    updateMoreHint(dialog);
+  }
+
+  // ダイアログの中身が画面に入らないときだけ、下端に「↓ 続きがあります」を出す（最後までスクロールしたら消す）。
+  function updateMoreHint(dialog) {
+    const hint = dialog.querySelector('.more-hint');
+    if (!hint) return;
+    const more = dialog.open && dialog.scrollHeight - dialog.clientHeight - dialog.scrollTop > 8;
+    if (hint.hidden === more) hint.hidden = !more;
   }
 
   function restoreDialogFocus(dialog) {
@@ -637,7 +761,10 @@ function initializeRuntime() {
     if (!playing() || event.ctrlKey || event.metaKey || event.altKey || !event.key.startsWith('Arrow')) return;
     event.preventDefault();
     const directions = session.selected === 'lamp' ? { ArrowUp: 1, ArrowDown: -1 } : { ArrowRight: 1, ArrowLeft: -1 };
-    if (!directions[event.key]) return;
+    if (!directions[event.key]) {
+      showAxisNotice();
+      return;
+    }
     endDrag(false);
     endNudge(false);
     nudge(session, directions[event.key], event.shiftKey ? STEP.coarse : STEP.fine);
@@ -682,25 +809,32 @@ function initializeRuntime() {
     if (!playing()) return;
     const wasUsed = session.usedGuide;
     toggleGuide(session);
+    rememberUsage();
     afterChange();
     if (!wasUsed && session.usedGuide) setText('feedback', 'ガイドを使ったので、この夜の星が1つ減ります');
   });
-  // ヒント：押すたびに「いまのずれの名指し」と「その夜の考え方」を交互に、注記の欄（壁の下・操作の上）へ出す。
+  // ヒント：押すたびに、まだ出していない文を1つ（いまのずれの名指し → その夜の考え方 → 「ここまで」）、
+  // 注記の欄（壁の下・操作の上）へ出す。「ここまで」には番号を振らない。
   byId('hint').addEventListener('click', () => {
     if (!playing()) return;
     const hint = useHint(session);
-    hintText = `ヒント${hint.index + 1}：${hint.text}`;
+    noteHint = hint.kind === 'end' ? { tag: '', text: hint.text } : { tag: `ヒント${hint.index + 1}：`, text: hint.text };
+    clearAxisNotice();
+    rememberUsage();
     afterChange();
-    setText('feedback', hintText);
+    setText('feedback', noteHint.tag + noteHint.text);
   });
   byId('reset-stage').addEventListener('click', () => {
     if (phase !== 'stage' || !session || hasDialog()) return;
     stopActivity();
     reset(session);
-    hintText = '';
+    noteHint = null;
+    clearAxisNotice();
     afterChange();
     setText('feedback', 'はじめからにしました');
   });
+  byId('item-select').addEventListener('scroll', updateChipOverflow, { passive: true });
+  byId('reload').addEventListener('click', () => location.reload());
   byId('strip-toggle').addEventListener('click', () => {
     if (phase !== 'stage' || hasDialog()) return;
     setStripOpen(byId('witness-strip').dataset.open !== 'true');
@@ -708,9 +842,13 @@ function initializeRuntime() {
   byId('deduction-hint').addEventListener('click', () => {
     if (phase !== 'deduction' || deductionHintUsed || hasDialog()) return;
     deductionHintUsed = true;
-    setRich('deduction-hint-text', CASES[caseIndex].deductionHint);
-    byId('deduction-hint-text').hidden = false;
+    rememberUsage();
+    const answer = byId('deduction-hint-text');
+    setRich(answer, CASES[caseIndex].deductionHint);
+    answer.hidden = false;
     byId('deduction-hint').disabled = true;
+    // 答えはボタンの下に出るので、画面の外なら見える所まで送る（動きを減らす設定では瞬時に）。
+    answer.scrollIntoView({ block: 'nearest', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
   });
   byId('start-case').addEventListener('click', startStage);
   byId('to-deduction').addEventListener('click', enterDeduction);
@@ -726,6 +864,7 @@ function initializeRuntime() {
   ]) {
     const dialog = byId(dialogId);
     for (const origin of origins) byId(origin).addEventListener('click', (event) => openDialog(event, dialog));
+    dialog.addEventListener('scroll', () => updateMoreHint(dialog), { passive: true });
     dialog.querySelector('[data-close]').addEventListener('click', () => closeDialog(dialog));
     dialog.addEventListener('cancel', (event) => {
       event.preventDefault();
@@ -744,6 +883,7 @@ function initializeRuntime() {
     stopActivity();
     progress = emptyProgress();
     persistProgress();
+    usage.clear();
     goHome();
     closeDialog(byId('reset-dialog'));
   });
@@ -763,6 +903,11 @@ function initializeRuntime() {
   window.addEventListener('resize', () => {
     for (const renderer of renderers.values()) renderer?.resize();
     requestRender();
+    for (const dialog of document.querySelectorAll('dialog[open]')) updateMoreHint(dialog);
+    if (phase === 'stage') {
+      revealedChip = null;
+      if (session) revealSelectedChip();
+    }
   });
   if (typeof ResizeObserver === 'function') {
     const observer = new ResizeObserver((entries) => {

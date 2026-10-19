@@ -6,7 +6,7 @@ import { createTransform } from './transform.js';
 import { propBounds } from './hit.js';
 
 const DEFAULT_COLORS = {
-  stage: '#12102a', panel: '#1b1840', wall: '#efe6cf', wallEdge: '#cdbf9d', ruler: '#8a7a52', shadow: '#1d1a3a',
+  stage: '#12102a', panel: '#1b1840', wall: '#efe6cf', wallEdge: '#cdbf9d', ruler: '#6b4f2a', shadow: '#1d1a3a',
   prop: '#e8d2a2', propLine: '#6b4f2a', lamp: '#ffb84d', stamp: '#d6402f', text: '#f1ecff', muted: '#b9b2d8', focus: '#ffd36e',
 };
 const CSS_NAMES = {
@@ -14,6 +14,8 @@ const CSS_NAMES = {
   prop: '--prop', propLine: '--prop-line', lamp: '--lamp', stamp: '--stamp', text: '--text', muted: '--muted', focus: '--focus',
 };
 const FONT = 'system-ui, -apple-system, "Hiragino Sans", "Yu Gothic", sans-serif';
+// 身長計の数字の大きさ（px）。紙の上で読める大きさ（画面評価：12px以上）。
+export const RULER_FONT_PX = 12;
 
 function readColors(canvas) {
   if (typeof getComputedStyle !== 'function') return { ...DEFAULT_COLORS };
@@ -53,6 +55,8 @@ function setup(canvas) {
 
 // 非表示のパネルにあるcanvasは大きさが0になる。小さすぎるときは描かない（半径が負になって例外になるため）。
 const drawable = ({ width, height }) => width >= 80 && height >= 60;
+// スケッチは塗りと枠だけ（半径を使わない）なので、狭くて低い画面の証言ストリップ（72×54）でも描く。
+const sketchDrawable = ({ width, height }) => width >= 40 && height >= 30;
 
 const worldSpace = (ctx, t, dpr) => ctx.setTransform(t.scale * dpr, 0, 0, -t.scale * dpr, (t.offsetX - VIEW.minX * t.scale) * dpr, (t.offsetY + VIEW.maxY * t.scale) * dpr);
 const screenSpace = (ctx, dpr) => ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -381,11 +385,12 @@ export function createWallRenderer(canvas) {
       }
     }
 
-    // 身長計（左端）。数字は壁の色で縁取り、影や枠の上でも読めるようにする。数字の位置は、札が覆わないように覚えておく。
+    // 身長計（左端）。数字は紙に対して4.5:1以上の濃い色（--ruler）・12px・太さ600。壁の色で縁取り、影や枠の上でも読めるようにする。
+    // 数字の位置は、札が覆わないように覚えておく（字の大きさに合わせた矩形）。
     ctx.strokeStyle = colors.ruler;
     ctx.fillStyle = colors.ruler;
     ctx.lineWidth = 1;
-    ctx.font = `600 10px ${FONT}`;
+    ctx.font = `600 ${RULER_FONT_PX}px ${FONT}`;
     ctx.textAlign = 'left';
     ctx.textBaseline = 'middle';
     const wallLeft = t.toScreen(0, 0).x;
@@ -405,7 +410,8 @@ export function createWallRenderer(canvas) {
       ctx.fillText(String(cm), wallLeft + 12, y);
       ctx.lineWidth = 1;
       ctx.strokeStyle = colors.ruler;
-      rulerNumbers.push({ left: wallLeft + 10, right: wallLeft + 14 + ctx.measureText(String(cm)).width, top: y - 8, bottom: y + 8 });
+      const half = RULER_FONT_PX * 0.75;
+      rulerNumbers.push({ left: wallLeft + 9, right: wallLeft + 15 + ctx.measureText(String(cm)).width, top: y - half, bottom: y + half });
     }
     // 灯りの高さの目印：身長計の左の余白に琥珀の三角、目盛りの上に短い線（数値は壁の下の読み出しにある。文字は描かない）。
     const markY = t.toScreen(0, lamp.y).y;
@@ -479,7 +485,7 @@ export function createSketchRenderer(canvas) {
 
   function render(stage) {
     const { width, height, dpr, colors } = state;
-    if (!drawable(state)) return;
+    if (!sketchDrawable(state)) return;
     const scale = Math.min(width / WALL.width, height / WALL.height);
     const ox = (width - WALL.width * scale) / 2;
     const oy = (height - WALL.height * scale) / 2;

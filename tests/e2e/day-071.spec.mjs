@@ -2,9 +2,9 @@ import { expect, test } from '@playwright/test';
 import { spawn } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { CASES, EPILOGUE, stageOf } from '../../day-071-kage-shogen/lib/cases.js';
-import { readingOf, suspectsOf, witnessOf } from '../../day-071-kage-shogen/lib/deduction.js';
+import { judge, readingOf, suspectsOf, witnessOf } from '../../day-071-kage-shogen/lib/deduction.js';
 import { hitTest, propScreenRect } from '../../day-071-kage-shogen/lib/hit.js';
-import { createSession, describeAssessment, useHint } from '../../day-071-kage-shogen/lib/stage.js';
+import { createSession, describeAssessment, HINT_END, setLamp, useHint } from '../../day-071-kage-shogen/lib/stage.js';
 import { createTransform } from '../../day-071-kage-shogen/lib/transform.js';
 
 const ROOT = fileURLToPath(new URL('../../', import.meta.url));
@@ -130,6 +130,26 @@ async function open(page, { unlocked = 0, canvasFailure = null, failureCanvas = 
 }
 
 const expectPhase = (page, phase) => expect(page.locator('#app')).toHaveAttribute('data-phase', phase);
+// 色のトークン（app.css の :root）を、getComputedStyle の書き方で。
+const AMBER = 'rgb(255, 184, 77)';
+const LINE_STRONG = 'rgb(106, 99, 166)';
+// 'rgb(…)' / 'rgba(…)' / '#rrggbb' どうしのコントラスト比（WCAG）。
+function contrastRatio(a, b) {
+  const channels = (color) => {
+    const hex = /^#([0-9a-f]{6})$/i.exec(color.trim());
+    if (hex) return [0, 2, 4].map((i) => parseInt(hex[1].slice(i, i + 2), 16));
+    return color.match(/[\d.]+/g).slice(0, 3).map(Number);
+  };
+  const luminance = (color) => {
+    const [r, g, b] = channels(color).map((value) => {
+      const c = value / 255;
+      return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
+    });
+    return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+  };
+  const [light, dark] = [luminance(a), luminance(b)].sort((x, y) => y - x);
+  return (light + 0.05) / (dark + 0.05);
+}
 const lampValue = async (page) => Number(await page.locator('#lamp-readout').getAttribute('data-ly'));
 const itemValue = async (page) => {
   const text = await page.locator('#item-readout').textContent();
@@ -240,7 +260,9 @@ test('night one finishes by keyboard, refutes an alibi suspect locally and opens
   await open(page);
   await start(page);
   await expect(page.locator('#item-select [data-item]')).toHaveCount(1);
-  await expect(page.locator('#lamp-readout')).toHaveAttribute('data-ly', '150');
+  // 夜1の灯りは135cmから始まる（正解の99cmまで、Shiftの5cm刻み7回と1cm1回）。
+  expect(CASES[0].stage.lamp.start).toBe(135);
+  await expect(page.locator('#lamp-readout')).toHaveAttribute('data-ly', String(CASES[0].stage.lamp.start));
   // 最初の一言は注記の欄に出し、近さの欄はいつも近さの言葉を出す（一言に置き換えない）。
   await expect(page.locator('#note-text')).toHaveText(CASES[0].coach);
   await expect(page.locator('#note-text')).toHaveAttribute('data-kind', 'coach');
@@ -251,8 +273,9 @@ test('night one finishes by keyboard, refutes an alibi suspect locally and opens
   await expect(page.locator('#clues')).toHaveAttribute('open', '');
   await expect(page.locator('#stage-clues [data-kind]')).toHaveCount(5);
   await expect(page.locator('#stage-clues [data-kind="witness"]')).toContainText(witnessOf(CASES[0]).quote);
-  for (let i = 0; i < 10; i += 1) await page.keyboard.press('Shift+ArrowDown');
-  await page.keyboard.press('ArrowDown');
+  const down = CASES[0].stage.lamp.start - CASES[0].stage.lamp.solution;
+  for (let i = 0; i < Math.floor(down / 5); i += 1) await page.keyboard.press('Shift+ArrowDown');
+  for (let i = 0; i < down % 5; i += 1) await page.keyboard.press('ArrowDown');
   await expect(page.locator('#lamp-readout')).toHaveAttribute('data-ly', '99');
   await expectPhase(page, 'solved');
   await expect(page.locator('#reading-text')).toContainText('165cm');
@@ -329,7 +352,7 @@ test('movable props use chips, arrow keys and dragging; reset returns the starti
   expect(await itemValue(page)).toBe(Math.round(31 + (pointer.pointermove.x - pointer.pointerdown.x) / transform.scale));
   await page.locator('#reset-stage').click();
   await expect(page.locator('#item-readout')).toHaveText('帽子 横 30cm');
-  await expect(page.locator('#lamp-readout')).toHaveAttribute('data-ly', '150');
+  await expect(page.locator('#lamp-readout')).toHaveAttribute('data-ly', String(CASES[2].stage.lamp.start));
   await expect(page.locator('#note-text')).toHaveText(CASES[2].coach);
   await expect(page.locator('#band-text')).toHaveText(startLabel(2));
   await expect(page.locator('#feedback')).toHaveText('はじめからにしました');
@@ -343,7 +366,7 @@ test('movable props use chips, arrow keys and dragging; reset returns the starti
   await page.mouse.down();
   await page.mouse.move(box.x + point.x - 30, box.y + point.y + 30);
   await page.mouse.up();
-  expect(await lampValue(page)).toBe(150);
+  expect(await lampValue(page)).toBe(CASES[0].stage.lamp.start);
 });
 
 test('night three finishes with the lamp and all movable props, awarding three stars', async ({ page }) => {
@@ -386,7 +409,8 @@ test('night five requires both decoy shadows to leave before success and reaches
 test('paid guide and hints preserve their use across reset and reduce stars by category', async ({ page }) => {
   await open(page, { unlocked: 1 });
   await start(page, 1);
-  await expect(page.locator('#guide-toggle')).toHaveText('ガイドを重ねる（★−1）');
+  // 夜2以降は短く「ガイド（★−1）」（押したあとは「ガイドを消す」）。
+  await expect(page.locator('#guide-toggle')).toHaveText('ガイド（★−1）');
   await page.locator('#guide-toggle').click();
   await expect(page.locator('#guide-toggle')).toHaveAttribute('aria-pressed', 'true');
   await expect(page.locator('#guide-toggle')).toHaveText('ガイドを消す');
@@ -486,6 +510,14 @@ for (const failure of [
     await expect(page.locator('#help-dialog')).toBeVisible();
     await page.locator('#help-dialog [data-close]').click();
     await expect(page.locator('#help')).toBeFocused();
+    // 案内の「再読み込み」ボタンで、ページを読み直せる。
+    const reload = page.locator('#unsupported #reload');
+    await expect(reload).toBeVisible();
+    await expect(reload).toHaveText('再読み込み');
+    expect((await reload.boundingBox()).height).toBeGreaterThanOrEqual(44);
+    await Promise.all([page.waitForEvent('load'), reload.click()]);
+    await expect(page.locator('#unsupported')).toBeVisible();
+    await expect(page.locator('#case-list [data-case-id]')).toHaveCount(5);
   });
 }
 
@@ -597,7 +629,7 @@ test('long press repeats after its delay, stops on leaving and adds no pointer c
   const box = await button.boundingBox();
   await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
   await page.mouse.down();
-  expect(await lampValue(page)).toBe(151);
+  expect(await lampValue(page)).toBe(CASES[0].stage.lamp.start + 1);
   await expect.poll(() => lampValue(page)).toBeGreaterThan(152);
   await page.mouse.move(box.x - 10, box.y - 10);
   const stopped = await lampValue(page);
@@ -606,7 +638,7 @@ test('long press repeats after its delay, stops on leaving and adds no pointer c
   await page.mouse.up();
   expect(await lampValue(page)).toBe(stopped);
   await button.click();
-  expect(await lampValue(page)).toBe(Math.min(165, stopped + 1));
+  expect(await lampValue(page)).toBe(Math.min(CASES[0].stage.lamp.max, stopped + 1));
 });
 
 for (const interrupt of ['dialog', 'blur', 'hidden', 'reset', 'home']) {
@@ -614,10 +646,11 @@ for (const interrupt of ['dialog', 'blur', 'hidden', 'reset', 'home']) {
     await open(page);
     await start(page);
     // Apply all keystrokes and interrupt in one task, before the real 350ms hold can fire.
-    await page.evaluate((action) => {
+    const down = CASES[0].stage.lamp.start - CASES[0].stage.lamp.solution;
+    await page.evaluate(({ action, coarse, fine }) => {
       const wall = document.getElementById('wall');
-      for (let i = 0; i < 10; i += 1) wall.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', shiftKey: true, bubbles: true, cancelable: true }));
-      wall.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true, cancelable: true }));
+      for (let i = 0; i < coarse; i += 1) wall.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', shiftKey: true, bubbles: true, cancelable: true }));
+      for (let i = 0; i < fine; i += 1) wall.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true, cancelable: true }));
       if (action === 'dialog') document.getElementById('help').click();
       if (action === 'blur') window.dispatchEvent(new Event('blur'));
       if (action === 'hidden') {
@@ -626,7 +659,7 @@ for (const interrupt of ['dialog', 'blur', 'hidden', 'reset', 'home']) {
       }
       if (action === 'reset') document.getElementById('reset-stage').click();
       if (action === 'home') document.getElementById('back').click();
-    }, interrupt);
+    }, { action: interrupt, coarse: Math.floor(down / 5), fine: down % 5 });
     await page.waitForTimeout(1500);
     await expectPhase(page, interrupt === 'home' ? 'home' : 'stage');
     if (interrupt === 'dialog') {
@@ -642,7 +675,7 @@ for (const interrupt of ['dialog', 'blur', 'hidden', 'reset', 'home']) {
     await start(page);
     await page.waitForTimeout(1500);
     await expectPhase(page, 'stage');
-    expect(await lampValue(page)).toBe(150);
+    expect(await lampValue(page)).toBe(CASES[0].stage.lamp.start);
   });
 }
 
@@ -669,7 +702,11 @@ test('deduction exclusions do not judge, the stool stays in clue order and its h
   await expect(page.locator('#reading-text')).toHaveText(readingOf(CASES[3]));
   await expect(page.locator('#reading-text')).not.toContainText('175cm');
   await page.locator('#to-deduction').click();
+  // 見出しは「灯りを提げたのは、誰か。」（2行目が3字だけにならない）。
+  await expect(page.locator('#deduction-title')).toHaveText('灯りを提げたのは、誰か。');
   expect(await page.locator('#deduction-clues [data-kind]').evaluateAll((nodes) => nodes.map((node) => node.dataset.kind))).toEqual(['rule', 'stool', 'alibi', 'result']);
+  // 夜4の踏み台の手がかりは、式を書かずに事実だけ。
+  await expect(page.locator('#deduction-clues [data-kind="stool"] .clue-text')).toHaveText('犯人は、20cmの踏み台の上に立って灯りを提げた。');
   const exclude = page.locator('[data-suspect-id="kiritani"] .exclude');
   await expect(exclude).toHaveText('外す ✕');
   await exclude.click();
@@ -677,6 +714,21 @@ test('deduction exclusions do not judge, the stool stays in clue order and its h
   await expect(exclude).toHaveText('✕ 外した（戻す）');
   // 外した人も薄くしない（肩書き・証言の文字はそのまま読める濃さ）。
   expect(await page.locator('[data-suspect-id="kiritani"]').evaluate((card) => getComputedStyle(card).opacity)).toBe('1');
+  // 外した人の「この人だ」は枠だけのボタン（琥珀の塗りと影なし、文字はカードの地に対して4.5:1以上）。押せるまま。
+  const look = (selector) => page.locator(selector).evaluate((node) => {
+    const style = getComputedStyle(node);
+    return { background: style.backgroundColor, color: style.color, border: style.borderTopColor, shadow: style.boxShadow };
+  });
+  const subdued = await look('[data-suspect-id="kiritani"] .accuse');
+  expect(subdued.background).toBe('rgba(0, 0, 0, 0)');
+  expect(subdued.shadow).toBe('none');
+  const cardBackground = await page.locator('[data-suspect-id="kiritani"]').evaluate((card) => getComputedStyle(card).backgroundColor);
+  expect(contrastRatio(subdued.color, cardBackground)).toBeGreaterThanOrEqual(4.5);
+  expect((await look('[data-suspect-id="saeki"] .accuse')).background).toBe(AMBER);
+  await expect(page.locator('[data-suspect-id="kiritani"] .accuse')).toBeEnabled();
+  // 「✕ 外した（戻す）」の枠は、ほかの「外す ✕」と同じ色（押せる部品の枠 --line-strong）。
+  expect((await look('[data-suspect-id="kiritani"] .exclude')).border).toBe(LINE_STRONG);
+  expect((await look('[data-suspect-id="saeki"] .exclude')).border).toBe(LINE_STRONG);
   await expectPhase(page, 'deduction');
   await page.locator('#deduction-hint').click();
   await expect(page.locator('#deduction-hint-text')).toHaveText(CASES[3].deductionHint);
@@ -720,11 +772,17 @@ function expectStill(before, after, label) {
   for (const id of CONTROL_IDS) expect(Math.abs(after[id] - before[id]), `${label}: ${id}`).toBeLessThanOrEqual(1);
 }
 // 要素の中の文字が何行に並んでいるか（文字の矩形の上端を数える）。
+// 要素の箱（注記の内側の span など）の矩形は数えない：文字の行とは上端がずれ、1行多く数えてしまう。
 const textLines = (page, selector) => page.locator(selector).evaluate((node) => {
-  const range = document.createRange();
-  range.selectNodeContents(node);
-  const tops = [...range.getClientRects()].filter((rect) => rect.width > 0).map((rect) => Math.round(rect.top));
-  return new Set(tops.map((top) => tops.find((other) => Math.abs(other - top) <= 3))).size;
+  const tops = [];
+  const walker = document.createTreeWalker(node, NodeFilter.SHOW_TEXT);
+  for (let text = walker.nextNode(); text; text = walker.nextNode()) {
+    const range = document.createRange();
+    range.selectNodeContents(text);
+    for (const rect of range.getClientRects()) if (rect.width > 0) tops.push(rect.top);
+  }
+  tops.sort((a, b) => a - b);
+  return tops.reduce((lines, top) => (lines.length && top - lines[lines.length - 1] < 6 ? lines : [...lines, top]), []).length;
 });
 async function expectInView(page, selector) {
   const box = await page.locator(selector).boundingBox();
@@ -779,7 +837,7 @@ for (const width of [360, 390, 768, 1440]) {
     await start(page, 0);
     let before = await controlTops(page);
     await dragItem(page, 0, startArrangement(0), 'lamp', 0, -20);
-    expect(await lampValue(page)).toBeLessThan(150);
+    expect(await lampValue(page)).toBeLessThan(CASES[0].stage.lamp.start);
     expectStill(before, await controlTops(page), 'first drag');
     before = await controlTops(page);
     await page.locator('#hint').click();
@@ -886,9 +944,17 @@ for (const width of [360, 390]) {
     await reproduce(page, 4);
     await finish(page, 4);
     await page.waitForTimeout(1100);
+    // 判子（傾いた外形）は、ヘッダと下の見出しから12px以上離れる。
+    let clearance = await stampClearance(page, '#verdict-panel', '#verdict-title');
+    expect(clearance.above, 'verdict stamp above').toBeGreaterThanOrEqual(12);
+    expect(clearance.below, 'verdict stamp below').toBeGreaterThanOrEqual(12);
     await page.locator('#next-case').click();
     await expectPhase(page, 'epilogue');
     await page.waitForTimeout(1100);
+    await page.evaluate(() => window.scrollTo(0, 0));
+    clearance = await stampClearance(page, '#epilogue-panel', '#epilogue-panel > .eyebrow');
+    expect(clearance.above, 'epilogue stamp above').toBeGreaterThanOrEqual(12);
+    expect(clearance.below, 'epilogue stamp below').toBeGreaterThanOrEqual(12);
     const frames = await page.evaluate(() => window.day071Overflow);
     for (const phase of ['verdict', 'epilogue']) expect(frames.filter((frame) => frame.phase === phase).length, phase).toBeGreaterThan(10);
     expect(frames.filter((frame) => frame.scrollWidth > frame.innerWidth)).toEqual([]);
@@ -901,9 +967,10 @@ for (const width of [360, 390]) {
   });
 }
 
-test('nights three and five show two suspects of the matching height, and only the alibi tells them apart', async ({ page }) => {
+test('night three shows two suspects of the matching height, and only the alibi tells them apart', async ({ page }) => {
   await open(page, { unlocked: 4 });
-  for (const index of [2, 4]) {
+  // 同じ身長の2人を、アリバイだけで分けるのは夜3だけ（夜5は小数まで計算して分ける。下の試験）。
+  for (const index of [2]) {
     const caseDef = CASES[index];
     await start(page, index);
     await reproduce(page, index);
@@ -926,6 +993,30 @@ test('nights three and five show two suspects of the matching height, and only t
     await page.locator('#to-home').click();
     await expectPhase(page, 'home');
   }
+});
+
+test('night five: the alibi rules out 188cm, and the decimal reading of 108cm separates 178cm from 180cm', async ({ page }) => {
+  await open(page, { unlocked: 4 });
+  const caseDef = CASES[4];
+  await start(page, 4);
+  await reproduce(page, 4);
+  await page.locator('#to-deduction').click();
+  await expectPhase(page, 'deduction');
+  await expect(page.locator('#deduction-clues [data-kind="result"] .clue-text')).toHaveText(readingOf(caseDef));
+  expect(await page.locator('#suspect-list .suspect-meta').allTextContents()).toEqual(['書生・178cm', '大工・180cm', '郵便配達・188cm']);
+  // 蓮見（188cm）はアリバイで外れる。
+  const alibi = caseDef.clues.find((clue) => clue.kind === 'alibi');
+  expect(alibi.rulesOut).toEqual(['hasumi']);
+  await page.locator('[data-suspect-id="hasumi"] .accuse').click();
+  await expect(page.locator('[data-suspect-id="hasumi"] #deduction-message')).toContainText(alibi.text);
+  // 日向（178cm）は、6割が106.8cm（小数1桁）で、再現した108cmと合わない。
+  await page.locator('[data-suspect-id="hinata"] .accuse').click();
+  await expect(page.locator('[data-suspect-id="hinata"] #deduction-message')).toHaveText(judge(caseDef, 'hinata').message);
+  await expect(page.locator('[data-suspect-id="hinata"] #deduction-message')).toContainText('身長178cmの6割は106.8cm。再現した灯りは108cmで、合わない。');
+  await expectPhase(page, 'deduction');
+  await page.locator('[data-suspect-id="hiiragi"] .accuse').click();
+  await expectPhase(page, 'verdict');
+  await expect(page.locator('#verdict-stars')).toContainText('星2つ（誤った推理があった）');
 });
 
 test('the case book highlights only the next night to open, keeps solved and locked nights readable', async ({ page }) => {
@@ -1021,7 +1112,23 @@ for (const [width, height] of [[360, 640], [390, 844]]) {
     await expect(toggle).toHaveAttribute('aria-controls', 'strip-quote');
     await expect(toggle).toContainText('全文を読む');
     expect((await toggle.boundingBox()).height).toBeGreaterThanOrEqual(44);
-    expect(await quote.evaluate((node) => node.scrollHeight > node.clientHeight + 1), 'clamped while closed').toBe(true);
+    // 「全文を読む」は枠付きの小さなピル（見た目の高さ36px以上）。
+    expect((await page.locator('#strip-toggle .strip-pill').boundingBox()).height).toBeGreaterThanOrEqual(36);
+    if (height <= 700) {
+      // 高さ700px以下：閉じているあいだは引用を隠し、スケッチを小さく（72×54）。スケッチは小さくても描く。
+      await expect(quote).toBeHidden();
+      const sketch = await page.locator('#sketch').boundingBox();
+      expect(Math.round(sketch.width)).toBe(72);
+      expect(Math.round(sketch.height)).toBe(54);
+    } else {
+      expect(await quote.evaluate((node) => node.scrollHeight > node.clientHeight + 1), 'clamped while closed').toBe(true);
+    }
+    await expect.poll(() => page.locator('#sketch').evaluate((canvas) => {
+      const { data } = canvas.getContext('2d').getImageData(0, 0, canvas.width, canvas.height);
+      let ink = 0;
+      for (let i = 0; i < data.length; i += 4) if (data[i] + data[i + 1] + data[i + 2] < 240) ink += 1;
+      return ink;
+    }), 'the sketch silhouette is drawn').toBeGreaterThan(20);
     await toggle.click();
     await expect(toggle).toHaveAttribute('aria-expanded', 'true');
     await expect(toggle).toContainText('たたむ');
@@ -1036,7 +1143,11 @@ for (const [width, height] of [[360, 640], [390, 844]]) {
   });
 }
 
-test('360×640 and 390×844 first views hold the wall, closeness, note, chips and controls', async ({ page }) => {
+// 「ヒント／ガイド／はじめから」が1段に並んでいるか（3つの上端が同じ）。
+const assistOneRow = (page) => page.evaluate(() => new Set(['hint', 'guide-toggle', 'reset-stage']
+  .map((id) => Math.round(document.getElementById(id).getBoundingClientRect().top))).size === 1);
+
+test('360×640: every night shows the nudges whole (8px clear of the bottom on nights 1–4) and the hint, guide and reset row; 390×844 keeps that row on one line', async ({ page }) => {
   await page.setViewportSize({ width: 360, height: 640 });
   await open(page, { unlocked: 4 });
   const bottom = async (selector) => {
@@ -1044,26 +1155,52 @@ test('360×640 and 390×844 first views hold the wall, closeness, note, chips an
     return box.y + box.height;
   };
   for (let index = 0; index < CASES.length; index += 1) {
+    const night = `night ${index + 1}`;
     await page.locator(`[data-case-id="${CASES[index].id}"]`).click();
     await expectPhase(page, 'briefing');
     expect(await bottom('#start-case'), `briefing ${index + 1}`).toBeLessThanOrEqual(640);
+    // 幅560px未満の導入では、スケッチをカードの中央に置く（左に寄って右が空かない）。
+    expect(Math.abs(await centerX(page, '#sketch-brief') - await centerX(page, '#briefing-panel .witness-card')), `briefing sketch ${night}`).toBeLessThanOrEqual(1);
     await page.locator('#start-case').click();
     await expectPhase(page, 'stage');
     expect(await scrollY(page)).toBe(0);
     // 題は見た目から隠すが、読み上げ用に残す（stage の見出し）。
     await expect(page.locator('#stage-title')).toHaveText(`第${index + 1}夜　${CASES[index].title}`);
     expect((await page.locator('#stage-title').boundingBox()).height).toBeLessThanOrEqual(1);
-    for (const selector of ['#wall', '#band-text', '#note-text', '#item-select']) expect(await bottom(selector), `${selector} night ${index + 1}`).toBeLessThanOrEqual(640);
-    const nudge = await page.locator('#nudge-minus').boundingBox();
-    if (index < 4) expect(nudge.y + nudge.height, `nudges night ${index + 1}`).toBeLessThanOrEqual(640);
-    else expect(640 - nudge.y, 'night 5 shows at least half of the nudges').toBeGreaterThanOrEqual(nudge.height / 2);
+    for (const selector of ['#wall', '#band-text', '#note-text', '#item-select']) expect(await bottom(selector), `${selector} ${night}`).toBeLessThanOrEqual(640);
+    // 「下げる/上げる」は全部見える（夜1〜4は下端から8px以上離れる）。
+    for (const selector of ['#nudge-minus', '#nudge-plus']) {
+      const box = await page.locator(selector).boundingBox();
+      expect(box.y, `${selector} ${night}`).toBeGreaterThanOrEqual(0);
+      expect(box.y + box.height, `${selector} ${night}`).toBeLessThanOrEqual(index < 4 ? 632 : 640);
+    }
+    // 「ヒント／ガイド／はじめから」の行も最初の画面に入り、1段に並ぶ。
+    for (const selector of ['#hint', '#guide-toggle', '#reset-stage']) expect(await bottom(selector), `${selector} ${night}`).toBeLessThanOrEqual(640);
+    expect(await assistOneRow(page), `assist row ${night}`).toBe(true);
+    // 注記の欄は2行分の高さで固定（幅360で2行に収まる）。
+    expect(await textLines(page, '#note-text'), `note ${night}`).toBeLessThanOrEqual(2);
+    // 道具のチップは1段（段が増えない）。続きがあれば右端をぼかす。
+    const chips = await page.locator('#item-select').evaluate((row) => ({
+      tops: new Set([...row.children].map((chip) => Math.round(chip.offsetTop))).size,
+      more: row.dataset.more, overflow: row.scrollWidth > row.clientWidth + 1,
+    }));
+    expect(chips.tops, `chips ${night}`).toBe(1);
+    expect(chips.more, `chips ${night}`).toBe(chips.overflow ? 'right' : '');
     await page.locator('#back').click();
   }
   await page.setViewportSize({ width: 390, height: 844 });
-  for (let index = 0; index < 4; index += 1) {
+  for (let index = 0; index < CASES.length; index += 1) {
     await start(page, index);
     expect(await scrollY(page)).toBe(0);
     for (const selector of ['#hint', '#guide-toggle', '#reset-stage']) expect(await bottom(selector), `${selector} night ${index + 1}`).toBeLessThanOrEqual(844);
+    // 夜2以降は「ガイド（★−1）」。押す前・ヒントのあと・ガイドを付けたあとも1段のまま。
+    await expect(page.locator('#guide-toggle')).toHaveText(index === 0 ? 'ガイドを消す' : 'ガイド（★−1）');
+    expect(await assistOneRow(page), `assist row night ${index + 1}`).toBe(true);
+    await page.locator('#hint').click();
+    await expect(page.locator('#hint')).toHaveText('次のヒント');
+    expect(await assistOneRow(page), `assist row after a hint, night ${index + 1}`).toBe(true);
+    await page.locator('#guide-toggle').click();
+    expect(await assistOneRow(page), `assist row after the guide, night ${index + 1}`).toBe(true);
     await page.locator('#back').click();
   }
 });
@@ -1083,6 +1220,23 @@ for (const width of [360, 390]) {
     // メーターは3つ満ちて、4つ目は空（合格だけが4つ目を満たす）。
     expect(await page.locator('#meter i').evaluateAll((ticks) => ticks.map((tick) => Number(tick.style.getPropertyValue('--fill'))))).toEqual([1, 1, 1, 0]);
     expectStill(before, await controlTops(page), 'longest closeness line');
+    // ほかの理由の文も、「近い」「あと少し」と並べて1行に収まる（app.js と同じ組み方で、文だけ差し替えて測る）。
+    const fits = await page.locator('#band-text').evaluate((node, details) => {
+      const saved = [...node.childNodes];
+      const result = [];
+      for (const label of ['近い', 'あと少し']) {
+        for (const detail of details) {
+          const span = document.createElement('span');
+          span.className = 'band-detail';
+          span.textContent = `（${detail}）`;
+          node.replaceChildren(label, span);
+          result.push({ text: node.textContent, fits: node.scrollWidth <= node.clientWidth });
+        }
+      }
+      node.replaceChildren(...saved);
+      return result;
+    }, ['関係ない道具の影が残っている', '灯りの高さがずれている', '道具の横位置がずれている', 'ずれている道具がある']);
+    expect(fits.filter((item) => !item.fits)).toEqual([]);
   });
 }
 
@@ -1123,3 +1277,499 @@ test('the tab icon is the SVG favicon and the header share button reads 共有',
   expect(Math.round(box.x)).toBe(16);
   expect(Math.round(box.width)).toBe(328);
 });
+
+// ---- 改修2（第2周の評価の指摘）の回帰防止 ----
+
+// 判子（傾いた外形）と、上のヘッダ・下の見出しとのあいだ。
+const stampClearance = (page, panel, next) => page.evaluate(([panelSelector, nextSelector]) => {
+  const header = document.querySelector('.app-header').getBoundingClientRect();
+  const stamp = document.querySelector(`${panelSelector} .stamp`).getBoundingClientRect();
+  const below = document.querySelector(nextSelector).getBoundingClientRect();
+  return { above: stamp.top - header.bottom, below: below.top - stamp.bottom };
+}, [panel, next]);
+// 要素の中心の x。
+const centerX = (page, selector) => page.locator(selector).evaluate((node) => {
+  const rect = node.getBoundingClientRect();
+  return (rect.left + rect.right) / 2;
+});
+
+test('hints go from the worst offset to each line of the night, then an unnumbered end, and never repeat a line', async ({ page }) => {
+  await open(page, { unlocked: 1 });
+  await start(page, 1);
+  const caseDef = CASES[1];
+  expect(caseDef.hints).toHaveLength(2);
+  const model = createSession(caseDef);
+  const expected = [useHint(model), useHint(model), useHint(model)];
+  expect(expected.map((hint) => hint.kind)).toEqual(['diagnosis', 'principle', 'principle']);
+  for (const hint of expected) {
+    await page.locator('#hint').click();
+    const line = `ヒント${hint.index + 1}：${hint.text}`;
+    await expect(page.locator('#note-text')).toHaveText(line);
+    await expect(page.locator('#note-text .note-tag')).toHaveText(`ヒント${hint.index + 1}：`);
+    await expect(page.locator('#feedback')).toHaveText(line);
+  }
+  expect(new Set(expected.map((hint) => hint.text)).size).toBe(3);
+  expect(expected.slice(1).map((hint) => hint.text)).toEqual(caseDef.hints);
+  // 出し尽くしたら「ここまで」。番号（ヒントN：）を付けない。何度押しても同じ。
+  for (let i = 0; i < 2; i += 1) {
+    expect(useHint(model).kind).toBe('end');
+    await page.locator('#hint').click();
+    await expect(page.locator('#note-text')).toHaveText(HINT_END);
+    await expect(page.locator('#note-text')).toHaveAttribute('data-kind', 'hint');
+    await expect(page.locator('#note-text .note-tag')).toHaveCount(0);
+    await expect(page.locator('#feedback')).toHaveText(HINT_END);
+  }
+  // 配置が変わって名指しの文が替わったら、また名指しを先に出す（番号は押した回数の続き）。
+  await moveTo(page, 'lamp', 88);
+  await expectPhase(page, 'stage');
+  setLamp(model, 88);
+  const renamed = useHint(model);
+  expect(renamed.kind).toBe('diagnosis');
+  expect(expected.map((hint) => hint.text)).not.toContain(renamed.text);
+  await page.locator('#hint').click();
+  await expect(page.locator('#note-text')).toHaveText(`ヒント${renamed.index + 1}：${renamed.text}`);
+});
+
+test('night one guide is practice: turning it off and on again and again still ends with three stars', async ({ page }) => {
+  await open(page);
+  await start(page);
+  await expect(page.locator('#guide-toggle')).toHaveText('ガイドを消す');
+  for (let i = 0; i < 5; i += 1) await page.locator('#guide-toggle').click();
+  await expect(page.locator('#guide-toggle')).toHaveText('ガイドを重ねる');
+  await expect(page.locator('#feedback')).not.toHaveText('ガイドを使ったので、この夜の星が1つ減ります');
+  // 出て入り直しても、練習のガイドは使用に数えない。
+  await page.locator('#back').click();
+  await start(page);
+  await page.locator('#guide-toggle').click();
+  await page.locator('#guide-toggle').click();
+  await reproduce(page);
+  await finish(page);
+  await expect(page.locator('#verdict-stars')).toContainText('星3つ（ガイド・ヒント・誤答なし）');
+});
+
+test('a guide used on night four still costs its star after leaving and re-entering, until the night is solved', async ({ page }) => {
+  await open(page, { unlocked: 3 });
+  await start(page, 3);
+  await page.locator('#guide-toggle').click();
+  await expect(page.locator('#feedback')).toHaveText('ガイドを使ったので、この夜の星が1つ減ります');
+  await page.locator('#back').click();
+  await expectPhase(page, 'home');
+  await start(page, 3);
+  // 画面は初めから（ガイドは消えた状態、注記はその夜の一言）。使ったことは覚えている。
+  await expect(page.locator('#guide-toggle')).toHaveAttribute('aria-pressed', 'false');
+  await expect(page.locator('#note-text')).toHaveText(CASES[3].coach);
+  await reproduce(page, 3);
+  await finish(page, 3);
+  await expect(page.locator('#verdict-stars')).toContainText('星2つ（ガイドを使った）');
+  // 解決したら使用歴は消える：遊び直すと、補助なしで星3つ。
+  await page.locator('#to-home').click();
+  await start(page, 3);
+  await reproduce(page, 3);
+  await finish(page, 3);
+  await expect(page.locator('#verdict-stars')).toContainText('星3つ（ガイド・ヒント・誤答なし）');
+});
+
+test('hints, a wrong answer and the deduction hint are kept across leaving the night, and a replay after solving starts fresh', async ({ page }) => {
+  await open(page, { unlocked: 1 });
+  const caseDef = CASES[1];
+  await start(page, 1);
+  const [first, second] = startHints(1);
+  await page.locator('#hint').click();
+  await expect(page.locator('#note-text')).toHaveText(`ヒント1：${first.text}`);
+  await page.locator('#back').click();
+  await start(page, 1);
+  // 入り直すと注記はその夜の一言に戻るが、ボタンは「次のヒント」のまま。出した文はくり返さない。
+  await expect(page.locator('#note-text')).toHaveText(caseDef.coach);
+  await expect(page.locator('#hint')).toHaveText('次のヒント');
+  await page.locator('#hint').click();
+  await expect(page.locator('#note-text')).toHaveText(`ヒント2：${second.text}`);
+  await reproduce(page, 1);
+  await page.locator('#to-deduction').click();
+  await page.locator('#deduction-hint').click();
+  await expect(page.locator('#deduction-hint-text')).toHaveText(caseDef.deductionHint);
+  const wrong = suspectsOf(caseDef).find((suspect) => suspect.id !== caseDef.culprit);
+  await page.locator(`[data-suspect-id="${wrong.id}"] .accuse`).click();
+  await expect(page.locator('#deduction-message')).toBeVisible();
+  // 推理の途中で事件簿へ戻り、もう一度入る。
+  await page.locator('#back').click();
+  await start(page, 1);
+  await reproduce(page, 1);
+  await page.locator('#to-deduction').click();
+  await expect(page.locator('#deduction-hint')).toBeDisabled();
+  await expect(page.locator('#deduction-hint-text')).toHaveText(caseDef.deductionHint);
+  await page.locator(`[data-suspect-id="${caseDef.culprit}"] .accuse`).click();
+  await expectPhase(page, 'verdict');
+  await expect(page.locator('#verdict-stars')).toContainText('星1つ（ヒントを使った・誤った推理があった）');
+  // 解決したあとは、遊び直すと補助なしから。
+  await page.locator('#to-home').click();
+  await start(page, 1);
+  await expect(page.locator('#hint')).toHaveText('ヒント（★−1）');
+  await expect(page.locator('#guide-toggle')).toHaveText('ガイド（★−1）');
+  await reproduce(page, 1);
+  await page.locator('#to-deduction').click();
+  await expect(page.locator('#deduction-hint')).toBeEnabled();
+  await expect(page.locator('#deduction-hint-text')).toBeHidden();
+  await page.locator(`[data-suspect-id="${caseDef.culprit}"] .accuse`).click();
+  await expect(page.locator('#verdict-stars')).toContainText('星3つ（ガイド・ヒント・誤答なし）');
+});
+
+test('resetting progress also forgets the aids used on an unsolved night', async ({ page }) => {
+  await open(page);
+  await start(page);
+  await page.locator('#hint').click();
+  await expect(page.locator('#hint')).toHaveText('次のヒント');
+  await page.locator('#back').click();
+  await page.locator('#reset-progress').click();
+  await page.locator('#reset-confirm').click();
+  await expect(page.locator('#reset-dialog')).toBeHidden();
+  await start(page);
+  await expect(page.locator('#hint')).toHaveText('ヒント（★−1）');
+  await reproduce(page);
+  await finish(page);
+  await expect(page.locator('#verdict-stars')).toContainText('星3つ（ガイド・ヒント・誤答なし）');
+});
+
+for (const reducedMotion of ['reduce', 'no-preference']) {
+  test(`390×844 night one (${reducedMotion}): the deduction hint answer scrolls into view below its button`, async ({ page }) => {
+    await page.emulateMedia({ reducedMotion });
+    await open(page);
+    await start(page);
+    await reproduce(page);
+    await page.locator('#to-deduction').click();
+    await expectPhase(page, 'deduction');
+    // ボタンが画面の下端に来る位置までスクロールし、スクロールせずに押す（答えはボタンの下＝画面の外に出る）。
+    await page.locator('#deduction-hint').evaluate((button) => {
+      window.scrollTo(0, Math.max(0, button.getBoundingClientRect().bottom + window.scrollY - window.innerHeight));
+      button.click();
+    });
+    // 答えの下端が画面の下端より上（小数の位置の丸めに1px残す）。
+    const inView = async () => {
+      const box = await page.locator('#deduction-hint-text').boundingBox();
+      return box !== null && box.y >= 0 && box.y + box.height <= 844 + 1;
+    };
+    if (reducedMotion === 'reduce') expect(await inView(), 'instantly').toBe(true);
+    else await expect.poll(inView).toBe(true);
+    await expect(page.locator('#deduction-hint-text')).toHaveText(CASES[0].deductionHint);
+  });
+}
+
+for (const width of [360, 390]) {
+  test(`width ${width}: the verdict reasons break only between reasons, never inside one`, async ({ page }) => {
+    await page.setViewportSize({ width, height: HEIGHTS[width] });
+    await open(page, { unlocked: 1 });
+    await start(page, 1);
+    await page.locator('#guide-toggle').click();
+    await page.locator('#hint').click();
+    await reproduce(page, 1);
+    await page.locator('#to-deduction').click();
+    const wrong = suspectsOf(CASES[1]).find((suspect) => suspect.id !== CASES[1].culprit);
+    await page.locator(`[data-suspect-id="${wrong.id}"] .accuse`).click();
+    await page.locator(`[data-suspect-id="${CASES[1].culprit}"] .accuse`).click();
+    await expectPhase(page, 'verdict');
+    await expect(page.locator('#verdict-stars .stars-reason')).toHaveText('星1つ（ガイドを使った・ヒントを使った・誤った推理があった）');
+    // 理由は1つずつ折り返さない範囲。
+    await expect(page.locator('#verdict-stars .stars-reason > .nb')).toHaveText(['星1つ', 'ガイドを使った', 'ヒントを使った', '誤った推理があった']);
+    // 折り返しは「・」のあとか「（」の前だけ。
+    const breaks = await page.locator('#verdict-stars .stars-reason').evaluate((node) => {
+      const chars = [];
+      const walker = document.createTreeWalker(node, NodeFilter.SHOW_TEXT);
+      for (let text = walker.nextNode(); text; text = walker.nextNode()) {
+        for (let i = 0; i < text.data.length; i += 1) {
+          const range = document.createRange();
+          range.setStart(text, i);
+          range.setEnd(text, i + 1);
+          const rect = range.getClientRects()[0];
+          if (rect) chars.push({ ch: text.data[i], top: rect.top, height: rect.height });
+        }
+      }
+      const found = [];
+      for (let k = 1; k < chars.length; k += 1) {
+        if (chars[k].top >= chars[k - 1].top + chars[k - 1].height / 2) found.push(`${chars[k - 1].ch}｜${chars[k].ch}`);
+      }
+      return found;
+    });
+    expect(breaks.length, 'the reasons wrap at this width').toBeGreaterThan(0);
+    for (const item of breaks) expect(item.startsWith('・') || item.endsWith('（'), item).toBe(true);
+  });
+}
+
+test('arrow keys on the axis that cannot move explain it for four seconds, without covering a hint', async ({ page }) => {
+  await open(page, { unlocked: 2 });
+  const note = page.locator('#note-text');
+  // 夜1（灯りだけ）：←→。
+  await start(page, 0);
+  await expect(page.locator('#feedback')).toHaveText(startLabel(0));
+  await page.keyboard.press('ArrowLeft');
+  await expect(note).toHaveText('灯りは上下だけ動きます。↑↓キーで動かそう。');
+  await expect(note).toHaveAttribute('data-kind', 'notice');
+  expect(await lampValue(page)).toBe(CASES[0].stage.lamp.start);
+  await page.locator('#back').click();
+  // 夜3：灯りを選んだまま←→。
+  await start(page, 2);
+  await expect(page.locator('#feedback')).toHaveText(startLabel(2));
+  await page.keyboard.press('ArrowRight');
+  const lampLine = '灯りは上下だけ動きます。道具は、選ぶ札（←→キー）から選べます。';
+  await expect(note).toHaveText(lampLine);
+  await expect(note).toHaveAttribute('data-kind', 'notice');
+  await expect(page.locator('#feedback')).toHaveText(lampLine);
+  expect(await lampValue(page)).toBe(CASES[2].stage.lamp.start);
+  // 4秒たつと、その夜の一言へ戻る。
+  await expect(note).toHaveText(CASES[2].coach, { timeout: 6000 });
+  await expect(note).toHaveAttribute('data-kind', 'coach');
+  // 道具を選んでいて↑↓。
+  await page.locator('#item-select [data-item="hat"]').click();
+  await page.locator('#wall').focus();
+  await page.keyboard.press('ArrowUp');
+  const propLine = '道具は左右だけ動きます。灯りは、選ぶ札から選べます。';
+  await expect(note).toHaveText(propLine);
+  await expect(page.locator('#feedback')).toHaveText(propLine);
+  await expect(page.locator('#item-readout')).toHaveText(`帽子 横 ${CASES[2].stage.props.find((prop) => prop.id === 'hat').x.start}cm`);
+  // ヒントが出ているときは、ヒントの文を消さない（読み上げだけ）。
+  await page.locator('#hint').click();
+  await expect(note).toHaveAttribute('data-kind', 'hint');
+  const hintLine = await note.textContent();
+  await page.locator('#wall').focus();
+  await page.keyboard.press('ArrowDown');
+  await expect(page.locator('#feedback')).toHaveText(propLine);
+  await expect(note).toHaveText(hintLine);
+  await expect(note).toHaveAttribute('data-kind', 'hint');
+});
+
+test('width 360: clue cards keep 8px gaps, put the label above a full-width text, and keep testimony, footprints and the stool within three lines', async ({ page }) => {
+  test.setTimeout(90_000);
+  await page.setViewportSize({ width: 360, height: 640 });
+  await open(page, { unlocked: 4 });
+  const cards = (selector) => page.locator(selector).evaluate((list) => {
+    const items = [...list.children];
+    return items.map((item, index) => {
+      const card = item.getBoundingClientRect();
+      const label = item.querySelector('.clue-kind').getBoundingClientRect();
+      const text = item.querySelector('.clue-text');
+      const box = text.getBoundingClientRect();
+      const range = document.createRange();
+      range.selectNodeContents(text);
+      const tops = [...range.getClientRects()].filter((rect) => rect.width > 0).map((rect) => rect.top).sort((a, b) => a - b);
+      const lines = tops.reduce((acc, top) => (acc.length && top - acc[acc.length - 1] < 6 ? acc : [...acc, top]), []).length;
+      return {
+        kind: item.dataset.kind, lines, labelAbove: label.bottom <= box.top + 0.5,
+        gap: index ? card.top - items[index - 1].getBoundingClientRect().bottom : 8,
+        inset: Math.max(box.left - card.left, card.right - box.right),
+      };
+    });
+  });
+  const check = (list, label) => {
+    for (const card of list) {
+      expect(Math.abs(card.gap - 8), `${label} ${card.kind} gap`).toBeLessThanOrEqual(0.5);
+      expect(card.labelAbove, `${label} ${card.kind} label above`).toBe(true);
+      expect(card.inset, `${label} ${card.kind} text spans the card`).toBeLessThanOrEqual(12);
+      if (['witness', 'footprint', 'stool'].includes(card.kind)) expect(card.lines, `${label} ${card.kind} lines`).toBeLessThanOrEqual(3);
+    }
+  };
+  for (let index = 0; index < CASES.length; index += 1) {
+    await start(page, index);
+    await page.locator('#clues').evaluate((details) => { details.open = true; });
+    check(await cards('#stage-clues'), `stage ${index + 1}`);
+    await reproduce(page, index);
+    await page.locator('#to-deduction').click();
+    await expectPhase(page, 'deduction');
+    check(await cards('#deduction-clues'), `deduction ${index + 1}`);
+    await page.locator('#back').click();
+  }
+});
+
+for (const [width, height] of [[768, 1024], [1440, 900]]) {
+  test(`width ${width}: home, briefing, stage, solved and deduction start at the header's left edge; verdict and epilogue stay centred with clear stamps`, async ({ page }) => {
+    await page.setViewportSize({ width, height });
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await open(page, { unlocked: 4 });
+    const left = (selector) => page.locator(selector).evaluate((node) => node.getBoundingClientRect().left);
+    const header = await left('.app-header');
+    const firsts = { home: await left('#home-panel > .eyebrow') };
+    await page.locator('[data-case-id="umbrella"]').click();
+    firsts.briefing = await left('#briefing-place');
+    await page.locator('#start-case').click();
+    await expectPhase(page, 'stage');
+    firsts.stage = await left('#stage-title');
+    await reproduce(page, 4);
+    firsts.solved = await left('#solved-panel > .eyebrow');
+    await page.locator('#to-deduction').click();
+    await expectPhase(page, 'deduction');
+    firsts.deduction = await left('#deduction-panel > .eyebrow');
+    for (const [name, x] of Object.entries(firsts)) expect(Math.abs(x - header), name).toBeLessThanOrEqual(1);
+    // 読む列は右側だけを絞る（680px）。
+    expect(Math.round((await page.locator('#deduction-panel').boundingBox()).width)).toBeLessThanOrEqual(680);
+    await page.locator(`[data-suspect-id="${CASES[4].culprit}"] .accuse`).click();
+    await expectPhase(page, 'verdict');
+    const middle = await centerX(page, '#app');
+    for (const selector of ['#verdict-panel .stamp', '#verdict-title', '#verdict-stars .stars', '#verdict-panel .verdict-actions']) {
+      expect(Math.abs(await centerX(page, selector) - middle), selector).toBeLessThanOrEqual(1);
+    }
+    let clearance = await stampClearance(page, '#verdict-panel', '#verdict-title');
+    expect(clearance.above).toBeGreaterThanOrEqual(12);
+    expect(clearance.below).toBeGreaterThanOrEqual(12);
+    await page.locator('#next-case').click();
+    await expectPhase(page, 'epilogue');
+    for (const selector of ['#epilogue-panel .stamp', '#epilogue-title', '#epilogue-panel .verdict-actions']) {
+      expect(Math.abs(await centerX(page, selector) - middle), selector).toBeLessThanOrEqual(1);
+    }
+    await page.evaluate(() => window.scrollTo(0, 0));
+    clearance = await stampClearance(page, '#epilogue-panel', '#epilogue-panel > .eyebrow');
+    expect(clearance.above).toBeGreaterThanOrEqual(12);
+    expect(clearance.below).toBeGreaterThanOrEqual(12);
+  });
+}
+
+test('the lock line stays on one line from 720px, and the next night reads はじめる → in a 36px pill', async ({ page }) => {
+  await open(page);
+  const lockLines = () => page.locator('[data-case-id="hat"] .lock-note').evaluate((note) => {
+    const text = [...note.childNodes].find((node) => node.nodeType === Node.TEXT_NODE);
+    const range = document.createRange();
+    range.selectNodeContents(text);
+    const tops = [...range.getClientRects()].filter((rect) => rect.width > 0).map((rect) => rect.top).sort((a, b) => a - b);
+    return tops.reduce((acc, top) => (acc.length && top - acc[acc.length - 1] < 6 ? acc : [...acc, top]), []).length;
+  });
+  for (const width of [720, 768, 1440]) {
+    await page.setViewportSize({ width, height: 900 });
+    expect(await lockLines(), `width ${width}`).toBe(1);
+  }
+  const pill = await page.locator('[data-case-id="rack"] .next-label').evaluate((node) => ({ height: node.getBoundingClientRect().height, size: getComputedStyle(node).fontSize }));
+  expect(pill.height).toBeGreaterThanOrEqual(36);
+  expect(pill.size).toBe('14px');
+});
+
+test('pressable parts use the strong outline, the pressed guide is amber, and small controls are real bordered buttons', async ({ page }) => {
+  await page.setViewportSize({ width: 360, height: 640 });
+  await open(page, { unlocked: 2 });
+  const look = (selector) => page.locator(selector).first().evaluate((node) => {
+    const style = getComputedStyle(node);
+    return { border: style.borderTopColor, width: style.borderTopWidth, background: style.backgroundColor, height: node.getBoundingClientRect().height };
+  });
+  // 事件簿：「進行をリセット」は枠付きの補助ボタン（44px）。ヘッダの丸ボタンも同じ枠。
+  for (const selector of ['#reset-progress', '#help', '#share-open']) {
+    const item = await look(selector);
+    expect(item.border, selector).toBe(LINE_STRONG);
+    expect(item.width, selector).toBe('1px');
+    expect(item.height, selector).toBeGreaterThanOrEqual(44);
+  }
+  // 壁の目盛りの色は、紙の壁に対して4.5:1以上（--ruler。目盛りの線も同じ色）。
+  const tokens = await page.evaluate(() => {
+    const root = getComputedStyle(document.documentElement);
+    return { ruler: root.getPropertyValue('--ruler').trim(), wall: root.getPropertyValue('--wall').trim() };
+  });
+  expect(tokens.ruler.toLowerCase()).toBe('#6b4f2a');
+  expect(contrastRatio(tokens.ruler, tokens.wall)).toBeGreaterThanOrEqual(4.5);
+  await start(page, 0);
+  // 夜1は最初からガイドが重なっている：「ガイドを消す」は琥珀の枠と薄い琥珀の面（朱は使わない）。
+  const guide = await look('#guide-toggle');
+  await expect(page.locator('#guide-toggle')).toHaveAttribute('aria-pressed', 'true');
+  expect(guide.border).toBe(AMBER);
+  expect(guide.background).toBe('rgba(255, 184, 77, 0.16)');
+  for (const selector of ['#hint', '#reset-stage', '#nudge-minus', '#nudge-plus']) {
+    const item = await look(selector);
+    expect(item.border, selector).toBe(LINE_STRONG);
+    expect(item.height, selector).toBeGreaterThanOrEqual(44);
+  }
+  // 注記の文は、高さ固定の欄の縦の中央（1行でも2行でも）。
+  const centred = () => page.locator('#note-text').evaluate((note) => {
+    const outer = note.getBoundingClientRect();
+    const inner = note.querySelector('.note-body').getBoundingClientRect();
+    return Math.abs((outer.top + outer.bottom) / 2 - (inner.top + inner.bottom) / 2);
+  });
+  expect(await centred()).toBeLessThanOrEqual(1);
+  // 「次のヒント」は見た目はそのまま、2回目以降は星が減らないことを title と読み上げで伝える。
+  await page.locator('#hint').click();
+  await expect(page.locator('#hint')).toHaveText('次のヒント');
+  await expect(page.locator('#hint')).toHaveAttribute('title', 'ヒントは最初の1回で星が1つ減ります。2回目以降は追加で減りません');
+  await expect(page.locator('#hint')).toHaveAttribute('aria-label', '次のヒント。ヒントは最初の1回で星が1つ減ります。2回目以降は追加で減りません');
+  expect(await centred()).toBeLessThanOrEqual(1);
+  await page.locator('#back').click();
+  await start(page, 2);
+  // 選んでいないチップの枠も --line-strong。
+  expect((await look('#item-select .chip[aria-checked="false"]')).border).toBe(LINE_STRONG);
+  expect(await centred()).toBeLessThanOrEqual(1);
+});
+
+test('dialogs: share buttons match the secondary buttons, the note is muted, the URL shows whole at 360, and help fits or says it continues', async ({ page }) => {
+  await page.setViewportSize({ width: 360, height: 640 });
+  await open(page);
+  await page.locator('#share-open').click();
+  await expect(page.locator('#share-dialog')).toBeVisible();
+  const buttons = await page.locator('#share .share__button').evaluateAll((nodes) => nodes.map((node) => {
+    const style = getComputedStyle(node);
+    return { name: node.textContent.trim(), border: style.borderTopColor, width: style.borderTopWidth, height: node.getBoundingClientRect().height };
+  }));
+  expect(buttons.length).toBeGreaterThanOrEqual(3);
+  for (const button of buttons) {
+    expect(button.border, button.name).toBe(LINE_STRONG);
+    expect(button.width, button.name).toBe('1px');
+    expect(button.height, button.name).toBeGreaterThanOrEqual(44);
+  }
+  const note = await page.locator('#share .share__note').evaluate((node) => ({ color: getComputedStyle(node).color, opacity: getComputedStyle(node).opacity }));
+  const muted = await page.locator('#share-dialog .dialog-note').first().evaluate((node) => getComputedStyle(node).color);
+  expect(note).toEqual({ color: muted, opacity: '1' });
+  // URL 欄は折り返して全部見せる（値・readonly・ID はそのまま）。
+  const url = page.locator('#share-url');
+  await expect(url).toHaveValue(CANONICAL);
+  await expect(url).toHaveAttribute('readonly', '');
+  expect(await url.evaluate((node) => node.scrollWidth <= node.clientWidth && node.scrollHeight <= node.clientHeight + 1)).toBe(true);
+  await page.locator('#share-dialog [data-close]').click();
+  // 遊び方は 360×640 で最後の段落まで入る。入らないときは「↓ 続きがあります」を出す。
+  await page.locator('#help').click();
+  const help = await page.locator('#help-dialog').evaluate((dialog) => ({
+    overflow: dialog.scrollHeight - dialog.clientHeight,
+    more: !dialog.querySelector('.more-hint').hidden,
+    last: [...dialog.querySelectorAll('.dialog-note')].at(-1).getBoundingClientRect().bottom,
+  }));
+  if (help.overflow > 8) expect(help.more).toBe(true);
+  else {
+    expect(help.more).toBe(false);
+    expect(help.last).toBeLessThanOrEqual(640);
+  }
+  await page.locator('#help-dialog [data-close]').click();
+  // 低い画面では、続きの印が出て、最後までスクロールすると消える。
+  await page.setViewportSize({ width: 360, height: 480 });
+  await page.locator('#help').click();
+  await expect(page.locator('#help-dialog .more-hint')).toBeVisible();
+  await expect(page.locator('#help-dialog .more-hint')).toHaveText('↓ 続きがあります');
+  await page.locator('#help-dialog').evaluate((dialog) => { dialog.scrollTop = dialog.scrollHeight; });
+  await expect(page.locator('#help-dialog .more-hint')).toBeHidden();
+  await page.locator('#help-dialog [data-close]').click();
+  await expect(page.locator('#help')).toBeFocused();
+});
+
+test('the help dialog explains that a raised lamp lowers the shadow and that the night one guide is free', async ({ page }) => {
+  await open(page);
+  await page.locator('#help').click();
+  await expect(page.locator('#help-dialog .help-rules li').nth(1)).toContainText('灯りを上げると影は下がり、下げると影は上がります。');
+  await expect(page.locator('#help-dialog .dialog-note').last()).toHaveText('ガイド・ヒント・誤った推理を使うと、星が減ります。夜1のガイドは練習用なので、何度出し入れしても減りません。');
+});
+
+for (const [width, height] of [[640, 360], [844, 390], [1440, 900]]) {
+  test(`${width}×${height}: hint, guide and reset stay on one line inside their column whatever the labels say`, async ({ page }) => {
+    await page.setViewportSize({ width, height });
+    await open(page, { unlocked: 4 });
+    const row = () => page.evaluate(() => {
+      const box = document.querySelector('#stage-panel .assist-row').getBoundingClientRect();
+      const buttons = ['hint', 'guide-toggle', 'reset-stage'].map((id) => document.getElementById(id).getBoundingClientRect());
+      return {
+        oneRow: new Set(buttons.map((rect) => Math.round(rect.top))).size === 1,
+        inside: buttons.every((rect) => rect.left >= box.left - 0.5 && rect.right <= box.right + 0.5),
+        tall: buttons.every((rect) => rect.height >= 44),
+      };
+    });
+    for (const index of [0, 4]) {
+      await start(page, index);
+      // 押す前／ヒントのあと／ガイドを付けたあと／外したあと（文言が替わっても、段と位置が変わらない）。
+      const states = [await row()];
+      await page.locator('#hint').click();
+      states.push(await row());
+      await page.locator('#guide-toggle').click();
+      states.push(await row());
+      await page.locator('#guide-toggle').click();
+      states.push(await row());
+      for (const [i, state] of states.entries()) expect(state, `night ${index + 1} state ${i}`).toEqual({ oneRow: true, inside: true, tall: true });
+      expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+      await page.locator('#back').click();
+    }
+  });
+}
