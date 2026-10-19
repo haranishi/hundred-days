@@ -99,3 +99,9 @@
   - 契約（改善は最大3周。同じ失敗が2周続けば、原因と残件を本人へ返す）に従い、**NEEDS_HUMAN として本人へ返す**。
   - _Boundary: Feature Validation_
   - _Depends: 14_
+- [ ] 16. 本番公開（2026-10-20・本人の依頼）
+  - PR157はdraftのままmainへマージ済み（2026-10-19）。本人の依頼を受け、`meta.json` を `published` にし、README一覧を同期して、公開用PRからmainへ反映する。ゲームの挙動・素材・画面は変えない。
+  - 手元：`npm run check`、公開用ビルドの確認、本番と同じCSPでの実ビルド操作。公開前の記録は `.agent-harness/runs/day071-kage-shogen/publication.md`。
+  - 反映：当該headの必須共通CIが成功してからマージする。mainのCI・本番デプロイの完了後、本番URLで応答・OGP・主要操作を確認する。X投稿は本人。
+  - _Boundary: Repository_
+  - _Depends: 15_

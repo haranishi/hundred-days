@@ -1,9 +1,9 @@
 {
   "feature_name": "day-071-kage-shogen",
   "created_at": "2026-10-19T04:46:21+00:00",
-  "updated_at": "2026-10-19T12:00:00+00:00",
+  "updated_at": "2026-10-20T00:30:00+09:00",
   "language": "ja",
-  "phase": "validated-experience-passed-visual-needs-human",
+  "phase": "published-visual-needs-human",
   "approvals": {
     "requirements": {
       "generated": true,
@@ -21,12 +21,12 @@
   "ready_for_implementation": true,
   "approval_scope": {
     "requirements": "本人の個別レビューは未実施。「影証というウェブアプリを作成していってほしい」の依頼と、2026-10-19の自律進行の指示（要件・設計・タスク・実装・検証・作業ブランチのGit操作まで一気通貫）に基づき、承認済みとして進める。",
-    "downstream": "設計・タスク作成・実装・検証は、同じ自律進行の指示の範囲。公開・マージ・デプロイ・SNS投稿は含まない。",
+    "downstream": "設計・タスク作成・実装・検証は、2026-10-19の自律進行の指示の範囲。公開（published・マージ・デプロイ）は、2026-10-20の本人の依頼「Gitで本番状況に反映してほしい」の範囲。SNS投稿は含まない。",
     "open_items": [
       "「影証」を、2026-10-19の再提案の案③「影証言」と解釈した（要件の前提）。",
-      "題名の商標は、J-PlatPatの簡易な自動検索（文字列・称呼とも一致0件、類似検索は別分野の3件）までで、弁理士の確認は未実施。公開前に本人が確認する。",
+      "題名の商標は、J-PlatPatの簡易な自動検索（文字列・称呼とも一致0件、類似検索は別分野の3件）までで、弁理士の確認は未実施。公開（2026-10-20）はこの確認を待たずに本人の依頼で行ったので、公開後に本人が確認する。問題があれば題名を替える。",
       "5つの夜の物語・容疑者の名前・身長は本リポジトリでの創作。本人の好みでの差し替えを想定する。",
-      "画面の独立評価（AI）が、3周とも合格に届かなかった（14・15・15/20）。同じ項目（余白と整列・タイポグラフィ・モバイル・一貫性）が続いたため、契約に従って本人へ返す。残件は experience-r3.md・visual-r3.md の改善案。続けるかどうかは本人の判断。",
+      "画面の独立評価（AI）が、3周とも合格に届かなかった（14・15・15/20）。同じ項目（余白と整列・タイポグラフィ・モバイル・一貫性）が続いたため、契約に従って本人へ返した。2026-10-20に本人から公開の依頼を受け、残件は直さないまま公開した。残件は experience-r3.md・visual-r3.md の改善案に残る。続けて直すかどうかは本人の判断。",
       "本人によるプレイと、面白さ・難しさの評価は未実施（AIの評価は代理指標）。"
     ]
   },
@@ -37,23 +37,23 @@
     "authorized_operations": [
       "commit",
       "push",
-      "PR"
-    ],
-    "not_authorized": [
+      "PR",
       "merge",
       "deploy",
-      "publish",
+      "publish"
+    ],
+    "not_authorized": [
       "x-post"
     ],
-    "scope": "作業ブランチへのcommit・push・draftのままのPR作成まで。公開は本人の指示を待つ。",
-    "status": "pr-opened-draft",
+    "scope": "作業ブランチへのcommit・push・PR作成（2026-10-19）。公開は、2026-10-20の本人の依頼の範囲：published への変更・PR・マージ・既存のCIと本番デプロイ・本番確認。X投稿は含まない。",
+    "status": "publication-pr",
     "pull_request": "https://github.com/haranishi/hundred-days/pull/157",
-    "note": "作業ブランチへのcommit・push・draftのままのPR作成まで済み。マージ・公開・X投稿は、本人の指示を待つ。"
+    "note": "PR157はdraftのままmainへマージ済み（2026-10-19 23:15 JST）。公開用のPRで status を published にして反映する。X投稿は本人。"
   },
   "validation": {
     "status": "experience-passed-visual-needs-human",
     "report": ".agent-harness/runs/day071-kage-shogen/validation-r2.md",
-    "public_status": "draft",
+    "public_status": "published",
     "rounds": {
       "experience": {
         "r1": 12,
