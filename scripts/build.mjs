@@ -5,6 +5,8 @@
 import { copyFileSync, cpSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { basename, join, relative, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { PUBLISH_CHECK_ENV, effectiveStatus, isPublishCheckOverride, unmatchedPublishCheckTargets } from './lib/day-status.mjs';
+import { isServedPath } from './lib/dist-files.mjs';
 
 const root = fileURLToPath(new URL('..', import.meta.url));
 const appsDir = root;
@@ -52,7 +54,7 @@ const isDate = (v) => /^\d{4}-\d{2}-\d{2}$/.test(String(v || ''));
 const allApps = dirs.map((dir) => {
   const metaPath = join(appsDir, dir, 'meta.json');
   const meta = existsSync(metaPath) ? JSON.parse(readFileSync(metaPath, 'utf8')) : {};
-  const status = meta.status || 'published';
+  const status = effectiveStatus(meta, dir);
   // screenshot / demo はアプリフォルダ内の相対ファイル名だけを受け付ける（パス指定の混入を防ぐ）
   const shot = meta.screenshot ? basename(String(meta.screenshot)) : '';
   const demo = meta.demo ? basename(String(meta.demo)) : '';
@@ -67,6 +69,7 @@ const allApps = dirs.map((dir) => {
     // draft は「まだ作りかけ」＝一覧にも統計にも出さない（公開前のDayが漏れるのを防ぐ）。
     // アプリ本体を公開しないだけの「制作記録のみ」のDayは draft 以外の status を使う
     draft: status === 'draft',
+    publishCheckOnly: isPublishCheckOverride(meta, dir),
     xPostUrl: typeof meta.xPostUrl === 'string' ? meta.xPostUrl.trim() : '',
     // Chrome拡張など、このサイトの外で公開しているDayのリンク先（紹介ページ）。
     // status を published 以外にしたうえで externalUrl を書くと、カードがここへ飛ぶ
@@ -91,6 +94,11 @@ const allApps = dirs.map((dir) => {
 
 const drafts = allApps.filter((a) => a.draft);
 const apps = allApps.filter((a) => !a.draft);
+const publishCheckOnly = allApps.filter((a) => a.publishCheckOnly);
+const unmatchedChecks = unmatchedPublishCheckTargets(dirs);
+if (unmatchedChecks.length) {
+  console.warn(`⚠ ${PUBLISH_CHECK_ENV} の ${unmatchedChecks.join(', ')} は、どのDayのフォルダも指していません（番号の打ち間違い？）`);
+}
 
 // ---------------------------------------------------------------- dist/ の組み立て
 
@@ -100,50 +108,12 @@ mkdirSync(distDir, { recursive: true });
 // リポジトリ直下の static/ の中身（OG画像など）を dist/ 直下へ。無くてもビルドは通す
 if (existsSync(staticDir)) cpSync(staticDir, distDir, { recursive: true });
 
-/* アプリのフォルダは原則そのまま配信するが、次の開発用ディレクトリは外す。
-   - tools/cache/ は素材の置き場（day-031 の行政区域 zip で 890MB）。同梱データは data/ に
-     書き出し済みなので配信には要らない。CI には cache が無いので、消えるのは手元の dist だけ
-   - tests/ は、中の fixtures に第三者の生データが入っている（day-033 の気象庁の実応答、
-     day-034 の潮位表、day-023 のNDLの生レスポンス）。ここに置いたつもりのものが本番URLから
-     落とせる状態になるので外す。E2E は dist ではなく各Dayのソースからフィクスチャを読んでいるので影響しない
-   - node_modules/ はビルド用の依存。必要なブラウザコードだけ vendor/ にまとめる。
-   ⚠️ 除外は名前の列挙なので、新しく「配信したくないフォルダ」を作ったらここに足すこと */
-const EXCLUDED_DIRS = [`tools${sep}cache`, 'tests', 'node_modules'];
-const isExcluded = (source) => EXCLUDED_DIRS.some((dir) => {
-  const marker = `${sep}${dir}`;
-  // そのフォルダ自身（末尾一致）と、その中身（区切り文字が続く）だけを外す。
-  // `tests` が `testsuite` のような別名に当たらないようにしている
-  return source.endsWith(marker) || source.includes(`${marker}${sep}`);
-});
-const skipToolsCache = (source) => !isExcluded(source);
-
-/* ソースから組み立てたビルド結果を同じフォルダに置いているDayは、ソースと生成ツールを配信しない。
-   見るのはDayのフォルダ直下の名前だけ（リポジトリを置いた場所の名前に source が含まれていても外さない） */
-const SOURCE_DIRS_BY_APP = {
-  'day-070-flip-court': ['tools'],
-  'day-071-kage-shogen': ['tools'],
-  'day-068-timetable-alibi': ['tools'],
-  'day-056-dragon-rush': ['source', 'tools'],
-  'day-058-meisho-kumitate': ['source', 'tools'],
-  'day-059-kuchi-sanmai': ['source', 'tools'],
-  'day-061-kumimae': ['source', 'tools'],
-  'day-064-breach-atlas': ['source', 'tools'],
-  // day-066 は素のJSをそのまま配信する。tools/ は宣伝動画の道具で、配信には要らない
-  'day-066-hakokage-kaito': ['tools'],
-  // day-060 は素のJSをそのまま配信する（source は無い）。tools/ はデータの作り直し・解説の検査・宣伝動画の道具で、配信には要らない
-  'day-060-prize-explained': ['tools']
-};
-const isSourceDir = (app, source) => {
-  const [top] = relative(join(appsDir, app.dir), source).split(sep);
-  return (SOURCE_DIRS_BY_APP[app.dir] ?? []).includes(top);
-};
-
+// 配信から外すフォルダの規則は scripts/lib/dist-files.mjs にある（公開の契約も同じ規則で画像の配信を確かめる）
 for (const app of apps) {
   if (app.published) {
-    const filter = source => skipToolsCache(source)
-      && !(app.dir === 'day-044-train-here' && source.includes(`${sep}tools`))
-      && !isSourceDir(app, source);
-    cpSync(join(appsDir, app.dir), join(distDir, app.dir), { recursive: true, filter });
+    const from = join(appsDir, app.dir);
+    const filter = (source) => isServedPath(app.dir, relative(from, source).split(sep).join('/'));
+    cpSync(from, join(distDir, app.dir), { recursive: true, filter });
   } else if (app.hasShot || app.hasDemo) {
     // 「制作記録のみ」のDayはアプリ本体を公開しないが、一覧に出すスクショとデモ動画だけはコピーする
     mkdirSync(join(distDir, app.dir), { recursive: true });
@@ -406,7 +376,8 @@ function injectAppMeta(app) {
 
   const add = wanted.filter(([probe]) => !html.includes(probe)).map(([, tag]) => tag);
   if (!add.length) return false;
-  writeFileSync(file, html.replace('</head>', `${add.map((tag) => `  ${tag}`).join('\n')}\n</head>`));
+  // 置換を文字列で渡すと、題名や説明の $& や $$ が特別な意味になる（$& は </head> に化ける）。関数で渡して、そのまま入れる
+  writeFileSync(file, html.replace('</head>', () => `${add.map((tag) => `  ${tag}`).join('\n')}\n</head>`));
   return true;
 }
 
@@ -919,5 +890,6 @@ console.log(
   `build: ${apps.length} day(s) / 公開 ${releasedCount}（うち外部 ${releasedCount - publishedCount}） / スクショ ${apps.filter((a) => a.hasShot).length}` +
     ` / 動画 ${apps.filter((a) => a.hasDemo).length} / OGP付与 ${metaInjected} -> ${process.env.HUNDRED_DAYS_BUILD_DIR ? "custom output/" : "dist/"}` +
     // 除外したものは必ず名前を出す（黙って落とすと「全部載っている」と誤解する）
-    (drafts.length ? `\n  draft のため一覧から除外: ${drafts.map((d) => d.dir).join(', ')}` : '')
+    (drafts.length ? `\n  draft のため一覧から除外: ${drafts.map((d) => d.dir).join(', ')}` : '') +
+    (publishCheckOnly.length ? `\n  （検査用）公開済みとして扱う：${publishCheckOnly.map((d) => d.dir).join(', ')}` : '')
 );

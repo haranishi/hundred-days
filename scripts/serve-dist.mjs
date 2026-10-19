@@ -42,7 +42,8 @@ const server = createServer((request, response) => {
 });
 
 server.listen(port, host, () => {
-  console.log(`Serving dist at http://${host}:${port}`);
+  // PLAYWRIGHT_PORT=0 のときはOSが選んだポートを出す。publish-check はこの1行から、自分のサーバーのポートを読む
+  console.log(`Serving dist at http://${host}:${server.address().port}`);
 });
 
 for (const signal of ['SIGINT', 'SIGTERM']) {

@@ -1,6 +1,7 @@
 import { expect, test } from '@playwright/test';
 import { readFileSync, readdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
+import { effectiveStatus } from '../../scripts/lib/day-status.mjs';
 
 /* シェア機能は全アプリ共通のルール（2026-08-17 本人指示）なので、Dayごとではなくここで横断的に見る。
    新しいDayを足したら、このspecが自動でその1件も見にいく。 */
@@ -9,7 +10,7 @@ const appsDir = fileURLToPath(new URL('../../', import.meta.url));
 const published = readdirSync(appsDir)
   .filter((name) => name.startsWith('day-'))
   .map((dir) => ({ dir, meta: JSON.parse(readFileSync(`${appsDir}${dir}/meta.json`, 'utf8')) }))
-  .filter(({ meta }) => (meta.status || 'published') === 'published')
+  .filter(({ dir, meta }) => effectiveStatus(meta, dir) === 'published')
   .sort((a, b) => a.meta.day - b.meta.day);
 
 test('公開しているアプリが1つ以上ある', () => {
