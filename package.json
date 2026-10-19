@@ -11,6 +11,7 @@
     "check": "npm run precheck && npm run check:syntax && npm run test:unit && npm run build",
     "test:unit": "node --test scripts/tests/*.test.mjs day-*/tests/",
     "test:e2e": "playwright test",
+    "publish:check": "node scripts/publish-check.mjs",
     "x:prepare": "node scripts/prepare-x-post.mjs",
     "shared:sync": "node scripts/sync-shared.mjs"
   },
