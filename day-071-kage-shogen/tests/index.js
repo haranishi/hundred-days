@@ -9,3 +9,4 @@ import './game.test.mjs';
 import './transform.test.mjs';
 import './hit.test.mjs';
 import './view.test.mjs';
+import './text.test.mjs';

@@ -158,27 +158,61 @@ function strokeEdges(ctx, shapes) {
   ctx.stroke();
 }
 
-// 背景の線に重なっても読めるよう、文字に縁取りを付ける。
-function haloText(ctx, text, x, y, colors) {
-  ctx.lineJoin = 'round';
-  ctx.lineWidth = 3.5;
-  ctx.strokeStyle = rgba(colors.panel, 0.92);
-  ctx.strokeText(text, x, y);
-  ctx.fillText(text, x, y);
+const PILL = Object.freeze({ height: 22, pad: 7 });
+
+function pillWidth(ctx, text, font = `600 12px ${FONT}`) {
+  ctx.font = font;
+  return ctx.measureText(text).width + PILL.pad * 2;
 }
 
-function pill(ctx, text, x, y, colors, { align = 'left', accent = colors.text } = {}) {
-  ctx.font = `600 12px ${FONT}`;
-  const width = ctx.measureText(text).width + 14;
-  const left = align === 'right' ? x - width : align === 'center' ? x - width / 2 : x;
-  ctx.fillStyle = rgba(colors.panel, 0.88);
+// 角の丸い札。left は左端、y は縦の中心。
+function pill(ctx, text, left, y, colors, { accent = colors.text, font = `600 12px ${FONT}` } = {}) {
+  const width = pillWidth(ctx, text, font);
+  ctx.fillStyle = rgba(colors.panel, 0.9);
   ctx.beginPath();
-  ctx.roundRect ? ctx.roundRect(left, y - 11, width, 22, 11) : ctx.rect(left, y - 11, width, 22);
+  ctx.roundRect ? ctx.roundRect(left, y - PILL.height / 2, width, PILL.height, PILL.height / 2) : ctx.rect(left, y - PILL.height / 2, width, PILL.height);
   ctx.fill();
   ctx.fillStyle = accent;
   ctx.textAlign = 'left';
   ctx.textBaseline = 'middle';
-  ctx.fillText(text, left + 7, y + 0.5);
+  ctx.fillText(text, left + PILL.pad, y + 0.5);
+  return { left, right: left + width, top: y - PILL.height / 2, bottom: y + PILL.height / 2 };
+}
+
+const overlaps = (a, b) => a.left < b.right && b.left < a.right && a.top < b.bottom && b.top < a.bottom;
+
+// 札（幅 width・高さ PILL.height）の置き場を選ぶ。候補は、枠の上の中央 → 下の中央 → 右横 → 左横（枠の縦の中央）
+// → 重なる物の左右へずらした位置。ずらすのは、札が枠の横幅の範囲に少しでもかかる所まで（離れた所へ飛ばさない）。
+// 画面の外へは出さない。どれも重なるなら、重なりのいちばん少ない候補にする。
+export function placeTag({ width, frame, bounds, avoid, prefer = 'above' }) {
+  const half = PILL.height / 2;
+  const centerX = (frame.left + frame.right) / 2;
+  const order = [frame.top - 7 - half, frame.bottom + 7 + half];
+  if (prefer === 'below') order.reverse();
+  const rows = order.filter((y) => y - half >= bounds.top && y + half <= bounds.bottom);
+  if (rows.length === 0) rows.push(Math.max(bounds.top + half, frame.top - 7 - half));
+  const clampLeft = (left) => Math.max(bounds.left, Math.min(bounds.right - width, left));
+  const rectAt = (left, y) => ({ left, right: left + width, top: y - half, bottom: y + half });
+  const near = (rect) => rect.right > frame.left && rect.left < frame.right;
+  const candidates = rows.map((y) => rectAt(clampLeft(centerX - width / 2), y));
+  // 横：枠の左右にある選択の矢印（9px）の外側。画面に収まるときだけ。
+  const middle = Math.max(bounds.top + half, Math.min(bounds.bottom - half, (frame.top + frame.bottom) / 2));
+  for (const left of [frame.right + 12, frame.left - 12 - width]) {
+    if (left >= bounds.left && left + width <= bounds.right) candidates.push(rectAt(left, middle));
+  }
+  for (const y of rows) {
+    for (const item of avoid) {
+      for (const left of [item.right + 4, item.left - 4 - width]) {
+        const rect = rectAt(clampLeft(left), y);
+        if (near(rect)) candidates.push(rect);
+      }
+    }
+  }
+  const area = (rect) => avoid.reduce((sum, item) => sum + (overlaps(rect, item)
+    ? (Math.min(rect.right, item.right) - Math.max(rect.left, item.left)) * (Math.min(rect.bottom, item.bottom) - Math.max(rect.top, item.top)) : 0), 0);
+  const clear = candidates.find((rect) => area(rect) === 0);
+  if (clear) return clear;
+  return candidates.reduce((best, rect) => (area(rect) < area(best) ? rect : best));
 }
 
 // ---- 壁 ----
@@ -321,7 +355,33 @@ export function createWallRenderer(canvas) {
     ctx.setLineDash([]);
 
     screenSpace(ctx, dpr);
-    // 身長計（左端）。
+    // 選択中の道具の枠（名前の札は最後に描く）。枠は身長計より先に描き、左端の道具の枠が数字を消さないようにする。
+    const chosen = stage.props.find((prop) => prop.id === selected && prop.x.min < prop.x.max);
+    let frame = null;
+    if (chosen) {
+      const b = propBounds(chosen, placements[chosen.id].x);
+      const a = t.toScreen(b.minX, b.maxY);
+      const c = t.toScreen(b.maxX, b.minY);
+      frame = { left: a.x - 5, right: c.x + 5, top: a.y - 5, bottom: c.y + 5 };
+      ctx.lineWidth = 3;
+      ctx.strokeStyle = colors.focus;
+      ctx.beginPath();
+      ctx.roundRect ? ctx.roundRect(frame.left, frame.top, frame.right - frame.left, frame.bottom - frame.top, 8) : ctx.rect(frame.left, frame.top, frame.right - frame.left, frame.bottom - frame.top);
+      ctx.stroke();
+      ctx.fillStyle = colors.focus;
+      const midY = (frame.top + frame.bottom) / 2;
+      for (const dir of [-1, 1]) {
+        const edge = dir < 0 ? frame.left : frame.right;
+        ctx.beginPath();
+        ctx.moveTo(edge + dir * 9, midY);
+        ctx.lineTo(edge + dir * 2, midY - 6);
+        ctx.lineTo(edge + dir * 2, midY + 6);
+        ctx.closePath();
+        ctx.fill();
+      }
+    }
+
+    // 身長計（左端）。数字は壁の色で縁取り、影や枠の上でも読めるようにする。数字の位置は、札が覆わないように覚えておく。
     ctx.strokeStyle = colors.ruler;
     ctx.fillStyle = colors.ruler;
     ctx.lineWidth = 1;
@@ -329,6 +389,7 @@ export function createWallRenderer(canvas) {
     ctx.textAlign = 'left';
     ctx.textBaseline = 'middle';
     const wallLeft = t.toScreen(0, 0).x;
+    const rulerNumbers = [];
     for (let cm = 10; cm <= 170; cm += 10) {
       const y = t.toScreen(0, cm).y;
       const long = cm % 50 === 0;
@@ -336,8 +397,31 @@ export function createWallRenderer(canvas) {
       ctx.moveTo(wallLeft, y);
       ctx.lineTo(wallLeft + (long ? 9 : 5), y);
       ctx.stroke();
-      if (long) ctx.fillText(String(cm), wallLeft + 12, y);
+      if (!long) continue;
+      ctx.lineWidth = 3;
+      ctx.lineJoin = 'round';
+      ctx.strokeStyle = rgba(colors.wall, 0.9);
+      ctx.strokeText(String(cm), wallLeft + 12, y);
+      ctx.fillText(String(cm), wallLeft + 12, y);
+      ctx.lineWidth = 1;
+      ctx.strokeStyle = colors.ruler;
+      rulerNumbers.push({ left: wallLeft + 10, right: wallLeft + 14 + ctx.measureText(String(cm)).width, top: y - 8, bottom: y + 8 });
     }
+    // 灯りの高さの目印：身長計の左の余白に琥珀の三角、目盛りの上に短い線（数値は壁の下の読み出しにある。文字は描かない）。
+    const markY = t.toScreen(0, lamp.y).y;
+    ctx.fillStyle = colors.lamp;
+    ctx.beginPath();
+    ctx.moveTo(wallLeft - 1, markY);
+    ctx.lineTo(wallLeft - 8, markY - 5);
+    ctx.lineTo(wallLeft - 8, markY + 5);
+    ctx.closePath();
+    ctx.fill();
+    ctx.strokeStyle = colors.lamp;
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(wallLeft, markY);
+    ctx.lineTo(wallLeft + 9, markY);
+    ctx.stroke();
     // 灯り：光の輪・玉・つかむ輪。
     const orb = t.toScreen(lamp.x, lamp.y);
     const halo = ctx.createRadialGradient(orb.x, orb.y, 3, orb.x, orb.y, 38);
@@ -371,31 +455,16 @@ export function createWallRenderer(canvas) {
         ctx.fill();
       }
     }
-    pill(ctx, `${Math.round(lamp.y)}cm`, orb.x, orb.y < 52 ? orb.y + 30 : orb.y - 30, colors, { align: 'center', accent: colors.lamp });
-
-    // 選択中の道具：枠と名前。
-    const chosen = stage.props.find((prop) => prop.id === selected);
-    if (chosen && chosen.x.min < chosen.x.max) {
-      const b = propBounds(chosen, placements[chosen.id].x);
-      const a = t.toScreen(b.minX, b.maxY);
-      const c = t.toScreen(b.maxX, b.minY);
-      ctx.lineWidth = 3;
-      ctx.strokeStyle = colors.focus;
-      ctx.beginPath();
-      ctx.roundRect ? ctx.roundRect(a.x - 5, a.y - 5, c.x - a.x + 10, c.y - a.y + 10, 8) : ctx.rect(a.x - 5, a.y - 5, c.x - a.x + 10, c.y - a.y + 10);
-      ctx.stroke();
-      ctx.fillStyle = colors.focus;
-      const midY = (a.y + c.y) / 2;
-      for (const dir of [-1, 1]) {
-        const edge = dir < 0 ? a.x - 5 : c.x + 5;
-        ctx.beginPath();
-        ctx.moveTo(edge + dir * 9, midY);
-        ctx.lineTo(edge + dir * 2, midY - 6);
-        ctx.lineTo(edge + dir * 2, midY + 6);
-        ctx.closePath();
-        ctx.fill();
-      }
-      pill(ctx, chosen.label, (a.x + c.x) / 2, a.y - 18 < 12 ? c.y + 20 : a.y - 18, colors, { align: 'center', accent: colors.focus });
+    // 選択中の道具の名前の札。身長計の数字と灯りの玉を避けて、枠の上（入らなければ下・横）に置く。
+    if (chosen) {
+      const orbBox = { left: orb.x - 20, right: orb.x + 20, top: orb.y - 20, bottom: orb.y + 20 };
+      const tag = placeTag({
+        width: pillWidth(ctx, chosen.label),
+        frame,
+        bounds: { left: 2, right: width - 2, top: 2, bottom: height - 2 },
+        avoid: [...rulerNumbers, orbBox],
+      });
+      pill(ctx, chosen.label, tag.left, (tag.top + tag.bottom) / 2, colors, { accent: colors.focus });
     }
   }
 
@@ -499,10 +568,8 @@ export function createSideRenderer(canvas) {
     }
     ctx.setLineDash([]);
 
-    // 道具（側面の高さの範囲）と名前。
-    ctx.font = `600 11px ${FONT}`;
-    ctx.textAlign = 'center';
-    placed.forEach((item, index) => {
+    // 道具（側面の高さの範囲）。名前の札は、線をすべて描いたあとに重ねる（破線が文字を横切らない）。
+    placed.forEach((item) => {
       const x = sx(item.prop.z);
       ctx.fillStyle = colors.prop;
       ctx.strokeStyle = colors.propLine;
@@ -510,10 +577,6 @@ export function createSideRenderer(canvas) {
       ctx.rect(x - 3, sy(item.b.maxY), 6, (item.b.maxY - item.b.minY) * s);
       ctx.fill();
       ctx.stroke();
-      ctx.fillStyle = colors.text;
-      const above = index % 2 === 0;
-      ctx.textBaseline = above ? 'bottom' : 'top';
-      haloText(ctx, item.prop.label, x, above ? sy(item.b.maxY) - 5 : sy(item.b.minY) + 5, colors);
     });
 
     // 足跡と踏み台。
@@ -549,7 +612,7 @@ export function createSideRenderer(canvas) {
     ctx.textBaseline = 'top';
     ctx.fillText(`壁から ${distance}cm`, (sx(0) + footX) / 2, dimY + 4);
 
-    // 灯りの高さ：左端の寸法線（縦書きの文字）と、灯りからの引き出し線。
+    // 灯りの高さ：左端の寸法線と、灯りからの引き出し線。数値は、灯りの玉の上に横書きの札で出す。
     const dimX = 16;
     ctx.strokeStyle = colors.lamp;
     ctx.lineWidth = 1.5;
@@ -564,15 +627,6 @@ export function createSideRenderer(canvas) {
     ctx.lineTo(footX, sy(lampY));
     ctx.stroke();
     ctx.setLineDash([]);
-    ctx.save();
-    ctx.translate(dimX + 14, (sy(0) + sy(lampY)) / 2);
-    ctx.rotate(-Math.PI / 2);
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillStyle = colors.lamp;
-    ctx.font = `700 12px ${FONT}`;
-    ctx.fillText(`灯り ${Math.round(lampY)}cm`, 0, 0);
-    ctx.restore();
     const halo = ctx.createRadialGradient(footX, sy(lampY), 2, footX, sy(lampY), 26);
     halo.addColorStop(0, rgba(colors.lamp, 0.8));
     halo.addColorStop(1, rgba(colors.lamp, 0));
@@ -584,6 +638,30 @@ export function createSideRenderer(canvas) {
     ctx.beginPath();
     ctx.arc(footX, sy(lampY), 7, 0, Math.PI * 2);
     ctx.fill();
+
+    // 札（最後に描く）：灯りの高さと、道具の名前。互いに重ならないよう、道具の札は上下を交互にし、重なれば反対側へ。
+    // 札は床より上に置く（床の下には「足跡」と「壁から」の文字がある）。
+    const bounds = { left: 2, right: width - 2, top: 2, bottom: sy(0) - 2 };
+    const lampText = `灯り ${Math.round(lampY)}cm`;
+    const lampFont = `700 12px ${FONT}`;
+    const lampTag = placeTag({
+      width: pillWidth(ctx, lampText, lampFont),
+      frame: { left: footX - 10, right: footX + 10, top: sy(lampY) - 12, bottom: sy(lampY) + 12 },
+      bounds, avoid: [],
+    });
+    pill(ctx, lampText, lampTag.left, (lampTag.top + lampTag.bottom) / 2, colors, { accent: colors.lamp, font: lampFont });
+    const taken = [lampTag, { left: footX - 12, right: footX + 12, top: sy(lampY) - 12, bottom: sy(lampY) + 12 }];
+    const labelFont = `600 11px ${FONT}`;
+    placed.forEach((item, index) => {
+      const x = sx(item.prop.z);
+      const tag = placeTag({
+        width: pillWidth(ctx, item.prop.label, labelFont),
+        frame: { left: x - 4, right: x + 4, top: sy(item.b.maxY), bottom: sy(item.b.minY) },
+        bounds, avoid: taken, prefer: index % 2 === 0 ? 'above' : 'below',
+      });
+      pill(ctx, item.prop.label, tag.left, (tag.top + tag.bottom) / 2, colors, { font: labelFont });
+      taken.push(tag);
+    });
   }
 
   return { resize: base.resize, render };

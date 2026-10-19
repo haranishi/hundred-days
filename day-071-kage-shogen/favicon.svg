@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="影証言">
+  <rect width="64" height="64" rx="14" fill="#12102a"/>
+  <rect x="7" y="7" width="50" height="50" rx="9" fill="#efe6cf"/>
+  <path d="M24 13h12.5l-1 8H41v3H19v-3h5z" fill="#1d1a3a"/>
+  <path d="M23 25.5h14.5l5.5 27H17.5z" fill="#1d1a3a"/>
+  <circle cx="49" cy="17" r="7" fill="#ffb84d" opacity=".32"/>
+  <circle cx="49" cy="17" r="4.5" fill="#ffb84d"/>
+</svg>

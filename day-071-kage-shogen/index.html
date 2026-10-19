@@ -24,7 +24,7 @@
   <meta name="twitter:description" content="停電の夜に壁へ映った人影は、本物か。灯りと道具を動かして影を再現し、灯りの高さから犯人の身長を割り出す5夜の推理パズル。">
   <meta name="twitter:image" content="https://hundred-days.pages.dev/day-071-kage-shogen/og.png">
   <meta name="twitter:image:alt" content="影証言のタイトル画像。壁に映る傘・長い外套・長靴の影が、傘をさした人の形にそろい、「再現」の朱印が押されている。">
-  <link rel="icon" type="image/png" href="./og.png">
+  <link rel="icon" type="image/svg+xml" href="./favicon.svg">
   <link rel="stylesheet" href="./shared/share.css">
   <link rel="stylesheet" href="./app.css">
   <script src="./shared/share.js" defer></script>
@@ -40,7 +40,7 @@
       </div>
       <div class="header-actions">
         <button id="help" class="icon-button" type="button" aria-label="遊び方を開く">?</button>
-        <button id="share-open" class="icon-button" type="button" aria-label="このアプリを共有する"><span aria-hidden="true">↗</span></button>
+        <button id="share-open" class="icon-button share-open" type="button" aria-label="このアプリを共有する">共有</button>
       </div>
     </header>
 
@@ -54,7 +54,7 @@
     <section id="home-panel" class="panel home-panel" aria-labelledby="home-title" data-panel="home">
       <p class="eyebrow">停電の夜、壁に映った人影は本物か。</p>
       <h2 id="home-title" tabindex="-1">灯りの高さで、<br>証言の嘘を暴け。</h2>
-      <p class="lead">目撃者が見た影を、灯りと道具を動かして再現する。影が教える灯りの高さから、犯人の身長を割り出す5つの夜。</p>
+      <p class="lead">目撃者が見た影を、灯りと道具を動かして再現する。影が教える灯りの高さから、犯人の身長を割り<span class="nb">出す5つの夜。</span></p>
       <ol id="case-list" class="case-list"></ol>
       <p class="total"><span>合計</span> <strong id="total-stars">0</strong> <span>/ 15</span></p>
       <div class="home-actions">
@@ -80,10 +80,13 @@
       <h2 id="stage-title" class="stage-title" tabindex="-1"></h2>
       <div class="stage-layout">
         <div class="stage-main">
-          <div id="witness-strip" class="witness-strip">
+          <div id="witness-strip" class="witness-strip" data-open="false">
             <canvas id="sketch" class="sketch" width="168" height="126" role="img" aria-label="証言のスケッチ。壁の影をこの形に重ねる"></canvas>
             <div class="witness-text">
-              <p class="witness-label">証言のスケッチ</p>
+              <div class="witness-head">
+                <p class="witness-label">証言のスケッチ</p>
+                <button id="strip-toggle" class="strip-toggle" type="button" aria-expanded="false" aria-controls="strip-quote"><span class="strip-toggle-label">全文を読む</span><span class="strip-toggle-mark" aria-hidden="true">▾</span></button>
+              </div>
               <p id="strip-quote" class="witness-quote"></p>
             </div>
           </div>
@@ -91,11 +94,16 @@
             <canvas id="wall" class="wall" width="520" height="360" tabindex="0" aria-label="壁。琥珀の玉が灯り、紙色の切り絵が道具。壁に落ちる影を、スケッチの形に重ねます。" aria-describedby="controls-note"></canvas>
           </div>
           <div class="status-row">
-            <p id="lamp-readout" class="readout" data-ly="">灯り <strong>--</strong>cm</p>
-            <p id="item-readout" class="readout" hidden></p>
-            <div id="meter" class="meter" data-band="far" role="img" aria-label="近さ"><i></i><i></i><i></i><i></i></div>
-            <p id="band-text" class="band-text"></p>
+            <div class="readouts">
+              <p id="lamp-readout" class="readout" data-ly="">灯り <strong>--</strong>cm</p>
+              <p id="item-readout" class="readout readout-item" hidden></p>
+            </div>
+            <div class="band-row">
+              <p id="band-text" class="band-text"></p>
+              <div id="meter" class="meter" data-band="far" role="img" aria-label="近さ"><i></i><i></i><i></i><i></i></div>
+            </div>
           </div>
+          <p id="note-text" class="note-text" data-kind="coach"></p>
           <div class="controls">
             <div id="item-select" class="chips" role="radiogroup" aria-label="動かすもの"></div>
             <div class="nudges">
@@ -103,13 +111,12 @@
               <button id="nudge-plus" class="nudge" type="button"><span class="nudge-icon nudge-up" aria-hidden="true"></span><span class="nudge-label">上げる</span></button>
             </div>
           </div>
-          <p id="controls-note" class="sr-only">灯りは上下、棚の道具は左右に動かします。壁をドラッグするか、壁に焦点を当てて矢印キーを押すか、画面のボタンを使います。Shiftを押しながらだと5cmずつ動きます。</p>
+          <p id="controls-note" class="sr-only">灯りは上下、棚の道具は左右に動きます。灯りの玉や道具をつかんでドラッグ、画面の『上げる・下げる』（道具は『左へ・右へ』）ボタン、パソコンでは壁をクリックしてから矢印キー（Shiftで5cm）のどれでもできます。</p>
           <div class="assist-row">
             <button id="hint" class="button button-secondary" type="button">ヒント</button>
             <button id="guide-toggle" class="button button-secondary" type="button" aria-pressed="false">ガイドを重ねる</button>
             <button id="reset-stage" class="text-button" type="button">はじめから</button>
           </div>
-          <p id="hint-text" class="hint-text" role="status" hidden></p>
         </div>
         <aside class="stage-side">
           <details id="clues" class="clues">
@@ -146,7 +153,7 @@
     </section>
 
     <section id="verdict-panel" class="panel verdict-panel" aria-labelledby="verdict-title" data-panel="verdict" hidden>
-      <div class="stamp stamp-static" aria-hidden="true">解決</div>
+      <div class="stamp-holder" aria-hidden="true"><div class="stamp stamp-static">解決</div></div>
       <h2 id="verdict-title" tabindex="-1"></h2>
       <p id="verdict-text" class="lead"></p>
       <p id="verdict-stars" class="verdict-stars"></p>
@@ -157,16 +164,16 @@
     </section>
 
     <section id="epilogue-panel" class="panel epilogue-panel" aria-labelledby="epilogue-title" data-panel="epilogue" hidden>
-      <div class="stamp stamp-static" aria-hidden="true">全夜解決</div>
+      <div class="stamp-holder" aria-hidden="true"><div class="stamp stamp-static">全夜解決</div></div>
       <p class="eyebrow">EPILOGUE</p>
       <h2 id="epilogue-title" tabindex="-1"></h2>
       <p id="epilogue-text" class="lead"></p>
-      <ol id="epilogue-recap" class="recap" aria-label="5つの夜の振り返り"></ol>
       <p id="epilogue-stars" class="verdict-stars"></p>
       <div class="verdict-actions">
         <button id="epilogue-share" class="button button-primary" type="button">友だちに紹介する</button>
         <button id="restart" class="button button-secondary" type="button">事件簿へ</button>
       </div>
+      <ol id="epilogue-recap" class="recap" aria-label="5つの夜の振り返り"></ol>
     </section>
 
     <p id="feedback" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></p>
@@ -179,10 +186,10 @@
         <li><strong>スケッチに重ねる</strong><span>目撃者のスケッチと同じ形になるよう、壁に落ちる影を動かします。</span></li>
         <li><strong>灯りは上下、道具は左右</strong><span>灯りは足跡の位置で上下にだけ動きます。棚の上の道具は、左右にすべらせられます。</span></li>
         <li><strong>近い物ほど、大きく動く</strong><span>灯りに近い道具ほど、影は大きく、速く動きます。</span></li>
-        <li><strong>身長を読む</strong><span>再現できたら、灯りの高さを6割で割ります。それが、灯りを提げた人の身長です。</span></li>
+        <li><strong>身長を読む</strong><span>再現できたら、灯りの<span class="nb">高さを6割で</span>割ります。それが、灯りを提げた人の身長です。</span></li>
       </ol>
-      <p class="dialog-note">操作は、壁のドラッグ、壁に焦点を当てての矢印キー（Shiftで5cm）、画面のボタンのどれでもできます。</p>
-      <p class="dialog-note">ガイド・ヒント・誤った推理を使うと、星が減ります。夜1の最初のガイドは減りません。</p>
+      <p class="dialog-note">灯りの玉や道具をつかんでドラッグ、画面の『上げる・下げる』ボタン、パソコンでは壁をクリックしてから矢印キー（<span class="nb">Shiftで5cm</span>）のどれでもできます。</p>
+      <p class="dialog-note">ガイド・ヒント・誤った推理を使うと、星が減ります。<span class="nb">夜1の</span>最初のガイドは減りません。</p>
     </div>
   </dialog>
 
@@ -190,7 +197,7 @@
     <div class="dialog-content">
       <div class="dialog-header"><div><p class="eyebrow">PASS THE CASE</p><h2 id="share-title">次は、友だちの番。</h2></div><button class="close-button" type="button" data-close aria-label="共有を閉じる">×</button></div>
       <p class="dialog-lead">影証言を共有する</p>
-      <p class="dialog-note">灯りを動かして影を再現し、灯りの高さから犯人の身長を割り出す。5つの夜の影絵×推理パズル。</p>
+      <p class="dialog-note">灯りを動かして影を再現し、灯りの高さから犯人の身長を割り<span class="nb">出す。5つの</span>夜の影絵×推理パズル。</p>
       <div id="share"></div>
       <div class="manual-copy"><label for="share-url">アプリのURL</label><input id="share-url" type="url" value="https://hundred-days.pages.dev/day-071-kage-shogen/" readonly aria-describedby="manual-copy-note"><p id="manual-copy-note">コピーできない場合は、このURLを選択して手動でコピーできます。</p></div>
     </div>

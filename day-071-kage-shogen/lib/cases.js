@@ -87,6 +87,8 @@ export const CASES = Object.freeze([
         { id: 'coat', shape: 'coat', label: '外套', scale: 0.533, z: 80, y: 89.5, x: fixed(116.5) },
         { id: 'hat', shape: 'hat', label: '帽子', scale: 0.414, z: 135.5, y: 114.5, x: fixed(114.5) },
       ],
+      // 夜1より少し厳しく：帽子と外套を、それぞれ75%以上重ねる（灯りの許容が約±4cmになり、夜1の約±5.5cmより狭い）。
+      threshold: { union: 0.8, part: 0.75, decoyArea: 0.05, near: 0.7, warm: 0.5 },
     },
     clues: [
       { id: 'rule', kind: 'rule', text: '灯りは、胸の高さに提げる。月影荘の決まりで、高さは身長のちょうど6割。' },

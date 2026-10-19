@@ -1,12 +1,13 @@
 import { CASES, EPILOGUE } from './lib/cases.js';
 import { MAX_STARS, SNAP_MS, SOLVE_HOLD_MS, STEP } from './lib/config.js';
 import { judge, readingOf, suspectsOf, witnessOf } from './lib/deduction.js';
-import { emptyProgress, isUnlocked, loadProgress, recordClear, saveProgress, starsFor, totalStars } from './lib/game.js';
+import { emptyProgress, isUnlocked, loadProgress, nextIndex, recordClear, saveProgress, starsFor, totalStars } from './lib/game.js';
 import { hitTest } from './lib/hit.js';
 import {
   confirmSolve, createSession, describeAssessment, lampReadout, movableIds, nudge, propReadout,
   reset, select, setLamp, setPropX, toggleGuide, useHint,
 } from './lib/stage.js';
+import { nowrapSegments } from './lib/text.js';
 import { createTransform } from './lib/transform.js';
 import { createSideRenderer, createSketchRenderer, createWallRenderer } from './lib/view.js';
 
@@ -47,7 +48,8 @@ function initializeRuntime() {
   let visual = null;
   let flash = 0;
   let announcedBand = '';
-  let coachVisible = false;
+  // 注記の欄に出しているヒントの文（空ならその夜の一言）。操作しても消さず、次のヒント・はじめから・夜の出入りで替わる。
+  let hintText = '';
   const dialogOrigins = new Map();
   const hasDialog = () => document.querySelector('dialog[open]') !== null;
   const active = () => !windowBlurred && !document.hidden && !hasDialog();
@@ -67,6 +69,32 @@ function initializeRuntime() {
     return node;
   }
 
+  // 数字を含む文：数字・単位・式の途中で折り返さない範囲を span.nb で包む（textContent は元の文のまま）。
+  function richNodes(text) {
+    return nowrapSegments(text).map((segment) => (segment.keep ? element('span', 'nb', segment.text) : document.createTextNode(segment.text)));
+  }
+
+  function richElement(tag, className, text) {
+    const node = element(tag, className);
+    node.append(...richNodes(text));
+    return node;
+  }
+
+  // 短い文（20字まで）は文ごとに折り返さず、句の途中（「影は／嘘をつかない」）で割れないようにする。
+  function sentenceNodes(text) {
+    return (String(text).match(/[^。]+。?/gu) ?? [String(text)])
+      .flatMap((sentence) => (Array.from(sentence).length <= 20 ? [element('span', 'nb', sentence)] : richNodes(sentence)));
+  }
+
+  const richTexts = new WeakMap();
+  function setRich(target, value) {
+    const node = typeof target === 'string' ? byId(target) : target;
+    const text = String(value);
+    if (node.textContent === text && richTexts.get(node) === text) return;
+    node.replaceChildren(...richNodes(text));
+    richTexts.set(node, text);
+  }
+
   function starsElement(stars) {
     const node = element('span', 'stars');
     node.setAttribute('role', 'img');
@@ -77,6 +105,15 @@ function initializeRuntime() {
       node.append(star);
     }
     return node;
+  }
+
+  // 星の並びと、星の数の文字（「2/3」。読み上げは星の並びの aria-label に任せる）。
+  function starRow(stars) {
+    const row = element('span', 'star-row');
+    const count = element('span', 'star-count', `${stars}/${MAX_STARS}`);
+    count.setAttribute('aria-hidden', 'true');
+    row.append(starsElement(stars), count);
+    return row;
   }
 
   function persistProgress() {
@@ -160,17 +197,19 @@ function initializeRuntime() {
   }
 
   function renderHome() {
+    const next = nextIndex(progress);
     byId('case-list').replaceChildren(...CASES.map((caseDef, index) => {
       const li = element('li');
       const button = element('button', 'case-card');
       const unlocked = isUnlocked(progress, index);
+      const cleared = progress.cleared[caseDef.id];
       button.dataset.caseId = caseDef.id;
       button.dataset.locked = String(!unlocked);
       button.setAttribute('aria-disabled', String(!unlocked || !supported));
       button.append(
         element('span', 'case-no', `第${caseDef.no}夜`),
         element('span', 'case-title', caseDef.title),
-        element('span', 'case-summary', caseDef.summary),
+        richElement('span', 'case-summary', caseDef.summary),
       );
       const state = element('span', 'case-state');
       if (!unlocked) {
@@ -179,8 +218,17 @@ function initializeRuntime() {
         icon.setAttribute('aria-hidden', 'true');
         note.append(icon, document.createTextNode('前の夜を解決すると開く'));
         state.append(note);
-      } else if (progress.cleared[caseDef.id]) {
-        state.append(starsElement(progress.cleared[caseDef.id].stars));
+      } else if (cleared) {
+        button.classList.add('is-solved');
+        state.append(starRow(cleared.stars));
+      } else if (index === next && supported) {
+        // 次に開く夜：琥珀の枠と「はじめる →」（琥珀の強調はこのカードだけ。描画できない環境では開けないので出さない）。
+        button.classList.add('is-next');
+        const label = element('span', 'next-label', 'はじめる ');
+        const arrow = element('span', '', '→');
+        arrow.setAttribute('aria-hidden', 'true');
+        label.append(arrow);
+        state.append(label);
       } else state.textContent = '未解決';
       button.append(state);
       button.addEventListener('click', () => {
@@ -219,10 +267,10 @@ function initializeRuntime() {
     const witness = witnessOf(caseDef);
     setText('briefing-place', caseDef.place);
     setText('briefing-title', caseTitle());
-    setText('briefing-intro', caseDef.intro);
+    setRich('briefing-intro', caseDef.intro);
     setText('witness-name', witness.name);
     setText('witness-role', witness.role);
-    setText('witness-quote', `「${witness.quote}」`);
+    setRich('witness-quote', `「${witness.quote}」`);
     progress = { ...progress, last: caseDef.id };
     persistProgress();
     showPhase('briefing');
@@ -232,7 +280,7 @@ function initializeRuntime() {
     const labels = { witness: '証言', scene: '現場', footprint: '足跡', rule: '決まり', stool: '踏み台', alibi: 'アリバイ', result: '再現' };
     const li = element('li', 'clue');
     li.dataset.kind = kind;
-    li.append(element('span', 'clue-kind', labels[kind]), element('span', 'clue-text', text));
+    li.append(element('span', 'clue-kind', labels[kind]), richElement('span', 'clue-text', text));
     return li;
   }
 
@@ -265,19 +313,43 @@ function initializeRuntime() {
     const caseDef = CASES[caseIndex];
     const witness = witnessOf(caseDef);
     setText('stage-title', caseTitle());
-    setText('strip-quote', `${witness.name}（${witness.role}）「${witness.quote}」`);
+    setRich('strip-quote', `${witness.name}（${witness.role}）「${witness.quote}」`);
+    setStripOpen(false);
     byId('stage-clues').replaceChildren(
       clueElement('witness', witness.quote), clueElement('scene', caseDef.sceneNote), clueElement('footprint', caseDef.footprint),
       ...ruleClues(caseDef).map((clue) => clueElement(clue.kind, clue.text)),
     );
     byId('clues').open = caseDef.no === 1;
-    setText('hint-text', '');
-    byId('hint-text').hidden = true;
-    setText('band-text', '');
-    coachVisible = true;
+    hintText = '';
     buildChips();
     showPhase('stage');
     afterChange();
+  }
+
+  // 証言ストリップの開閉。開くと引用の全文と、大きいスケッチ。夜に入るたびに閉じる。
+  function setStripOpen(open) {
+    const strip = byId('witness-strip');
+    const toggle = byId('strip-toggle');
+    strip.dataset.open = String(open);
+    toggle.setAttribute('aria-expanded', String(open));
+    toggle.querySelector('.strip-toggle-label').textContent = open ? 'たたむ' : '全文を読む';
+    toggle.querySelector('.strip-toggle-mark').textContent = open ? '▴' : '▾';
+    requestRender();
+  }
+
+  // 注記の欄：ヒントを押したあとはヒントの文、それ以外はその夜の一言（ガイドを消している夜1は、消したとき用の一言）。
+  function updateNote() {
+    const caseDef = session.caseDef;
+    const note = byId('note-text');
+    const kind = hintText ? 'hint' : 'coach';
+    const coach = caseDef.guide === 'on' && !session.guideOn && caseDef.coachNoGuide ? caseDef.coachNoGuide : caseDef.coach;
+    const text = hintText || coach;
+    if (note.dataset.kind === kind && note.textContent === text) return;
+    note.dataset.kind = kind;
+    if (kind === 'hint') {
+      const [, tag, body] = /^(ヒント\d+：)(.*)$/su.exec(text) ?? [null, '', text];
+      note.replaceChildren(...(tag ? [element('strong', 'note-tag', tag)] : []), ...richNodes(body));
+    } else note.replaceChildren(...richNodes(text));
   }
 
   function chooseItem(id) {
@@ -294,14 +366,32 @@ function initializeRuntime() {
     strong.textContent = String(lamp);
     byId('lamp-readout').dataset.ly = String(lamp);
     const isLamp = session.selected === 'lamp';
-    byId('item-readout').hidden = isLamp;
-    if (!isLamp) setText('item-readout', `${itemLabel(session.selected)} 横 ${propReadout(session, session.selected)}cm`);
+    const itemReadout = byId('item-readout');
+    itemReadout.hidden = isLamp;
+    if (!isLamp) {
+      const label = itemLabel(session.selected);
+      const value = String(propReadout(session, session.selected));
+      if (itemReadout.textContent !== `${label} 横 ${value}cm`) {
+        itemReadout.replaceChildren(`${label} 横 `, element('strong', '', value), 'cm');
+      }
+    }
+    // 近さ：言葉（左）とメーター（右）。理由があれば、言葉のあとに小さく添える。メーターは段の中の位置まで連続して満たす。
     const description = describeAssessment(session);
     const band = ['far', 'warm', 'near', 'match'][description.step - 1];
     const text = description.detail ? `${description.label}（${description.detail}）` : description.label;
-    byId('meter').dataset.band = band;
-    byId('meter').setAttribute('aria-label', `近さ：${description.label}`);
-    setText('band-text', coachVisible && session.caseDef.coach ? session.caseDef.coach : text);
+    const meter = byId('meter');
+    meter.dataset.band = band;
+    meter.setAttribute('aria-label', `近さ：${description.label}`);
+    description.fills.forEach((fill, index) => {
+      const value = String(Math.round(Math.max(0, Math.min(1, fill)) * 1000) / 1000);
+      const tick = meter.children[index];
+      if (tick.style.getPropertyValue('--fill') !== value) tick.style.setProperty('--fill', value);
+    });
+    const bandText = byId('band-text');
+    if (bandText.textContent !== text) {
+      bandText.replaceChildren(description.label, ...(description.detail ? [element('span', 'band-detail', `（${description.detail}）`)] : []));
+    }
+    updateNote();
     for (const chip of byId('item-select').querySelectorAll('[data-item]')) {
       const selected = chip.dataset.item === session.selected;
       chip.setAttribute('aria-checked', String(selected));
@@ -326,8 +416,7 @@ function initializeRuntime() {
     return text;
   }
 
-  function afterChange(changed = false) {
-    if (changed) coachVisible = false;
+  function afterChange() {
     const text = updateStageDisplay();
     requestRender();
     clearTimeout(solveTimer);
@@ -392,8 +481,8 @@ function initializeRuntime() {
 
   function enterSolved() {
     if (phase !== 'stage' || session?.status !== 'solved') return;
-    setText('reveal-text', CASES[caseIndex].reveal);
-    setText('reading-text', readingOf(CASES[caseIndex]));
+    setRich('reveal-text', CASES[caseIndex].reveal);
+    setRich('reading-text', readingOf(CASES[caseIndex]));
     showPhase('solved');
     setText('feedback', '再現できた');
   }
@@ -412,14 +501,20 @@ function initializeRuntime() {
       const head = element('div', 'suspect-head');
       const badge = element('span', 'suspect-badge', 'ちがう');
       badge.hidden = true;
-      head.append(element('h3', 'suspect-name', suspect.name), element('p', 'suspect-meta', `${suspect.role}・${suspect.height}cm`), badge);
+      head.append(element('h3', 'suspect-name', suspect.name), richElement('p', 'suspect-meta', `${suspect.role}・${suspect.height}cm`), badge);
       const actions = element('div', 'suspect-actions');
-      const exclude = element('button', 'button button-ghost exclude', '外す ✕');
-      exclude.setAttribute('aria-pressed', 'false');
+      // 外す：自分用の印（判定には使わない。外した人も「この人だ」で選べる）。押したあとは「✕ 外した（戻す）」。
+      const exclude = element('button', 'button button-ghost exclude');
+      const setExcludeLabel = (excluded) => {
+        const mark = element('span', '', '✕');
+        mark.setAttribute('aria-hidden', 'true');
+        exclude.replaceChildren(...(excluded ? [mark, ' 外した（戻す）'] : ['外す ', mark]));
+        exclude.setAttribute('aria-pressed', String(excluded));
+      };
+      setExcludeLabel(false);
       exclude.addEventListener('click', () => {
         if (phase !== 'deduction' || hasDialog()) return;
-        const excluded = card.classList.toggle('is-excluded');
-        exclude.setAttribute('aria-pressed', String(excluded));
+        setExcludeLabel(card.classList.toggle('is-excluded'));
       });
       const accuse = element('button', 'button button-primary accuse', 'この人だ');
       accuse.addEventListener('click', () => {
@@ -435,12 +530,12 @@ function initializeRuntime() {
         accuse.disabled = true;
         const message = byId('deduction-message');
         card.append(message);
-        message.textContent = result.message;
+        setRich(message, result.message);
         message.hidden = false;
         setText('feedback', result.message);
       });
       actions.append(exclude, accuse);
-      card.append(head, element('p', 'suspect-statement', `「${suspect.statement}」`), actions);
+      card.append(head, richElement('p', 'suspect-statement', `「${suspect.statement}」`), actions);
       return card;
     }));
     showPhase('deduction');
@@ -454,26 +549,26 @@ function initializeRuntime() {
     progress = recordClear(progress, caseDef.id, stars);
     persistProgress();
     setText('verdict-title', caseTitle());
-    setText('verdict-text', caseDef.closing);
+    setRich('verdict-text', caseDef.closing);
     const reasons = [session.usedGuide && 'ガイドを使った', hintsUsed > 0 && 'ヒントを使った', wrongAnswers > 0 && '誤った推理があった'].filter(Boolean);
     const detail = reasons.length ? reasons.join('・') : 'ガイド・ヒント・誤答なし';
-    byId('verdict-stars').replaceChildren(starsElement(stars), element('span', '', `星${stars}つ（${detail}）`));
+    byId('verdict-stars').replaceChildren(starsElement(stars), richElement('span', '', `星${stars}つ（${detail}）`));
     setText('next-case', caseIndex === CASES.length - 1 ? 'エピローグへ →' : '次の夜へ →');
     showPhase('verdict');
   }
 
   function enterEpilogue() {
     setText('epilogue-title', EPILOGUE.title);
-    setText('epilogue-text', EPILOGUE.text);
-    setText('epilogue-stars', `合計 ${totalStars(progress)} / ${CASES.length * MAX_STARS}`);
+    byId('epilogue-text').replaceChildren(...sentenceNodes(EPILOGUE.text));
+    setRich('epilogue-stars', `合計 ${totalStars(progress)} / ${CASES.length * MAX_STARS}`);
     byId('epilogue-recap')?.replaceChildren(...CASES.map((caseDef) => {
       const li = element('li');
       const culprit = suspectsOf(caseDef).find((suspect) => suspect.id === caseDef.culprit);
       li.append(
         element('span', 'recap-no', `第${caseDef.no}夜`),
         element('span', 'recap-title', caseDef.title),
-        element('span', 'recap-culprit', `${culprit.name}・灯り${caseDef.stage.lamp.solution}cm`),
-        starsElement(progress.cleared[caseDef.id]?.stars ?? 0),
+        richElement('span', 'recap-culprit', `${culprit.name}・灯り${caseDef.stage.lamp.solution}cm`),
+        starRow(progress.cleared[caseDef.id]?.stars ?? 0),
       );
       return li;
     }));
@@ -530,10 +625,9 @@ function initializeRuntime() {
   });
   wall.addEventListener('pointermove', (event) => {
     if (!playing() || !drag || drag.pointerId !== event.pointerId) return;
-    const changed = drag.id === 'lamp'
-      ? setLamp(session, drag.startValue - (event.clientY - drag.startY) / drag.scale)
-      : setPropX(session, drag.id, drag.startValue + (event.clientX - drag.startX) / drag.scale);
-    afterChange(changed);
+    if (drag.id === 'lamp') setLamp(session, drag.startValue - (event.clientY - drag.startY) / drag.scale);
+    else setPropX(session, drag.id, drag.startValue + (event.clientX - drag.startX) / drag.scale);
+    afterChange();
   });
   for (const type of ['pointerup', 'pointercancel', 'lostpointercapture']) {
     wall.addEventListener(type, (event) => { if (drag?.pointerId === event.pointerId) endDrag(); });
@@ -546,7 +640,8 @@ function initializeRuntime() {
     if (!directions[event.key]) return;
     endDrag(false);
     endNudge(false);
-    afterChange(nudge(session, directions[event.key], event.shiftKey ? STEP.coarse : STEP.fine));
+    nudge(session, directions[event.key], event.shiftKey ? STEP.coarse : STEP.fine);
+    afterChange();
   });
 
   for (const [id, direction] of [['nudge-minus', -1], ['nudge-plus', 1]]) {
@@ -562,10 +657,12 @@ function initializeRuntime() {
       const current = session;
       const tick = () => {
         if (epoch !== activityEpoch || current !== session || heldNudge !== held || !playing()) return;
-        afterChange(nudge(session, direction, STEP.fine));
+        nudge(session, direction, STEP.fine);
+        afterChange();
         repeatTimer = setTimeout(tick, 60);
       };
-      afterChange(nudge(session, direction, STEP.fine));
+      nudge(session, direction, STEP.fine);
+      afterChange();
       repeatTimer = setTimeout(tick, 400);
     });
     for (const type of ['pointerup', 'pointercancel', 'pointerleave']) {
@@ -576,7 +673,8 @@ function initializeRuntime() {
     button.addEventListener('blur', () => { if (heldNudge?.button === button) endNudge(); });
     button.addEventListener('click', (event) => {
       if (event.detail !== 0 || !playing()) return;
-      afterChange(nudge(session, direction, STEP.fine));
+      nudge(session, direction, STEP.fine);
+      afterChange();
     });
   }
 
@@ -584,30 +682,33 @@ function initializeRuntime() {
     if (!playing()) return;
     const wasUsed = session.usedGuide;
     toggleGuide(session);
-    afterChange(true);
+    afterChange();
     if (!wasUsed && session.usedGuide) setText('feedback', 'ガイドを使ったので、この夜の星が1つ減ります');
   });
+  // ヒント：押すたびに「いまのずれの名指し」と「その夜の考え方」を交互に、注記の欄（壁の下・操作の上）へ出す。
   byId('hint').addEventListener('click', () => {
     if (!playing()) return;
     const hint = useHint(session);
-    const text = `ヒント${hint.index + 1}：${hint.text}`;
-    setText('hint-text', text);
-    byId('hint-text').hidden = false;
-    afterChange(true);
-    setText('feedback', text);
+    hintText = `ヒント${hint.index + 1}：${hint.text}`;
+    afterChange();
+    setText('feedback', hintText);
   });
   byId('reset-stage').addEventListener('click', () => {
     if (phase !== 'stage' || !session || hasDialog()) return;
     stopActivity();
     reset(session);
-    coachVisible = true;
+    hintText = '';
     afterChange();
     setText('feedback', 'はじめからにしました');
+  });
+  byId('strip-toggle').addEventListener('click', () => {
+    if (phase !== 'stage' || hasDialog()) return;
+    setStripOpen(byId('witness-strip').dataset.open !== 'true');
   });
   byId('deduction-hint').addEventListener('click', () => {
     if (phase !== 'deduction' || deductionHintUsed || hasDialog()) return;
     deductionHintUsed = true;
-    setText('deduction-hint-text', CASES[caseIndex].deductionHint);
+    setRich('deduction-hint-text', CASES[caseIndex].deductionHint);
     byId('deduction-hint-text').hidden = false;
     byId('deduction-hint').disabled = true;
   });

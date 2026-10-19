@@ -15,14 +15,17 @@ const publicFiles = new Map([
   ['lib/score.js', 'text/javascript; charset=utf-8'],
   ['lib/cases.js', 'text/javascript; charset=utf-8'],
   ['lib/deduction.js', 'text/javascript; charset=utf-8'],
+  ['lib/diagnose.js', 'text/javascript; charset=utf-8'],
   ['lib/stage.js', 'text/javascript; charset=utf-8'],
   ['lib/game.js', 'text/javascript; charset=utf-8'],
   ['lib/transform.js', 'text/javascript; charset=utf-8'],
   ['lib/hit.js', 'text/javascript; charset=utf-8'],
   ['lib/view.js', 'text/javascript; charset=utf-8'],
+  ['lib/text.js', 'text/javascript; charset=utf-8'],
   ['shared/share.js', 'text/javascript; charset=utf-8'],
   ['shared/share.css', 'text/css; charset=utf-8'],
   ['og.png', 'image/png'],
+  ['favicon.svg', 'image/svg+xml'],
 ]);
 const securityHeaders = {
   'Cache-Control': 'no-store',

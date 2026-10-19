@@ -1,8 +1,8 @@
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
-import { copyFile, mkdir, mkdtemp, rm, symlink, writeFile } from 'node:fs/promises';
+import { copyFile, mkdir, mkdtemp, readdir, readFile, rm, symlink, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
-import { dirname, join } from 'node:path';
+import { dirname, join, posix } from 'node:path';
 import test from 'node:test';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
@@ -12,9 +12,10 @@ const publicFiles = [
   ['index.html', 'text/html'], ['app.css', 'text/css'], ['app.js', 'text/javascript'],
   ['lib/config.js', 'text/javascript'], ['lib/geometry.js', 'text/javascript'], ['lib/shapes.js', 'text/javascript'],
   ['lib/score.js', 'text/javascript'], ['lib/cases.js', 'text/javascript'], ['lib/deduction.js', 'text/javascript'],
+  ['lib/diagnose.js', 'text/javascript'],
   ['lib/stage.js', 'text/javascript'], ['lib/game.js', 'text/javascript'], ['lib/transform.js', 'text/javascript'], ['lib/hit.js', 'text/javascript'],
-  ['lib/view.js', 'text/javascript'], ['shared/share.js', 'text/javascript'], ['shared/share.css', 'text/css'],
-  ['og.png', 'image/png'],
+  ['lib/view.js', 'text/javascript'], ['lib/text.js', 'text/javascript'], ['shared/share.js', 'text/javascript'], ['shared/share.css', 'text/css'],
+  ['og.png', 'image/png'], ['favicon.svg', 'image/svg+xml'],
 ];
 const csp = "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'none'";
 
@@ -48,6 +49,26 @@ async function fixtureRoot(t) {
   await copyFile(join(dayRoot, 'tools/serve.mjs'), join(root, 'tools/serve.mjs'));
   return { fixture, root };
 }
+
+// 新しい lib のファイルを足したのに許可リストへ足し忘れると、画面が空になる（2回起きた）。ここで防ぐ。
+test('lib の全ファイルと、app.js・lib が import するファイルは、すべて配信される', async () => {
+  const get = await previewRequests();
+  const modules = (await readdir(join(dayRoot, 'lib'))).filter((name) => name.endsWith('.js'));
+  assert.ok(modules.length >= 13, `lib のファイルが少なすぎる: ${modules.length}`);
+  for (const name of modules) assert.equal((await get(`${prefix}lib/${name}`)).status, 200, `lib/${name}`);
+  for (const source of ['app.js', ...modules.map((name) => `lib/${name}`)]) {
+    const text = await readFile(join(dayRoot, source), 'utf8');
+    for (const [, specifier] of text.matchAll(/(?:import|export)\s[^'"]*?from\s*['"](\.[^'"]+)['"]/g)) {
+      const target = posix.join(posix.dirname(source), specifier);
+      assert.equal((await get(`${prefix}${target}`)).status, 200, `${source} が import する ${target}`);
+    }
+  }
+  // index.html が読む自分のファイルも、同じく配信される。
+  const html = await readFile(join(dayRoot, 'index.html'), 'utf8');
+  for (const [, href] of html.matchAll(/(?:href|src)="(\.\/[^"]+)"/g)) {
+    assert.equal((await get(`${prefix}${href.slice(2)}`)).status, 200, `index.html が読む ${href}`);
+  }
+});
 
 test('source preview は自分のDayの公開ファイルだけを配る', async (t) => {
   const get = await previewRequests();
@@ -113,7 +134,7 @@ test('source preview は自分のDayの公開ファイルだけを配る', async
   });
 });
 
-test('一時ディレクトリで許可リスト全17ファイルの配信とMIMEを確かめる', async (t) => {
+test(`一時ディレクトリで許可リスト全${publicFiles.length}ファイルの配信とMIMEを確かめる`, async (t) => {
   const { root } = await fixtureRoot(t);
   for (const [path] of publicFiles) {
     await mkdir(dirname(join(root, path)), { recursive: true });
@@ -124,7 +145,7 @@ test('一時ディレクトリで許可リスト全17ファイルの配信とMIM
     const response = await get(`${prefix}${path}`);
     assert.equal(response.status, 200, path);
     assert.equal(response.body, `public fixture: ${path}`);
-    assert.equal(response.headers['content-type'], type === 'image/png' ? type : `${type}; charset=utf-8`);
+    assert.equal(response.headers['content-type'], type.startsWith('image/') ? type : `${type}; charset=utf-8`);
     assertHeaders(response);
   }
   assert.equal((await get(prefix)).body, 'public fixture: index.html');
