@@ -1,0 +1,74 @@
+{
+  "feature_name": "day-071-kage-shogen",
+  "created_at": "2026-10-19T04:46:21+00:00",
+  "updated_at": "2026-10-19T12:00:00+00:00",
+  "language": "ja",
+  "phase": "validated-experience-passed-visual-needs-human",
+  "approvals": {
+    "requirements": {
+      "generated": true,
+      "approved": true
+    },
+    "design": {
+      "generated": true,
+      "approved": true
+    },
+    "tasks": {
+      "generated": true,
+      "approved": true
+    }
+  },
+  "ready_for_implementation": true,
+  "approval_scope": {
+    "requirements": "本人の個別レビューは未実施。「影証というウェブアプリを作成していってほしい」の依頼と、2026-10-19の自律進行の指示（要件・設計・タスク・実装・検証・作業ブランチのGit操作まで一気通貫）に基づき、承認済みとして進める。",
+    "downstream": "設計・タスク作成・実装・検証は、同じ自律進行の指示の範囲。公開・マージ・デプロイ・SNS投稿は含まない。",
+    "open_items": [
+      "「影証」を、2026-10-19の再提案の案③「影証言」と解釈した（要件の前提）。",
+      "題名の商標は、J-PlatPatの簡易な自動検索（文字列・称呼とも一致0件、類似検索は別分野の3件）までで、弁理士の確認は未実施。公開前に本人が確認する。",
+      "5つの夜の物語・容疑者の名前・身長は本リポジトリでの創作。本人の好みでの差し替えを想定する。",
+      "画面の独立評価（AI）が、3周とも合格に届かなかった（14・15・15/20）。同じ項目（余白と整列・タイポグラフィ・モバイル・一貫性）が続いたため、契約に従って本人へ返す。残件は experience-r3.md・visual-r3.md の改善案。続けるかどうかは本人の判断。",
+      "本人によるプレイと、面白さ・難しさの評価は未実施（AIの評価は代理指標）。"
+    ]
+  },
+  "delivery": {
+    "repository": "haranishi/hundred-days",
+    "base": "main",
+    "branch": "feat/day-071-kage-shogen",
+    "authorized_operations": [
+      "commit",
+      "push",
+      "PR"
+    ],
+    "not_authorized": [
+      "merge",
+      "deploy",
+      "publish",
+      "x-post"
+    ],
+    "scope": "作業ブランチへのcommit・push・draftのままのPR作成まで。公開は本人の指示を待つ。",
+    "status": "pr-opened-draft",
+    "pull_request": "https://github.com/haranishi/hundred-days/pull/157",
+    "note": "作業ブランチへのcommit・push・draftのままのPR作成まで済み。マージ・公開・X投稿は、本人の指示を待つ。"
+  },
+  "validation": {
+    "status": "experience-passed-visual-needs-human",
+    "report": ".agent-harness/runs/day071-kage-shogen/validation-r2.md",
+    "public_status": "draft",
+    "rounds": {
+      "experience": {
+        "r1": 12,
+        "r2": 15,
+        "r3": 17,
+        "passed": true
+      },
+      "visual": {
+        "r1": 14,
+        "r2": 15,
+        "r3": 15,
+        "passed": false
+      }
+    },
+    "evaluated_commit": "6ac5e2b",
+    "note": "体験は第3周で合格（17/20・0点なし）。画面は3周とも不合格（14・15・15。合格は16点以上かつ0点なし）で、同じ項目が2周続いたため、契約に従って本人へ返す。AIによる評価は代理指標で、本人のプレイが最終判定。"
+  }
+}

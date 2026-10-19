@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#12102a">
+  <meta name="color-scheme" content="dark">
+  <meta name="description" content="停電の夜に壁へ映った人影は、本物か。灯りと道具を動かして目撃証言の影を再現し、灯りの高さから犯人の身長を割り出す5夜の推理パズル。">
+  <title>影証言 — 灯りの高さで、証言の嘘を暴く</title>
+  <meta name="share:text" content="影証言 — 灯りの高さで、目撃証言の嘘を暴く影絵×推理パズル。5つの夜、約10分。">
+  <link rel="canonical" href="https://hundred-days.pages.dev/day-071-kage-shogen/">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="ja_JP">
+  <meta property="og:title" content="影証言 — 灯りの高さで、証言の嘘を暴く">
+  <meta property="og:description" content="停電の夜に壁へ映った人影は、本物か。灯りと道具を動かして影を再現し、灯りの高さから犯人の身長を割り出す5夜の推理パズル。">
+  <meta property="og:url" content="https://hundred-days.pages.dev/day-071-kage-shogen/">
+  <meta property="og:image" content="https://hundred-days.pages.dev/day-071-kage-shogen/og.png">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="影証言のタイトル画像。壁に映る傘・長い外套・長靴の影が、傘をさした人の形にそろい、「再現」の朱印が押されている。">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="影証言 — 灯りの高さで、証言の嘘を暴く">
+  <meta name="twitter:description" content="停電の夜に壁へ映った人影は、本物か。灯りと道具を動かして影を再現し、灯りの高さから犯人の身長を割り出す5夜の推理パズル。">
+  <meta name="twitter:image" content="https://hundred-days.pages.dev/day-071-kage-shogen/og.png">
+  <meta name="twitter:image:alt" content="影証言のタイトル画像。壁に映る傘・長い外套・長靴の影が、傘をさした人の形にそろい、「再現」の朱印が押されている。">
+  <link rel="icon" type="image/svg+xml" href="./favicon.svg">
+  <link rel="stylesheet" href="./shared/share.css">
+  <link rel="stylesheet" href="./app.css">
+  <script src="./shared/share.js" defer></script>
+  <script type="module" src="./app.js"></script>
+</head>
+<body>
+  <main id="app" class="app" data-phase="home" data-case="">
+    <header class="app-header">
+      <button id="back" class="icon-button back-button" type="button" hidden><span aria-hidden="true">‹</span> 事件簿</button>
+      <div class="brand">
+        <p class="eyebrow">KAGE-SHŌGEN</p>
+        <h1 id="title">影証言</h1>
+      </div>
+      <div class="header-actions">
+        <button id="help" class="icon-button" type="button" aria-label="遊び方を開く">?</button>
+        <button id="share-open" class="icon-button share-open" type="button" aria-label="このアプリを共有する">共有</button>
+      </div>
+    </header>
+
+    <noscript><p class="notice notice-error">このゲームはJavaScriptを使います。JavaScriptを有効にして、ページを再読み込みしてください。</p></noscript>
+    <section id="unsupported" class="notice notice-error" role="alert" hidden>
+      <h2>壁を表示できませんでした</h2>
+      <p>このブラウザーでは、ゲームの描画を利用できません。ページを再読み込みするか、別のブラウザーで開いてください。</p>
+      <button id="reload" class="button button-secondary notice-action" type="button">再読み込み</button>
+    </section>
+    <p id="storage-note" class="notice" hidden>このブラウザーでは進行を保存できません。画面を開いている間は、最後まで遊べます。</p>
+
+    <section id="home-panel" class="panel home-panel" aria-labelledby="home-title" data-panel="home">
+      <p class="eyebrow">停電の夜、壁に映った人影は本物か。</p>
+      <h2 id="home-title" tabindex="-1">灯りの高さで、<br>証言の嘘を暴け。</h2>
+      <p class="lead">目撃者が見た影を、灯りと道具を動かして再現する。影が教える灯りの高さから、犯人の身長を割り<span class="nb">出す5つの夜。</span></p>
+      <ol id="case-list" class="case-list"></ol>
+      <p class="total"><span>合計</span> <strong id="total-stars">0</strong> <span>/ 15</span></p>
+      <div class="home-actions">
+        <button id="reset-progress" class="button button-secondary button-small" type="button">進行をリセット</button>
+      </div>
+    </section>
+
+    <section id="briefing-panel" class="panel briefing-panel" aria-labelledby="briefing-title" data-panel="briefing" hidden>
+      <p id="briefing-place" class="eyebrow"></p>
+      <h2 id="briefing-title" tabindex="-1"></h2>
+      <p id="briefing-intro" class="lead"></p>
+      <figure class="witness-card">
+        <canvas id="sketch-brief" class="sketch" width="168" height="126" role="img" aria-label="目撃者が描いた、壁の人影のスケッチ"></canvas>
+        <figcaption>
+          <p class="witness-who"><strong id="witness-name"></strong> <span id="witness-role"></span></p>
+          <blockquote id="witness-quote"></blockquote>
+        </figcaption>
+      </figure>
+      <button id="start-case" class="button button-primary" type="button">再現室へ <span aria-hidden="true">→</span></button>
+    </section>
+
+    <section id="stage-panel" class="panel stage-panel" aria-labelledby="stage-title" data-panel="stage" hidden>
+      <h2 id="stage-title" class="stage-title" tabindex="-1"></h2>
+      <div class="stage-layout">
+        <div class="stage-main">
+          <div id="witness-strip" class="witness-strip" data-open="false">
+            <canvas id="sketch" class="sketch" width="168" height="126" role="img" aria-label="証言のスケッチ。壁の影をこの形に重ねる"></canvas>
+            <div class="witness-text">
+              <div class="witness-head">
+                <p class="witness-label">証言のスケッチ</p>
+                <button id="strip-toggle" class="strip-toggle" type="button" aria-expanded="false" aria-controls="strip-quote"><span class="strip-pill"><span class="strip-toggle-label">全文を読む</span><span class="strip-toggle-mark" aria-hidden="true">▾</span></span></button>
+              </div>
+              <p id="strip-quote" class="witness-quote"></p>
+            </div>
+          </div>
+          <div class="wall-frame">
+            <canvas id="wall" class="wall" width="520" height="360" tabindex="0" aria-label="壁。琥珀の玉が灯り、紙色の切り絵が道具。壁に落ちる影を、スケッチの形に重ねます。" aria-describedby="controls-note"></canvas>
+          </div>
+          <div class="status-row">
+            <div class="readouts">
+              <p id="lamp-readout" class="readout" data-ly="">灯り <strong>--</strong>cm</p>
+              <p id="item-readout" class="readout readout-item" hidden></p>
+            </div>
+            <div class="band-row">
+              <p id="band-text" class="band-text"></p>
+              <div id="meter" class="meter" data-band="far" role="img" aria-label="近さ"><i></i><i></i><i></i><i></i></div>
+            </div>
+          </div>
+          <p id="note-text" class="note-text" data-kind="coach"></p>
+          <div class="controls">
+            <div id="item-select" class="chips" role="radiogroup" aria-label="動かすもの"></div>
+            <div class="nudges">
+              <button id="nudge-minus" class="nudge" type="button"><span class="nudge-icon nudge-down" aria-hidden="true"></span><span class="nudge-label">下げる</span></button>
+              <button id="nudge-plus" class="nudge" type="button"><span class="nudge-icon nudge-up" aria-hidden="true"></span><span class="nudge-label">上げる</span></button>
+            </div>
+          </div>
+          <p id="controls-note" class="sr-only">灯りは上下、棚の道具は左右に動きます。灯りの玉や道具をつかんでドラッグ、画面の『上げる・下げる』（道具は『左へ・右へ』）ボタン、パソコンでは壁をクリックしてから矢印キー（Shiftで5cm）のどれでもできます。</p>
+          <div class="assist-row">
+            <button id="hint" class="button button-secondary" type="button">ヒント</button>
+            <button id="guide-toggle" class="button button-secondary" type="button" aria-pressed="false">ガイドを重ねる</button>
+            <button id="reset-stage" class="button button-secondary" type="button">はじめから</button>
+          </div>
+        </div>
+        <aside class="stage-side">
+          <details id="clues" class="clues">
+            <summary>現場メモと手がかり</summary>
+            <div id="stage-clues" class="clue-body"></div>
+          </details>
+        </aside>
+      </div>
+    </section>
+
+    <section id="solved-panel" class="panel solved-panel" aria-labelledby="solved-title" data-panel="solved" hidden>
+      <p class="eyebrow">RECONSTRUCTED</p>
+      <h2 id="solved-title" tabindex="-1">再現できた</h2>
+      <div class="wall-frame result-frame">
+        <canvas id="wall-result" class="wall wall-static" width="520" height="360" role="img" aria-label="再現した壁。影がスケッチの形にそろっている"></canvas>
+        <div id="stamp" class="stamp" aria-hidden="true">再現</div>
+      </div>
+      <canvas id="side-view" class="side-view" width="520" height="322" role="img" aria-label="現場図。横から見た、灯りの高さ・足跡までの距離・道具の位置"></canvas>
+      <p id="reveal-text" class="lead"></p>
+      <p id="reading-text" class="reading"></p>
+      <button id="to-deduction" class="button button-primary" type="button">推理する <span aria-hidden="true">→</span></button>
+    </section>
+
+    <section id="deduction-panel" class="panel deduction-panel" aria-labelledby="deduction-title" data-panel="deduction" hidden>
+      <p class="eyebrow">DEDUCTION</p>
+      <h2 id="deduction-title" tabindex="-1">灯りを提げたのは、誰か。</h2>
+      <ul id="deduction-clues" class="clue-list"></ul>
+      <ul id="suspect-list" class="suspect-list"></ul>
+      <p id="deduction-message" class="message" role="status" hidden></p>
+      <div class="assist-row">
+        <button id="deduction-hint" class="button button-secondary" type="button">考え方を見る（★−1）</button>
+      </div>
+      <p id="deduction-hint-text" class="hint-text" hidden></p>
+    </section>
+
+    <section id="verdict-panel" class="panel verdict-panel" aria-labelledby="verdict-title" data-panel="verdict" hidden>
+      <div class="stamp-holder" aria-hidden="true"><div class="stamp stamp-static">解決</div></div>
+      <h2 id="verdict-title" tabindex="-1"></h2>
+      <p id="verdict-text" class="lead"></p>
+      <p id="verdict-stars" class="verdict-stars"></p>
+      <div class="verdict-actions">
+        <button id="next-case" class="button button-primary" type="button">次の夜へ <span aria-hidden="true">→</span></button>
+        <button id="to-home" class="button button-secondary" type="button">事件簿へ</button>
+      </div>
+    </section>
+
+    <section id="epilogue-panel" class="panel epilogue-panel" aria-labelledby="epilogue-title" data-panel="epilogue" hidden>
+      <div class="stamp-holder" aria-hidden="true"><div class="stamp stamp-static">全夜解決</div></div>
+      <p class="eyebrow">EPILOGUE</p>
+      <h2 id="epilogue-title" tabindex="-1"></h2>
+      <p id="epilogue-text" class="lead"></p>
+      <p id="epilogue-stars" class="verdict-stars"></p>
+      <div class="verdict-actions">
+        <button id="epilogue-share" class="button button-primary" type="button">友だちに紹介する</button>
+        <button id="restart" class="button button-secondary" type="button">事件簿へ</button>
+      </div>
+      <ol id="epilogue-recap" class="recap" aria-label="5つの夜の振り返り"></ol>
+    </section>
+
+    <p id="feedback" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></p>
+  </main>
+
+  <dialog id="help-dialog" aria-labelledby="help-title">
+    <div class="dialog-content">
+      <div class="dialog-header"><div><p class="eyebrow">HOW TO PLAY</p><h2 id="help-title">影を動かして、嘘を暴く</h2></div><button class="close-button" type="button" data-close aria-label="遊び方を閉じる">×</button></div>
+      <ol class="help-rules">
+        <li><strong>スケッチに重ねる</strong><span>目撃者のスケッチと同じ形になるよう、壁に落ちる影を動かします。</span></li>
+        <li><strong>灯りは上下、道具は左右</strong><span>灯りは足跡の位置で上下にだけ動きます。灯りを上げると影は下がり、下げると影は上がります。棚の上の道具は、左右にすべらせられます。</span></li>
+        <li><strong>近い物ほど、大きく動く</strong><span>灯りに近い道具ほど、影は大きく、速く動きます。</span></li>
+        <li><strong>身長を読む</strong><span>再現できたら、灯りの<span class="nb">高さを6割で</span>割ります。それが、灯りを提げた人の身長です。</span></li>
+      </ol>
+      <p class="dialog-note">灯りの玉や道具をつかんでドラッグ、画面の『上げる・下げる』ボタン、パソコンでは壁をクリックしてから矢印キー（<span class="nb">Shiftで5cm</span>）のどれでもできます。</p>
+      <p class="dialog-note">ガイド・ヒント・誤った推理を使うと、星が減ります。<span class="nb">夜1の</span>ガイドは練習用なので、何度出し入れしても減りません。</p>
+      <p class="more-hint" aria-hidden="true" hidden>↓ 続きがあります</p>
+    </div>
+  </dialog>
+
+  <dialog id="share-dialog" aria-labelledby="share-title">
+    <div class="dialog-content">
+      <div class="dialog-header"><div><p class="eyebrow">PASS THE CASE</p><h2 id="share-title">次は、友だちの番。</h2></div><button class="close-button" type="button" data-close aria-label="共有を閉じる">×</button></div>
+      <p class="dialog-lead">影証言を共有する</p>
+      <p class="dialog-note">灯りを動かして影を再現し、灯りの高さから犯人の身長を割り<span class="nb">出す。5つの</span>夜の影絵×推理パズル。</p>
+      <div id="share"></div>
+      <div class="manual-copy"><label for="share-url">アプリのURL</label><textarea id="share-url" rows="2" readonly spellcheck="false" aria-describedby="manual-copy-note">https://hundred-days.pages.dev/day-071-kage-shogen/</textarea><p id="manual-copy-note">コピーできない場合は、このURLを選択して手動でコピーできます。</p></div>
+      <p class="more-hint" aria-hidden="true" hidden>↓ 続きがあります</p>
+    </div>
+  </dialog>
+
+  <dialog id="reset-dialog" aria-labelledby="reset-title">
+    <div class="dialog-content">
+      <div class="dialog-header"><div><p class="eyebrow">RESET</p><h2 id="reset-title">進行をリセットしますか</h2></div><button class="close-button" type="button" data-close aria-label="閉じる">×</button></div>
+      <p class="dialog-lead">解決した夜と星の記録が、この端末から消えます。</p>
+      <div class="dialog-actions">
+        <button id="reset-confirm" class="button button-danger" type="button">リセットする</button>
+        <button id="reset-cancel" class="button button-secondary" type="button">やめる</button>
+      </div>
+    </div>
+  </dialog>
+</body>
+</html>
