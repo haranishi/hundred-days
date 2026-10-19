@@ -1,0 +1,73 @@
+# 実装タスク：影証言
+
+境界の名前は [design.md](design.md) のコンポーネント。完了は、テストや実挙動の証拠で判断する。
+
+- [x] 0. 設計側の参照実装と事件簿のデータを用意する
+  - geometry・shapes・score・cases・deduction・config と、事件簿の回帰テスト（`tests/cases.test.mjs`）。
+  - 5夜の正解が合格し、開始が不合格、灯りの高さが一意、邪魔な道具が壁に残ると不合格であることを、機械で確認済み。
+  - _Boundary: Geometry / Score / Cases・Deduction_
+  - _Requirements: 3.1, 3.5, 3.6, 3.7, 4.2, 4.5_
+- [x] 1. 実行と検査の基盤を用意する
+  - `tests/index.js`（全テストの入口）、`tools/serve.mjs`（許可した公開ファイルだけを配るsource preview。Day070と同じ型）。
+  - 既存の検査依存を使い、`node --test day-071-kage-shogen/tests/` が動く。
+  - 証拠：全114件成功（WP-A記録 `.agent-harness/runs/day071-kage-shogen/wp-a.md`）、実HTTPでの許可リストの応答を確認。previewの許可リストに `lib/hit.js` を足した（依頼書の書き漏れ）。
+  - _Boundary: Foundation Integration_
+  - _Requirements: 7.5_
+- [x] 2. (P) 幾何と採点の単体試験を足す
+  - 既知の投影、格子の面積、IoUの対称性と空の扱い、部品ごとの被覆、邪魔な道具、しきい値の境界を先に試験にし、参照実装が満たすことを確かめる。不備があれば参照実装を直し、理由を記録する。
+  - _Boundary: Geometry / Score_
+  - _Depends: 1_
+  - _Requirements: 2.3, 3.1, 3.2, 3.7_
+- [x] 3. (P) 推理の単体試験を足す
+  - 候補の絞り込み（再現前2人以上・再現後1人）、判定の文、踏み台の計算、読みの文。
+  - _Boundary: Cases・Deduction_
+  - _Depends: 1_
+  - _Requirements: 4.2, 4.3, 4.5_
+- [x] 4. 1夜の操作のセッションを作る（`lib/stage.js`）
+  - 選択・範囲に収める移動・微調整・はじめから・ガイドとヒントの記録・成功の確定を、先に失敗する試験から実装する。
+  - 灯りは縦だけ、すべれる道具は横だけ。固定の道具・未知のid・非有限の値は無視。成功の確定は success のときだけ、正解へそろえる。
+  - _Boundary: Stage_
+  - _Depends: 2_
+  - _Requirements: 2.1, 2.2, 2.4, 2.7, 2.8, 3.1, 3.3_
+- [x] 5. (P) 進行と保存を作る（`lib/game.js`）
+  - 星の計算・解放・最高星・保存と復元（壊れた値・保存不可でも例外にしない）を、先に失敗する試験から実装する。
+  - _Boundary: Game_
+  - _Depends: 1_
+  - _Requirements: 5.1, 5.2, 5.3, 5.4, 5.5, 5.6_
+- [x] 6. 座標変換と描画を作る（`lib/transform.js`・`lib/view.js`）
+  - 変換の往復試験。壁・スケッチ・現場図の3つの描画器（偽の2D contextで呼び出しと `null` の扱いを試験）。
+  - 設計は [ux.md](ux.md) の「壁と操作」「成功の演出と現場図」。モデルを変更しない。
+  - 証拠：`tests/{transform,hit,view}.test.mjs` 14件。実ブラウザの描画を、幅360〜1440・5夜で目視（描画確認ページと実アプリ）。非表示のcanvasで半径が負になる例外を見つけて直した。
+  - _Boundary: View_
+  - _Depends: 4_
+  - _Requirements: 2.3, 3.3, 3.4, 6.3, 7.4_
+- [x] 7. 画面の骨格とトークンを作る（`index.html`・`app.css`）
+  - [ux.md](ux.md) のDOM契約・レイアウト・見た目。色は `:root` のトークンだけ。OGP・canonical・共有dialogを含む（Day070の `index.html` と同じ型）。
+  - 証拠：360×640・390×844・768・1440×900・低い横画面で、横スクロールなし・主要操作が最初の画面に収まることを撮影で確認。推理の手がかりを4項目に絞り、誤答の理由をカードの中へ出し、再現した壁を solved に出すなど、画面の確認から3点を直した。
+  - _Boundary: UI_
+  - _Depends: 1_
+  - _Requirements: 1.1, 1.2, 1.4, 6.1, 6.3, 7.3_
+- [ ] 8. 入力・phase・タイマー・保存・dialog・共有を統合する（`app.js`）
+  - ポインター・キー・微調整・長押し・合格の保持・そろえる動き・phaseの遷移と焦点・保存の復元・dialog・描画不可と保存不可の案内。
+  - 開始後に夜1が解け、推理・次の夜・復元まで通る。入力解放・遷移・はじめからでタイマーが残らない。
+  - _Boundary: Runtime Integration_
+  - _Depends: 4, 5, 6, 7_
+  - _Requirements: 1.1〜1.5, 2.1〜2.8, 3.1〜3.4, 4.1〜4.6, 5.1〜5.6, 6.2, 6.4, 6.5, 7.1, 7.2, 7.4_
+- [ ] 9. 既存の共有・制作記録・配信形式へ接続する
+  - `npm run shared:sync`、`meta.json`（`status: "draft"`）、`README.md`、`og.png`（`tools/capture-og.mjs`で、ゲームの形から自作）、`scripts/build.mjs` のtools除外、`npm run index:sync`。
+  - draftのままpreviewで共有の各ボタン・コピー失敗・共有取消を確認し、標準ビルドが公開せずtoolsを配信しないことを確かめる。
+  - _Boundary: Repository Integration_
+  - _Depends: 8_
+  - _Requirements: 7.1, 7.2, 7.3, 7.5_
+- [ ] 10. ブラウザと既存検査で主要フローを検証する
+  - Chromium/WebKitで、キー・ポインターによる夜1の完走、推理（誤り→正解）、次の夜、保存の復元、描画不可・保存不可、幅360/390/768/1440、外部通信0・CSP違反0。
+  - 新作の単体・構文・標準ビルド・`npm run check` が通り、既存Dayへの変更が必要範囲に収まる。
+  - _Boundary: Feature Validation_
+  - _Depends: 9_
+  - _Requirements: 全要件_
+- [ ] 11. 実時間の体験と画面を独立評価する
+  - 実際の入力で5〜10分操作し、5つの夜と推理の結果・画面を記録する。体験（0〜2点×10項目）→ 見た目の順で、独立した評価者が採点する。
+  - 360/390/768/1440幅の画像と、重大な進行不良が無いことの証拠を残す。改善は最大3周。
+  - _Boundary: Feature Validation_
+  - _Depends: 10_
+  - _Requirements: 1.1, 2.1〜2.4, 3.2, 3.3, 4.3, 6.1〜6.5_

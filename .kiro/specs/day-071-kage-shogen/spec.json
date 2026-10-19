@@ -1,0 +1,54 @@
+{
+  "feature_name": "day-071-kage-shogen",
+  "created_at": "2026-10-19T04:46:21+00:00",
+  "updated_at": "2026-10-19T04:46:21+00:00",
+  "language": "ja",
+  "phase": "implementation-in-progress",
+  "approvals": {
+    "requirements": {
+      "generated": true,
+      "approved": true
+    },
+    "design": {
+      "generated": true,
+      "approved": true
+    },
+    "tasks": {
+      "generated": true,
+      "approved": true
+    }
+  },
+  "ready_for_implementation": true,
+  "approval_scope": {
+    "requirements": "本人の個別レビューは未実施。「影証というウェブアプリを作成していってほしい」の依頼と、2026-10-19の自律進行の指示（要件・設計・タスク・実装・検証・作業ブランチのGit操作まで一気通貫）に基づき、承認済みとして進める。",
+    "downstream": "設計・タスク作成・実装・検証は、同じ自律進行の指示の範囲。公開・マージ・デプロイ・SNS投稿は含まない。",
+    "open_items": [
+      "「影証」を、2026-10-19の再提案の案③「影証言」と解釈した（要件の前提）。",
+      "題名の商標照会（J-PlatPat）は未実施。公開前に本人が確認する。",
+      "5つの夜の物語・容疑者の名前・身長は本リポジトリでの創作。本人の好みでの差し替えを想定する。"
+    ]
+  },
+  "delivery": {
+    "repository": "haranishi/hundred-days",
+    "base": "main",
+    "branch": "feat/day-071-kage-shogen",
+    "authorized_operations": [
+      "commit",
+      "push",
+      "PR"
+    ],
+    "not_authorized": [
+      "merge",
+      "deploy",
+      "publish",
+      "x-post"
+    ],
+    "scope": "作業ブランチへのcommit・push・draftのままのPR作成まで。公開は本人の指示を待つ。",
+    "status": "not-started"
+  },
+  "validation": {
+    "status": "design-validated",
+    "report": ".agent-harness/runs/day071-kage-shogen/design-validation.md",
+    "public_status": "draft"
+  }
+}
