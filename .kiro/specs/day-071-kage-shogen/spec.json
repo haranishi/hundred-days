@@ -46,7 +46,9 @@
       "x-post"
     ],
     "scope": "作業ブランチへのcommit・push・draftのままのPR作成まで。公開は本人の指示を待つ。",
-    "status": "not-started"
+    "status": "pr-opened-draft",
+    "pull_request": "https://github.com/haranishi/hundred-days/pull/157",
+    "note": "作業ブランチへのcommit・push・draftのままのPR作成まで済み。マージ・公開・X投稿は、本人の指示を待つ。"
   },
   "validation": {
     "status": "experience-passed-visual-needs-human",
