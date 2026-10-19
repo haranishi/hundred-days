@@ -29,6 +29,8 @@ test('事件簿の文章と数値が欠けず、足跡の説明が場面の数�
     assert.equal(item.hints.length, 2);
     item.hints.forEach((hint) => assert.ok(text(hint)));
     assert.ok(['on', 'off'].includes(item.guide));
+    // ガイドを最初から出す夜は、ガイドを消したときの一言も持つ（画面の文とガイドの有無を食い違わせない）。
+    assert.equal(text(item.coachNoGuide), item.guide === 'on', `${item.id} coachNoGuide`);
     assert.ok(text(witnessOf(item).name));
     // 足跡の文は、壁からの距離と灯りの横位置を数値どおりに言う（文章と場面のずれを防ぐ）。
     assert.ok(item.footprint.includes(`壁から${item.stage.distance}cm`), `${item.id} distance`);
@@ -165,7 +167,9 @@ test('推理：影を再現する前は2人以上残り、再現すると犯人�
     assert.equal(item.clues.filter((clue) => clue.kind === 'rule').length, 1);
     assert.equal(item.clues.filter((clue) => clue.kind === 'stool').length, item.stool > 0 ? 1 : 0);
     assert.ok(text(readingOf(item)));
-    assert.ok(readingOf(item).includes(`${culprit.height}cm`), `${item.id}: 読みの文に身長`);
+    assert.ok(readingOf(item).includes(`${item.stage.lamp.solution}cm`), `${item.id}: 読みの文に灯りの高さ`);
+    // 身長まで書くのは夜1だけ。夜2以降は、犯人の身長を読みの文に出さず、自分で割り出させる。
+    assert.equal(readingOf(item).includes(`${culprit.height}cm`), item.showsHeight === true, `${item.id}: 読みの文の身長`);
   }
   assert.equal(culprits.size, CASES.length, '犯人は5件とも別人');
 });

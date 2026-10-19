@@ -1,6 +1,7 @@
 // 1夜の操作と評価。成功を保つ時間の判断は呼び出し側が行う。
 import { stageOf } from './cases.js';
 import { STEP } from './config.js';
+import { diagnose } from './diagnose.js';
 import { buildTarget, evaluate, solutionArrangement } from './score.js';
 
 const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
@@ -73,31 +74,53 @@ export function toggleGuide(session) {
   return session.guideOn;
 }
 
+// ヒントは、押すたびに交互に出す。奇数回目は、いまの配置でいちばんずれているものの名指し（kind: 'diagnosis'）、
+// 偶数回目は、その夜の考え方（kind: 'principle'）。どちらも星は1回分しか減らない。index は何回目かの数（0から）。
 export function useHint(session) {
-  const index = session.hintIndex;
-  session.hintIndex = (index + 1) % session.caseDef.hints.length;
+  const count = session.hintsUsed;
   session.hintsUsed += 1;
-  return { index, text: session.caseDef.hints[index] };
+  if (count % 2 === 0) {
+    const { text } = diagnose(session.stage, session.target, session.assessment, session.arrangement);
+    return { index: count, kind: 'diagnosis', text };
+  }
+  const { hints } = session.caseDef;
+  const index = session.hintIndex;
+  session.hintIndex = (index + 1) % hints.length;
+  return { index: count, kind: 'principle', text: hints[index] };
 }
 
+// 合格が保たれたら、灯りと必要な道具を正解の位置へそろえる。邪魔な道具は、置いた位置のまま残す
+// （壁の外ならどちらの端でも合格なので、左右を入れ替えない）。
 export function confirmSolve(session) {
   if (!session.assessment.success) return false;
-  session.arrangement = solutionArrangement(session.stage);
+  const solution = solutionArrangement(session.stage);
+  for (const prop of session.stage.props) {
+    if (prop.decoy) solution.xs[prop.id] = session.arrangement.xs[prop.id];
+  }
+  session.arrangement = solution;
   session.status = 'solved';
   assess(session);
   return true;
 }
 
+// 近さのメーター：4つの目盛りの、それぞれの満ち具合（0〜1）。IoUが各段の範囲のどこにあるかで連続して伸びる。
+function fillsOf({ iou, success }, { warm, near, union }) {
+  if (success) return [1, 1, 1, 1];
+  const part = (low, high) => Math.max(0, Math.min(1, (iou - low) / (high - low)));
+  return [part(0, warm), part(warm, near), part(near, union), 0];
+}
+
 export function describeAssessment(session) {
   const { assessment, stage } = session;
-  if (assessment.success) return { step: 4, label: '再現できた', detail: '' };
+  const fills = fillsOf(assessment, stage.threshold);
+  if (assessment.success) return { step: 4, label: '再現できた', detail: '', fills };
   if (assessment.iou >= stage.threshold.union) {
     const detail = assessment.decoysOk ? 'ずれている道具がある' : '関係ない道具の影が残っている';
-    return { step: 3, label: 'あと少し', detail };
+    return { step: 3, label: 'あと少し', detail, fills };
   }
-  if (assessment.band === 'near') return { step: 3, label: '近い', detail: '' };
-  if (assessment.band === 'warm') return { step: 2, label: 'すこし似ている', detail: '' };
-  return { step: 1, label: '遠い', detail: '' };
+  if (assessment.band === 'near') return { step: 3, label: '近い', detail: '', fills };
+  if (assessment.band === 'warm') return { step: 2, label: 'すこし似ている', detail: '', fills };
+  return { step: 1, label: '遠い', detail: '', fills };
 }
 
 export const lampReadout = (session) => Math.round(session.arrangement.ly);

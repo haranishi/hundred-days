@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import { CASES, stageOf } from '../lib/cases.js';
 import { buildTarget, evaluate, solutionArrangement } from '../lib/score.js';
+import { diagnose, sizeWord } from '../lib/diagnose.js';
 import {
   confirmSolve, createSession, describeAssessment, lampReadout, movableIds, nudge, propReadout, reset, select,
   setLamp, setPropX, toggleGuide, useHint,
@@ -53,9 +54,13 @@ for (const caseDef of CASES) {
         if (id === 'lamp') setLamp(session, session.stage.lamp.solution + delta);
         else setPropX(session, id, session.arrangement.xs[id] + delta);
         assert.equal(session.assessment.success, true, `${id} ${delta}`);
+        const placed = { ...session.arrangement.xs };
         assert.equal(confirmSolve(session), true, `${id} ${delta}`);
         assert.equal(session.status, 'solved');
-        assert.deepEqual(session.arrangement, solutionArrangement(session.stage));
+        // 灯りと必要な道具は正解へそろう。邪魔な道具は、置いた位置のまま残る。
+        const expected = solutionArrangement(session.stage);
+        for (const prop of session.stage.props) if (prop.decoy) expected.xs[prop.id] = placed[prop.id];
+        assert.deepEqual(session.arrangement, expected);
         assert.equal(session.assessment.iou, 1);
         assert.equal(session.assessment.band, 'match');
       }
@@ -219,7 +224,7 @@ test('reset は開始の配置に戻し、選択・ガイド・使用歴・ヒ�
   assert.equal(session.guideOn, true);
   assert.equal(session.usedGuide, true);
   assert.equal(session.hintsUsed, 1);
-  assert.equal(session.hintIndex, 1);
+  assert.equal(session.hintIndex, 0);
   reset(session);
   assert.deepEqual(session.arrangement, startOf(stage));
   assert.equal(session.hintsUsed, 1);
@@ -248,14 +253,29 @@ test('夜2はガイドを付けた時点で使用を記録する', () => {
   assert.equal(session.usedGuide, true);
 });
 
-test('ヒントは順に巡り、表示するたびに使用数を増やす', () => {
+test('ヒントは、ずれの名指しと考え方を交互に出し、表示するたびに使用数を増やす', () => {
   const session = createSession(CASES[0]);
-  for (let used = 0; used < 5; used += 1) {
-    const index = used % 2;
-    assert.deepEqual(useHint(session), { index, text: CASES[0].hints[index] });
+  for (let used = 0; used < 6; used += 1) {
+    const hint = useHint(session);
+    assert.equal(hint.index, used);
     assert.equal(session.hintsUsed, used + 1);
-    assert.equal(session.hintIndex, (index + 1) % 2);
+    if (used % 2 === 0) {
+      assert.equal(hint.kind, 'diagnosis');
+      assert.deepEqual(hint, { index: used, kind: 'diagnosis', text: diagnose(session.stage, session.target, session.assessment, session.arrangement).text });
+    } else {
+      const principle = Math.floor(used / 2) % 2;
+      assert.deepEqual(hint, { index: used, kind: 'principle', text: CASES[0].hints[principle] });
+      assert.equal(session.hintIndex, (principle + 1) % 2);
+    }
   }
+});
+
+test('ヒントの名指しは、押した時点の配置で変わる', () => {
+  const session = createSession(CASES[0]);
+  assert.match(useHint(session).text, /^灯りが、だいぶ高い。下げてみよう。$/);
+  useHint(session);
+  setLamp(session, session.stage.lamp.solution - 4);
+  assert.match(useHint(session).text, /^灯りが、少し低い。上げてみよう。$/);
 });
 
 test('describeAssessment は成功・不足の理由・近さの全分岐を返す', () => {
@@ -270,7 +290,9 @@ test('describeAssessment は成功・不足の理由・近さの全分岐を返�
   ];
   for (const [assessment, expected] of checks) {
     session.assessment = assessment;
-    assert.deepEqual(describeAssessment(session), expected);
+    const { fills, ...rest } = describeAssessment(session);
+    assert.deepEqual(rest, expected);
+    assert.equal(fills.length, 4);
     assert.strictEqual(session.assessment, assessment);
   }
   const last = createSession(CASES[4]);
@@ -288,4 +310,120 @@ test('読み出しは灯りの高さと道具の横位置を整数cmへ丸める
   setPropX(session, 'bag', 92.5);
   assert.equal(lampReadout(session), 99);
   assert.equal(propReadout(session, 'bag'), 93);
+});
+
+test('近さのメーターは、IoUが各段の範囲のどこにあるかで連続して伸び、成功のときだけ4つ目まで満ちる', () => {
+  const session = createSession(CASES[0]);
+  const fillsFor = (assessment) => {
+    session.assessment = assessment;
+    return describeAssessment(session).fills;
+  };
+  const near = (value) => assert.ok(Math.abs(value) < 1e-9, String(value));
+  const far = fillsFor({ success: false, iou: 0.25, decoysOk: true, band: 'far' });
+  near(far[0] - 0.5);
+  assert.deepEqual(far.slice(1), [0, 0, 0]);
+  const warm = fillsFor({ success: false, iou: 0.6, decoysOk: true, band: 'warm' });
+  assert.deepEqual(warm.slice(0, 1), [1]);
+  near(warm[1] - 0.5);
+  assert.deepEqual(warm.slice(2), [0, 0]);
+  const close = fillsFor({ success: false, iou: 0.75, decoysOk: true, band: 'near' });
+  assert.deepEqual(close.slice(0, 2), [1, 1]);
+  near(close[2] - 0.5);
+  assert.equal(close[3], 0);
+  assert.deepEqual(fillsFor({ success: false, iou: 0.81, decoysOk: false, band: 'near' }), [1, 1, 1, 0]);
+  assert.deepEqual(fillsFor({ success: true, iou: 1, decoysOk: true, band: 'match' }), [1, 1, 1, 1]);
+  // 実際の評価でも、灯りを正解へ近づけるほど満ち具合の合計は増える。
+  const live = createSession(CASES[1]);
+  let previous = -1;
+  for (const ly of [45, 60, 75, 90]) {
+    setLamp(live, ly);
+    const total = describeAssessment(live).fills.reduce((sum, value) => sum + value, 0);
+    assert.ok(total > previous, `ly ${ly}: ${total} <= ${previous}`);
+    previous = total;
+  }
+});
+
+test('成功の確定は、邪魔な道具を置いた位置のまま残す（左右を入れ替えない）', () => {
+  const caseDef = CASES[4];
+  for (const [bowler, globe] of [[10, 230], [232, 8], [8, 8], [232, 232]]) {
+    const session = atSolution(caseDef);
+    setPropX(session, 'bowler', bowler);
+    setPropX(session, 'globe', globe);
+    assert.equal(session.assessment.success, true, `${bowler} ${globe}`);
+    assert.equal(confirmSolve(session), true);
+    assert.equal(session.arrangement.xs.bowler, bowler);
+    assert.equal(session.arrangement.xs.globe, globe);
+    const solution = solutionArrangement(session.stage);
+    assert.equal(session.arrangement.ly, solution.ly);
+    for (const id of ['umbrella', 'coat', 'boots']) assert.equal(session.arrangement.xs[id], solution.xs[id], id);
+    assert.equal(session.assessment.success, true);
+    assert.equal(session.assessment.decoysOk, true);
+  }
+});
+
+test('diagnose は、灯り・道具・邪魔な道具のうち、いちばんずれているものを向きつきで名指しする', () => {
+  const lampCase = createSession(CASES[1]);
+  assert.equal(diagnose(lampCase.stage, lampCase.target, lampCase.assessment, lampCase.arrangement).kind, 'lamp');
+  assert.match(diagnose(lampCase.stage, lampCase.target, lampCase.assessment, lampCase.arrangement).text, /^灯りが、だいぶ低い。上げてみよう。$/);
+
+  const bag = atSolution(CASES[2]);
+  setPropX(bag, 'bag', bag.stage.props.find((prop) => prop.id === 'bag').x.solution + 4);
+  let result = diagnose(bag.stage, bag.target, bag.assessment, bag.arrangement);
+  assert.deepEqual(result, { kind: 'prop', id: 'bag', text: '鞄が、少し右にずれている。左へすべらせよう。' });
+  setPropX(bag, 'bag', bag.stage.props.find((prop) => prop.id === 'bag').x.solution - 10);
+  result = diagnose(bag.stage, bag.target, bag.assessment, bag.arrangement);
+  assert.equal(result.text, '鞄が、だいぶ左にずれている。右へすべらせよう。');
+
+  // 外套が最大のずれのとき、灯りではなく外套を言う。
+  const chair = atSolution(CASES[3]);
+  setPropX(chair, 'coat', chair.stage.props.find((prop) => prop.id === 'coat').x.solution + 3);
+  setLamp(chair, chair.stage.lamp.solution + 1);
+  result = diagnose(chair.stage, chair.target, chair.assessment, chair.arrangement);
+  assert.equal(result.id, 'coat');
+
+  // 邪魔な道具の影が壁に残っていれば、ほかが少しずれていても先に名指しする。
+  const umbrella = atSolution(CASES[4]);
+  setPropX(umbrella, 'bowler', 140);
+  setPropX(umbrella, 'umbrella', umbrella.stage.props.find((prop) => prop.id === 'umbrella').x.solution + 2);
+  result = diagnose(umbrella.stage, umbrella.target, umbrella.assessment, umbrella.arrangement);
+  assert.deepEqual(result, { kind: 'decoy', id: 'bowler', text: '山高帽の影が、壁に残っている。壁の右の端へすべらせよう。' });
+  setPropX(umbrella, 'bowler', 70);
+  assert.equal(diagnose(umbrella.stage, umbrella.target, umbrella.assessment, umbrella.arrangement).text.includes('壁の左の端'), true);
+  // 壁の外へ出ていれば、邪魔な道具は名指しされない。
+  setPropX(umbrella, 'bowler', 10);
+  assert.notEqual(diagnose(umbrella.stage, umbrella.target, umbrella.assessment, umbrella.arrangement).kind, 'decoy');
+
+  // ずれが無ければ、無いと言う。
+  const done = atSolution(CASES[2]);
+  assert.equal(diagnose(done.stage, done.target, done.assessment, done.arrangement).kind, 'none');
+});
+
+test('sizeWord は、ずれの大きさを3段の言葉にする', () => {
+  assert.equal(sizeWord(1), 'ほんの少し');
+  assert.equal(sizeWord(-2.4), 'ほんの少し');
+  assert.equal(sizeWord(2.5), '少し');
+  assert.equal(sizeWord(-6.9), '少し');
+  assert.equal(sizeWord(7), 'だいぶ');
+  assert.equal(sizeWord(-40), 'だいぶ');
+});
+
+test('どの夜でも、開始の配置の名指しは、ガイドなしで次の一手になる', () => {
+  for (const caseDef of CASES) {
+    const session = createSession(caseDef);
+    const result = diagnose(session.stage, session.target, session.assessment, session.arrangement);
+    assert.ok(['lamp', 'prop', 'decoy'].includes(result.kind), caseDef.id);
+    assert.ok(result.text.length > 10 && !/undefined|NaN/.test(result.text), caseDef.id);
+    // 名指しに従って動かすと、ずれが小さくなる（向きが正しい）。
+    const before = Math.abs(result.kind === 'lamp'
+      ? session.arrangement.ly - session.stage.lamp.solution
+      : session.arrangement.xs[result.id] - session.stage.props.find((prop) => prop.id === result.id).x.solution);
+    if (result.kind === 'decoy') continue;
+    const step = result.text.includes('上げ') || result.text.includes('右へ') ? 5 : -5;
+    if (result.kind === 'lamp') setLamp(session, session.arrangement.ly + step);
+    else setPropX(session, result.id, session.arrangement.xs[result.id] + step);
+    const after = Math.abs(result.kind === 'lamp'
+      ? session.arrangement.ly - session.stage.lamp.solution
+      : session.arrangement.xs[result.id] - session.stage.props.find((prop) => prop.id === result.id).x.solution);
+    assert.ok(after < before, `${caseDef.id}: ${result.text}`);
+  }
 });

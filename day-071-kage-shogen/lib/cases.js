@@ -7,13 +7,14 @@ import { DEFAULT_THRESHOLD } from './score.js';
 // 月影荘の人々。身長は推理の材料（灯りの高さ＝身長×0.6＋踏み台）。
 export const PEOPLE = Object.freeze({
   saeki: { name: '佐伯 ふみ', role: '家政婦', height: 150 },
-  tsubaki: { name: '椿 みお', role: '料理人', height: 156 },
+  tsubaki: { name: '椿 みお', role: '料理人', height: 170 },
   uno: { name: '宇野 蒼', role: '画家', height: 160 },
   moriyama: { name: '森山 達也', role: '庭師', height: 165 },
   kuga: { name: '久我 澄', role: '医師', height: 170 },
   kiritani: { name: '桐谷 恒一', role: '管理人', height: 175 },
   hinata: { name: '日向 悠', role: '書生', height: 178 },
   hiiragi: { name: '柊 悟', role: '大工', height: 180 },
+  shirase: { name: '白瀬 あきら', role: '運転手', height: 180 },
   hasumi: { name: '蓮見 渉', role: '郵便配達', height: 188 },
 });
 
@@ -34,11 +35,13 @@ export const CASES = Object.freeze([
     footprint: '玄関の床に、立ち止まった足跡が一組。壁から260cm、壁の左端から150cmの位置にある。灯りは、その足跡の真上で提げられていた。',
     guide: 'on',
     coach: '灯りの玉を上下にドラッグして、影を朱のガイドに重ねよう。',
+    coachNoGuide: '灯りの玉を上下にドラッグして、影を証言のスケッチの形に重ねよう。',
+    showsHeight: true,
     hints: [
       '灯りは上下にだけ動く。足跡の位置から、横には動かせない。',
       '灯りを上げると、影は下がる。壁の影が、紳士の形に重なる高さを探そう。',
     ],
-    deductionHint: '灯りの高さを、6割で割ると身長になる。',
+    deductionHint: '身長が合う人を探す。アリバイが確かな人は、外してよい。',
     stage: {
       distance: 260,
       lamp: { x: 150, ...LAMP_RANGE, start: 150, solution: 99 },
@@ -76,7 +79,7 @@ export const CASES = Object.freeze([
       '灯りに近い物ほど、影は大きく動く。帽子の影と外套の影は、同じ速さでは動かない。',
       '帽子の影が、外套の襟の上にのる高さを探そう。',
     ],
-    deductionHint: '灯りの高さを6割で割る。候補は、身長が近い2人まで絞れている。',
+    deductionHint: '身長の6割が灯りの高さ。2人の身長に0.6をかけて、96cmと比べよう。',
     stage: {
       distance: 240,
       lamp: { x: 110, ...LAMP_RANGE, start: 45, solution: 96 },
@@ -106,7 +109,7 @@ export const CASES = Object.freeze([
     place: '月影荘 渡り廊下',
     summary: '縦は灯りで、横は道具で合わせる。',
     intro: '三日目の夜、蔵から掛け軸が消えた。書生の日向は、渡り廊下の壁に、鞄を提げた男を見たという。',
-    witness: { person: 'hinata', quote: '鞄を提げた男が、廊下の突き当たりの壁を、ゆっくり歩いていました。帽子も外套も、こっちを向かないまま……。' },
+    witness: { person: 'hinata', quote: '鞄を提げた男が、廊下の奥の壁を、ゆっくり歩いていました。帽子も外套も、こっちを向かないまま……。' },
     sceneNote: '廊下の棚に、帽子と外套と鞄がある。置き方はばらばら。道具は、棚の上を横にすべらせられる。',
     footprint: '廊下の床に、足跡が一組。壁から280cm、壁の左端から120cmの位置にある。',
     guide: 'off',
@@ -115,7 +118,7 @@ export const CASES = Object.freeze([
       '縦の位置は、灯りの高さで決まる。横の位置は、道具をすべらせて合わせる。',
       'まず、帽子・外套・鞄の上下のつながりが合う灯りの高さを探す。そのあと、横をそろえよう。',
     ],
-    deductionHint: '灯りの高さを6割で割る。身長が一番近い人が、灯りを提げていた。',
+    deductionHint: '灯り102cmに合う身長の人が、2人いる。アリバイが確かな人は、外せる。',
     stage: {
       distance: 280,
       lamp: { x: 120, ...LAMP_RANGE, start: 150, solution: 102 },
@@ -127,7 +130,7 @@ export const CASES = Object.freeze([
     },
     clues: [
       { id: 'rule', kind: 'rule', text: '灯りは、胸の高さに提げる。月影荘の決まりで、高さは身長のちょうど6割。' },
-      { id: 'alibi', kind: 'alibi', text: '佐伯は、停電のあいだ管理人室で、桐谷の帳簿を手伝っていた。桐谷がそれを覚えている。', rulesOut: ['saeki'] },
+      { id: 'alibi', kind: 'alibi', text: '椿は、停電のあいだ厨房で火の始末をしていた。見習いが、ずっと隣にいた。', rulesOut: ['tsubaki'] },
     ],
     suspects: [
       { id: 'saeki', statement: '管理人室で、帳簿の手伝いをしていました。' },
@@ -137,7 +140,7 @@ export const CASES = Object.freeze([
     culprit: 'kuga',
     stool: 0,
     reveal: '男はいなかった。帽子と外套と鞄の影が、灯りの高さ102cmでそろっただけだった。',
-    closing: '102cmは、身長170cmの人が提げる灯り。診察室にいたはずの久我が、廊下に立っていた。',
+    closing: '102cmは、身長170cmの人が提げる灯り。同じ170cmの椿には、厨房に見習いがいた。診察室にいたはずの久我が、廊下に立っていた。',
   },
   {
     id: 'chair',
@@ -155,7 +158,7 @@ export const CASES = Object.freeze([
       '椅子の影が、座った人の下半身になる。帽子と外套を、その上に重ねよう。',
       '縦のつながりは灯りの高さで合わせ、横は道具をすべらせて合わせる。',
     ],
-    deductionHint: '灯りの高さから、踏み台の20cmを引いてから、6割で割る。',
+    deductionHint: '踏み台に立つと、灯りは20cm高くなる。灯りから20cmを引いてから、6割で割る。',
     stool: 20,
     stage: {
       distance: 250,
@@ -196,7 +199,7 @@ export const CASES = Object.freeze([
       '人影に関係のない道具の影は、壁の左右の端へ追い出そう。',
       '傘・外套・長靴の上下のつながりは、灯りの高さで決まる。そのあと、横をそろえよう。',
     ],
-    deductionHint: '灯りの高さを6割で割る。残った2人は、身長が8cm違う。',
+    deductionHint: '灯り108cmに合う身長の人が、2人いる。アリバイが確かなほうを外そう。',
     stool: 0,
     stage: {
       distance: 300,
@@ -212,16 +215,16 @@ export const CASES = Object.freeze([
     },
     clues: [
       { id: 'rule', kind: 'rule', text: '灯りは、胸の高さに提げる。月影荘の決まりで、高さは身長のちょうど6割。' },
-      { id: 'alibi', kind: 'alibi', text: '久我は、夕方から往診で外出していた。診療所の記録が残っている。', rulesOut: ['kuga'] },
+      { id: 'alibi', kind: 'alibi', text: '白瀬は、雨の夕方から主人の送迎で車を出していた。同乗した客が、それを覚えている。', rulesOut: ['shirase'] },
     ],
     suspects: [
-      { id: 'kuga', statement: '往診で、夕方から外にいました。' },
+      { id: 'shirase', statement: '車で、お客さんを送っていました。' },
       { id: 'hiiragi', statement: '納屋で、棚の修理をしていました。' },
       { id: 'hasumi', statement: '配達の帰りに、門のそばを通っただけです。' },
     ],
     culprit: 'hiiragi',
     reveal: '傘の人は、開いた傘・長い外套・長靴の影だった。山高帽と地球儀は関係ない。灯りは108cm。',
-    closing: '108cmは、身長180cmの人が提げる灯り。蓮見の188cmなら約113cmで、5cm高い。納屋にいたはずの柊が、門に立っていた。',
+    closing: '108cmは、身長180cmの人が提げる灯り。同じ180cmの白瀬には、客を乗せた車の記録がある。蓮見の188cmなら約113cmで、5cm高い。納屋にいたはずの柊が、門に立っていた。',
   },
 ]);
 
