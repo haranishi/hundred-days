@@ -1,9 +1,9 @@
 {
   "feature_name": "day-071-kage-shogen",
   "created_at": "2026-10-19T04:46:21+00:00",
-  "updated_at": "2026-10-19T04:46:21+00:00",
+  "updated_at": "2026-10-19T12:00:00+00:00",
   "language": "ja",
-  "phase": "implementation-in-progress",
+  "phase": "validated-experience-passed-visual-needs-human",
   "approvals": {
     "requirements": {
       "generated": true,
@@ -25,7 +25,9 @@
     "open_items": [
       "「影証」を、2026-10-19の再提案の案③「影証言」と解釈した（要件の前提）。",
       "題名の商標は、J-PlatPatの簡易な自動検索（文字列・称呼とも一致0件、類似検索は別分野の3件）までで、弁理士の確認は未実施。公開前に本人が確認する。",
-      "5つの夜の物語・容疑者の名前・身長は本リポジトリでの創作。本人の好みでの差し替えを想定する。"
+      "5つの夜の物語・容疑者の名前・身長は本リポジトリでの創作。本人の好みでの差し替えを想定する。",
+      "画面の独立評価（AI）が、3周とも合格に届かなかった（14・15・15/20）。同じ項目（余白と整列・タイポグラフィ・モバイル・一貫性）が続いたため、契約に従って本人へ返す。残件は experience-r3.md・visual-r3.md の改善案。続けるかどうかは本人の判断。",
+      "本人によるプレイと、面白さ・難しさの評価は未実施（AIの評価は代理指標）。"
     ]
   },
   "delivery": {
@@ -47,8 +49,24 @@
     "status": "not-started"
   },
   "validation": {
-    "status": "design-validated",
-    "report": ".agent-harness/runs/day071-kage-shogen/design-validation.md",
-    "public_status": "draft"
+    "status": "experience-passed-visual-needs-human",
+    "report": ".agent-harness/runs/day071-kage-shogen/validation-r2.md",
+    "public_status": "draft",
+    "rounds": {
+      "experience": {
+        "r1": 12,
+        "r2": 15,
+        "r3": 17,
+        "passed": true
+      },
+      "visual": {
+        "r1": 14,
+        "r2": 15,
+        "r3": 15,
+        "passed": false
+      }
+    },
+    "evaluated_commit": "6ac5e2b",
+    "note": "体験は第3周で合格（17/20・0点なし）。画面は3周とも不合格（14・15・15。合格は16点以上かつ0点なし）で、同じ項目が2周続いたため、契約に従って本人へ返す。AIによる評価は代理指標で、本人のプレイが最終判定。"
   }
 }
