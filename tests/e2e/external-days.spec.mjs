@@ -1,6 +1,7 @@
 import { expect, test } from '@playwright/test';
 import { readFileSync, readdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
+import { effectiveStatus } from '../../scripts/lib/day-status.mjs';
 
 /* Chrome拡張など、アプリ本体をこのサイトの外で公開しているDay（status: external ＋ externalUrl）の検査。
    コードはこのリポジトリに置かず、一覧のカードが紹介ページへ正しくリンクすることだけを約束する。
@@ -70,9 +71,9 @@ test('外部で公開したDayも進捗（公開済み N/100）に数えられ�
   const appsDir = fileURLToPath(new URL('../../', import.meta.url));
   const released = readdirSync(appsDir)
     .filter((name) => name.startsWith('day-'))
-    .map((dir) => JSON.parse(readFileSync(`${appsDir}${dir}/meta.json`, 'utf8')))
-    .filter((meta) => {
-      const status = meta.status || 'published';
+    .map((dir) => ({ dir, meta: JSON.parse(readFileSync(`${appsDir}${dir}/meta.json`, 'utf8')) }))
+    .filter(({ dir, meta }) => {
+      const status = effectiveStatus(meta, dir);
       if (status === 'draft') return false;
       return status === 'published' || Boolean(meta.externalUrl);
     }).length;

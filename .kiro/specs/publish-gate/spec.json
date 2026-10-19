@@ -1,0 +1,59 @@
+{
+  "feature_name": "publish-gate",
+  "created_at": "2026-10-20T02:00:00+09:00",
+  "updated_at": "2026-10-20T05:45:00+09:00",
+  "language": "ja",
+  "phase": "implemented-verified",
+  "approvals": {
+    "requirements": {
+      "generated": true,
+      "approved": true
+    },
+    "design": {
+      "generated": true,
+      "approved": true
+    },
+    "tasks": {
+      "generated": true,
+      "approved": true
+    }
+  },
+  "ready_for_implementation": true,
+  "approval_scope": {
+    "requirements": "本人の個別レビューは未実施。2026-10-20の本人の依頼「今後こういうことが起こらないように、CDDを追加していってほしい。ASGDも追加していってほしい。会社用のCodexも使いながらやっていってほしい」と、2026-10-19の自律進行の指示に基づき、承認済みとして進める。",
+    "downstream": "設計・タスク・実装・検証・作業ブランチのGit操作・PR作成まで。マージとデプロイは含まない。実装は会社用のCodexに任せ、検証と独立レビューも別の呼び出しで行う。",
+    "open_items": [
+      "「CDD」は、過去の言い直し（「SDDだったかな」）から cc-sdd と解釈した。「ASGD」は意味を特定できず、AGENTS.md または SDD と解釈した。どちらも、仕様・steering・手順書への追記として扱った。違えば本人が直す。",
+      "「こういうこと」は、Day70・Day71の公開時に横断の共有試験が落ちたこと、と、マージしても未公開のまま本人が公開を頼み直したこと、の両方と解釈した。前者は公開ゲート（要件1〜5）、後者は新Dayの既定（要件6）で扱う。",
+      "CIのワークフローは変えていない。下書きを含む検査をCIの必須にするかどうかは、別の仕様で本人が決める。"
+    ]
+  },
+  "delivery": {
+    "repository": "haranishi/hundred-days",
+    "base": "main",
+    "branch": "feat/publish-gate",
+    "authorized_operations": [
+      "commit",
+      "push",
+      "PR"
+    ],
+    "not_authorized": [
+      "merge",
+      "deploy",
+      "publish",
+      "x-post"
+    ],
+    "scope": "作業ブランチへのcommit・push・PR作成まで。マージは本人（`gh pr merge` は環境の権限設定で私からは拒否される）。",
+    "status": "pr-opened"
+  },
+  "validation": {
+    "status": "verified",
+    "unit_tests": "npm run check 成功（npm run test:unit 3607件・成功3606・スキップ1・失敗0）",
+    "build_identity": "環境変数なしのビルドは、変更前のmain（2438bdd）と全2969ファイルが一致",
+    "e2e": "通常の横断ブラウザ試験282件成功。publish:check -- --day 71 合格（282件成功）",
+    "incident_replay": "Day71をdraft＋旧い共有文にすると、静的な契約とブラウザ試験の両方が失敗する",
+    "independent_review": "会社用Codex（gpt-6-astra・読み取り専用）：第1周7件を採用して修正。第2周はクレジット切れで途中停止（新規2件を修正）。第3周は、会社用Codexが起動の直後にクレジット切れだったため、別のOpusが実施（7件のうち、中1・低4を修正、1件は注記、1件は記録の更新）。記録は .agent-harness/runs/publish-gate/review-1.md・review-2.md",
+    "implementation_note": "実装は会社用Codexのクレジット切れのため、Opusの別サブエージェントが行い、メインが検証し直した",
+    "signals": "SIGTERM・SIGINT・SIGHUP・出力先の切断（| head）で、終了コード1または0（切断は最後まで走る）・サーバーが残らない・dist/が通常のビルドに戻る"
+  }
+}

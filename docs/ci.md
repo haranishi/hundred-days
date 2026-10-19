@@ -45,6 +45,22 @@ CIの分割を再現する場合は `npm run test:e2e -- --shard=1/4` を使う�
 TypeScript製Dayのソースを変える場合は、その `source/package.json` の型検査・lint・テスト・リリース手順も確認する。
 構文検査では生成済みのassets/game/dist、vendor、評価用の記録を除く。これらの動作はビルドとブラウザテストで確認する。
 
+## 下書きのDayと横断の検査
+
+共有・OGP・ヘッダーの横断の検査（`shared-share`・`security-headers`）は、このサイトで配信するアプリ本体（`status: "published"`）だけが対象になる。
+`external-days` は、外部で公開したDay（`status: "external"`）の一覧のカードと素材を見る検査で、こちらも下書きは対象外。
+ビルドは下書きのDayを `dist/` に入れないので、下書きの違反は、公開に切り替えたPRのCIで初めて見つかる。Day70とDay71で続けて起きた。
+
+この穴は2か所で埋めている。
+単体テストの静的な契約（`scripts/lib/publish-contract.mjs`）は、canonical・OGP・共有文のように、HTMLと `meta.json` の文字列だけで決まる項目を、下書きを含む全Dayに当てる。共通CIでも `npm run check` でも走る。
+44pxの大きさや枠のコントラストのように、ブラウザでしか測れない契約は、公開ゲート `npm run publish:check -- --day <N>` が受け持つ。そのDayだけを公開済みとみなしてビルドし、横断のブラウザテストを流す。ブラウザは上の `npx playwright install chromium` で入れたものを使う。
+
+公開ゲートは `meta.json` を書き換えない。通常の終了・失敗・例外・SIGINT・SIGTERM・SIGHUP・出力先の切断では、検査用のサーバーを止めて、`dist/` を通常のビルドに戻す。
+SIGKILL や電源断のようにプロセスがその場で止まると、後始末は走らず、`dist/` に検査用のビルドが残ることがある。そのときと、戻せなかったと表示されたときは、`npm run build` を実行する。
+検査用のサーバーも、公開ゲートが自分で立てて、終わりに止める。ポートはOSが空きを選び、公開ゲートはそのサーバーの出力から読むので、ほかのサーバーは拾わない。
+判定を変える環境変数 `PUBLISH_CHECK_DAY` は、GitHub Actions では例外で止まる。CIのビルドで下書きが公開されることはない。
+契約の一覧と足し方は [公開の契約](../.kiro/steering/publish-contract.md) にある。
+
 ## ブラウザテストが失敗したら資料を開く
 
 GitHub Actionsの該当実行で、Artifactsの `browser-failure-1`〜`browser-failure-4` を取得する。
