@@ -46,11 +46,11 @@ select(session, id)                  // 'lamp' か、すべれる道具のid。�
 setLamp(session, ly) / setPropX(session, id, x)   // 範囲に収め、評価を更新。固定の道具は無視
 nudge(session, direction, step)      // direction は -1 か +1。選択中が灯りなら高さ、道具なら横位置
 reset(session)                       // 開始の配置へ。guideOn・usedGuide・hintsUsed は変えない
-toggleGuide(session)                 // usedGuide（夜1の初期ガイドは数えない）を更新
-useHint(session) → { index, kind, text }  // hintsUsed を増やす。奇数回目は kind:'diagnosis'（diagnose の名指し）、偶数回目は kind:'principle'（hints[] を順に）
+toggleGuide(session)                 // 夜2以降は、付けた時点で usedGuide を立てる。夜1（guide:'on'）は、何度出し入れしても立てない
+useHint(session) → { index, kind, text }  // hintsUsed を増やす。まだ出していない文を1つ：kind:'diagnosis'（diagnose の名指し。配置が変わって文が替わったら、また先に）→ kind:'principle'（hints[] を順に）→ kind:'end'（出し尽くした）。shownHints に覚える
 confirmSolve(session)                // 評価が success のときだけ、灯りと必要な道具を正解の配置へそろえて status を 'solved' にする。邪魔な道具は置いた位置のまま
 movableIds(session)                  // ['lamp', ...すべれる道具のid]
-describeAssessment(session) → { step, label, detail, fills }  // fills：4つの目盛りの満ち具合（0〜1）。IoU が各段の範囲のどこにあるかで連続して伸びる
+describeAssessment(session) → { step, label, detail, fills }  // fills：4つの目盛りの満ち具合（0〜1）。IoU が各段の範囲のどこにあるかで連続して伸びる。「近い」「あと少し」の detail は、邪魔な道具が残っている／灯りの高さがずれている／道具の横位置がずれている（灯りと道具が正解から3cm以内なら「合っている」）
 ```
 
 ## ヒントの名指し（`lib/diagnose.js`）
@@ -70,7 +70,7 @@ starsFor({ usedGuide, hintsUsed, wrongAnswers }) → 1..3   // 3 − min(2, 使�
 recordClear(progress, caseId, stars) → progress           // 最も高い星を残す
 totalStars(progress) / clearedCount(progress) / nextIndex(progress)
 ```
-`usedGuide` には、夜1の初期ガイドを含めない（`guide:'on'` の夜は、ガイドを消して付け直さない限り false）。
+`usedGuide` には、夜1のガイドを含めない（`guide:'on'` の夜は、何度出し入れしても false）。
 保存形式は `{"v":1,"cleared":{"rack":{"stars":3}},"last":"rack"}`。値は検証してから使う。
 
 ## 変換（`lib/transform.js`・実装する）
