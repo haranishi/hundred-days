@@ -1,7 +1,7 @@
 {
   "feature_name": "day-071-kage-shogen",
   "created_at": "2026-10-19T04:46:21+00:00",
-  "updated_at": "2026-10-20T00:30:00+09:00",
+  "updated_at": "2026-10-20T02:10:00+09:00",
   "language": "ja",
   "phase": "published-visual-needs-human",
   "approvals": {
@@ -46,9 +46,11 @@
       "x-post"
     ],
     "scope": "作業ブランチへのcommit・push・PR作成（2026-10-19）。公開は、2026-10-20の本人の依頼の範囲：published への変更・PR・マージ・既存のCIと本番デプロイ・本番確認。X投稿は含まない。",
-    "status": "publication-pr",
+    "status": "published",
     "pull_request": "https://github.com/haranishi/hundred-days/pull/157",
-    "note": "PR157はdraftのままmainへマージ済み（2026-10-19 23:15 JST）。公開用のPRで status を published にして反映する。X投稿は本人。"
+    "note": "PR157はdraftのままmainへマージ済み（2026-10-19）。公開用のPR158を本人がマージし（2026-10-20 01:28 JST）、mainのCIと本番デプロイが成功した。本番で応答・OGP・E2E 76件を確認済み。X投稿は本人。",
+    "publication_pull_request": "https://github.com/haranishi/hundred-days/pull/158",
+    "published_commit": "2438bdd"
   },
   "validation": {
     "status": "experience-passed-visual-needs-human",
