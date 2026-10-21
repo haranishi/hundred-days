@@ -1,6 +1,7 @@
 import { initReflection } from './reflection.js';
 import { ANSWER_OPTIONS, GUIDE_STORAGE_KEY } from './lib/guide-data.js';
-import { GUIDE_LIMIT, nextQuestion, addAnswer, reviseFrom, buildGuideReport, guideText, encodeGuide, decodeGuide, questionOf, answerOf, GUIDE_EXAMPLE } from './lib/guide-model.js';
+import { GUIDE_LIMIT, nextQuestion, addAnswer, reviseFrom, buildGuideReport, guideText, encodeGuide, decodeGuide, questionOf, answerOf, industryUrl, GUIDE_EXAMPLE } from './lib/guide-model.js';
+import { reducedMotion, guideIcon, setupPreview, renderJourney, animateGuide, cancelGuideMotion } from './lib/guide-visuals.js';
 
 const $ = selector => document.querySelector(selector);
 function node(tag, className, text) {
@@ -30,9 +31,18 @@ let savingPaused = false;
 let mode = 'guide';
 let reflectionOpened = false;
 let answerTimer;
+let answerUnlockTimer;
+let screenVersion = 0;
 function announce(text) { $('#guide-status').textContent = text; }
 function focusTop(selector) {
-  requestAnimationFrame(() => { $(selector).focus({ preventScroll: true }); window.scrollTo({ top: 0, behavior: 'instant' }); });
+  const version = screenVersion;
+  requestAnimationFrame(() => {
+    if (version !== screenVersion || mode !== 'guide' || $('dialog[open]')) return;
+    $(selector).focus({ preventScroll: true }); window.scrollTo({ top: 0, behavior: 'instant' });
+  });
+}
+function cancelTransition() {
+  clearTimeout(answerTimer); clearTimeout(answerUnlockTimer); cancelGuideMotion(); screenVersion++;
 }
 function pauseSaving() {
   saveEnabled = false; savingPaused = true;
@@ -76,14 +86,24 @@ $('#guide-save-toggle').addEventListener('change', event => {
 window.addEventListener('storage', event => { if (event.key === GUIDE_STORAGE_KEY || event.key === null) pauseSaving(); });
 
 function showGuide(nextView = view, { focus = true } = {}) {
+  cancelTransition();
   mode = 'guide'; view = nextView;
   document.body.dataset.mode = mode;
   $('#reflection').hidden = true; $('#guide').hidden = false;
   $('#save-control').hidden = true; $('#reset-button').hidden = true; $('#storage-status').hidden = true;
   render();
+  if (view === 'question') {
+    animateGuide($('.guide-question-card'), [{ opacity: .5, transform: 'translateY(10px)' }, { opacity: 1, transform: 'translateY(0)' }], { duration: 230 });
+    if (answers.length) animateGuide($('#guide-collection [data-axis="' + questionOf(answers.at(-1).q).axis + '"] .guide-collection-icon'), [{ transform: 'scale(.85) rotate(-9deg)' }, { transform: 'scale(1) rotate(0)' }]);
+  }
+  if (view === 'result') {
+    animateGuide($('.guide-completion-stamp'), [{ opacity: .2, transform: 'scale(.8) rotate(-16deg)' }, { opacity: 1, transform: 'scale(1) rotate(-8deg)' }], { duration: 450 });
+    $('#guide-axes').querySelectorAll('.guide-axis-card').forEach((card, i) => animateGuide(card, [{ opacity: .3, transform: 'translateY(16px)' }, { opacity: 1, transform: 'translateY(0)' }], { duration: 350, delay: Math.min(i, 2) * 60 }));
+  }
   if (focus) focusTop(view === 'welcome' ? '#guide-welcome-title' : view === 'question' ? '#guide-question-title' : '#guide-result-title');
 }
 function showReflection() {
+  cancelTransition();
   mode = 'reflection'; document.body.dataset.mode = mode;
   $('#guide').hidden = true; $('#reflection').hidden = false;
   $('#guide-save-control').hidden = true; $('#storage-status').hidden = false;
@@ -108,12 +128,14 @@ function renderQuestion() {
   const count = answers.length;
   $('#guide-count').textContent = String(count + 1).padStart(2, '0') + ' / 12';
   $('#guide-progress').value = count;
+  renderJourney(answers);
+  $('#guide-question-symbol').replaceChildren(guideIcon(question.axis));
   $('#guide-question-number').textContent = 'QUESTION ' + String(count + 1).padStart(2, '0');
   $('#guide-question-title').textContent = question.text;
   $('#guide-question-title').dataset.question = question.id;
   $('#guide-question-hint').textContent = question.hint;
   $('#guide-remaining').textContent = '結果まで、あと' + (GUIDE_LIMIT - count) + '問';
-  $('#guide-followup').textContent = count >= 6 ? 'ここからは、あなたの回答に合わせて、もう少し具体的に聞きます。' : '6つの角度から、仕事への気持ちを聞いていきます。';
+  $('#guide-followup').textContent = count >= 6 ? '後半に到着！あなたの回答に合わせて、もう少し具体的に聞きます。' : count ? count + '問、集まりました。次の場面では、どう感じる？' : 'まずは、最初の一枚から。';
   const host = $('#guide-answers'); host.replaceChildren();
   for (const [index, option] of ANSWER_OPTIONS.entries()) {
     const button = node('button', 'guide-answer' + (option.value === null ? ' guide-answer-unknown' : ''));
@@ -122,13 +144,18 @@ function renderQuestion() {
     button.append(mark, node('span', '', option.label), node('span', 'guide-answer-arrow', '→'));
     button.addEventListener('click', () => {
       if (button.disabled) return;
+      host.querySelectorAll('button').forEach(item => { item.disabled = true; });
+      button.classList.add('is-selected'); button.lastElementChild.textContent = '✓';
       answers = addAnswer(answers, option.id);
-      showGuide(answers.length === GUIDE_LIMIT ? 'result' : 'question'); persist();
-      // 押した直後に同じ位置を連打して、次の問いまで答えるのを防ぐ。
-      const nextButtons = [...host.querySelectorAll('button')];
-      nextButtons.forEach(item => { item.disabled = true; });
-      clearTimeout(answerTimer);
-      answerTimer = setTimeout(() => nextButtons.forEach(item => { item.disabled = false; }), 180);
+      view = answers.length === GUIDE_LIMIT ? 'result' : 'question'; persist();
+      const advance = () => {
+        showGuide(view);
+        // 新しい問いが同じ位置に現れても、連打を次の回答として受け取らない。
+        const nextButtons = [...host.querySelectorAll('button')];
+        nextButtons.forEach(item => { item.disabled = true; });
+        answerUnlockTimer = setTimeout(() => nextButtons.forEach(item => { item.disabled = false; }), 180);
+      };
+      if (reducedMotion.matches) advance(); else answerTimer = setTimeout(advance, 140);
     });
     host.append(button);
   }
@@ -158,13 +185,18 @@ function renderResult() {
     open: '今回の場面からは、軸を絞るだけの手がかりが集まりませんでした。気持ちに近い仕事を、別の角度から探してみよう。',
   };
   $('#guide-result-summary').textContent = summaries[report.status];
+  $('#guide-result-title').replaceChildren(node('span', 'guide-title-phrase', report.leading.length ? '見つけた、' : 'これから描く、'), node('span', 'guide-title-phrase', 'わたしの就活の軸。'));
+  $('#guide-next-jump').hidden = !report.leading.length;
   const axesHost = $('#guide-axes'); axesHost.replaceChildren();
   for (const [index, axis] of report.leading.entries()) {
     const card = node('article', 'guide-axis-card');
+    card.dataset.axis = axis.id;
     const title = node('h2');
     const phrases = axis.title.split('、');
     phrases.forEach((phrase, i) => title.append(node('span', 'guide-title-phrase', phrase + (i < phrases.length - 1 ? '、' : ''))));
-    card.append(node('p', 'section-index', '仕事選びの軸の候補 ' + String(index + 1).padStart(2, '0')), title);
+    const top = node('div', 'guide-axis-top');
+    top.append(node('p', 'section-index', '仕事選びの軸の候補 ' + String(index + 1).padStart(2, '0')), guideIcon(axis.id));
+    card.append(top, title);
     const badge = node('span', 'guide-axis-badge', axis.label); card.append(badge, node('p', 'guide-evidence-label', 'この回答が、手がかりになりました'));
     for (const entry of axis.entries) {
       const evidence = node('div', 'guide-evidence'); evidence.append(node('p', '', entry.question.text), node('span', '', '→ ' + entry.answer.label)); card.append(evidence);
@@ -186,20 +218,24 @@ function renderResult() {
   const industryHost = $('#guide-industries'); industryHost.replaceChildren();
   for (const industry of report.industries) {
     const card = node('article', 'guide-industry-card'); card.dataset.industry = industry.id;
-    card.append(node('h3', '', industry.name), node('p', 'guide-industry-description', industry.description));
+    const top = node('div', 'guide-industry-top'); top.append(guideIcon('industry'), node('span', '', '気になる仕事を、のぞいてみよう'));
+    card.append(top, node('h3', '', industry.name), node('p', 'guide-industry-description', industry.description), node('p', 'guide-job-example', '仕事の例：' + industry.jobs));
     const tags = node('div', 'guide-industry-tags');
     for (const axis of industry.matches) tags.append(node('span', '', axis.label));
-    card.append(node('p', 'guide-evidence-label', 'あなたの回答との接点'), tags, node('p', 'guide-small', '↑ 根拠となる質問・回答は、上の就活軸で確認できます。'));
+    card.append(node('p', 'guide-evidence-label', 'あなたの回答との接点'), tags);
+    const more = node('details', 'guide-industry-more');
+    const summary = node('summary'); summary.append(node('span', '', 'この業界を、もう少しのぞく'), node('span', 'guide-more-mark', '＋'));
+    more.append(summary, node('p', 'guide-small', '根拠となる質問・回答は、上の就活軸で確認できます。'));
     if (industry.matches.some(axis => !report.leading.some(lead => lead.id === axis.id))) {
       const detail = node('details', 'guide-other-evidence'); detail.append(node('summary', '', 'この候補の回答根拠も見る'));
       for (const axis of industry.matches) for (const entry of axis.entries) detail.append(node('p', '', entry.question.text + ' → ' + entry.answer.label));
-      card.append(detail);
+      more.append(detail);
     }
-    card.append(node('p', 'guide-job-example', '仕事の例：' + industry.jobs), node('p', 'guide-industry-check', industry.check));
+    more.append(node('p', 'guide-industry-check', industry.check));
     if (industry.cautions.length) card.append(node('p', 'guide-caution', '関心が低かった「' + industry.cautions.map(axis => axis.label).join(' / ') + '」の比重も、仕事内容で確かめよう。'));
     const link = node('a', 'guide-job-link', industry.sourceLabel + ' ↗');
-    link.href = industry.source ? 'https://shigoto.mhlw.go.jp/User/Occupation/Detail/' + industry.source : 'https://shigoto.mhlw.go.jp/User/Occupation';
-    link.target = '_blank'; link.rel = 'noopener noreferrer'; card.append(link); industryHost.append(card);
+    link.href = industryUrl(industry);
+    link.target = '_blank'; link.rel = 'noopener noreferrer'; more.append(link); card.append(more); industryHost.append(card);
   }
   $('#guide-company-questions').hidden = !report.leading.length;
   $('#guide-company-list').replaceChildren(...report.leading.map(axis => { const item = node('li'); item.append(node('span', '', axis.label), node('p', '', axis.question)); return item; }));
@@ -217,7 +253,7 @@ function render() {
   for (const screen of ['welcome', 'question', 'result']) $('#guide-' + screen).hidden = view !== screen;
   $('#guide-save-control').hidden = demo || (view === 'welcome' && !answers.length);
   $('#guide-save-toggle').checked = saveEnabled;
-  $('#guide-start').textContent = answers.length === GUIDE_LIMIT ? '自分の結果を見る →' : answers.length ? '続きの質問に答える →' : '質問に答えてみる →';
+  $('#guide-start').textContent = answers.length === GUIDE_LIMIT ? '自分の結果を見る →' : answers.length ? '続きの質問に答える →' : '手がかりを探しに行く →';
   $('#guide-resume-note').textContent = answers.length ? answers.length + '問の回答が残っています。' : '';
   if (view === 'question') renderQuestion();
   if (view === 'result') renderResult();
@@ -232,6 +268,25 @@ $('#guide-download').addEventListener('click', () => {
   $('#guide-export-status').textContent = 'テキストファイルの保存を開始しました。';
 });
 $('#guide-print').addEventListener('click', () => window.print());
+for (const button of document.querySelectorAll('[data-guide-jump]')) button.addEventListener('click', () => {
+  const target = document.getElementById(button.dataset.guideJump);
+  if (!target || target.closest('[hidden]')) return;
+  target.tabIndex = -1; target.focus({ preventScroll: true }); target.scrollIntoView({ block: 'start', behavior: reducedMotion.matches ? 'instant' : 'smooth' });
+});
+// 折りたたんだ説明も印刷し、印刷後は閲覧時の開閉状態に戻す。
+let printDetails = [];
+let printing = false;
+function preparePrint() {
+  cancelGuideMotion();
+  if (printing) return;
+  printing = true;
+  printDetails = [...document.querySelectorAll('#guide-industries details')].filter(detail => !detail.open);
+  printDetails.forEach(detail => { detail.open = true; });
+}
+function finishPrint() { printDetails.forEach(detail => { detail.open = false; }); printDetails = []; printing = false; }
+window.addEventListener('beforeprint', preparePrint);
+window.addEventListener('afterprint', finishPrint);
+window.matchMedia('print').addEventListener('change', event => { if (event.matches) preparePrint(); else finishPrint(); });
 $('#guide-reset').addEventListener('click', () => reflection.confirm('質問の回答を消して、やり直しますか？', 'この質問の回答と保存内容を削除します。経験ワークの回答は残ります。必要なら先に結果をコピーしてください。', '消してやり直す', () => {
   let removed = false;
   try { storage.removeItem(GUIDE_STORAGE_KEY); savedText = null; removed = true; } catch { /* report below */ }
@@ -239,9 +294,11 @@ $('#guide-reset').addEventListener('click', () => reflection.confirm('質問の�
   for (const selector of ['#guide-axes', '#guide-industries', '#guide-answer-list', '#guide-company-list', '#guide-answers']) $(selector).replaceChildren();
   $('#guide-draft').textContent = ''; $('#guide-copy-text').value = ''; $('#guide-result-summary').textContent = ''; $('#guide-export-status').textContent = '';
   $('#guide-manual-copy').hidden = true;
+  $('#guide-collection').replaceChildren(); $('#guide-journey').replaceChildren();
   showGuide('welcome'); announce(removed ? '質問の回答と、保存した内容を消しました。' : '画面の回答は消しましたが、保存内容を削除できませんでした。ブラウザのサイトデータで確認してください。');
 }));
 
+setupPreview(buildGuideReport(GUIDE_EXAMPLE));
 showGuide(view, { focus: false });
 if (storageMessage) announce(storageMessage);
 if (location.hash === '#usage-examples') { showReflection(); requestAnimationFrame(() => $('#usage-examples').scrollIntoView()); }

@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { AXES, INDUSTRIES, GUIDE_QUESTIONS, ANSWER_OPTIONS } from '../lib/guide-data.js';
-import { nextQuestion, addAnswer, reviseFrom, validAnswers, buildGuideReport, guideText, encodeGuide, decodeGuide, GUIDE_EXAMPLE } from '../lib/guide-model.js';
+import { nextQuestion, addAnswer, reviseFrom, validAnswers, buildGuideReport, guideText, encodeGuide, decodeGuide, industryUrl, GUIDE_EXAMPLE } from '../lib/guide-model.js';
 
 function finish(choose) {
   let answers = [];
@@ -109,5 +109,18 @@ test('authored data has unique IDs, valid weights and complete question branches
   for (const industry of INDUSTRIES) {
     assert.ok(Object.keys(industry.weights).every(id => AXES.some(axis => axis.id === id)));
     assert.ok(Object.values(industry.weights).every(weight => Number.isFinite(weight) && weight > 0));
+  }
+});
+
+test('exports retain secondary industry evidence, cautions and public job links', () => {
+  const choices = ['no', 'yes', 'yes', 'no', 'no', 'maybe', 'yes', 'maybe', 'maybe', 'no', 'no', 'no'];
+  const answers = finish((q, index) => choices[index]);
+  const report = buildGuideReport(answers); const text = guideText(answers);
+  const secondary = report.industries.flatMap(item => item.matches.filter(axis => !report.leading.some(lead => lead.id === axis.id)));
+  assert.ok(secondary.some(axis => axis.id === 'sustain'));
+  for (const axis of secondary) for (const entry of axis.entries) assert.ok(text.includes(entry.question.text + ' → ' + entry.answer.label));
+  for (const item of report.industries) {
+    assert.ok(text.includes(industryUrl(item)));
+    for (const axis of item.cautions) assert.ok(text.includes(axis.label));
   }
 });

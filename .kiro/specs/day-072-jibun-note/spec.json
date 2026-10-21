@@ -17,10 +17,11 @@
     }
   },
   "ready_for_implementation": true,
-  "approval_scope": "選択式の質問で就活軸・業界候補を知りたいという本人の改修依頼に基づく。個別仕様の本人レビューは未実施。依頼済みのマージと本番確認まで進める。SNS投稿は対象外。",
-  "review": "R11–R16 independent specification/code/UI/experience reviews PASS after fixes. 11 new unit tests, 31 relevant browser tests, 286 publish-gate browser tests PASS. Main delivery status is recorded on the change PR.",
+  "approval_scope": "ワクワクするUIを作る本人の改修依頼に基づきR17–R20を具体化。個別仕様の本人レビューは未実施。依頼済みのマージと本番確認まで進める。SNS投稿は対象外。",
+  "review": "R17–R20 specification/code reviews PASS after fixes; UI 20/20, experience 19/20. 36 relevant browser tests, 3642 full unit tests (1 existing skip), 286 publish-gate browser tests PASS. Merge/deployment/production evidence is recorded on the change PR.",
   "previous_pull_requests": [
     "https://github.com/haranishi/hundred-days/pull/161",
-    "https://github.com/haranishi/hundred-days/pull/162"
+    "https://github.com/haranishi/hundred-days/pull/162",
+    "https://github.com/haranishi/hundred-days/pull/163"
   ]
 }

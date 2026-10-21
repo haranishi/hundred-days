@@ -4,6 +4,7 @@ const questionById = new Map(GUIDE_QUESTIONS.map(q => [q.id, q]));
 const answerById = new Map(ANSWER_OPTIONS.map(a => [a.id, a]));
 export const questionOf = id => questionById.get(id);
 export const answerOf = id => answerById.get(id);
+export const industryUrl = industry => industry.source ? 'https://shigoto.mhlw.go.jp/User/Occupation/Detail/' + industry.source : 'https://shigoto.mhlw.go.jp/User/Occupation';
 
 export function axisResults(answers) {
   return AXES.map(axis => {
@@ -83,7 +84,14 @@ export function guideText(answers, { demo = false } = {}) {
   if (report.draft) lines.push('', '就活軸のたたき台', report.draft);
   if (report.status === 'broad') lines.push('', '関心が複数に広がっています。一つの軸に決める前に、具体的な仕事内容を比較してみましょう。');
   lines.push('', '次に調べる業界の候補' + (report.tied ? '（同点を含みます）' : ''));
-  for (const item of report.industries) lines.push('・' + item.name + '：' + item.matches.map(axis => axis.label).join(' / '), '  仕事例：' + item.jobs, '  ' + item.check);
+  for (const item of report.industries) {
+    lines.push('・' + item.name + '：' + item.matches.map(axis => axis.label).join(' / '), '  仕事例：' + item.jobs, '  ' + item.check);
+    for (const axis of item.matches.filter(axis => !report.leading.some(lead => lead.id === axis.id))) {
+      for (const entry of axis.entries) lines.push('  接点「' + axis.label + '」の根拠：' + entry.question.text + ' → ' + entry.answer.label);
+    }
+    if (item.cautions.length) lines.push('  関心が低かった「' + item.cautions.map(axis => axis.label).join(' / ') + '」の比重も、仕事内容で確かめよう。');
+    lines.push('  ' + item.sourceLabel + '：' + industryUrl(item));
+  }
   if (!report.industries.length) lines.push('今の回答からは業界候補を絞れていません。気になる仕事内容から探してみましょう。');
   lines.push('', '企業に確かめる質問', ...report.leading.map(axis => '・' + axis.question), '', '選んだ回答を整理した探索の手がかりです。能力や採用可能性を判定するものではありません。', 'https://hundred-days.pages.dev/day-072-jibun-note/');
   return lines.join('\n');

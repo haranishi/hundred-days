@@ -165,3 +165,91 @@ for (const width of [390, 768, 1440]) test(`guide welcome, choices and results f
   await page.locator('#about-button').focus(); await page.keyboard.press('Enter'); await expect(page.locator('#about-dialog')).toBeVisible();
   await page.keyboard.press('Escape'); await expect(page.locator('#about-button')).toBeFocused();
 });
+
+test('opening the three fictional clue cards never changes answers or saving', async ({ page }) => {
+  await start(page); await choose(page, 'no'); await page.locator('#guide-save-control').click();
+  await page.locator('#home-button').click();
+  const snapshot = await page.evaluate(key => localStorage.getItem(key), GUIDE_STORAGE_KEY);
+  const cards = page.locator('.guide-preview-card');
+  await expect(cards).toHaveCount(3);
+  for (let i = 0; i < 3; i++) {
+    await cards.nth(i).focus(); await page.keyboard.press('Enter');
+    await expect(cards.nth(i)).toHaveAttribute('aria-expanded', 'true');
+    await expect(cards.nth(i).locator('.guide-preview-content')).toBeVisible();
+    await expect(page.locator('.guide-preview-card[aria-expanded=true]')).toHaveCount(1);
+  }
+  await expect(page.locator('.guide-fiction-label')).toHaveText('架空の見本');
+  expect(await page.evaluate(key => localStorage.getItem(key), GUIDE_STORAGE_KEY)).toBe(snapshot);
+  await page.locator('#guide-start').click(); await expect(page.locator('#guide-count')).toHaveText('02 / 12');
+});
+
+test('the passport counts unsure and negative answers equally and follows back and reload', async ({ page }) => {
+  await start(page); await choose(page, 'unknown'); await choose(page, 'no');
+  await expect(page.locator('#guide-collected-count')).toHaveText('2 / 12');
+  await expect(page.locator('#guide-collection [data-axis=care]')).toHaveAttribute('data-count', '1');
+  await expect(page.locator('#guide-collection [data-axis=improve]')).toHaveAttribute('data-count', '1');
+  await expect(page.locator('#guide-journey .is-done')).toHaveCount(2);
+  await page.locator('#guide-back').click(); await expect(page.locator('#guide-collected-count')).toHaveText('1 / 12');
+  await expect(page.locator('#guide-collection [data-axis=improve]')).toHaveAttribute('data-count', '0');
+  await page.locator('#guide-save-control').click(); await page.reload();
+  await expect(page.locator('#guide-collected-count')).toHaveText('1 / 12');
+  await expect(page.locator('#guide-journey [aria-current=step]')).toHaveAttribute('aria-label', '質問2 回答中');
+});
+
+test('rapid clicks collect one answer and a pending transition cannot reopen an abandoned screen', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
+  await start(page);
+  await page.locator('#guide-answers [data-answer=yes]').dblclick({ delay: 60 });
+  await expect(page.locator('#guide-count')).toHaveText('02 / 12');
+  await expect(page.locator('#guide-collected-count')).toHaveText('1 / 12');
+  await expect(page.locator('#guide-answers [data-answer=yes]')).toBeEnabled();
+  await page.evaluate(() => { document.querySelector('#guide-answers [data-answer=no]').click(); document.querySelector('#home-button').click(); });
+  await page.waitForTimeout(350);
+  await expect(page.locator('#guide-welcome')).toBeVisible(); await expect(page.locator('#guide-welcome-title')).toBeFocused();
+  await page.locator('#guide-start').click(); await expect(page.locator('#guide-count')).toHaveText('03 / 12');
+  await page.evaluate(() => { document.querySelector('#guide-answers [data-answer=unknown]').click(); document.querySelector('#about-button').click(); });
+  await page.waitForTimeout(350);
+  expect(await page.locator('#about-dialog').evaluate(dialog => dialog.contains(document.activeElement))).toBe(true);
+  await page.keyboard.press('Escape');
+  await page.locator('#home-button').click(); await page.locator('#guide-start').click();
+  await page.evaluate(() => { document.querySelector('#guide-answers [data-answer=no]').click(); document.querySelector('#home-button').click(); document.querySelector('#reflection-button').click(); });
+  await page.waitForTimeout(350); await expect(page.locator('#reflection')).toBeVisible(); await expect(page.locator('#guide')).toBeHidden();
+});
+
+test('reduced motion skips the reveal while result exploration and print keep complete information', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await start(page); await finish(page, ['no', 'yes', 'yes', 'no', 'no', 'maybe', 'yes', 'maybe', 'maybe', 'no', 'no', 'no']);
+  expect(await page.evaluate(() => document.getAnimations().filter(a => a.playState === 'running' && a.effect?.target?.closest('#guide')).length)).toBe(0);
+  await page.locator('[data-guide-jump=guide-industries-title]').click();
+  await expect(page.locator('#guide-industries-title')).toBeFocused();
+  const more = page.locator('.guide-industry-more').first();
+  await expect(more).not.toHaveAttribute('open', '');
+  await more.locator('summary').first().focus(); await page.keyboard.press('Enter');
+  await expect(more.locator('.guide-industry-check')).toBeVisible();
+  const check = await more.locator('.guide-industry-check').textContent();
+  await expect(page.locator('#guide-copy-text')).toHaveValue(new RegExp(check.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
+  const secondary = page.locator('.guide-other-evidence').first();
+  expect(await secondary.count()).toBe(1);
+  const evidence = await secondary.locator('p').first().textContent();
+  expect(await page.locator('#guide-copy-text').inputValue()).toContain(evidence);
+  expect(await page.locator('#guide-copy-text').inputValue()).toContain(await more.locator('.guide-job-link').getAttribute('href'));
+  await more.locator('summary').first().click();
+  await page.emulateMedia({ media: 'print' });
+  await expect(more.locator('.guide-industry-check')).toBeVisible();
+  await expect(page.locator('.guide-result-nav')).toBeHidden();
+  await page.emulateMedia({ media: 'screen' }); await expect(more).not.toHaveAttribute('open', '');
+});
+
+test('printing during the result entrance keeps the clue cards fully legible', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
+  await page.goto(path); await page.locator('#guide-example').click();
+  await page.evaluate(() => {
+    for (const animation of document.getAnimations()) {
+      if (animation.effect?.target?.classList.contains('guide-axis-card')) { animation.pause(); animation.currentTime = 30; }
+    }
+    window.addEventListener('beforeprint', () => { window.printedCardOpacity = getComputedStyle(document.querySelector('.guide-axis-card')).opacity; });
+  });
+  const pdf = await page.pdf(); expect(pdf.length).toBeGreaterThan(1000);
+  expect(await page.evaluate(() => window.printedCardOpacity)).toBe('1');
+  await expect(page.locator('#guide-demo')).toBeVisible();
+});
