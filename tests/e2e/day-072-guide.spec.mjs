@@ -203,6 +203,8 @@ test('rapid clicks collect one answer and a pending transition cannot reopen an 
   await expect(page.locator('#guide-count')).toHaveText('02 / 12');
   await expect(page.locator('#guide-collected-count')).toHaveText('1 / 12');
   await expect(page.locator('#guide-answers [data-answer=yes]')).toBeEnabled();
+  await page.locator('#guide-save-control').click();
+  expect(await page.evaluate(key => JSON.parse(localStorage.getItem(key)).answers[0].a, GUIDE_STORAGE_KEY)).toBe('yes');
   await page.evaluate(() => { document.querySelector('#guide-answers [data-answer=no]').click(); document.querySelector('#home-button').click(); });
   await page.waitForTimeout(350);
   await expect(page.locator('#guide-welcome')).toBeVisible(); await expect(page.locator('#guide-welcome-title')).toBeFocused();
@@ -214,6 +216,23 @@ test('rapid clicks collect one answer and a pending transition cannot reopen an 
   await page.locator('#home-button').click(); await page.locator('#guide-start').click();
   await page.evaluate(() => { document.querySelector('#guide-answers [data-answer=no]').click(); document.querySelector('#home-button').click(); document.querySelector('#reflection-button').click(); });
   await page.waitForTimeout(350); await expect(page.locator('#reflection')).toBeVisible(); await expect(page.locator('#guide')).toBeHidden();
+});
+
+test('mouse focus stays in place, releasing outside cancels, and Space still answers', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
+  await start(page);
+  const answer = page.locator('#guide-answers [data-answer=yes]');
+  await answer.hover();
+  const scrollBefore = await page.evaluate(() => scrollY);
+  await page.mouse.down();
+  await expect(answer).toBeFocused();
+  expect(await page.evaluate(() => scrollY)).toBe(scrollBefore);
+  await page.mouse.move(1, 1); await page.mouse.up();
+  await expect(page.locator('#guide-count')).toHaveText('01 / 12');
+  await expect(answer).toBeEnabled();
+  await page.keyboard.press('Space');
+  await expect(page.locator('#guide-count')).toHaveText('02 / 12');
+  await expect(page.locator('#guide-collected-count')).toHaveText('1 / 12');
 });
 
 test('reduced motion skips the reveal while result exploration and print keep complete information', async ({ page }) => {

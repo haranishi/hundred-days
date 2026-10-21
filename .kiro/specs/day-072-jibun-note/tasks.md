@@ -40,3 +40,5 @@ Depends: 11 → 12 → 13 → 14 → 15。実装前の設計はchoice-design.md�
 
 Depends: 16 → 17 → 18 → 19。設計はdiscovery-ui-design.md、証拠はdiscovery-ui-verification.md。
 実際のPR・依頼済みマージ・デプロイ・本番操作確認は、この変更のPR検証欄へ記録する。
+
+- [x] 20. 押下中のスクロールをLinux対照実験で切り分け、修正・取消/Spaceの回帰検査を完了する（R19）
