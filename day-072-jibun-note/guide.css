@@ -1,4 +1,5 @@
 /* A field trip through twelve answers. All artwork is drawn for this app. */
+html:has(body[data-mode=guide] #guide-question:not([hidden])){scroll-behavior:auto}
 #guide{--lime:#d8ed85;--forest:#214c3f;--clay:#a34c2c;--lavender:#e6e1f1;--card-shadow:0 9px 26px #243e3610}
 #guide .primary-button{background:var(--forest);border-color:var(--forest);border-radius:12px;box-shadow:0 4px 0 #123b2f;transition:transform .16s,box-shadow .16s}
 #guide .primary-button:active{transform:translateY(3px);box-shadow:0 1px 0 #123b2f}

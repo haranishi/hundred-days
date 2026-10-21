@@ -142,11 +142,6 @@ function renderQuestion() {
     button.type = 'button'; button.dataset.answer = option.id;
     const mark = node('span', 'guide-answer-mark', option.value === null ? '?' : String(index + 1).padStart(2, '0')); mark.setAttribute('aria-hidden', 'true');
     button.append(mark, node('span', '', option.label), node('span', 'guide-answer-arrow', '→'));
-    button.addEventListener('pointerdown', event => {
-      if (event.pointerType !== 'mouse' || event.button !== 0) return;
-      // 押下中のフォーカススクロールで、離す位置が別の回答へずれるのを防ぐ。
-      event.preventDefault(); button.focus({ preventScroll: true });
-    });
     button.addEventListener('click', () => {
       if (button.disabled) return;
       host.querySelectorAll('button').forEach(item => { item.disabled = true; });
