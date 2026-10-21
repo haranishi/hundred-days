@@ -35,6 +35,7 @@
           <h1>いつもの経験に、<br><span>あなたの強み</span>がある。</h1>
           <p class="hero-description">アルバイト、授業、誰かのために動いた日。<br>一つの出来事をたどって、<br class="mobile-break">自分の言葉で話せる材料を見つけよう。</p>
           <ul class="hero-facts"><li>4つのステップ</li><li>登録なし</li><li>回答の外部送信なし</li></ul>
+          <a class="usage-link" href="#usage-examples">就活での使い方を、具体例で見る <span aria-hidden="true">↓</span></a>
         </div>
         <div class="hero-art" aria-hidden="true">
           <div class="orbit orbit-one"></div><div class="orbit orbit-two"></div>
@@ -51,9 +52,37 @@
       <section class="begin-card" aria-labelledby="begin-title">
         <div class="begin-heading"><div><p class="section-index">はじめの一歩</p><h2 id="begin-title">どんな経験を、振り返りますか？</h2></div><p>最近の、小さな出来事で大丈夫。</p></div>
         <fieldset class="context-fieldset"><legend class="sr-only">振り返る経験の種類</legend><div id="context-options" class="context-grid"></div></fieldset>
-        <div class="begin-bottom"><p id="begin-hint" class="begin-hint">思い出しやすいものを、ひとつ選んでください。</p><div class="begin-actions"><button id="example-button" type="button" class="text-button example-button">見本で試す <span aria-hidden="true">↗</span></button><button id="start-button" class="primary-button" type="button" disabled>振り返りをはじめる <span aria-hidden="true">→</span></button></div></div>
+        <div class="begin-bottom"><p id="begin-hint" class="begin-hint">思い出しやすいものを、ひとつ選んでください。</p><div class="begin-actions"><button id="example-button" type="button" class="text-button example-button" data-start-example>見本で試す <span aria-hidden="true">↗</span></button><button id="start-button" class="primary-button" type="button" disabled>振り返りをはじめる <span aria-hidden="true">→</span></button></div></div>
       </section>
       <div class="welcome-footnote"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 9V6a5 5 0 0 1 10 0v3M4 9h12v9H4Z"/></svg><p>入力はこの画面の中だけ。保存は、自分でオンにしたときだけ。</p></div>
+      <section id="usage-examples" class="usage-examples" tabindex="-1" aria-labelledby="usage-title">
+        <div class="usage-heading">
+          <div><p class="section-index">このワークで、できること</p><h2 id="usage-title">いつもの経験が、就活の材料に。</h2><p>例えば、カフェのアルバイトであったことを振り返ると。</p></div>
+          <span class="usage-fiction">架空の例</span>
+        </div>
+        <div class="usage-story">
+          <div><p class="usage-label">入力する経験の例</p><h3 id="usage-story-title"></h3><span class="tag">アルバイト</span></div>
+          <div><p class="usage-label">自分がやってみたこと</p><p id="usage-action"></p><p class="usage-selected"><span>自分で選んだ行動：</span><span id="usage-behaviors"></span></p></div>
+        </div>
+        <div class="usage-outcomes">
+          <article class="usage-outcome">
+            <p class="section-index">01 / 自己PR・面接</p><h3>自己PRで話す材料ができる</h3>
+            <p class="usage-label">強みの候補</p><ul id="usage-strengths"></ul>
+            <p class="usage-caption">困っている点を聞き、メモを作って見直した行動が、強みを話す根拠になります。</p>
+          </article>
+          <article class="usage-outcome">
+            <p class="section-index">02 / 企業選び</p><h3>企業選びの軸を言葉にできる</h3>
+            <p class="usage-label">大切にしたいこと</p><p id="usage-values" class="usage-output"></p>
+            <p class="usage-caption">「人の困りごとを知り、工夫して役に立てる仕事か」を、企業を見るときの観点にできます。</p>
+          </article>
+          <article class="usage-outcome">
+            <p class="section-index">03 / 説明会・面接での質問</p><h3>企業に聞く質問が具体的になる</h3>
+            <p class="usage-label">企業に聞きたいこと</p><p id="usage-question" class="usage-output"></p>
+            <p class="usage-caption">仕事内容と自分の価値観が合いそうかを、説明会や面接で確かめる問いに使えます。</p>
+          </article>
+        </div>
+        <div class="usage-footer"><p>架空の見本と、その使い方の例です。強みは、自分で選んだ行動から整理した候補です。</p><button id="usage-example-button" type="button" class="secondary-button" data-start-example>この見本を入力画面で試す <span aria-hidden="true">→</span></button></div>
+      </section>
     </section>
 
     <section id="work" class="work-page" hidden aria-label="経験を振り返る">

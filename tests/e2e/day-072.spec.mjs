@@ -150,6 +150,10 @@ test('a tab that never enabled saving cannot silently overwrite a different save
 
 test('reset clears rendered answers and print does not reveal a previous report', async ({ page }) => {
   await complete(page);
+  const privateTitle = '初期化で消す、私だけの経験072';
+  await page.getByRole('button', { name: '回答を見直す' }).click();
+  await page.locator('#field-title').fill(privateTitle);
+  for (let step = 0; step < 4; step++) await page.locator('#next-button').click();
   await page.emulateMedia({ media: 'print' });
   await expect(page.locator('#result')).toBeVisible();
   await page.emulateMedia({ media: 'screen' });
@@ -159,10 +163,29 @@ test('reset clears rendered answers and print does not reveal a previous report'
   await page.emulateMedia({ media: 'screen' });
   await page.getByRole('button', { name: '入力をすべて消す' }).click();
   await page.locator('#confirm-ok').click();
-  expect(await page.locator('body').textContent()).not.toContain(EXAMPLE.title);
+  expect(await page.locator('body').textContent()).not.toContain(privateTitle);
   await expect(page.locator('#copy-text')).toHaveValue('');
   await page.emulateMedia({ media: 'print' });
   await expect(page.locator('#result')).toBeHidden();
+});
+
+test('usage example shows the outcome and shares the protected example-start flow', async ({ page }) => {
+  await page.goto(path);
+  await page.getByRole('link', { name: '就活での使い方を、具体例で見る' }).click();
+  await expect(page.locator('#usage-examples')).toBeInViewport();
+  await expect(page.locator('#usage-strengths')).toContainText('相手を理解しようとする姿勢');
+  await expect(page.locator('#usage-values')).toContainText('誰かの役に立つ');
+  await expect(page.locator('#usage-question')).toContainText('この仕事は、誰のどんな困りごとを解決しますか？');
+  await page.locator('#usage-example-button').click();
+  await expect(page.locator('#field-title')).toHaveValue(EXAMPLE.title);
+  await expect(page.locator('#demo-banner')).toBeVisible();
+  await page.locator('#field-title').fill('自分で書き直した経験');
+  await page.locator('#home-button').click();
+  await page.locator('#usage-example-button').click();
+  await expect(page.locator('#confirm-dialog')).toBeVisible();
+  await page.locator('#confirm-cancel').click();
+  await page.locator('#start-button').click();
+  await expect(page.locator('#field-title')).toHaveValue('自分で書き直した経験');
 });
 
 test('example replacement is confirmed and examples stay labeled in exported text', async ({ page }) => {
