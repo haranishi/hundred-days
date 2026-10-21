@@ -1,0 +1,14 @@
+{
+  "feature_name": "day-072-jibun-note",
+  "language": "ja",
+  "phase": "implementation-complete",
+  "approvals": {
+    "requirements": {"generated": true, "approved": true},
+    "design": {"generated": true, "approved": true},
+    "tasks": {"generated": true, "approved": true}
+  },
+  "ready_for_implementation": true,
+  "approval_scope": "作成依頼と共通の自律進行方針に基づく。個別仕様の本人レビューは未実施。マージ・本番公開・SNS投稿は含めない。",
+  "review": "Independent specification review, final code re-review, and browser UI/experience review: PASS",
+  "pull_request": "https://github.com/haranishi/hundred-days/pull/161"
+}

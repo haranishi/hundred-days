@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="身近な経験を4つのステップで振り返り、強みの候補と大切にしたいことを整理する就活の自己分析ワーク。登録不要。回答は外へ送信しません。">
+  <meta name="share:text" content="じぶんの手がかり — いつもの経験から、強みと大切にしたいことを見つける就活の自己分析ワーク。登録不要。回答は外へ送信しません。">
+  <meta name="theme-color" content="#f7f6f0">
+  <title>じぶんの手がかり | 経験からはじめる、就活の自己分析</title>
+  <link rel="icon" type="image/svg+xml" href="./favicon.svg">
+  <link rel="stylesheet" href="./app.css">
+  <link rel="stylesheet" href="./shared/share.css">
+  <script type="module" src="./app.js"></script>
+  <script src="./shared/share.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">本文へ移動</a>
+  <header class="site-header">
+    <button id="home-button" class="brand" type="button" aria-label="じぶんの手がかりの最初の画面へ">
+      <svg class="brand-mark" viewBox="0 0 40 44" aria-hidden="true"><path d="M8 37V11a7 7 0 0 1 7-7h17v33l-12-7-12 7Z"/><path d="M15 14h10M15 20h7"/></svg>
+      <span>じぶんの手がかり<small>経験からはじめる、自己分析</small></span>
+    </button>
+    <nav class="header-actions" aria-label="アプリの操作">
+      <label id="save-control" class="save-switch" hidden><input id="save-toggle" type="checkbox"><span class="switch-track" aria-hidden="true"></span><span>この端末に保存</span></label>
+      <button id="about-button" class="text-button about-button" type="button">使い方</button>
+      <button id="share-button" class="icon-button" type="button" aria-label="このアプリを共有する"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V3m-4 4 4-4 4 4M5 13v7h14v-7"/></svg></button>
+    </nav>
+  </header>
+  <p id="storage-status" class="storage-status" role="status" aria-live="polite"></p>
+  <main id="main">
+    <section id="welcome" class="welcome">
+      <div class="hero">
+        <div class="hero-copy">
+          <p class="eyebrow"><span></span> 就活のための、小さな振り返り</p>
+          <h1>いつもの経験に、<br><span>あなたの強み</span>がある。</h1>
+          <p class="hero-description">アルバイト、授業、誰かのために動いた日。<br>一つの出来事をたどって、<br class="mobile-break">自分の言葉で話せる材料を見つけよう。</p>
+          <ul class="hero-facts"><li>4つのステップ</li><li>登録なし</li><li>回答の外部送信なし</li></ul>
+        </div>
+        <div class="hero-art" aria-hidden="true">
+          <div class="orbit orbit-one"></div><div class="orbit orbit-two"></div>
+          <span class="art-spark spark-one">＋</span><span class="art-spark spark-two">✳</span>
+          <div class="paper-note">
+            <div class="paper-top"><span class="paper-label">わたしの経験メモ</span><span class="paper-number">01</span></div>
+            <div class="paper-lines"><p>新人さんが、困っていた。</p><p>話を聞いて、メモを作った。</p><span class="hand-circle">相手の立場で考える</span></div>
+            <div class="paper-bottom"><span class="tiny-leaf">↗</span><span>小さな行動も、手がかりになる。</span></div>
+            <div class="bookmark"></div>
+          </div>
+          <div class="art-caption">例えば、いつものアルバイトで。<span>架空の例</span></div>
+        </div>
+      </div>
+      <section class="begin-card" aria-labelledby="begin-title">
+        <div class="begin-heading"><div><p class="section-index">はじめの一歩</p><h2 id="begin-title">どんな経験を、振り返りますか？</h2></div><p>最近の、小さな出来事で大丈夫。</p></div>
+        <fieldset class="context-fieldset"><legend class="sr-only">振り返る経験の種類</legend><div id="context-options" class="context-grid"></div></fieldset>
+        <div class="begin-bottom"><p id="begin-hint" class="begin-hint">思い出しやすいものを、ひとつ選んでください。</p><div class="begin-actions"><button id="example-button" type="button" class="text-button example-button">見本で試す <span aria-hidden="true">↗</span></button><button id="start-button" class="primary-button" type="button" disabled>振り返りをはじめる <span aria-hidden="true">→</span></button></div></div>
+      </section>
+      <div class="welcome-footnote"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 9V6a5 5 0 0 1 10 0v3M4 9h12v9H4Z"/></svg><p>入力はこの画面の中だけ。保存は、自分でオンにしたときだけ。</p></div>
+    </section>
+
+    <section id="work" class="work-page" hidden aria-label="経験を振り返る">
+      <div class="work-top"><p class="eyebrow">ひとつの経験を、4つの角度から。</p><span id="step-count" class="step-count"></span></div>
+      <nav id="steps" class="steps" aria-label="振り返りの段階"></nav>
+      <div id="demo-banner" class="demo-banner" hidden><span>架空の見本を表示しています。</span><button class="text-button" id="own-button" type="button">自分の経験で始める →</button></div>
+      <div class="work-layout">
+        <section class="question-card" aria-labelledby="question-title">
+          <p id="question-kicker" class="section-index"></p><h1 id="question-title" tabindex="-1"></h1><p id="question-intro" class="question-intro"></p>
+          <details class="question-hint"><summary>言葉が出てこないときは</summary><p id="context-hint"></p></details>
+          <form id="work-form" novalidate autocomplete="off"><div id="question-fields"></div><p id="form-error" class="field-error" role="alert"></p><div class="work-buttons"><button id="back-button" class="secondary-button" type="button">← 戻る</button><button id="next-button" class="primary-button" type="submit">次へ →</button></div></form>
+        </section>
+        <aside class="memo-panel"><details id="memo-details" open><summary><span>ここまでの、あなたのメモ</span><span class="memo-symbol" aria-hidden="true">＋</span></summary><div class="memo-content"><p id="memo-context" class="tag"></p><h2 id="memo-title">経験の見出し</h2><div id="memo-items"></div><p class="memo-note">きれいな文章にしなくても大丈夫。<br>まずは、思い出した言葉のままで。</p></div></details></aside>
+      </div>
+      <p class="work-privacy">回答は外へ送信しません。保存をオンにすると、このブラウザに残ります。</p>
+    </section>
+
+    <section id="result" class="result-page" hidden aria-labelledby="result-title">
+      <div class="result-intro"><p class="eyebrow"><span></span> あなたの振り返りシート</p><h1 id="result-title" tabindex="-1">一つの経験を、<br>話せる言葉に。</h1><p>ここにあるのは、あなたが書いた経験と、選んだ言葉。<br>自分らしいと感じるところから、話してみよう。</p><p id="result-demo" class="demo-banner" hidden>架空の見本です。実際の経験を記載したものではありません。</p></div>
+      <div class="result-toolbar"><button id="edit-button" class="secondary-button" type="button">← 回答を見直す</button><div class="export-actions"><button id="copy-button" class="primary-button" type="button">まとめをコピー</button><button id="download-button" class="secondary-button" type="button">テキスト保存</button><button id="print-button" class="secondary-button" type="button">印刷</button></div></div>
+      <p id="export-status" class="export-status" role="status" aria-live="polite"></p>
+      <details id="manual-copy" class="manual-copy" hidden><summary>文章を選んでコピーする</summary><label for="copy-text">振り返りシートの全文</label><textarea id="copy-text" readonly rows="10"></textarea></details>
+      <div class="result-grid"><section class="result-card strengths-card"><p class="section-index">01 / 行動から見えたこと</p><h2>強みの、手がかり</h2><p class="card-description">選んだ行動を、強みの言葉にすると。</p><div id="strengths-list"></div><p class="result-note">選んだ行動から整理した候補です。自分の経験と照らして確かめてください。</p></section><section class="result-card values-card"><p class="section-index">02 / 気持ちから見えたこと</p><h2>大切にしたいこと</h2><div id="values-list"></div><div class="reason-block"><span class="small-label">そう感じる理由</span><p id="result-reason"></p></div></section></div>
+      <section class="result-card story-card"><div class="story-heading"><div><p class="section-index">03 / 自己PRを考えるときの素材</p><h2 id="story-title"></h2></div><span id="story-context" class="tag"></span></div><dl id="story-list" class="story-list"></dl><p class="result-note">数値や実績を付け足す必要はありません。自分の行動と、その後に起きたことを確かめながら整えましょう。</p></section>
+      <section class="next-questions" aria-labelledby="next-questions-title"><div><p class="section-index">もう一歩、先へ</p><h2 id="next-questions-title">次に、こんな問いを。</h2><p>経験を深めたり、<br>企業選びで確かめたり。</p></div><ul id="questions-list"></ul></section>
+      <div class="result-end"><p>違う経験にも、別の手がかりがあるかもしれません。</p><button id="new-button" class="secondary-button" type="button">別の経験を振り返る →</button><p class="small-note">今のシートは、コピーかテキスト保存で手元に残せます。</p></div>
+    </section>
+  </main>
+  <footer class="site-footer"><div><span class="footer-brand">じぶんの手がかり</span><span class="footer-caption">経験からはじめる、就活の自己分析</span></div><div><button id="reset-button" class="text-button" type="button" hidden>入力をすべて消す</button><a href="../">100 DAYS / 072 ↗</a></div></footer>
+  <noscript><p class="noscript">このワークにはJavaScriptが必要です。ブラウザの設定で有効にしてください。</p></noscript>
+
+  <dialog id="about-dialog" aria-labelledby="about-title"><div class="dialog-heading"><h2 id="about-title">このワークについて</h2><button class="icon-button" type="button" data-close aria-label="説明を閉じる">×</button></div><p>身近な経験を振り返り、自分の行動と大切にしたいことを言葉にする、就活の自己分析ワークです。</p><ol class="about-steps"><li>経験の場面を思い出す</li><li>自分が考え、動いたことを書く</li><li>その後の変化を振り返る</li><li>行動と価値観を言葉にする</li></ol><h3>回答の扱い</h3><p>入力や結果は外へ送信しません。「この端末に保存」をオンにした場合だけ、このブラウザに残します。共有するのはアプリへのリンクだけです。</p><h3>強みの候補について</h3><p>自分で選んだ行動に対応する言葉を表示します。性格や適職を判定するものではありません。結果は、自分の経験を話すための材料として使ってください。</p><p class="source-note">振り返りの考え方の参考：<a href="https://www.job-card.mhlw.go.jp/column/jobseeker/strengths" target="_blank" rel="noopener noreferrer">厚生労働省 マイジョブ・カード</a>。質問・言い換え・見本は、このアプリ独自のものです。</p></dialog>
+  <dialog id="share-dialog" aria-label="このアプリを共有する"><div class="dialog-heading"><h2>アプリを友だちに紹介する</h2><button class="icon-button" type="button" data-close aria-label="共有を閉じる">×</button></div><p>あなたの回答は共有されません。</p><div id="share"></div></dialog>
+  <dialog id="confirm-dialog" aria-labelledby="confirm-title"><p class="section-index">内容の確認</p><h2 id="confirm-title"></h2><p id="confirm-description"></p><div class="dialog-actions"><button id="confirm-cancel" class="secondary-button" type="button" autofocus>戻る</button><button id="confirm-ok" class="primary-button" type="button">続ける</button></div></dialog>
+</body>
+</html>

@@ -105,6 +105,7 @@ Day 051「ハコニワ」も外部公開アプリです。本体は独立リポ�
 | 069 | 年収の壁時計 | [day-069-nenshu-kabe/](day-069-nenshu-kabe/) | [アプリを開く](https://hundred-days.pages.dev/day-069-nenshu-kabe/) |
 | 070 | フリップコート — 60秒の陣取りラリー | [day-070-flip-court/](day-070-flip-court/) | [アプリを開く](https://hundred-days.pages.dev/day-070-flip-court/) |
 | 071 | 影証言 — 灯りの高さで、証言の嘘を暴く | [day-071-kage-shogen/](day-071-kage-shogen/) | [アプリを開く](https://hundred-days.pages.dev/day-071-kage-shogen/) |
+| 072 | じぶんの手がかり | [day-072-jibun-note/](day-072-jibun-note/) | [アプリを開く](https://hundred-days.pages.dev/day-072-jibun-note/) |
 <!-- day-index:end -->
 
 ## 1日アプリのルール
