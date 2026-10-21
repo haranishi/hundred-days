@@ -3,12 +3,13 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="身近な経験を4つのステップで振り返り、強みの候補と大切にしたいことを整理する就活の自己分析ワーク。登録不要。回答は外へ送信しません。">
-  <meta name="share:text" content="じぶんの手がかり — いつもの経験から、強みと大切にしたいことを見つける就活の自己分析ワーク。登録不要。回答は外へ送信しません。">
+  <meta name="description" content="12問の選択式の質問から、あなたの就活軸と、次に調べる業界の候補を見つける。答えが結果につながる理由も分かります。登録不要。">
+  <meta name="share:text" content="じぶんの手がかり — 選んで答える12問から、あなたの就活軸と、次に調べる業界の候補を見つけよう。登録不要。">
   <meta name="theme-color" content="#f7f6f0">
-  <title>じぶんの手がかり | 経験からはじめる、就活の自己分析</title>
+  <title>じぶんの手がかり | 12問から見つける、あなたの就活軸</title>
   <link rel="icon" type="image/svg+xml" href="./favicon.svg">
   <link rel="stylesheet" href="./app.css">
+  <link rel="stylesheet" href="./guide.css">
   <link rel="stylesheet" href="./shared/share.css">
   <script type="module" src="./app.js"></script>
   <script src="./shared/share.js" defer></script>
@@ -18,9 +19,10 @@
   <header class="site-header">
     <button id="home-button" class="brand" type="button" aria-label="じぶんの手がかりの最初の画面へ">
       <svg class="brand-mark" viewBox="0 0 40 44" aria-hidden="true"><path d="M8 37V11a7 7 0 0 1 7-7h17v33l-12-7-12 7Z"/><path d="M15 14h10M15 20h7"/></svg>
-      <span>じぶんの手がかり<small>経験からはじめる、自己分析</small></span>
+      <span>じぶんの手がかり<small>選んで見つける、就活の軸</small></span>
     </button>
     <nav class="header-actions" aria-label="アプリの操作">
+      <label id="guide-save-control" class="guide-save-control" hidden><input id="guide-save-toggle" type="checkbox"><span class="switch-track" aria-hidden="true"></span><span>回答を端末に保存</span></label>
       <label id="save-control" class="save-switch" hidden><input id="save-toggle" type="checkbox"><span class="switch-track" aria-hidden="true"></span><span>この端末に保存</span></label>
       <button id="about-button" class="text-button about-button" type="button">使い方</button>
       <button id="share-button" class="icon-button" type="button" aria-label="このアプリを共有する"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V3m-4 4 4-4 4 4M5 13v7h14v-7"/></svg></button>
@@ -28,6 +30,63 @@
   </header>
   <p id="storage-status" class="storage-status" role="status" aria-live="polite"></p>
   <main id="main">
+    <div id="guide">
+      <section id="guide-welcome" class="guide-welcome" aria-labelledby="guide-welcome-title">
+        <div class="guide-hero">
+          <div class="guide-hero-copy">
+            <p class="eyebrow"><span></span> まだ、志望業界が決まっていないあなたへ。</p>
+            <h1 id="guide-welcome-title" tabindex="-1">どんな仕事に、<br>心が動くんだろう。</h1>
+            <p class="guide-lead">選んで答える、12の質問。<br>あなたが大切にしたい<span class="guide-underline">就活の軸</span>と、<br>次に調べる業界を、一緒に見つけよう。</p>
+            <div class="guide-start-actions"><button id="guide-start" class="primary-button" type="button">質問に答えてみる <span aria-hidden="true">→</span></button><button id="guide-example" class="text-button" type="button">結果の見本を見る ↗</button></div>
+            <p id="guide-resume-note" class="guide-small"></p>
+            <ul class="hero-facts"><li>12問・5択</li><li>文字入力なし</li><li>登録不要</li></ul>
+          </div>
+          <div class="guide-cover" aria-hidden="true">
+            <div class="guide-cover-orbit"></div>
+            <span class="guide-cover-label">CAREER FIELD NOTES / 072</span>
+            <svg class="guide-signpost" viewBox="0 0 330 300"><path class="guide-route" d="M65 267c-40-43 7-67 56-66s114-10 81-43"/><path class="guide-pole" d="M166 48v213M147 263h40"/><path class="guide-sign guide-sign-one" d="M72 63h169l25 25-25 25H72Z"/><path class="guide-sign guide-sign-two" d="M256 133H88l-25 25 25 25h168Z"/><text x="161" y="94" text-anchor="middle">わたしの就活軸</text><text x="163" y="164" text-anchor="middle">次に調べる業界</text><path class="guide-spark" d="M42 104v15m-7-8h14m238 100v15m-7-8h14"/></svg>
+            <div class="guide-cover-note"><span>大切にしたいことから、</span><strong>選ぶ方向が、見えてくる。</strong><span class="guide-note-line"></span></div>
+          </div>
+        </div>
+        <section id="guide-outcomes" class="guide-outcomes" aria-labelledby="guide-outcomes-title">
+          <div class="guide-section-heading"><p class="section-index">答えたあとに、分かること</p><h2 id="guide-outcomes-title">「自分に合う」を、<br class="mobile-break">探す手がかりに。</h2></div>
+          <div class="guide-outcome-grid">
+            <article><span class="guide-number">01</span><h3>あなたの就活軸</h3><p>「人の変化を支えたい」「仕組みを変えたい」など、仕事選びで大事にしたいことを言葉に。</p></article>
+            <article><span class="guide-number">02</span><h3>次に調べる業界</h3><p>回答との接点から業界候補と具体的な仕事例を提案。「なぜこの候補か」も見られます。</p></article>
+            <article><span class="guide-number">03</span><h3>企業に確かめること</h3><p>説明会で聞く質問や、仕事内容を見るポイントに。企業選びの次の一歩が決まります。</p></article>
+          </div>
+        </section>
+        <div class="guide-welcome-bottom"><p>今の「やってみたい」で答えて大丈夫。<br>回答は外へ送信しません。保存は自分でオンにしたときだけ。</p><button id="reflection-button" class="text-button" type="button">経験から自己PRの材料を整理する ↗</button></div>
+      </section>
+
+      <section id="guide-question" class="guide-question-page" hidden aria-labelledby="guide-question-title">
+        <div class="guide-progress-heading"><p class="eyebrow">あなたの、仕事選びの手がかり。</p><span id="guide-count"></span></div>
+        <progress id="guide-progress" max="12" value="0" aria-label="質問への回答数"></progress>
+        <div class="guide-question-layout">
+          <div class="guide-question-card">
+            <p id="guide-question-number" class="section-index"></p><h1 id="guide-question-title" tabindex="-1"></h1><p id="guide-question-hint" class="guide-question-hint"></p>
+            <div id="guide-answers" class="guide-answers" role="group" aria-labelledby="guide-question-title"></div>
+            <div class="guide-question-bottom"><button id="guide-back" class="text-button" type="button">← ひとつ戻る</button><span id="guide-remaining" class="guide-small"></span></div>
+          </div>
+          <aside class="guide-question-note"><span class="guide-number">a little hint</span><h2>正解は、<br>あなたの気持ち。</h2><p>今できるかよりも、<br>やってみたいかで選ぼう。</p><p>迷ったら、<br>「まだ分からない」でも大丈夫。</p><p id="guide-followup" class="guide-followup"></p></aside>
+        </div>
+      </section>
+
+      <section id="guide-result" class="guide-result-page" hidden aria-labelledby="guide-result-title">
+        <div id="guide-demo" class="demo-banner" hidden><span>架空の回答による結果の見本です。あなたの回答は変わりません。</span><button id="guide-exit-demo" class="text-button" type="button">自分の質問に戻る →</button></div>
+        <div class="guide-result-intro"><p class="eyebrow"><span></span> 12の回答から、見えてきたこと。</p><h1 id="guide-result-title" tabindex="-1">あなたの、就活の軸。</h1><p id="guide-result-summary"></p></div>
+        <div class="guide-toolbar"><button id="guide-review" class="secondary-button" type="button">← 回答を見直す</button><div><button id="guide-copy" class="primary-button" type="button">結果をコピー</button><button id="guide-download" class="secondary-button" type="button">テキスト保存</button><button id="guide-print" class="secondary-button" type="button">印刷</button></div></div>
+        <p id="guide-export-status" class="export-status" role="status"></p><details id="guide-manual-copy" class="manual-copy" hidden><summary>文章を選んでコピーする</summary><textarea id="guide-copy-text" readonly aria-label="就活軸と業界候補の全文" rows="10"></textarea></details>
+        <div id="guide-axes" class="guide-axis-grid"></div>
+        <div id="guide-draft-card" class="guide-draft-card"><p class="section-index">企業を選ぶ、自分の言葉に</p><h2>就活軸の、たたき台。</h2><p id="guide-draft"></p><span class="guide-small">しっくりくる言葉に直し、経験と合わせて使ってみよう。</span></div>
+        <section class="guide-industries-section" aria-labelledby="guide-industries-title"><div class="guide-section-heading"><p class="section-index">次に、ここから調べてみよう</p><h2 id="guide-industries-title">回答とつながる、業界の候補。</h2><p id="guide-industry-note"></p></div><div id="guide-industries" class="guide-industry-grid"></div></section>
+        <section id="guide-company-questions" class="guide-company-questions" aria-labelledby="guide-company-title"><div><p class="section-index">説明会で、聞いてみる</p><h2 id="guide-company-title">「合うか」を、<br>確かめる質問。</h2></div><ul id="guide-company-list"></ul></section>
+        <details id="guide-answer-review" class="guide-answer-review"><summary>選んだ12の回答を見直す</summary><p class="guide-small">選び直すと、その質問以降をもう一度聞きます。</p><ol id="guide-answer-list"></ol></details>
+        <div class="guide-result-end"><p>今の気持ちから見えた、仕事探しの出発点です。<br>同じ業界でも、職種や企業で仕事内容は変わります。</p><a href="https://shigoto.mhlw.go.jp/User/Search/Top/" target="_blank" rel="noopener noreferrer">公的な仕事情報「job tag」でも調べる ↗</a><p class="guide-small">質問と候補の対応は、このアプリ独自のものです。能力や採用可能性を判定するものではありません。</p><button id="guide-reset" class="text-button" type="button">この質問の回答を消して、やり直す</button></div>
+      </section>
+      <p id="guide-status" class="guide-status" role="status" aria-live="polite"></p>
+    </div>
+    <div id="reflection" hidden>
     <section id="welcome" class="welcome">
       <div class="hero">
         <div class="hero-copy">
@@ -110,11 +169,12 @@
       <section class="next-questions" aria-labelledby="next-questions-title"><div><p class="section-index">もう一歩、先へ</p><h2 id="next-questions-title">次に、こんな問いを。</h2><p>経験を深めたり、<br>企業選びで確かめたり。</p></div><ul id="questions-list"></ul></section>
       <div class="result-end"><p>違う経験にも、別の手がかりがあるかもしれません。</p><button id="new-button" class="secondary-button" type="button">別の経験を振り返る →</button><p class="small-note">今のシートは、コピーかテキスト保存で手元に残せます。</p></div>
     </section>
+    </div>
   </main>
-  <footer class="site-footer"><div><span class="footer-brand">じぶんの手がかり</span><span class="footer-caption">経験からはじめる、就活の自己分析</span></div><div><button id="reset-button" class="text-button" type="button" hidden>入力をすべて消す</button><a href="../">100 DAYS / 072 ↗</a></div></footer>
+  <footer class="site-footer"><div><span class="footer-brand">じぶんの手がかり</span><span class="footer-caption">選んで見つける、就活の軸</span></div><div><button id="reset-button" class="text-button" type="button" hidden>入力をすべて消す</button><a href="../">100 DAYS / 072 ↗</a></div></footer>
   <noscript><p class="noscript">このワークにはJavaScriptが必要です。ブラウザの設定で有効にしてください。</p></noscript>
 
-  <dialog id="about-dialog" aria-labelledby="about-title"><div class="dialog-heading"><h2 id="about-title">このワークについて</h2><button class="icon-button" type="button" data-close aria-label="説明を閉じる">×</button></div><p>身近な経験を振り返り、自分の行動と大切にしたいことを言葉にする、就活の自己分析ワークです。</p><ol class="about-steps"><li>経験の場面を思い出す</li><li>自分が考え、動いたことを書く</li><li>その後の変化を振り返る</li><li>行動と価値観を言葉にする</li></ol><h3>回答の扱い</h3><p>入力や結果は外へ送信しません。「この端末に保存」をオンにした場合だけ、このブラウザに残します。共有するのはアプリへのリンクだけです。</p><h3>強みの候補について</h3><p>自分で選んだ行動に対応する言葉を表示します。性格や適職を判定するものではありません。結果は、自分の経験を話すための材料として使ってください。</p><p class="source-note">振り返りの考え方の参考：<a href="https://www.job-card.mhlw.go.jp/column/jobseeker/strengths" target="_blank" rel="noopener noreferrer">厚生労働省 マイジョブ・カード</a>。質問・言い換え・見本は、このアプリ独自のものです。</p></dialog>
+  <dialog id="about-dialog" aria-labelledby="about-title"><div class="dialog-heading"><h2 id="about-title">このアプリについて</h2><button class="icon-button" type="button" data-close aria-label="説明を閉じる">×</button></div><p>12問の選択式の質問から、仕事選びで大切にしたい軸と、次に調べる業界の候補を整理します。結果には、根拠になった質問と回答を載せます。</p><h3>結果の使い方</h3><p>軸の文案を出発点に、仕事内容や働く環境を調べてみてください。同じ業界でも職種や企業によって仕事は変わります。質問と候補の対応は、このアプリ独自のものです。能力や採用可能性を判定するものではありません。</p><h3>回答の扱い</h3><p>回答や結果は外へ送信しません。端末への保存は、自分でオンにしたときだけ。共有するのはアプリへのリンクだけです。</p><h3>経験から整理したいときは</h3><p>最初の画面の「経験から自己PRの材料を整理する」から、従来の4段階のワークも使えます。保存した経験はそのまま残っています。</p><p class="source-note">仕事探しの参考：<a href="https://shigoto.mhlw.go.jp/User/Search/Top/" target="_blank" rel="noopener noreferrer">厚生労働省 job tag</a>。公的な検査の問題や得点は使用していません。</p></dialog>
   <dialog id="share-dialog" aria-label="このアプリを共有する"><div class="dialog-heading"><h2>アプリを友だちに紹介する</h2><button class="icon-button" type="button" data-close aria-label="共有を閉じる">×</button></div><p>あなたの回答は共有されません。</p><div id="share"></div></dialog>
   <dialog id="confirm-dialog" aria-labelledby="confirm-title"><p class="section-index">内容の確認</p><h2 id="confirm-title"></h2><p id="confirm-description"></p><div class="dialog-actions"><button id="confirm-cancel" class="secondary-button" type="button" autofocus>戻る</button><button id="confirm-ok" class="primary-button" type="button">続ける</button></div></dialog>
 </body>
