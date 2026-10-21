@@ -8,6 +8,15 @@ const element = (tag, className, text) => {
   if (text !== undefined) node.textContent = text;
   return node;
 };
+const usageExample = buildReport(EXAMPLE);
+if (usageExample) {
+  $('#usage-story-title').textContent = usageExample.data.title;
+  $('#usage-action').textContent = usageExample.data.action;
+  $('#usage-behaviors').textContent = usageExample.strengths.map(item => item.label).join(' / ');
+  $('#usage-strengths').replaceChildren(...usageExample.strengths.map(item => element('li', '', item.strength)));
+  $('#usage-values').textContent = usageExample.values.map(item => item.label).join(' / ');
+  $('#usage-question').textContent = usageExample.values[0].question;
+}
 let storage;
 try { storage = window.localStorage; } catch { storage = null; }
 const restored = readSaved(storage);
@@ -278,7 +287,7 @@ function beginExample() {
   state = { data: normalizeData(EXAMPLE), step: 0, screen: 'work', demo: true };
   lastErrors = {}; render(); focusHeading('#question-title'); persist();
 }
-$('#example-button').addEventListener('click', () => {
+for (const button of document.querySelectorAll('[data-start-example]')) button.addEventListener('click', () => {
   if (hasContent(state.data)) confirm('今の内容を、見本に置き換えますか？', '現在の入力は置き換わります。必要なら、先に振り返りシートをコピーかテキスト保存で残してください。', '見本に置き換える', beginExample);
   else beginExample();
 });

@@ -8,7 +8,7 @@
     "tasks": {"generated": true, "approved": true}
   },
   "ready_for_implementation": true,
-  "approval_scope": "作成依頼と共通の自律進行方針に基づく。個別仕様の本人レビューは未実施。マージ・本番公開・SNS投稿は含めない。",
-  "review": "Independent specification review, final code re-review, and browser UI/experience review: PASS",
+  "approval_scope": "作成と具体例追加の依頼に基づく。個別仕様の本人レビューは未実施。依頼済みのマージと本番確認まで進める。SNS投稿は対象外。",
+  "review": "Initial implementation: independent specification/code/UI reviews PASS. R10: self-review with 3 viewport sizes and browser tests PASS.",
   "pull_request": "https://github.com/haranishi/hundred-days/pull/161"
 }
