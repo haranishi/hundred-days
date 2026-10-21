@@ -37,3 +37,10 @@
 ブラウザは `npm run test:e2e -- tests/e2e/day-072.spec.mjs tests/e2e/day-072-guide.spec.mjs`。
 公開前は `npm run publish:check -- --day 72` で共通の公開ゲートも確認する。
 設計判断・根拠・検証記録は `.kiro/specs/day-072-jibun-note/` に残す。
+
+## プロモーション動画
+実画面と字幕・合成BGMによる縦1080×1920・30秒の紹介動画を制作する。
+`tools/promo/render-promo.mjs` → `tools/promo/verify-promo.mjs` で再生成・検査する。
+完成MP4は同output（Git管理外）、一覧用の15秒無音版は `demo.mp4`。
+画面は架空の回答を実際に選択して撮影し、静止画を短縮編集している。SNS投稿は含めない。
+詳しい形式・素材・検証方法は [動画制作のREADME](tools/promo/README.md) を参照。
