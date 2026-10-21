@@ -1,14 +1,26 @@
 {
   "feature_name": "day-072-jibun-note",
   "language": "ja",
-  "phase": "implementation-complete",
+  "phase": "implementation-verified",
   "approvals": {
-    "requirements": {"generated": true, "approved": true},
-    "design": {"generated": true, "approved": true},
-    "tasks": {"generated": true, "approved": true}
+    "requirements": {
+      "generated": true,
+      "approved": true
+    },
+    "design": {
+      "generated": true,
+      "approved": true
+    },
+    "tasks": {
+      "generated": true,
+      "approved": true
+    }
   },
   "ready_for_implementation": true,
-  "approval_scope": "作成と具体例追加の依頼に基づく。個別仕様の本人レビューは未実施。依頼済みのマージと本番確認まで進める。SNS投稿は対象外。",
-  "review": "Initial implementation: independent specification/code/UI reviews PASS. R10: self-review with 3 viewport sizes and browser tests PASS.",
-  "pull_request": "https://github.com/haranishi/hundred-days/pull/161"
+  "approval_scope": "選択式の質問で就活軸・業界候補を知りたいという本人の改修依頼に基づく。個別仕様の本人レビューは未実施。依頼済みのマージと本番確認まで進める。SNS投稿は対象外。",
+  "review": "R11–R16 independent specification/code/UI/experience reviews PASS after fixes. 11 new unit tests, 31 relevant browser tests, 286 publish-gate browser tests PASS. Main delivery status is recorded on the change PR.",
+  "previous_pull_requests": [
+    "https://github.com/haranishi/hundred-days/pull/161",
+    "https://github.com/haranishi/hundred-days/pull/162"
+  ]
 }

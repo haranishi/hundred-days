@@ -2,8 +2,12 @@ import { test, expect } from '@playwright/test';
 import { EXAMPLE, STORAGE_KEY } from '../../day-072-jibun-note/lib/model.js';
 
 const path = '/day-072-jibun-note/';
-async function openWork(page) {
+async function openReflection(page) {
   await page.goto(path);
+  await page.locator('#reflection-button').click();
+}
+async function openWork(page) {
+  await openReflection(page);
   await page.locator('label[for="context-work"]').click();
   await page.getByRole('button', { name: '振り返りをはじめる' }).click();
 }
@@ -52,7 +56,7 @@ test('empty answers show a useful error and focus the missing field', async ({ p
 });
 
 test('choice limit is explained and a selected option can be changed', async ({ page }) => {
-  await page.goto(path); await page.getByRole('button', { name: '見本で試す' }).click();
+  await openReflection(page); await page.getByRole('button', { name: '見本で試す' }).click();
   for (let i = 0; i < 3; i++) await page.locator('#next-button').click();
   await page.getByRole('button', { name: '段取りを考えた', exact: true }).click();
   await expect(page.locator('#behaviors-error')).toContainText('2つまで');
@@ -68,6 +72,7 @@ test('saving is opt-in, resumes exact text, and disabling deletes only this app'
   await page.evaluate(() => localStorage.setItem('other-app', 'untouched'));
   await page.locator('.save-switch').click();
   await page.reload();
+  await page.locator('#reflection-button').click();
   await expect(page.locator('#field-title')).toHaveValue('保存する途中の経験');
   await expect(page.locator('#save-toggle')).toBeChecked();
   await page.locator('.save-switch').click();
@@ -87,7 +92,7 @@ test('denied storage preserves entered text and reports the real status', async 
 
 test('corrupt saved content does not prevent starting or expose raw saved data', async ({ page }) => {
   await page.addInitScript(key => localStorage.setItem(key, '{broken-data'), STORAGE_KEY);
-  await page.goto(path);
+  await openReflection(page);
   await expect(page.locator('#welcome')).toBeVisible();
   await expect(page.locator('#storage-status')).toContainText('読み込めません');
   await expect(page.locator('body')).not.toContainText('{broken-data');
@@ -99,7 +104,7 @@ test('corrupt saved content does not prevent starting or expose raw saved data',
 test('a second tab pauses saving instead of overwriting its newer content', async ({ page, context }) => {
   await openWork(page); await page.locator('#field-title').fill('最初のタブ');
   await page.locator('.save-switch').click();
-  const second = await context.newPage(); await second.goto(path);
+  const second = await context.newPage(); await openReflection(second);
   await second.locator('#field-title').fill('別のタブの新しい回答');
   await expect(page.locator('#storage-status')).toContainText('別のタブで保存内容が変わりました');
   await page.locator('#field-title').fill('最初のタブの未保存の回答');
@@ -170,7 +175,7 @@ test('reset clears rendered answers and print does not reveal a previous report'
 });
 
 test('usage example shows the outcome and shares the protected example-start flow', async ({ page }) => {
-  await page.goto(path);
+  await openReflection(page);
   await page.getByRole('link', { name: '就活での使い方を、具体例で見る' }).click();
   await expect(page.locator('#usage-examples')).toBeInViewport();
   await expect(page.locator('#usage-strengths')).toContainText('相手を理解しようとする姿勢');
@@ -181,6 +186,7 @@ test('usage example shows the outcome and shares the protected example-start flo
   await expect(page.locator('#demo-banner')).toBeVisible();
   await page.locator('#field-title').fill('自分で書き直した経験');
   await page.locator('#home-button').click();
+  await page.locator('#reflection-button').click();
   await page.locator('#usage-example-button').click();
   await expect(page.locator('#confirm-dialog')).toBeVisible();
   await page.locator('#confirm-cancel').click();
@@ -191,6 +197,7 @@ test('usage example shows the outcome and shares the protected example-start flo
 test('example replacement is confirmed and examples stay labeled in exported text', async ({ page }) => {
   await openWork(page); await page.locator('#field-title').fill('私の経験');
   await page.locator('#home-button').click();
+  await page.locator('#reflection-button').click();
   await page.getByRole('button', { name: '見本で試す' }).click();
   await expect(page.locator('#confirm-dialog')).toBeVisible();
   await page.locator('#confirm-ok').click();
@@ -236,7 +243,7 @@ test('user text stays text and never enters requests or the application share li
 for (const width of [390, 768, 1440]) {
   test(`welcome, input and result fit ${width}px and have accessible inputs`, async ({ page }) => {
     await page.setViewportSize({ width, height: 900 });
-    await page.goto(path);
+    await openReflection(page);
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
     await complete(page);
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
