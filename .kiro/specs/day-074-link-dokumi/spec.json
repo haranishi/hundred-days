@@ -1,0 +1,27 @@
+{
+  "feature_name": "day-074-link-dokumi",
+  "language": "ja",
+  "phase": "implementation-verified",
+  "approvals": {
+    "requirements": {
+      "generated": true,
+      "approved": true
+    },
+    "design": {
+      "generated": true,
+      "approved": true
+    },
+    "tasks": {
+      "generated": true,
+      "approved": true
+    }
+  },
+  "ready_for_implementation": true,
+  "approval_scope": "本人が『サイトの脆弱性がわかるWebアプリ（リンクを送ると安全かどうか分かる）をcc-sddとハーネスで作り、100日チャレンジへ今日分としてマージ』と依頼した（2026-10-22・音声入力）。2026-10-19の自律進行の指示に基づき、要件・設計・タスクは承認済みとして進める。PR作成・CI通過後のマージ・本番確認までが依頼の範囲。X投稿とプロモ動画は含めない。",
+  "decisions": [
+    "Day73（DJゲームoffbeat.）は今日すでに公開済みなので触らず、新しいDay74として足す。依頼文の『DJのやつは一旦なし』は、今日の次のアプリの題材から外すという意味に読む。Day73を取り下げるかは本人に残す。",
+    "診断は受け身の1回きり。ブラウザが開くのと同じ範囲（対象のページ1回＋リダイレクト）と、公開が前提の取り決め（/.well-known/security.txt、http→httpsの転送）だけを取りに行く。隠しファイル探し・ログイン試行・攻撃用の入力・ポート走査はしない。",
+    "『安全です』とは言わない。出せるのは『見つかった兆候』と『見つからなかったこと』だけ。"
+  ],
+  "open_items": []
+}
