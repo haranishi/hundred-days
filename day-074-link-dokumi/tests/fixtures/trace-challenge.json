@@ -1,0 +1,16 @@
+{
+  "v": 1,
+  "ok": false,
+  "requested": "https://guarded.example/",
+  "hops": [],
+  "final": null,
+  "html": null,
+  "error": {
+    "code": "blocked_by_challenge",
+    "stage": "read",
+    "host": "guarded.example",
+    "detail": "cf-mitigated"
+  },
+  "notes": [],
+  "elapsedMs": 420
+}

@@ -1,0 +1,16 @@
+{
+  "v": 1,
+  "ok": false,
+  "requested": "https://no-such-host-1234.example/",
+  "hops": [],
+  "final": null,
+  "html": null,
+  "error": {
+    "code": "dns_failed",
+    "stage": "dns",
+    "host": "no-such-host-1234.example",
+    "detail": null
+  },
+  "notes": [],
+  "elapsedMs": 420
+}

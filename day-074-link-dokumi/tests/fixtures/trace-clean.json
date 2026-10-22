@@ -1,0 +1,121 @@
+{
+  "v": 1,
+  "ok": true,
+  "requested": "https://www.well-kept.example/",
+  "hops": [],
+  "final": {
+    "url": "https://www.well-kept.example/",
+    "host": "www.well-kept.example",
+    "scheme": "https",
+    "status": 200,
+    "contentType": "text/html; charset=utf-8",
+    "contentLength": null,
+    "kind": "html",
+    "download": null,
+    "headers": {
+      "strict-transport-security": "max-age=63072000; includeSubDomains; preload",
+      "content-security-policy": "default-src 'self'; script-src 'self' 'nonce-r4nd0m'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'",
+      "x-frame-options": "DENY",
+      "x-content-type-options": "nosniff",
+      "referrer-policy": "strict-origin-when-cross-origin",
+      "permissions-policy": "camera=(), microphone=()",
+      "cross-origin-opener-policy": "same-origin",
+      "content-type": "text/html; charset=utf-8",
+      "server": "cloudflare",
+      "cache-control": "no-cache"
+    },
+    "cookies": [
+      {
+        "name": "__Host-session",
+        "secure": true,
+        "httpOnly": true,
+        "sameSite": "lax",
+        "hasDomain": false,
+        "path": "/",
+        "persistent": false,
+        "prefix": "__Host-"
+      }
+    ],
+    "ms": 180,
+    "bytesRead": 18420,
+    "truncated": false
+  },
+  "html": {
+    "title": "ようこそ — 見本の店",
+    "h1": "季節の菓子と茶",
+    "siteName": "見本の店",
+    "lang": "ja",
+    "generator": null,
+    "textSample": "季節の菓子と茶 ご注文はこちら 営業時間 10時から18時",
+    "metaRefresh": null,
+    "baseHref": null,
+    "forms": [
+      {
+        "method": "get",
+        "action": "/search",
+        "actionHost": null,
+        "hasPassword": false,
+        "hasEmail": false,
+        "hasCardLike": false,
+        "hasFileUpload": false,
+        "fieldCount": 1,
+        "hidden": 0
+      }
+    ],
+    "passwordFields": 0,
+    "scripts": {
+      "total": 1,
+      "inline": 0,
+      "external": [
+        {
+          "src": "/assets/app.js",
+          "host": null,
+          "scheme": "relative",
+          "sri": false,
+          "async": false,
+          "defer": true,
+          "module": true
+        }
+      ]
+    },
+    "styles": {
+      "total": 1,
+      "inline": 0,
+      "external": [
+        {
+          "href": "/assets/app.css",
+          "host": null,
+          "scheme": "relative",
+          "sri": false
+        }
+      ]
+    },
+    "iframes": [],
+    "images": {
+      "total": 6,
+      "http": 0
+    },
+    "links": {
+      "total": 14,
+      "external": 1,
+      "externalHosts": [
+        "www.instagram.com"
+      ],
+      "http": 0
+    },
+    "signals": {
+      "directoryListing": false,
+      "defaultPage": null,
+      "errorDisclosure": null,
+      "obfuscation": [],
+      "autoSubmit": false,
+      "noindex": false,
+      "metaReferrer": null,
+      "metaCsp": false
+    },
+    "truncated": false
+  },
+  "error": null,
+  "notes": [],
+  "elapsedMs": 420
+}

@@ -1,0 +1,48 @@
+{
+  "v": 1,
+  "host": "old-shop.example",
+  "registrable": "old-shop.example",
+  "scheme": "http",
+  "dns": {
+    "a": [
+      "192.0.2.55"
+    ],
+    "aaaa": [],
+    "resolvedPublic": true,
+    "dnssec": false,
+    "caa": false,
+    "mx": true,
+    "spf": {
+      "present": false,
+      "all": null,
+      "value": null
+    },
+    "dmarc": {
+      "present": false,
+      "policy": null,
+      "value": null
+    }
+  },
+  "rdap": {
+    "unavailable": "unsupported"
+  },
+  "httpProbe": {
+    "tested": false,
+    "reason": "final_is_http"
+  },
+  "httpsProbe": {
+    "tested": true,
+    "reachable": false,
+    "status": null,
+    "error": "connect_failed"
+  },
+  "securityTxt": {
+    "found": false,
+    "status": 404,
+    "hasContact": false,
+    "expires": null,
+    "expired": false
+  },
+  "error": null,
+  "elapsedMs": 700
+}

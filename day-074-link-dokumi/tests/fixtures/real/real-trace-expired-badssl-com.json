@@ -1,0 +1,1 @@
+{"v":1,"ok":false,"requested":"https://expired.badssl.com/","hops":[],"final":null,"html":null,"error":{"code":"tls_failed","stage":"tls","host":"expired.badssl.com","detail":"http_responds"},"notes":[],"elapsedMs":1069}

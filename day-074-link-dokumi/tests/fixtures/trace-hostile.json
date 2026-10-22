@@ -1,0 +1,107 @@
+{
+  "v": 1,
+  "ok": true,
+  "requested": "https://hostile.example/",
+  "hops": [],
+  "final": {
+    "url": "https://hostile.example/",
+    "host": "hostile.example",
+    "scheme": "https",
+    "status": 200,
+    "contentType": "text/html; charset=utf-8",
+    "contentLength": null,
+    "kind": "html",
+    "download": null,
+    "headers": {
+      "server": "<script>alert(5)</script>",
+      "x-powered-by": "<img src=x onerror=alert(6)>",
+      "content-type": "text/html"
+    },
+    "cookies": [
+      {
+        "name": "\"><svg onload=alert(7)>",
+        "secure": false,
+        "httpOnly": false,
+        "sameSite": null,
+        "hasDomain": false,
+        "path": "/",
+        "persistent": false,
+        "prefix": null
+      }
+    ],
+    "ms": 180,
+    "bytesRead": 18420,
+    "truncated": false
+  },
+  "html": {
+    "title": "<img src=x onerror=alert(1)>",
+    "h1": "</title><script>alert(2)</script>",
+    "siteName": "javascript:alert(3)",
+    "lang": "ja",
+    "generator": "\"><script>alert(8)</script>",
+    "textSample": "ログイン‮⁦gnp.exe⁩ &lt;b&gt;太字&lt;/b&gt; <b>太字</b>",
+    "metaRefresh": null,
+    "baseHref": null,
+    "forms": [
+      {
+        "method": "post",
+        "action": "javascript:alert(4)",
+        "actionHost": null,
+        "hasPassword": true,
+        "hasEmail": false,
+        "hasCardLike": false,
+        "hasFileUpload": false,
+        "fieldCount": 1,
+        "hidden": 0
+      }
+    ],
+    "passwordFields": 1,
+    "scripts": {
+      "total": 1,
+      "inline": 0,
+      "external": [
+        {
+          "src": "\"><script>alert(9)</script>.js",
+          "host": "\"><script>alert(9)</script>",
+          "scheme": "https",
+          "sri": false,
+          "async": false,
+          "defer": false,
+          "module": false
+        }
+      ]
+    },
+    "styles": {
+      "total": 0,
+      "inline": 0,
+      "external": []
+    },
+    "iframes": [],
+    "images": {
+      "total": 0,
+      "http": 0
+    },
+    "links": {
+      "total": 1,
+      "external": 1,
+      "externalHosts": [
+        "<b>evil</b>.example"
+      ],
+      "http": 0
+    },
+    "signals": {
+      "directoryListing": false,
+      "defaultPage": null,
+      "errorDisclosure": null,
+      "obfuscation": [],
+      "autoSubmit": false,
+      "noindex": false,
+      "metaReferrer": null,
+      "metaCsp": false
+    },
+    "truncated": false
+  },
+  "error": null,
+  "notes": [],
+  "elapsedMs": 420
+}

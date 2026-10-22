@@ -1,0 +1,32 @@
+{
+  "v": 1,
+  "ok": true,
+  "requested": "https://dl.parcel-update.example/track.apk",
+  "hops": [],
+  "final": {
+    "url": "https://dl.parcel-update.example/track.apk",
+    "host": "dl.parcel-update.example",
+    "scheme": "https",
+    "status": 200,
+    "contentType": "application/vnd.android.package-archive",
+    "contentLength": null,
+    "kind": "download",
+    "download": {
+      "reason": "apk",
+      "filename": "track.apk",
+      "ext": "apk"
+    },
+    "headers": {
+      "content-type": "application/vnd.android.package-archive",
+      "content-disposition": "attachment; filename=\"track.apk\""
+    },
+    "cookies": [],
+    "ms": 180,
+    "bytesRead": 0,
+    "truncated": false
+  },
+  "html": null,
+  "error": null,
+  "notes": [],
+  "elapsedMs": 420
+}

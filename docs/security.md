@@ -56,3 +56,24 @@ Cloudflare ダッシュボード → Workers & Pages → `hundred-days` → Metr
 Security → WAF → Rate limiting rules（無料プランで1本使える）で、パス `/api/day-009/vehicles` に対し
 「同一IPから1分あたり10リクエストを超えたらブロック」程度を入れる。
 アプリは20秒に1回しか呼ばないので、普通の閲覧者はこの制限に当たらない。
+
+## 第三者のURLへ接続するAPI（Day74「リンクの毒見」）
+
+Day74は、このリポジトリで初めて、**利用者が決めたURLへサーバーから接続する**。ほかのAPIは、行き先がコードに直書きされているか、入力を受け取らない。
+脅威と対策の全体は [Day74の脅威モデル](../.kiro/specs/day-074-link-dokumi/threat-model.md) にある。ここには、運用で見る点だけを書く。
+
+| 入口 | していること |
+|---|---|
+| `/api/day-074/trace?url=` | 指定のURLへGETを1本送り、転送を最大5回までたどる。応答のヘッダー・Cookieの名前と属性・HTMLの構造だけを返す（本文と値は返さない） |
+| `/api/day-074/around?host=&scheme=[&site=0]` | 転送先の名前について、公開DNS・登録日（RDAP）・`http://`の転送・`/.well-known/security.txt`を調べる。診断先に取得を断られたあと（403・429・ボット対策）は、画面が `site=0` を付け、診断先への追加のアクセス（`http://`側・`security.txt`）を省く |
+
+- **宛先の検査は自前。** 非公開アドレスへのfetchを基盤が拒否する保証は、公式文書で確認できていない（ローカルのworkerdはループバックへ接続できた）。URLの検査と、名前をDoHで引いた結果の検査（1つでも非公開なら拒否）を、転送先ごとにやり直す。DoHが失敗したら閉じる。残るリスク：DoHで引いた結果と、fetchが実際に使う解決先の一致は保証できない。
+- 呼び出せるのは同一ブラウザ発（`Sec-Fetch-Site`が`same-origin`か未送信）だけ。IPごとに1分12回まで。結果は最大5分、登録日は最大24時間、Cache APIに置く。診断したURLを履歴やログに残さない。
+- 取りに行くのは、対象のURLとその転送先、`http://<host>/`、`https://<host>/`、`/.well-known/security.txt`、DoH、RDAPだけ。`robots.txt`・隠しパス・別のポートは取りに行かない（単体テストで固定している）。User-Agentは `LinkDokumi/1.0` で名乗る。
+
+### 気づける状態と止め方
+- 日次のリクエスト数は、Cloudflare → Workers & Pages → `hundred-days` → Metrics で見る。通知は Notifications から使用量のアラートを作る。
+- **止める**：Pagesの環境変数に `LINK_DOKUMI_DISABLED=1` を入れて再デプロイする。両APIが503を返す。
+- **絞る**：環境変数 `LINK_DOKUMI_RATE_LIMIT`（1分あたりの回数。既定12）を下げて再デプロイする。
+- WAFのRate limiting rulesは、ゾーンの機能で、`pages.dev`には効かない可能性が高い（公式に確認できていない）。独自ドメインを当てたら検討する。
+- キャッシュと上限はデータセンター単位なので、分散して叩かれればその数だけ増える（`/api/day-009/vehicles` と同じ制約）。

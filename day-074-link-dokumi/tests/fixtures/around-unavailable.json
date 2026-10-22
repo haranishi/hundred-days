@@ -1,0 +1,24 @@
+{
+  "v": 1,
+  "host": "guarded.example",
+  "registrable": "guarded.example",
+  "scheme": "https",
+  "dns": {
+    "unavailable": "resolver_unavailable"
+  },
+  "rdap": {
+    "unavailable": "timeout"
+  },
+  "httpProbe": {
+    "tested": false,
+    "reason": "timeout"
+  },
+  "httpsProbe": {
+    "tested": false
+  },
+  "securityTxt": {
+    "unavailable": "timeout"
+  },
+  "error": null,
+  "elapsedMs": 6000
+}

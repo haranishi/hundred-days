@@ -1,0 +1,123 @@
+{
+  "v": 1,
+  "ok": true,
+  "requested": "http://old-shop.example/",
+  "hops": [],
+  "final": {
+    "url": "http://old-shop.example/",
+    "host": "old-shop.example",
+    "scheme": "http",
+    "status": 200,
+    "contentType": "text/html; charset=utf-8",
+    "contentLength": null,
+    "kind": "html",
+    "download": null,
+    "headers": {
+      "server": "Apache/2.2.15 (CentOS)",
+      "x-powered-by": "PHP/5.6.40",
+      "content-type": "text/html"
+    },
+    "cookies": [
+      {
+        "name": "PHPSESSID",
+        "secure": false,
+        "httpOnly": false,
+        "sameSite": null,
+        "hasDomain": false,
+        "path": "/",
+        "persistent": false,
+        "prefix": null
+      }
+    ],
+    "ms": 180,
+    "bytesRead": 18420,
+    "truncated": false
+  },
+  "html": {
+    "title": "見本商店 — 通信販売",
+    "h1": "見本商店",
+    "siteName": null,
+    "lang": "ja",
+    "generator": "WordPress 4.9.8",
+    "textSample": "ログイン 新規会員登録 カート",
+    "metaRefresh": null,
+    "baseHref": null,
+    "forms": [
+      {
+        "method": "post",
+        "action": "http://old-shop.example/login.php",
+        "actionHost": "old-shop.example",
+        "hasPassword": true,
+        "hasEmail": true,
+        "hasCardLike": false,
+        "hasFileUpload": false,
+        "fieldCount": 2,
+        "hidden": 0
+      }
+    ],
+    "passwordFields": 1,
+    "scripts": {
+      "total": 3,
+      "inline": 1,
+      "external": [
+        {
+          "src": "http://old-shop.example/js/jquery-1.12.4.min.js",
+          "host": "old-shop.example",
+          "scheme": "http",
+          "sri": false,
+          "async": false,
+          "defer": false,
+          "module": false
+        },
+        {
+          "src": "https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js",
+          "host": "maxcdn.bootstrapcdn.com",
+          "scheme": "https",
+          "sri": false,
+          "async": false,
+          "defer": false,
+          "module": false
+        }
+      ]
+    },
+    "styles": {
+      "total": 1,
+      "inline": 0,
+      "external": [
+        {
+          "href": "http://old-shop.example/css/style.css",
+          "host": "old-shop.example",
+          "scheme": "http",
+          "sri": false
+        }
+      ]
+    },
+    "iframes": [],
+    "images": {
+      "total": 10,
+      "http": 3
+    },
+    "links": {
+      "total": 22,
+      "external": 1,
+      "externalHosts": [
+        "twitter.com"
+      ],
+      "http": 20
+    },
+    "signals": {
+      "directoryListing": false,
+      "defaultPage": null,
+      "errorDisclosure": "php",
+      "obfuscation": [],
+      "autoSubmit": false,
+      "noindex": false,
+      "metaReferrer": null,
+      "metaCsp": false
+    },
+    "truncated": false
+  },
+  "error": null,
+  "notes": [],
+  "elapsedMs": 420
+}
