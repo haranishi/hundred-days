@@ -1,0 +1,92 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <!-- og.png の元。文字は本物の文字（システムの明朝・ゴシック）で、画像生成は使わない。
+       書き出し：.agent-harness/runs/day074-link-dokumi/render-og.mjs -->
+  <defs>
+    <radialGradient id="paper" cx="0.28" cy="0.18" r="1.05">
+      <stop offset="0" stop-color="#FCFAF4"/>
+      <stop offset="0.62" stop-color="#F6F1E7"/>
+      <stop offset="1" stop-color="#EDE5D5"/>
+    </radialGradient>
+    <linearGradient id="rule" x1="0" x2="1" y1="0" y2="0">
+      <stop offset="0" stop-color="#8E98A6"/>
+      <stop offset="0.45" stop-color="#C9D0DA"/>
+      <stop offset="1" stop-color="#C9D0DA" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="shaft" x1="0" x2="1" y1="0" y2="0">
+      <stop offset="0" stop-color="#8E98A6"/>
+      <stop offset="0.42" stop-color="#F4F6F9"/>
+      <stop offset="0.7" stop-color="#C9D0DA"/>
+      <stop offset="1" stop-color="#8E98A6"/>
+    </linearGradient>
+    <radialGradient id="head" cx="0.36" cy="0.34" r="0.78">
+      <stop offset="0" stop-color="#F4F6F9"/>
+      <stop offset="0.55" stop-color="#C9D0DA"/>
+      <stop offset="1" stop-color="#8E98A6"/>
+    </radialGradient>
+    <linearGradient id="tarnish" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0" stop-color="#2B2F38" stop-opacity="0"/>
+      <stop offset="0.5" stop-color="#2B2F38" stop-opacity="0.9"/>
+      <stop offset="1" stop-color="#14161B"/>
+    </linearGradient>
+    <linearGradient id="bowl" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0" stop-color="#3A3F4B"/>
+      <stop offset="1" stop-color="#1D2028"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1200" height="630" fill="url(#paper)"/>
+  <rect x="28" y="28" width="1144" height="574" rx="26" fill="none" stroke="#D6D0C3" stroke-width="2"/>
+
+  <text x="92" y="116" font-family="Hiragino Sans, Hiragino Kaku Gothic ProN, Yu Gothic, Noto Sans JP, sans-serif" font-size="25" fill="#4A5365" letter-spacing="3">100日チャレンジ Day74</text>
+  <text x="86" y="244" font-family="Hiragino Mincho ProN, Yu Mincho, Noto Serif JP, serif" font-weight="700" font-size="116" fill="#1B2230" letter-spacing="10">リンクの毒見</text>
+  <text x="92" y="314" font-family="Hiragino Mincho ProN, Yu Mincho, Noto Serif JP, serif" font-size="40" fill="#4A5365" letter-spacing="5">踏む前に、銀の針で確かめる</text>
+  <rect x="92" y="352" width="700" height="2" fill="url(#rule)"/>
+  <text font-family="Hiragino Sans, Hiragino Kaku Gothic ProN, Yu Gothic, Noto Sans JP, sans-serif" font-size="29" fill="#1B2230">
+    <tspan x="92" y="408">URLを貼ると、なりすましの兆候と、</tspan>
+    <tspan x="92" y="452">サイトの守りの弱点を、根拠つきで返します。</tspan>
+  </text>
+
+  <!-- 4つの段階（色・記号・言葉） -->
+  <g font-family="Hiragino Sans, Hiragino Kaku Gothic ProN, Yu Gothic, Noto Sans JP, sans-serif" font-size="23" font-weight="700" fill="#1B2230">
+    <g transform="translate(92 496)">
+      <rect width="218" height="58" rx="29" fill="#FBF8F1" stroke="#1E6B5C" stroke-width="2"/>
+      <circle cx="33" cy="29" r="14" fill="#1E6B5C"/>
+      <path d="M26.5 29.6l4.3 4.3 8.3-9" fill="none" stroke="#FBF8F1" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+      <text x="58" y="37">見当たらない</text>
+    </g>
+    <g transform="translate(322 496)">
+      <rect width="172" height="58" rx="29" fill="#FBF8F1" stroke="#8A5A00" stroke-width="2"/>
+      <circle cx="33" cy="29" r="14" fill="#8A5A00"/>
+      <circle cx="33" cy="22.5" r="2" fill="#FBF8F1"/>
+      <path d="M33 27.5v8" stroke="#FBF8F1" stroke-width="3.2" stroke-linecap="round"/>
+      <text x="58" y="37">気になる</text>
+    </g>
+    <g transform="translate(506 496)">
+      <rect width="124" height="58" rx="29" fill="#FBF8F1" stroke="#A44300" stroke-width="2"/>
+      <path d="M33 14.5 48 41.5H18Z" fill="#A44300" stroke="#A44300" stroke-width="2" stroke-linejoin="round"/>
+      <path d="M33 23.5v8" stroke="#FBF8F1" stroke-width="3" stroke-linecap="round"/>
+      <circle cx="33" cy="36.4" r="1.9" fill="#FBF8F1"/>
+      <text x="56" y="37">注意</text>
+    </g>
+    <g transform="translate(642 496)">
+      <rect width="195" height="58" rx="29" fill="#FBF8F1" stroke="#B3261E" stroke-width="2"/>
+      <path d="M27 15h12l8.5 8.5v11L39 43H27l-8.5-8.5v-11Z" fill="#B3261E"/>
+      <path d="M28.5 24.5l9 9M37.5 24.5l-9 9" stroke="#FBF8F1" stroke-width="3" stroke-linecap="round"/>
+      <text x="58" y="37">近づかない</text>
+    </g>
+  </g>
+
+  <!-- 銀の針と器（毒に触れた先が黒ずむ） -->
+  <g transform="translate(906 58) scale(2.6)">
+    <ellipse cx="30" cy="198.6" rx="25" ry="2.2" fill="#1B2230" opacity="0.14"/>
+    <ellipse cx="30" cy="166" rx="25" ry="6" fill="#2A2E37"/>
+    <g transform="translate(0 12)">
+      <path d="M28.7 18h2.6l-.5 124-.8 9-.8-9Z" fill="url(#shaft)" stroke="#8E98A6" stroke-width="0.4"/>
+      <path d="M28.95 80h2.1l-.25 62-.8 9-.8-9Z" fill="url(#tarnish)" opacity="0.92"/>
+      <circle cx="30" cy="11" r="7" fill="url(#head)" stroke="#8E98A6" stroke-width="0.8"/>
+    </g>
+    <path d="M4 166c1.5 18 13 28 26 28s24.5-10 26-28c-6 4.4-15.6 6.4-26 6.4S10 170.4 4 166Z" fill="url(#bowl)"/>
+    <path d="M4 166c6 4.4 15.6 6.4 26 6.4s20-2 26-6.4" fill="none" stroke="#6A7182" stroke-width="1.1"/>
+    <path d="M20 193h20l2 5H18Z" fill="#1D2028"/>
+  </g>
+</svg>
