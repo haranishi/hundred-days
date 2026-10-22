@@ -1,0 +1,13 @@
+- target-guard.js: S1: IPv6を2000::/3の許可リストへ変更。
+- sanitize.js: S3/S5: 共通の上限付き本文読み取りと双方向制御の除去。
+- doh.js: S3: 64KiB・回答64件上限、末尾の非公開IPも拒否。
+- observe.js: S3: 本文読み取りを共通化。BG追加: 拒否転送のホップ保持。
+- handlers.js: S4/BG追加: 外向き応答をno-store、内部鍵をcache.invalidへ。
+- rdap.js: S3/S7: RDAP本文・配列上限、検査付き手動転送3回。
+- html-facts.js: S2: baseの2048字上限・文書内1500回の解決予算。S6: textSampleは400字のまま。
+- observer-guard.test.mjs: S1の旧site-local・未割当・IPv4変換用IPv6の許可期待を拒否へ変更。
+- observer-handlers.test.mjs: S4の応答ヘッダー期待をno-storeへ更新。
+- observer-review1.test.mjs: S1〜S7とBG追加の回帰試験を追加。
+- observer.index.mjs: 専用回帰試験をimport登録。
+- 最終確認: cacheKeyの未使用引数を除去。専用試験でaround成功応答のno-store・RDAP内部鍵/86400秒TTLも確認。
+- report_BG.md: 受領書を作成。新規30件・観測204件・全体856件が成功。レビュー再現プローブの修正後挙動、期待値変更、S6のメイン担当残件と未実施範囲を記録。

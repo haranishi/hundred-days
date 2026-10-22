@@ -1,0 +1,15 @@
+- headers.js 完了：CSP/HSTS/Cookieと実効ヘッダーの解析。複数CSPの簡易評価はlimitsで明記する方針。
+- score.js 完了：段階・floor・運営者点数・評点。
+- eol.js 完了：PHP/Apache 2.2/IISの確認済み系統のみ。Apacheの終了日は日が未確認なので2017-12と表示し、月末経過後に判定。
+- libs.js 完了：確認済みCVE範囲、候補表示、AngularJS/Vue 2 EOL。完全版とpathnameのみを抽出。
+- messages.js 完了：全71所見、行動・限界・禁止語、5種のヘッダー設定例。例はR2と担当指示の値を照合。
+- rules.js 完了：全ルール・2軸分離・取得失敗/対象外・部分情報の限界・入力経路・所見順序と改善上位3。ブランド照合等はdepsで試験時に差し替え可能。
+- report.js 完了：平文報告（日時・対象href・経路・2軸・設定例・限界）と6行以内の家族向け要約。
+- samples.js 完了：予約済み.exampleの3見本。fixtureのコピーをdeepEqualで固定する予定。
+- resources.js 完了：公式窓口14件、外部検査6件。未確認3件はverified:false、SSL Labs/urlscanの到達確認と診断完了の未確認を区別。
+- judge-headers.test.mjs 作成：CSP/HSTS/Cookie・点数境界・EOL日付・CDN偽装とCVE版境界の試験。
+- judge-rules.test.mjsとjudge.index.mjs 完了：全fixture組み合わせ、全idの到達、境界と重複抑制、設定例・見本一致・外部リンク・禁止語・レポートを登録。
+
+- 最終修正：禁止語と衝突する「絶対URL」を平易な表現へ変更。HSTS片側引用符を拒否。自サイト絶対scriptはselfHostを注入して識別し、任意ホストを除外。公式ホストの本文ブランド所見を抑制。通信失敗時の周辺情報による追加点を抑制。
+- 公式相談先は最終13件（Google状態確認の重複を削除）。
+- 検証完了：A2 169/169、全体487/487、構文12ファイル成功。受領書report_A2.mdに全71id・API・解釈差・未検証事項を記載。

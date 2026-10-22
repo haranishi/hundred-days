@@ -1,0 +1,14 @@
+- html-facts.js: 属性・base64走査を文字コード比較へ変更。実体参照なしの置換を省略、可視文のsliceを上限内だけにし、baseホストを再利用、小文字全文はscript/style時のみ生成。
+- target-guard.js: IPv6の::/96、3fff::/20、64:ff9b:1::/48、5f00::/16を拒否。
+- handlers.js: LINK_DOKUMI_RATE_LIMITの整数文字列1〜1000を採用、不正値は既定へ戻す。
+- observe.js: fetch例外のメッセージ判定を廃止。検査済みの同じホストのHTTPルートへ残りのホップ期限内で1回だけ追加取得し本文破棄。転送先DNS失敗と私設宛先を分離。本文上限時にbody_truncatedを記録。
+- observer-guard.test.mjs: 追加4範囲の先頭・末尾・隣接公開境界とIPv4互換ループバックのDoH拒否、計5試験を追加。::/96には下側のアドレスがないため上側だけ確認。
+- observer-network.test.mjs: opaque例外・同一ホップのHTTPルート・手動転送・本文破棄・期限の共有・HTTP入力/読取失敗の追加取得なし・転送先DNS理由・64KiB切詰めを10試験で追加。旧メッセージ由来TLS試験は仕様変更に合わせopaque例外＋応答の試験へ置換。ステータス由来TLS/拒否の再取得なしは保持。
+- observer-handlers.test.mjs: レート上限1/2/1000・先頭0・不正/未設定の既定値・aroundにも適用する16試験を追加。非キャッシュ接続失敗2診断のfetch回数はHTTP補助取得込み4回へ更新（仕様変更により必要）。
+- observer-html.test.mjs: 旧160KiB/50msの試験をLIMITSの正確な上限・15回の中央値10ms未満へ強化（3試験）。上限後の所見除外・属性走査互換の2試験を追加。
+- observer-performance.test.mjs: ニュース風HTML・2000リンク・200script・長い属性・大量の不等号・正規表現の失敗候補を15回ずつ計測する6試験を追加。環境変数による保存済みHTMLのオフライン試験にも対応。
+- observer.index.mjs: 性能試験のimport登録を追加。
+- html-facts.js最終確認: URLをhref文字列へ戻してから再解析する処理を省略。保存済み8文書で最適化前後のHtmlFactsをdeepEqualし、すべて一致。
+- 検証: 観測側132→171件（39件追加）、171合格。保存済み8ページを任意性能試験へ追加した実行は179合格。10ファイルのnode --check合格。
+- 全体試験は2回とも担当外rules.js:101のMESSAGES[id].titleで初期化失敗。未定義idはV-NOT-FETCHED、V-SHARED-HOST、O-STATUS-NOTE。担当外を修正せず、同一失敗の再実行は打ち切る。
+- 保存済みページの64KiB計測（15回）の最大中央値は2.403→1.030ms、最初の文書の初回は6.059→4.100ms。初回3ms未満の目標は未達。WorkersのCPU時間は未検証。

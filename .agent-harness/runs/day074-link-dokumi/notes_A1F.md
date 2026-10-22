@@ -1,0 +1,14 @@
+- lists.js: SHARED_HOSTS（FREE_HOSTSは同一参照の別名）、USER_CONTENT_HOSTSと判定関数、配達・金銭・脅しの敏感語を追加。
+- url-input.js: 通信可否をvalidateTargetへ委譲し理由名を対応。空userinfoは許可、既定以外のポート拒否。単体URLの制御文字も抽出前に拒否。
+- brands.js: 指定の公式ドメイン19件を公知として追加。曖昧語の補助手がかり、パス・手前ラベル、ホスト途中の公式名、共有語の重複抑止、利用者コンテンツの公式除外を実装。
+- lexical.js: パスをブランド照合へ渡しuserContentHost:booleanを追加。freeHostの形を維持してSHARED_HOSTSを利用。
+- fixtures/legit-domains.json: 指定の正規ドメイン96件。
+- fixtures/phish-urls.json: 指定の見逃し防止URL22件と期待するファクト。
+- address-brands.test.mjs: docs.google.comの公式期待を除外。曖昧語appleの陽性例にはverifyの手がかりを追加。
+- address-input.test.mjs: ポートはスキーム既定のみ、空のuserinfoは許可という指示へ既存期待値を更新。
+- address-lexical.test.mjs: LexicalFactsの完全一致期待にuserContentHost:falseを追加。
+- address-regressions.test.mjs: 正規96件・偽装22件、曖昧語・パス・重複・公開ホスト境界・既存攻撃fixture＋追加ベクトルの一致を固定。
+- address.index.mjs: 回帰テストのimportを登録。
+- 初回検証: Google Docsの提供者名googleを偽装語として数えた点と、空白で壊れたホストを抽出が短縮する点を修正。曖昧語試験は公式apple.comを除外するため非公式.topで検証するよう訂正。別担当の観測試験2件にも失敗があり、担当外のため変更しない。
+- 最終検証: 住所入口377件合格（新規200件、公式期待のGoogle Docs1件を除外）。全体717件合格・0失敗。正規96件の誤検知0、偽装22件の期待すべて成立。
+- report_A1F.md: 受領書に追加公式19件、仕様への反映事項、変更した既存テストの理由、検証結果を記録。
