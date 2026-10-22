@@ -44,7 +44,12 @@
 評価の報告：`.agent-harness/runs/day074-link-dokumi/eval_*.md`。
 
 ## 5. 公開後（本番）
-（マージ・デプロイ後に記入）本番URLで主要操作、拒否されるべき宛先の拒否、配信ファイルの一致。
+PR #167 を rebase でマージ（main `71489bb`、2026-10-22 23:38）。mainのCI（単体・ブラウザ試験4分割）が成功し、Cloudflare Pagesへ自動デプロイ。以下を本番URL（`https://hundred-days.pages.dev/day-074-link-dokumi/`）で確認した（2026-10-23 0:10ごろ）。
+- ページは200で、canonical・メタ（`meta.json` の `actualMinutes` まで）が最新のコミットの内容。APIの応答は `Cache-Control: no-store`・`nosniff`・`Cross-Origin-Resource-Policy: same-origin`。
+- **`tools/api-check.mjs` の40ケースが、本物のCloudflareの網で、すべて期待どおり**：実在の無害なサイト、期限切れ・自己署名・ホスト名不一致のTLS、存在しない名前、拒否されるべき宛先（ループバックの各種表記・内部名・メタデータ・DNSが私設を指す名前・転送先が内部・このサービス自身）、`Sec-Fetch-Site`・メソッド・長大URL。
+- **実ブラウザ（`tools/smoke-real.mjs`）で、画面→本番のAPI→表示の7ケース**（example.com・github.com・httpforever.com・メッセージ全文・期限切れ証明書・数字のアドレス・`@`の偽装）。画面は壊れず、外部への通信は0件。
+- **大きな実在ページ**（日本語版Wikipedia・Yahoo!ニュース・GitHub・楽天・Apple・Amazon）は、いずれも200で `ok:true`（本文は先頭64KiBで切る）。無料枠のCPU超過（1102）・500は出なかった。NHKは、ブラウザ以外の名乗りを約10秒遅らせるため、設計どおり7秒で「時間切れ」と表示した。
+- 守りの点は本番の網の差で変わることがある（例：httpforever.com は、手元ではHTTPSにつながらず、本番ではHTTPSが302で応答したため点が違う）。観測した事実をそのまま返している。
 
 ## 6. 未確認として残すこと
 - 実機のiPhone Safari・Androidでの操作（WebKitの自動試験とChromiumのモバイル扱いだけ）
