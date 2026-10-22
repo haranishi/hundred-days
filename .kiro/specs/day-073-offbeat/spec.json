@@ -1,0 +1,21 @@
+{
+  "feature_name": "day-073-offbeat",
+  "language": "ja",
+  "phase": "implementation-in-progress",
+  "approvals": {
+    "requirements": {
+      "generated": true,
+      "approved": true
+    },
+    "design": {
+      "generated": true,
+      "approved": true
+    },
+    "tasks": {
+      "generated": true,
+      "approved": true
+    }
+  },
+  "ready_for_implementation": true,
+  "approval_scope": "DJゲーム制作と、今日のWebアプリとしてのObsidian記録・PR作成・マージを本人が依頼。"
+}
