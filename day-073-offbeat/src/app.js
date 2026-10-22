@@ -13,22 +13,24 @@ let mode = 'free', best = readBest(safeStorage), initPromise, startingSet, lastS
 let toastTimer, judgementTimer, transitionOrigin = null, resultShown = false;
 let reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const pointers = new Map(), keyScratches = new Map();
+const mobileViewport = matchMedia('(max-width:640px), (max-width:960px) and (max-height:500px) and (pointer:coarse)');
+let mobilePanel = 'a';
 
 function knob(id, band, label, value = 0, min = -18, max = 8) {
   return `<label class="knob-control" title="${id.toUpperCase()} ${label} — 左右ドラッグ / 矢印キー。ダブルクリックでリセット"><span class="knob-ring"><span class="knob-dial" style="--rotation:${(value - min) / (max - min) * 270 - 135}deg"></span></span><input type="range" data-knob="${band}" data-deck="${id}" aria-label="デッキ${id.toUpperCase()} ${label}" min="${min}" max="${max}" step="${band === 'filter' ? '.01' : '1'}" value="${value}"><span class="knob-label">${label}</span></label>`;
 }
 function deckMarkup(id, track) {
-  return `<article class="deck deck-${id}" data-id="${id}" aria-label="デッキ${id.toUpperCase()}">
+  return `<article id="deck-${id}" class="deck deck-${id}" data-id="${id}" aria-label="デッキ${id.toUpperCase()}">
     <div class="deck-heading"><span class="deck-badge">${id.toUpperCase()}</span><div class="track-info"><strong class="track-name">${track.title}</strong><span class="track-meta">${track.genre} <span>·</span> ${track.key} <span>·</span> ORIGINAL</span></div><div class="tempo-display"><strong data-bpm="${id}">${track.bpm.toFixed(1)}</strong><span>BPM</span></div></div>
     <div class="wave-screen"><canvas data-wave="${id}" aria-label="デッキ${id.toUpperCase()}の音声波形"></canvas><i class="wave-playhead"></i><span class="wave-overlay" data-time="${id}">00:00 / 4 BARS</span></div>
     <div class="deck-body"><div class="turntable"><div class="platter-shell"></div><button class="vinyl" data-vinyl="${id}" aria-label="デッキ${id.toUpperCase()}をスクラッチ。前後にドラッグ、または${id === 'a' ? 'S' : 'K'}キー"><span class="record-marker"></span><span class="record-label"><span class="label-top">ORIGINAL PRESSING</span><span class="label-wordmark">offbeat.</span><span class="label-bottom">SIDE ${id.toUpperCase()}<br>33⅓ RPM</span><span class="label-star">✳</span></span><span class="record-spindle"></span></button></div>
     <div class="tonearm" aria-hidden="true"><svg viewBox="0 0 70 184"><defs><linearGradient id="arm-${id}" x1="0" x2="1"><stop offset="0" stop-color="#7f8676"/><stop offset=".25" stop-color="#c4caba"/><stop offset=".48" stop-color="#e0e2d2"/><stop offset=".72" stop-color="#848d75"/><stop offset="1" stop-color="#454f38"/></linearGradient></defs><circle cx="45" cy="20" r="16" fill="#141a0f" stroke="#5d694e"/><circle cx="45" cy="20" r="11" fill="#4a5640" stroke="#7b876a"/><circle cx="45" cy="20" r="4" fill="#1b2414"/><path d="M45 21v62q0 12-10 23l-22 31v23" fill="none" stroke="#10170b" stroke-width="9"/><path d="M45 21v62q0 12-10 23l-22 31v23" fill="none" stroke="url(#arm-${id})" stroke-width="5.5"/><path d="M5 150h17l-1 18H7Z" fill="#313d26" stroke="#778563"/><path d="M10 165h7v8h-7Z" fill="${id === 'a' ? '#ff805a' : '#a9dfcd'}"/><path d="M45 0v-9" stroke="#808b72" stroke-width="9"/></svg></div>
-    <label class="pitch-control"><span>TEMPO</span><span>+</span><span class="pitch-rail"><input class="vertical-range" data-tempo="${id}" type="range" min="-40" max="40" value="0" step=".1" aria-label="デッキ${id.toUpperCase()} テンポ変更パーセント"></span><span>−</span><output data-pitch-output="${id}">+0.0%</output></label><span class="deck-bottom-meta"><i></i> VINYL MODE</span><span class="scratch-caption">DRAG TO SCRATCH <kbd>${id === 'a' ? 'S' : 'K'}</kbd></span></div>
+    <label class="pitch-control"><span>TEMPO</span><span>+</span><span class="pitch-rail"><input class="vertical-range" data-tempo="${id}" type="range" min="-40" max="40" value="0" step=".1" aria-label="デッキ${id.toUpperCase()} テンポ変更パーセント"></span><span>−</span><output data-pitch-output="${id}">+0.0%</output></label><span class="deck-bottom-meta"><i></i> VINYL MODE</span><span class="scratch-caption"><span class="desktop-scratch-copy">DRAG TO SCRATCH</span><span class="mobile-scratch-copy">指で前後にスクラッチ</span> <kbd>${id === 'a' ? 'S' : 'K'}</kbd></span></div>
     <div class="deck-transport"><button class="transport-play" data-play="${id}" aria-label="デッキ${id.toUpperCase()}を再生" aria-pressed="false">${icon('play')}<kbd>${id === 'a' ? 'Z' : 'M'}</kbd></button><button class="cue-button" data-cue="${id}" aria-label="デッキ${id.toUpperCase()}の先頭へ戻る">CUE</button><span class="transport-spacer"></span><button class="sync-button" data-sync="${id}" aria-pressed="false" aria-label="デッキ${id.toUpperCase()}を相手のビートに同期">${icon('sync')}SYNC</button><button class="loop-button" data-loop="${id}" aria-pressed="false" aria-label="デッキ${id.toUpperCase()}の4拍ループ">${icon('loop')}4 LOOP</button></div>
   </article>`;
 }
 function mixerMarkup() {
-  return `<section class="mixer" aria-label="2チャンネルミキサー"><div class="mixer-top"><h2 class="mixer-heading">THE MIXER</h2><div class="beat-lights" role="img" aria-label="4拍のビートガイド"><i></i><i></i><i></i><i></i></div></div><div class="eq-section">${['a', 'b'].map(id => `<div class="eq-channel" data-channel="${id.toUpperCase()}">${knob(id, 2, 'HI')}${knob(id, 1, 'MID')}${knob(id, 0, 'LOW')}</div>`).join('')}</div><div class="eq-middle-labels" aria-hidden="true"><span>HI</span><span>MID</span><span>LOW</span></div><div class="filter-row">${knob('a', 'filter', 'FILTER A', 1, 0, 1)}<span>FILTER</span>${knob('b', 'filter', 'FILTER B', 1, 0, 1)}</div><div class="mixer-bottom"><label class="channel-slider"><input type="range" class="vertical-range" data-volume="a" min="0" max="100" value="85" aria-label="デッキAの音量"><span>A</span></label><div class="vu-meter" role="img" aria-label="音量レベルメーター"><i class="vu-bar"></i><i class="vu-bar"></i></div><label class="channel-slider b"><input type="range" class="vertical-range" data-volume="b" min="0" max="100" value="85" aria-label="デッキBの音量"><span>B</span></label></div><span class="mixer-signature">ANALOG FEEL. DIGITAL SOUL.</span></section>`;
+  return `<section id="mixer" class="mixer" aria-label="2チャンネルミキサー"><div class="mixer-top"><h2 class="mixer-heading">THE MIXER</h2><div class="beat-lights" role="img" aria-label="4拍のビートガイド"><i></i><i></i><i></i><i></i></div></div><div class="eq-section">${['a', 'b'].map(id => `<div class="eq-channel" data-channel="${id.toUpperCase()}">${knob(id, 2, 'HI')}${knob(id, 1, 'MID')}${knob(id, 0, 'LOW')}</div>`).join('')}</div><div class="eq-middle-labels" aria-hidden="true"><span>HI</span><span>MID</span><span>LOW</span></div><div class="filter-row">${knob('a', 'filter', 'FILTER A', 1, 0, 1)}<span>FILTER</span>${knob('b', 'filter', 'FILTER B', 1, 0, 1)}</div><div class="mixer-bottom"><label class="channel-slider"><input type="range" class="vertical-range" data-volume="a" min="0" max="100" value="85" aria-label="デッキAの音量"><span>A</span></label><div class="vu-meter" role="img" aria-label="音量レベルメーター"><i class="vu-bar"></i><i class="vu-bar"></i></div><label class="channel-slider b"><input type="range" class="vertical-range" data-volume="b" min="0" max="100" value="85" aria-label="デッキBの音量"><span>B</span></label></div><span class="mixer-signature">ANALOG FEEL. DIGITAL SOUL.</span></section>`;
 }
 $('#booth').innerHTML = deckMarkup('a', TRACKS[0]) + mixerMarkup() + deckMarkup('b', TRACKS[1]);
 $('#track-list').innerHTML = TRACKS.map(track => `<article class="crate-track"><span class="track-art" style="--track-color:${track.color}" aria-hidden="true"></span><div class="crate-info"><strong>${track.title}</strong><span>${track.genre} · ${track.bpm} BPM · ${track.key}</span><p>${track.description}</p></div><div class="load-buttons"><button data-load="${track.id}" data-target="a" aria-label="${track.title}をデッキAへ読み込む">A ↗</button><button data-load="${track.id}" data-target="b" aria-label="${track.title}をデッキBへ読み込む">B ↗</button></div></article>`).join('');
@@ -85,7 +87,7 @@ function startSet() {
   audio.setCrossfade(0); $('#crossfader').value = '0';
   game.start(mode, audio.now); lastStage = -1; resultShown = false; transitionOrigin = 'a';
   audio.playBoth(); updateTransport();
-  if (matchMedia('(max-width:640px)').matches) $('#booth').scrollIntoView({ behavior: reduceMotion ? 'instant' : 'smooth', block: 'start' });
+  if (mobileViewport.matches && mobilePanel === 'mixer') selectMobilePanel('a');
   announce(mode === 'challenge' ? '60秒のライブを開始。レコードを4回擦ろう。' : 'フリープレイを開始。');
   })().finally(() => { startingSet = null; });
   return startingSet;
@@ -123,6 +125,9 @@ function updateTransport() {
     const percent = (d.bpm / d.track.bpm - 1) * 100;
     r.tempo.value = String(percent); r.pitch.textContent = `${percent >= 0 ? '+' : ''}${percent.toFixed(1)}%`;
     r.root.querySelector('.track-name').textContent = d.track.title;
+    $(`[data-mobile-track=${d.id}]`).textContent = d.track.title;
+    $(`#mobile-tab-${d.id}`).setAttribute('aria-label', `デッキ${d.id.toUpperCase()}、${d.track.title}`);
+    $(`#mobile-tab-${d.id}`).classList.toggle('is-playing', active);
     r.root.querySelector('.track-meta').textContent = `${d.track.genre} · ${d.track.key} · ORIGINAL`;
   }
   const playing = audio.decks.some(d => d.playing) && !audio.paused;
@@ -131,7 +136,7 @@ function updateTransport() {
   ui.start.querySelector('use').setAttribute('href', playing ? '#i-pause' : '#i-play');
   ui.start.querySelector('span').textContent = playing ? '一時停止' : game.running ? 'プレイを再開' : mode === 'challenge' ? '60秒のライブを始める' : 'セットをはじめる';
   $('#mobile-transport use').setAttribute('href', playing ? '#i-pause' : '#i-play');
-  $('#mobile-transport strong').textContent = playing ? 'PAUSE' : 'PLAY';
+  $('#mobile-transport strong').textContent = playing ? '一時停止' : game.running ? '再開' : '再生';
   $('#mobile-transport').setAttribute('aria-label', playing ? 'セットを一時停止' : game.running ? 'プレイを再開' : 'セットをはじめる');
   ui.booth.textContent = playing ? 'NEEDLE DOWN. VOLUME UP.' : game.paused ? 'TAKE A BREATHER. YOUR SET IS PAUSED.' : 'READY WHEN YOU ARE';
   const synced = Math.abs(audio.get('a').bpm - audio.get('b').bpm) < .05;
@@ -195,6 +200,44 @@ function releaseAll() {
     keyScratches.delete(id); audio.endScratch(id); refs[id].vinyl.classList.remove('scratching');
   }
 }
+const mobilePanels = { a: refs.a.root, b: refs.b.root, mixer: $('#mixer') };
+const effectsPanel = $('.effects-panel'), libraryButton = $('#library-open'), beatLights = $('.beat-lights');
+function selectMobilePanel(next, focus = false) {
+  if (!Object.hasOwn(mobilePanels, next)) return;
+  if (next !== mobilePanel) releaseAll();
+  mobilePanel = next;
+  for (const [id, panel] of Object.entries(mobilePanels)) {
+    const tab = $(`#mobile-tab-${id}`), selected = id === next;
+    tab.setAttribute('aria-selected', String(selected)); tab.tabIndex = selected ? 0 : -1;
+    panel.hidden = mobileViewport.matches && !selected;
+  }
+  if (focus) $(`#mobile-tab-${next}`).focus({ preventScroll: true });
+}
+function updateMobileLayout() {
+  releaseAll();
+  const mobile = mobileViewport.matches;
+  document.body.classList.toggle('mobile-layout', mobile);
+  (mobile ? $('#mobile-library-slot') : $('.booth-toolbar')).append(libraryButton);
+  (mobile ? $('#mobile-beats') : $('.mixer-top')).append(beatLights);
+  (mobile ? $('#mixer') : $('.performance')).append(effectsPanel);
+  for (const [id, panel] of Object.entries(mobilePanels)) {
+    if (mobile) { panel.setAttribute('role', 'tabpanel'); panel.setAttribute('aria-labelledby', `mobile-tab-${id}`); }
+    else { panel.removeAttribute('role'); panel.removeAttribute('aria-labelledby'); }
+  }
+  selectMobilePanel(mobilePanel);
+}
+$$('[data-mobile-panel]').forEach(tab => {
+  tab.addEventListener('click', () => selectMobilePanel(tab.dataset.mobilePanel));
+  tab.addEventListener('keydown', event => {
+    const ids = Object.keys(mobilePanels), current = ids.indexOf(tab.dataset.mobilePanel);
+    const next = event.key === 'Home' ? 0 : event.key === 'End' ? 2 : event.key === 'ArrowRight' ? (current + 1) % 3 : event.key === 'ArrowLeft' ? (current + 2) % 3 : -1;
+    if (next < 0) return;
+    event.preventDefault(); event.stopPropagation(); selectMobilePanel(ids[next], true);
+  });
+});
+mobileViewport.addEventListener('change', updateMobileLayout);
+window.addEventListener('resize', releaseAll);
+
 for (const id of ['a', 'b']) {
   const vinyl = refs[id].vinyl;
   vinyl.addEventListener('pointerdown', action(async event => {
@@ -262,7 +305,9 @@ $$('dialog').forEach(dialog => dialog.addEventListener('click', event => {
 $$('[data-load]').forEach(button => button.addEventListener('click', action(async () => {
   if (mode === 'challenge' && game.running) { toast('ライブ中のレコード交換はお休み。セット後に選ぼう。'); return; }
   releaseAll(); audio.load(button.dataset.target, button.dataset.load); refs[button.dataset.target].angle = 0; updateTransport();
-  $('#library-dialog').close(); toast(`${audio.get(button.dataset.target).track.title} → デッキ${button.dataset.target.toUpperCase()}`);
+  $('#library-dialog').close();
+  if (mobileViewport.matches) selectMobilePanel(button.dataset.target);
+  toast(`${audio.get(button.dataset.target).track.title} → デッキ${button.dataset.target.toUpperCase()}`);
 })));
 $('#mute').addEventListener('click', () => {
   audio.setMuted(!audio.muted); $('#mute').setAttribute('aria-pressed', String(audio.muted));
@@ -286,7 +331,7 @@ function showResult() {
   $('#result-combo').textContent = String(game.maxCombo); $('#result-missions').textContent = `${game.completed.filter(Boolean).length} / 5`;
   $('#result-best').textContent = best.toLocaleString(); $('#new-best').hidden = game.score <= oldBest;
   $('#result-title').textContent = game.rank === 'S' ? 'フロアは、あなたのもの。' : game.rank === 'A' ? 'そのグルーヴ、最高。' : game.score > 0 ? 'ナイスセット。' : '次は、最初の一音から。';
-  $('#result-message').textContent = game.score > 0 ? 'この60秒は、あなただけの音楽。もう1セット、いこう。' : 'S / Kでスクラッチ。1〜4で音を重ねよう。';
+  $('#result-message').textContent = game.score > 0 ? 'この60秒は、あなただけの音楽。もう1セット、いこう。' : 'レコードを擦ってスクラッチ。下のパッドで音を重ねよう。';
   $('#result-dialog').showModal(); announce(`ライブ終了。${game.score}点、ランク${game.rank}。`);
 }
 $('#retry').addEventListener('click', action(async () => { $('#result-dialog').close(); await startSet(); }));
@@ -296,7 +341,7 @@ function renderUI() {
   ui.score.textContent = formatScore(game.score); ui.combo.innerHTML = `${String(game.combo).padStart(2, '0')}<span>×</span>`;
   $('#mobile-score').textContent = formatScore(game.score);
   const mobileTitles = ['スクラッチ', 'ビートを重ねる', 'SYNCで同期', 'フェーダーでつなぐ', '自由にプレイ'];
-  $('#mobile-goal').textContent = mode === 'challenge' && game.running ? `${game.stageIndex + 1}/5 ${mobileTitles[game.stageIndex]} ${game.completed[game.stageIndex] ? '✓' : `${game.counts[game.stageIndex]}/${MISSIONS[game.stageIndex].target}`} ⓘ` : '自由に、ミックス。 ⓘ';
+  $('#mobile-goal-copy').textContent = mode === 'challenge' && game.running ? `${game.stageIndex + 1}/5 ${mobileTitles[game.stageIndex]} ${game.completed[game.stageIndex] ? '✓' : `${game.counts[game.stageIndex]}/${MISSIONS[game.stageIndex].target}`} ⓘ` : mode === 'challenge' ? '60秒・5つのミッション ⓘ' : game.running ? '指で前後にスクラッチ ⓘ' : '▶で再生、指でスクラッチ ⓘ';
   $('#mobile-time').textContent = game.paused ? 'PAUSED' : mode === 'challenge' ? `${Math.max(0, Math.ceil(60 - game.elapsed(audio.now)))}s` : '';
   ui.multiplier.textContent = `×${Math.min(4, 1 + Math.floor(game.combo / 8))}`;
   ui.energy.style.width = `${game.crowd}%`; ui.energyValue.innerHTML = `${Math.round(game.crowd)}<span>%</span>`; ui.meter.setAttribute('aria-valuenow', String(Math.round(game.crowd)));
@@ -339,12 +384,17 @@ function peaks(track) {
 }
 const resizeObserver = new ResizeObserver(entries => {
   for (const entry of entries) {
+    if (entry.target.id === 'booth') {
+      document.body.classList.toggle('compact-booth', mobileViewport.matches && entry.contentRect.height < 350);
+      continue;
+    }
     const canvas = entry.target, dpr = Math.min(devicePixelRatio || 1, 2);
     canvas.width = Math.round(entry.contentRect.width * dpr); canvas.height = Math.round(entry.contentRect.height * dpr);
     canvas.logicalWidth = entry.contentRect.width; canvas.logicalHeight = entry.contentRect.height; canvas.dpr = dpr;
   }
 });
 for (const r of Object.values(refs)) resizeObserver.observe(r.canvas);
+resizeObserver.observe($('#booth'));
 function drawWave(d) {
   const r = refs[d.id], canvas = r.canvas, ctx = canvas.getContext('2d'), w = canvas.logicalWidth || 300, h = canvas.logicalHeight || 48;
   const pcm = peaks(d.track); if (!pcm) return;
@@ -384,5 +434,5 @@ function frame(time) {
   }
   requestAnimationFrame(frame);
 }
-updateTransport(); renderUI(); requestAnimationFrame(frame);
+updateMobileLayout(); updateTransport(); renderUI(); requestAnimationFrame(frame);
 setTimeout(() => audio.prepare(), 40);
