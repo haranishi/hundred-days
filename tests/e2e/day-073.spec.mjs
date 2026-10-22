@@ -11,7 +11,8 @@ const read = page => page.evaluate(async () => {
     faders: audio.decks.map(d => d.fader?.gain.value),
     loop: audio.decks.map(d => ({ on: d.loop, position: audio.position(d.id), start: d.loopStart, end: d.loopEnd })),
     score: game.score, counts: game.counts, paused: game.paused, elapsed: game.elapsed(audio.now),
-    echo: audio.echo, tracks: audio.decks.map(d => d.track.id),
+    eq: audio.decks.map(d => d.eq), filter: audio.decks.map(d => d.filterValue), volume: audio.decks.map(d => d.volume),
+    crossfade: audio.crossfade, echo: audio.echo, tracks: audio.decks.map(d => d.track.id),
   };
 });
 async function open(page) { await page.goto(new URL(base, test.info().project.use.baseURL).href); await expect(page.locator('[data-vinyl=a]')).toBeVisible(); }
@@ -91,7 +92,7 @@ test('touch scratches cancel cleanly and the mobile performance HUD stays on scr
   await cdp.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: [{ x: x + 50, y, id: 1 }] });
   await cdp.send('Input.dispatchTouchEvent', { type: 'touchCancel', touchPoints: [] });
   expect((await read(page)).scratching).toEqual([false, false]);
-  await expect(page.locator('.mobile-hud')).toBeVisible(); await expect(page.locator('#mobile-goal')).toContainText('ミックス');
+  await expect(page.locator('.mobile-hud')).toBeVisible(); await expect(page.locator('#mobile-goal')).toContainText('スクラッチ');
   const fader = await page.locator('#crossfader').boundingBox(); expect(fader.y).toBeGreaterThan(600); expect(fader.y).toBeLessThan(844);
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(390);
   await context.close();
@@ -106,4 +107,115 @@ test('all controls fit 390, 768 and 1440px and shared links use the published UR
   await expect(page.locator('.share')).toHaveCount(1);
   const x = page.locator('.share').getByRole('link', { name: 'Xで投稿' });
   expect(decodeURIComponent(await x.getAttribute('href'))).toContain('https://hundred-days.pages.dev/day-073-offbeat/');
+});
+
+
+test('phone booths keep the record and 44px controls visible in portrait and landscape', async ({ browser }) => {
+  for (const [width, height] of [[320, 568], [390, 700], [390, 844], [430, 932], [844, 390]]) {
+    const context = await browser.newContext({ viewport: { width, height }, isMobile: true, hasTouch: true });
+    const page = await context.newPage(); await open(page);
+    await expect(page.locator('body')).toHaveClass(/mobile-layout/);
+    await expect(page.locator('#deck-b')).toBeHidden();
+    const record = page.locator('[data-vinyl=a]');
+    await expect.poll(async () => (await record.boundingBox()).width).toBeGreaterThanOrEqual(140);
+    const r = await record.boundingBox(), controls = await page.locator('.performance').boundingBox();
+    expect(r.y).toBeGreaterThan(0);
+    expect(r.y + r.height < controls.y || r.x + r.width < controls.x, `${width} record must not overlap the controls`).toBe(true);
+    for (const selector of ['#mobile-transport', '#crossfader', '[data-sample=kick]', '[data-sample=clap]', '[data-sample=hat]', '[data-sample=horn]', '[data-sync=a]', '[data-loop=a]', '#mobile-tab-a', '#mobile-tab-b', '#mobile-tab-mixer', '#library-open', '#help']) {
+      const box = await page.locator(selector).boundingBox();
+      expect(box, `${width} ${selector}`).toBeTruthy();
+      expect(box.width, `${width} ${selector} width`).toBeGreaterThanOrEqual(44);
+      expect(box.height, `${width} ${selector} height`).toBeGreaterThanOrEqual(44);
+      expect(box.x).toBeGreaterThanOrEqual(0); expect(box.x + box.width).toBeLessThanOrEqual(width);
+      expect(box.y, `${width} ${selector} top`).toBeGreaterThanOrEqual(0); expect(box.y + box.height, `${width} ${selector} bottom`).toBeLessThanOrEqual(height);
+    }
+    expect(await page.evaluate(() => [document.documentElement.scrollWidth, document.documentElement.scrollHeight])).toEqual([width, height]);
+    await context.close();
+  }
+});
+
+test('two fingers, deck switching and rotation preserve the live mix without a stuck scratch', async ({ browser }) => {
+  const context = await browser.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
+  const page = await context.newPage(); await open(page); await page.tap('#mobile-transport');
+  await expect.poll(async () => (await read(page)).playing).toEqual([true, true]);
+  await expect.poll(async () => (await read(page)).level).toBeGreaterThan(.001);
+  const cdp = await context.newCDPSession(page);
+  const r = await page.locator('[data-vinyl=a]').boundingBox(), p = await page.locator('[data-sample=kick]').boundingBox();
+  const finger = { x: Math.round(r.x + r.width * .4), y: Math.round(r.y + r.height * .4), id: 1 };
+  await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [finger] });
+  await expect.poll(async () => (await read(page)).scratching[0]).toBe(true);
+  finger.x += 40;
+  await cdp.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: [finger] });
+  // Scoring accepts distinct hits at least 120ms apart; keep the first finger held.
+  await page.waitForTimeout(140);
+  const beforePad = (await read(page)).score;
+  await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [finger, { x: Math.round(p.x + p.width / 2), y: Math.round(p.y + p.height / 2), id: 2 }] });
+  await expect.poll(async () => (await read(page)).score).toBeGreaterThan(beforePad);
+  expect((await read(page)).scratching[0]).toBe(true);
+  await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [finger] });
+  await page.setViewportSize({ width: 844, height: 390 });
+  await expect.poll(async () => (await read(page)).scratching).toEqual([false, false]);
+  await cdp.send('Input.dispatchTouchEvent', { type: 'touchCancel', touchPoints: [] });
+  await page.tap('#mobile-tab-b'); await expect(page.locator('[data-vinyl=b]')).toBeVisible();
+  let state = await read(page); expect(state.playing).toEqual([true, true]); expect(state.paused).toBe(false);
+  const fader = page.locator('#crossfader'), box = await fader.boundingBox();
+  await fader.tap({ position: { x: box.width * .8, y: box.height / 2 } });
+  const mix = (await read(page)).crossfade;
+  const gains = [Math.cos(mix * Math.PI / 2), Math.sin(mix * Math.PI / 2)];
+  await expect.poll(async () => (await read(page)).faders[1]).toBeCloseTo(gains[1], 3);
+  await page.locator('#mobile-tab-b').focus(); await page.keyboard.press('ArrowRight');
+  await expect(page.locator('#mobile-tab-mixer')).toBeFocused();
+  expect((await read(page)).crossfade).toBe(mix);
+  (await read(page)).faders.forEach((gain, i) => expect(gain).toBeCloseTo(gains[i], 3));
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  await expect(page.locator('#deck-a')).toBeVisible(); await expect(page.locator('#deck-b')).toBeVisible();
+  await expect(page.locator('.mixer-top .beat-lights')).toBeVisible(); await expect(page.locator('.performance #echo')).toBeVisible();
+  state = await read(page); expect(state.playing).toEqual([true, true]); expect(state.paused).toBe(false); expect(state.crossfade).toBe(mix); state.faders.forEach((gain, i) => expect(gain).toBeCloseTo(gains[i], 3));
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.tap('#mobile-tab-a'); await expect(page.locator('#mobile-beats .beat-lights')).toBeVisible();
+  await expect(page.locator('#crossfader')).toHaveCount(1); await expect(page.locator('#echo')).toHaveCount(1);
+  await context.close();
+});
+
+test('mobile mixer exposes both channels and choosing a record returns to its deck', async ({ browser }) => {
+  const context = await browser.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
+  const page = await context.newPage(); await open(page); await page.tap('#mobile-transport'); await page.tap('#mobile-tab-mixer');
+  for (const id of ['a', 'b']) {
+    for (const band of ['0', '1', '2', 'filter']) await expect(page.locator(`[data-deck=${id}][data-knob="${band}"]`)).toBeVisible();
+  }
+  await page.locator('[data-deck=b][data-knob="2"]').tap({ position: { x: 10, y: 28 } });
+  await expect.poll(async () => (await read(page)).eq[1][2]).not.toBe(0);
+  await page.locator('[data-deck=b][data-knob=filter]').tap({ position: { x: 15, y: 30 } });
+  await expect.poll(async () => (await read(page)).filter[1]).toBeLessThan(.5);
+  const volume = page.locator('[data-volume=b]'), box = await volume.boundingBox();
+  await volume.tap({ position: { x: box.width * .25, y: box.height / 2 } });
+  await expect.poll(async () => (await read(page)).volume[1]).toBeLessThan(.5);
+  await page.tap('#echo'); expect((await read(page)).echo).toBe(true);
+  await page.tap('#library-open'); await page.locator('[data-load=dusty][data-target=b]').tap();
+  await expect(page.locator('#mobile-tab-b')).toHaveAttribute('aria-selected', 'true');
+  await expect(page.locator('[data-vinyl=b]')).toBeVisible();
+  expect((await read(page)).tracks[1]).toBe('dusty');
+  await page.tap('#help'); await expect(page.locator('#help-dialog')).toBeVisible();
+  await page.locator('#help-dialog [data-close]').first().tap(); await expect(page.locator('#help-dialog')).toBeHidden();
+  await context.close();
+});
+
+test('small-phone result dialog scrolls to retry and returns to free play', async ({ browser }) => {
+  const context = await browser.newContext({ viewport: { width: 320, height: 568 }, isMobile: true, hasTouch: true });
+  const page = await context.newPage(); await open(page); await page.tap('#mode-challenge'); await page.tap('#mobile-transport');
+  await expect.poll(async () => (await read(page)).playing).toEqual([true, true]);
+  const showResult = () => page.evaluate(async () => { const { audio, game } = await import('/day-073-offbeat/src/app.js'); game.start('challenge', audio.now - 60); });
+  // This fixture checks the scrollable result UI; the real 60s live is played separately.
+  await showResult(); await expect(page.locator('#result-dialog')).toBeVisible();
+  await expect(page.locator('#result-message')).toContainText('レコードを擦って');
+  await page.locator('#retry').tap(); await expect(page.locator('#result-dialog')).toBeHidden();
+  await expect.poll(async () => (await read(page)).playing).toEqual([true, true]);
+  expect((await read(page)).counts).toEqual([0, 0, 0, 0, 0]);
+  expect((await read(page)).elapsed).toBeLessThan(2);
+  await showResult(); await expect(page.locator('#result-dialog')).toBeVisible();
+  await page.locator('#back-free').tap(); await expect(page.locator('#result-dialog')).toBeHidden();
+  await expect(page.locator('#mode-free')).toHaveAttribute('aria-pressed', 'true');
+  await expect.poll(async () => (await read(page)).playing).toEqual([true, true]);
+  expect(await page.evaluate(() => window.scrollY)).toBe(0);
+  await context.close();
 });

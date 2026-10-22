@@ -1,0 +1,253 @@
+/* A pocket booth: one record at a time, with the mix always within reach. */
+.mobile-navigation, .mobile-scratch-copy { display:none; }
+.mobile-layout {
+  height:100vh;
+  height:100dvh;
+  padding:0;
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
+  overscroll-behavior:none;
+}
+.mobile-layout .site-header {
+  flex:0 0 auto;
+  height:calc(56px + env(safe-area-inset-top));
+  padding:env(safe-area-inset-top) max(12px,env(safe-area-inset-right)) 0 max(12px,env(safe-area-inset-left));
+  gap:8px;
+}
+.mobile-layout .brand { font-size:27px; letter-spacing:-1.5px; }
+.mobile-layout .brand-mark { width:22px; height:22px; margin-right:7px; }
+.mobile-layout .header-caption, .mobile-layout .sound-status { display:none; }
+.mobile-layout .header-tools { gap:0; }
+.mobile-layout .icon-button { width:44px; height:44px; }
+.mobile-layout .header-tools .icon { width:19px; height:19px; }
+.mobile-layout .app-shell {
+  flex:1;
+  min-height:0;
+  width:100%;
+  max-width:none;
+  margin:0;
+  padding:8px max(12px,env(safe-area-inset-right)) max(8px,env(safe-area-inset-bottom)) max(12px,env(safe-area-inset-left));
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+.mobile-layout .intro { display:block; flex:none; margin:0; padding:0; }
+/* Keep the page heading available to screen readers, without using playing space. */
+.mobile-layout .intro>div:first-child { position:absolute; width:1px; height:1px; margin:-1px; padding:0; overflow:hidden; clip-path:inset(50%); white-space:nowrap; }
+.mobile-layout .mode-switch { width:100%; margin:0; padding:3px; gap:3px; border-radius:9px; }
+.mobile-layout .mode-switch button { flex:1; min-height:44px; padding:8px; justify-content:center; gap:8px; font-size:12px; }
+.mobile-layout .mode-switch .icon { display:block; width:16px; height:16px; }
+.mobile-layout .session-panel, .mobile-layout .booth-toolbar, .mobile-layout .app-footer { display:none; }
+.mobile-layout .mobile-navigation { display:flex; flex:none; align-items:stretch; gap:8px; }
+.mobile-layout .mobile-deck-tabs { display:flex; flex:1; min-width:0; gap:4px; }
+.mobile-deck-tabs>button { --accent:var(--orange); }
+.mobile-deck-tabs>[data-mobile-panel=b] { --accent:var(--mint); }
+.mobile-deck-tabs>[data-mobile-panel=mixer] { --accent:var(--ink); }
+.mobile-layout .mobile-deck-tabs>button {
+  display:flex;
+  align-items:center;
+  gap:7px;
+  flex:1;
+  min-width:0;
+  min-height:52px;
+  padding:6px 8px;
+  border:1px solid var(--line);
+  border-radius:7px;
+  background:#1b1e1b;
+  text-align:left;
+  position:relative;
+  color:var(--muted);
+}
+.mobile-layout .mobile-deck-tabs>button[aria-selected=true] { color:var(--ink); border-color:var(--accent); background:color-mix(in srgb,var(--accent) 8%,#1b1e1b); box-shadow:inset 0 -2px var(--accent); }
+.mobile-layout .mobile-tab-badge { display:grid; place-items:center; width:24px; height:28px; border-radius:4px; color:var(--accent); background:color-mix(in srgb,var(--accent) 12%,transparent); font:14px var(--mono); flex:none; }
+.mobile-layout .mobile-deck-tabs>button>span:not(.mobile-tab-badge) { min-width:0; flex:1; }
+.mobile-layout .mobile-deck-tabs strong { display:block; font:10px var(--mono); letter-spacing:.5px; }
+.mobile-layout .mobile-deck-tabs small { display:block; font-size:10px; margin-top:5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100%; }
+.mobile-layout .mobile-deck-tabs i { position:absolute; top:6px; right:6px; width:4px; height:4px; border-radius:50%; background:#50564d; }
+.mobile-layout .mobile-deck-tabs .is-playing i { background:var(--accent); box-shadow:0 0 7px color-mix(in srgb,var(--accent) 40%,transparent); }
+.mobile-layout .mobile-deck-tabs>[data-mobile-panel=mixer] { flex:0 0 52px; flex-direction:column; justify-content:center; gap:4px; padding:5px; text-align:center; }
+.mobile-layout .mobile-deck-tabs .icon { width:18px; height:18px; }
+.mobile-layout #mobile-library-slot { display:flex; }
+.mobile-layout #library-open { display:grid; place-items:center; min-width:44px; min-height:44px; width:44px; font-size:0; border:1px solid var(--line); border-radius:7px; color:var(--ink); padding:0; }
+.mobile-layout #library-open .icon { width:22px; height:22px; }
+.mobile-layout #library-open .small { display:none; }
+.mobile-layout .booth { display:block; flex:1; min-height:0; overflow:hidden; border-radius:10px; box-shadow:0 8px 22px #0003; }
+.mobile-layout .deck { height:100%; padding:12px 14px; display:flex; flex-direction:column; border:0; }
+.mobile-layout .deck-heading { flex:none; gap:9px; }
+.mobile-layout .deck-badge { width:28px; height:28px; font-size:12px; }
+.mobile-layout .track-name { display:block; font-size:16px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.mobile-layout .track-meta { font-size:8px; letter-spacing:.5px; margin-top:4px; }
+.mobile-layout .tempo-display strong { font-size:24px; }
+.mobile-layout .tempo-display span { font-size:8px; }
+.mobile-layout .wave-screen { flex:none; height:36px; margin-top:10px; }
+.mobile-layout .wave-overlay { font-size:8px; }
+.mobile-layout .deck-body { flex:1; min-height:0; display:flex; padding:14px 48px 22px 8px; overflow:hidden; }
+.mobile-layout .turntable { height:100%; width:auto; max-width:100%; max-height:300px; aspect-ratio:1; flex:none; margin:auto; }
+.mobile-layout .tonearm { height:62%; max-height:180px; width:auto; aspect-ratio:70 / 184; top:10%; right:45px; opacity:.9; }
+.mobile-layout .pitch-control { width:44px; right:0; top:18px; bottom:23px; gap:5px; }
+.mobile-layout .pitch-control>span { font-size:8px; }
+.mobile-layout .pitch-control>span:nth-child(2), .mobile-layout .pitch-control>span:nth-child(4) { display:none; }
+.mobile-layout .pitch-rail { flex:1; min-height:0; height:auto; width:44px; }
+.mobile-layout .pitch-rail::before { width:26px; }
+.mobile-layout .vertical-range { height:100%; width:44px; border:0; background:linear-gradient(#10130f,#10130f) center / 5px 100% no-repeat; margin:0; touch-action:none; }
+.mobile-layout .vertical-range::-webkit-slider-thumb { width:28px; height:18px; }
+.mobile-layout .vertical-range::-moz-range-thumb { width:28px; height:18px; }
+.mobile-layout .pitch-control output { font-size:9px; }
+.mobile-layout .deck-bottom-meta { display:none; }
+.mobile-layout .scratch-caption { bottom:2px; left:0; right:44px; text-align:center; font-family:var(--sans); font-size:10px; color:#b4bcac; letter-spacing:0; }
+.mobile-layout .desktop-scratch-copy, .mobile-layout .scratch-caption kbd { display:none; }
+.mobile-layout .mobile-scratch-copy { display:inline; }
+.mobile-layout .deck-transport { flex:none; display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); margin:7px 0 0; padding-top:9px; gap:8px; }
+.mobile-layout .transport-spacer, .mobile-layout .transport-play kbd { display:none; }
+.mobile-layout .transport-play, .mobile-layout .cue-button, .mobile-layout .sync-button, .mobile-layout .loop-button { width:100%; min-width:44px; height:44px; min-height:44px; margin:0; padding:6px 4px; justify-content:center; font-size:10px; }
+.mobile-layout .sync-button .icon, .mobile-layout .loop-button .icon { width:13px; height:13px; }
+.mobile-layout .performance { flex:none; display:flex; flex-direction:column; margin:0; padding:4px 12px 10px; gap:0; border-radius:10px; background:#20251d; border-color:#414a38; }
+.mobile-layout .performance::after { display:none; }
+.mobile-layout .performance .crossfader-panel, .mobile-layout .performance .sampler-panel { position:static; inset:auto; height:auto; width:100%; padding:0!important; border:0; }
+.mobile-layout .performance .section-top, .mobile-layout .performance .control-help { display:none; }
+.mobile-layout .mobile-hud { display:flex; align-items:center; gap:9px; margin:0; height:44px; }
+.mobile-layout #mobile-goal { flex:1; min-width:0; min-height:44px; display:flex; flex-direction:column; justify-content:center; gap:6px; text-align:left; padding:0; color:#d0dac4; }
+.mobile-layout #mobile-goal-copy { display:block; max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:11px; }
+.mobile-layout #mobile-beats { display:block; }
+.mobile-layout .beat-lights { display:flex; gap:6px; border:0; background:none; padding:0; }
+.mobile-layout .beat-lights i { width:5px; height:5px; }
+.mobile-layout .mobile-score-block { text-align:right; flex:none; }
+.mobile-layout .mobile-score-block small { display:block; font:8px var(--mono); letter-spacing:1px; color:#a0ad91; margin-bottom:4px; }
+.mobile-layout #mobile-score { font:14px var(--mono); color:var(--orange); }
+.mobile-layout #mobile-time { font:11px var(--mono); color:var(--mint); flex:none; }
+.mobile-layout .crossfader-wrap { padding:0; gap:12px; height:44px; }
+.mobile-layout .deck-letter { font-size:12px; }
+.mobile-layout .fader-track { height:44px; }
+.mobile-layout .fader-marks { inset:8px 9px; }
+.mobile-layout #crossfader { height:44px; border:0; border-radius:0; background:linear-gradient(#10150d,#10150d) center / 100% 6px no-repeat; touch-action:none; }
+.mobile-layout #crossfader::-webkit-slider-thumb { width:36px; height:28px; }
+.mobile-layout #crossfader::-moz-range-thumb { width:36px; height:28px; }
+.mobile-layout .performance .sample-pads { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)) 56px; gap:8px; }
+.mobile-layout .performance .sample-pad { min-height:60px; gap:8px; border-radius:6px; }
+.mobile-layout .performance .sample-pad strong { font-size:9px; letter-spacing:0; }
+.mobile-layout .sample-pad kbd { display:none; }
+.mobile-layout .mobile-transport { display:flex; flex-direction:column; align-items:center; justify-content:center; min-width:44px; min-height:60px; padding:4px; gap:6px; color:#23271e; background:var(--orange); border:1px solid var(--orange); border-radius:6px; }
+.mobile-layout .mobile-transport .icon { width:23px; height:23px; }
+.mobile-layout .mobile-transport strong { font:10px var(--sans); font-weight:700; white-space:nowrap; }
+.mobile-layout .playing .mobile-transport, .mobile-layout.playing .mobile-transport { background:#dce6c8; border-color:#dce6c8; }
+/* The mixer scrolls inside its panel; the performance controls stay in view. */
+.mobile-layout .mixer { height:100%; min-height:0; display:flex; flex-direction:column; align-items:stretch; gap:18px; overflow:auto; overscroll-behavior:contain; padding:16px; border:0; }
+.mobile-layout .mixer-top { display:block; }
+.mobile-layout .mixer-heading { margin:0; font-size:11px; justify-content:center; }
+.mobile-layout .mixer .eq-section { flex-direction:column; width:100%; gap:16px; margin:0; }
+.mobile-layout .mixer .eq-channel { display:flex; flex-direction:row; justify-content:space-around; align-items:center; gap:8px; }
+.mobile-layout .mixer .eq-channel::before { content:attr(data-channel); font:16px var(--mono); width:22px; margin:0; }
+.mobile-layout .mixer .knob-control { width:60px; height:62px; flex:none; }
+.mobile-layout .mixer .knob-ring { width:44px; height:44px; }
+.mobile-layout .mixer .knob-label { display:block; bottom:0; font-size:9px; color:#b1bca4; }
+.mobile-layout .mixer .knob-dial::after { top:7px; height:9px; }
+.mobile-layout .mixer .filter-row { position:static; display:flex; width:100%; height:auto; padding:16px 0 0; border:0; border-top:1px solid var(--line); margin:0; justify-content:space-around; gap:8px; }
+.mobile-layout .mixer .filter-row>span { display:none; }
+.mobile-layout .mixer .filter-row .knob-control { width:90px; height:65px; }
+.mobile-layout .mixer .mixer-bottom { padding:0; gap:12px; border:0; align-items:center; justify-content:space-between; }
+.mobile-layout .channel-slider { flex-direction:row-reverse; width:43%; min-width:0; gap:8px; }
+.mobile-layout .channel-slider>span { font-size:12px; }
+.mobile-layout .channel-slider .vertical-range { writing-mode:horizontal-tb; direction:ltr; height:44px; width:100%; min-width:44px; background-size:100% 5px; }
+.mobile-layout .vu-meter { flex:none; height:40px; align-self:center; margin:0; }
+.mobile-layout .mixer .effects-panel { flex:none; display:flex; align-items:center; justify-content:space-between; padding:16px 0 0!important; margin:0; border:0; border-top:1px solid var(--line)!important; gap:12px; }
+.mobile-layout .effects-panel .section-top { display:block; margin:0; }
+.mobile-layout .effects-panel .section-top h2 { font-size:10px; }
+.mobile-layout .effects-panel .section-top>span { display:block; margin:6px 0 0; font-size:10px; }
+.mobile-layout .effects-panel .effect-button { min-height:48px; width:150px; font-size:11px; padding:9px 12px; }
+.mobile-layout .effects-panel .effect-button strong { font-size:11px; }
+.mobile-layout .mixer-signature, .mobile-layout .eq-middle-labels { display:none; }
+.mobile-layout .modal { width:calc(100% - 24px); max-height:calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 24px); padding:20px; overscroll-behavior:contain; }
+.mobile-layout .modal-header .icon-button { width:44px; height:44px; flex:none; }
+.mobile-layout .modal h2 { font-size:22px; }
+.mobile-layout .eyebrow { font-size:9px; letter-spacing:1px; }
+.mobile-layout .load-buttons { flex-direction:column; gap:6px; }
+.mobile-layout .load-buttons button { min-width:44px; min-height:44px; padding:8px; font-size:11px; }
+.mobile-layout .crate-track { gap:10px; }
+.mobile-layout .track-art { width:44px; height:52px; }
+.mobile-layout .crate-info>strong { font-size:13px; }
+.mobile-layout .crate-info>span { font-size:9px; letter-spacing:0; line-height:1.5; }
+.mobile-layout .crate-info p { font-size:10px; line-height:1.6; }
+.mobile-layout .standard-range { min-height:44px; touch-action:none; }
+.mobile-layout .toggle-setting { min-height:44px; }
+.mobile-layout .toggle-setting input { min-width:32px; min-height:32px; }
+.mobile-layout .judgement { top:42%; width:max-content; max-width:calc(100% - 40px); padding:12px 18px; }
+.mobile-layout .judgement strong { font-size:19px; }
+.mobile-layout .toast { bottom:calc(172px + env(safe-area-inset-bottom)); font-size:11px; padding:10px 14px; }
+@media(max-height:780px) {
+  .mobile-layout .site-header { height:calc(48px + env(safe-area-inset-top)); }
+  .mobile-layout .app-shell { gap:6px; padding-top:6px; }
+  .mobile-layout .mode-switch { padding:0; }
+  .mobile-layout .mobile-deck-tabs>button { min-height:44px; }
+  .mobile-layout .mobile-deck-tabs small { display:none; }
+  .mobile-layout .deck { padding:9px 12px; }
+  .mobile-layout .track-meta { display:none; }
+  .mobile-layout .wave-screen { height:24px; margin-top:6px; }
+  .mobile-layout .deck-body { padding-top:10px; padding-bottom:18px; }
+  .mobile-layout .deck-transport { margin-top:4px; padding-top:6px; }
+  .mobile-layout .performance { padding:0 10px 6px; }
+  .mobile-layout .performance .sample-pad, .mobile-layout .mobile-transport { min-height:52px; }
+  .mobile-layout .pad-visual { height:12px; }
+}
+@media(max-width:360px) {
+  .mobile-layout .brand { font-size:24px; }
+  .mobile-layout .brand-mark { margin-right:5px; width:19px; height:19px; }
+  .mobile-layout .site-header { padding-left:8px; padding-right:8px; }
+  .mobile-layout .app-shell { padding-left:8px; padding-right:8px; }
+  .mobile-layout .mobile-tab-badge { width:20px; font-size:12px; }
+  .mobile-layout .mobile-deck-tabs>button { padding:5px; gap:4px; }
+  .mobile-layout .mobile-deck-tabs strong { font-size:9px; }
+  .mobile-layout .performance .sample-pads { gap:5px; grid-template-columns:repeat(4,minmax(0,1fr)) 50px; }
+  .mobile-layout .performance .sample-pad strong { font-size:8px; }
+  .mobile-layout #mobile-goal-copy { font-size:10px; }
+}
+/* Small screens keep the record large by giving decoration back its space. */
+.mobile-layout.compact-booth .deck { padding:8px 12px; }
+.mobile-layout.compact-booth .wave-screen { display:none; }
+.mobile-layout.compact-booth .tempo-display { display:flex; gap:4px; align-items:baseline; }
+.mobile-layout.compact-booth .tempo-display span { margin:0; }
+.mobile-layout.compact-booth .deck-body { padding:6px 44px 14px 4px; }
+.mobile-layout.compact-booth .deck-transport { padding-top:0; margin-top:4px; border:0; }
+@media(max-height:600px) {
+  .mobile-layout .site-header { height:calc(46px + env(safe-area-inset-top)); }
+  .mobile-layout .app-shell { padding-top:4px; padding-bottom:max(4px,env(safe-area-inset-bottom)); gap:4px; }
+  .mobile-layout .mode-switch { border:0; }
+  .mobile-layout .performance { padding-bottom:4px; }
+  .mobile-layout .performance .sample-pad, .mobile-layout .mobile-transport { min-height:44px; }
+  .mobile-layout .mobile-transport { gap:3px; padding:2px; }
+  .mobile-layout .mobile-transport .icon { width:20px; height:20px; }
+}
+@media(orientation:landscape) and (max-height:500px) {
+  .mobile-layout .site-header { height:calc(46px + env(safe-area-inset-top)); }
+  .mobile-layout .app-shell { display:grid; grid-template-columns:minmax(0,1fr) clamp(220px,32vw,290px); grid-template-rows:44px minmax(0,1fr); gap:8px; }
+  .mobile-layout .intro { grid-column:2; grid-row:1; }
+  .mobile-layout .mode-switch { height:44px; padding:0; }
+  .mobile-layout .mode-switch button { font-size:11px; gap:5px; }
+  .mobile-layout .mode-switch .icon { display:none; }
+  .mobile-layout .mobile-navigation { grid-column:1; grid-row:1; }
+  .mobile-layout .mobile-deck-tabs>button { min-height:44px; }
+  .mobile-layout .booth { grid-column:1; grid-row:2; }
+  .mobile-layout .deck { padding:8px 12px; }
+  .mobile-layout .deck-heading { position:relative; z-index:1; }
+  .mobile-layout .wave-screen { height:20px; margin-top:4px; }
+  .mobile-layout .deck-body { padding-top:9px; padding-bottom:16px; }
+  .mobile-layout .pitch-control { top:5px; bottom:10px; }
+  .mobile-layout .deck-transport { padding-top:5px; margin-top:3px; }
+  .mobile-layout .performance { grid-column:2; grid-row:2; min-height:0; padding:4px 10px 10px; justify-content:space-between; }
+  .mobile-layout .mobile-hud { height:44px; gap:6px; }
+  .mobile-layout #mobile-goal-copy { font-size:10px; }
+  .mobile-layout #mobile-score { font-size:12px; }
+  .mobile-layout .performance .sample-pads { grid-template-columns:repeat(4,minmax(0,1fr)); gap:8px; }
+  .mobile-layout .performance .sample-pad { min-height:64px; }
+  .mobile-layout .mobile-transport { grid-column:1/-1; flex-direction:row; min-height:44px; }
+  .mobile-layout .toast { bottom:16px; }
+  .mobile-layout .modal { max-width:560px; }
+}
+
+.mobile-layout .keyboard-copy, .mobile-layout .keyboard-list { display:none; }
+.mobile-layout .result-stats span { font-size:8px; letter-spacing:.3px; }
+
+.mobile-layout.compact-booth .label-wordmark { font-size:13px; letter-spacing:-1px; }
+.mobile-layout.compact-booth .record-label .label-top { font-size:3.5px; letter-spacing:.2px; }
+.mobile-layout.compact-booth .label-bottom { font-size:3.5px; }
+.mobile-layout.compact-booth .label-star { font-size:10px; }
