@@ -107,6 +107,7 @@ Day 051「ハコニワ」も外部公開アプリです。本体は独立リポ�
 | 071 | 影証言 — 灯りの高さで、証言の嘘を暴く | [day-071-kage-shogen/](day-071-kage-shogen/) | [アプリを開く](https://hundred-days.pages.dev/day-071-kage-shogen/) |
 | 072 | じぶんの手がかり | [day-072-jibun-note/](day-072-jibun-note/) | [アプリを開く](https://hundred-days.pages.dev/day-072-jibun-note/) |
 | 073 | offbeat. — ここから、フロアを揺らせ。 | [day-073-offbeat/](day-073-offbeat/) | [アプリを開く](https://hundred-days.pages.dev/day-073-offbeat/) |
+| 074 | リンクの毒見 — 踏む前に、銀の針で確かめる | [day-074-link-dokumi/](day-074-link-dokumi/) | [アプリを開く](https://hundred-days.pages.dev/day-074-link-dokumi/) |
 <!-- day-index:end -->
 
 ## 1日アプリのルール

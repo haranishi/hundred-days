@@ -1,0 +1,464 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#f5f1e8">
+  <meta name="description" content="URLを貼ると、なりすましの兆候と、サイトの守りの弱点を平易な日本語で調べます。登録不要。診断したURLの履歴は残しません。">
+  <meta property="og:title" content="リンクの毒見 — 踏む前に、銀の針で確かめる">
+  <meta property="og:description" content="届いたリンクを踏む前に。アドレスの見た目、転送先、サイトの守りの設定を、根拠つきで調べます。">
+  <meta property="og:url" content="https://hundred-days.pages.dev/day-074-link-dokumi/">
+  <meta name="share:text" content="リンクの毒見 — 踏む前に、銀の針で確かめる。URLを貼ると、なりすましの兆候とサイトの弱点を調べます。">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="https://hundred-days.pages.dev/day-074-link-dokumi/og.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="canonical" href="https://hundred-days.pages.dev/day-074-link-dokumi/">
+  <link rel="icon" type="image/svg+xml" href="./favicon.svg">
+  <title>リンクの毒見 — 踏む前に、銀の針で確かめる | 100日チャレンジ Day74</title>
+  <link rel="stylesheet" href="./app.css">
+  <link rel="stylesheet" href="./shared/share.css">
+  <script src="./shared/share.js" defer></script>
+  <script type="module" src="./app.js"></script>
+</head>
+<body>
+  <!-- 銀の針の色。針は3か所（題名・調べている途中・判定の帯）で使うので、色の定義はここに1つだけ置く -->
+  <svg class="svg-defs" aria-hidden="true" focusable="false">
+    <defs>
+      <linearGradient id="silver-shaft" x1="0" x2="1" y1="0" y2="0">
+        <stop offset="0" stop-color="#8E98A6"/>
+        <stop offset="0.42" stop-color="#F4F6F9"/>
+        <stop offset="0.7" stop-color="#C9D0DA"/>
+        <stop offset="1" stop-color="#8E98A6"/>
+      </linearGradient>
+      <radialGradient id="silver-head" cx="0.36" cy="0.34" r="0.78">
+        <stop offset="0" stop-color="#F4F6F9"/>
+        <stop offset="0.55" stop-color="#C9D0DA"/>
+        <stop offset="1" stop-color="#8E98A6"/>
+      </radialGradient>
+      <linearGradient id="tarnish" x1="0" x2="0" y1="0" y2="1">
+        <stop offset="0" stop-color="#2B2F38" stop-opacity="0"/>
+        <stop offset="0.5" stop-color="#2B2F38" stop-opacity="0.88"/>
+        <stop offset="1" stop-color="#14161B" stop-opacity="1"/>
+      </linearGradient>
+      <linearGradient id="bowl-body" x1="0" x2="0" y1="0" y2="1">
+        <stop offset="0" stop-color="#3A3F4B"/>
+        <stop offset="1" stop-color="#1D2028"/>
+      </linearGradient>
+    </defs>
+  </svg>
+
+  <main id="app" data-phase="idle">
+    <header class="masthead wrap">
+      <p class="masthead__day">100日チャレンジ Day74</p>
+      <div class="masthead__row">
+        <svg class="masthead__mark" viewBox="0 0 40 120" aria-hidden="true" focusable="false">
+          <path d="M18.8 18h2.4l-.5 86-.7 7-.7-7Z" fill="url(#silver-shaft)" stroke="#7D8796" stroke-width="0.6"/>
+          <circle cx="20" cy="12" r="6.5" fill="url(#silver-head)" stroke="#7D8796" stroke-width="1"/>
+        </svg>
+        <div>
+          <h1 class="masthead__title">リンクの毒見</h1>
+          <p class="masthead__tagline">踏む前に、銀の針で確かめる</p>
+        </div>
+      </div>
+      <p class="masthead__lede">知らない相手から届いたリンクを、開く前に調べます。アドレスの見た目、<span class="nb">たどり着く先</span>、サイトの守りの設定を、実際に見えた値を添えて、ふだんの言葉で返します。</p>
+    </header>
+
+    <section id="intake" class="intake wrap" aria-label="調べるリンクの入力">
+      <div class="intake__main">
+      <form id="check-form" class="intake__card" novalidate>
+        <div class="intake__labelrow">
+          <label id="intake-label" for="url-input" class="intake__label">調べたいリンク</label>
+          <button type="button" id="paste-button" class="btn btn--quiet" hidden>
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M9 4h6v3H9zM7 5H5v16h14V5h-2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+            貼り付け
+          </button>
+        </div>
+        <p id="input-help" class="intake__help">届いたメッセージを丸ごと貼っても、最初のリンクを取り出して調べます。</p>
+        <textarea id="url-input" name="url" rows="3" maxlength="20000" autocapitalize="off" autocomplete="off" spellcheck="false" inputmode="url" aria-describedby="input-help input-preview input-error keys-hint" placeholder="ここにリンクを貼り付け"></textarea>
+        <p id="input-preview" class="intake__preview" hidden></p>
+        <p id="input-error" class="intake__error" hidden></p>
+        <div class="intake__actions">
+          <button type="submit" id="check-button" class="btn btn--primary">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M16.6 7.4 4.2 19.8" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><circle cx="18" cy="6" r="2.6" fill="none" stroke="currentColor" stroke-width="1.7"/></svg>
+            調べる
+          </button>
+          <p id="keys-hint" class="intake__keys">Enterで調べる・Shift＋Enterで改行</p>
+        </div>
+
+        <ul class="cautions" aria-label="調べる前に">
+          <li class="caution">
+            <svg class="caution__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3.5 7.2c0-.7.5-1.2 1.2-1.2h14.6c.7 0 1.2.5 1.2 1.2v2.6a2.2 2.2 0 0 0 0 4.4v2.6c0 .7-.5 1.2-1.2 1.2H4.7c-.7 0-1.2-.5-1.2-1.2v-2.6a2.2 2.2 0 0 0 0-4.4Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M15.5 6.5v11" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+            <span><strong>一度しか使えないリンク</strong>（ログイン・本人確認・登録・配信停止のリンク）は調べないでください。調べると、使えなくなることがあります。</span>
+          </li>
+          <li class="caution">
+            <svg class="caution__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 12h12M12 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M20 4v16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+            <span>入力したリンクは、<strong>診断のためにこのサイトのサーバーへ送られます</strong>。「?」から後ろ（個人の情報や認証用の文字列が入りやすい部分）は、初めの設定では送りません。</span>
+          </li>
+          <li class="caution">
+            <svg class="caution__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="4" y="4" width="16" height="16" rx="3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-dasharray="3 2.4"/><path d="M8.5 12.5l2.4 2.4 4.6-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span>試すだけなら、<a href="#samples" class="inline-link">見本</a>（実在しないサイト）を使えます。見本は通信しません。</span>
+          </li>
+        </ul>
+
+        <details class="settings" id="settings">
+          <summary class="settings__summary">くわしい設定</summary>
+          <div class="settings__body">
+            <label class="check">
+              <input type="checkbox" id="include-query" aria-describedby="include-query-note">
+              <span>「?」から後ろも一緒に送って調べる</span>
+            </label>
+            <p id="include-query-note" class="settings__note">「?」から後ろには、ログイン用の文字列や、名前・メールアドレスなどの個人の情報が入っていることがあります。入れる前に、そうした文字列が含まれていないか確かめてください。「#」から後ろは、この設定でも送りません。</p>
+          </div>
+        </details>
+      </form>
+
+      <section id="one-time-notice" class="onetime" hidden aria-labelledby="one-time-title">
+        <h2 id="one-time-title" class="onetime__title" tabindex="-1">このリンクは、<span class="nb">一度きりのリンク</span>かもしれません</h2>
+        <p>本人確認・登録・パスワードの再設定・配信停止などのリンクは、調べるために開いただけで使えなくなることがあります。まだ使う予定があるなら、調べずに、公式のアプリや窓口から手続きしてください。</p>
+        <dl class="onetime__facts">
+          <dt>そう判断した手がかり</dt>
+          <dd id="one-time-clues" class="mono"></dd>
+          <dt>このまま調べると送るアドレス</dt>
+          <dd id="one-time-href" class="mono"></dd>
+        </dl>
+        <div class="btn-row">
+          <button type="button" id="one-time-continue" class="btn btn--primary">それでも調べる</button>
+          <button type="button" id="one-time-cancel" class="btn">やめる</button>
+        </div>
+      </section>
+      </div>
+
+      <div class="intake__side">
+      <section id="samples" class="samples" aria-labelledby="samples-title">
+        <h2 id="samples-title" class="section-title">見本で試す</h2>
+        <p class="samples__note">どれも実在しないサイトと、作りものの観測データです。押しても通信しません。</p>
+        <div id="sample-list" class="samples__list"></div>
+      </section>
+
+      <section id="primer" class="primer" aria-labelledby="primer-title">
+        <h2 id="primer-title" class="section-title">調べる3つのこと</h2>
+        <ol class="primer__steps">
+          <li><strong>アドレスの見た目</strong><span>通信する前に、つづり・紛らわしい文字・有名な名前の借り方・<span class="nb">短縮URL</span>などを調べます。</span></li>
+          <li><strong>たどり着く先</strong><span>転送を最大<span data-limit="MAX_REDIRECTS"></span>回までたどり、最後のページの応答と、ページに書かれた事実（題名・入力欄の送り先など）を読みます。</span></li>
+          <li><strong>周りの情報</strong><span>名前の登録日、メールのなりすまし対策、連絡先の公開（security.txt）などを調べます。</span></li>
+        </ol>
+      </section>
+      </div>
+
+      <!-- 結果の2つの見方。狭い画面では見本と3つのことの後ろ、広い画面では入力カードの下（左の列）に置き、左右の列の長さをそろえる -->
+      <section id="axes" class="intake__axes primer__axes" aria-labelledby="axes-title">
+        <h2 id="axes-title" class="visually-hidden">結果の2つの見方</h2>
+        <div class="axis-card">
+          <h3 class="axis-card__title">訪問者向け「なりすましの兆候」</h3>
+          <p>なりすましの兆候の強さを、4つの段階（調べきれなかったときは「不明」）で示します。</p>
+          <ul id="level-legend" class="legend" aria-label="4つの段階と「不明」"></ul>
+        </div>
+        <div class="axis-card">
+          <h3 class="axis-card__title">運営者向け「サイトの守り」</h3>
+          <p>守りの設定を、100点満点の点数とA〜Fの評価で示します。<strong>点数が低くても、危険な<span class="nb">サイトという</span>意味ではありません。</strong>守りの評価と、なりすましの兆候は混ぜずに出します。</p>
+        </div>
+      </section>
+    </section>
+
+    <section id="checking" class="checking wrap" hidden aria-labelledby="checking-title">
+      <div class="checking__head">
+        <svg class="needle-figure needle-figure--dipping" viewBox="0 0 60 200" aria-hidden="true" focusable="false">
+          <ellipse class="bowl-inside" cx="30" cy="166" rx="25" ry="6"/>
+          <g class="needle">
+            <path class="needle__shaft" d="M28.7 18h2.6l-.5 124-.8 9-.8-9Z" fill="url(#silver-shaft)" stroke="#8E98A6" stroke-width="0.4"/>
+            <path class="needle__tarnish" d="M28.95 80h2.1l-.25 62-.8 9-.8-9Z" fill="url(#tarnish)"/>
+            <circle class="needle__head" cx="30" cy="11" r="7" fill="url(#silver-head)" stroke="#8E98A6" stroke-width="0.8"/>
+          </g>
+          <path class="bowl" d="M4 166c1.5 18 13 28 26 28s24.5-10 26-28c-6 4.4-15.6 6.4-26 6.4S10 170.4 4 166Z" fill="url(#bowl-body)"/>
+          <path class="bowl-rim" d="M4 166c6 4.4 15.6 6.4 26 6.4s20-2 26-6.4"/>
+          <path class="bowl-foot" d="M20 193h20l2 5H18Z"/>
+        </svg>
+        <div class="checking__text">
+          <h2 id="checking-title" class="checking__title" tabindex="-1">調べています</h2>
+          <p class="checking__target"><span class="tag">送ったアドレス</span> <span id="checking-href" class="mono"></span></p>
+          <ul id="checking-notes" class="notes"></ul>
+          <div class="btn-row checking__actions">
+            <button type="button" id="cancel-button" class="btn">やめる</button>
+          </div>
+        </div>
+      </div>
+      <ol id="progress" class="progress" aria-label="調べる段階">
+        <li data-step="read" data-state="waiting"><span class="progress__icon" aria-hidden="true"></span><span class="progress__label">アドレスを読む</span><span class="progress__state">待ち</span><span class="progress__detail"></span></li>
+        <li data-step="connect" data-state="waiting"><span class="progress__icon" aria-hidden="true"></span><span class="progress__label">つなぐ・転送先をたどる</span><span class="progress__state">待ち</span><span class="progress__detail"></span></li>
+        <li data-step="page" data-state="waiting"><span class="progress__icon" aria-hidden="true"></span><span class="progress__label">ページの中身を見る</span><span class="progress__state">待ち</span><span class="progress__detail"></span></li>
+        <li data-step="around" data-state="waiting"><span class="progress__icon" aria-hidden="true"></span><span class="progress__label">守りの設定を見る</span><span class="progress__state">待ち</span><span class="progress__detail"></span></li>
+        <li data-step="summary" data-state="waiting"><span class="progress__icon" aria-hidden="true"></span><span class="progress__label">まとめる</span><span class="progress__state">待ち</span><span class="progress__detail"></span></li>
+      </ol>
+      <p id="slow-note" class="slow-note" hidden>画面は止まっていません。アドレスの見た目から分かったことは、下に先に出しています。最後の結果は、相手のサイトへの問い合わせ（最大で約<span data-limit="TRACE_TIMEOUT_MS" data-unit="s"></span>秒）と、周りの情報の確認（最大で約<span data-limit="AROUND_TIMEOUT_MS" data-unit="s"></span>秒）が終わってから、まとめて出ます。途中で結果だけを先に出す仕組みはありません。待たずにやめるときは「やめる」を押してください。</p>
+      <div class="checking__side">
+        <section id="early" class="early" aria-labelledby="early-title">
+          <h3 id="early-title" class="early__title">アドレスの見た目（通信の前に分かったこと）</h3>
+          <ul id="early-list" class="early__list"></ul>
+        </section>
+        <section id="early-path" class="early" hidden aria-labelledby="early-path-title">
+          <h3 id="early-path-title" class="early__title">たどれた経路</h3>
+          <ol id="early-path-list" class="early__list early__list--path"></ol>
+        </section>
+      </div>
+    </section>
+
+    <section id="result" class="result wrap" hidden aria-label="診断の結果">
+      <p id="sample-banner" class="sample-banner" hidden>
+        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="4" y="4" width="16" height="16" rx="3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-dasharray="3 2.4"/></svg>
+        <span><strong>見本の結果</strong>です（実在しないサイトと、作りものの観測データ）。</span>
+      </p>
+      <div class="result__grid">
+        <section id="verdict" class="verdict" data-level="unknown" aria-labelledby="verdict-headline">
+          <div class="verdict__head">
+            <svg class="needle-figure needle-figure--verdict" viewBox="0 0 60 200" aria-hidden="true" focusable="false">
+              <ellipse class="bowl-inside" cx="30" cy="166" rx="25" ry="6"/>
+              <g class="needle">
+                <path class="needle__shaft" d="M28.7 18h2.6l-.5 124-.8 9-.8-9Z" fill="url(#silver-shaft)" stroke="#8E98A6" stroke-width="0.4"/>
+                <path class="needle__tarnish" d="M28.95 80h2.1l-.25 62-.8 9-.8-9Z" fill="url(#tarnish)"/>
+                <circle class="needle__head" cx="30" cy="11" r="7" fill="url(#silver-head)" stroke="#8E98A6" stroke-width="0.8"/>
+              </g>
+              <path class="bowl" d="M4 166c1.5 18 13 28 26 28s24.5-10 26-28c-6 4.4-15.6 6.4-26 6.4S10 170.4 4 166Z" fill="url(#bowl-body)"/>
+              <path class="bowl-rim" d="M4 166c6 4.4 15.6 6.4 26 6.4s20-2 26-6.4"/>
+              <path class="bowl-foot" d="M20 193h20l2 5H18Z"/>
+            </svg>
+            <p class="verdict__kicker"><span id="verdict-icon" class="lv-icon"></span><span id="verdict-word" class="verdict__word"></span><span class="verdict__axis">訪問者向けの判定</span><span id="verdict-sample" class="tag tag--sample" hidden>見本</span></p>
+            <h2 id="verdict-headline" class="verdict__headline" tabindex="-1"></h2>
+            <p id="verdict-caveat" class="verdict__caveat" hidden>見つからなかったことは、安全の保証ではありません。</p>
+          </div>
+          <p id="verdict-summary" class="verdict__summary"></p>
+          <div id="verdict-fetch" class="verdict__fetch" hidden>
+            <p id="verdict-fetch-title" class="verdict__fetch-title"></p>
+            <p id="verdict-fetch-body" class="verdict__fetch-body" hidden></p>
+            <p id="verdict-fetch-next" class="verdict__fetch-next"></p>
+            <div id="retry-row" class="verdict__retry" hidden>
+              <button type="button" id="retry" class="btn btn--primary">もう一度調べる</button>
+              <span id="retry-wait" class="verdict__retry-wait"></span>
+            </div>
+          </div>
+          <div id="verdict-reasons-wrap" class="verdict__reasons">
+            <p class="mini-title">主な理由</p>
+            <ul id="verdict-reasons"></ul>
+          </div>
+        </section>
+        <div id="verdict-detail" class="verdict-detail" data-level="unknown">
+          <ol id="verdict-meter" class="meter" aria-label="訪問者向けの4つの段階"></ol>
+          <div id="verdict-host" class="verdict__host"></div>
+          <p id="verdict-time" class="verdict__time"></p>
+        </div>
+
+        <div id="quick-actions" class="quick btn-row" role="group" aria-label="結果の操作">
+          <button type="button" id="copy-report" class="btn" data-action="copy-report">結果をコピー</button>
+          <button type="button" id="copy-summary" class="btn" data-action="copy-summary">家族に送る要約をコピー</button>
+          <button type="button" id="again" class="btn" data-action="again">別のリンクを調べる</button>
+        </div>
+
+        <section class="actions" aria-labelledby="actions-title">
+          <h3 id="actions-title" class="block-title">いま取る行動</h3>
+          <ol id="verdict-actions" class="actions__list"></ol>
+          <p id="actions-consult" class="actions__consult" hidden><a href="#consult-title" class="jump-link" data-jump="consult-title">相談・報告の窓口を見る <span aria-hidden="true">↓</span></a></p>
+        </section>
+
+        <section id="consult" class="consult" hidden aria-labelledby="consult-title">
+          <h3 id="consult-title" class="block-title" tabindex="-1">相談・報告の窓口</h3>
+          <p class="consult__lead">届いたリンクは使わず、ブックマーク・公式アプリ・自分で検索した公式サイトから開き直して確かめてください。入力してしまったときや、迷ったときは、次の窓口へ。</p>
+          <ul id="consult-list" class="link-cards"></ul>
+        </section>
+
+        <section class="route" aria-labelledby="path-title">
+          <h3 id="path-title" class="block-title">たどった経路</h3>
+          <div id="target-chip" class="target"></div>
+          <ol id="path" class="path"></ol>
+          <p id="path-note" class="route__note" hidden></p>
+        </section>
+
+        <div class="result__main">
+          <div id="axis-tabs" class="tabs" role="tablist" aria-label="判定の軸">
+            <button type="button" role="tab" id="tab-visitor" class="tab" data-axis="visitor" aria-selected="true" aria-controls="panel-visitor" tabindex="0">
+              <span class="tab__title">なりすましの兆候</span><span class="tab__sub">訪問者向け</span><span id="tab-visitor-badge" class="tab__badge"></span>
+            </button>
+            <button type="button" role="tab" id="tab-owner" class="tab" data-axis="owner" aria-selected="false" aria-controls="panel-owner" tabindex="-1">
+              <span class="tab__title">サイトの守り</span><span class="tab__sub">運営者向け</span><span id="tab-owner-badge" class="tab__badge"></span>
+            </button>
+          </div>
+
+          <section id="panel-visitor" class="panel" role="tabpanel" aria-labelledby="tab-visitor" tabindex="0">
+            <p class="panel__lead">リンクの行き先に、なりすましの手口と似た形があるかを見ました。見えた値は、各項目を開くと読めます。</p>
+            <div id="visitor-findings" class="groups"></div>
+          </section>
+
+          <section id="panel-owner" class="panel" role="tabpanel" aria-labelledby="tab-owner" tabindex="0" hidden>
+            <p id="owner-note" class="callout"></p>
+            <div class="score" id="owner-score-block">
+              <div class="score__row">
+                <p class="score__num"><span id="owner-score"></span><span class="score__of">/100点</span><span id="owner-provisional" class="tag score__provisional" hidden>暫定</span></p>
+                <p class="score__grade"><span class="score__grade-label">守りの評価</span><span id="owner-grade" class="score__grade-letter"></span></p>
+              </div>
+              <div class="score__bar" aria-hidden="true"><span id="owner-bar"></span></div>
+              <p id="owner-scale" class="score__scale"></p>
+              <p id="owner-unscored" class="score__unscored" hidden></p>
+              <a id="owner-how" class="row-link" href="#how-scoring">点数と評価の付け方を見る <span aria-hidden="true">↓</span></a>
+            </div>
+            <section id="owner-fixes-wrap" class="fixes" aria-labelledby="owner-fixes-title">
+              <h3 id="owner-fixes-title" class="block-title">先に付けると点が戻るもの</h3>
+              <ol id="owner-fixes" class="fixes__list"></ol>
+            </section>
+            <div id="owner-findings" class="groups"></div>
+            <p id="owner-ref" class="panel__ref"></p>
+          </section>
+
+          <details id="observed" class="observed">
+            <summary class="observed__summary">取得した値をそのまま見る（文字だけで表示）</summary>
+            <div id="observed-body" class="observed__body"></div>
+          </details>
+        </div>
+
+        <section class="limits" aria-labelledby="limits-title">
+          <h3 id="limits-title" class="block-title">見ていないこと・確かめきれないこと</h3>
+          <ul id="limits" class="limits__list"></ul>
+        </section>
+
+        <section class="after" aria-label="結果の扱い">
+          <div class="btn-row">
+            <button type="button" class="btn" data-action="copy-report">結果をコピー</button>
+            <button type="button" class="btn" data-action="copy-summary">家族に送る要約をコピー</button>
+            <button type="button" class="btn" data-action="again">別のリンクを調べる</button>
+          </div>
+          <p class="after__note">コピーは、この端末の中だけで行います。共有欄で送るのはこのアプリのアドレスだけで、診断の結果は含みません。</p>
+        </section>
+
+        <section id="external" class="external" aria-labelledby="external-title">
+          <h3 id="external-title" class="block-title">ほかのサービスでも確かめる</h3>
+          <p class="external__lead">押したときだけ、外部のサイトが別のタブで開きます。何が相手に渡るかを、押す前に確かめてください。</p>
+          <ul id="external-list" class="link-cards"></ul>
+        </section>
+      </div>
+    </section>
+
+    <div class="docs wrap">
+      <nav class="docs__nav" aria-label="このページの説明（目次）">
+        <p class="docs__nav-title">このページの説明</p>
+        <ul class="docs__toc">
+          <li><a href="#how">しくみと限界 <span aria-hidden="true">↓</span></a></li>
+          <li><a href="#fetcher">サイト運営者の方へ <span aria-hidden="true">↓</span></a></li>
+          <li><a href="#privacy">プライバシー <span aria-hidden="true">↓</span></a></li>
+        </ul>
+      </nav>
+
+      <section class="doc" aria-labelledby="how">
+        <h2 id="how" class="doc__title" tabindex="-1">しくみと限界</h2>
+        <h3>やること</h3>
+        <ul>
+          <li>通信する前に、アドレスの見た目を調べます（つづり、紛らわしい文字、有名な名前の借り方、<span class="nb">短縮URL</span>、別のサイトへ進む指定など）。</li>
+          <li>「調べる」を押すと、このサイトのサーバーが、そのアドレスへアクセスします。転送があれば最大<span data-limit="MAX_REDIRECTS"></span>回までたどり、行き先を1つずつ確かめてから進みます。</li>
+          <li>最後のページについて、応答ヘッダー（守りの設定）、Cookieの名前と属性（値は読み捨てます）、HTMLから取り出した事実（題名・入力欄の送り先・読み込むファイルなど）を見ます。本文は先頭<span data-limit="BODY_CAP_BYTES" data-unit="kib"></span>KiBまでしか読みません。</li>
+          <li>行き先の名前について、公開DNS（メールのなりすまし対策の設定など）、登録日、<span class="mono">http://</span>で開いたときの転送、<span class="nb">連絡先の公開（<span class="mono">security.txt</span>）を調べます。</span></li>
+        </ul>
+        <h3>やらないこと</h3>
+        <ul>
+          <li>ログイン、入力欄への送信、ファイルのダウンロードや実行、JavaScriptの実行はしません。</li>
+          <li>診断先の画面を撮ったり、このページに映したりはしません。</li>
+          <li>隠れたファイルを探す、何度も繰り返してアクセスするなど、侵入に近い確認はしません。</li>
+          <li>既知の詐欺サイトの一覧との照合や、ウイルス検査はしません。必要なら、結果の下にある外部のサービスを使ってください。</li>
+          <li>診断の履歴を残しません。結果の公開やランキングもしません。</li>
+        </ul>
+        <h3>見ていないこと</h3>
+        <ul id="how-limits"></ul>
+        <h3>診断が確実でない理由</h3>
+        <ul>
+          <li>見るのは、診断した時点の応答だけです（同じURLの結果は、最大<span data-limit="CACHE_TTL_S" data-unit="min"></span>分、使い回すことがあります）。あとから中身が変わることがあります。</li>
+          <li>相手のサーバーは、アクセスしてきた相手を見分けて、人が開いたときと違う中身を返せます。</li>
+          <li>一部のサイトは、ブラウザ以外からのアクセスを遅くしたり断ったりします。その場合は「時間切れ」や「断られた」と表示します。診断のために、ブラウザになりすますことはしません。</li>
+          <li>JavaScriptで後から作られる部分や、ログインした後の画面は見ていません。</li>
+          <li>名前の表に載っていないブランドや新しい手口は、見た目の判定に出ないことがあります。</li>
+          <li>公式ドメインの表と一致していても、乗っ取りや、個別のページの問題までは分かりません。</li>
+          <li>守りの点数は、見えた設定だけを数えた独自の評価です。点数が高くても、なりすましではないとは限りません。</li>
+        </ul>
+        <h3 id="how-scoring" tabindex="-1">点数と評価の付け方</h3>
+        <p>訪問者向けは、見つかった兆候の重み（画面では「兆候 +9」のように出します）を足して、4つの段階を決めます。とくに強い兆候には「これより下の段階にはしない」という下限があります。</p>
+        <ul id="how-visitor-bands" class="bands"></ul>
+        <p>運営者向けは、100点から「付けると良いもの」の減点（画面では「減点 15」のように出します）を引き、A〜Fの評価にします。直したときに戻る点は「直すと +15点」と書きます。</p>
+        <ul id="how-owner-bands" class="bands bands--grades"></ul>
+        <p>ほかの診断サービスの採点（MDN HTTP Observatory など）とは別の、このサービス独自の評価です。</p>
+        <p id="how-back" class="how-back" hidden><a href="#verdict-headline" class="jump-link" data-jump="verdict-headline">結果に戻る <span aria-hidden="true">↑</span></a></p>
+        <details id="how-catalog" class="catalog" hidden>
+          <summary class="catalog__summary">所見ごとの点の一覧<span id="how-catalog-count"></span></summary>
+          <div class="catalog__body">
+            <h4 class="catalog__group">訪問者向け（なりすましの兆候）：兆候の重み</h4>
+            <ul id="how-catalog-visitor" class="rules"></ul>
+            <h4 class="catalog__group">運営者向け（サイトの守り）：減点</h4>
+            <ul id="how-catalog-owner" class="rules"></ul>
+          </div>
+        </details>
+        <p id="how-back-end" class="how-back" hidden><a href="#verdict-headline" class="jump-link" data-jump="verdict-headline">結果に戻る <span aria-hidden="true">↑</span></a></p>
+        <h3>データの出どころ</h3>
+        <ul>
+          <li>ブランドの公式ドメイン：日本で名前をかたられやすい36の会社・サービスについて、各社の公式サイトで確かめたドメインの表です（2026年10月22日に確認）。選ぶときは、フィッシング対策協議会の月次報告（2026年9月分）を参考にしました。</li>
+          <li>短縮URLと、だれでもページを公開できるサービスの一覧：各サービスの公式の情報で確かめました。</li>
+          <li>ドメインの区切り（どこまでが1つの登録か）と、利用者ごとにサブドメインを配るサービスの判別：Public Suffix List（公開サフィックスリスト。2026年10月20日版）を使っています（自治体名の規則2件だけ除いています）。ライセンスはMPL 2.0です。</li>
+          <li>末尾（.comや.jpの部分）の目安：Interisle Consultingの2026年の調査で、1万ドメインあたりのフィッシングの報告が多かった .xin・.icu・.cfd の3つだけです。これだけを根拠にはしません。</li>
+          <li>サーバーのソフトの保守が終わった時期：PHP・Apache 2.2・IIS 6〜8.5について、配布元の公式の情報で確かめました。</li>
+          <li>JavaScriptの部品（ライブラリ）の既知の弱点：公式の情報で、影響する版の範囲が一致したものだけを使います。</li>
+          <li>守りの設定の目安：MDN（ブラウザの技術資料）などの公開資料をもとにしています。</li>
+        </ul>
+      </section>
+
+      <section class="doc" aria-labelledby="fetcher">
+        <h2 id="fetcher" class="doc__title" tabindex="-1">サイト運営者の方へ</h2>
+        <p>このサービスは、利用者が指定したページにだけ、指定のたびにアクセスします。巡回はしません。</p>
+        <h3>アクセスの見分け方</h3>
+        <p>次のUser-Agentを名乗ります。Cookie・Referer・Originは送りません。診断のために、ブラウザになりすますことはしません。</p>
+        <p class="codeline mono">LinkDokumi/1.0 (+https://hundred-days.pages.dev/day-074-link-dokumi/#fetcher)</p>
+        <h3>取りに行くもの</h3>
+        <ul>
+          <li>利用者が指定したURL（「?」から後ろは、利用者が選んだときだけ）</li>
+          <li>そこからの転送先（最大<span data-limit="MAX_REDIRECTS"></span>回）</li>
+          <li>行き先のホストの http:// 側（HTTPSへ転送されるかの確認）</li>
+          <li>/.well-known/security.txt</li>
+        </ul>
+        <p>名前の記録（DNS）と登録日（RDAP）は、公開の問い合わせサービスで調べます。この2つのために、あなたのサイトへアクセスすることはありません。</p>
+        <h3>頻度</h3>
+        <p>同じURLの結果は最大<span data-limit="CACHE_TTL_S" data-unit="min"></span>分まで使い回し、相手のサイトへのアクセスを減らします。同じ接続元からの問い合わせは、1分あたり約<span data-limit="RATE_PER_MINUTE"></span>回までに抑えています（厳密な上限ではありません）。</p>
+        <h3>robots.txtを見ない理由</h3>
+        <p>利用者が指定した1回ごとの取得で、チャットアプリなどがリンクのプレビューを作るときと同じ扱いだからです。robots.txtの決まり（RFC 9309）は、ページを巡回するクローラーのためのものです。</p>
+        <h3>断り方</h3>
+        <p>User-Agentに <span class="mono">LinkDokumi</span> を含むアクセスを拒否（403など）してください。診断は「取得を断られました」と表示し、そのページへの再試行はしません。名前（DNS）と登録日の問い合わせは続けますが、あなたのサイトへの追加のアクセス（http:// 側・security.txt）は省きます。</p>
+        <h3>問い合わせ</h3>
+        <p><a href="https://github.com/haranishi/hundred-days/issues" target="_blank" rel="noopener noreferrer">GitHubのIssue（外部サイト）</a>から連絡してください。</p>
+      </section>
+
+      <section class="doc" aria-labelledby="privacy">
+        <h2 id="privacy" class="doc__title" tabindex="-1">プライバシー</h2>
+        <h3>送られるもの</h3>
+        <ul>
+          <li>「調べる」を押すと、入力したリンクが、このサイトのサーバー（Cloudflare Pages Functions）へ送られます。サーバーが、あなたの代わりに相手のサイトへアクセスします。</li>
+          <li>入力したリンクの「?」から後ろは、くわしい設定で選んだときだけ送ります。「#」から後ろは送りません（転送先のURLは、そのまま取りに行きます）。</li>
+          <li>相手のサイトから読み取った値（題名・大見出し・文章の先頭の最大400字・転送先・ヘッダーなど）は、結果の「取得した値」の欄に、文字としてだけ並べます。</li>
+          <li>相手のサイトに届くのは、このサイトのサーバーからのアクセスです。あなたのIPアドレスやCookieは相手に渡りません。</li>
+          <li>行き先の名前（ホスト名）は、名前を調べる公開のサービス（いまはCloudflareとGoogleのDNS）と、登録日を調べる公開のサービス（.comと.netはVerisign、それ以外はrdap.org）にも渡ります。</li>
+        </ul>
+        <h3>残るもの・残さないもの</h3>
+        <ul>
+          <li id="privacy-cache">診断の履歴は残しません。同じ相手サイトへ短時間に何度もアクセスしないよう、結果を最大<span data-limit="CACHE_TTL_S" data-unit="min"></span>分だけ一時的に置きます。</li>
+          <li>回数の上限を守るため、IPアドレスから作った読めない値（ハッシュ）を、<span data-limit="RATE_KEEP_S"></span>秒だけ置きます。</li>
+          <li>このサイトのプログラムは、調べたURLやIPアドレスを記録に書き出しません。ただし、配信に使っているCloudflareの仕組みで、ふつうのアクセスと同じように、リクエスト（調べたURLを含みます）が処理される場合があります。</li>
+          <li>この端末には、調べたURLも結果も残しません。Cookieやブラウザの保存領域は使いません。</li>
+        </ul>
+        <h3>外部のサービスと共有</h3>
+        <ul>
+          <li>結果の下にある外部の診断サービスは、押したときだけ開きます。そのとき、ボタンの上に書いた値（URLかホスト名）が相手に渡ります。</li>
+          <li>共有欄で送るのは、このアプリのアドレスだけです。診断の結果は含みません。</li>
+        </ul>
+        <p>サイト全体の方針は<a href="/privacy.html">プライバシーポリシー</a>にあります。</p>
+      </section>
+    </div>
+
+    <div id="live" class="visually-hidden" aria-live="polite"></div>
+  </main>
+  <footer class="site-footer">
+    <div class="wrap">
+      <div id="share"></div>
+      <p class="site-footer__links"><a href="/">100日チャレンジの一覧へ</a></p>
+    </div>
+  </footer>
+</body>
+</html>
