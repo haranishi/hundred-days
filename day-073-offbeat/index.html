@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#141615">
+  <meta name="description" content="レコードを擦る。ビートを重ねる。フロアを揺らす。誰でもDJになれる、オリジナル音楽のブラウザゲーム。">
+  <meta property="og:title" content="offbeat. — ここから、フロアを揺らせ。">
+  <meta property="og:description" content="2枚のレコードと、あなたのグルーヴ。スクラッチもミックスも楽しめるDJゲーム。">
+  <meta property="og:url" content="https://hundred-days.pages.dev/day-073-offbeat/">
+  <meta name="share:text" content="offbeat. — ここから、フロアを揺らせ。 レコードを擦り、ビートを重ねるDJゲーム。">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="https://hundred-days.pages.dev/day-073-offbeat/og.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="canonical" href="https://hundred-days.pages.dev/day-073-offbeat/">
+  <link rel="icon" type="image/svg+xml" href="./favicon.svg">
+  <title>offbeat. — ここから、フロアを揺らせ。 | 100日チャレンジ Day73</title>
+  <link rel="stylesheet" href="./src/styles.css">
+  <link rel="stylesheet" href="./shared/share.css">
+  <script src="./shared/share.js" defer></script>
+</head>
+<body>
+  <svg class="svg-defs" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><defs>
+    <symbol id="i-play" viewBox="0 0 24 24"><path d="m9 5 11 7-11 7Z" fill="currentColor" stroke="none"/></symbol>
+    <symbol id="i-pause" viewBox="0 0 24 24"><path d="M8 5v14M16 5v14" stroke-width="4"/></symbol>
+    <symbol id="i-volume" viewBox="0 0 24 24"><path d="M11 5 6 9H3v6h3l5 4V5ZM15 8a6 6 0 0 1 0 8M18 5a10 10 0 0 1 0 14"/></symbol>
+    <symbol id="i-mute" viewBox="0 0 24 24"><path d="M11 5 6 9H3v6h3l5 4V5ZM16 9l6 6m0-6-6 6"/></symbol>
+    <symbol id="i-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 0 1 5 .5c0 2-2.5 2-2.5 4M12 17h.01"/></symbol>
+    <symbol id="i-settings" viewBox="0 0 24 24"><path d="M5 3v18M12 3v18M19 3v18"/><path d="M2 8h6M9 16h6M16 7h6" stroke-width="4"/></symbol>
+    <symbol id="i-share" viewBox="0 0 24 24"><path d="M12 16V3m-5 5 5-5 5 5M5 13v7h14v-7"/></symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14m-6-6 6 6-6 6"/></symbol>
+    <symbol id="i-sync" viewBox="0 0 24 24"><path d="M20 8a9 9 0 0 0-15-2L3 8m0-5v5h5M4 16a9 9 0 0 0 15 2l2-2m0 5v-5h-5"/></symbol>
+    <symbol id="i-loop" viewBox="0 0 24 24"><path d="M4 9V6h15m-3-3 3 3-3 3M20 15v3H5m3-3-3 3 3 3"/></symbol>
+    <symbol id="i-close" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></symbol>
+    <symbol id="i-record" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/><path d="M5 12a7 7 0 0 1 7-7M19 12a7 7 0 0 1-7 7"/></symbol>
+    <symbol id="i-headphones" viewBox="0 0 24 24"><path d="M4 14v-3a8 8 0 0 1 16 0v3M4 13H3v7h4v-7H4Zm16 0h1v7h-4v-7h3Z"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></symbol>
+    <symbol id="i-spark" viewBox="0 0 24 24"><path d="m12 2 2.8 7.2L22 12l-7.2 2.8L12 22l-2.8-7.2L2 12l7.2-2.8Z"/></symbol>
+  </defs></svg>
+
+  <header class="site-header">
+    <a class="brand" href="./" aria-label="offbeat ホーム"><span class="brand-mark"><i></i></span>offbeat<span class="brand-period">.</span></a>
+    <span class="header-caption">LESS RULES. MORE GROOVE.</span>
+    <nav class="header-tools" aria-label="ユーティリティ">
+      <span class="sound-status"><i></i> YOUR DJ BOOTH</span>
+      <button class="icon-button" id="mute" aria-label="音をミュート" aria-pressed="false"><svg class="icon"><use href="#i-volume"/></svg></button>
+      <button class="icon-button" id="help" aria-label="遊び方"><svg class="icon"><use href="#i-help"/></svg></button>
+      <button class="icon-button" id="settings" aria-label="設定"><svg class="icon"><use href="#i-settings"/></svg></button>
+      <button class="icon-button" id="share-button" aria-label="このアプリを共有する"><svg class="icon"><use href="#i-share"/></svg></button>
+    </nav>
+  </header>
+
+  <main class="app-shell">
+    <section class="intro" aria-labelledby="headline">
+      <div><div class="eyebrow"><span class="tiny-star">✳</span> THE DECKS ARE YOURS.</div><h1 id="headline">ここから、フロアを揺らせ<span>。</span></h1><p>レコードを擦る。ビートを重ねる。<span>音楽は、遊べる。</span></p></div>
+      <div class="mode-switch" role="group" aria-label="ゲームモード"><button id="mode-free" class="selected" aria-pressed="true"><svg class="icon"><use href="#i-record"/></svg>フリープレイ</button><button id="mode-challenge" aria-pressed="false"><svg class="icon"><use href="#i-spark"/></svg>ライブチャレンジ</button></div>
+    </section>
+
+    <section class="session-panel" aria-label="ライブの状態">
+      <div class="session-instruction"><div class="session-label"><i id="live-dot"></i><span id="session-label">SOUND CHECK</span><span class="session-chip" id="session-chip">NO PRESSURE. JUST PLAY.</span></div><div class="mission-line"><strong id="mission-title">まずは、一音鳴らしてみよう。</strong><span id="mission-progress"></span></div><p id="mission-hint">再生したら、レコードを前後にドラッグ。S / K キーでも擦れます。</p></div>
+      <div class="session-stats"><div class="score-block"><span class="micro-label">SCORE <span id="score-multiplier">×1</span></span><strong id="score">000000</strong></div><div class="combo-block"><span class="micro-label">COMBO</span><strong id="combo">00<span>×</span></strong></div><div class="time-block" id="time-block" hidden><span class="micro-label">TIME LEFT</span><strong id="time-left">60<span>s</span></strong></div></div>
+      <button class="start-button" id="session-start"><svg class="icon"><use href="#i-play"/></svg><span>セットをはじめる</span></button>
+    </section>
+
+    <div class="booth-toolbar"><span><i class="status-dot"></i> <span id="booth-state">READY WHEN YOU ARE</span></span><div class="crowd-display"><svg class="icon"><use href="#i-headphones"/></svg><span>FLOOR ENERGY</span><div class="energy-meter" role="meter" aria-label="フロアの盛り上がり" aria-valuemin="0" aria-valuemax="100" aria-valuenow="25"><i id="energy-fill"></i></div><strong id="energy-value">25<span>%</span></strong></div><button id="library-open" class="text-button"><svg class="icon"><use href="#i-record"/></svg>レコードを選ぶ<svg class="icon small"><use href="#i-arrow"/></svg></button></div>
+
+    <section class="booth" id="booth" aria-label="DJターンテーブルとミキサー"></section>
+
+    <section class="performance" aria-label="パフォーマンスコントロール">
+      <div class="crossfader-panel"><div class="mobile-hud"><button id="mobile-goal" aria-label="いまの目標と操作のヒント">自由に、ミックス。<span>ⓘ</span></button><span id="mobile-time"></span><strong id="mobile-score">000000</strong></div><div class="section-top"><h2>CROSSFADER</h2><span>2つの音を、つなぐ。</span></div><div class="crossfader-wrap"><span class="deck-letter a">A</span><div class="fader-track"><div class="fader-marks" aria-hidden="true"></div><input type="range" id="crossfader" min="0" max="100" value="50" aria-label="クロスフェーダー AからB" aria-valuetext="AとBを同じ音量でミックス"></div><span class="deck-letter b">B</span></div><p class="control-help">← / → キーでもミックス <button id="fader-center">中央に戻す</button></p></div>
+      <div class="sampler-panel"><div class="section-top"><h2>SAMPLER</h2><span>ビートに、自分の色を。</span></div><div class="sample-pads"><button class="sample-pad" data-sample="kick"><span class="pad-visual kick-visual" aria-hidden="true"></span><strong>KICK</strong><kbd>1</kbd></button><button class="sample-pad" data-sample="clap"><span class="pad-visual clap-visual" aria-hidden="true"></span><strong>CLAP</strong><kbd>2</kbd></button><button class="sample-pad" data-sample="hat"><span class="pad-visual hat-visual" aria-hidden="true"></span><strong>HI-HAT</strong><kbd>3</kbd></button><button class="sample-pad horn-pad" data-sample="horn"><span class="pad-visual horn-visual" aria-hidden="true"></span><strong>AIR HORN</strong><kbd>4</kbd></button><button id="mobile-transport" class="mobile-transport" aria-label="セットをはじめる"><svg class="icon"><use href="#i-play"/></svg><strong>PLAY</strong></button></div></div>
+      <div class="effects-panel"><div class="section-top"><h2>MASTER FX</h2><span>ひとさじの魔法。</span></div><button class="effect-button" id="echo" aria-pressed="false"><span class="echo-art" aria-hidden="true">)))</span><span><strong>ECHO</strong><small>音を、余韻に。</small></span><i></i></button></div>
+    </section>
+
+    <footer class="app-footer"><span><svg class="icon"><use href="#i-headphones"/></svg>ヘッドホンで、もっと気持ちよく。</span><span class="footer-shortcut"><kbd>SPACE</kbd>再生 / 一時停止 <span class="footer-divider">/</span><kbd>S</kbd><kbd>K</kbd>スクラッチ</span><span>MADE FOR THE LOVE OF MUSIC <i>↗</i></span></footer>
+  </main>
+
+  <div id="judgement" class="judgement" aria-hidden="true"><strong></strong><span></span></div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <div class="sr-only" id="announcer" role="status" aria-live="polite"></div>
+
+  <dialog id="help-dialog" class="modal help-modal" aria-labelledby="help-title"><div class="modal-header"><span class="eyebrow">YOUR FIRST SET</span><button class="icon-button" data-close aria-label="閉じる"><svg class="icon"><use href="#i-close"/></svg></button></div><h2 id="help-title">知識より、ノリでいこう。</h2><p class="modal-lead">難しいことは、音を鳴らしてから。<br>この3つで、もうDJです。</p><div class="help-steps"><article><span>01</span><div><h3>レコードを回そう。</h3><p>▶で再生。盤面を前後にドラッグすると、あの「ギュギュッ」。<kbd>S</kbd> / <kbd>K</kbd>でも擦れます。</p></div></article><article><span>02</span><div><h3>自分のグルーヴを重ねよう。</h3><p>パッドを叩いてドラムやホーンを追加。4つの丸いランプが、拍のガイドです。</p></div></article><article><span>03</span><div><h3>次の曲へ、つなごう。</h3><p>両方を再生してSYNC。フェーダーをAからBへ動かせば、曲が自然に切り替わります。</p></div></article></div><button class="primary-button full" data-close>さあ、音を出そう<svg class="icon"><use href="#i-arrow"/></svg></button><p class="help-footnote">テンポ・EQ・フィルター・4拍ループも、ぜんぶ触れます。</p></dialog>
+  <dialog id="settings-dialog" class="modal" aria-labelledby="settings-title"><div class="modal-header"><span class="eyebrow">MAKE YOURSELF AT HOME</span><button class="icon-button" data-close aria-label="閉じる"><svg class="icon"><use href="#i-close"/></svg></button></div><h2 id="settings-title">ブースの設定</h2><label class="setting-label" for="master-volume">マスター音量 <output id="master-output">65%</output></label><input id="master-volume" type="range" min="0" max="100" value="65" class="standard-range"><label class="toggle-setting"><span>動きを少なくする<small>レコードの回転や装飾の点滅を抑えます。</small></span><input id="reduce-motion" type="checkbox" role="switch"></label><div class="keyboard-list"><h3>キーボードでも、ノリよく。</h3><p><span>全体の再生 / 一時停止</span><kbd>SPACE</kbd></p><p><span>A / B の再生</span><span><kbd>Z</kbd> <kbd>M</kbd></span></p><p><span>A / B のスクラッチ</span><span><kbd>S</kbd> <kbd>K</kbd></span></p><p><span>サンプラー</span><span><kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> <kbd>4</kbd></span></p><p><span>クロスフェーダー</span><span><kbd>←</kbd> <kbd>→</kbd></span></p></div><p class="privacy-note">ハイスコアは、このブラウザだけに保存されます。</p></dialog>
+  <dialog id="library-dialog" class="modal library-modal" aria-labelledby="library-title"><div class="modal-header"><span class="eyebrow">THE RECORD CRATE</span><button class="icon-button" data-close aria-label="閉じる"><svg class="icon"><use href="#i-close"/></svg></button></div><h2 id="library-title">今日の1枚、どれにする？</h2><p class="modal-lead">4つのグルーヴ。すべて、このブースのオリジナル。</p><div id="track-list"></div><p class="privacy-note">読み込み先のデッキは停止します。▶でプレイ。</p></dialog>
+  <dialog id="share-dialog" class="modal" aria-labelledby="share-title"><div class="modal-header"><span class="eyebrow">PASS THE GROOVE</span><button class="icon-button" data-close aria-label="閉じる"><svg class="icon"><use href="#i-close"/></svg></button></div><h2 id="share-title">このグルーヴ、シェアしよう。</h2><p class="modal-lead">友達も、今日からDJ。</p><div id="share"></div></dialog>
+  <dialog id="result-dialog" class="modal result-modal" aria-labelledby="result-title"><div class="modal-header"><span class="eyebrow">THAT WAS YOUR MOMENT.</span><button class="icon-button" data-close aria-label="結果を閉じる"><svg class="icon"><use href="#i-close"/></svg></button></div><span class="result-rank" id="result-rank">A</span><h2 id="result-title">ナイスセット。</h2><p class="modal-lead" id="result-message">もう一度、フロアを揺らそう。</p><div class="result-score"><span class="micro-label">YOUR SCORE</span><strong id="result-score">000000</strong><span id="new-best" hidden>NEW PERSONAL BEST ↗</span></div><div class="result-stats"><div><strong id="result-combo">0</strong><span>MAX COMBO</span></div><div><strong id="result-missions">0 / 5</strong><span>MISSIONS</span></div><div><strong id="result-best">0</strong><span>PERSONAL BEST</span></div></div><button class="primary-button full" id="retry">もう一度、プレイ<svg class="icon"><use href="#i-sync"/></svg></button><button class="secondary-button full" id="back-free">自由にミックスする</button></dialog>
+
+  <noscript><p class="noscript">このゲームで遊ぶには、ブラウザのJavaScriptを有効にしてください。</p></noscript>
+  <script type="module" src="./src/app.js"></script>
+</body>
+</html>
