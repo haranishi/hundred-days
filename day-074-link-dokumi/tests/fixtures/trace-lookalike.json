@@ -1,0 +1,116 @@
+{
+  "v": 1,
+  "ok": true,
+  "requested": "https://www.amazon.co.jp.account-check.example/signin",
+  "hops": [],
+  "final": {
+    "url": "https://www.amazon.co.jp.account-check.example/signin",
+    "host": "www.amazon.co.jp.account-check.example",
+    "scheme": "https",
+    "status": 200,
+    "contentType": "text/html; charset=utf-8",
+    "contentLength": null,
+    "kind": "html",
+    "download": null,
+    "headers": {
+      "server": "nginx",
+      "content-type": "text/html; charset=utf-8"
+    },
+    "cookies": [
+      {
+        "name": "PHPSESSID",
+        "secure": false,
+        "httpOnly": false,
+        "sameSite": null,
+        "hasDomain": false,
+        "path": "/",
+        "persistent": false,
+        "prefix": null
+      }
+    ],
+    "ms": 180,
+    "bytesRead": 18420,
+    "truncated": false
+  },
+  "html": {
+    "title": "Amazonサインイン",
+    "h1": "ログイン",
+    "siteName": null,
+    "lang": "ja",
+    "generator": null,
+    "textSample": "Amazonアカウントの確認が必要です。24時間以内にログインしてください。",
+    "metaRefresh": null,
+    "baseHref": null,
+    "forms": [
+      {
+        "method": "post",
+        "action": "https://collect-1337.example/post.php",
+        "actionHost": "collect-1337.example",
+        "hasPassword": true,
+        "hasEmail": true,
+        "hasCardLike": false,
+        "hasFileUpload": false,
+        "fieldCount": 3,
+        "hidden": 2
+      }
+    ],
+    "passwordFields": 1,
+    "scripts": {
+      "total": 3,
+      "inline": 2,
+      "external": [
+        {
+          "src": "https://cdn.example/jq.js",
+          "host": "cdn.example",
+          "scheme": "https",
+          "sri": false,
+          "async": false,
+          "defer": false,
+          "module": false
+        }
+      ]
+    },
+    "styles": {
+      "total": 0,
+      "inline": 0,
+      "external": []
+    },
+    "iframes": [
+      {
+        "src": "https://trk.example/p",
+        "host": "trk.example",
+        "scheme": "https",
+        "hidden": true,
+        "sandbox": false
+      }
+    ],
+    "images": {
+      "total": 4,
+      "http": 0
+    },
+    "links": {
+      "total": 5,
+      "external": 2,
+      "externalHosts": [
+        "www.amazon.co.jp"
+      ],
+      "http": 0
+    },
+    "signals": {
+      "directoryListing": false,
+      "defaultPage": null,
+      "errorDisclosure": null,
+      "obfuscation": [
+        "eval-atob"
+      ],
+      "autoSubmit": false,
+      "noindex": true,
+      "metaReferrer": null,
+      "metaCsp": false
+    },
+    "truncated": false
+  },
+  "error": null,
+  "notes": [],
+  "elapsedMs": 420
+}

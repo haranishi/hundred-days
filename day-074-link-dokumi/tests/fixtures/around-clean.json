@@ -1,0 +1,51 @@
+{
+  "v": 1,
+  "host": "www.well-kept.example",
+  "registrable": "well-kept.example",
+  "scheme": "https",
+  "dns": {
+    "a": [
+      "203.0.113.10"
+    ],
+    "aaaa": [],
+    "resolvedPublic": true,
+    "dnssec": true,
+    "caa": true,
+    "mx": true,
+    "spf": {
+      "present": true,
+      "all": "-all",
+      "value": "v=spf1 include:_spf.mail.example -all"
+    },
+    "dmarc": {
+      "present": true,
+      "policy": "reject",
+      "value": "v=DMARC1; p=reject; rua=mailto:dmarc@well-kept.example"
+    }
+  },
+  "rdap": {
+    "registeredAt": "2009-03-12T00:00:00Z",
+    "expiresAt": "2027-03-12T00:00:00Z",
+    "ageDays": 6400,
+    "registrar": "Example Registrar",
+    "source": "verisign"
+  },
+  "httpProbe": {
+    "tested": true,
+    "status": 301,
+    "location": "https://www.well-kept.example/",
+    "upgradesToHttps": true
+  },
+  "httpsProbe": {
+    "tested": false
+  },
+  "securityTxt": {
+    "found": true,
+    "status": 200,
+    "hasContact": true,
+    "expires": "2027-06-30T00:00:00Z",
+    "expired": false
+  },
+  "error": null,
+  "elapsedMs": 610
+}

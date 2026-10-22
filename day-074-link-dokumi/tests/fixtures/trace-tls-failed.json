@@ -1,0 +1,16 @@
+{
+  "v": 1,
+  "ok": false,
+  "requested": "https://expired.example/",
+  "hops": [],
+  "final": null,
+  "html": null,
+  "error": {
+    "code": "tls_failed",
+    "stage": "tls",
+    "host": "expired.example",
+    "detail": null
+  },
+  "notes": [],
+  "elapsedMs": 420
+}

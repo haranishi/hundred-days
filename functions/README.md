@@ -14,5 +14,6 @@
 | 029 | [ちかくのWi-Fi](../day-029-nearby-wifi/) | [place.js](api/day-029/place.js) |
 | 030 | [せかいのまど](../day-030-world-window/) | [windy.js](api/day-030/windy.js) |
 | 035 | [きょうの一面](../day-035-front-page/) | [page.js](api/day-035/page.js) |
+| 074 | [リンクの毒見](../day-074-link-dokumi/) | [trace.js](api/day-074/trace.js)・[around.js](api/day-074/around.js) |
 
 共通の配信設定は [scripts/build.mjs](../scripts/build.mjs)、ブラウザテストは [tests/e2e/](../tests/e2e/) にあります。

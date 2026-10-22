@@ -1,0 +1,16 @@
+{
+  "v": 1,
+  "ok": false,
+  "requested": "http://169.254.169.254/latest/meta-data/",
+  "hops": [],
+  "final": null,
+  "html": null,
+  "error": {
+    "code": "blocked_target",
+    "stage": "validate",
+    "host": null,
+    "detail": "metadata"
+  },
+  "notes": [],
+  "elapsedMs": 420
+}

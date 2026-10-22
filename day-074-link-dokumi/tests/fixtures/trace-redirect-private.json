@@ -1,0 +1,24 @@
+{
+  "v": 1,
+  "ok": false,
+  "requested": "https://redirector.example/go",
+  "hops": [
+    {
+      "url": "https://redirector.example/go",
+      "host": "redirector.example",
+      "status": 302,
+      "location": "http://127.0.0.1/admin",
+      "ms": 70
+    }
+  ],
+  "final": null,
+  "html": null,
+  "error": {
+    "code": "blocked_redirect",
+    "stage": "redirect",
+    "host": null,
+    "detail": "private"
+  },
+  "notes": [],
+  "elapsedMs": 420
+}

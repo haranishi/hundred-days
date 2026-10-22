@@ -1,0 +1,80 @@
+{
+  "v": 1,
+  "ok": true,
+  "requested": "https://bit.ly/3xYzAb",
+  "hops": [
+    {
+      "url": "https://bit.ly/3xYzAb",
+      "host": "bit.ly",
+      "status": 301,
+      "location": "https://www.news-site.example/campaign?utm_source=sms",
+      "ms": 90
+    }
+  ],
+  "final": {
+    "url": "https://www.news-site.example/campaign?utm_source=sms",
+    "host": "www.news-site.example",
+    "scheme": "https",
+    "status": 200,
+    "contentType": "text/html; charset=utf-8",
+    "contentLength": null,
+    "kind": "html",
+    "download": null,
+    "headers": {
+      "strict-transport-security": "max-age=31536000",
+      "content-type": "text/html; charset=utf-8",
+      "server": "nginx"
+    },
+    "cookies": [],
+    "ms": 180,
+    "bytesRead": 18420,
+    "truncated": false
+  },
+  "html": {
+    "title": "秋のキャンペーン",
+    "h1": "秋のキャンペーン",
+    "siteName": null,
+    "lang": "ja",
+    "generator": null,
+    "textSample": "期間限定のお知らせ",
+    "metaRefresh": null,
+    "baseHref": null,
+    "forms": [],
+    "passwordFields": 0,
+    "scripts": {
+      "total": 0,
+      "inline": 0,
+      "external": []
+    },
+    "styles": {
+      "total": 0,
+      "inline": 0,
+      "external": []
+    },
+    "iframes": [],
+    "images": {
+      "total": 3,
+      "http": 0
+    },
+    "links": {
+      "total": 6,
+      "external": 0,
+      "externalHosts": [],
+      "http": 0
+    },
+    "signals": {
+      "directoryListing": false,
+      "defaultPage": null,
+      "errorDisclosure": null,
+      "obfuscation": [],
+      "autoSubmit": false,
+      "noindex": false,
+      "metaReferrer": null,
+      "metaCsp": false
+    },
+    "truncated": false
+  },
+  "error": null,
+  "notes": [],
+  "elapsedMs": 420
+}

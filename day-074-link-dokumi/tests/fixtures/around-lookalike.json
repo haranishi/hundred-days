@@ -1,0 +1,51 @@
+{
+  "v": 1,
+  "host": "www.amazon.co.jp.account-check.example",
+  "registrable": "account-check.example",
+  "scheme": "https",
+  "dns": {
+    "a": [
+      "198.51.100.7"
+    ],
+    "aaaa": [],
+    "resolvedPublic": true,
+    "dnssec": false,
+    "caa": false,
+    "mx": false,
+    "spf": {
+      "present": false,
+      "all": null,
+      "value": null
+    },
+    "dmarc": {
+      "present": false,
+      "policy": null,
+      "value": null
+    }
+  },
+  "rdap": {
+    "registeredAt": "2026-10-19T00:00:00Z",
+    "expiresAt": "2027-10-19T00:00:00Z",
+    "ageDays": 3,
+    "registrar": "Cheap Registrar",
+    "source": "rdap.org"
+  },
+  "httpProbe": {
+    "tested": true,
+    "status": 200,
+    "location": null,
+    "upgradesToHttps": false
+  },
+  "httpsProbe": {
+    "tested": false
+  },
+  "securityTxt": {
+    "found": false,
+    "status": 404,
+    "hasContact": false,
+    "expires": null,
+    "expired": false
+  },
+  "error": null,
+  "elapsedMs": 540
+}
