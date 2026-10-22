@@ -1,0 +1,16 @@
+{"name":"non-public-ipv6-accepted","address":"fec0::1","targets":0,"ok":false}
+{"name":"non-public-ipv6-accepted","address":"::ffff:0:7f00:1","targets":0,"ok":false}
+{"name":"non-public-ipv6-accepted","address":"2001:2::1","targets":0,"ok":false}
+{"name":"non-public-ipv6-accepted","address":"100:0:0:1::1","targets":0,"ok":false}
+{"name":"non-public-ipv6-accepted","address":"4000::1","targets":0,"ok":false}
+{"name":"json-unbounded","fn":"doh","emitted":147456,"success":false}
+{"name":"json-unbounded","fn":"rdap","emitted":270336,"success":false}
+{"name":"large-base-cpu","baseLength":4000,"htmlBytes":31033,"medianMs":2.408}
+{"name":"large-base-cpu","baseLength":16000,"htmlBytes":43033,"medianMs":1.574}
+{"name":"large-base-cpu","baseLength":32000,"htmlBytes":59033,"medianMs":1.649}
+{"name":"cache-freshness-reset","ageSeconds":299,"cacheControl":"no-store","age":null}
+{"name":"bidi-survives","title":"\"Invoicegpj.exe\""}
+{"name":"body-excerpt-returned","textSample":"BODY_ONLY_MARKER_12345"}
+{"name":"rdap-redirect-mode","redirectMode":"manual","actualRedirectFollowed":false}
+{"name":"positive-boundaries","passed":true}
+{"name":"query-default","passed":true,"scope":"parseInput only; app.js reviewed separately in review-2"}

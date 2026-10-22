@@ -1,0 +1,19 @@
+- sanitize.js: 制御文字除去・文字数上限・ホスト/方式の抽出を実装。
+- target-guard.js: URLと自己参照の検査、IPv4/IPv6の公開範囲検査を実装。
+- cookies.js: Cookieの値を捨て、名前と属性のみ抽出。
+- doh.js: A/AAAAの並列検査、リゾルバ代替、SPF/DMARC/CAA/MX抽出。
+- rdap.js: 登録イベントとレジストラだけ抽出、取得不能の理由を分類。
+- html-facts.js: 文字位置を進めるHTML走査と文字コード判定、所定の事実/兆候抽出を実装。
+- observe.js: DNS検査つき転送、時間/本文/JSON上限、周辺の並列観測を実装。
+- handlers.js: 同一生成元/停止/必須値、IPハッシュのレート制限、URL/RDAPの期限つきキャッシュを実装。
+- functions/api/day-074/trace.js: 薄いPages入口を実装。
+- functions/api/day-074/around.js: 薄いPages入口を実装。
+- observer-guard/html試験: 攻撃URL、IP境界、変異、HTML抽出・上限・160KiB時間、文字コードを登録。
+- observer-network試験: DNS・転送拒否・本文/時間上限・取得URLの種類・RDAPとaroundを登録。
+- observer-handlers試験: 13回制限/並行呼出し/期限/キャッシュ/漏洩防止/Pages入口を登録。
+- observer-guard.test.mjs: 攻撃URL52本の未接続、拒否9種の変異検出、IPv4全15範囲とIPv6境界を確認。
+- observer-html.test.mjs: 160KiBの3文書、上限、文字コード、Cookie属性抽出が合格。
+- observer-network.test.mjs: NFKC区切り、64KiB JSON、DNS SERVFAILの不明扱い、HTTPSの403到達も回帰確認。
+- observer-handlers.test.mjs / observer.index.mjs: 全試験を入口に登録。B担当132件合格。
+- 最終検証: node --test day-074-link-dokumi/tests/ は487件全合格、担当15ファイルの構文検査合格。
+- 初回の他担当V-REDIRECT-PARAM文言試験失敗は、他担当の修正が反映された最終実行で解消。Bからは変更していない。
