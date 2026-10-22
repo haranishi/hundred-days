@@ -150,8 +150,9 @@ test.describe('Day74 リンクの毒見', () => {
       await page.setViewportSize({ width, height: 900 });
       await open(page);
       const [main, side, axes] = [await box('.intake__main'), await box('.intake__side'), await box('#axes')];
-      // 上の段の左右の下端の差は120px以内。2つの見方は上の段の下で、両方の列にまたがる
-      expect(Math.abs(main.bottom - side.bottom), `${width}px：左右の列の下端の差`).toBeLessThanOrEqual(120);
+      // 上の段の左右の下端の差が大きすぎない（以前は一方の列の横に約490pxの空白ができた）。フォントで行数が変わり、
+      // CIのLinuxでは1040pxで160pxになるので、基準は240px。2つの見方は上の段の下で、両方の列にまたがる
+      expect(Math.abs(main.bottom - side.bottom), `${width}px：左右の列の下端の差`).toBeLessThanOrEqual(240);
       expect(axes.top).toBeGreaterThanOrEqual(Math.max(main.bottom, side.bottom));
       const cards = await page.locator('#axes .axis-card').evaluateAll((nodes) => nodes.map((node) => Math.round(node.getBoundingClientRect().left)));
       expect(cards, `${width}px：2つの見方が列にそろっていない`).toEqual([main.left, side.left]);
