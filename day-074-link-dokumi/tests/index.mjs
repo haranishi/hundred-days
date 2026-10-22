@@ -1,0 +1,9 @@
+// 担当ごとに入口を分ける（同時に編集しても衝突しないように）。ここに登録されないテストは走らない。
+import './contract.test.mjs';
+import './psl.test.mjs';
+import './address.index.mjs';
+import './judge.index.mjs';
+import './observer.index.mjs';
+import './integration.test.mjs';
+import './integration-review.test.mjs';
+import './real-fixtures.test.mjs';

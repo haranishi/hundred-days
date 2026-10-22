@@ -1,0 +1,240 @@
+[
+ {
+  "url": "https://amazon-co-jp.verify-account.top/",
+  "before": {
+   "level": "warn",
+   "points": 9
+  }
+ },
+ {
+  "url": "https://www.amazon.co.jp.account-check.xyz/",
+  "before": {
+   "level": "danger",
+   "points": 18
+  }
+ },
+ {
+  "url": "https://smbc-card.com.login-secure.example/",
+  "before": {
+   "level": "danger",
+   "points": 18
+  }
+ },
+ {
+  "url": "https://rakuten-card-login.cn/",
+  "before": {
+   "level": "warn",
+   "points": 7
+  }
+ },
+ {
+  "url": "https://kuronekoyamato-redelivery.top/",
+  "before": {
+   "level": "warn",
+   "points": 9
+  }
+ },
+ {
+  "url": "https://apple-id-locked.icu/",
+  "before": {
+   "level": "note",
+   "points": 5
+  }
+ },
+ {
+  "url": "https://paypay-bank.co.jp.verify.example/",
+  "before": {
+   "level": "danger",
+   "points": 16
+  }
+ },
+ {
+  "url": "https://xn--mazon-3ve.co.jp/",
+  "before": {
+   "level": "danger",
+   "points": 16
+  }
+ },
+ {
+  "url": "https://amazon.co.jp@evil.example/",
+  "before": {
+   "level": "danger",
+   "points": 9
+  }
+ },
+ {
+  "url": "http://203.0.113.5/login",
+  "before": {
+   "level": "warn",
+   "points": 8
+  }
+ },
+ {
+  "url": "https://vpass-member-verify.com/",
+  "before": {
+   "level": "warn",
+   "points": 7
+  }
+ },
+ {
+  "url": "https://myjcb-secure-verify.top/",
+  "before": {
+   "level": "warn",
+   "points": 9
+  }
+ },
+ {
+  "url": "https://etc-meisai.jp.payment-check.top/",
+  "before": {
+   "level": "danger",
+   "points": 16
+  }
+ },
+ {
+  "url": "https://d-account-authentication.icu/",
+  "before": {
+   "level": "warn",
+   "points": 8
+  }
+ },
+ {
+  "url": "https://e-navi-rakuten-card.icu/",
+  "before": {
+   "level": "warn",
+   "points": 7
+  }
+ },
+ {
+  "url": "https://e-tax-refund-confirm.top/",
+  "before": {
+   "level": "note",
+   "points": 4
+  }
+ },
+ {
+  "url": "https://saison-netanswer-verify.icu/",
+  "before": {
+   "level": "warn",
+   "points": 8
+  }
+ },
+ {
+  "url": "https://aeon-card-auth.icu/",
+  "before": {
+   "level": "note",
+   "points": 5
+  }
+ },
+ {
+  "url": "https://eposcard-secure-login.top/",
+  "before": {
+   "level": "warn",
+   "points": 9
+  }
+ },
+ {
+  "url": "https://eki-net-payment-update.icu/",
+  "before": {
+   "level": "danger",
+   "points": 12
+  }
+ },
+ {
+  "url": "https://mynumber-card-update.icu/",
+  "before": {
+   "level": "warn",
+   "points": 8
+  }
+ },
+ {
+  "url": "https://tepco-payment-verify.icu/",
+  "before": {
+   "level": "danger",
+   "points": 10
+  }
+ },
+ {
+  "url": "https://jp-bank-login-confirm.top/",
+  "before": {
+   "level": "danger",
+   "points": 11
+  }
+ },
+ {
+  "url": "https://softbank-billing-verify.icu/",
+  "before": {
+   "level": "danger",
+   "points": 10
+  }
+ },
+ {
+  "url": "https://netflix-payment-update.icu/",
+  "before": {
+   "level": "danger",
+   "points": 10
+  }
+ },
+ {
+  "url": "https://microsoft-security-verify.icu/",
+  "before": {
+   "level": "danger",
+   "points": 10
+  }
+ },
+ {
+  "url": "https://secure-paypay.pages.dev/login",
+  "before": {
+   "level": "warn",
+   "points": 9
+  }
+ },
+ {
+  "url": "https://apple-login.vercel.app/",
+  "before": {
+   "level": "warn",
+   "points": 7
+  }
+ },
+ {
+  "url": "https://amazon.netlify.app/login",
+  "before": {
+   "level": "warn",
+   "points": 7
+  }
+ },
+ {
+  "url": "https://google-account.web.app/verify",
+  "before": {
+   "level": "warn",
+   "points": 9
+  }
+ },
+ {
+  "url": "https://bank-login.sakura.ne.jp/",
+  "before": {
+   "level": "unknown",
+   "points": 0
+  }
+ },
+ {
+  "url": "https://аpple.icu/",
+  "before": {
+   "level": "danger",
+   "points": 17
+  }
+ },
+ {
+  "url": "https://random.top/amazon/login",
+  "before": {
+   "level": "note",
+   "points": 5
+  }
+ },
+ {
+  "url": "https://smbc-vpass.top/",
+  "before": {
+   "level": "note",
+   "points": 4
+  }
+ }
+]

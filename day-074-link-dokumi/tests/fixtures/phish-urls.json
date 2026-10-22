@@ -1,0 +1,143 @@
+[
+  {
+    "url": "https://www.amazon.co.jp.account-check.xyz/signin",
+    "expect": {
+      "subdomain": "amazon"
+    }
+  },
+  {
+    "url": "https://amazon-co-jp.verify-account.top/login",
+    "expect": {
+      "keyword": "amazon"
+    }
+  },
+  {
+    "url": "https://arnazon.co.jp/ap/signin",
+    "expect": {
+      "typo": "amazon"
+    }
+  },
+  {
+    "url": "https://amaz0n.co.jp/",
+    "expect": {
+      "typo": "amazon"
+    }
+  },
+  {
+    "url": "https://amazon.co.jp@evil-host.example/",
+    "expect": {
+      "hasUserinfo": true,
+      "userinfoLooksLikeHost": true
+    }
+  },
+  {
+    "url": "https://smbc-card.com.login-secure.example/vpass",
+    "expect": {
+      "subdomain": "smbc_card"
+    }
+  },
+  {
+    "url": "https://rakuten-card-login.cn/",
+    "expect": {
+      "keyword": "rakuten",
+      "keywordCount": 1
+    }
+  },
+  {
+    "url": "https://kuronekoyamato-redelivery.top/abc",
+    "expect": {
+      "keyword": "yamato"
+    }
+  },
+  {
+    "url": "https://yamato-redelivery.top/abc",
+    "expect": {
+      "keyword": "yamato"
+    }
+  },
+  {
+    "url": "https://apple-id-locked.icu/verify",
+    "expect": {
+      "keyword": "apple",
+      "tldRisky": true
+    }
+  },
+  {
+    "url": "https://appleid.apple.com.verify-id.example/",
+    "expect": {
+      "subdomain": "apple"
+    }
+  },
+  {
+    "url": "https://paypay-bank.co.jp.verify.example/",
+    "expect": {
+      "subdomain": "paypay"
+    }
+  },
+  {
+    "url": "https://xn--mazon-3ve.co.jp/",
+    "expect": {
+      "typo": "amazon",
+      "mixedScript": true
+    }
+  },
+  {
+    "url": "http://203.0.113.5/login",
+    "expect": {
+      "isIpHost": true
+    }
+  },
+  {
+    "url": "https://www.mufg.jp.cn/login",
+    "expect": {
+      "subdomain": "mufg"
+    }
+  },
+  {
+    "url": "https://sagawa-exp.co.jp.kakunin.top/",
+    "expect": {
+      "subdomain": "sagawa"
+    }
+  },
+  {
+    "url": "https://nta-gojp.com/etax",
+    "expect": {
+      "keyword": "nta",
+      "where": "path"
+    }
+  },
+  {
+    "url": "https://e-tax.nta.go.jp.refund-check.xyz/",
+    "expect": {
+      "subdomain": "nta"
+    }
+  },
+  {
+    "url": "https://secure-paypay.pages.dev/login",
+    "expect": {
+      "keyword": "paypay",
+      "freeHost": true
+    }
+  },
+  {
+    "url": "https://login-rakuten.vercel.app/",
+    "expect": {
+      "keyword": "rakuten",
+      "freeHost": true
+    }
+  },
+  {
+    "url": "https://amazon.netlify.app/",
+    "expect": {
+      "keyword": "amazon",
+      "freeHost": true
+    }
+  },
+  {
+    "url": "https://evil.sharepoint.com/",
+    "expect": {
+      "userContentHost": true,
+      "official": null
+    }
+  }
+]

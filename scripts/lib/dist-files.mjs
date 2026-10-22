@@ -25,7 +25,9 @@ export const SOURCE_DIRS_BY_APP = {
   // day-066 は素のJSをそのまま配信する。tools/ は宣伝動画の道具で、配信には要らない
   'day-066-hakokage-kaito': ['tools'],
   // day-060 は素のJSをそのまま配信する（source は無い）。tools/ はデータの作り直し・解説の検査・宣伝動画の道具で、配信には要らない
-  'day-060-prize-explained': ['tools']
+  'day-060-prize-explained': ['tools'],
+  // day-074 の tools/ は、観測APIを実在のサイトで確かめる検証の道具（api-check.mjs）。配信には要らない
+  'day-074-link-dokumi': ['tools']
 };
 
 /** Dayのフォルダからの相対パス（/ 区切り。'' はフォルダそのもの）が、dist/ に配信されるか */
