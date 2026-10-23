@@ -74,7 +74,8 @@
           </button>
         </div>
         <p id="input-help" class="intake__help">届いたメッセージを丸ごと貼っても、最初のリンクを取り出して調べます。</p>
-        <textarea id="url-input" name="url" rows="3" maxlength="20000" autocapitalize="off" autocomplete="off" spellcheck="false" inputmode="url" aria-describedby="input-help input-preview input-error keys-hint" placeholder="ここにリンクを貼り付け"></textarea>
+        <p id="input-caveat" class="intake__help"><strong>診断結果は判断の目安です。</strong>兆候が見つからなくても安全とは限らず、見つかっても危険なサイトとは断定できません。</p>
+        <textarea id="url-input" name="url" rows="3" maxlength="20000" autocapitalize="off" autocomplete="off" spellcheck="false" inputmode="url" aria-describedby="input-help input-caveat input-preview input-error keys-hint" placeholder="ここにリンクを貼り付け"></textarea>
         <p id="input-preview" class="intake__preview" hidden></p>
         <p id="input-error" class="intake__error" hidden></p>
         <div class="intake__actions">
@@ -226,6 +227,7 @@
             <p id="verdict-caveat" class="verdict__caveat" hidden>見つからなかったことは、安全の保証ではありません。</p>
           </div>
           <p id="verdict-summary" class="verdict__summary"></p>
+          <p id="result-caveat" class="verdict__summary"><strong>診断結果は判断の目安です。</strong>兆候が見つからなくても安全とは限らず、見つかっても危険なサイトとは断定できません。</p>
           <div id="verdict-fetch" class="verdict__fetch" hidden>
             <p id="verdict-fetch-title" class="verdict__fetch-title"></p>
             <p id="verdict-fetch-body" class="verdict__fetch-body" hidden></p>
