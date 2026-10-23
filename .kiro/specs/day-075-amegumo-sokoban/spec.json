@@ -24,7 +24,15 @@
       768,
       1440
     ],
-    "security": "independent PASS; no required fixes"
+    "security": "independent PASS; no required fixes",
+    "gitleaks": {
+      "reviewed_false_positives": 2,
+      "exact_fingerprint_exceptions": 2,
+      "local_findings_after": 0,
+      "negative_control": "detected"
+    },
+    "existing_dependency_alerts": "41 API-open alerts matched already-patched lock versions; no Day75 path"
   },
-  "release_tracking": "PR state, exact-head CI, main deployment, and live URL observations are authoritative for the external release steps."
+  "release_tracking": "PR state, exact-head CI, main deployment, and live URL observations are authoritative for the external release steps.",
+  "release_merge_method": "merge (retain the introducing commit fingerprints)"
 }

@@ -57,3 +57,17 @@
 
 rootによる全変更ファイル全文・紹介画像の目視、ゲーム評価、全体CI/PRの同一head確認は別工程。
 本監査のPASSはそれらの完了や本番への攻撃試験を意味しない。
+
+## CIの識別名誤検知
+初回PR CIのgeneric-api-keyは、認証情報ではない公開localStorage名を2箇所で検知した。
+.gitleaksignoreは導入コミット・ファイル・規則・行を固定した正確な2 fingerprintだけ。全ファイル/規則の除外はしない。
+ローカルGitleaks 8.30.1で同じ差分履歴を走査し、変更前2件→変更後0件。
+同じ公開値を別findingとしてstdinへ与える対照ではgeneric-api-keyが引き続き検知した。
+[公式のfingerprint仕様](https://github.com/gitleaks/gitleaks/blob/master/README.md#gitleaksignore)に従い、通常mergeで導入SHAを保持する。
+
+## 既存依存アラートの照合
+GitHub表示のopen 41件はDay056/058/059/061/064のsource内development依存だけだった。
+現在のlockは既存修正dac06baを引き継ぎ、vite 8.3.3、@vitest/mocker 5.0.3、source-map-js 1.2.2で、41件ともAPI記載の修正版と一致。
+rootのnpm ci対象はPlaywrightのみ、共通ビルドはコピー、各sourceは非配信。Day75のimportにも到達経路なし。
+既存専用workflowは今回の変更で起動しない。アラート表示と現在のlock内容を分け、アラートを手動dismissして安全に見せる操作は行っていない。
+この到達性と2 fingerprint限定の対応も、移植担当と別の読み取り点検で確認した。
