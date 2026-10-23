@@ -1,0 +1,25 @@
+/* Four small chapters in the existing gardener's notebook. */
+.campaign-heading{display:flex;justify-content:space-between;gap:12px;margin:15px 0 8px;font-size:11px;color:var(--ink-soft)}
+.chapter-tabs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;margin-top:16px}
+.chapter-button{display:flex;align-items:center;gap:9px;min-height:47px;padding:7px 11px;border:1px solid #b3bba4;border-radius:4px 13px 4px 4px;background:transparent;text-align:left;font-size:12px}
+.chapter-number{font:18px Georgia,serif;color:#7c8e71}
+.chapter-button[aria-current="true"]{background:#e1e7cf;border-color:#718c6b;color:#244e42}
+.chapter-button[aria-current="true"] .chapter-number{color:#526d49}
+.chapter-button:hover{background:#e5e8d5}
+#chapter-theme{margin:8px 0 0;font-size:12px;color:var(--ink-soft);font-family:var(--serif);letter-spacing:.05em}
+#level-tabs{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;margin:15px 0 20px}
+#level-tabs .level-tab{position:relative;display:grid;place-items:center;min-width:0;min-height:46px;padding:5px;border-radius:18px 18px 3px 3px;font-size:15px}
+#level-tabs .level-tab .tab-achieved{position:absolute;right:1px;top:-6px;display:grid;place-items:center;width:17px;height:17px;border-radius:50%;background:var(--paper);color:#6c895b}
+.level-tab .tab-achieved .tab-blossom{width:16px;height:16px}
+.campaign-target{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:11px;color:var(--ink-soft);padding:7px 0 10px;border-bottom:1px dashed var(--line);margin:0}
+.campaign-target strong{font:17px Georgia,var(--serif);color:var(--ink)}
+.mechanic-legend{margin:0 4px 13px;padding:10px 12px;border:1px solid #b5c1a7;border-radius:4px 14px 4px 4px;background:#e9eddc}
+.mechanic-legend[hidden]{display:none}
+.mechanic-legend p{display:flex;align-items:center;gap:10px;margin:0;font-size:11px;line-height:1.75}
+.mechanic-legend p+p{margin-top:6px;padding-top:6px;border-top:1px dashed #b8c3ac}
+.mechanic-legend strong{font-weight:600;margin-right:4px}
+.mechanic-legend small{white-space:nowrap;margin-left:7px;color:#537263;font-size:10px}
+.mechanic-mark{display:grid;place-items:center;flex-shrink:0;width:27px;height:27px;border:1px solid;border-radius:50%;font-size:13px;line-height:1}
+.mark-ledge{color:#826443;background:#f0e5c9}.mark-dew{color:#3c797e;background:#dae9df}.mark-portal{color:#657894;background:#e0e2e9}
+@media(max-width:760px){.chapter-tabs{margin-top:13px}.campaign-heading{font-size:12px}#chapter-theme{font-size:13px}.chapter-button{min-height:47px;font-size:13px}.campaign-target{font-size:12px}.mechanic-legend{margin:0 2px 12px}.mechanic-legend p{font-size:11px}.garden-section{scroll-margin-top:14px}}
+@media(min-width:761px) and (max-width:900px){.chapter-button{font-size:11px;padding:6px 8px}.chapter-number{font-size:16px}.mechanic-legend{padding:8px}.mechanic-legend p{gap:6px;font-size:10px}.mechanic-mark{width:24px;height:24px}}

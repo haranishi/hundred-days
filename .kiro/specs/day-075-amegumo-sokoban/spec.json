@@ -1,0 +1,30 @@
+{
+  "feature_name": "day-075-amegumo-sokoban",
+  "language": "ja",
+  "phase": "local-verified",
+  "approvals": {
+    "requirements": true,
+    "design": true,
+    "tasks": true
+  },
+  "approval_basis": "本人のDay75登録・セキュリティ確認・PR作成・マージの明示依頼。自律実行で進める。",
+  "verification": {
+    "day_unit": 138,
+    "repository_unit_pass": 4905,
+    "repository_unit_skip": 1,
+    "publish_gate": 298,
+    "day_e2e": 11,
+    "browsers": [
+      "Chromium",
+      "WebKit"
+    ],
+    "levels": 20,
+    "widths": [
+      390,
+      768,
+      1440
+    ],
+    "security": "independent PASS; no required fixes"
+  },
+  "release_tracking": "PR state, exact-head CI, main deployment, and live URL observations are authoritative for the external release steps."
+}

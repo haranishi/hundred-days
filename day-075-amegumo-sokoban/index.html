@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f4f1df">
+  <meta name="description" content="雲を押して、畑にちょうどの雨を。ひと雨ずつ庭を育てる、仕掛けを巡る20面の倉庫番パズル。スマホとPCで遊べます。">
+  <link rel="canonical" href="https://hundred-days.pages.dev/day-075-amegumo-sokoban/">
+  <meta property="og:url" content="https://hundred-days.pages.dev/day-075-amegumo-sokoban/">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="雨雲倉庫番 — ひと雨ずつ、庭をほどく。">
+  <meta property="og:description" content="雲を押して、畑にちょうどの雨を。ひと雨ずつ庭を育てる、仕掛けを巡る20面の倉庫番パズル。">
+  <meta property="og:image" content="https://hundred-days.pages.dev/day-075-amegumo-sokoban/og.png">
+  <meta name="share:text" content="雨雲倉庫番 — ひと雨ずつ、庭をほどく。 石段・雨玉・風穴をめぐる20面のパズル。">
+  <title>雨雲倉庫番 — ひと雨ずつ、庭をほどく。</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="shared/share.css">
+  <link rel="stylesheet" href="app.css">
+  <link rel="stylesheet" href="motion.css">
+  <link rel="stylesheet" href="guide.css">
+  <link rel="stylesheet" href="audio.css">
+  <link rel="stylesheet" href="campaign.css">
+  <script defer src="shared/share.js"></script>
+  <script type="module" src="app.js"></script>
+</head>
+<body>
+  <svg class="icon-definitions" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <defs>
+      <symbol id="icon-cloud" viewBox="0 0 48 48"><path d="M12 29C2 28 3 16 12 15c2-12 20-12 23 0 12-1 14 15 3 15H12Z" fill="currentColor" opacity=".12"/><path d="M12 29C2 28 3 16 12 15c2-12 20-12 23 0 12-1 14 15 3 15H12Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="m17 35-2 5m11-5-2 5m11-5-2 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+      <symbol id="icon-sprout" viewBox="0 0 48 48"><path d="M24 38V23M24 27C12 28 8 20 10 13c12 0 16 6 14 14ZM24 23c1-12 8-16 16-14 0 10-6 16-16 14Z" fill="currentColor" opacity=".17"/><path d="M24 38V23M24 27C12 28 8 20 10 13c12 0 16 6 14 14ZM24 23c1-12 8-16 16-14 0 10-6 16-16 14ZM8 40h32" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+      <symbol id="icon-gardener" viewBox="0 0 48 48"><path d="M15 20h18l2 23H13Z" fill="currentColor" opacity=".16"/><path d="M14 14c0-9 20-9 20 0M9 15h30M16 18a8 8 0 0 0 16 0M19 28h10l5 13H14l5-13ZM24 30v9" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+      <symbol id="icon-arrow" viewBox="0 0 24 24"><path d="M12 19V5m-6 6 6-6 6 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+      <symbol id="icon-undo" viewBox="0 0 24 24"><path d="M8 5 3 10l5 5M3 10h10a6 6 0 0 1 0 12" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" transform="translate(0 -2)"/></symbol>
+      <symbol id="icon-reset" viewBox="0 0 24 24"><path d="M20 9a8 8 0 1 0 0 6M20 4v5h-5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+      <symbol id="icon-share" viewBox="0 0 24 24"><path d="M12 15V3m-4 4 4-4 4 4M7 11H4v10h16V11h-3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+      <symbol id="icon-close" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></symbol>
+      <symbol id="icon-drop" viewBox="0 0 24 24"><path d="M12 3S5 11 5 15a7 7 0 0 0 14 0c0-4-7-12-7-12Z" fill="currentColor"/></symbol>
+    </defs>
+  </svg>
+  <a class="skip-link" href="#garden">庭へ移動する</a>
+  <header class="site-header">
+    <a class="wordmark" href="./" aria-label="雨雲倉庫番 ホーム"><svg aria-hidden="true" viewBox="0 0 48 48"><use href="#icon-cloud"/></svg><span>雨雲倉庫番<span class="wordmark-reading">あめぐも そうこばん</span></span></a>
+    <p class="header-note">小さな雲と、考えるひととき。</p>
+    <nav class="header-actions" aria-label="ゲームの案内">
+      <button id="help-button" class="text-button" type="button"><span class="question-mark" aria-hidden="true">?</span><span>遊びかた</span></button>
+      <button id="share-button" class="icon-button" type="button" aria-label="このアプリを共有する"><svg aria-hidden="true" viewBox="0 0 24 24"><use href="#icon-share"/></svg></button>
+    </nav>
+  </header>
+  <main class="play-layout">
+    <section class="notebook" aria-labelledby="main-title">
+      <div class="notebook-intro">
+        <p class="eyebrow"><span></span> 雲を押して、雨を配るパズル</p>
+        <h1 id="main-title">ひと雨ずつ、<br><span>庭をほどく。</span></h1>
+        <p class="intro-text">小さな雲を、そっとひと押し。<br>乾いた畑に、ちょうどの雨を。</p>
+        <svg class="intro-drawing" viewBox="0 0 180 74" aria-hidden="true"><path d="M6 61c39-9 62 7 95-3s41-3 72-8" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><path d="m110 54-4-29 27-4 5 29-28 4ZM106 30l-13-7-6 8 21 11m26-16c22-7 25 14 3 17M113 18l-2-8 15-2 2 8" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="m83 37-3 5m7 0-3 5m-7-12-3 5M42 60V42m0 9c-12-1-14-9-13-13 10 0 14 6 13 13Zm0-8c0-10 7-15 14-13-1 9-7 15-14 13Z" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div class="field-notes">
+        <div class="section-label"><span>庭の手帖</span><span class="label-line"></span><span>全二十景</span></div>
+        <nav id="chapter-tabs" class="chapter-tabs" aria-label="庭の章を選ぶ"></nav>
+        <div class="campaign-heading"><span id="campaign-progress">育った庭 0 / 20</span><span id="chapter-progress">この章 0 / 5</span></div>
+        <p id="chapter-theme"></p>
+        <nav id="level-tabs" class="level-tabs" aria-label="遊ぶ庭を選ぶ"></nav>
+        <div class="level-heading"><span id="level-kicker" class="level-kicker">第一景</span><h2 id="level-name">はじめての雨</h2></div>
+        <p id="level-story" class="level-story">雨を待つ畑へ、雲を運びましょう。</p>
+        <div class="best-record"><span>この庭の最少手数</span><span><strong id="best">—</strong><span class="record-unit">手</span></span></div>
+        <p class="campaign-target"><span>最短の目標</span><strong id="level-par">—</strong></p>
+        <button id="hint-button" class="hint-button" type="button" aria-expanded="false" aria-controls="level-hint"><svg aria-hidden="true" viewBox="0 0 48 48"><use href="#icon-sprout"/></svg><span>ひとことヒント</span><span class="hint-plus" aria-hidden="true">＋</span></button>
+        <p id="level-hint" class="level-hint" hidden>畑の手前に回り込み、雲を押してみましょう。</p>
+      </div>
+      <div class="garden-guide" aria-label="庭のきまり">
+        <div class="guide-figures" aria-hidden="true"><span><svg viewBox="0 0 48 48"><use href="#icon-gardener"/></svg>庭師</span><span class="guide-link">→</span><span><svg viewBox="0 0 48 48"><use href="#icon-cloud"/></svg>雲</span><span class="guide-link">→</span><span><svg viewBox="0 0 48 48"><use href="#icon-sprout"/></svg>畑</span></div>
+        <p>押して畑に入ると<span class="marked">1滴</span>。<br>空の地面では降らない。</p>
+        <p>畑は表示の数<span class="marked">ちょうど</span>に。<br>降らせすぎたら一手戻せる。</p>
+        <p class="guide-note">雲の中の数は、残りの雨。</p>
+      </div>
+    </section>
+    <section class="garden-section" aria-label="雨を配る庭">
+      <div class="garden-topline">
+        <div class="garden-sound" aria-label="庭の音"><button id="sound-toggle" class="sound-toggle " data-audio-toggle type="button" aria-pressed="false" aria-label="音をつける"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 9h4l5-4v14l-5-4H4Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path class="sound-wave" d="M16 8q4 4 0 8m3-11q7 7 0 14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path class="sound-slash" d="m16 9 5 6m0-6-5 6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg><span data-audio-label>音をつける</span></button><button id="sound-settings-button" class="sound-settings" type="button" aria-label="音量を調整する" title="音量を調整する"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M5 4v16m7-16v16m7-16v16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M2 8h6m1 8h6m1-10h6" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round"/></svg></button></div>
+        <div class="garden-stats" aria-label="いまの庭の記録">
+          <div><span>手数</span><strong id="moves">0</strong></div>
+          <div><span>雲の雨</span><strong id="rain-left">—</strong></div>
+          <div><span>育った畑</span><strong id="plot-count">0 / 0</strong></div>
+        </div>
+      </div>
+      <div id="mechanic-legend" class="mechanic-legend" aria-label="この庭の仕掛け" hidden></div>
+      <div id="garden-shell" class="garden-shell"><svg id="garden" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 600" tabindex="0" role="img" aria-label="庭の盤面。矢印キーで庭師を動かし、雲を押して畑に雨を配ります。"></svg></div>
+      <div class="garden-progress" aria-hidden="true"><span id="progress-fill"></span></div>
+      <p id="status" class="garden-status" role="status" aria-live="polite" aria-atomic="true">庭師を動かして、雲をひと押し。</p>
+      <div class="garden-controls">
+        <div class="history-controls"><button id="undo-button" class="undo-button" type="button" disabled><svg aria-hidden="true" viewBox="0 0 24 24"><use href="#icon-undo"/></svg><span>一手もどす</span><kbd>Z</kbd></button><button id="reset-button" class="reset-button" type="button"><svg aria-hidden="true" viewBox="0 0 24 24"><use href="#icon-reset"/></svg><span>はじめから</span></button></div>
+        <div class="movement-controls"><div id="dpad" class="dpad" aria-label="庭師を動かす"><button data-dir="up" type="button" aria-label="上へ移動"><svg aria-hidden="true" viewBox="0 0 24 24"><use href="#icon-arrow"/></svg></button><button data-dir="left" type="button" aria-label="左へ移動"><svg aria-hidden="true" viewBox="0 0 24 24"><use href="#icon-arrow"/></svg></button><span class="dpad-center" aria-hidden="true"><svg viewBox="0 0 48 48"><use href="#icon-sprout"/></svg></span><button data-dir="right" type="button" aria-label="右へ移動"><svg aria-hidden="true" viewBox="0 0 24 24"><use href="#icon-arrow"/></svg></button><button data-dir="down" type="button" aria-label="下へ移動"><svg aria-hidden="true" viewBox="0 0 24 24"><use href="#icon-arrow"/></svg></button></div><p class="input-note">矢印キー・WASD<br><span>タップ・スワイプでも</span></p></div>
+      </div>
+    </section>
+  </main>
+  <footer class="site-footer"><span class="footer-flower" aria-hidden="true">＊</span><p>急がなくても、庭は待っています。</p><span class="footer-rule"></span><p class="save-note">達成記録は、この端末に保存されます。</p></footer>
+  <dialog id="help-dialog" aria-labelledby="help-title">
+    <div class="dialog-inner guide-inner">
+      <button id="help-close" class="dialog-close icon-button" type="button" aria-label="遊びかたを閉じる"><svg aria-hidden="true" viewBox="0 0 24 24"><use href="#icon-close"/></svg></button>
+      <p class="guide-eyebrow">はじめに、小さな庭しごと</p>
+      <h2 id="help-title">ひと雨ずつ、庭づくり。</h2>
+      <ol class="guide-route" aria-label="遊びかたの3ステップ">
+        <li data-guide-marker aria-current="step"><span class="guide-step-number">1</span>雲を押す</li>
+        <li data-guide-marker><span class="guide-step-number">2</span>畑へ1滴</li>
+        <li data-guide-marker><span class="guide-step-number">3</span>ちょうどに</li>
+      </ol>
+      <section class="guide-panel" data-guide-panel aria-labelledby="guide-title-1">
+        <h3 id="guide-title-1" tabindex="-1">雲のうしろから、ひと押し。</h3>
+        <p>庭師を動かして、雲を畑へ運びます。<br><strong>雲は押せます。引くことはできません。</strong></p>
+        <div class="guide-drawing" aria-hidden="true">
+          <svg viewBox="0 0 384 166">
+            <rect class="guide-tile" x="40" y="38" width="80" height="81" rx="13"/><rect class="guide-tile" x="151" y="38" width="80" height="81" rx="13"/><rect class="guide-soil" x="262" y="38" width="80" height="81" rx="13"/>
+            <path class="guide-soil-line" d="m274 59 55-5m-54 22 55-5m-54 23 55-5"/>
+            <g transform="translate(56 41)"><path d="M16 27h16l5 39H11Z" fill="#cda55e"/><path d="M15 19a9 9 0 0 0 18 0" fill="#eccca1" stroke="#244e42" stroke-width="1.4"/><path class="guide-ink-line" d="M13 15c0-12 22-12 22 0M7 16h34m-23 16-7 25m20-25 9 15M18 65v7m14-7v7"/><path d="M16 14h18" stroke="#cda55e" stroke-width="5"/></g>
+            <path class="guide-arrow" d="M125 77h20m-6-5 6 5-6 5m97-5h20m-6-5 6 5-6 5"/>
+            <g transform="translate(158 49)"><path class="guide-cloud" d="M10 43C-4 40 0 20 13 20c1-22 34-23 38-3 23-3 30 26 9 27Z"/><text class="guide-cloud-number" x="35" y="37">2</text></g>
+            <path class="guide-ink-line" d="M300 103v-6m0 2c-10 0-13-7-11-11 8 0 12 5 11 11m0-4c0-9 6-13 12-12 0 8-5 12-12 12"/>
+            <text x="80" y="143">庭師</text><text x="191" y="143">雲</text><text x="302" y="143">畑</text>
+          </svg>
+        </div>
+        <p class="guide-caption">岩・ほかの雲・庭のふちは通れません。<br>雲の中の数字は、あと何滴降らせられるか。</p>
+        <p class="guide-controls-note">矢印キー / WASD / 画面の矢印で移動。<br>庭をスワイプ、隣のマスをタップでも動けます。</p>
+      </section>
+      <section class="guide-panel" data-guide-panel aria-labelledby="guide-title-2" hidden>
+        <h3 id="guide-title-2" tabindex="-1">畑へ入ると、ぽつり1滴。</h3>
+        <p>雨が残る雲を<strong>畑へ押し入れるたび1滴</strong>。<br>空の地面では、雨を使いません。</p>
+        <div id="guide-demo" class="guide-drawing" aria-hidden="true">
+          <svg viewBox="0 0 384 166">
+            <rect class="guide-tile" x="101" y="41" width="80" height="82" rx="13"/><rect class="guide-soil" x="209" y="41" width="80" height="82" rx="13"/>
+            <path class="guide-soil-line" d="m220 68 56-5m-56 23 56-5m-56 23 56-5"/>
+            <path class="guide-arrow" d="M184 83h18m-6-5 6 5-6 5"/>
+            <ellipse class="guide-demo-seed" cx="246" cy="107" rx="5" ry="3" transform="rotate(-22 246 107)"/>
+            <g class="guide-demo-sprout"><path d="M246 111V80" fill="none" stroke-width="2"/><path d="M246 100c-16 1-20-9-18-15 12 0 19 5 18 15Zm0-8c0-12 9-17 18-15-1 11-8 16-18 15Z"/></g>
+            <g class="guide-demo-flower"><g class="guide-demo-petals"><ellipse cx="246" cy="65" rx="7" ry="11"/><ellipse cx="258" cy="73" rx="11" ry="7" transform="rotate(-20 258 73)"/><ellipse cx="253" cy="87" rx="7" ry="11" transform="rotate(-30 253 87)"/><ellipse cx="238" cy="87" rx="7" ry="11" transform="rotate(30 238 87)"/><ellipse cx="234" cy="73" rx="11" ry="7" transform="rotate(20 234 73)"/></g><circle cx="246" cy="77" r="6" fill="#fff1bf" stroke="#ac8041" stroke-width="1"/></g>
+            <path class="guide-demo-burst" d="m246 42 0-5m29 20 5-3m-4 40 5 3m-64-40-5-3m5 40-5 3"/>
+            <path class="guide-demo-rain" d="m230 58-2 7m18-4-2 7m18-10-2 7"/>
+            <g class="guide-demo-cloud"><path class="guide-cloud" d="M218 50c-15-3-12-25 4-25 1-24 34-25 39-4 22-3 30 28 7 29Z"/><text id="guide-demo-cloud-count" class="guide-cloud-number" x="246" y="41">1</text></g>
+            <text x="141" y="148" class="guide-small-label">空の地面</text><text id="guide-demo-count" class="guide-water-count" x="249" y="148">0 / 1</text>
+          </svg>
+        </div>
+        <button id="guide-demo-action" class="guide-demo-action" type="button">雲を押して、1滴</button>
+        <p id="guide-demo-status" class="guide-demo-status" role="status" aria-live="polite">この小さな畑で、ためしてみましょう。</p>
+      </section>
+      <section class="guide-panel" data-guide-panel aria-labelledby="guide-title-3" hidden>
+        <h3 id="guide-title-3" tabindex="-1">ちょうどの雨で、花ひらく。</h3>
+        <p>畑の数字は、<strong>「いまの雨 / 必要な雨」</strong>。<br>すべての畑を、必要量ちょうどにしましょう。</p>
+        <div class="guide-drawing" aria-hidden="true">
+          <svg viewBox="0 0 384 166">
+            <rect class="guide-soil" x="63" y="43" width="83" height="79" rx="13"/><rect class="guide-soil" x="239" y="43" width="83" height="79" rx="13"/>
+            <path class="guide-soil-line" d="m73 65 62-5m-62 25 62-5m-62 25 62-5m113-35 62-5m-62 25 62-5m-62 25 62-5"/>
+            <path d="M103 108V80m0 20c-18 0-21-11-19-16 13 0 20 7 19 16Zm0-9c0-13 10-19 19-16-1 11-9 17-19 16Z" fill="#739664" stroke="#3f7350" stroke-width="1.3" stroke-linejoin="round"/>
+            <path class="guide-arrow" d="M160 81h64m-7-5 7 5-7 5"/><text class="guide-small-label" x="192" y="62">もう1滴</text>
+            <path d="M280 110V77m0 24c-16-1-22-12-18-18 13 1 20 8 18 18Zm0-7c1-14 10-19 19-16-2 11-9 16-19 16Z" fill="#739664" stroke="#3f7350" stroke-width="1.3"/>
+            <g fill="#d5a84e" stroke="#ac8041" stroke-width="1"><ellipse cx="280" cy="60" rx="7" ry="12"/><ellipse cx="292" cy="68" rx="12" ry="7" transform="rotate(-20 292 68)"/><ellipse cx="288" cy="81" rx="7" ry="12" transform="rotate(-30 288 81)"/><ellipse cx="272" cy="81" rx="7" ry="12" transform="rotate(30 272 81)"/><ellipse cx="268" cy="68" rx="12" ry="7" transform="rotate(20 268 68)"/></g><circle cx="280" cy="71" r="6" fill="#fff1bf" stroke="#ac8041"/>
+            <text class="guide-water-count" x="105" y="147">1 / 2</text><text class="guide-water-count" x="281" y="147">2 / 2</text>
+          </svg>
+        </div>
+        <div class="guide-exact"><svg aria-hidden="true" viewBox="0 0 48 48"><use href="#icon-cloud"/></svg><span>2滴ほしい畑は、雲を一度外へ出して、<br>もう一度畑へ押し入れると、もう1滴。</span></div>
+        <p class="guide-last-note">降らせすぎたら<strong>「一手もどす」</strong>で大丈夫。<br>雲も雨も、ひとつ前に戻ります。Zキーでも。</p>
+      </section>
+      <div class="guide-navigation">
+        <button id="guide-prev" class="guide-prev" type="button" disabled>前へ</button>
+        <span id="guide-page" class="guide-page" aria-label="現在のページ">1 / 3</span>
+        <button id="guide-next" class="guide-next" type="button" autofocus>次へ</button>
+      </div>
+      <div class="guide-bottom"><button id="guide-sound-toggle" class="sound-toggle " data-audio-toggle type="button" aria-pressed="false" aria-label="音をつける"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 9h4l5-4v14l-5-4H4Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path class="sound-wave" d="M16 8q4 4 0 8m3-11q7 7 0 14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path class="sound-slash" d="m16 9 5 6m0-6-5 6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg><span data-audio-label>音をつける</span></button><button id="guide-skip" class="guide-skip" type="button">スキップして庭へ</button></div>
+    </div>
+  </dialog>
+  <dialog id="reset-dialog" class="small-dialog" aria-labelledby="reset-title"><div class="dialog-inner"><p class="eyebrow">もういちど、この庭で</p><h2 id="reset-title">はじめから<br>やり直しますか。</h2><p>いまの庭を、最初の状態に戻します。<br>これまでの達成記録は残ります。</p><div class="dialog-actions"><button id="reset-confirm" class="primary-button" type="button">はじめから</button><button id="reset-cancel" class="secondary-button" type="button" autofocus>庭にもどる</button></div></div></dialog>
+  <dialog id="win-dialog" aria-labelledby="win-title"><div class="dialog-inner win-inner"><button id="win-close" class="dialog-close icon-button" type="button" aria-label="結果を閉じて庭を見る"><svg aria-hidden="true" viewBox="0 0 24 24"><use href="#icon-close"/></svg></button><svg class="win-sprout win-flower" viewBox="0 0 48 48" aria-hidden="true"><path d="M24 43V20 M24 35C11 35 10 28 11 25c10 0 13 5 13 10Z M24 31c12 0 15-7 13-11-10 0-13 6-13 11Z" fill="#7e9b61" stroke="#3e6c4c" stroke-width="1.6" stroke-linecap="round"/><ellipse cx="24" cy="7.5" rx="4.2" ry="7" transform="rotate(0 24 18)" fill="var(--reward-flower,#fff6c9)" stroke="#7c8d60" stroke-width=".65"/><ellipse cx="24" cy="7.5" rx="4.2" ry="7" transform="rotate(45 24 18)" fill="var(--reward-flower,#fff6c9)" stroke="#7c8d60" stroke-width=".65"/><ellipse cx="24" cy="7.5" rx="4.2" ry="7" transform="rotate(90 24 18)" fill="var(--reward-flower,#fff6c9)" stroke="#7c8d60" stroke-width=".65"/><ellipse cx="24" cy="7.5" rx="4.2" ry="7" transform="rotate(135 24 18)" fill="var(--reward-flower,#fff6c9)" stroke="#7c8d60" stroke-width=".65"/><ellipse cx="24" cy="7.5" rx="4.2" ry="7" transform="rotate(180 24 18)" fill="var(--reward-flower,#fff6c9)" stroke="#7c8d60" stroke-width=".65"/><ellipse cx="24" cy="7.5" rx="4.2" ry="7" transform="rotate(225 24 18)" fill="var(--reward-flower,#fff6c9)" stroke="#7c8d60" stroke-width=".65"/><ellipse cx="24" cy="7.5" rx="4.2" ry="7" transform="rotate(270 24 18)" fill="var(--reward-flower,#fff6c9)" stroke="#7c8d60" stroke-width=".65"/><ellipse cx="24" cy="7.5" rx="4.2" ry="7" transform="rotate(315 24 18)" fill="var(--reward-flower,#fff6c9)" stroke="#7c8d60" stroke-width=".65"/><circle cx="24" cy="18" r="4.8" fill="#d9a947" stroke="#96733c" stroke-width=".8"/></svg><p class="eyebrow">ちょうどの雨が、届きました</p><h2 id="win-title">庭が、ひらきました。</h2><p id="win-description">すべての畑に雨が届きました。</p><div class="dialog-actions"><button id="win-next" class="primary-button" type="button">次の庭へ</button><button id="win-replay" class="secondary-button" type="button">もう一度あそぶ</button></div></div></dialog>
+  <dialog id="share-dialog" aria-labelledby="share-title"><div class="dialog-inner"><button id="share-close" class="dialog-close icon-button" type="button" aria-label="共有を閉じる"><svg aria-hidden="true" viewBox="0 0 24 24"><use href="#icon-close"/></svg></button><p class="eyebrow">小さな庭を、おすそわけ</p><h2 id="share-title">この雨を、だれかにも。</h2><p id="local-share-note" class="local-share-note" hidden>いまは手元の端末で開いています。このリンクは、ほかの端末からは遊べません。</p><div id="share"></div></div></dialog>
+  <dialog id="sound-dialog" aria-labelledby="sound-title"><div class="dialog-inner audio-inner">
+    <button id="sound-close" class="dialog-close icon-button" type="button" aria-label="音の設定を閉じる"><svg aria-hidden="true" viewBox="0 0 24 24"><use href="#icon-close"/></svg></button>
+    <p class="audio-eyebrow">庭の音の、ちょうどよさ</p><h2 id="sound-title">耳にも、小さな庭を。</h2>
+    <p class="audio-intro">足音、雨粒、花の音。<br>BGMと効果音を、好きな大きさに。</p>
+    <div class="audio-master"><span class="audio-master-label">庭のサウンド</span><button id="sound-dialog-toggle" class="sound-toggle " data-audio-toggle type="button" aria-pressed="false" aria-label="音をつける"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 9h4l5-4v14l-5-4H4Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path class="sound-wave" d="M16 8q4 4 0 8m3-11q7 7 0 14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path class="sound-slash" d="m16 9 5 6m0-6-5 6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg><span data-audio-label>音をつける</span></button></div>
+    <div class="audio-level"><div class="audio-level-heading"><label for="sound-music">BGM</label><output id="sound-music-output" for="sound-music">28%</output></div><p>静かな、庭のメロディー</p><input id="sound-music" type="range" min="0" max="100" step="1" value="28" aria-valuetext="28パーセント"></div>
+    <div class="audio-level"><div class="audio-level-heading"><label for="sound-effects">効果音</label><output id="sound-effects-output" for="sound-effects">65%</output></div><p>足音・雨・開花のお知らせ</p><input id="sound-effects" type="range" min="0" max="100" step="1" value="65" aria-valuetext="65パーセント"></div>
+    <button id="sound-preview" class="audio-preview" type="button"><svg aria-hidden="true" viewBox="0 0 48 48"><use href="#icon-sprout"/></svg>開花の音を試す</button>
+    <p id="sound-status" class="audio-status" role="status" aria-live="polite" aria-atomic="true"></p>
+    <button id="sound-done" class="audio-done" type="button">庭にもどる</button>
+  </div></dialog>
+</body>
+</html>
