@@ -26,6 +26,11 @@ const pathOf = (dir) => `/${dir}/${TEST_QUERY[dir] ?? ''}`;
 
 async function openShare(page, dir) {
   await page.goto(pathOf(dir));
+  // Day75は初回図解が主操作を覆う。利用者と同じスキップで庭へ戻ってから共有する。
+  if (dir === 'day-075-amegumo-sokoban') {
+    const skip = page.locator('#guide-skip');
+    if (await skip.isVisible()) await skip.click();
+  }
   // 全画面ビューでは共有欄をダイアログに置く。利用者と同じ入口を操作して検証する。
   const opener = page.getByRole('button', { name: 'このアプリを共有する', exact: true });
   if (await opener.count()) await opener.click();

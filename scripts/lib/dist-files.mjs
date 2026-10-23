@@ -27,7 +27,9 @@ export const SOURCE_DIRS_BY_APP = {
   // day-060 は素のJSをそのまま配信する（source は無い）。tools/ はデータの作り直し・解説の検査・宣伝動画の道具で、配信には要らない
   'day-060-prize-explained': ['tools'],
   // day-074 の tools/ は、観測APIを実在のサイトで確かめる検証の道具（api-check.mjs）。配信には要らない
-  'day-074-link-dokumi': ['tools']
+  'day-074-link-dokumi': ['tools'],
+  // Day75の解探索・ブラウザ検証は開発用で、静的配信に含めない。
+  'day-075-amegumo-sokoban': ['tools']
 };
 
 /** Dayのフォルダからの相対パス（/ 区切り。'' はフォルダそのもの）が、dist/ に配信されるか */

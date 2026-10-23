@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "scope": "Production browser modules, generated helpers and their upstream notices.",
-  "noticeSha256": "b4d2ecf6b04076324c8c3421e6e393fa80587b5a562abdd437613f856eac6092",
+  "noticeSha256": "37b763bb1d71309f29703ae7cf579c64b5669e6160f2232f75813e65ac69ab90",
   "fiberLicenseProvenance": {
     "version": "9.8.0",
     "file": "tools/licenses/react-three-fiber-9.8.0.LICENSE.txt",
@@ -11,8 +11,8 @@
   },
   "generatedFiles": [
     {
-      "file": "assets/Diagram-CF0sJrp4.js",
-      "sha256": "554523b87214b47765e1c94a28cfcba59d920cf30bd35997386edc9572c9d3a3"
+      "file": "assets/Diagram-D2D19ozo.js",
+      "sha256": "ff479f5fc8a534a0741f2eaddf5876c454a41ba71b83d688341fced04705f574"
     },
     {
       "file": "assets/Diagram-DzDnQ6Kb.css",
@@ -23,12 +23,12 @@
       "sha256": "bff0c47ef420a8aecc487ddd58f944c93451bfc23b92801eff6a6f0193c81127"
     },
     {
-      "file": "assets/index-cTEraY2S.js",
-      "sha256": "caf8a380ad68240bb03b7a66b4ac9c71b1e991be491375e91abd98c41ad34f8a"
+      "file": "assets/index-B1C1w-fw.js",
+      "sha256": "147971247402bc3eee272c5ed575a9773216582b63a4a4bc2ec3301d25b388c9"
     },
     {
       "file": "index.html",
-      "sha256": "f83ad77d59930db14943aa6a5bbf9b04fd318b2e7c3aea0436ffabc32870fbe9"
+      "sha256": "8c6b27a0ffb1435c32d8181d33ddd02951199393799ffdda9e3bbd3d136bf9f3"
     }
   ],
   "packages": [
@@ -239,10 +239,10 @@
     },
     {
       "name": "rolldown",
-      "version": "1.2.10",
+      "version": "1.2.14",
       "license": "MIT",
       "lockPath": "node_modules/rolldown",
-      "integrity": "sha512-OxkA08pSryMK7B3XiFA09B4OJ1xJMPgIYCBMY2xchzpqgBGsV1o0DetPAE+Sl3N3L4oCPiEzmHVSOj7iR04Zog==",
+      "integrity": "sha512-eTBTTqMR6uHKLgcUqpJP8ntzDI6V4LYA8negAMBEI7gkgVvOdrx6VsvS2Ym+83KhOPdLCHWJu0w7UQFJZhHKNw==",
       "scope": "Generated browser module interop runtime, with upstream Rollup/esbuild notices retained. Build tools are not shipped.",
       "licenses": [
         {
@@ -430,15 +430,15 @@
     },
     {
       "name": "vite",
-      "version": "8.3.0",
+      "version": "8.3.3",
       "license": "MIT",
       "lockPath": "node_modules/vite",
-      "integrity": "sha512-lhZBVvEHefgE+HQZC9O7EBJgCU/nVzFNl7vkS4RE0APtWLP02/8QVIkQtzBxPquh7lq5/78NHipTj7ODQ6XuyQ==",
+      "integrity": "sha512-cTAldKPImjg6c+gk48U19POPn3GCBzZwpdsN8ZMEEcbpes+6/wvfqUd0C2y3qYY4wsj8PwgFwrZ/1jBPVttMSg==",
       "scope": "Only the modulepreload and dynamic-import preload browser helpers; the build server is not distributed.",
       "licenses": [
         {
           "source": "node_modules/vite/LICENSE.md",
-          "sourceSha256": "387dd7baa307083401a27c58c362c30832f5ba1dba84f10cc22c33401523f45c",
+          "sourceSha256": "a47172e44a86a7e2cd1c16282341f7726ec60caafe3a6166fe3e0602005b6fa6",
           "includedSha256": "e373c2e74cd342b9e74d0b8813a8fddf3c9788515669a79c2ac238195673d38b"
         }
       ],

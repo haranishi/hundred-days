@@ -1,0 +1,28 @@
+/* Root actor transforms use board coordinates; inner sprites move around their own origin. */
+#garden [data-actor],
+#garden [data-actor-label],
+#garden .gardener-sprite,
+#garden .cloud-sprite,
+#garden .plant-growth,
+#garden .flower-petals,
+#garden .garden-rain-drop,
+#garden .garden-rain-ripple,
+#garden .garden-floating-petal {
+  transform-box: view-box;
+  transform-origin: 0 0;
+}
+#garden [data-fx-layer],
+#garden [data-motion-fx],
+#garden .garden-glow {
+  pointer-events: none;
+}
+#garden .garden-glow { opacity: 0; }
+#garden .garden-rain-drop { stroke: #fcfff6; stroke-width: .65; }
+#garden .garden-rain-ripple { fill: none; stroke: #f2ead2; stroke-width: 1.5; }
+#garden .garden-floating-petal { stroke: #fff5dc; stroke-width: .45; }
+
+/* No ambient loop: all garden motion is a finite response to a new action. */
+@media (prefers-reduced-motion: reduce) {
+  #garden [data-motion-fx] { display: none; }
+  #garden .garden-glow { opacity: 0 !important; }
+}

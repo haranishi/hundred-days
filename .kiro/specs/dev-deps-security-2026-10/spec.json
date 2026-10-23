@@ -1,0 +1,58 @@
+{
+  "feature_name": "dev-deps-security-2026-10",
+  "created_at": "2026-10-23T03:11:22Z",
+  "updated_at": "2026-10-23T03:39:13Z",
+  "language": "ja",
+  "phase": "implemented-verified",
+  "approvals": {
+    "requirements": {
+      "generated": true,
+      "approved": true
+    },
+    "design": {
+      "generated": true,
+      "approved": true
+    },
+    "tasks": {
+      "generated": true,
+      "approved": true
+    }
+  },
+  "ready_for_implementation": true,
+  "approval_scope": {
+    "requirements": "本人の個別レビューは未実施。2026-10-23の本人の依頼「セキュリティアンドクエリが発生したので直してほしいです。そのクエリも、安全なのかを確かめながら実行をお願いしたいです。」と、2026-10-19の自律進行の指示に基づき、承認済みとして進める。",
+    "downstream": "設計・タスク・実装・検証・作業ブランチのGit操作・PR作成・CIの確認・CI成功後のmainへの反映（rebaseマージ）・反映後の確認まで。マージが環境の権限設定で拒否されたら、回避せず本人へ渡す。",
+    "open_items": [
+      "「セキュリティアンドクエリ」は、GitHubのセキュリティ警告（Dependabot）と解釈した。コードスキャン（CodeQL）は未設定、シークレット検出は0件のため。「そのクエリ」は、直すために実行するコマンドや問い合わせと解釈した。違えば本人が直す。",
+      "タスクの流れの点検は、独立したレビュアーを使わず、同じ会話の中で行った（mode: inline）。独立レビューとは呼ばない。"
+    ]
+  },
+  "delivery": {
+    "repository": "haranishi/hundred-days",
+    "base": "main",
+    "branch": "fix/dev-deps-security-alerts",
+    "authorized_operations": [
+      "commit",
+      "push",
+      "PR",
+      "merge (CI成功後・rebase)"
+    ],
+    "not_authorized": [
+      "mainへの直接push",
+      "force push",
+      "リポジトリ設定の変更",
+      "本人の作業フォルダの変更"
+    ],
+    "status": "pr-opened"
+  },
+  "validation": {
+    "status": "verified",
+    "lock_audit": "5つのロックの変更項目すべてで、取得先は公式レジストリ、整合値は公式レジストリの値と一致、公開から9日以上、取り下げなし。実行時の部品は前後で不変。監査の道具は変異テスト（5種）で検出を確認した",
+    "vulnerability_query": "更新後のロックはOSVとGitHubの勧告DBの両方で0件。更新前のロックでDependabotと同じ41件を見つけられることを先に示した（門番）",
+    "tests": "Day56=417・58=481・59=134・61=125・64=21で更新前と同じ件数。ルート側の単体27件成功。npm run check 成功（単体4768件のうち成功4767・失敗0・スキップ1）",
+    "site_identity": "サイトのビルド結果3045ファイルのうち2970個が一致。違いは Day58・61 の公開物だけ。ビルドは同じ入力から2回作って全一致する（決定的）",
+    "e2e": "Day58=8件、Day61=11件、全Dayの共有・ヘッダー・外部Dayの検査=294件、すべて成功",
+    "independent_review": "使っていない。決定的な検査（監査・照会・全ファイル比較・試験）と変異テストで確認した",
+    "pending": "CI（PRの必須チェックと専用ワークフロー）、マージ、マージ後の確認（警告0件・デプロイ・5つのDayのページ）は、PRのコメントに記録する"
+  }
+}
