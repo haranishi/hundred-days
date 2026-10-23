@@ -1,0 +1,4 @@
+# Day75: two reviewed public localStorage identifiers, not credentials.
+# Exact introducing-commit findings only. Keep all default scanner rules enabled.
+edc53e175c032b40fd7feb0c42e69c9ef63de3f2:day-075-amegumo-sokoban/lib/progress.js:generic-api-key:2
+edc53e175c032b40fd7feb0c42e69c9ef63de3f2:tests/e2e/day-075.spec.mjs:generic-api-key:8

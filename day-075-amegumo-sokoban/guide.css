@@ -1,0 +1,69 @@
+/* A small field manual. Its drawing never changes the real garden. */
+#help-dialog{width:min(570px,calc(100% - 32px));border-radius:7px 28px 7px 7px;overflow:auto}
+#help-dialog .guide-inner{padding:32px 36px 22px;background:linear-gradient(90deg,transparent 21px,#b9846326 21px,#b9846326 22px,transparent 22px),var(--paper)}
+#help-dialog .guide-eyebrow{font-size:11px;letter-spacing:.12em;margin:0 44px 10px 0;color:var(--ink-soft)}
+#help-dialog h2{font-size:28px;line-height:1.55;margin:0 0 20px;letter-spacing:.045em}
+#help-dialog .dialog-close{top:9px;right:10px}
+.guide-route{display:flex;padding:0;margin:0 0 23px;list-style:none;gap:10px}
+.guide-route li{flex:1;display:flex;align-items:center;gap:7px;border-bottom:1px dashed var(--line);padding:0 0 10px;color:var(--ink-soft);font-size:11px}
+.guide-route li[aria-current]{border-bottom:2px solid var(--ink);color:var(--ink)}
+.guide-route .guide-step-number{display:grid;place-items:center;flex-shrink:0;width:25px;height:25px;border:1px solid var(--line);border-radius:50%;font-family:Georgia,var(--serif);font-size:13px;line-height:1;background:var(--white)}
+.guide-route li[aria-current] .guide-step-number{background:var(--ink);border-color:var(--ink);color:var(--white)}
+#help-dialog .guide-panel[hidden]{display:none!important}
+.guide-panel{min-height:315px}
+#help-dialog .guide-panel h3{font:500 23px/1.5 var(--serif);letter-spacing:.035em;margin:0 0 7px;outline-offset:5px}
+#help-dialog .guide-panel p{font-size:14px;line-height:1.85;margin:0 0 14px}
+#help-dialog .guide-panel strong{font-weight:600;background:linear-gradient(transparent 65%,#dfd6a37a 65%)}
+.guide-drawing{position:relative;background:#e7ead9;border:1px solid #c7ceba;border-radius:42px 10px 38px 10px;margin:17px 0 12px;overflow:hidden;isolation:isolate}
+.guide-drawing:after{content:"";position:absolute;inset:8px;border:1px solid #fffdf385;border-radius:34px 7px 30px 7px;pointer-events:none}
+.guide-drawing>svg{display:block;width:100%;height:166px;overflow:visible}
+.guide-tile{fill:#eef0df;stroke:#bdc9ae;stroke-width:1.1}
+.guide-soil{fill:#bb9475;stroke:#8e6245;stroke-width:1.2}
+.guide-soil-line{fill:none;stroke:#906c4b;stroke-width:1.2;stroke-linecap:round;opacity:.75}
+.guide-cloud{fill:#fffdf3;stroke:#708d7c;stroke-width:1.5;stroke-linejoin:round}
+.guide-drawing text{fill:var(--ink);font-family:var(--sans);font-size:12px;text-anchor:middle}
+.guide-drawing .guide-cloud-number{font:500 18px Georgia,var(--serif)}
+.guide-drawing .guide-water-count{font:500 17px Georgia,var(--serif)}
+.guide-drawing .guide-small-label{font-size:10px;fill:var(--ink-soft)}
+.guide-ink-line{fill:none;stroke:var(--ink);stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.guide-arrow{fill:none;stroke:#6f8976;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#help-dialog .guide-caption{font-size:13px;line-height:1.75;margin:0;color:var(--ink-soft)}
+#help-dialog .guide-controls-note{font-size:13px;line-height:1.7;margin:13px 0 0;padding-top:12px;border-top:1px dashed var(--line)}
+.guide-demo-action{display:block;min-height:44px;width:100%;margin:0 0 10px;padding:9px 16px;border:1px solid #7b927d;border-radius:5px;background:#fffdf3;color:var(--ink);font-size:14px;box-shadow:0 2px 0 #bdc7af}
+.guide-demo-action:hover:not(:disabled){background:#dfe8cc}
+.guide-demo-action:disabled{opacity:1;background:#dde8cd;color:#385b44;box-shadow:none;border-style:dashed}
+#help-dialog .guide-demo-status{font-size:13px;line-height:1.7;min-height:44px;margin:0;color:var(--ink-soft)}
+.guide-demo-cloud{transform:translateX(-108px)}
+.guide-demo-rain{opacity:0;fill:none;stroke:#719d9d;stroke-width:2.2;stroke-linecap:round}
+.guide-demo-seed{fill:#775739}
+.guide-demo-sprout{opacity:0;transform-origin:246px 111px;fill:#739664;stroke:#3f7350;stroke-width:1;stroke-linecap:round;stroke-linejoin:round}
+.guide-demo-flower{opacity:0;transform-origin:246px 77px}
+.guide-demo-petals{fill:#d5a84e;stroke:#ac8041;stroke-width:1}
+.guide-demo-burst{opacity:0;fill:none;stroke:#d5a84e;stroke-width:1.8;stroke-linecap:round;transform-origin:246px 77px}
+.has-rained .guide-demo-cloud{transform:translateX(0);transition:transform .2s ease-out}
+.has-rained .guide-demo-rain{animation:guide-one-rain .44s .19s ease-in both}
+.has-rained .guide-demo-seed{opacity:0;transition:opacity .1s .35s}
+.has-rained .guide-demo-sprout{opacity:1;animation:guide-grow .38s .35s cubic-bezier(.2,.7,.2,1) both}
+.has-rained .guide-demo-flower{opacity:1;animation:guide-flower .45s .59s cubic-bezier(.2,.8,.2,1) both}
+.has-rained .guide-demo-burst{animation:guide-burst .46s .65s ease-out both}
+.guide-exact{display:flex;gap:9px;align-items:center;padding:13px 15px;border:1px dashed #94a282;border-radius:5px;background:#e6ead4;font-size:13px;line-height:1.7;margin:12px 0}
+.guide-exact>svg{width:27px;height:27px;flex-shrink:0;color:#6d8a58}
+#help-dialog .guide-last-note{font-size:13px;margin:12px 0 0;line-height:1.8}
+.guide-navigation{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:14px;margin-top:20px;padding-top:18px;border-top:1px solid var(--line)}
+.guide-navigation button{min-height:46px;padding:9px 16px;font-size:14px;border-radius:5px}
+.guide-navigation .guide-prev{border:1px solid #a6b39a;background:transparent}
+.guide-navigation .guide-prev:hover:not(:disabled){background:#e3e7d3}
+.guide-navigation .guide-prev:disabled{opacity:.4}
+.guide-page{font:13px Georgia,var(--serif);letter-spacing:.12em;white-space:nowrap;color:var(--ink-soft)}
+.guide-navigation .guide-next{background:var(--ink);border:1px solid var(--ink);color:var(--white);box-shadow:0 3px 0 #16392f}
+.guide-navigation .guide-next:hover{background:#30614f}
+.guide-bottom{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:10px}
+#help-dialog .guide-reopen{font-size:11px;color:var(--ink-soft);line-height:1.6;margin:0}
+.guide-skip{min-height:44px;border:0;background:none;font-size:12px;text-decoration:underline;text-underline-offset:4px;white-space:nowrap;padding:8px 0 8px 10px}
+.guide-skip:hover{color:var(--clay)}
+@keyframes guide-one-rain{0%{opacity:0;transform:translateY(-5px)}20%{opacity:1}90%{opacity:1}100%{opacity:0;transform:translateY(18px)}}
+@keyframes guide-grow{from{opacity:0;transform:scaleY(.12)}to{opacity:1;transform:scaleY(1)}}
+@keyframes guide-flower{0%{opacity:0;transform:scale(.12) rotate(-28deg)}65%{opacity:1;transform:scale(1.18) rotate(4deg)}100%{opacity:1;transform:scale(1) rotate(0)}}
+@keyframes guide-burst{0%{opacity:0;transform:scale(.55)}20%{opacity:1}100%{opacity:0;transform:scale(1.35)}}
+@media(max-width:520px){#help-dialog .guide-inner{padding:29px 24px 17px;background:linear-gradient(90deg,transparent 13px,#b9846326 13px,#b9846326 14px,transparent 14px),var(--paper)}#help-dialog h2{font-size:25px;margin-bottom:17px}.guide-route{gap:7px;margin-bottom:19px}.guide-route li{font-size:10px;gap:5px}.guide-route .guide-step-number{width:23px;height:23px;font-size:12px}#help-dialog .guide-panel h3{font-size:22px}.guide-panel{min-height:326px}.guide-navigation{gap:10px;margin-top:17px;padding-top:16px}.guide-navigation button{padding-left:10px;padding-right:10px;font-size:13px}.guide-bottom{gap:6px}#help-dialog .guide-reopen{font-size:10px}.guide-skip{font-size:11px}}
+@media(prefers-reduced-motion:reduce){.has-rained .guide-demo-cloud{transform:translateX(0);transition:none}.has-rained .guide-demo-seed{opacity:0}.has-rained .guide-demo-sprout,.has-rained .guide-demo-flower{opacity:1;transform:none}.has-rained .guide-demo-rain,.has-rained .guide-demo-burst{opacity:0}}
