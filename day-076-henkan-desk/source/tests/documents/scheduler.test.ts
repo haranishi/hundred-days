@@ -1,0 +1,9 @@
+// @vitest-environment node
+import { describe,expect,it } from 'vitest';
+import { DocumentScheduler } from '../../server/documents/scheduler';
+import { DocumentError } from '../../server/documents/errors';
+describe('document scheduler',()=>{
+ it('limits all reservations to one active plus two pending and runs FIFO',async()=>{const scheduler=new DocumentScheduler();const leases=[scheduler.reserve(),scheduler.reserve(),scheduler.reserve()];expect(()=>scheduler.reserve()).toThrowError(DocumentError);const order:number[]=[];let finish!:()=>void;const gate=new Promise<void>(resolve=>{finish=resolve;});const first=leases[0]!.run(async()=>{order.push(1);await gate;return 1;});const second=leases[1]!.run(async()=>{order.push(2);return 2;});const third=leases[2]!.run(async()=>{order.push(3);return 3;});await new Promise(resolve=>setTimeout(resolve,5));expect(order).toEqual([1]);finish();expect(await Promise.all([first,second,third])).toEqual([1,2,3]);expect(order).toEqual([1,2,3]);leases.forEach(lease=>lease.release());expect(scheduler.count).toBe(0);scheduler.close();});
+ it('removes aborted pending work without starting it',async()=>{const scheduler=new DocumentScheduler();const first=scheduler.reserve(),pending=scheduler.reserve();let finish!:()=>void;const active=first.run(()=>new Promise<void>(resolve=>{finish=resolve;}));let called=false;const queued=pending.run(async()=>{called=true;});pending.abort();await expect(queued).rejects.toMatchObject({code:'CANCELLED'});expect(called).toBe(false);finish();await active;first.release();pending.release();scheduler.close();});
+ it('aborts requests at their deadline',async()=>{const scheduler=new DocumentScheduler(15),lease=scheduler.reserve();await new Promise(resolve=>setTimeout(resolve,25));expect(lease.signal.aborted).toBe(true);expect(lease.signal.reason).toMatchObject({code:'TIMEOUT'});lease.release();scheduler.close();});
+});

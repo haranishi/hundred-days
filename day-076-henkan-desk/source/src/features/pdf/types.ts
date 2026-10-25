@@ -1,0 +1,4 @@
+export type PDFOperation = 'images-pdf' | 'pdf-images' | 'merge' | 'extract' | 'split' | 'reorder' | 'rotate' | 'text' | 'optimize';
+export type PdfOptions = { operation: PDFOperation; pages: string; order: string; rotation: 90 | 180 | 270; imageFormat: 'png' | 'jpeg'; scale: number; quality: number; paper: 'original' | 'a4'; orientation: 'portrait' | 'landscape'; margin: number };
+export const DEFAULT_PDF_OPTIONS: Omit<PdfOptions, 'operation'> = { pages: '', order: '', rotation: 90, imageFormat: 'png', scale: 1.5, quality: 0.9, paper: 'original', orientation: 'portrait', margin: 24 };
+export const PDF_TOOL_LABELS: Record<PDFOperation, string> = { 'images-pdf': '画像 → PDF', 'pdf-images': 'PDF → 画像', merge: 'PDFを結合', extract: 'ページを抽出', split: '1ページずつ分割', reorder: 'ページを並べ替え', rotate: 'PDFを回転', text: 'PDFの文字を抽出', optimize: 'PDFを軽量化' };

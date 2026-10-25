@@ -1,0 +1,154 @@
+{
+  "status": "PASS",
+  "scope": "Day076 public UI and experience, independent review without reading implementation source",
+  "method": "Chromium, generated dist on localhost:4187, synthetic input only. Screenshots inspected with view_image. No repository code/config/Git changes.",
+  "viewports": [
+    390,
+    768,
+    1440
+  ],
+  "ui": {
+    "total": 19,
+    "max": 20,
+    "items": [
+      [
+        "3秒理解",
+        2,
+        "画像/PDF/データの3カテゴリと入力→設定→保存の順番が分かる。"
+      ],
+      [
+        "視覚階層",
+        2,
+        "見出し・カテゴリ・01/02/03と主操作の青が揃う。"
+      ],
+      [
+        "配色",
+        2,
+        "選択は青だけでなく下線・チェックもあり、本文・エラーは判別できる。"
+      ],
+      [
+        "余白と整列",
+        2,
+        "390/768/1440で横溢れ・重なり無し。"
+      ],
+      [
+        "タイポグラフィ",
+        1,
+        "主要見出しと法的ページ本文は読める。アプリ補助説明は小さめで、改善余地。"
+      ],
+      [
+        "モバイル",
+        2,
+        "390pxは縦配置、3カテゴリと保存・法的リンク・共有が使える。"
+      ],
+      [
+        "CTA",
+        2,
+        "変換と保存が区別され、入力前は主操作が無効。"
+      ],
+      [
+        "一貫性",
+        2,
+        "画像/データと利用説明の色・リンク・戻り方が整う。"
+      ],
+      [
+        "アクセシビリティ",
+        2,
+        "ArrowRight/End/Tabでカテゴリと操作選択を移動。共有ボタン3個は実測44px。"
+      ],
+      [
+        "体感速度",
+        2,
+        "小画像とCSVの操作が滞らず、結果が表示される。"
+      ]
+    ]
+  },
+  "experience": {
+    "total": 20,
+    "max": 20,
+    "items": [
+      [
+        "初見の理解",
+        2,
+        "画像を選び、4:5指定から保存まで説明なしで進める。"
+      ],
+      [
+        "コアループ",
+        2,
+        "PNG→WebPとCSV→JSONを実保存し、実体/内容を再確認。"
+      ],
+      [
+        "手応え",
+        2,
+        "4:5のプレビューと384×480の結果が一致。"
+      ],
+      [
+        "フィードバック",
+        2,
+        "成功形式/容量/件数が分かり、不正JSONの説明は画面内へ移動。"
+      ],
+      [
+        "導入",
+        2,
+        "登録不要でサンプルがあり、利用できるカテゴリだけを表示。"
+      ],
+      [
+        "失敗の納得感",
+        2,
+        "JSONの二重引用符に関する対処を示す。"
+      ],
+      [
+        "目標",
+        2,
+        "入力・設定・結果の順と正しい出力形式が一貫。"
+      ],
+      [
+        "再試行",
+        2,
+        "不正JSONを修正して次の変換が成功。"
+      ],
+      [
+        "継続利用",
+        2,
+        "カテゴリ切替で前の結果が消え、法的ページからアプリへ戻れる。"
+      ],
+      [
+        "信頼性",
+        2,
+        "入力送信なしの説明、配信通信の説明、共有はアプリURLだけという実挙動が一致。"
+      ]
+    ]
+  },
+  "verified": [
+    "PNG→4:5 WebP: download ui-review.webp, RIFF/WEBP signature, 384x480 decoded dimensions.",
+    "CSV sample plus fictional marker row→JSON: downloaded and parsed 3 records.",
+    "One share component; X/LINE URLs and clipboard contain canonical URL and no input marker.",
+    "Supported-device share simulated via navigator.share receives title/text/url only; actual device not verified.",
+    "legal.html and licenses/index.html readable at390, no horizontal overflow, return link works.",
+    "OFL1.1 license link returns HTTP200 and original license text.",
+    "No POST, no unexpected external request, no pageerror during reviewed actions.",
+    "Invalid JSON error visible at y538.7 in900px viewport; correction succeeds."
+  ],
+  "remaining": [
+    {
+      "severity": "cosmetic",
+      "finding": "アプリの補助説明の文字が小さめ。操作を妨げない。"
+    }
+  ],
+  "limits": [
+    "Chromiumによる今回の画面/体験確認。24操作すべての出力正当性は別の統合E2Eで判断。",
+    "navigator.shareは対応端末のAPIを模して確認した。実Safari/iOS機器の共有・メモリを確認したとは扱わない。",
+    "今回のUI確認サーバーは生成distを配信する通常サーバー。実CSPは別のDay076統合E2Eが担当。"
+  ],
+  "evidence": [
+    "initial-390.png",
+    "initial-768.png",
+    "initial-1440.png",
+    "image-result-390.png",
+    "data-share-390.png",
+    "legal-390.png",
+    "licenses-390.png",
+    "error-visible-390.png",
+    "observations.json"
+  ]
+}

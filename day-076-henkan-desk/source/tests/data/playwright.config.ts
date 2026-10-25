@@ -1,0 +1,2 @@
+import { defineConfig,devices } from '@playwright/test';
+export default defineConfig({testDir:'.',outputDir:'./test-results',testMatch:'browser.spec.ts',workers:1,timeout:30000,projects:[{name:'chromium',use:{...devices['Desktop Chrome']}},{name:'webkit',use:{...devices['Desktop Safari']}}],use:{baseURL:'http://127.0.0.1:5178'},webServer:{command:'npm run dev -- --port 5178 --strictPort',url:'http://127.0.0.1:5178/tests/data/harness.html',reuseExistingServer:false}});

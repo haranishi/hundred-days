@@ -1,0 +1,2 @@
+const MiB = 1_048_576;
+export const LIMITS = Object.freeze({ imageCount: 10, imageFileBytes: 10 * MiB, imageBatchBytes: 30 * MiB, imagePixels: 16_000_000, imageEdge: 8192, imageOutputBytes: 20 * MiB, imageResultsBytes: 40 * MiB, docxFileBytes: 10 * MiB, docxExpandedBytes: 100 * MiB, docxEntries: 1000, pdfBytes: 20 * MiB, documentTimeoutMs: 60_000, engineTimeoutMs: 30_000, documentQueue: 2, pdfFileBytes: 10 * MiB, pdfBatchBytes: 30 * MiB, pdfFiles: 10, pdfPages: 100, pdfImagePages: 20, dataInputBytes: 2 * MiB, dataOutputBytes: 5 * MiB });

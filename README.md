@@ -109,6 +109,7 @@ Day 051「ハコニワ」も外部公開アプリです。本体は独立リポ�
 | 073 | offbeat. — ここから、フロアを揺らせ。 | [day-073-offbeat/](day-073-offbeat/) | [アプリを開く](https://hundred-days.pages.dev/day-073-offbeat/) |
 | 074 | リンクの毒見 — 踏む前に、銀の針で確かめる | [day-074-link-dokumi/](day-074-link-dokumi/) | [アプリを開く](https://hundred-days.pages.dev/day-074-link-dokumi/) |
 | 075 | 雨雲倉庫番 — ひと雨ずつ、庭をほどく。 | [day-075-amegumo-sokoban/](day-075-amegumo-sokoban/) | [アプリを開く](https://hundred-days.pages.dev/day-075-amegumo-sokoban/) |
+| 076 | へんかんデスク | [day-076-henkan-desk/](day-076-henkan-desk/) | [アプリを開く](https://hundred-days.pages.dev/day-076-henkan-desk/) |
 <!-- day-index:end -->
 
 ## 1日アプリのルール

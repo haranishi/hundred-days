@@ -154,3 +154,16 @@ React、React DOM、React Three Fiber、Drei、Three.jsなど、実際の配布�
 three.js 0.186.1の本体とEffectComposer・RenderPass・UnrealBloomPass・OutputPassおよび参照する補助モジュールを同梱。MITの全文は[THREE-LICENSE.txt](day-068-timetable-alibi/vendor/THREE-LICENSE.txt)。addons内のthreeへのimportだけを相対パスに変更し、描画処理は改変していません。
 
 駅・地形・列車・効果音はこの作品用の独自生成。人物4人の表情シートと、待合室・閉鎖ホーム・港の記録映像・列車内・駅務室・灯台港は組み込み画像生成で新規制作し、[制作記録](day-068-timetable-alibi/ART.md)と最終プロンプトを同梱しています。実在の運行データ、既存作品の画像・モデル・音源・配信フォントは使いません。
+
+
+## Day076 へんかんデスク
+
+React/React DOM/Scheduler、pdf-lib、fflate、Papa Parse、Marked、@pdf-lib/standard-fonts、@pdf-lib/upngはMIT。
+yamlはISC、tslibは0BSD、pakoはMIT/Zlib。jSquash WebP・wasm-feature-detect・PDF.jsはApache2.0、libwebpは同梱許諾に従う。
+DOMPurifyは配布元のdual licenseからApache2.0側を採用する。
+PDF.js 6.4.299のdisplay APIは2026-10-25にエラー伝播順を補正した。再現可能なpatchと変更告知を残す。
+PDF.jsのCMap・Foxitフォント・ICC・画像/色WASMは本体と別の許諾を含むため、一括でApache2.0扱いしない。
+旧Liberationフォントは配布せず、公式未改変Liberation Sans2.1.5（OFL1.1）の4書体と許諾・作者・来歴を同梱する。
+配布元・固定版・SHA-256はday-076-henkan-desk/source/vendor/liberation-fonts/provenance.mdを参照。
+公開物の許諾全文と各PDF資材への入口は[Day076のライセンス一覧](day-076-henkan-desk/licenses/index.html)。
+ユーザーの入力や結果の権利は移転せず、これらのライセンスを入力へ強制するものではない。

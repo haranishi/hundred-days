@@ -53,3 +53,6 @@ day-*/tools/promo/output/
 # Day 054 のデモ切り出しの確認用（コマの一覧と1コマ目）
 day-*/tools/demo-sheet.jpg
 day-*/tools/demo-first-frame.png
+
+# ローカルの依存・検証キャッシュ
+.cache/
