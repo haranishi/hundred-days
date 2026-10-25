@@ -198,13 +198,16 @@ const CONNECT_BY_APP = {
   /* day-054 は外部へは出ない。3Dモデル（.glb）に埋め込まれた質感画像を、three.js の GLTFLoader が
      blob: のURLにしてから fetch で読む（Chrome は ImageBitmapLoader を使うため）。
      'self' は blob: に合わないので、足さないと本番だけ家具が真っ白になる（2026-10-01 に本番と同じCSPで確認） */
-  'day-054-what-vanished': 'blob:'
+  'day-054-what-vanished': 'blob:',
+  // Day76のPDF内部フォント/画像は端末内のblobから読み込む。
+  'day-076-henkan-desk': 'blob:'
 };
 
 /* day-025 の MapLibre は blob: から Web Worker を起こす。
    worker-src は child-src → script-src → default-src の順に落ちるので、
    'self' のままだと地図が黙って出ない。 */
 const WORKER_BY_APP = {
+  'day-076-henkan-desk': "worker-src 'self'",
   'day-041-who-got-hurt': "worker-src blob:",
   'day-040-shelter-by-hazard': "worker-src blob:",
   'day-039-dig-below': "worker-src blob:",
@@ -259,11 +262,11 @@ const appCsp = (dir) => [
   "default-src 'self'",
   // Day64 compiles its local Rust module in a same-origin Worker.
   // Permit Wasm compilation for this app without permitting JavaScript eval.
-  `script-src 'self'${dir === 'day-064-breach-atlas' ? " 'wasm-unsafe-eval'" : ''}`,
+  `script-src 'self'${['day-064-breach-atlas', 'day-076-henkan-desk'].includes(dir) ? " 'wasm-unsafe-eval'" : ''}`,
   "style-src 'self' 'unsafe-inline'",
   `img-src 'self' data: blob:${IMG_BY_APP[dir] || ''}`,
   `media-src 'self'${MEDIA_BY_APP[dir] || ''}`,
-  "font-src 'self'",
+  `font-src 'self'${dir === 'day-076-henkan-desk' ? ' data: blob:' : ''}`,
   `connect-src 'self'${CONNECT_BY_APP[dir] ? ` ${CONNECT_BY_APP[dir]}` : ''}`,
   "frame-ancestors 'none'",
   "base-uri 'none'",

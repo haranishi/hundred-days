@@ -1,0 +1,17 @@
+import { useRef, useState } from 'react';
+import type { SourceFile, ToolId } from '../shared/contracts';
+import { Icon } from './Icon';
+export function formatBytes(value: number) { return value < 1024 ? `${value} B` : value < 1024 * 1024 ? `${(value / 1024).toFixed(1)} KB` : `${(value / 1024 / 1024).toFixed(2)} MB`; }
+export function FileInput({ mode, sources, busy, onSelect, onRemove, onClear, accept, multiple, help, onMove }: { mode: ToolId; sources: readonly SourceFile[]; busy: boolean; onSelect: (files: File[]) => void; onRemove: (id: string) => void; onClear: () => void; accept?: string; multiple?: boolean; help?: string; onMove?: (id: string, direction: number) => void }) {
+  const input = useRef<HTMLInputElement>(null); const [dragging, setDragging] = useState(false);
+  return <section className="source-section" aria-labelledby="file-heading"><div className="section-heading"><h2 id="file-heading"><span className="step">01</span>ファイルを選ぶ</h2><div className="section-heading-actions"><span className="subtle">{multiple ?? mode === 'images' ? '最大10ファイル' : '1ファイル'}</span>{sources.length > 0 && <button className="clear-button" onClick={onClear} aria-label="ファイルをすべて外す">クリア</button>}</div></div>
+    <div className={`dropzone ${dragging ? 'is-dragging' : ''} ${sources.length ? 'has-files' : ''}`} onDragOver={event => { event.preventDefault(); if (!busy) setDragging(true); }} onDragLeave={() => setDragging(false)} onDrop={event => { event.preventDefault(); setDragging(false); if (!busy) onSelect([...event.dataTransfer.files]); }}>
+      <div className="upload-illustration"><div className="file-back"/><div className="file-front"><Icon name={mode === 'images' ? 'image' : 'file'} size={35}/></div><span className="upload-bubble"><Icon name="upload" size={18}/></span></div>
+      <h3>{sources.length ? '別のファイルを選ぶ' : 'ここにファイルをドロップ'}</h3><p>または、端末から選択してください</p>
+      <button className="button button-primary" disabled={busy} onClick={() => input.current?.click()}><Icon name="upload" size={17}/>ファイルを選ぶ</button>
+      <input ref={input} type="file" aria-label="変換するファイル" accept={accept ?? (mode === 'images' ? 'image/jpeg,image/png,image/webp' : '.docx')} multiple={multiple ?? mode === 'images'} disabled={busy} onChange={event => { onSelect([...event.target.files ?? []]); event.target.value = ''; }} className="visually-hidden" tabIndex={-1}/>
+      <small>{help ?? (mode === 'images' ? 'JPG・PNG・WebP / 1枚10MiB、合計30MiBまで' : 'Word（.docx）/ 10MiBまで')}</small>
+    </div>
+    {sources.length > 0 && <ul className="source-list">{sources.map((source,index) => <li key={source.id}><span className="mini-file"><Icon name={mode === 'images' ? 'image' : 'file'} size={19}/></span><span className="file-description"><strong title={source.file.name}>{source.file.name}</strong><small>{formatBytes(source.file.size)}</small></span><>{onMove&&<div className="file-reorder"><button className="icon-button" aria-label={`${source.file.name}を上へ`} disabled={busy||index===0} onClick={()=>onMove(source.id,-1)}><Icon name="up" size={15}/></button><button className="icon-button" aria-label={`${source.file.name}を下へ`} disabled={busy||index===sources.length-1} onClick={()=>onMove(source.id,1)}><Icon name="down" size={15}/></button></div>}</><button className="icon-button" aria-label={`${source.file.name}を外す`} disabled={busy} onClick={() => onRemove(source.id)}><Icon name="close" size={17}/></button></li>)}</ul>}
+  </section>;
+}

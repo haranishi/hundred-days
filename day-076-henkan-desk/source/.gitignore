@@ -1,0 +1,11 @@
+node_modules/
+dist/
+dist-server/
+playwright-report/
+test-results/
+.env*
+!.env.example
+coverage/
+.DS_Store
+.cache/
+public/pdf-assets/

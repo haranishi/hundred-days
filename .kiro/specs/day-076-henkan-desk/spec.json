@@ -1,0 +1,27 @@
+{
+  "feature_name": "day-076-henkan-desk",
+  "language": "ja",
+  "phase": "pr-ready",
+  "implementation_authorized": true,
+  "approval_basis": "本人の100日チャレンジへ規約・法律確認後のPR作成・マージ依頼",
+  "scope": "public client-only plus preserved local Office",
+  "reviews": {
+    "requirements": "inline-pass",
+    "design": "inline-pass",
+    "tasks": "inline-pass",
+    "independent_code": "PASS",
+    "ui": "19/20",
+    "experience": "20/20"
+  },
+  "verification": {
+    "precheck": "pass",
+    "common_unit": "4905 passed, 1 skipped",
+    "source_unit": "161 passed, 9 runtime skipped",
+    "static_browser": "54 passed",
+    "pdf_after_font_change": "14 passed",
+    "production_csp": "8 passed",
+    "publish_gate": "302 passed",
+    "github_ci": "pending",
+    "deployment": "pending"
+  }
+}

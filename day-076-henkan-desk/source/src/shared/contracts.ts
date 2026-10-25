@@ -1,0 +1,17 @@
+export type ToolId = 'images' | 'word-pdf' | 'pdf' | 'data';
+export type SourceFile = { id: string; file: File };
+export type ProcessingLocation = 'device' | 'server';
+export type ErrorCode = 'UNSUPPORTED' | 'INVALID_FILE' | 'LIMIT_EXCEEDED' | 'ENCODE_FAILED' | 'MEMORY_LIMIT' | 'PASSWORD_PROTECTED' | 'UNSAFE_DOCUMENT' | 'CONSENT_REQUIRED' | 'BUSY' | 'TIMEOUT' | 'NETWORK' | 'UNAVAILABLE' | 'CANCELLED' | 'INTERNAL';
+export type ConversionError = { code: ErrorCode; retryable: boolean; message: string };
+export type Artifact = { id: string; blob: Blob; filename: string; mime: string; size: number; width?: number; height?: number; inputIds?: readonly string[]; inputBytes?: number };
+export type ItemState = 'ready' | 'validating' | 'queued' | 'converting' | 'succeeded' | 'failed' | 'cancelled';
+export type ConversionEvent = { type: 'state'; id: string; state: ItemState } | { type: 'result'; id: string; artifact: Artifact } | { type: 'error'; id: string; error: ConversionError };
+export type ImageFormat = 'jpeg' | 'png' | 'webp';
+export type ResizeSpec = { mode: 'original' } | { mode: 'percentage'; percent: number } | { mode: 'fit'; maxWidth: number; maxHeight: number };
+export type AspectSpec = { mode: 'original' } | { mode: 'crop' | 'pad'; width: number; height: number; anchor: { x: number; y: number } };
+export type ImageOptions = { format: ImageFormat; resize: ResizeSpec; aspect: AspectSpec; padFill: 'transparent' | 'color'; quality: number; background: string; allowUpscale: false };
+export type RunContext = { signal: AbortSignal; emit: (event: ConversionEvent) => void };
+export type RunStarter = (operation: (context: RunContext) => Promise<void>) => void;
+export type ToolPanelProps = { sources: readonly SourceFile[]; startRun: RunStarter; busy: boolean };
+export type ConvertImages = (files: readonly SourceFile[], options: ImageOptions, context: RunContext) => Promise<void>;
+export type ConvertDocument = (source: SourceFile, consent: boolean, context: RunContext) => Promise<void>;
