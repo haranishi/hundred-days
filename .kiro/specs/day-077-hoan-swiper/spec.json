@@ -1,9 +1,9 @@
 {
   "feature_name": "day-077-hoan-swiper",
   "created_at": "2026-10-26T10:50:00+09:00",
-  "updated_at": "2026-10-26T11:30:00+09:00",
+  "updated_at": "2026-10-26",
   "language": "ja",
-  "phase": "local-verified",
+  "phase": "3d-local-verified",
   "approvals": {
     "requirements": {
       "generated": true,
@@ -18,5 +18,6 @@
       "approved": true
     }
   },
-  "ready_for_implementation": true
+  "ready_for_implementation": true,
+  "revision_note": "User requested actual 3D and repository security fixes; existing approvals carried forward."
 }

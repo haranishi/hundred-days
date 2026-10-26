@@ -15,3 +15,10 @@
 - [x] **Task 6**: 公開ゲート・E2E・OGP更新・PR・本番反映・プロモ動画更新
   - 新UIに合わせて `og.svg` / `og.png` と `tests/e2e/day-077.spec.mjs` を更新し、`npm run check` および `npm run publish:check -- --day 77` を通過させる。
   - PR作成・マージ・本番環境検証・新UIでのプロモーション動画再収録およびGoogle Drive／Obsidian更新を行う。
+
+## v3 実3Dへの刷新
+- [x] 既存仕様、UX5階層、描画と操作の境界を3d-design.mdに記録。
+- [x] 手続き3D検査場・全品目形状・材質/影/照明・搬送とX線を実装。
+- [x] UI、3系統入力、視点切替、背景休止、描画失敗時案内を統合。
+- [x] 主要フローの回帰検証と3幅の独立画面/体験評価、指摘修正。
+- [x] 全体check、Day77 E2E、公開ゲートと根拠をv3-validation.mdへ記録。

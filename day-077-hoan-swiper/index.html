@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#0f172a">
-  <meta name="description" content="モバイルバッテリー、化粧水、コードレスヘアアイロン……空港の保安検査コンベアで流れてくる荷物を「機内持ち込み」「預け荷物」「持込不可」の3方向へ瞬時に仕分ける2.5Dゲーム＆全36品目の手荷物ルール早見図鑑。">
+  <meta name="theme-color" content="#163d36">
+  <meta name="description" content="モバイルバッテリー、化粧水、コードレスヘアアイロン……空港の保安検査コンベアで流れてくる荷物を「機内持ち込み」「預け荷物」「持込不可」の3方向へ瞬時に仕分ける3Dゲーム＆全36品目の手荷物ルール早見図鑑。">
   <link rel="canonical" href="https://hundred-days.pages.dev/day-077-hoan-swiper/">
   <meta property="og:url" content="https://hundred-days.pages.dev/day-077-hoan-swiper/">
   <meta name="twitter:card" content="summary_large_image">
@@ -23,7 +23,7 @@
 <body>
   <svg class="svg-defs" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
     <defs>
-      <!-- 仕分け方向アイコン（2.5Dモックアップ準拠） -->
+      <!-- 図鑑用の仕分け方向アイコン -->
       <symbol id="icon-carry-on" viewBox="0 0 48 48">
         <path d="M18 13V9.5a6 6 0 0 1 12 0V13" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round"/>
         <rect x="10" y="13" width="28" height="28" rx="8" fill="currentColor" fill-opacity="0.2" stroke="currentColor" stroke-width="3.2"/>
@@ -272,298 +272,89 @@
   <a class="skip-link" href="#main-content">メインコンテンツへ移動</a>
 
   <header class="terminal-header">
-    <div class="terminal-brand">
-      <span class="gate-badge" aria-hidden="true">GATE 077</span>
-      <div>
-        <h1 class="brand-title">保安検査スワイパー</h1>
-        <p class="brand-subtitle">その荷物、機内？預け？没収？</p>
-      </div>
-    </div>
+    <a class="terminal-brand" href="./" aria-label="保安検査スワイパー ホーム">
+      <span class="brand-mark" aria-hidden="true">✈</span>
+      <div><p class="brand-kicker">AIRPORT SECURITY SIMULATOR</p><h1 class="brand-title">保安検査スワイパー</h1></div>
+      <span class="edition-tag">3D EDITION</span>
+    </a>
     <div class="header-controls">
-      <button id="sound-toggle" class="ctrl-btn" type="button" aria-pressed="false" aria-label="効果音の切り替え">
-        <span id="sound-icon" aria-hidden="true">🔇</span>
-        <span id="sound-label">音 OFF</span>
-      </button>
-      <button id="guide-open-btn" class="ctrl-btn" type="button" aria-haspopup="dialog">
-        <span aria-hidden="true">？</span>
-        <span>3原則ガイド</span>
-      </button>
+      <button id="sound-toggle" class="ctrl-btn" type="button" aria-pressed="false" aria-label="効果音の切り替え"><span id="sound-icon" aria-hidden="true">♪</span><span id="sound-label">音 OFF</span></button>
+      <button id="guide-open-btn" class="ctrl-btn" type="button" aria-label="遊び方と手荷物の3原則ガイド" aria-haspopup="dialog"><span class="help-icon" aria-hidden="true">?</span><span>遊び方</span></button>
     </div>
   </header>
-
-  <nav class="view-tabs" aria-label="画面モード切替">
-    <button id="tab-game" class="view-tab is-active" type="button" aria-selected="true" data-tab="game">
-      <span aria-hidden="true">🛂</span> 検査レーンで仕分ける
-    </button>
-    <button id="tab-catalog" class="view-tab" type="button" aria-selected="false" data-tab="catalog">
-      <span aria-hidden="true">📖</span> 手荷物ルール早見図鑑（全36品）
-    </button>
-  </nav>
-
+  <div class="terminal-nav">
+    <nav class="view-tabs" aria-label="画面モード切替">
+      <button id="tab-game" class="view-tab is-active" type="button" aria-pressed="true" data-tab="game">検査レーン<span>SIMULATOR</span></button>
+      <button id="tab-catalog" class="view-tab" type="button" aria-pressed="false" data-tab="catalog">手荷物ルール図鑑<span>36 ITEMS</span></button>
+    </nav>
+    <span class="terminal-location">TERMINAL 01 <span aria-hidden="true">/</span> LANE 077</span>
+  </div>
   <main id="main-content" class="app-main">
-    <!-- ==================== 1. ゲーム画面セクション ==================== -->
     <section id="panel-game" class="panel-game" aria-label="保安検査仕分けゲーム">
-      <!-- モード選択バー＆自己ベスト -->
-      <div class="mode-bar" role="group" aria-label="シフト選択">
-        <div class="mode-buttons">
-          <button id="mode-rush" class="mode-btn is-selected" type="button" data-mode="rush">
-            <strong>⏱️ 60秒タイムアタック</strong>
-            <span>次々流れる荷物を高速仕分け</span>
-          </button>
-          <button id="mode-training" class="mode-btn" type="button" data-mode="training">
-            <strong>🎓 厳選10問・研修シフト</strong>
-            <span>時間制限なしで頻出10品を確認</span>
-          </button>
-        </div>
-        <div class="record-pills" aria-label="自己ベスト記録">
-          <span>60秒最高: <strong id="best-rush-score">0</strong>&nbsp;pts</span>
-          <span>研修最高: <strong id="best-training-score">0</strong>&nbsp;/&nbsp;10</span>
-        </div>
-      </div>
-
-      <!-- 天吊り空港デジタル電光掲示板風 HUD -->
-      <div class="flight-board-wrap">
-        <div class="hanging-rods" aria-hidden="true">
-          <span></span>
-          <span></span>
-        </div>
+      <div class="shift-heading">
+        <div><p class="eyebrow">YOU ARE THE SECURITY OFFICER</p><h2>その荷物、<span>どこへ？</span></h2><p class="shift-lead">見て、調べて、仕分ける。空の安全は、あなたの判断から。</p></div>
         <div class="flight-board" role="region" aria-label="検査ステータス">
-          <div class="board-topline">
-            <span id="board-shift-badge" class="board-shift-badge">LANE 03 / STANDBY</span>
-            <span class="board-clock" aria-hidden="true">TERMINAL 1 SECURITY</span>
-            <button id="btn-back-standby" class="board-mini-btn" type="button" hidden>⏹ シフト中断・最初へ</button>
-          </div>
+          <div class="board-topline"><span class="status-dot" aria-hidden="true"></span><span id="board-shift-badge">LANE 077 / STANDBY</span><button id="btn-back-standby" class="board-mini-btn" type="button" hidden>中断</button></div>
           <div class="board-grid">
-            <div class="board-cell">
-              <span class="board-label" id="hud-progress-label">TIMER</span>
-              <strong class="board-value" id="hud-timer">1:00</strong>
-            </div>
-            <div class="board-cell">
-              <span class="board-label">SCORE</span>
-              <strong class="board-value board-score" id="hud-score">0</strong>
-            </div>
-            <div class="board-cell">
-              <span class="board-label">COMBO</span>
-              <strong class="board-value board-combo" id="hud-combo">×0</strong>
-            </div>
+            <div class="board-cell"><span class="board-label" id="hud-progress-label">TIMER</span><strong id="hud-timer">1:00</strong></div>
+            <div class="board-cell"><span class="board-label">SCORE</span><strong id="hud-score">0</strong></div>
+            <div class="board-cell"><span class="board-label">COMBO</span><strong id="hud-combo">×0</strong></div>
           </div>
         </div>
       </div>
-
-      <!-- 2.5D 保安検査コンベア＆3方向仕分けステージ -->
       <div id="inspection-stage" class="inspection-stage is-standby">
-        <!-- 空港ターミナル背景＆X線ゲート装飾レイヤー -->
-        <div class="terminal-scene-bg" aria-hidden="true">
-          <div class="terminal-wall-board">
-            <span class="wall-board-title">✈ DEPARTURES / 保安検査場</span>
-            <span class="wall-board-row">GATE 077 TOKYO</span>
+        <div id="xray-arch" class="viewport-wrap">
+          <div class="viewport-chrome"><span><i class="status-dot" aria-hidden="true"></i>保安検査レーン <span class="muted">/ 077</span></span><button id="btn-camera" class="camera-btn" type="button" aria-pressed="false" aria-label="荷物を近くから見る">視点を切り替える <span aria-hidden="true">⤢</span></button></div>
+          <div id="security-tray" class="scene-surface" tabindex="0" role="group" aria-label="3D検査トレイ。左・上・右へスワイプ、または矢印キーで仕分け">
+            <canvas id="inspection-canvas" aria-label="空港の3D保安検査場。現在の荷物は右の検査モニターに表示されます"></canvas>
+            <div id="scene-loading" class="scene-loading" role="status"><span class="loading-ring" aria-hidden="true"></span>検査レーンを準備しています</div>
+            <div id="scene-error" class="scene-error" role="status" hidden><strong>3D表示を開始できませんでした</strong><p>ブラウザのハードウェアアクセラレーションをご確認ください。下の仕分けボタンと図鑑は引き続き使えます。</p><button id="btn-scene-retry" type="button" class="secondary-btn">再読み込み</button></div>
+            <div class="scene-item-label"><strong id="scene-item-name">モバイルバッテリー</strong><span id="scene-item-spec">10,000mAh・37Wh</span></div>
+            <span id="tray-stamp" class="tray-stamp" aria-hidden="true"></span>
+            <div class="scene-caption"><span class="scene-caption-code">SECURITY CHECKPOINT</span><span id="scene-status">3D検査場</span></div>
           </div>
-          <div id="xray-arch" class="xray-arch">
-            <div class="arch-top">
-              <span id="arch-lamp" class="arch-lamp"></span>
-              <span class="arch-label">X-RAY</span>
-            </div>
-            <div class="arch-tunnel">
-              <div id="next-tray-preview" class="next-tray-preview">
-                <span class="next-tray-tag">NEXT</span>
-                <span id="next-tray-name" class="next-tray-name">待機中…</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- ==================== 初回オンボーディング・スタート画面オーバーレイ ==================== -->
-        <div id="start-overlay" class="start-overlay" role="region" aria-labelledby="start-title">
-          <div class="start-card">
-            <div class="start-badge-row">
-              <span class="start-pill">🛂 空港保安検査シミュレーション</span>
-              <span class="start-pill start-pill-sub">全36品目・国土交通省基準</span>
-            </div>
-            <h2 id="start-title" class="start-title">その荷物、機内？預け？没収？</h2>
-            <p class="start-lead">
-              検査トレイの荷物を<strong>「← 機内持ち込み」「↑ 預け荷物」「→ 持込不可」</strong>の3方向へスワイプ（またはボタン／矢印キー）で仕分けましょう！
-            </p>
-
-            <!-- 3秒でわかる3方向仕分け図解 -->
-            <div class="start-rules-grid" aria-label="3方向の仕分けルール">
-              <div class="start-rule-box start-dir-card rule-carry">
-                <span class="rule-dir">← 左（青）</span>
-                <strong>機内持ち込み</strong>
-                <small>モバイルバッテリー・ライター1個・100ml以下透明袋</small>
-              </div>
-              <div class="start-rule-box start-dir-card rule-checked">
-                <span class="rule-dir">↑ 上（黄）</span>
-                <strong>預け荷物</strong>
-                <small>ハサミ・工具・国際線100ml超ボトル・保冷剤</small>
-              </div>
-              <div class="start-rule-box start-dir-card rule-prohibited">
-                <span class="rule-dir">→ 右（赤）</span>
-                <strong>持込不可（没収）</strong>
-                <small>電池外せないヘアアイロン・花火・200Wh電源</small>
-              </div>
-            </div>
-
-            <!-- スタート画面内のシフト選択＆開始CTA -->
-            <div class="start-cta-group">
-              <button id="btn-start-shift" class="start-primary-btn" type="button">
-                <span class="start-btn-icon" aria-hidden="true">▶</span>
-                <span id="start-primary-label">60秒タイムアタックを開始する（START）</span>
-              </button>
-              <div class="start-sub-actions">
-                <button id="btn-start-training-direct" class="start-secondary-btn" type="button">
-                  🎓 じっくり10問・研修シフトで始める
-                </button>
-                <button id="btn-start-tutorial" class="start-secondary-btn start-tutorial-btn" type="button">
-                  🖐️ 1問おためし練習（10秒）
-                </button>
-              </div>
-            </div>
+          <div class="sort-instruction"><span class="instruction-line"></span><span>荷物をスワイプ、またはボタンで仕分け</span><span class="instruction-line"></span></div>
+          <button id="btn-start-mobile" class="start-primary-btn mobile-start" type="button"><span id="mobile-start-label">10問の検査をはじめる</span><span aria-hidden="true">↗</span></button>
+          <div class="sorting-controls" role="group" aria-label="荷物の仕分け先">
+            <button id="btn-carry-on" class="action-zone zone-carry" type="button" data-action="carry_on" aria-label="機内持ち込みへ仕分ける（左矢印キーまたはAキー）"><span class="action-arrow" aria-hidden="true">←</span><span><strong>機内持ち込み</strong><small>CARRY-ON</small></span><kbd>A</kbd></button>
+            <button id="btn-checked" class="action-zone zone-checked" type="button" data-action="checked" aria-label="預け荷物へ仕分ける（上矢印キーまたはWキー）"><span class="action-arrow" aria-hidden="true">↑</span><span><strong>預け荷物</strong><small>CHECKED</small></span><kbd>W</kbd></button>
+            <button id="btn-prohibited" class="action-zone zone-prohibited" type="button" data-action="prohibited" aria-label="持込不可へ仕分ける（右矢印キーまたはDキー）"><span class="action-arrow" aria-hidden="true">→</span><span><strong>持込不可</strong><small>PROHIBITED</small></span><kbd>D</kbd></button>
           </div>
         </div>
-
-        <!-- プレイ中常時表示されるステップコーチ＆直近判定モニター（高さ完全固定でCLSゼロ・トレイ直上配置） -->
-        <div id="coach-banner" class="coach-banner" hidden>
-          <span id="coach-step-badge" class="coach-step-badge">💡 第1問ガイド</span>
-          <p id="coach-text" class="coach-text">
-            トレイの荷物を確認し、「← 機内持ち込み」「↑ 預け荷物」「→ 持込不可」へ仕分けましょう！
-          </p>
-        </div>
-
-        <div id="feedback-banner" class="feedback-banner" role="status" aria-live="polite">
-          <div class="feedback-top-row">
-            <span id="feedback-badge" class="feedback-badge">検査スタンバイ</span>
-            <span id="feedback-item-chip" class="feedback-item-chip">シフト開始で検査レーン稼働</span>
-          </div>
-          <p id="feedback-text" class="feedback-text">
-            流れてくる荷物を「← 機内持ち込み」「↑ 預け荷物」「→ 持込不可」へ仕分けてください。「🔍 X線透視」で内部構造を確認できます。
-          </p>
-        </div>
-
-        <!-- 上方向：預け荷物（スーツケース） -->
-        <div class="zone-top-wrap">
-          <button id="btn-checked" class="action-zone zone-checked" type="button" data-action="checked" aria-label="預け荷物へ仕分ける（上矢印キーまたはWキー）">
-            <span class="zone-arrow" aria-hidden="true">↑</span>
-            <svg class="zone-icon" viewBox="0 0 48 48" aria-hidden="true"><use href="#icon-checked"/></svg>
-            <span class="zone-text">
-              <strong>預け荷物へ</strong>
-              <small>スーツケース預託 (↑ / W)</small>
-            </span>
-          </button>
-        </div>
-
-        <!-- 中央：2.5Dベルトコンベアと成形プラスチック検査トレイ -->
-        <div class="conveyor-middle">
-          <!-- 左方向：機内持ち込み（客室バッグ） -->
-          <button id="btn-carry-on" class="action-zone zone-carry" type="button" data-action="carry_on" aria-label="機内持ち込みへ仕分ける（左矢印キーまたはAキー）">
-            <span class="zone-arrow" aria-hidden="true">←</span>
-            <svg class="zone-icon" viewBox="0 0 48 48" aria-hidden="true"><use href="#icon-carry-on"/></svg>
-            <span class="zone-text">
-              <strong>機内持ち込み</strong>
-              <small>客室手荷物 (← / A)</small>
-            </span>
-          </button>
-
-          <!-- 斜め立体ローラーコンベア＆プラスチックトレイ -->
-          <div class="conveyor-lane" aria-live="polite">
-            <div class="conveyor-rail rail-top" aria-hidden="true"></div>
-            <div class="conveyor-belt-stripes" aria-hidden="true"></div>
-            <div class="conveyor-rail rail-bottom" aria-hidden="true"></div>
-
-            <div id="security-tray" class="security-tray" tabindex="0" role="group" aria-label="検査トレイの荷物">
-              <!-- スワイプ・判定時の検印スタンプ -->
-              <div id="tray-stamp" class="tray-stamp" aria-hidden="true"></div>
-
-              <div class="tray-rim">
-                <div class="tray-inner">
-                  <div class="tray-header">
-                    <span id="item-category-badge" class="tray-cat-badge">電池・電子機器</span>
-                    <div class="tray-header-right">
-                      <button id="btn-xray-toggle" class="xray-toggle-btn" type="button" aria-pressed="false" title="X線透視スキャンで内部構造を確認（Spaceキー）">
-                        <span aria-hidden="true">🔍</span>
-                        <span id="xray-btn-label">X線透視</span>
-                      </button>
-                      <span id="item-counter-badge" class="tray-count-badge">ITEM #01</span>
-                    </div>
-                  </div>
-
-                  <div class="tray-main-row">
-                    <div class="tray-visual-stage">
-                      <!-- サイズ比較用スマートフォン小物（モバイルでも表示） -->
-                      <div class="tray-companion-phone" aria-hidden="true" title="サイズ比較用スマートフォン">
-                        <div class="phone-screen"></div>
-                      </div>
-                      <div class="tray-visual">
-                        <div class="xray-scanline" aria-hidden="true"></div>
-                        <svg id="item-svg" class="item-illustration" viewBox="0 0 96 96" aria-hidden="true">
-                          <use id="item-svg-use" href="#item-battery"/>
-                        </svg>
-                      </div>
-                    </div>
-
-                    <div class="tray-item-info">
-                      <h2 id="item-name" class="item-title">モバイルバッテリー</h2>
-                      <p id="item-spec" class="item-spec">10,000mAh・定格37Wh</p>
-                    </div>
-                  </div>
-
-                  <!-- 固定高さテレメトリ枠（X線OFF時は待機ガイド、ON時はX線所見を表示して高さ変化ゼロ） -->
-                  <div class="tray-telemetry-slot">
-                    <div id="xray-standby-hint" class="xray-standby-hint">
-                      <span>📡 内部構造（電池・刃渡り・容器容量）は右上の<strong>「🔍 X線透視」</strong>（またはSpaceキー）で透視できます</span>
-                    </div>
-                    <div id="xray-telemetry" class="xray-telemetry" hidden>
-                      <p id="xray-material-tag" class="xray-material-tag"></p>
-                      <p id="xray-inspect-point" class="xray-inspect-point"></p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="tray-footer-bar">
-                <span class="tray-id-tag" aria-hidden="true">TRAY #077-A</span>
-                <p class="swipe-hint" aria-hidden="true">ドラッグ ／ 3方向ボタン ／ 矢印キーで仕分け</p>
-              </div>
+        <aside class="inspection-console" aria-label="検査モニター">
+          <div class="console-topline"><span>INSPECTION DESK</span><span class="console-number">01—36</span></div>
+          <div id="start-overlay" class="start-overlay" role="region" aria-labelledby="start-title">
+            <p class="eyebrow">WELCOME ABOARD</p><h2 id="start-title">搭乗前の、<br>腕だめし。</h2><p class="start-lead">あなたは空港の保安検査員。<br>トレイの荷物を、正しい行き先へ。</p>
+            <div class="direction-guide" aria-label="3方向のルール"><span><b>←</b>機内</span><span><b>↑</b>預け</span><span><b>→</b>持込不可</span></div>
+            <p class="field-label">シフトを選ぶ</p>
+            <div class="mode-buttons" role="group" aria-label="シフト選択">
+              <button id="mode-training" class="mode-btn is-selected" type="button" aria-pressed="true"><span class="mode-radio" aria-hidden="true"></span><span><strong>10問・研修シフト</strong><small>時間制限なしで、じっくり</small></span><span class="mode-tag">はじめてに</span></button>
+              <button id="mode-rush" class="mode-btn" type="button" aria-pressed="false"><span class="mode-radio" aria-hidden="true"></span><span><strong>60秒タイムアタック</strong><small>連続正解でハイスコアへ</small></span></button>
             </div>
+            <button id="btn-start-shift" class="start-primary-btn" type="button"><span id="start-primary-label">検査をはじめる</span><span aria-hidden="true">↗</span></button>
+            <button id="btn-start-tutorial" class="start-tutorial-btn" type="button">まずは1問、おためし練習 <span aria-hidden="true">→</span></button>
+            <button id="btn-start-training-direct" type="button" hidden>10問研修を開始</button>
           </div>
-
-          <!-- 右方向：持込不可（放棄・没収） -->
-          <button id="btn-prohibited" class="action-zone zone-prohibited" type="button" data-action="prohibited" aria-label="持込不可・没収へ仕分ける（右矢印キーまたはDキー）">
-            <span class="zone-arrow" aria-hidden="true">→</span>
-            <svg class="zone-icon" viewBox="0 0 48 48" aria-hidden="true"><use href="#icon-prohibited"/></svg>
-            <span class="zone-text">
-              <strong>持込不可（没収）</strong>
-              <small>両方ともNG (→ / D)</small>
-            </span>
-          </button>
-        </div>
-
-        <!-- モバイル用下部3ボタン（親指で押しやすい配置） -->
-        <div class="mobile-action-bar" role="group" aria-label="スマートフォン用仕分けボタン">
-          <button class="mobile-act-btn act-carry" type="button" data-action="carry_on">
-            <span class="m-arrow" aria-hidden="true">←</span>
-            <strong>機内持ち込み</strong>
-            <small>客室へ携帯</small>
-          </button>
-          <button class="mobile-act-btn act-checked" type="button" data-action="checked">
-            <span class="m-arrow" aria-hidden="true">↑</span>
-            <strong>預け荷物へ</strong>
-            <small>スーツケース</small>
-          </button>
-          <button class="mobile-act-btn act-prohibited" type="button" data-action="prohibited">
-            <span class="m-arrow" aria-hidden="true">→</span>
-            <strong>持込不可</strong>
-            <small>両方NG・破棄</small>
-          </button>
-        </div>
+          <div id="active-console" class="active-console" hidden>
+            <div class="item-topline"><span id="item-category-badge">電池・電子機器</span><span id="item-counter-badge">ITEM #01</span></div>
+            <div class="item-title-row"><div><p class="field-label">現在の検査品</p><h2 id="item-name">モバイルバッテリー</h2></div><svg class="item-small-icon" viewBox="0 0 96 96" aria-hidden="true"><use id="item-svg-use" href="#item-battery"/></svg></div>
+            <p id="item-spec" class="item-spec">10,000mAh・37Wh</p>
+            <button id="btn-xray-toggle" class="xray-toggle-btn" type="button" aria-pressed="false"><span class="scan-icon" aria-hidden="true">⌗</span><span id="xray-btn-label">X線透視</span><kbd>SPACE</kbd></button>
+            <div class="xray-readout"><div id="xray-standby-hint"><p class="readout-label">SCANNER READY</p><p>迷ったらX線で、中の構造を確認。</p></div><div id="xray-telemetry" hidden><p id="xray-material-tag" class="readout-label"></p><p id="xray-inspect-point"></p><small>ゲーム用の模式図です</small></div></div>
+            <div id="feedback-banner" class="feedback-banner" role="status" aria-live="polite"><span id="feedback-badge">検査スタンバイ</span><span id="feedback-item-chip" class="sr-only"></span><p id="feedback-text"></p></div>
+            <div class="next-item"><span>NEXT IN LINE</span><strong id="next-tray-name">次の荷物</strong></div>
+          </div>
+          <div class="desk-records"><span>BEST RECORD</span><span>研修 <b id="best-training-score">0</b>/10</span><span>60秒 <b id="best-rush-score">0</b> pts</span></div>
+        </aside>
+        <div id="coach-banner" class="coach-banner" hidden><span id="coach-step-badge">第1問ガイド</span><p id="coach-text"></p></div>
       </div>
-
-      <!-- ゲーム終了時のリザルト＆復習パネル -->
       <section id="result-panel" class="result-panel" aria-labelledby="result-heading" hidden>
         <div class="result-card">
           <div class="result-top">
             <span id="result-grade" class="result-grade">S</span>
             <div class="result-titles">
               <p class="result-eyebrow">SHIFT COMPLETED / 検査シフト完了</p>
-              <h2 id="result-heading" class="result-title">伝説の保安検査長</h2>
+              <h2 id="result-heading" class="result-title" tabindex="-1">伝説の保安検査長</h2>
               <p id="result-comment" class="result-comment"></p>
             </div>
           </div>

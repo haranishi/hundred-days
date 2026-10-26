@@ -29,6 +29,13 @@ let timerId = null;
 let timerRunning = false;
 let itemPresentedAt = Date.now();
 let selectedCategory = 'all';
+let scene = null;
+let cameraClose = false;
+let actionPending = false;
+let pendingActionTimer = null;
+let pausedByOverlay = false;
+const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
 
 // DOM参照
 const elSoundToggle = document.getElementById('sound-toggle');
@@ -61,6 +68,13 @@ const elXrayArch = document.getElementById('xray-arch');
 const elNextTrayName = document.getElementById('next-tray-name');
 
 const elStartOverlay = document.getElementById('start-overlay');
+const elActiveConsole = document.getElementById('active-console');
+const elCanvas = document.getElementById('inspection-canvas');
+const elSceneLoading = document.getElementById('scene-loading');
+const elSceneError = document.getElementById('scene-error');
+const elCameraButton = document.getElementById('btn-camera');
+const elSceneStatus = document.getElementById('scene-status');
+
 const elStartPrimaryLabel = document.getElementById('start-primary-label');
 const elBtnStartShift = document.getElementById('btn-start-shift');
 const elBtnStartTrainingDirect = document.getElementById('btn-start-training-direct');
@@ -119,7 +133,7 @@ function formatSeconds(sec) {
 function updateSoundButtonUI() {
   const on = sound.isEnabled();
   elSoundToggle.setAttribute('aria-pressed', String(on));
-  elSoundIcon.textContent = on ? '🔊' : '🔇';
+  elSoundIcon.textContent = on ? '♫' : '♪';
   elSoundLabel.textContent = on ? '音 ON' : '音 OFF';
 }
 
@@ -154,6 +168,8 @@ function ensureRushTimerStarted() {
 function setXrayMode(enabled, playSfx = false) {
   xrayEnabled = Boolean(enabled);
   elSecurityTray.classList.toggle('is-xray', xrayEnabled);
+  callScene('setXray', xrayEnabled);
+  elCanvas.dataset.xray = String(xrayEnabled);
   elBtnXrayToggle.setAttribute('aria-pressed', String(xrayEnabled));
   elXrayBtnLabel.textContent = xrayEnabled ? 'X線 ON' : 'X線透視';
   elXrayTelemetry.hidden = !xrayEnabled;
@@ -216,26 +232,31 @@ function renderCoachBanner() {
 
 function renderStartOverlay() {
   elStartOverlay.hidden = !isStandby;
+  document.getElementById('mobile-start-label').textContent = gameState.mode === 'training' ? '10問の検査をはじめる' : '60秒の検査をはじめる';
+  elActiveConsole.hidden = isStandby;
+  for (const button of allActionButtons) button.disabled = isStandby || actionPending;
+  callScene('setActive', !elPanelGame.hidden && !elInspectionStage.hidden && !document.hidden);
+  elSceneStatus.textContent = isStandby ? '検査待機中' : '荷物を仕分けてください';
   elInspectionStage.classList.toggle('is-standby', isStandby);
   document.body.classList.toggle('is-standby', isStandby);
   document.body.classList.toggle('is-playing', !isStandby && gameState.status === 'playing');
   elBtnBackStandby.hidden = isStandby || gameState.status !== 'playing';
   if (gameState.mode === 'training') {
-    elStartPrimaryLabel.textContent = '厳選10問・研修シフトを開始する（START）';
+    elStartPrimaryLabel.textContent = '10問の検査をはじめる';
   } else {
-    elStartPrimaryLabel.textContent = '60秒タイムアタックを開始する（START）';
+    elStartPrimaryLabel.textContent = '60秒の検査をはじめる';
   }
 }
 
 function renderHud() {
   if (isStandby) {
-    elBoardShiftBadge.textContent = 'LANE 03 / STANDBY';
+    elBoardShiftBadge.textContent = 'LANE 077 / STANDBY';
   } else if (isTutorial) {
-    elBoardShiftBadge.textContent = 'LANE 03 / TUTORIAL';
+    elBoardShiftBadge.textContent = 'LANE 077 / TUTORIAL';
   } else if (gameState.mode === 'training') {
-    elBoardShiftBadge.textContent = 'LANE 03 / TRAINING 10';
+    elBoardShiftBadge.textContent = 'LANE 077 / TRAINING 10';
   } else {
-    elBoardShiftBadge.textContent = 'LANE 03 / 60s RUSH';
+    elBoardShiftBadge.textContent = 'LANE 077 / 60s RUSH';
   }
 
   if (gameState.mode === 'rush') {
@@ -261,6 +282,10 @@ function renderCurrentTray() {
   elItemSvgUse.setAttribute('href', `#item-${item.icon}`);
   elItemName.textContent = item.name;
   elItemSpec.textContent = item.spec;
+  document.getElementById('scene-item-name').textContent = item.name;
+  document.getElementById('scene-item-spec').textContent = item.spec;
+  elCanvas.dataset.item = item.id;
+  callScene('showItem', item);
 
   const xray = getXrayTelemetry(item);
   if (xray) {
@@ -391,22 +416,20 @@ function onGameFinished() {
 
   renderReviewList(gameState);
   elInspectionStage.hidden = true;
+  callScene('setActive', false);
   elResultPanel.hidden = false;
+  elResultHeading.focus({ preventScroll: true });
+  elResultPanel.scrollIntoView({ block: 'start', behavior: 'instant' });
 }
 
 function handleAction(action) {
-  if (gameState.status !== 'playing') return;
-
-  // スタート画面のまま操作された場合もシームレスにシフト開始する
-  if (isStandby) {
-    isStandby = false;
-    renderStartOverlay();
-  }
+  if (gameState.status !== 'playing' || actionPending || isStandby) return;
 
   // おためし練習モード時の処理
   if (isTutorial) {
     if (action !== 'carry_on') {
       sound.playWrong();
+      callScene('setDrag', 0, 0);
       flashTrayAndArch(false, action);
       elFeedbackBanner.classList.remove('is-correct');
       elFeedbackBanner.classList.add('is-wrong');
@@ -418,7 +441,9 @@ function handleAction(action) {
     }
 
     sound.playCorrect(1);
+    callScene('sort', action, true);
     flashTrayAndArch(true, action);
+    holdActions();
     isTutorial = false;
     gameState = createGameState(gameState.mode);
     renderHud();
@@ -444,7 +469,9 @@ function handleAction(action) {
     } else {
       sound.playWrong();
     }
+    callScene('sort', action, last.isCorrect);
     flashTrayAndArch(last.isCorrect, action);
+    holdActions();
   }
 
   renderHud();
@@ -460,12 +487,15 @@ function handleAction(action) {
 }
 
 function prepareStandby(mode = gameState.mode) {
+  releaseActions();
   stopTimer();
   isStandby = true;
   isTutorial = false;
   gameState = createGameState(mode);
   elModeRush.classList.toggle('is-selected', mode === 'rush');
   elModeTraining.classList.toggle('is-selected', mode === 'training');
+  elModeTraining.setAttribute('aria-pressed', String(mode === 'training'));
+  elModeRush.setAttribute('aria-pressed', String(mode === 'rush'));
   elInspectionStage.hidden = false;
   elResultPanel.hidden = true;
   renderStartOverlay();
@@ -476,15 +506,21 @@ function prepareStandby(mode = gameState.mode) {
 }
 
 function startActiveShift(mode = gameState.mode) {
+  releaseActions();
   stopTimer();
   isStandby = false;
   isTutorial = false;
   gameState = createGameState(mode);
   elModeRush.classList.toggle('is-selected', mode === 'rush');
   elModeTraining.classList.toggle('is-selected', mode === 'training');
+  elModeTraining.setAttribute('aria-pressed', String(mode === 'training'));
+  elModeRush.setAttribute('aria-pressed', String(mode === 'rush'));
   elInspectionStage.hidden = false;
   elResultPanel.hidden = true;
+  pausedByOverlay = false;
+  setInspectionView();
   sound.playStart();
+  elSecurityTray.focus({ preventScroll: true });
   renderStartOverlay();
   renderHud();
   renderCurrentTray();
@@ -493,6 +529,7 @@ function startActiveShift(mode = gameState.mode) {
 }
 
 function startTutorialPractice() {
+  releaseActions();
   stopTimer();
   isStandby = false;
   isTutorial = true;
@@ -504,7 +541,10 @@ function startTutorialPractice() {
   };
   elInspectionStage.hidden = false;
   elResultPanel.hidden = true;
+  pausedByOverlay = false;
+  setInspectionView();
   sound.playStart();
+  elSecurityTray.focus({ preventScroll: true });
   renderStartOverlay();
   renderHud();
   renderCurrentTray();
@@ -587,15 +627,18 @@ function renderCatalogItems() {
 function switchTab(tabName) {
   const isGame = tabName === 'game';
   elTabGame.classList.toggle('is-active', isGame);
-  elTabGame.setAttribute('aria-selected', String(isGame));
+  elTabGame.setAttribute('aria-pressed', String(isGame));
   elTabCatalog.classList.toggle('is-active', !isGame);
-  elTabCatalog.setAttribute('aria-selected', String(!isGame));
+  elTabCatalog.setAttribute('aria-pressed', String(!isGame));
   elPanelGame.hidden = !isGame;
   elPanelCatalog.hidden = isGame;
 
   if (!isGame) {
-    stopTimer();
+    pauseShift();
+  } else {
+    resumeShift();
   }
+  callScene('setActive', isGame && !elInspectionStage.hidden && !document.hidden);
 }
 
 // ==================== イベント結線 ====================
@@ -611,6 +654,7 @@ elSoundToggle.addEventListener('click', () => {
 });
 
 elGuideOpenBtn.addEventListener('click', () => {
+  pauseShift();
   if (typeof elGuideDialog.showModal === 'function') {
     elGuideDialog.showModal();
   } else {
@@ -628,14 +672,16 @@ function closeGuideDialog() {
 
 elGuideCloseBtn.addEventListener('click', closeGuideDialog);
 elGuideOkBtn.addEventListener('click', closeGuideDialog);
+elGuideDialog.addEventListener('close', resumeShift);
 
 elTabGame.addEventListener('click', () => switchTab('game'));
 elTabCatalog.addEventListener('click', () => switchTab('catalog'));
 
-elModeRush.addEventListener('click', () => startActiveShift('rush'));
-elModeTraining.addEventListener('click', () => startActiveShift('training'));
+elModeRush.addEventListener('click', () => isStandby ? prepareStandby('rush') : startActiveShift('rush'));
+elModeTraining.addEventListener('click', () => isStandby ? prepareStandby('training') : startActiveShift('training'));
 
 elBtnStartShift.addEventListener('click', () => startActiveShift(gameState.mode));
+document.getElementById('btn-start-mobile').addEventListener('click', () => startActiveShift(gameState.mode));
 elBtnStartTrainingDirect.addEventListener('click', () => startActiveShift('training'));
 elBtnStartTutorial.addEventListener('click', () => startTutorialPractice());
 elBtnBackStandby.addEventListener('click', () => prepareStandby(gameState.mode));
@@ -666,7 +712,7 @@ for (const btn of allActionButtons) {
 
 // キーボードショートカット（矢印キー & WASD & SpaceでX線透視）
 window.addEventListener('keydown', (event) => {
-  if (elPanelGame.hidden || elGuideDialog.open || gameState.status !== 'playing') {
+  if (isStandby || event.repeat || elPanelGame.hidden || elGuideDialog.open || gameState.status !== 'playing') {
     return;
   }
   const tag = document.activeElement?.tagName;
@@ -699,8 +745,8 @@ function clearDragHighlights() {
 }
 
 elSecurityTray.addEventListener('pointerdown', (event) => {
-  if (event.target.closest('#btn-xray-toggle')) return;
-  if (gameState.status !== 'playing') return;
+  if (event.target.closest('button, a, input, select, textarea')) return;
+  if (event.button !== 0 || isStandby || actionPending || gameState.status !== 'playing') return;
   dragStart = { x: event.clientX, y: event.clientY, pointerId: event.pointerId };
   if (elSecurityTray.setPointerCapture) {
     try {
@@ -717,7 +763,7 @@ elSecurityTray.addEventListener('pointermove', (event) => {
   const dy = event.clientY - dragStart.y;
   const clampX = Math.max(-95, Math.min(95, dx));
   const clampY = Math.max(-95, Math.min(40, dy));
-  elSecurityTray.style.transform = `translate(${clampX * 0.45}px, ${clampY * 0.45}px) rotate(${clampX * 0.08}deg)`;
+  callScene('setDrag', clampX, clampY);
 
   clearDragHighlights();
   if (dy < -42 && Math.abs(dy) > Math.abs(dx)) {
@@ -739,7 +785,7 @@ function finishDrag(event) {
   const dx = event ? event.clientX - dragStart.x : 0;
   const dy = event ? event.clientY - dragStart.y : 0;
   dragStart = null;
-  elSecurityTray.style.transform = '';
+  callScene('setDrag', 0, 0);
   clearDragHighlights();
 
   if (dy < -50 && Math.abs(dy) > Math.abs(dx)) {
@@ -754,11 +800,114 @@ function finishDrag(event) {
 }
 
 elSecurityTray.addEventListener('pointerup', finishDrag);
-elSecurityTray.addEventListener('pointercancel', finishDrag);
+elSecurityTray.addEventListener('pointercancel', () => {
+  dragStart = null;
+  callScene('setDrag', 0, 0);
+  clearDragHighlights();
+  showStampPreview(null);
+});
+elSecurityTray.addEventListener('lostpointercapture', () => {
+  dragStart = null;
+  callScene('setDrag', 0, 0);
+  clearDragHighlights();
+});
+
+function holdActions() {
+  actionPending = true;
+  for (const button of allActionButtons) button.disabled = true;
+  pendingActionTimer = setTimeout(releaseActions, reducedMotion.matches ? 60 : 430);
+}
+
+function releaseActions() {
+  clearTimeout(pendingActionTimer);
+  pendingActionTimer = null;
+  actionPending = false;
+  for (const button of allActionButtons) button.disabled = isStandby || gameState.status !== 'playing';
+}
+
+function pauseShift() {
+  if (timerRunning) {
+    pausedByOverlay = true;
+    stopTimer();
+    elSceneStatus.textContent = '一時停止中';
+  }
+}
+
+function resumeShift() {
+  if (pausedByOverlay && !document.hidden && !elPanelGame.hidden && !elGuideDialog.open && !isStandby) {
+    pausedByOverlay = false;
+    ensureRushTimerStarted();
+    elSceneStatus.textContent = '荷物を仕分けてください';
+  }
+}
+
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) pauseShift();
+  else resumeShift();
+});
+
+function setInspectionView() {
+  cameraClose = true;
+  callScene('setView', 'close');
+  elCameraButton.setAttribute('aria-pressed', 'true');
+  elCameraButton.setAttribute('aria-label', '検査レーン全体を見る');
+}
+
+elCameraButton.addEventListener('click', () => {
+  cameraClose = !cameraClose;
+  callScene('setView', cameraClose ? 'close' : 'overview');
+  elCameraButton.setAttribute('aria-pressed', String(cameraClose));
+  elCameraButton.setAttribute('aria-label', cameraClose ? '検査レーン全体を見る' : '荷物を近くから見る');
+  elCanvas.dataset.view = cameraClose ? 'close' : 'overview';
+});
+document.getElementById('btn-scene-retry').addEventListener('click', () => window.location.reload());
+
+function callScene(method, ...args) {
+  if (!scene) return;
+  try { return scene[method](...args); }
+  catch { showSceneError(); }
+}
+
+function showSceneError() {
+  const failed = scene;
+  scene = null;
+  try { failed?.dispose(); } catch { /* Keep the text game available after a renderer failure. */ }
+
+  elSceneLoading.hidden = true;
+  elSceneError.hidden = false;
+  elCanvas.dataset.ready = 'false';
+  elCameraButton.disabled = true;
+  elSceneStatus.textContent = '3D表示を利用できません';
+}
+
+async function initializeScene() {
+  try {
+    const { createInspectionScene } = await import('./lib/scene.js');
+    scene = createInspectionScene(elCanvas, {
+      reducedMotion: reducedMotion.matches,
+      onReady() { elSceneLoading.hidden = true; elSceneError.hidden = true; },
+      onError: showSceneError
+    });
+    callScene('showItem', gameState.currentItem);
+    callScene('setXray', xrayEnabled);
+    callScene('setView', cameraClose ? 'close' : 'overview');
+    callScene('setActive', !elPanelGame.hidden && !elInspectionStage.hidden && !document.hidden);
+  } catch {
+    showSceneError();
+  }
+}
+window.addEventListener('pagehide', (event) => {
+  if (event.persisted) callScene('setActive', false);
+  else callScene('dispose');
+});
+window.addEventListener('pageshow', (event) => {
+  if (event.persisted) callScene('setActive', !elPanelGame.hidden && !elInspectionStage.hidden && !document.hidden);
+});
 
 // 初期化
 updateSoundButtonUI();
 updateBestRecordUI();
 renderCatalogCategories();
 renderCatalogItems();
-prepareStandby('rush');
+prepareStandby('training');
+initializeScene();
