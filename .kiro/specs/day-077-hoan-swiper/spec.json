@@ -1,9 +1,9 @@
 {
   "feature_name": "day-077-hoan-swiper",
   "created_at": "2026-10-26T10:50:00+09:00",
-  "updated_at": "2026-10-26",
+  "updated_at": "2026-10-27",
   "language": "ja",
-  "phase": "3d-local-verified",
+  "phase": "start-flow-local-verified",
   "approvals": {
     "requirements": {
       "generated": true,
@@ -19,5 +19,5 @@
     }
   },
   "ready_for_implementation": true,
-  "revision_note": "User requested actual 3D and repository security fixes; existing approvals carried forward."
+  "revision_note": "User requested an obvious start button and responsive input; start gate and render scheduling revised."
 }

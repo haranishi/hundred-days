@@ -68,6 +68,7 @@ const elXrayArch = document.getElementById('xray-arch');
 const elNextTrayName = document.getElementById('next-tray-name');
 
 const elStartOverlay = document.getElementById('start-overlay');
+const elStandbyConsole = document.getElementById('standby-console');
 const elActiveConsole = document.getElementById('active-console');
 const elCanvas = document.getElementById('inspection-canvas');
 const elSceneLoading = document.getElementById('scene-loading');
@@ -77,7 +78,6 @@ const elSceneStatus = document.getElementById('scene-status');
 
 const elStartPrimaryLabel = document.getElementById('start-primary-label');
 const elBtnStartShift = document.getElementById('btn-start-shift');
-const elBtnStartTrainingDirect = document.getElementById('btn-start-training-direct');
 const elBtnStartTutorial = document.getElementById('btn-start-tutorial');
 
 const elCoachBanner = document.getElementById('coach-banner');
@@ -232,25 +232,28 @@ function renderCoachBanner() {
 
 function renderStartOverlay() {
   elStartOverlay.hidden = !isStandby;
-  document.getElementById('mobile-start-label').textContent = gameState.mode === 'training' ? '10問の検査をはじめる' : '60秒の検査をはじめる';
+  elStandbyConsole.hidden = !isStandby;
+  document.getElementById('start-mode-note').textContent = gameState.mode === 'training' ? '10問の研修・時間制限なし' : 'スタートから60秒で、いくつ仕分けられる？';
+  document.getElementById('sort-instruction-text').textContent = isStandby ? 'ゲームスタートを押して検査をはじめましょう' : '荷物をスワイプ、またはボタンで仕分け';
   elActiveConsole.hidden = isStandby;
   for (const button of allActionButtons) button.disabled = isStandby || actionPending;
-  callScene('setActive', !elPanelGame.hidden && !elInspectionStage.hidden && !document.hidden);
+  callScene('setActive', !isStandby && !elPanelGame.hidden && !elInspectionStage.hidden && !document.hidden);
   elSceneStatus.textContent = isStandby ? '検査待機中' : '荷物を仕分けてください';
   elInspectionStage.classList.toggle('is-standby', isStandby);
   document.body.classList.toggle('is-standby', isStandby);
   document.body.classList.toggle('is-playing', !isStandby && gameState.status === 'playing');
   elBtnBackStandby.hidden = isStandby || gameState.status !== 'playing';
-  if (gameState.mode === 'training') {
-    elStartPrimaryLabel.textContent = '10問の検査をはじめる';
-  } else {
-    elStartPrimaryLabel.textContent = '60秒の検査をはじめる';
-  }
+  elStartPrimaryLabel.textContent = 'ゲームスタート';
 }
 
 function renderHud() {
   if (isStandby) {
-    elBoardShiftBadge.textContent = 'LANE 077 / STANDBY';
+    elBoardShiftBadge.textContent = '開始前 / STANDBY';
+    elHudProgressLabel.textContent = 'READY';
+    elHudTimer.textContent = '開始前';
+    elHudScore.textContent = '—';
+    elHudCombo.textContent = '—';
+    return;
   } else if (isTutorial) {
     elBoardShiftBadge.textContent = 'LANE 077 / TUTORIAL';
   } else if (gameState.mode === 'training') {
@@ -314,7 +317,7 @@ function renderFeedback() {
     elFeedbackBadge.textContent = isTutorial ? '練習ナビ' : '検査スタンバイ';
     elFeedbackItemChip.textContent =
       gameState.mode === 'rush'
-        ? '60秒タイムアタック（最初の仕分けでタイマー開始）'
+        ? '60秒タイムアタック（スタートでタイマー開始）'
         : '厳選10問・研修シフト（時間制限なし）';
     elFeedbackText.textContent =
       gameState.mode === 'rush'
@@ -455,6 +458,7 @@ function handleAction(action) {
     elFeedbackItemChip.textContent = 'モバイルバッテリー → 機内持ち込み（正解！）';
     elFeedbackText.textContent =
       'バッチリです！そのまま本番シフトがスタートしました。次々流れてくる荷物を3方向へ仕分けましょう！';
+    ensureRushTimerStarted();
     return;
   }
 
@@ -526,6 +530,7 @@ function startActiveShift(mode = gameState.mode) {
   renderCurrentTray();
   renderFeedback();
   renderCoachBanner();
+  ensureRushTimerStarted();
 }
 
 function startTutorialPractice() {
@@ -638,7 +643,7 @@ function switchTab(tabName) {
   } else {
     resumeShift();
   }
-  callScene('setActive', isGame && !elInspectionStage.hidden && !document.hidden);
+  callScene('setActive', !isStandby && isGame && !elInspectionStage.hidden && !document.hidden);
 }
 
 // ==================== イベント結線 ====================
@@ -668,6 +673,7 @@ function closeGuideDialog() {
   } else {
     elGuideDialog.removeAttribute('open');
   }
+  resumeShift();
 }
 
 elGuideCloseBtn.addEventListener('click', closeGuideDialog);
@@ -681,8 +687,6 @@ elModeRush.addEventListener('click', () => isStandby ? prepareStandby('rush') : 
 elModeTraining.addEventListener('click', () => isStandby ? prepareStandby('training') : startActiveShift('training'));
 
 elBtnStartShift.addEventListener('click', () => startActiveShift(gameState.mode));
-document.getElementById('btn-start-mobile').addEventListener('click', () => startActiveShift(gameState.mode));
-elBtnStartTrainingDirect.addEventListener('click', () => startActiveShift('training'));
 elBtnStartTutorial.addEventListener('click', () => startTutorialPractice());
 elBtnBackStandby.addEventListener('click', () => prepareStandby(gameState.mode));
 
@@ -891,7 +895,7 @@ async function initializeScene() {
     callScene('showItem', gameState.currentItem);
     callScene('setXray', xrayEnabled);
     callScene('setView', cameraClose ? 'close' : 'overview');
-    callScene('setActive', !elPanelGame.hidden && !elInspectionStage.hidden && !document.hidden);
+    callScene('setActive', !isStandby && !elPanelGame.hidden && !elInspectionStage.hidden && !document.hidden);
   } catch {
     showSceneError();
   }
@@ -901,7 +905,7 @@ window.addEventListener('pagehide', (event) => {
   else callScene('dispose');
 });
 window.addEventListener('pageshow', (event) => {
-  if (event.persisted) callScene('setActive', !elPanelGame.hidden && !elInspectionStage.hidden && !document.hidden);
+  if (event.persisted) callScene('setActive', !isStandby && !elPanelGame.hidden && !elInspectionStage.hidden && !document.hidden);
 });
 
 // 初期化

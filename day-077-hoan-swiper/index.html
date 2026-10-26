@@ -20,7 +20,7 @@
   <script defer src="shared/share.js"></script>
   <script type="module" src="app.js"></script>
 </head>
-<body>
+<body class="is-standby">
   <svg class="svg-defs" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
     <defs>
       <!-- 図鑑用の仕分け方向アイコン -->
@@ -296,9 +296,9 @@
         <div class="flight-board" role="region" aria-label="検査ステータス">
           <div class="board-topline"><span class="status-dot" aria-hidden="true"></span><span id="board-shift-badge">LANE 077 / STANDBY</span><button id="btn-back-standby" class="board-mini-btn" type="button" hidden>中断</button></div>
           <div class="board-grid">
-            <div class="board-cell"><span class="board-label" id="hud-progress-label">TIMER</span><strong id="hud-timer">1:00</strong></div>
-            <div class="board-cell"><span class="board-label">SCORE</span><strong id="hud-score">0</strong></div>
-            <div class="board-cell"><span class="board-label">COMBO</span><strong id="hud-combo">×0</strong></div>
+            <div class="board-cell"><span class="board-label" id="hud-progress-label">READY</span><strong id="hud-timer">開始前</strong></div>
+            <div class="board-cell"><span class="board-label">SCORE</span><strong id="hud-score">—</strong></div>
+            <div class="board-cell"><span class="board-label">COMBO</span><strong id="hud-combo">—</strong></div>
           </div>
         </div>
       </div>
@@ -309,12 +309,24 @@
             <canvas id="inspection-canvas" aria-label="空港の3D保安検査場。現在の荷物は右の検査モニターに表示されます"></canvas>
             <div id="scene-loading" class="scene-loading" role="status"><span class="loading-ring" aria-hidden="true"></span>検査レーンを準備しています</div>
             <div id="scene-error" class="scene-error" role="status" hidden><strong>3D表示を開始できませんでした</strong><p>ブラウザのハードウェアアクセラレーションをご確認ください。下の仕分けボタンと図鑑は引き続き使えます。</p><button id="btn-scene-retry" type="button" class="secondary-btn">再読み込み</button></div>
+            <div id="start-overlay" class="start-overlay" role="region" aria-labelledby="start-title">
+              <div class="start-card">
+                <p class="eyebrow">READY FOR YOUR FIRST SHIFT?</p>
+                <h2 id="start-title">保安検査、はじめよう。</h2>
+                <p id="start-mode-note" class="start-lead" aria-live="polite">10問の研修・時間制限なし</p>
+            <div class="mode-buttons" role="group" aria-label="シフト選択">
+              <button id="mode-training" class="mode-btn is-selected" type="button" aria-pressed="true"><span class="mode-radio" aria-hidden="true"></span><span><strong>10問・研修シフト</strong><small>時間制限なしで、じっくり</small></span><span class="mode-tag">はじめてに</span></button>
+              <button id="mode-rush" class="mode-btn" type="button" aria-pressed="false"><span class="mode-radio" aria-hidden="true"></span><span><strong>60秒タイムアタック</strong><small>連続正解でハイスコアへ</small></span></button>
+            </div>
+                <button id="btn-start-shift" class="start-primary-btn" type="button"><span aria-hidden="true">▶</span><span id="start-primary-label">ゲームスタート</span><span aria-hidden="true">↗</span></button>
+                <button id="btn-start-tutorial" class="start-tutorial-btn" type="button">操作を試す・1問練習 <span aria-hidden="true">→</span></button>
+              </div>
+            </div>
             <div class="scene-item-label"><strong id="scene-item-name">モバイルバッテリー</strong><span id="scene-item-spec">10,000mAh・37Wh</span></div>
             <span id="tray-stamp" class="tray-stamp" aria-hidden="true"></span>
             <div class="scene-caption"><span class="scene-caption-code">SECURITY CHECKPOINT</span><span id="scene-status">3D検査場</span></div>
           </div>
-          <div class="sort-instruction"><span class="instruction-line"></span><span>荷物をスワイプ、またはボタンで仕分け</span><span class="instruction-line"></span></div>
-          <button id="btn-start-mobile" class="start-primary-btn mobile-start" type="button"><span id="mobile-start-label">10問の検査をはじめる</span><span aria-hidden="true">↗</span></button>
+          <div class="sort-instruction"><span class="instruction-line"></span><span id="sort-instruction-text">ゲームスタートを押して検査をはじめましょう</span><span class="instruction-line"></span></div>
           <div class="sorting-controls" role="group" aria-label="荷物の仕分け先">
             <button id="btn-carry-on" class="action-zone zone-carry" type="button" data-action="carry_on" aria-label="機内持ち込みへ仕分ける（左矢印キーまたはAキー）"><span class="action-arrow" aria-hidden="true">←</span><span><strong>機内持ち込み</strong><small>CARRY-ON</small></span><kbd>A</kbd></button>
             <button id="btn-checked" class="action-zone zone-checked" type="button" data-action="checked" aria-label="預け荷物へ仕分ける（上矢印キーまたはWキー）"><span class="action-arrow" aria-hidden="true">↑</span><span><strong>預け荷物</strong><small>CHECKED</small></span><kbd>W</kbd></button>
@@ -323,17 +335,16 @@
         </div>
         <aside class="inspection-console" aria-label="検査モニター">
           <div class="console-topline"><span>INSPECTION DESK</span><span class="console-number">01—36</span></div>
-          <div id="start-overlay" class="start-overlay" role="region" aria-labelledby="start-title">
-            <p class="eyebrow">WELCOME ABOARD</p><h2 id="start-title">搭乗前の、<br>腕だめし。</h2><p class="start-lead">あなたは空港の保安検査員。<br>トレイの荷物を、正しい行き先へ。</p>
-            <div class="direction-guide" aria-label="3方向のルール"><span><b>←</b>機内</span><span><b>↑</b>預け</span><span><b>→</b>持込不可</span></div>
-            <p class="field-label">シフトを選ぶ</p>
-            <div class="mode-buttons" role="group" aria-label="シフト選択">
-              <button id="mode-training" class="mode-btn is-selected" type="button" aria-pressed="true"><span class="mode-radio" aria-hidden="true"></span><span><strong>10問・研修シフト</strong><small>時間制限なしで、じっくり</small></span><span class="mode-tag">はじめてに</span></button>
-              <button id="mode-rush" class="mode-btn" type="button" aria-pressed="false"><span class="mode-radio" aria-hidden="true"></span><span><strong>60秒タイムアタック</strong><small>連続正解でハイスコアへ</small></span></button>
+          <div id="standby-console" class="standby-console">
+            <p class="eyebrow">HOW TO PLAY</p>
+            <h2>あなたは、<br>空港の検査員。</h2>
+            <p class="start-lead">トレイの荷物を見て、<br>正しい行き先へ仕分けよう。</p>
+            <div class="standby-directions">
+              <div><b>←</b><span><strong>機内持ち込み</strong><small>客室へ持っていく荷物</small></span></div>
+              <div><b>↑</b><span><strong>預け荷物</strong><small>貨物室へ預ける荷物</small></span></div>
+              <div><b>→</b><span><strong>持込不可</strong><small>飛行機に乗せられない物</small></span></div>
             </div>
-            <button id="btn-start-shift" class="start-primary-btn" type="button"><span id="start-primary-label">検査をはじめる</span><span aria-hidden="true">↗</span></button>
-            <button id="btn-start-tutorial" class="start-tutorial-btn" type="button">まずは1問、おためし練習 <span aria-hidden="true">→</span></button>
-            <button id="btn-start-training-direct" type="button" hidden>10問研修を開始</button>
+            <p class="standby-reminder">中央の「ゲームスタート」を押すと始まります。<br>迷ったときは、X線で中の構造を確認。</p>
           </div>
           <div id="active-console" class="active-console" hidden>
             <div class="item-topline"><span id="item-category-badge">電池・電子機器</span><span id="item-counter-badge">ITEM #01</span></div>

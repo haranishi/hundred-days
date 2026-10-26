@@ -222,7 +222,7 @@ test('描画APIの故障時も仕分け・結果が進行し、再読み込み�
   await expect(page.locator('#item-counter-badge')).toHaveText('ITEM #02');
   await page.locator('#btn-scene-retry').click();
   await expect(page.locator('#start-overlay')).toBeVisible();
-  await expect(page.locator('#hud-timer')).toHaveText('1 / 10');
+  await expect(page.locator('#hud-timer')).toHaveText('開始前');
 });
 
 test('タッチスワイプも同じ判定へつながり、モバイルのガイドに名前がある', async ({ browser, baseURL }) => {
@@ -239,7 +239,7 @@ test('タッチスワイプも同じ判定へつながり、モバイルのガ�
   await context.close();
 });
 
-test('60秒タイマーは最初の仕分けから進み、図鑑とガイドで一時停止し復帰後に完了する', async ({ page }) => {
+test('60秒タイマーはスタートから進み、図鑑とガイドで一時停止し復帰後に完了する', async ({ page }) => {
   // Other scenarios exercise WebGL. Keep virtual-time playback independent of GPU frame speed.
   await page.route('**/lib/scene.js', (route) => route.fulfill({ contentType: 'text/javascript', body: `export function createInspectionScene(canvas, {onReady} = {}) { canvas.dataset.ready='true'; onReady?.(); return {showItem(){},setXray(){},setView(){},setActive(){},setDrag(){},sort(){},dispose(){}}; }` }));
   await page.clock.install();
@@ -247,23 +247,24 @@ test('60秒タイマーは最初の仕分けから進み、図鑑とガイドで
   await page.locator('#mode-rush').click();
   await expect(page.locator('#start-overlay')).toBeVisible();
   await page.locator('#btn-start-shift').click();
-  await page.clock.fastForward('00:05');
   await expect(page.locator('#hud-timer')).toHaveText('1:00');
+  await page.clock.runFor(5_000);
+  await expect(page.locator('#hud-timer')).toHaveText('0:55');
   await page.locator('#btn-checked').click();
   await page.clock.runFor(3_000);
-  await expect(page.locator('#hud-timer')).toHaveText('0:57');
+  await expect(page.locator('#hud-timer')).toHaveText('0:52');
   await page.locator('#tab-catalog').click();
   await page.clock.fastForward('00:10');
   await page.locator('#tab-game').click();
-  await expect(page.locator('#hud-timer')).toHaveText('0:57');
+  await expect(page.locator('#hud-timer')).toHaveText('0:52');
   await page.clock.runFor(2_000);
-  await expect(page.locator('#hud-timer')).toHaveText('0:55');
+  await expect(page.locator('#hud-timer')).toHaveText('0:50');
   await page.locator('#guide-open-btn').click();
   await page.clock.fastForward('00:10');
   await page.locator('#guide-ok-btn').click();
-  await expect(page.locator('#hud-timer')).toHaveText('0:55');
+  await expect(page.locator('#hud-timer')).toHaveText('0:50');
   // runFor invokes every timer callback; fastForward deliberately skips intermediate intervals.
-  await page.clock.runFor(55_100);
+  await page.clock.runFor(50_100);
   await expect(page.locator('#result-panel')).toBeVisible();
   await expect(page.locator('#hud-timer')).toHaveText('0:00');
 });
@@ -272,7 +273,7 @@ test('60秒タイマーは最初の仕分けから進み、図鑑とガイドで
 test('スマホの初回画面内から研修を開始できる', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto(base);
-  const button = page.locator('#btn-start-mobile');
+  const button = page.locator('#btn-start-shift');
   await expect(button).toBeInViewport();
   await button.click();
   await expect(page.locator('#start-overlay')).toBeHidden();
@@ -294,4 +295,63 @@ test('本番のCSPを適用しても3DとX線を表示できる', async ({ page 
   await page.locator('#btn-xray-toggle').click();
   await expect(page.locator('#inspection-canvas')).toHaveAttribute('data-xray', 'true');
   await expect(page.locator('#scene-error')).toBeHidden();
+});
+
+
+test('低いPC画面とスマホで中央のゲームスタートから明示的に開始する', async ({ page }) => {
+  // Isolate the start-screen interaction from GPU availability and frame speed.
+  await page.route('**/lib/scene.js', route => route.fulfill({ contentType: 'text/javascript', body: `export function createInspectionScene(canvas, {onReady} = {}) { canvas.dataset.ready='true'; onReady?.(); return {showItem(){},setXray(){},setView(){},setActive(){},setDrag(){},sort(){},dispose(){}}; }` }));
+  for (const viewport of [{width:1440,height:700},{width:1280,height:720},{width:768,height:800},{width:390,height:844},{width:360,height:640}]) {
+    await page.setViewportSize(viewport);
+    await page.goto(base);
+    await expect(page.locator('#btn-start-shift')).toBeInViewport({ ratio: 1 });
+    await expect(page.locator('#btn-start-shift')).toContainText('ゲームスタート');
+    await expect(page.locator('#hud-timer')).toHaveText('開始前');
+    await page.keyboard.press('ArrowLeft');
+    await expect(page.locator('#hud-timer')).toHaveText('開始前');
+    await page.locator('#btn-start-shift').click();
+    await expect(page.locator('#start-overlay')).toBeHidden();
+    await expect(page.locator('#hud-timer')).toHaveText('1 / 10');
+    await expect(page.locator('#btn-carry-on')).toBeEnabled();
+    await page.locator('#btn-carry-on').click();
+    await expect(page.locator('#hud-timer')).toHaveText('2 / 10');
+  }
+});
+
+test('低減モーションと待機中は実WebGLを描き続けず、複数の更新を1フレームにまとめる', async ({ page }) => {
+  await page.goto(base);
+  await expect(page.locator('#inspection-canvas')).toHaveAttribute('data-ready', 'true');
+  const stats = await page.evaluate(async () => {
+    const { createInspectionScene } = await import('/day-077-hoan-swiper/lib/scene.js');
+    const { ITEMS } = await import('/day-077-hoan-swiper/lib/items.js');
+    const canvas = document.createElement('canvas');
+    canvas.style.cssText = 'position:fixed;left:-1000px;top:0;width:240px;height:180px';
+    document.body.append(canvas);
+    let scene;
+    const ready = new Promise(resolve => { scene = createInspectionScene(canvas, { reducedMotion: true, onReady: resolve }); });
+    const frame = () => new Promise(requestAnimationFrame);
+    const settle = async () => { await frame(); await frame(); };
+    try {
+      scene.showItem(ITEMS[0]);
+      await ready;
+      await settle();
+      const before = scene.getStats().frames;
+      await new Promise(resolve => setTimeout(resolve, 150));
+      const after = scene.getStats().frames;
+      scene.setXray(true);
+      scene.setView('close');
+      scene.showItem(ITEMS[1]);
+      await settle();
+      const batched = scene.getStats().frames;
+      scene.setActive(false);
+      await settle();
+      const standby = scene.getStats().frames;
+      await new Promise(resolve => setTimeout(resolve, 150));
+      return { idle: after - before, batched: batched - after, standby: scene.getStats().frames - standby };
+    } finally {
+      scene?.dispose();
+      canvas.remove();
+    }
+  });
+  expect(stats).toEqual({ idle: 0, batched: 1, standby: 0 });
 });

@@ -1973,18 +1973,9 @@ button:hover {
     font-size:8px
   }
 }
-.mobile-start {
-  display:none
-}
 @media(max-width:650px) {
   .is-standby .sorting-controls {
     display:none
-  }
-  .is-standby .mobile-start {
-    display:flex;
-    width:calc(100% - 20px);
-    margin:0 10px 12px;
-    min-height:48px
   }
   .is-standby .sort-instruction {
     padding-bottom:12px
@@ -2025,5 +2016,95 @@ button:hover {
   .board-grid {
     grid-template-columns: 1.35fr 1.05fr .75fr;
     gap: 5px;
+  }
+}
+
+/* The start gate occupies the play surface, so a short viewport cannot hide it. */
+.start-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 18px;
+  background: #163e362e;
+  cursor: default;
+}
+.start-card {
+  width: 360px;
+  max-width: 100%;
+  border: 1px solid #9bb49a;
+  border-radius: 10px;
+  padding: 22px 24px 14px;
+  background: #fbfdf5f5;
+  box-shadow: 0 15px 45px #183e3630;
+  text-align: center;
+}
+.start-overlay h2 {
+  font-size: 25px;
+  line-height: 1.4;
+  margin: 0 0 8px;
+}
+.start-overlay .eyebrow { margin-bottom: 7px; }
+.start-overlay .start-lead { font-size: 11px; margin: 0 0 14px; }
+.start-overlay .mode-buttons { flex-direction: row; gap: 8px; }
+.start-overlay .mode-btn { flex: 1; min-height: 59px; padding: 10px; gap: 7px; }
+.start-overlay .mode-btn strong { font-size: 11px; line-height: 1.4; }
+.start-overlay .mode-btn small { font-size: 9px; line-height: 1.4; }
+.start-overlay .mode-tag { display: none; }
+.start-overlay .start-primary-btn { justify-content: center; margin-top: 13px; font-size: 16px; }
+.start-overlay .start-primary-btn > span:last-child { margin-left: auto; }
+.start-overlay .start-tutorial-btn { min-height: 36px; margin-top: 3px; }
+.is-standby .sorting-controls { display: none; }
+.is-standby .scene-caption { opacity: .6; }
+.standby-console { padding: 29px 22px 18px; }
+.standby-console h2 { margin: 0 0 16px; font-size: 28px; line-height: 1.55; }
+.standby-directions { display: grid; gap: 17px; margin: 28px 0; }
+.standby-directions > div { display: flex; align-items: center; gap: 12px; }
+.standby-directions b { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 6px; background: #e1ebdf; font-size: 23px; font-weight: 400; }
+.standby-directions > div:nth-child(2) b { color: var(--checked); background: #eee9d5; }
+.standby-directions > div:nth-child(3) b { color: var(--prohibited); background: #f3e1d8; }
+.standby-directions span { display: flex; flex-direction: column; gap: 6px; }
+.standby-directions strong { font-size: 12px; }
+.standby-directions small { font-size: 10px; color: var(--muted); }
+.standby-reminder { font-size: 11px; line-height: 1.9; color: var(--muted); border-top: 1px solid var(--line); padding-top: 20px; margin: 0; }
+.is-standby #hud-timer { font-size: 21px; line-height: 1.4; }
+@media (max-width: 850px) {
+  .standby-console { padding: 24px 17px 17px; }
+  .standby-console h2 { font-size: 25px; }
+  .start-card { padding: 20px 17px 12px; }
+  .start-overlay h2 { font-size: 23px; }
+  .start-overlay .mode-btn { padding: 9px 7px; gap: 5px; }
+  .start-overlay .mode-btn strong { font-size: 10px; }
+}
+@media (max-width: 650px) {
+  .is-standby .shift-heading .eyebrow, .is-standby .shift-lead { display: none; }
+  .is-standby .shift-heading { gap: 10px; }
+  .is-standby .scene-surface { height: 310px; }
+  .is-standby #hud-timer { font-size: 17px; }
+  .start-overlay { padding: 12px; }
+  .start-card { width: 310px; padding: 16px 15px 9px; }
+  .start-overlay h2 { font-size: 22px; margin-bottom: 6px; }
+  .start-overlay .eyebrow { font-size: 8px; margin-bottom: 6px; }
+  .start-overlay .start-lead { font-size: 10px; line-height: 1.5; margin-bottom: 10px; }
+  .start-overlay .mode-btn { min-height: 50px; padding: 8px; }
+  .start-overlay .mode-btn strong { font-size: 10px; }
+  .start-overlay .mode-btn small { font-size: 8px; }
+  .start-overlay .start-primary-btn { min-height: 48px; padding: 10px 13px; margin-top: 10px; font-size: 15px; }
+  .start-overlay .start-tutorial-btn { font-size: 10px; min-height: 34px; }
+  .standby-console h2 br, .standby-console .start-lead br { display: none; }
+  .standby-console { padding: 20px; }
+  .standby-console h2 { font-size: 22px; margin-bottom: 10px; }
+  .standby-directions { grid-template-columns: repeat(3, 1fr); gap: 7px; margin: 20px 0; }
+  .standby-directions > div { flex-direction: column; align-items: start; gap: 9px; }
+  .standby-directions strong { font-size: 10px; }
+  .standby-directions small { font-size: 9px; line-height: 1.7; }
+  .standby-reminder { font-size: 10px; }
+}
+@media (min-width: 651px) and (max-height: 800px) {
+  .is-standby .start-overlay {
+    align-items: flex-start;
+    padding-top: 22px;
   }
 }

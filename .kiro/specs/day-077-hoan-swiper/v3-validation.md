@@ -1,6 +1,7 @@
 # Day77 実3D版の検証記録
 
 2026-10-26。対象：day-077-hoan-swiper。現行要件は3d-design.md。
+開始導線と反応の再修正は [2026-10-27の検証](start-flow-validation.md) を参照。
 
 ## 変更と確認
 CSS/SVGの検査場をThree.js r186の実3Dへ変更した。

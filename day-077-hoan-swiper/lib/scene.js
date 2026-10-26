@@ -8,12 +8,19 @@ const easeOut = (t) => 1 - (1 - Math.min(1, Math.max(0, t))) ** 3;
 export function createInspectionScene(canvas, { onReady, onError, reducedMotion = false } = {}) {
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false, powerPreference: 'high-performance' });
   const mobile = matchMedia('(max-width: 700px)').matches;
-  renderer.setPixelRatio(Math.min(devicePixelRatio || 1, mobile ? 1.5 : 1.8));
+  const gl = renderer.getContext();
+  const rendererInfo = gl.getExtension('WEBGL_debug_renderer_info');
+  const rendererName = rendererInfo ? gl.getParameter(rendererInfo.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER);
+  const softwareRenderer = /swiftshader|llvmpipe|softpipe|lavapipe|software/i.test(rendererName);
+  // Software WebGL shares the CPU with input handling. Keep the same scene, with smaller render targets.
+  renderer.setPixelRatio(Math.min(devicePixelRatio || 1, softwareRenderer ? 1 : mobile ? 1.5 : 1.8));
+  canvas.dataset.quality = softwareRenderer ? 'efficient' : 'standard';
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure = 0.97;
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFShadowMap;
+  renderer.shadowMap.autoUpdate = false;
   const scene = new THREE.Scene();
   scene.background = new THREE.Color(0xd6e0d5);
   scene.fog = new THREE.Fog(0xd6e0d5, 20, 46);
@@ -33,6 +40,11 @@ export function createInspectionScene(canvas, { onReady, onError, reducedMotion 
   let height = 1;
   let time = 0;
   let lastFrame = 0;
+  let renderRequest = null;
+  let dirty = true;
+  let preparing = false;
+  let prepared = false;
+  let compileGeneration = 0;
   let frames = 0;
   let ready = false;
   let pulse = 0;
@@ -136,7 +148,7 @@ export function createInspectionScene(canvas, { onReady, onError, reducedMotion 
   const envFill = new THREE.Mesh(new THREE.PlaneGeometry(8, 6), new THREE.MeshBasicMaterial({ color: 0xe9e5c5 }));
   envFill.position.set(8, 4, -6); envFill.lookAt(0, 0, 0); envScene.add(envFill);
   const pmrem = new THREE.PMREMGenerator(renderer);
-  const environment = pmrem.fromScene(envScene, 0.08);
+  const environment = pmrem.fromScene(envScene, 0.08, 0.1, 100, { size: softwareRenderer ? 64 : 256 });
   scene.environment = environment.texture;
   scene.environmentIntensity = 0.65;
   pmrem.dispose();
@@ -144,7 +156,8 @@ export function createInspectionScene(canvas, { onReady, onError, reducedMotion 
   scene.add(new THREE.HemisphereLight(0xdcefeb, 0x3f5f50, 1.6));
   const key = new THREE.DirectionalLight(0xffe5b0, 3.15);
   key.position.set(-5, 10, 7); key.castShadow = true;
-  key.shadow.mapSize.set(mobile ? 1024 : 2048, mobile ? 1024 : 2048);
+  const shadowSize = softwareRenderer ? 512 : mobile ? 1024 : 2048;
+  key.shadow.mapSize.set(shadowSize, shadowSize);
   Object.assign(key.shadow.camera, { left: -9, right: 9, top: 9, bottom: -9, near: 1, far: 28 });
   key.shadow.normalBias = 0.045; key.shadow.bias = -0.00035;
   key.target.position.set(0, 0, -1); scene.add(key, key.target);
@@ -369,7 +382,7 @@ export function createInspectionScene(canvas, { onReady, onError, reducedMotion 
     model.position.y = 0.13; group.add(model);
     current = { group, model, born: time, item };
     group.position.copy(trayBase);
-    if (ready && !reducedMotion) group.position.z -= 2.4;
+    if (ready && active && !reducedMotion) group.position.z -= 2.4;
     model.userData.setXray?.(xray);
     canvas.dataset.itemId = item.id;
     renderOnce();
@@ -400,7 +413,7 @@ export function createInspectionScene(canvas, { onReady, onError, reducedMotion 
   }
   function setView(name) {
     view = name === 'close' ? 'close' : 'overview'; canvas.dataset.view = view;
-    if (reducedMotion) { getCameraPose(); camera.position.copy(desiredCamera); target.copy(desiredTarget); }
+    if (reducedMotion || !active) { getCameraPose(); camera.position.copy(desiredCamera); target.copy(desiredTarget); }
     renderOnce();
   }
   function getCameraPose() {
@@ -417,17 +430,18 @@ export function createInspectionScene(canvas, { onReady, onError, reducedMotion 
   }
   function update(dt) {
     time += dt;
-    if (!reducedMotion) rollerMap.offset.x = time * 0.35;
-    getCameraPose(); camera.position.lerp(desiredCamera, reducedMotion ? 1 : 1 - Math.exp(-dt * 5));
-    target.lerp(desiredTarget, reducedMotion ? 1 : 1 - Math.exp(-dt * 5));
+    const animate = active && !reducedMotion;
+    if (animate) rollerMap.offset.x = time * 0.35;
+    getCameraPose(); camera.position.lerp(desiredCamera, animate ? 1 - Math.exp(-dt * 5) : 1);
+    target.lerp(desiredTarget, animate ? 1 - Math.exp(-dt * 5) : 1);
     camera.lookAt(target); camera.updateProjectionMatrix();
     if (current) {
-      const t = reducedMotion ? 1 : easeOut((time - current.born) / 0.56);
+      const t = !animate ? 1 : easeOut((time - current.born) / 0.56);
       current.group.position.set(trayBase.x + dragX, trayBase.y + Math.abs(dragX) * 0.05, trayBase.z - (1 - t) * 2.4 + dragY);
       current.group.rotation.set(dragY * 0.08, dragX * 0.09, -dragX * 0.07);
     }
     for (let i = departures.length - 1; i >= 0; i--) {
-      const actor = departures[i]; const t = reducedMotion ? 1 : Math.min(1, (time - actor.start) / 0.62);
+      const actor = departures[i]; const t = !animate ? 1 : Math.min(1, (time - actor.start) / 0.62);
       const eased = easeOut(t);
       const dx = actor.action === 'carry_on' ? -5.5 : actor.action === 'prohibited' ? 5.5 : 0;
       const dz = actor.action === 'checked' ? -6.2 : 0;
@@ -439,41 +453,96 @@ export function createInspectionScene(canvas, { onReady, onError, reducedMotion 
     for (const mat of Object.values(laneLights)) mat.emissiveIntensity = THREE.MathUtils.lerp(mat.emissiveIntensity, 0.25, Math.min(1, dt * 5));
     if (!pulse) { statusLight.emissive.setHex(COLORS.lime); statusLight.color.setHex(COLORS.lime); }
   }
-  function renderOnce() {
-    if (!disposed && !contextLost && width > 1 && height > 1) {
-      update(0); renderer.render(scene, camera); frames++;
-      if (!ready) { ready = true; canvas.dataset.ready = 'true'; onReady?.(); }
+  function scheduleFrame() {
+    if (renderRequest === null && !disposed && !contextLost && !document.hidden && width > 1 && height > 1) {
+      renderRequest = requestAnimationFrame(frame);
     }
   }
+  function renderOnce() {
+    // Several setters often run in one input event. Submit one frame after the browser can handle input.
+    dirty = true;
+    scheduleFrame();
+  }
   function frame(stamp) {
-    if (disposed || contextLost || !active || document.hidden) return;
+    renderRequest = null;
+    if (disposed || contextLost || document.hidden) return;
+    const continuous = active && !reducedMotion;
     const dt = lastFrame ? Math.min(0.12, (stamp - lastFrame) / 1000) : 0;
-    if (lastFrame && dt < 0.026 && mobile) return;
-    lastFrame = stamp; update(dt); renderer.render(scene, camera); frames++;
+    const minimumFrameMs = softwareRenderer ? 1000 / 12 : 1000 / 30;
+    if (!dirty && lastFrame && stamp - lastFrame < minimumFrameMs) {
+      if (continuous) scheduleFrame();
+      return;
+    }
+    if (!dirty && !continuous) return;
+    if (!prepared) {
+      if (!preparing) {
+        preparing = true;
+        const generation = compileGeneration;
+        // Let parallel shader compilation finish without blocking the controls on first draw.
+        renderer.compileAsync(scene, camera).then(() => {
+          if (disposed || contextLost || generation !== compileGeneration) return;
+          prepared = true; preparing = false; renderOnce();
+        }).catch((error) => {
+          if (disposed || contextLost || generation !== compileGeneration) return;
+          contextLost = true; canvas.dataset.ready = 'false'; onError?.(error);
+        });
+      }
+      return;
+    }
+    const movingItems = departures.length > 0 || Boolean(current && time - current.born < 0.56);
+    renderer.shadowMap.needsUpdate = dirty || movingItems;
+    lastFrame = stamp;
+    dirty = false;
+    update(dt);
+    try {
+      renderer.render(scene, camera);
+    } catch (error) {
+      contextLost = true;
+      canvas.dataset.ready = 'false';
+      onError?.(error);
+      return;
+    }
+    frames++;
     if (!ready) { ready = true; canvas.dataset.ready = 'true'; onReady?.(); }
+    if (continuous || dirty) scheduleFrame();
   }
   function syncLoop() {
     lastFrame = 0;
-    renderer.setAnimationLoop(active && !document.hidden && !disposed && !contextLost ? frame : null);
-    if (active && !document.hidden) renderOnce();
+    if (disposed || contextLost || document.hidden) {
+      if (renderRequest !== null) cancelAnimationFrame(renderRequest);
+      renderRequest = null;
+      return;
+    }
+    if (dirty || (active && !reducedMotion)) scheduleFrame();
   }
-  function setActive(value) { active = Boolean(value); syncLoop(); }
+  function setActive(value) {
+    const next = Boolean(value);
+    if (active === next) return;
+    active = next;
+    renderOnce();
+    syncLoop();
+  }
   function resize() {
     if (disposed) return;
-    const rect = canvas.getBoundingClientRect(); width = Math.max(1, rect.width); height = Math.max(1, rect.height);
+    const rect = canvas.getBoundingClientRect();
+    const nextWidth = Math.max(1, rect.width), nextHeight = Math.max(1, rect.height);
+    if (nextWidth === width && nextHeight === height) return;
+    width = nextWidth; height = nextHeight;
     renderer.setSize(width, height, false); camera.aspect = width / height;
     getCameraPose(); camera.position.copy(desiredCamera); target.copy(desiredTarget); camera.lookAt(target);
     camera.updateProjectionMatrix(); renderOnce();
   }
   const observer = new ResizeObserver(resize); observer.observe(canvas);
-  function handleLost(event) { event.preventDefault(); contextLost = true; canvas.dataset.ready = 'false'; syncLoop(); onError?.(new Error('3D描画が中断しました。ページを再読み込みしてください。')); }
-  function handleRestored() { contextLost = false; ready = false; resize(); syncLoop(); }
+  function handleLost(event) { event.preventDefault(); contextLost = true; prepared = false; preparing = false; compileGeneration++; canvas.dataset.ready = 'false'; syncLoop(); onError?.(new Error('3D描画が中断しました。ページを再読み込みしてください。')); }
+  function handleRestored() { contextLost = false; ready = false; resize(); renderOnce(); syncLoop(); }
   canvas.addEventListener('webglcontextlost', handleLost);
   canvas.addEventListener('webglcontextrestored', handleRestored);
   document.addEventListener('visibilitychange', syncLoop);
   function dispose() {
     if (disposed) return;
-    disposed = true; renderer.setAnimationLoop(null); observer.disconnect();
+    disposed = true; compileGeneration++;
+    if (renderRequest !== null) cancelAnimationFrame(renderRequest);
+    renderRequest = null; observer.disconnect();
     canvas.removeEventListener('webglcontextlost', handleLost); canvas.removeEventListener('webglcontextrestored', handleRestored);
     document.removeEventListener('visibilitychange', syncLoop);
     removeActor(current); departures.forEach(removeActor); departures.length = 0;
@@ -484,5 +553,5 @@ export function createInspectionScene(canvas, { onReady, onError, reducedMotion 
   }
   resize(); syncLoop();
   return { showItem, setXray, setActive, setDrag, sort, setView, dispose,
-    getStats: () => ({ frames, drawCalls: renderer.info.render.calls, triangles: renderer.info.render.triangles, geometries: renderer.info.memory.geometries, textures: renderer.info.memory.textures, departures: departures.length, itemId: current?.item.id || null, view, active: active && !document.hidden && !contextLost, width, height }) };
+    getStats: () => ({ frames, drawCalls: renderer.info.render.calls, triangles: renderer.info.render.triangles, geometries: renderer.info.memory.geometries, textures: renderer.info.memory.textures, departures: departures.length, itemId: current?.item.id || null, view, active: active && !document.hidden && !contextLost, continuous: active && !reducedMotion && !document.hidden && !contextLost, quality: softwareRenderer ? 'efficient' : 'standard', pixelRatio: renderer.getPixelRatio(), shadowSize, width, height }) };
 }
