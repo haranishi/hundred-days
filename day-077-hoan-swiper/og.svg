@@ -1,0 +1,77 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ecfdf5"/>
+      <stop offset="0.5" stop-color="#f0f9ff"/>
+      <stop offset="1" stop-color="#e2e8f0"/>
+    </linearGradient>
+    <linearGradient id="board" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1e293b"/>
+      <stop offset="1" stop-color="#0f172a"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <rect x="28" y="28" width="1144" height="574" rx="28" fill="none" stroke="#94a3b8" stroke-width="3"/>
+
+  <!-- 左側：タイトルと説明 -->
+  <g transform="translate(76 74)">
+    <rect width="276" height="44" rx="10" fill="#0f172a"/>
+    <text x="138" y="29" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-weight="800" font-size="20" fill="#facc15" letter-spacing="1.5">GATE 077 / 100 DAYS</text>
+
+    <text x="0" y="138" font-family="Hiragino Sans, Hiragino Kaku Gothic ProN, Noto Sans JP, sans-serif" font-weight="900" font-size="68" fill="#0f172a">保安検査スワイパー</text>
+    <text x="4" y="198" font-family="Hiragino Sans, Hiragino Kaku Gothic ProN, Noto Sans JP, sans-serif" font-weight="800" font-size="36" fill="#0369a1">その荷物、機内？預け？没収？</text>
+
+    <text font-family="Hiragino Sans, Hiragino Kaku Gothic ProN, Noto Sans JP, sans-serif" font-weight="600" font-size="25" fill="#334155">
+      <tspan x="4" y="264">モバイルバッテリー、150ml化粧水、ヘアアイロン……</tspan>
+      <tspan x="4" y="304">空港のコンベアで流れてくる荷物を3方向へ瞬間仕分け！</tspan>
+      <tspan x="4" y="344">国土交通省基準で学べる60秒ゲーム＆全36品目の早見図鑑。</tspan>
+    </text>
+
+    <!-- 3つの仕分けバッジ -->
+    <g transform="translate(0 390)" font-family="Hiragino Sans, Hiragino Kaku Gothic ProN, Noto Sans JP, sans-serif" font-weight="800" font-size="22">
+      <g transform="translate(0 0)">
+        <rect width="210" height="64" rx="16" fill="#d1fae5" stroke="#059669" stroke-width="3"/>
+        <text x="105" y="40" text-anchor="middle" fill="#064e3b">← 機内持ち込み</text>
+      </g>
+      <g transform="translate(226 0)">
+        <rect width="200" height="64" rx="16" fill="#fef3c7" stroke="#d97706" stroke-width="3"/>
+        <text x="100" y="40" text-anchor="middle" fill="#78350f">↑ 預け荷物へ</text>
+      </g>
+      <g transform="translate(442 0)">
+        <rect width="210" height="64" rx="16" fill="#fee2e2" stroke="#dc2626" stroke-width="3"/>
+        <text x="105" y="40" text-anchor="middle" fill="#7f1d1d">→ 持込不可・没収</text>
+      </g>
+    </g>
+  </g>
+
+  <!-- 右側：コンベア＆検査トレイのイラスト -->
+  <g transform="translate(790 86)">
+    <!-- 電光掲示板ミニ -->
+    <rect x="20" y="0" width="300" height="78" rx="16" fill="url(#board)" stroke="#475569" stroke-width="3"/>
+    <text x="90" y="28" text-anchor="middle" font-family="ui-monospace, Menlo, monospace" font-weight="700" font-size="14" fill="#94a3b8">TIMER</text>
+    <text x="90" y="60" text-anchor="middle" font-family="ui-monospace, Menlo, monospace" font-weight="900" font-size="32" fill="#f8fafc">0:45</text>
+    <line x1="170" y1="14" x2="170" y2="64" stroke="#334155" stroke-width="2"/>
+    <text x="245" y="28" text-anchor="middle" font-family="ui-monospace, Menlo, monospace" font-weight="700" font-size="14" fill="#94a3b8">SCORE</text>
+    <text x="245" y="60" text-anchor="middle" font-family="ui-monospace, Menlo, monospace" font-weight="900" font-size="32" fill="#facc15">1,250</text>
+
+    <!-- コンベアとトレイ -->
+    <rect x="0" y="110" width="340" height="340" rx="28" fill="#1e293b" stroke="#64748b" stroke-width="6"/>
+    <rect x="28" y="136" width="284" height="288" rx="22" fill="#cbd5e1" stroke="#f8fafc" stroke-width="4"/>
+    <rect x="44" y="152" width="252" height="256" rx="16" fill="#f8fafc" stroke="#94a3b8" stroke-width="2"/>
+
+    <!-- モバイルバッテリーアイコン -->
+    <g transform="translate(110 172) scale(1.5)">
+      <rect x="18" y="10" width="44" height="54" rx="9" fill="#1e293b" stroke="#0f172a" stroke-width="3"/>
+      <rect x="23" y="15" width="34" height="44" rx="6" fill="#334155"/>
+      <circle cx="31" cy="26" r="2.5" fill="#38bdf8"/>
+      <circle cx="39" cy="26" r="2.5" fill="#38bdf8"/>
+      <circle cx="47" cy="26" r="2.5" fill="#38bdf8"/>
+      <path d="m42 34-7 11h6l-3 10 9-12h-6l3-9Z" fill="#facc15"/>
+    </g>
+
+    <text x="170" y="344" text-anchor="middle" font-family="Hiragino Sans, Noto Sans JP, sans-serif" font-weight="900" font-size="24" fill="#0f172a">モバイルバッテリー</text>
+    <rect x="60" y="358" width="220" height="32" rx="8" fill="#fffbeb" stroke="#fcd34d" stroke-width="1.5"/>
+    <text x="170" y="380" text-anchor="middle" font-family="Hiragino Sans, Noto Sans JP, sans-serif" font-weight="800" font-size="17" fill="#92400e">10,000mAh (37Wh)</text>
+  </g>
+</svg>

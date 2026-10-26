@@ -110,6 +110,7 @@ Day 051「ハコニワ」も外部公開アプリです。本体は独立リポ�
 | 074 | リンクの毒見 — 踏む前に、銀の針で確かめる | [day-074-link-dokumi/](day-074-link-dokumi/) | [アプリを開く](https://hundred-days.pages.dev/day-074-link-dokumi/) |
 | 075 | 雨雲倉庫番 — ひと雨ずつ、庭をほどく。 | [day-075-amegumo-sokoban/](day-075-amegumo-sokoban/) | [アプリを開く](https://hundred-days.pages.dev/day-075-amegumo-sokoban/) |
 | 076 | へんかんデスク | [day-076-henkan-desk/](day-076-henkan-desk/) | [アプリを開く](https://hundred-days.pages.dev/day-076-henkan-desk/) |
+| 077 | 保安検査スワイパー — その荷物、機内？預け？没収？ | [day-077-hoan-swiper/](day-077-hoan-swiper/) | [アプリを開く](https://hundred-days.pages.dev/day-077-hoan-swiper/) |
 <!-- day-index:end -->
 
 ## 1日アプリのルール
