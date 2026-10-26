@@ -106,6 +106,7 @@ export function createGameState(mode = 'rush', rng = Math.random) {
     deck,
     currentIndex: 0,
     currentItem: deck[0] || null,
+    nextItem: deck[1] || null,
     history: [],
     lastFeedback: null
   };
@@ -176,15 +177,16 @@ export function submitAction(state, action, { elapsedMs = 1500, rng = Math.rando
       totalAnswered: nextTotal,
       currentIndex: state.currentIndex + 1,
       currentItem: null,
+      nextItem: null,
       history: nextHistory,
       lastFeedback: entry
     };
   }
 
-  // 次のアイテムを取り出す（rushモードでデッキ末尾に達したら再シャッフル補充）
+  // 次のアイテムを取り出す（rushモードでデッキ末尾付近に達したら再シャッフル補充）
   let nextDeck = state.deck;
   let nextIndex = state.currentIndex + 1;
-  if (nextIndex >= nextDeck.length) {
+  if (nextIndex + 1 >= nextDeck.length && !state.targetCount) {
     const reshuffled = shuffleList(ITEMS, rng);
     // 直前のアイテムと連続しないよう配慮
     if (reshuffled.length > 1 && reshuffled[0].id === item.id) {
@@ -206,6 +208,7 @@ export function submitAction(state, action, { elapsedMs = 1500, rng = Math.rando
     deck: nextDeck,
     currentIndex: nextIndex,
     currentItem: nextDeck[nextIndex] || null,
+    nextItem: nextDeck[nextIndex + 1] || null,
     history: nextHistory,
     lastFeedback: entry
   };

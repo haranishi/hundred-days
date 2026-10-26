@@ -31,16 +31,16 @@
     <!-- 3つの仕分けバッジ -->
     <g transform="translate(0 390)" font-family="Hiragino Sans, Hiragino Kaku Gothic ProN, Noto Sans JP, sans-serif" font-weight="800" font-size="22">
       <g transform="translate(0 0)">
-        <rect width="210" height="64" rx="16" fill="#d1fae5" stroke="#059669" stroke-width="3"/>
-        <text x="105" y="40" text-anchor="middle" fill="#064e3b">← 機内持ち込み</text>
+        <rect width="210" height="64" rx="16" fill="#e0f2fe" stroke="#0284c7" stroke-width="3"/>
+        <text x="105" y="40" text-anchor="middle" fill="#0369a1">← 機内持ち込み</text>
       </g>
       <g transform="translate(226 0)">
         <rect width="200" height="64" rx="16" fill="#fef3c7" stroke="#d97706" stroke-width="3"/>
         <text x="100" y="40" text-anchor="middle" fill="#78350f">↑ 預け荷物へ</text>
       </g>
       <g transform="translate(442 0)">
-        <rect width="210" height="64" rx="16" fill="#fee2e2" stroke="#dc2626" stroke-width="3"/>
-        <text x="105" y="40" text-anchor="middle" fill="#7f1d1d">→ 持込不可・没収</text>
+        <rect width="210" height="64" rx="16" fill="#ffe4e6" stroke="#e11d48" stroke-width="3"/>
+        <text x="105" y="40" text-anchor="middle" fill="#881337">→ 持込不可・没収</text>
       </g>
     </g>
   </g>

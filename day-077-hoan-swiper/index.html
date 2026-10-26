@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#0f172a">
-  <meta name="description" content="モバイルバッテリー、化粧水、コードレスヘアアイロン……空港の保安検査コンベアで流れてくる荷物を「機内持ち込み」「預け荷物」「持込不可」の3方向へ瞬時に仕分けるWebゲーム＆全36品目の手荷物ルール早見図鑑。">
+  <meta name="description" content="モバイルバッテリー、化粧水、コードレスヘアアイロン……空港の保安検査コンベアで流れてくる荷物を「機内持ち込み」「預け荷物」「持込不可」の3方向へ瞬時に仕分ける2.5Dゲーム＆全36品目の手荷物ルール早見図鑑。">
   <link rel="canonical" href="https://hundred-days.pages.dev/day-077-hoan-swiper/">
   <meta property="og:url" content="https://hundred-days.pages.dev/day-077-hoan-swiper/">
   <meta name="twitter:card" content="summary_large_image">
@@ -23,183 +23,248 @@
 <body>
   <svg class="svg-defs" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
     <defs>
-      <!-- 仕分け方向アイコン -->
+      <!-- 仕分け方向アイコン（2.5Dモックアップ準拠） -->
       <symbol id="icon-carry-on" viewBox="0 0 48 48">
-        <path d="M18 12V9a6 6 0 0 1 12 0v3" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
-        <rect x="11" y="12" width="26" height="28" rx="7" fill="currentColor" fill-opacity="0.18" stroke="currentColor" stroke-width="3"/>
-        <rect x="16" y="24" width="16" height="10" rx="3" fill="none" stroke="currentColor" stroke-width="2.5"/>
-        <path d="M20 18h8" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+        <path d="M18 13V9.5a6 6 0 0 1 12 0V13" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round"/>
+        <rect x="10" y="13" width="28" height="28" rx="8" fill="currentColor" fill-opacity="0.2" stroke="currentColor" stroke-width="3.2"/>
+        <rect x="15" y="25" width="18" height="10" rx="3.5" fill="none" stroke="currentColor" stroke-width="2.6"/>
+        <path d="M19 19h10" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"/>
+        <path d="m24 16 2.5 2.5L24 21l-2.5-2.5Z" fill="currentColor"/>
       </symbol>
       <symbol id="icon-checked" viewBox="0 0 48 48">
-        <path d="M19 11V6h10v5" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-        <rect x="12" y="11" width="24" height="29" rx="5" fill="currentColor" fill-opacity="0.18" stroke="currentColor" stroke-width="3"/>
-        <path d="M18 17v17M24 17v17M30 17v17" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/>
-        <circle cx="16" cy="43" r="2.5" fill="currentColor"/>
-        <circle cx="32" cy="43" r="2.5" fill="currentColor"/>
+        <path d="M19 11V5.5h10V11" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
+        <rect x="12" y="11" width="24" height="29" rx="5.5" fill="currentColor" fill-opacity="0.2" stroke="currentColor" stroke-width="3.2"/>
+        <path d="M18 17v17M24 17v17M30 17v17" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/>
+        <circle cx="16" cy="43.5" r="2.6" fill="currentColor"/>
+        <circle cx="32" cy="43.5" r="2.6" fill="currentColor"/>
       </symbol>
       <symbol id="icon-prohibited" viewBox="0 0 48 48">
-        <circle cx="24" cy="24" r="16" fill="currentColor" fill-opacity="0.18" stroke="currentColor" stroke-width="3.2"/>
-        <path d="m15 15 18 18M33 15 15 33" stroke="currentColor" stroke-width="3.2" stroke-linecap="round"/>
+        <circle cx="24" cy="24" r="17" fill="currentColor" fill-opacity="0.2" stroke="currentColor" stroke-width="3.4"/>
+        <path d="m16 16 16 16M32 16 16 32" stroke="currentColor" stroke-width="3.6" stroke-linecap="round"/>
       </symbol>
 
-      <!-- アイテムアイコン群 -->
-      <symbol id="item-battery" viewBox="0 0 80 80">
-        <rect x="18" y="14" width="44" height="54" rx="9" fill="#1e293b" stroke="#0f172a" stroke-width="3"/>
-        <rect x="23" y="19" width="34" height="44" rx="6" fill="#334155"/>
-        <circle cx="31" cy="30" r="2.5" fill="#38bdf8"/>
-        <circle cx="39" cy="30" r="2.5" fill="#38bdf8"/>
-        <circle cx="47" cy="30" r="2.5" fill="#38bdf8"/>
-        <circle cx="55" cy="30" r="2.5" fill="#64748b"/>
-        <path d="m42 38-7 11h6l-3 10 9-12h-6l3-9Z" fill="#facc15"/>
-        <rect x="33" y="10" width="14" height="4" rx="2" fill="#475569"/>
+      <!-- 36品目用 立体感＆ディテール強化SVGシンボル群 -->
+      <symbol id="item-battery" viewBox="0 0 96 96">
+        <ellipse cx="48" cy="82" rx="28" ry="6" fill="#0f172a" fill-opacity="0.16"/>
+        <rect x="22" y="16" width="52" height="64" rx="11" fill="#0f172a" stroke="#334155" stroke-width="3"/>
+        <rect x="26" y="20" width="44" height="54" rx="8" fill="#1e293b"/>
+        <rect x="30" y="25" width="36" height="14" rx="4" fill="#091326" stroke="#38bdf8" stroke-width="1.5"/>
+        <circle cx="37" cy="32" r="2.8" fill="#38bdf8"/>
+        <circle cx="45" cy="32" r="2.8" fill="#38bdf8"/>
+        <circle cx="53" cy="32" r="2.8" fill="#38bdf8"/>
+        <circle cx="61" cy="32" r="2.8" fill="#475569"/>
+        <path d="m50 43-9 13h8l-4 13 13-15h-8l4-11Z" fill="#facc15" stroke="#ca8a04" stroke-width="1"/>
+        <rect x="36" y="11" width="10" height="5" rx="2" fill="#38bdf8"/>
+        <rect x="50" y="11" width="10" height="5" rx="2" fill="#94a3b8"/>
       </symbol>
-      <symbol id="item-battery-huge" viewBox="0 0 80 80">
-        <rect x="12" y="20" width="56" height="46" rx="8" fill="#ea580c" stroke="#7c2d12" stroke-width="3"/>
-        <path d="M24 20v-6h32v6" fill="none" stroke="#7c2d12" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
-        <rect x="17" y="27" width="32" height="16" rx="3" fill="#0f172a"/>
-        <text x="33" y="38.5" text-anchor="middle" fill="#38bdf8" font-size="8.5" font-weight="bold">200Wh</text>
-        <circle cx="57" cy="35" r="4.5" fill="#1e293b"/>
-        <rect x="20" y="50" width="40" height="8" rx="2" fill="#9a3412"/>
+
+      <symbol id="item-battery-huge" viewBox="0 0 96 96">
+        <ellipse cx="48" cy="83" rx="34" ry="6" fill="#0f172a" fill-opacity="0.2"/>
+        <path d="M28 24v-8h40v8" fill="none" stroke="#7c2d12" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+        <rect x="14" y="24" width="68" height="54" rx="10" fill="#ea580c" stroke="#7c2d12" stroke-width="3.2"/>
+        <rect x="19" y="30" width="40" height="22" rx="4" fill="#0f172a" stroke="#fb923c" stroke-width="1.5"/>
+        <text x="39" y="45" text-anchor="middle" fill="#38bdf8" font-size="11" font-weight="900" font-family="monospace">200Wh</text>
+        <circle cx="69" cy="36" r="5" fill="#1e293b" stroke="#fed7aa" stroke-width="1.5"/>
+        <circle cx="69" cy="48" r="5" fill="#1e293b" stroke="#fed7aa" stroke-width="1.5"/>
+        <rect x="20" y="58" width="56" height="12" rx="3" fill="#9a3412"/>
+        <path d="M26 64h44" stroke="#fdba74" stroke-width="2" stroke-dasharray="4 4"/>
       </symbol>
-      <symbol id="item-lighter" viewBox="0 0 80 80">
-        <path d="M40 10c5 7 8 12 4 17-3 4-9 4-11-1-2-5 2-10 7-16Z" fill="#f97316"/>
-        <path d="M40 15c2 4 4 7 2 10-1 2-4 2-5 0-1-3 1-6 3-10Z" fill="#fde047"/>
-        <rect x="30" y="26" width="20" height="10" rx="2" fill="#94a3b8" stroke="#475569" stroke-width="2.5"/>
-        <rect x="28" y="35" width="24" height="35" rx="5" fill="#3b82f6" stroke="#1d4ed8" stroke-width="2.5"/>
-        <rect x="33" y="42" width="14" height="22" rx="3" fill="#93c5fd" fill-opacity="0.45"/>
+
+      <symbol id="item-lighter" viewBox="0 0 96 96">
+        <ellipse cx="48" cy="83" rx="22" ry="5" fill="#0f172a" fill-opacity="0.16"/>
+        <path d="M48 10c7 8 10 15 5 22-4 5-11 5-13-1-3-6 2-13 8-21Z" fill="#f97316"/>
+        <path d="M48 16c3 5 5 9 2 13-1 3-5 3-6 0-1-4 1-8 4-13Z" fill="#fde047"/>
+        <rect x="34" y="31" width="28" height="12" rx="3" fill="#cbd5e1" stroke="#475569" stroke-width="2.8"/>
+        <circle cx="56" cy="37" r="4" fill="#64748b"/>
+        <rect x="32" y="42" width="32" height="38" rx="7" fill="#2563eb" stroke="#1e3a8a" stroke-width="3"/>
+        <rect x="37" y="49" width="22" height="25" rx="4" fill="#93c5fd" fill-opacity="0.5"/>
+        <path d="M37 58h22" stroke="#1d4ed8" stroke-width="2"/>
       </symbol>
-      <symbol id="item-lighter-turbo" viewBox="0 0 80 80">
-        <path d="M40 8 33 26h14L40 8Z" fill="#38bdf8"/>
-        <path d="M40 13 36 25h8l-4-12Z" fill="#e0f2fe"/>
-        <rect x="26" y="26" width="28" height="44" rx="6" fill="#334155" stroke="#0f172a" stroke-width="3"/>
-        <path d="M26 42h28" stroke="#ef4444" stroke-width="4"/>
-        <circle cx="40" cy="55" r="6" fill="#ef4444"/>
+
+      <symbol id="item-lighter-turbo" viewBox="0 0 96 96">
+        <ellipse cx="48" cy="83" rx="24" ry="5" fill="#0f172a" fill-opacity="0.18"/>
+        <path d="M48 8 39 30h18L48 8Z" fill="#38bdf8"/>
+        <path d="M48 14 43 29h10l-5-15Z" fill="#e0f2fe"/>
+        <rect x="30" y="30" width="36" height="50" rx="8" fill="#1e293b" stroke="#0f172a" stroke-width="3.2"/>
+        <path d="M30 48h36" stroke="#ef4444" stroke-width="5"/>
+        <circle cx="48" cy="64" r="8" fill="#ef4444" stroke="#fecaca" stroke-width="2"/>
+        <text x="48" y="42" text-anchor="middle" fill="#f8fafc" font-size="8.5" font-weight="800">TURBO</text>
       </symbol>
-      <symbol id="item-match" viewBox="0 0 80 80">
-        <rect x="18" y="24" width="44" height="38" rx="5" fill="#fef08a" stroke="#ca8a04" stroke-width="3"/>
-        <rect x="23" y="30" width="34" height="18" rx="2" fill="#dc2626"/>
-        <path d="M54 14v22" stroke="#d97706" stroke-width="4" stroke-linecap="round"/>
-        <ellipse cx="54" cy="13" rx="4.5" ry="6" fill="#ef4444"/>
+
+      <symbol id="item-match" viewBox="0 0 96 96">
+        <ellipse cx="48" cy="82" rx="28" ry="5" fill="#0f172a" fill-opacity="0.16"/>
+        <rect x="20" y="28" width="52" height="46" rx="6" fill="#fef08a" stroke="#b45309" stroke-width="3"/>
+        <rect x="26" y="35" width="40" height="22" rx="3" fill="#dc2626"/>
+        <rect x="26" y="61" width="40" height="6" rx="2" fill="#78350f"/>
+        <path d="M66 16v30" stroke="#d97706" stroke-width="5" stroke-linecap="round"/>
+        <ellipse cx="66" cy="15" rx="6" ry="7.5" fill="#ef4444" stroke="#991b1b" stroke-width="1.5"/>
       </symbol>
-      <symbol id="item-vape" viewBox="0 0 80 80">
-        <rect x="35" y="12" width="10" height="14" rx="2" fill="#f8fafc" stroke="#64748b" stroke-width="2.5"/>
-        <rect x="28" y="25" width="24" height="45" rx="9" fill="#0f766e" stroke="#115e59" stroke-width="3"/>
-        <circle cx="40" cy="45" r="4.5" fill="#5eead4"/>
-        <path d="M35 58h10" stroke="#99f6e4" stroke-width="2.5" stroke-linecap="round"/>
+
+      <symbol id="item-vape" viewBox="0 0 96 96">
+        <ellipse cx="48" cy="83" rx="22" ry="5" fill="#0f172a" fill-opacity="0.16"/>
+        <rect x="42" y="12" width="12" height="16" rx="3" fill="#f8fafc" stroke="#475569" stroke-width="2.8"/>
+        <rect x="32" y="27" width="32" height="52" rx="11" fill="#0f766e" stroke="#134e4a" stroke-width="3.2"/>
+        <rect x="38" y="34" width="20" height="16" rx="4" fill="#042f2e"/>
+        <circle cx="48" cy="58" r="5.5" fill="#5eead4" stroke="#14b8a6" stroke-width="2"/>
+        <path d="M41 70h14" stroke="#99f6e4" stroke-width="3" stroke-linecap="round"/>
       </symbol>
-      <symbol id="item-earphone" viewBox="0 0 80 80">
-        <rect x="20" y="26" width="40" height="38" rx="14" fill="#f8fafc" stroke="#475569" stroke-width="3"/>
-        <path d="M20 42h40" stroke="#94a3b8" stroke-width="2.5"/>
-        <circle cx="40" cy="51" r="2.8" fill="#22c55e"/>
-        <path d="M29 22v-6a5 5 0 0 1 10 0v6M41 22v-6a5 5 0 0 1 10 0v6" fill="none" stroke="#475569" stroke-width="3" stroke-linecap="round"/>
+
+      <symbol id="item-earphone" viewBox="0 0 96 96">
+        <ellipse cx="48" cy="82" rx="28" ry="5" fill="#0f172a" fill-opacity="0.15"/>
+        <path d="M33 28v-8a7 7 0 0 1 14 0v8M49 28v-8a7 7 0 0 1 14 0v8" fill="none" stroke="#475569" stroke-width="3.5" stroke-linecap="round"/>
+        <rect x="22" y="28" width="52" height="48" rx="18" fill="#f8fafc" stroke="#334155" stroke-width="3.2"/>
+        <path d="M22 48h52" stroke="#94a3b8" stroke-width="3"/>
+        <rect x="40" y="45" width="16" height="6" rx="3" fill="#cbd5e1" stroke="#475569" stroke-width="1.5"/>
+        <circle cx="48" cy="60" r="3.8" fill="#22c55e"/>
       </symbol>
-      <symbol id="item-fan" viewBox="0 0 80 80">
-        <circle cx="40" cy="30" r="19" fill="#e0f2fe" stroke="#0284c7" stroke-width="3"/>
-        <circle cx="40" cy="30" r="5" fill="#0284c7"/>
-        <path d="M40 14c4 4 4 8 0 11M56 30c-4 4-8 4-11 0M40 46c-4-4-4-8 0-11M24 30c4-4 8-4 11 0" stroke="#0369a1" stroke-width="3.5" stroke-linecap="round"/>
-        <rect x="34" y="49" width="12" height="21" rx="5" fill="#bae6fd" stroke="#0284c7" stroke-width="3"/>
+
+      <symbol id="item-fan" viewBox="0 0 96 96">
+        <ellipse cx="48" cy="84" rx="22" ry="5" fill="#0f172a" fill-opacity="0.15"/>
+        <circle cx="48" cy="36" r="23" fill="#e0f2fe" stroke="#0284c7" stroke-width="3.4"/>
+        <circle cx="48" cy="36" r="6" fill="#0284c7"/>
+        <path d="M48 17c6 5 6 10 0 13M67 36c-5 6-10 6-13 0M48 55c-6-5-6-10 0-13M29 36c5-6 10-6 13 0" stroke="#0369a1" stroke-width="4" stroke-linecap="round"/>
+        <rect x="40" y="59" width="16" height="23" rx="6" fill="#bae6fd" stroke="#0284c7" stroke-width="3"/>
+        <circle cx="48" cy="68" r="2.5" fill="#0284c7"/>
       </symbol>
-      <symbol id="item-scissors" viewBox="0 0 80 80">
-        <circle cx="26" cy="56" r="10" fill="none" stroke="#ef4444" stroke-width="4.5"/>
-        <circle cx="54" cy="56" r="10" fill="none" stroke="#ef4444" stroke-width="4.5"/>
-        <path d="M32 48 56 14M48 48 24 14" stroke="#64748b" stroke-width="5" stroke-linecap="round"/>
-        <circle cx="40" cy="34" r="3" fill="#1e293b"/>
+
+      <symbol id="item-scissors" viewBox="0 0 96 96">
+        <ellipse cx="48" cy="83" rx="28" ry="5" fill="#0f172a" fill-opacity="0.15"/>
+        <path d="M38 56 68 14M58 56 28 14" stroke="#94a3b8" stroke-width="6.5" stroke-linecap="round"/>
+        <path d="M38 56 68 14M58 56 28 14" stroke="#475569" stroke-width="2.5" stroke-linecap="round"/>
+        <circle cx="31" cy="66" r="12" fill="none" stroke="#ef4444" stroke-width="5.5"/>
+        <circle cx="65" cy="66" r="12" fill="none" stroke="#ef4444" stroke-width="5.5"/>
+        <circle cx="48" cy="40" r="3.8" fill="#0f172a"/>
       </symbol>
-      <symbol id="item-cutter" viewBox="0 0 80 80">
-        <path d="M52 28 66 14l4 10-12 12Z" fill="#cbd5e1" stroke="#475569" stroke-width="2.5"/>
-        <rect x="16" y="36" width="44" height="16" rx="6" transform="rotate(-35 38 44)" fill="#facc15" stroke="#a16207" stroke-width="3"/>
-        <circle cx="38" cy="44" r="4" fill="#1e293b"/>
+
+      <symbol id="item-cutter" viewBox="0 0 96 96">
+        <ellipse cx="48" cy="82" rx="30" ry="5" fill="#0f172a" fill-opacity="0.15"/>
+        <path d="M60 34 78 16l5 12-15 15Z" fill="#e2e8f0" stroke="#334155" stroke-width="2.8"/>
+        <rect x="18" y="42" width="52" height="19" rx="7" transform="rotate(-35 44 51)" fill="#facc15" stroke="#a16207" stroke-width="3.2"/>
+        <circle cx="44" cy="51" r="4.8" fill="#0f172a"/>
       </symbol>
-      <symbol id="item-bottle" viewBox="0 0 80 80">
-        <rect x="33" y="12" width="14" height="9" rx="2" fill="#0284c7"/>
-        <rect x="24" y="21" width="32" height="49" rx="8" fill="#e0f2fe" stroke="#0284c7" stroke-width="3"/>
-        <path d="M26 52h28v12a6 6 0 0 1-6 6H32a6 6 0 0 1-6-6V52Z" fill="#38bdf8" fill-opacity="0.55"/>
-        <rect x="29" y="31" width="22" height="14" rx="2" fill="#ffffff" stroke="#7dd3fc" stroke-width="1.5"/>
-        <text x="40" y="41" text-anchor="middle" fill="#0369a1" font-size="8.5" font-weight="bold">150ml</text>
+
+      <symbol id="item-bottle" viewBox="0 0 96 96">
+        <ellipse cx="48" cy="84" rx="24" ry="5" fill="#0f172a" fill-opacity="0.16"/>
+        <rect x="39" y="12" width="18" height="11" rx="3" fill="#0284c7" stroke="#0369a1" stroke-width="2"/>
+        <rect x="28" y="23" width="40" height="57" rx="10" fill="#e0f2fe" stroke="#0284c7" stroke-width="3.2"/>
+        <path d="M30 58h36v14a8 8 0 0 1-8 8H38a8 8 0 0 1-8-8V58Z" fill="#38bdf8" fill-opacity="0.6"/>
+        <rect x="33" y="34" width="30" height="18" rx="3" fill="#ffffff" stroke="#0284c7" stroke-width="1.8"/>
+        <text x="48" y="46.5" text-anchor="middle" fill="#0369a1" font-size="10.5" font-weight="900">150ml</text>
       </symbol>
-      <symbol id="item-jar" viewBox="0 0 80 80">
-        <ellipse cx="40" cy="24" rx="20" ry="6" fill="#f59e0b" stroke="#b45309" stroke-width="2.5"/>
-        <path d="M22 25h36l-4 41a6 6 0 0 1-6 5H32a6 6 0 0 1-6-5l-4-41Z" fill="#fef3c7" stroke="#d97706" stroke-width="3"/>
-        <path d="M25 54h30l-1.5 14H26.5L25 54Z" fill="#78350f"/>
+
+      <symbol id="item-jar" viewBox="0 0 96 96">
+        <ellipse cx="48" cy="83" rx="26" ry="5" fill="#0f172a" fill-opacity="0.16"/>
+        <ellipse cx="48" cy="26" rx="24" ry="7" fill="#f59e0b" stroke="#b45309" stroke-width="3"/>
+        <path d="M26 27h44l-5 48a7 7 0 0 1-7 6H38a7 7 0 0 1-7-6l-5-48Z" fill="#fef3c7" stroke="#d97706" stroke-width="3.2"/>
+        <path d="M30 62h36l-2 16H32l-2-16Z" fill="#78350f"/>
+        <text x="48" y="51" text-anchor="middle" fill="#92400e" font-size="10" font-weight="900">180g</text>
       </symbol>
-      <symbol id="item-tool" viewBox="0 0 80 80">
-        <path d="M46 34 64 16m-4-2 6 6" stroke="#64748b" stroke-width="4.5" stroke-linecap="round"/>
-        <rect x="16" y="44" width="30" height="14" rx="6" transform="rotate(-45 31 51)" fill="#dc2626" stroke="#7f1d1d" stroke-width="3"/>
+
+      <symbol id="item-tool" viewBox="0 0 96 96">
+        <ellipse cx="48" cy="82" rx="28" ry="5" fill="#0f172a" fill-opacity="0.15"/>
+        <path d="M54 40 76 18m-5-3 8 8" stroke="#64748b" stroke-width="5.5" stroke-linecap="round"/>
+        <rect x="18" y="52" width="36" height="17" rx="7" transform="rotate(-45 36 60)" fill="#dc2626" stroke="#7f1d1d" stroke-width="3.2"/>
       </symbol>
-      <symbol id="item-bat" viewBox="0 0 80 80">
-        <path d="M18 62 56 16c4-4 10 2 6 6L24 66c-3 3-8-1-6-4Z" fill="#d97706" stroke="#78350f" stroke-width="3"/>
-        <circle cx="56" cy="54" r="9" fill="#f8fafc" stroke="#dc2626" stroke-width="2.5"/>
+
+      <symbol id="item-bat" viewBox="0 0 96 96">
+        <ellipse cx="48" cy="83" rx="30" ry="5" fill="#0f172a" fill-opacity="0.15"/>
+        <path d="M20 72 66 18c5-5 12 2 7 7L27 77c-4 4-9-1-7-5Z" fill="#d97706" stroke="#78350f" stroke-width="3.2"/>
+        <circle cx="66" cy="64" r="11" fill="#f8fafc" stroke="#dc2626" stroke-width="2.8"/>
       </symbol>
-      <symbol id="item-ice" viewBox="0 0 80 80">
-        <rect x="18" y="18" width="44" height="46" rx="8" fill="#bae6fd" stroke="#0284c7" stroke-width="3"/>
-        <path d="M40 28v26M27 41h26M31 32l18 18M49 32 31 50" stroke="#0369a1" stroke-width="3" stroke-linecap="round"/>
+
+      <symbol id="item-ice" viewBox="0 0 96 96">
+        <ellipse cx="48" cy="83" rx="28" ry="5" fill="#0f172a" fill-opacity="0.15"/>
+        <rect x="20" y="20" width="56" height="56" rx="10" fill="#bae6fd" stroke="#0284c7" stroke-width="3.2"/>
+        <path d="M48 32v32M32 48h32M37 37l22 22M59 37 37 59" stroke="#0369a1" stroke-width="3.6" stroke-linecap="round"/>
       </symbol>
-      <symbol id="item-hair-iron" viewBox="0 0 80 80">
-        <path d="M20 56 54 18a5 5 0 0 1 7 7L27 63Z" fill="#ec4899" stroke="#9d174d" stroke-width="2.8"/>
-        <path d="M26 62 62 28a5 5 0 0 1 6 7L32 68Z" fill="#f472b6" stroke="#9d174d" stroke-width="2.8"/>
-        <circle cx="24" cy="60" r="6" fill="#831843"/>
-        <path d="m45 45-4 7h5l-2 6" fill="none" stroke="#fef08a" stroke-width="2.5" stroke-linecap="round"/>
+
+      <symbol id="item-hair-iron" viewBox="0 0 96 96">
+        <ellipse cx="48" cy="83" rx="28" ry="5" fill="#0f172a" fill-opacity="0.16"/>
+        <path d="M22 66 64 20a6 6 0 0 1 8 8L30 74Z" fill="#ec4899" stroke="#9d174d" stroke-width="3"/>
+        <path d="M30 74 72 32a6 6 0 0 1 7 8L37 81Z" fill="#f472b6" stroke="#9d174d" stroke-width="3"/>
+        <circle cx="27" cy="71" r="7" fill="#831843"/>
+        <path d="m54 52-5 9h6l-3 8" fill="none" stroke="#fef08a" stroke-width="3" stroke-linecap="round"/>
       </symbol>
-      <symbol id="item-gas" viewBox="0 0 80 80">
-        <rect x="33" y="12" width="14" height="8" rx="2" fill="#475569"/>
-        <rect x="22" y="20" width="36" height="48" rx="8" fill="#ef4444" stroke="#991b1b" stroke-width="3"/>
-        <rect x="26" y="34" width="28" height="18" rx="3" fill="#fef2f2"/>
-        <text x="40" y="46" text-anchor="middle" fill="#b91c1c" font-size="9.5" font-weight="bold">GAS</text>
+
+      <symbol id="item-gas" viewBox="0 0 96 96">
+        <ellipse cx="48" cy="84" rx="26" ry="5" fill="#0f172a" fill-opacity="0.18"/>
+        <rect x="39" y="12" width="18" height="10" rx="3" fill="#475569"/>
+        <rect x="24" y="22" width="48" height="58" rx="10" fill="#ef4444" stroke="#991b1b" stroke-width="3.2"/>
+        <rect x="30" y="38" width="36" height="22" rx="4" fill="#fef2f2"/>
+        <text x="48" y="53" text-anchor="middle" fill="#b91c1c" font-size="11.5" font-weight="900">LPG GAS</text>
       </symbol>
-      <symbol id="item-spray-danger" viewBox="0 0 80 80">
-        <rect x="34" y="12" width="12" height="9" rx="2" fill="#1e293b"/>
-        <path d="M48 16h12M48 13l10-4M48 19l10 4" stroke="#ef4444" stroke-width="2.5" stroke-linecap="round"/>
-        <rect x="25" y="21" width="30" height="48" rx="6" fill="#fbbf24" stroke="#b45309" stroke-width="3"/>
-        <path d="M40 34 31 50h18L40 34Z" fill="#dc2626"/>
-        <text x="40" y="48" text-anchor="middle" fill="#ffffff" font-size="9" font-weight="bold">!</text>
+
+      <symbol id="item-spray-danger" viewBox="0 0 96 96">
+        <ellipse cx="48" cy="84" rx="24" ry="5" fill="#0f172a" fill-opacity="0.16"/>
+        <rect x="40" y="13" width="16" height="10" rx="3" fill="#1e293b"/>
+        <path d="M58 18h14M58 14l12-5M58 22l12 5" stroke="#ef4444" stroke-width="3" stroke-linecap="round"/>
+        <rect x="28" y="23" width="40" height="57" rx="8" fill="#fbbf24" stroke="#b45309" stroke-width="3.2"/>
+        <path d="M48 38 36 58h24L48 38Z" fill="#dc2626"/>
+        <text x="48" y="56" text-anchor="middle" fill="#ffffff" font-size="11" font-weight="900">!</text>
       </symbol>
-      <symbol id="item-spray-ok" viewBox="0 0 80 80">
-        <rect x="34" y="12" width="12" height="9" rx="2" fill="#0d9488"/>
-        <path d="M48 16h10M48 12l8-3M48 20l8 3" stroke="#14b8a6" stroke-width="2.5" stroke-linecap="round"/>
-        <rect x="26" y="21" width="28" height="48" rx="8" fill="#ccfbf1" stroke="#0d9488" stroke-width="3"/>
-        <circle cx="40" cy="44" r="8" fill="#14b8a6" fill-opacity="0.35"/>
+
+      <symbol id="item-spray-ok" viewBox="0 0 96 96">
+        <ellipse cx="48" cy="84" rx="24" ry="5" fill="#0f172a" fill-opacity="0.15"/>
+        <rect x="40" y="13" width="16" height="10" rx="3" fill="#0d9488"/>
+        <path d="M58 18h12M58 14l10-4M58 22l10 4" stroke="#14b8a6" stroke-width="3" stroke-linecap="round"/>
+        <rect x="30" y="23" width="36" height="57" rx="10" fill="#ccfbf1" stroke="#0d9488" stroke-width="3.2"/>
+        <circle cx="48" cy="51" r="10" fill="#14b8a6" fill-opacity="0.35"/>
       </symbol>
-      <symbol id="item-bottle-danger" viewBox="0 0 80 80">
-        <rect x="34" y="10" width="12" height="10" rx="2" fill="#1e293b"/>
-        <path d="M28 24h24l4 12v32a4 4 0 0 1-4 4H28a4 4 0 0 1-4-4V36l4-12Z" fill="#fee2e2" stroke="#dc2626" stroke-width="3"/>
-        <rect x="28" y="40" width="24" height="16" rx="2" fill="#dc2626"/>
-        <text x="40" y="51" text-anchor="middle" fill="#ffffff" font-size="8.5" font-weight="bold">96%</text>
+
+      <symbol id="item-bottle-danger" viewBox="0 0 96 96">
+        <ellipse cx="48" cy="84" rx="24" ry="5" fill="#0f172a" fill-opacity="0.18"/>
+        <rect x="40" y="11" width="16" height="11" rx="3" fill="#1e293b"/>
+        <path d="M32 26h32l5 14v38a5 5 0 0 1-5 5H32a5 5 0 0 1-5-5V40l5-14Z" fill="#fee2e2" stroke="#dc2626" stroke-width="3.2"/>
+        <rect x="32" y="46" width="32" height="20" rx="3" fill="#dc2626"/>
+        <text x="48" y="60" text-anchor="middle" fill="#ffffff" font-size="10.5" font-weight="900">96%</text>
       </symbol>
-      <symbol id="item-fireworks" viewBox="0 0 80 80">
-        <rect x="34" y="34" width="12" height="34" rx="3" fill="#ef4444" stroke="#991b1b" stroke-width="2.5"/>
-        <path d="M40 12v14M24 18l10 10M56 18 46 28M18 32h14M62 32H48" stroke="#f59e0b" stroke-width="3.5" stroke-linecap="round"/>
-        <circle cx="40" cy="28" r="4" fill="#fde047"/>
+
+      <symbol id="item-fireworks" viewBox="0 0 96 96">
+        <ellipse cx="48" cy="84" rx="24" ry="5" fill="#0f172a" fill-opacity="0.16"/>
+        <rect x="40" y="40" width="16" height="40" rx="4" fill="#ef4444" stroke="#991b1b" stroke-width="3"/>
+        <path d="M48 12v18M28 20l12 12M68 20 56 32M20 38h18M76 38H58" stroke="#f59e0b" stroke-width="4" stroke-linecap="round"/>
+        <circle cx="48" cy="34" r="5" fill="#fde047"/>
       </symbol>
-      <symbol id="item-pouch" viewBox="0 0 80 80">
-        <rect x="14" y="20" width="52" height="46" rx="8" fill="#e0f2fe" fill-opacity="0.7" stroke="#0284c7" stroke-width="3"/>
-        <path d="M16 27h48" stroke="#0ea5e9" stroke-width="3.5"/>
-        <rect x="22" y="34" width="10" height="24" rx="3" fill="#38bdf8" stroke="#0369a1" stroke-width="2"/>
-        <rect x="35" y="36" width="10" height="22" rx="3" fill="#34d399" stroke="#047857" stroke-width="2"/>
-        <rect x="48" y="38" width="10" height="20" rx="3" fill="#f472b6" stroke="#be185d" stroke-width="2"/>
+
+      <symbol id="item-pouch" viewBox="0 0 96 96">
+        <ellipse cx="48" cy="83" rx="32" ry="5" fill="#0f172a" fill-opacity="0.15"/>
+        <rect x="16" y="22" width="64" height="56" rx="10" fill="#e0f2fe" fill-opacity="0.75" stroke="#0284c7" stroke-width="3.2"/>
+        <path d="M18 31h60" stroke="#0ea5e9" stroke-width="4"/>
+        <rect x="26" y="39" width="12" height="30" rx="4" fill="#38bdf8" stroke="#0369a1" stroke-width="2.2"/>
+        <rect x="42" y="41" width="12" height="28" rx="4" fill="#34d399" stroke="#047857" stroke-width="2.2"/>
+        <rect x="58" y="43" width="12" height="26" rx="4" fill="#f472b6" stroke="#be185d" stroke-width="2.2"/>
       </symbol>
-      <symbol id="item-plug" viewBox="0 0 80 80">
-        <path d="M22 50 52 20a5 5 0 0 1 7 7L29 57Z" fill="#64748b" stroke="#1e293b" stroke-width="2.8"/>
-        <path d="M24 54c-6 8 4 16 14 10s18-4 18 4" fill="none" stroke="#1e293b" stroke-width="3.2" stroke-linecap="round"/>
-        <rect x="50" y="54" width="14" height="12" rx="3" fill="#334155"/>
-        <path d="M54 50v4M60 50v4" stroke="#334155" stroke-width="3" stroke-linecap="round"/>
+
+      <symbol id="item-plug" viewBox="0 0 96 96">
+        <ellipse cx="48" cy="83" rx="28" ry="5" fill="#0f172a" fill-opacity="0.15"/>
+        <path d="M24 58 62 22a6 6 0 0 1 8 8L32 66Z" fill="#64748b" stroke="#1e293b" stroke-width="3"/>
+        <path d="M28 63c-7 10 5 18 17 12s22-5 22 5" fill="none" stroke="#1e293b" stroke-width="3.6" stroke-linecap="round"/>
+        <rect x="58" y="62" width="18" height="14" rx="3" fill="#334155"/>
+        <path d="M63 56v6M71 56v6" stroke="#334155" stroke-width="3.5" stroke-linecap="round"/>
       </symbol>
-      <symbol id="item-wine" viewBox="0 0 80 80">
-        <rect x="36" y="10" width="8" height="12" rx="2" fill="#065f46"/>
-        <path d="M32 22h16l5 14v32a4 4 0 0 1-4 4H31a4 4 0 0 1-4-4V36l5-14Z" fill="#047857" stroke="#064e3b" stroke-width="3"/>
-        <rect x="31" y="40" width="18" height="16" rx="2" fill="#fef3c7"/>
-        <text x="40" y="51" text-anchor="middle" fill="#065f46" font-size="8" font-weight="bold">15%</text>
+
+      <symbol id="item-wine" viewBox="0 0 96 96">
+        <ellipse cx="48" cy="84" rx="22" ry="5" fill="#0f172a" fill-opacity="0.16"/>
+        <rect x="43" y="11" width="10" height="14" rx="2" fill="#065f46"/>
+        <path d="M38 25h20l6 16v38a5 5 0 0 1-5 5H37a5 5 0 0 1-5-5V41l6-16Z" fill="#047857" stroke="#064e3b" stroke-width="3.2"/>
+        <rect x="36" y="46" width="24" height="20" rx="3" fill="#fef3c7"/>
+        <text x="48" y="60" text-anchor="middle" fill="#065f46" font-size="10" font-weight="900">15%</text>
       </symbol>
-      <symbol id="item-clipper" viewBox="0 0 80 80">
-        <rect x="24" y="16" width="32" height="12" rx="4" fill="#38bdf8" stroke="#0369a1" stroke-width="2.8"/>
-        <path d="M36 28v36a4 4 0 0 0 8 0V28" fill="#cbd5e1" stroke="#475569" stroke-width="2.8"/>
+
+      <symbol id="item-clipper" viewBox="0 0 96 96">
+        <ellipse cx="48" cy="83" rx="24" ry="5" fill="#0f172a" fill-opacity="0.15"/>
+        <rect x="28" y="18" width="40" height="14" rx="5" fill="#38bdf8" stroke="#0369a1" stroke-width="3"/>
+        <path d="M43 32v44a5 5 0 0 0 10 0V32" fill="#cbd5e1" stroke="#475569" stroke-width="3"/>
       </symbol>
-      <symbol id="item-medicine" viewBox="0 0 80 80">
-        <rect x="18" y="24" width="26" height="38" rx="6" fill="#f8fafc" stroke="#64748b" stroke-width="2.8"/>
-        <circle cx="26" cy="34" r="3.5" fill="#38bdf8"/>
-        <circle cx="36" cy="34" r="3.5" fill="#38bdf8"/>
-        <circle cx="26" cy="45" r="3.5" fill="#38bdf8"/>
-        <circle cx="36" cy="45" r="3.5" fill="#38bdf8"/>
-        <path d="M56 24 50 38v22a6 6 0 0 0 12 0V38l-6-14Z" fill="#bae6fd" stroke="#0284c7" stroke-width="2.8"/>
+
+      <symbol id="item-medicine" viewBox="0 0 96 96">
+        <ellipse cx="48" cy="83" rx="28" ry="5" fill="#0f172a" fill-opacity="0.15"/>
+        <rect x="20" y="28" width="32" height="46" rx="7" fill="#f8fafc" stroke="#475569" stroke-width="3"/>
+        <circle cx="30" cy="40" r="4.2" fill="#38bdf8"/>
+        <circle cx="42" cy="40" r="4.2" fill="#38bdf8"/>
+        <circle cx="30" cy="54" r="4.2" fill="#38bdf8"/>
+        <circle cx="42" cy="54" r="4.2" fill="#38bdf8"/>
+        <path d="M66 28 59 44v26a7 7 0 0 0 14 0V44l-7-16Z" fill="#bae6fd" stroke="#0284c7" stroke-width="3"/>
       </symbol>
     </defs>
   </svg>
@@ -238,7 +303,7 @@
   <main id="main-content" class="app-main">
     <!-- ==================== 1. ゲーム画面セクション ==================== -->
     <section id="panel-game" class="panel-game" aria-label="保安検査仕分けゲーム">
-      <!-- モード選択バー -->
+      <!-- モード選択バー＆自己ベスト -->
       <div class="mode-bar" role="group" aria-label="シフト選択">
         <div class="mode-buttons">
           <button id="mode-rush" class="mode-btn is-selected" type="button" data-mode="rush">
@@ -251,29 +316,129 @@
           </button>
         </div>
         <div class="record-pills" aria-label="自己ベスト記録">
-          <span>60秒最高: <strong id="best-rush-score">0</strong> pts</span>
-          <span>研修最高: <strong id="best-training-score">0</strong> / 10</span>
+          <span>60秒最高: <strong id="best-rush-score">0</strong>&nbsp;pts</span>
+          <span>研修最高: <strong id="best-training-score">0</strong>&nbsp;/&nbsp;10</span>
         </div>
       </div>
 
-      <!-- 空港デジタル電光掲示板風 HUD -->
-      <div class="flight-board" role="region" aria-label="検査ステータス">
-        <div class="board-cell">
-          <span class="board-label" id="hud-progress-label">TIMER</span>
-          <strong class="board-value" id="hud-timer">0:60</strong>
+      <!-- 天吊り空港デジタル電光掲示板風 HUD -->
+      <div class="flight-board-wrap">
+        <div class="hanging-rods" aria-hidden="true">
+          <span></span>
+          <span></span>
         </div>
-        <div class="board-cell">
-          <span class="board-label">SCORE</span>
-          <strong class="board-value board-score" id="hud-score">0</strong>
-        </div>
-        <div class="board-cell">
-          <span class="board-label">COMBO</span>
-          <strong class="board-value board-combo" id="hud-combo">×0</strong>
+        <div class="flight-board" role="region" aria-label="検査ステータス">
+          <div class="board-topline">
+            <span id="board-shift-badge" class="board-shift-badge">LANE 03 / STANDBY</span>
+            <span class="board-clock" aria-hidden="true">TERMINAL 1 SECURITY</span>
+            <button id="btn-back-standby" class="board-mini-btn" type="button" hidden>⏹ シフト中断・最初へ</button>
+          </div>
+          <div class="board-grid">
+            <div class="board-cell">
+              <span class="board-label" id="hud-progress-label">TIMER</span>
+              <strong class="board-value" id="hud-timer">1:00</strong>
+            </div>
+            <div class="board-cell">
+              <span class="board-label">SCORE</span>
+              <strong class="board-value board-score" id="hud-score">0</strong>
+            </div>
+            <div class="board-cell">
+              <span class="board-label">COMBO</span>
+              <strong class="board-value board-combo" id="hud-combo">×0</strong>
+            </div>
+          </div>
         </div>
       </div>
 
       <!-- 2.5D 保安検査コンベア＆3方向仕分けステージ -->
-      <div id="inspection-stage" class="inspection-stage">
+      <div id="inspection-stage" class="inspection-stage is-standby">
+        <!-- 空港ターミナル背景＆X線ゲート装飾レイヤー -->
+        <div class="terminal-scene-bg" aria-hidden="true">
+          <div class="terminal-wall-board">
+            <span class="wall-board-title">✈ DEPARTURES / 保安検査場</span>
+            <span class="wall-board-row">GATE 077 TOKYO</span>
+          </div>
+          <div id="xray-arch" class="xray-arch">
+            <div class="arch-top">
+              <span id="arch-lamp" class="arch-lamp"></span>
+              <span class="arch-label">X-RAY</span>
+            </div>
+            <div class="arch-tunnel">
+              <div id="next-tray-preview" class="next-tray-preview">
+                <span class="next-tray-tag">NEXT</span>
+                <span id="next-tray-name" class="next-tray-name">待機中…</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ==================== 初回オンボーディング・スタート画面オーバーレイ ==================== -->
+        <div id="start-overlay" class="start-overlay" role="region" aria-labelledby="start-title">
+          <div class="start-card">
+            <div class="start-badge-row">
+              <span class="start-pill">🛂 空港保安検査シミュレーション</span>
+              <span class="start-pill start-pill-sub">全36品目・国土交通省基準</span>
+            </div>
+            <h2 id="start-title" class="start-title">その荷物、機内？預け？没収？</h2>
+            <p class="start-lead">
+              検査トレイの荷物を<strong>「← 機内持ち込み」「↑ 預け荷物」「→ 持込不可」</strong>の3方向へスワイプ（またはボタン／矢印キー）で仕分けましょう！
+            </p>
+
+            <!-- 3秒でわかる3方向仕分け図解 -->
+            <div class="start-rules-grid" aria-label="3方向の仕分けルール">
+              <div class="start-rule-box start-dir-card rule-carry">
+                <span class="rule-dir">← 左（青）</span>
+                <strong>機内持ち込み</strong>
+                <small>モバイルバッテリー・ライター1個・100ml以下透明袋</small>
+              </div>
+              <div class="start-rule-box start-dir-card rule-checked">
+                <span class="rule-dir">↑ 上（黄）</span>
+                <strong>預け荷物</strong>
+                <small>ハサミ・工具・国際線100ml超ボトル・保冷剤</small>
+              </div>
+              <div class="start-rule-box start-dir-card rule-prohibited">
+                <span class="rule-dir">→ 右（赤）</span>
+                <strong>持込不可（没収）</strong>
+                <small>電池外せないヘアアイロン・花火・200Wh電源</small>
+              </div>
+            </div>
+
+            <!-- スタート画面内のシフト選択＆開始CTA -->
+            <div class="start-cta-group">
+              <button id="btn-start-shift" class="start-primary-btn" type="button">
+                <span class="start-btn-icon" aria-hidden="true">▶</span>
+                <span id="start-primary-label">60秒タイムアタックを開始する（START）</span>
+              </button>
+              <div class="start-sub-actions">
+                <button id="btn-start-training-direct" class="start-secondary-btn" type="button">
+                  🎓 じっくり10問・研修シフトで始める
+                </button>
+                <button id="btn-start-tutorial" class="start-secondary-btn start-tutorial-btn" type="button">
+                  🖐️ 1問おためし練習（10秒）
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- プレイ中常時表示されるステップコーチ＆直近判定モニター（高さ完全固定でCLSゼロ・トレイ直上配置） -->
+        <div id="coach-banner" class="coach-banner" hidden>
+          <span id="coach-step-badge" class="coach-step-badge">💡 第1問ガイド</span>
+          <p id="coach-text" class="coach-text">
+            トレイの荷物を確認し、「← 機内持ち込み」「↑ 預け荷物」「→ 持込不可」へ仕分けましょう！
+          </p>
+        </div>
+
+        <div id="feedback-banner" class="feedback-banner" role="status" aria-live="polite">
+          <div class="feedback-top-row">
+            <span id="feedback-badge" class="feedback-badge">検査スタンバイ</span>
+            <span id="feedback-item-chip" class="feedback-item-chip">シフト開始で検査レーン稼働</span>
+          </div>
+          <p id="feedback-text" class="feedback-text">
+            流れてくる荷物を「← 機内持ち込み」「↑ 預け荷物」「→ 持込不可」へ仕分けてください。「🔍 X線透視」で内部構造を確認できます。
+          </p>
+        </div>
+
         <!-- 上方向：預け荷物（スーツケース） -->
         <div class="zone-top-wrap">
           <button id="btn-checked" class="action-zone zone-checked" type="button" data-action="checked" aria-label="預け荷物へ仕分ける（上矢印キーまたはWキー）">
@@ -286,7 +451,7 @@
           </button>
         </div>
 
-        <!-- 中央：ベルトコンベアと検査トレイ -->
+        <!-- 中央：2.5Dベルトコンベアと成形プラスチック検査トレイ -->
         <div class="conveyor-middle">
           <!-- 左方向：機内持ち込み（客室バッグ） -->
           <button id="btn-carry-on" class="action-zone zone-carry" type="button" data-action="carry_on" aria-label="機内持ち込みへ仕分ける（左矢印キーまたはAキー）">
@@ -298,24 +463,65 @@
             </span>
           </button>
 
-          <!-- コンベアベルト＆プラスチックトレイ -->
+          <!-- 斜め立体ローラーコンベア＆プラスチックトレイ -->
           <div class="conveyor-lane" aria-live="polite">
+            <div class="conveyor-rail rail-top" aria-hidden="true"></div>
             <div class="conveyor-belt-stripes" aria-hidden="true"></div>
+            <div class="conveyor-rail rail-bottom" aria-hidden="true"></div>
+
             <div id="security-tray" class="security-tray" tabindex="0" role="group" aria-label="検査トレイの荷物">
-              <div class="tray-inner">
-                <div class="tray-header">
-                  <span id="item-category-badge" class="tray-cat-badge">電池・電子機器</span>
-                  <span id="item-counter-badge" class="tray-count-badge">ITEM #01</span>
+              <!-- スワイプ・判定時の検印スタンプ -->
+              <div id="tray-stamp" class="tray-stamp" aria-hidden="true"></div>
+
+              <div class="tray-rim">
+                <div class="tray-inner">
+                  <div class="tray-header">
+                    <span id="item-category-badge" class="tray-cat-badge">電池・電子機器</span>
+                    <div class="tray-header-right">
+                      <button id="btn-xray-toggle" class="xray-toggle-btn" type="button" aria-pressed="false" title="X線透視スキャンで内部構造を確認（Spaceキー）">
+                        <span aria-hidden="true">🔍</span>
+                        <span id="xray-btn-label">X線透視</span>
+                      </button>
+                      <span id="item-counter-badge" class="tray-count-badge">ITEM #01</span>
+                    </div>
+                  </div>
+
+                  <div class="tray-main-row">
+                    <div class="tray-visual-stage">
+                      <!-- サイズ比較用スマートフォン小物（モバイルでも表示） -->
+                      <div class="tray-companion-phone" aria-hidden="true" title="サイズ比較用スマートフォン">
+                        <div class="phone-screen"></div>
+                      </div>
+                      <div class="tray-visual">
+                        <div class="xray-scanline" aria-hidden="true"></div>
+                        <svg id="item-svg" class="item-illustration" viewBox="0 0 96 96" aria-hidden="true">
+                          <use id="item-svg-use" href="#item-battery"/>
+                        </svg>
+                      </div>
+                    </div>
+
+                    <div class="tray-item-info">
+                      <h2 id="item-name" class="item-title">モバイルバッテリー</h2>
+                      <p id="item-spec" class="item-spec">10,000mAh・定格37Wh</p>
+                    </div>
+                  </div>
+
+                  <!-- 固定高さテレメトリ枠（X線OFF時は待機ガイド、ON時はX線所見を表示して高さ変化ゼロ） -->
+                  <div class="tray-telemetry-slot">
+                    <div id="xray-standby-hint" class="xray-standby-hint">
+                      <span>📡 内部構造（電池・刃渡り・容器容量）は右上の<strong>「🔍 X線透視」</strong>（またはSpaceキー）で透視できます</span>
+                    </div>
+                    <div id="xray-telemetry" class="xray-telemetry" hidden>
+                      <p id="xray-material-tag" class="xray-material-tag"></p>
+                      <p id="xray-inspect-point" class="xray-inspect-point"></p>
+                    </div>
+                  </div>
                 </div>
-                <div class="tray-visual">
-                  <svg id="item-svg" class="item-illustration" viewBox="0 0 80 80" aria-hidden="true">
-                    <use id="item-svg-use" href="#item-battery"/>
-                  </svg>
-                </div>
-                <h2 id="item-name" class="item-title">モバイルバッテリー</h2>
-                <p id="item-spec" class="item-spec">10,000mAh (約37Wh)</p>
               </div>
-              <p class="swipe-hint" aria-hidden="true">トレイをスワイプ または 3方向ボタンで仕分け</p>
+              <div class="tray-footer-bar">
+                <span class="tray-id-tag" aria-hidden="true">TRAY #077-A</span>
+                <p class="swipe-hint" aria-hidden="true">ドラッグ ／ 3方向ボタン ／ 矢印キーで仕分け</p>
+              </div>
             </div>
           </div>
 
@@ -348,14 +554,6 @@
             <small>両方NG・破棄</small>
           </button>
         </div>
-      </div>
-
-      <!-- 直近の判定フィードバック＆理由フラッシュバー -->
-      <div id="feedback-banner" class="feedback-banner" role="status" aria-live="polite">
-        <span id="feedback-badge" class="feedback-badge">検査スタンバイ</span>
-        <p id="feedback-text" class="feedback-text">
-          流れてくる荷物を「← 機内持ち込み」「↑ 預け荷物」「→ 持込不可」の3方向へ仕分けてください。最初の1個を仕分けるとタイマーが動き出します！
-        </p>
       </div>
 
       <!-- ゲーム終了時のリザルト＆復習パネル -->
@@ -403,12 +601,12 @@
     <section id="panel-catalog" class="panel-catalog" aria-labelledby="catalog-title" hidden>
       <div class="catalog-header">
         <div>
-          <h2 id="catalog-title" class="catalog-title">空港の手荷物ルール早見図鑑（全36品目）</h2>
+          <h2 id="catalog-title" class="catalog-title">空港の手荷物ルール早見図鑑<span class="nowrap">（全36品目）</span></h2>
           <p class="catalog-lead">旅行・帰省の荷造り前に「機内持ち込み」「預け荷物」のどちらに入れるべきかすぐ確認できます。</p>
         </div>
         <div class="catalog-search-wrap">
           <label for="catalog-search" class="sr-only">品名やキーワードで検索</label>
-          <input id="catalog-search" class="catalog-search" type="search" placeholder="例: バッテリー、ヘアアイロン、化粧水、ライター…" autocomplete="off">
+          <input id="catalog-search" class="catalog-search" type="search" placeholder="例: バッテリー、化粧水、ライター" autocomplete="off">
         </div>
       </div>
 
@@ -465,12 +663,12 @@
   <dialog id="guide-dialog" class="guide-dialog" aria-labelledby="guide-dialog-title">
     <div class="dialog-content">
       <div class="dialog-header">
-        <h2 id="guide-dialog-title">保安検査・手荷物仕分けの「3大原則」</h2>
+        <h2 id="guide-dialog-title">保安検査・手荷物仕分けの<span class="nowrap">「3大原則」</span></h2>
         <button id="guide-close-btn" class="dialog-close" type="button" aria-label="ガイドを閉じる">✕</button>
       </div>
       <div class="guide-body">
         <div class="rule-pillar pillar-carry">
-          <h3>🟢 1.「発火しそうな電池・ライター1個」は【機内持ち込み】へ！</h3>
+          <h3>🔵 1.「発火しそうな予備電池・ライター1個」は【機内持ち込み】へ！</h3>
           <p>
             <strong>モバイルバッテリー（160Wh以下）</strong>、<strong>加熱式タバコ</strong>、<strong>身につけるライター1個</strong>は、万一発火した際に客室ですぐ消火できるよう、<strong>スーツケースへの預け入れは禁止（機内持ち込みのみOK）</strong>です。
           </p>

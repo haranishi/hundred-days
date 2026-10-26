@@ -50,7 +50,7 @@ export const ITEMS = [
   {
     id: 'powerbank-10000',
     name: 'モバイルバッテリー',
-    spec: '10,000mAh (約37Wh)',
+    spec: '10,000mAh・37Wh',
     category: 'battery',
     allowed: ['carry_on'],
     ruleBadge: '機内のみOK（預けNG）',
@@ -461,6 +461,210 @@ export const ITEMS = [
     icon: 'medicine'
   }
 ];
+
+export const XRAY_BY_ID = {
+  'powerbank-10000': {
+    scanColor: 'cyan',
+    materialTag: 'X線所見：リチウムイオンセル×2（定格37Wh・単体予備電池）',
+    inspectPoint: '着眼点：160Wh以下の予備リチウム電池は発火時に客室で対処するため貨物室預けNG'
+  },
+  'powerbank-140wh': {
+    scanColor: 'cyan',
+    materialTag: 'X線所見：高密度リチウムセル×6（定格140Wh・100〜160Wh帯）',
+    inspectPoint: '着眼点：100Wh超〜160Wh以下の予備電池は1人2個まで客室手荷物のみ可（預けNG）'
+  },
+  'lighter-1': {
+    scanColor: 'amber',
+    materialTag: 'X線所見：小型液化ガス容器×1（着火フリント式・1個のみ）',
+    inspectPoint: '着眼点：通常の喫煙ライターは「1人1個・身につけて機内持込」のみ許可（預けNG）'
+  },
+  'safety-match': {
+    scanColor: 'amber',
+    materialTag: 'X線所見：木軸マッチ1箱（側面擦り着火式）',
+    inspectPoint: '着眼点：小型の安全マッチは1人1箱に限り身につけて機内持ち込みのみ可（預けNG）'
+  },
+  'heated-tobacco': {
+    scanColor: 'cyan',
+    materialTag: 'X線所見：リチウムイオン電池内蔵＋加熱ブレード回路',
+    inspectPoint: '着眼点：発熱素子と電池を内蔵する電子タバコ・加熱式タバコは貨物室への預け入れ禁止'
+  },
+  'spare-lithium-camera': {
+    scanColor: 'cyan',
+    materialTag: 'X線所見：カメラ用リチウムイオン電池パック単体（60Wh）',
+    inspectPoint: '着眼点：機器から外した予備のリチウム電池はすべてモバイルバッテリーと同じく預けNG'
+  },
+  'earphone-charging-case': {
+    scanColor: 'cyan',
+    materialTag: 'X線所見：充電用リチウム電池内蔵ケース＋小型基板',
+    inspectPoint: '着眼点：イヤホンを充電するバッテリー内蔵ケースはモバイルバッテリー扱いで機内へ携帯'
+  },
+  'handy-fan': {
+    scanColor: 'cyan',
+    materialTag: 'X線所見：18650型リチウムイオン電池内蔵＋モーター羽根',
+    inspectPoint: '着眼点：衝撃で発火しやすいリチウム電池内蔵ファンは誤作動を防いで機内手荷物へ'
+  },
+  'hair-iron-removed-battery': {
+    scanColor: 'cyan',
+    materialTag: 'X線所見：ヘアアイロン本体から分離されたリチウム電池単体',
+    inspectPoint: '着眼点：本体から取り外したリチウム電池（160Wh以下）は予備電池として機内持ち込みへ'
+  },
+  'vape-mod': {
+    scanColor: 'cyan',
+    materialTag: 'X線所見：バッテリー内蔵VAPE本体＋アトマイザーコイル',
+    inspectPoint: '着眼点：バッテリー内蔵の電子タバコは貨物室での誤作動発熱を防ぐため機内持ち込みのみ'
+  },
+  'scissors-8cm': {
+    scanColor: 'crimson',
+    materialTag: 'X線所見：高密度金属二枚刃（刃渡り8cm・先端鋭利）',
+    inspectPoint: '着眼点：ハサミやナイフ等の刃物類は客室持ち込み禁止。スーツケースに預ければ輸送可'
+  },
+  'cutter-knife': {
+    scanColor: 'crimson',
+    materialTag: 'X線所見：スライド式金属替刃（鋭利な鋼製ブレード）',
+    inspectPoint: '着眼点：小型の事務用カッターでも鋭利な刃物として客室持ち込みは厳禁（預け荷物へ）'
+  },
+  'swiss-knife': {
+    scanColor: 'crimson',
+    materialTag: 'X線所見：折りたたみ金属ナイフ刃・缶切り内蔵マルチツール',
+    inspectPoint: '着眼点：キーホルダー型でもナイフ刃付きのマルチツールは客室NG（外して預け荷物へ）'
+  },
+  'lotion-150ml-intl': {
+    scanColor: 'amber',
+    materialTag: 'X線所見：樹脂ボトル容器（容器刻印 150ml ／ 液面残り約30ml）',
+    inspectPoint: '着眼点：国際線の液体物は残量ではなく「容器の表示容量が100ml以下か」で判定される'
+  },
+  'pudding-jelly-intl': {
+    scanColor: 'amber',
+    materialTag: 'X線所見：高水分ゲル状食品カップ（1個 180g）',
+    inspectPoint: '着眼点：プリン・ゼリー・味噌・ジャム等も国際線では液体物扱い（100g超は預け荷物へ）'
+  },
+  'screwdriver-tool': {
+    scanColor: 'crimson',
+    materialTag: 'X線所見：鋼製シャフト工具（全長20cm・先端金属）',
+    inspectPoint: '着眼点：ドライバー・レンチ・ペンチ等の作業工具は凶器防止のため客室NG（預け荷物へ）'
+  },
+  'baseball-bat': {
+    scanColor: 'crimson',
+    materialTag: 'X線所見：中空アルミ合金製長尺バット（打撃用具）',
+    inspectPoint: '着眼点：バットやゴルフクラブ等の長尺スポーツ用品は客室へ持ち込めず預け荷物扱い'
+  },
+  'souvenir-kitchen-knife': {
+    scanColor: 'crimson',
+    materialTag: 'X線所見：箱内部に鋼製包丁ブレード（刃渡り16cm）',
+    inspectPoint: '着眼点：未開封の贈答箱入りでも包丁・ナイフ類は客室持ち込み不可（カウンターで預けへ）'
+  },
+  'gel-ice-pack-intl': {
+    scanColor: 'amber',
+    materialTag: 'X線所見：高密度ポリマー保冷ジェルパック（250g）',
+    inspectPoint: '着眼点：保冷剤もジェル（液体物）扱い。国際線で100g超は品物と一緒に預け荷物へ'
+  },
+  'camp-peg-hammer': {
+    scanColor: 'crimson',
+    materialTag: 'X線所見：鍛造スチール製ペグ（30cm）＋金属ヘッドハンマー',
+    inspectPoint: '着眼点：先端が尖った金属ペグや重量ハンマーは客室NG。受託手荷物として預け入れへ'
+  },
+  'powerbank-200wh': {
+    scanColor: 'crimson',
+    materialTag: 'X線所見：超大型リチウムイオン電池ブロック（定格200Wh・上限160Wh超過）',
+    inspectPoint: '着眼点：160Whを超えるリチウムイオン電池（ポータブル電源）は機内も預けも法律で全面禁止'
+  },
+  'lighter-turbo': {
+    scanColor: 'crimson',
+    materialTag: 'X線所見：高圧プリミキシングノズル内蔵バーナーライター（青炎式）',
+    inspectPoint: '着眼点：高温の青い炎が出るターボライター・ジェットライターは1個でも機内・預け全面禁止'
+  },
+  'lighter-multiple': {
+    scanColor: 'crimson',
+    materialTag: 'X線所見：液化ガスライター×3本（1人1個の上限超過）',
+    inspectPoint: '着眼点：ライターは「1人1個」まで。2個目以降の予備ライターは機内も預けも一切不可'
+  },
+  'hair-iron-fixed-battery': {
+    scanColor: 'crimson',
+    materialTag: 'X線所見：ヒータープレート＋固定式リチウムイオン電池（取外し不可構造）',
+    inspectPoint: '着眼点：電池が本体から取り外せないコードレスヘアアイロンは機内・預けともに全面禁止'
+  },
+  'gas-cartridge-camp': {
+    scanColor: 'crimson',
+    materialTag: 'X線所見：高圧LPG液化ガス充填ボンベ（250g・引火性高圧ガス）',
+    inspectPoint: '着眼点：カセットコンロ用ボンベやキャンプ用ODガス缶は爆発危険のため機内・預け全面禁止'
+  },
+  'spray-waterproof': {
+    scanColor: 'crimson',
+    materialTag: 'X線所見：エアゾール缶（300ml・LPG引火性噴射剤＋有機溶剤）',
+    inspectPoint: '着眼点：化粧品・医薬品以外の引火性スプレー（防水スプレー・塗料等）は機内・預け全面禁止'
+  },
+  'alcohol-spirytus': {
+    scanColor: 'crimson',
+    materialTag: 'X線所見：ガラス瓶液体（アルコール度数96%・上限70%超過の引火性液体）',
+    inspectPoint: '着眼点：アルコール度数70%を超える酒類は引火性液体（危険物）として機内・預けともに不可'
+  },
+  'fireworks-cracker': {
+    scanColor: 'crimson',
+    materialTag: 'X線所見：黒色火薬・発火薬充填チューブ（火薬類反応あり）',
+    inspectPoint: '着眼点：手持ち花火やパーティー用クラッカーは「火薬類」のため少量でも全面禁止'
+  },
+  'strike-anywhere-match': {
+    scanColor: 'crimson',
+    materialTag: 'X線所見：硫化りん頭薬マッチ（摩擦発火性物質）',
+    inspectPoint: '着眼点：どこで擦っても発火する硫化りんマッチ（ロウマッチ）は自然発火リスクで全面禁止'
+  },
+  'chlorine-bleach': {
+    scanColor: 'crimson',
+    materialTag: 'X線所見：強アルカリ・次亜塩素酸液体ボトル（腐食性物質マーク）',
+    inspectPoint: '着眼点：塩素系漂白剤やカビ取り剤は機体金属を腐食させる危険物として機内・預け全面禁止'
+  },
+  'liquid-pouch-intl': {
+    scanColor: 'amber',
+    materialTag: 'X線所見：1L透明ジッパー袋内に小型ボトル×3本（各100ml以下）',
+    inspectPoint: '着眼点：100ml以下の容器＋1L透明ジッパー袋1袋に収まっていれば国際線の機内も預けもOK'
+  },
+  'spray-deodorant': {
+    scanColor: 'amber',
+    materialTag: 'X線所見：人体用医薬部外品スプレー缶（200ml・1容器500ml以下）',
+    inspectPoint: '着眼点：肌・髪用の化粧品・医薬品スプレー（1容器500ml以下）は国内線機内も預けもOK'
+  },
+  'hair-iron-corded': {
+    scanColor: 'cyan',
+    materialTag: 'X線所見：ヒータープレート＋AC電源コードのみ（内蔵電池なし）',
+    inspectPoint: '着眼点：リチウム電池やガスを内蔵しない「コンセント電源コード式」は機内も預けも自由'
+  },
+  'wine-bottle-domestic': {
+    scanColor: 'amber',
+    materialTag: 'X線所見：ガラス瓶飲料（750ml・アルコール度数15%・24%以下）',
+    inspectPoint: '着眼点：アルコール度数24%以下のワイン・日本酒・ビールは国内線なら機内も預けもOK'
+  },
+  'nail-clipper-shaver': {
+    scanColor: 'cyan',
+    materialTag: 'X線所見：てこ式爪切り（ナイフ刃なし）＋安全ガード付きT字カミソリ',
+    inspectPoint: '着眼点：ナイフ刃のない一般的な爪切りや安全ガード付きT字カミソリは機内も預けもOK'
+  },
+  'eyedrops-medicine': {
+    scanColor: 'amber',
+    materialTag: 'X線所見：小型点眼薬ボトル（15ml）＋PTP錠剤シート',
+    inspectPoint: '着眼点：目薬（100ml以下）や機内で必要な常備薬・処方薬は機内持ち込みも預け入れもOK'
+  }
+};
+
+for (const item of ITEMS) {
+  item.xray = XRAY_BY_ID[item.id] || {
+    scanColor: 'cyan',
+    materialTag: `X線所見：${item.spec}`,
+    inspectPoint: `着眼点：${item.ruleBadge}`
+  };
+}
+
+/**
+ * アイテムのX線スキャン所見を取得する純関数
+ * @param {object} item
+ */
+export function getXrayTelemetry(item) {
+  if (!item) return null;
+  return item.xray || XRAY_BY_ID[item.id] || {
+    scanColor: 'cyan',
+    materialTag: `X線所見：${item.spec || ''}`,
+    inspectPoint: `着眼点：${item.ruleBadge || ''}`
+  };
+}
 
 /**
  * IDからアイテムを取得する

@@ -1,9 +1,17 @@
-# Day77 保安検査スワイパー — 実装・検証タスク
+# Day77 保安検査スワイパー — 実装タスク（v2 品質刷新＆ハーネス評価）
 
-- [x] 1. SDD仕様の作成とObsidian再開メモの整備（R1〜R5）
-- [x] 2. 手荷物36品目マスターデータ（`lib/items.js`）とゲーム判定エンジン（`lib/engine.js`）、端末保存（`lib/storage.js`）、効果音（`lib/sound.js`）の実装（R1, R2, R4）
-- [x] 3. 単体テスト（`day-077-hoan-swiper/tests/*.test.mjs`）の作成と実行検証（R1, R2, R4）
-- [x] 4. 2.5DコンベアUI・手荷物ルール図鑑・公式リンク・共有連携（`index.html`, `app.css`, `app.js`）の実装（R1, R2, R3, R5）
-- [x] 5. 公開メタデータ・OGP画像・README・ルート同期（`meta.json`, `favicon.svg`, `og.png`, `README.md`, `shared:sync`, `index:sync`）の整備（R5）
-- [x] 6. Playwright E2Eテスト（`tests/e2e/day-077.spec.mjs`）、公開ゲート（`npm run publish:check -- --day 77`）、全体チェック（`npm run check`）、3画面幅スクリーンショット目視評価、セキュリティ点検の実施（R5）
-- [x] 7. Git commit・push・PR作成・CI確認とObsidian記録の更新
+- [x] **Task 1**: SDD仕様書と開発契約の作成（v1完了・v2刷新に合わせて更新済み）
+- [x] **Task 2**: 36品目マスターデータ（`lib/items.js`）の拡充
+  - 各品目に `xrayHint`（X線透視時の内部構造・バッテリー種別・容量・危険物コード）と視覚タグを追加し、単体テスト（`tests/items.test.mjs`）を更新する。
+- [x] **Task 3**: ゲームエンジン（`lib/engine.js`）・効果音（`lib/sound.js`）の拡充
+  - スタート画面（`standby`）・1問おためし練習（`tutorial`）・プレイ中（`playing`）・完了（`finished`）のフェーズ遷移、次トレイ予告（`nextItem`）、X線スキャン効果音を実装し、単体テスト（`tests/engine.test.mjs`）を更新する。
+- [x] **Task 4**: スタート画面（オンボーディング）＆ 2.5D空港保安検査レーンUIの刷新（`index.html`, `app.css`, `app.js`）
+  - スタート画面オーバーレイ（`▶ 検査シフトを開始する` 主ボタン、🎓10問研修／⏱️60秒ラッシュ選択、3方向ルール図解、`🖐️ 1問おためし練習` ボタン）を実装する。
+  - 天吊りデジタル電光掲示板、奥のX線スキャナーゲートと次トレイ予告、斜め立体ローラーコンベア、3D成形プラスチック検査トレイ、発光する3方向シュートパッドを実装する。
+  - ドラッグ追従時の検印スタンプ（`[機内持込]` / `[預け入れ]` / `[持込不可]`）、トレイ送出アニメーション、`🔍 X線透視スキャン` モニター表示、CLSゼロの直前判定モニターを実装する。
+- [x] **Task 5**: ハーネス評価ツールの構築と独立サブエージェント評価（Round 1 → 改修 → Round 2）
+  - `.agent-harness/runs/day077-hoan-swiper/` に全状態スクリーンショット撮影スクリプトとプレイテスト環境を構築する。
+  - 独立サブエージェントによる **体験評価（`experience-r1.md`）** と **画面評価（`visual-r1.md`）** を実施し、減点箇所・改善TOP項目を改修して **Round 2（`experience-r2.md` / `visual-r2.md`）で16/20点以上・0点なし** を達成する。
+- [x] **Task 6**: 公開ゲート・E2E・OGP更新・PR・本番反映・プロモ動画更新
+  - 新UIに合わせて `og.svg` / `og.png` と `tests/e2e/day-077.spec.mjs` を更新し、`npm run check` および `npm run publish:check -- --day 77` を通過させる。
+  - PR作成・マージ・本番環境検証・新UIでのプロモーション動画再収録およびGoogle Drive／Obsidian更新を行う。
