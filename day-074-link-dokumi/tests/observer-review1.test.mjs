@@ -60,6 +60,52 @@ test('S2 resolution budget makes later script relative', () => {
   assert.equal(facts.scripts.external[0].scheme,'relative');
   assert.equal(facts.scripts.external[0].host,null);
 });
+function countUrlResolutions(t) {
+  const NativeURL = globalThis.URL, calls = [];
+  t.mock.method(globalThis,'URL',function(value,base) {
+    calls.push({value,base});
+    return new NativeURL(value,base);
+  });
+  return calls;
+}
+test('S2 repeated relative references reuse parsing but still exhaust the 1500-reference budget', t => {
+  const calls = countUrlResolutions(t);
+  const facts = extractHtmlFacts('<a href=x>x</a>'.repeat(1500)+'<script src="https://other.com/x"></script>',urls.target);
+  assert.equal(calls.filter(call => call.value === 'x' && call.base === urls.target).length,1);
+  assert.equal(facts.links.total,1500);
+  assert.deepEqual(facts.links.externalHosts,[]);
+  assert.equal(facts.scripts.external[0].scheme,'relative');
+  assert.equal(facts.scripts.external[0].host,null);
+});
+test('S2 the same reference is resolved again when a later base changes its destination', t => {
+  const calls = countUrlResolutions(t);
+  const facts = extractHtmlFacts('<a href=x>x</a><base href="https://other.com/"><a href=x>x</a>',urls.target);
+  assert.equal(calls.filter(call => call.value === 'x').length,2);
+  assert.equal(facts.links.total,2);
+  assert.equal(facts.links.external,1);
+  assert.deepEqual(facts.links.externalHosts,['other.com']);
+});
+test('S2 repeated invalid URLs stay invalid without affecting the next different URL', t => {
+  const calls = countUrlResolutions(t);
+  const facts = extractHtmlFacts('<a href="http://[">x</a>'.repeat(2)+'<script src="http://["></script><a href="https://other.com/x">valid</a>',urls.target);
+  assert.equal(calls.filter(call => call.value === 'http://[' && call.base === urls.target).length,1);
+  assert.equal(facts.links.total,3);
+  assert.equal(facts.links.http,0);
+  assert.equal(facts.links.external,1);
+  assert.deepEqual(facts.links.externalHosts,['other.com']);
+  assert.equal(facts.scripts.external[0].scheme,'other');
+  assert.equal(facts.scripts.external[0].host,null);
+});
+test('S2 resolved references are not shared between documents', t => {
+  const calls = countUrlResolutions(t), html = '<a href=x>x</a>'.repeat(2);
+  const first = extractHtmlFacts(html,urls.target);
+  const second = extractHtmlFacts(html,urls.target);
+  assert.deepEqual(first,second);
+  assert.equal(calls.filter(call => call.value === 'x' && call.base === urls.target).length,2);
+  const third = extractHtmlFacts(html,'https://different.com/');
+  assert.equal(third.links.external,0);
+  assert.deepEqual(third.links.externalHosts,[]);
+});
 
 function streamed(data) {
   const bytes = new TextEncoder().encode(JSON.stringify(data));
