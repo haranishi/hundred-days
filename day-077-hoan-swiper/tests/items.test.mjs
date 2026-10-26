@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { ACTION_META, CATEGORIES, ITEMS, filterItems, getItemById } from '../lib/items.js';
+import { ACTION_META, CATEGORIES, ITEMS, filterItems, getItemById, getXrayTelemetry } from '../lib/items.js';
 
 test('36品目の手荷物データが定義され、IDが一意であること', () => {
   assert.equal(ITEMS.length, 36);
@@ -28,6 +28,10 @@ test('全品目が必須フィールドと有効なカテゴリ・仕分け先�
     assert.ok(item.shortReason && item.shortReason.length >= 15);
     assert.ok(item.detailRule && item.detailRule.length >= 25);
     assert.ok(item.icon && typeof item.icon === 'string');
+    const xray = getXrayTelemetry(item);
+    assert.ok(xray && ['cyan', 'amber', 'crimson'].includes(xray.scanColor), `Invalid xray scanColor on ${item.id}`);
+    assert.ok(xray.materialTag && xray.materialTag.length >= 4);
+    assert.ok(xray.inspectPoint && xray.inspectPoint.length >= 8);
   }
 });
 

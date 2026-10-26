@@ -38,6 +38,8 @@ test('createGameState と submitAction: 正解でスコアとコンボが増加�
   assert.equal(state.status, 'playing');
   assert.equal(state.remainingSeconds, 60);
   assert.ok(state.currentItem);
+  assert.ok(state.nextItem);
+  assert.notEqual(state.currentItem.id, state.nextItem.id);
 
   // 1問目を正解させる
   const firstCorrectAction = state.currentItem.allowed[0];

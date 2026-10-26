@@ -30,14 +30,39 @@ test.afterEach(async ({ page }) => {
   expect(externalRequests.get(page)).toEqual([]);
 });
 
-test('初期表示から3方向仕分け（ボタン・キーボード）で判定と理由フィードバックが動く', async ({ page }) => {
+test('初期表示でスタート画面が表示され、1問練習チュートリアル・X線透視・シフト開始から3方向仕分けが動く', async ({ page }) => {
   await page.goto(base);
 
   await expect(page.locator('.brand-title')).toHaveText('保安検査スワイパー');
-  await expect(page.locator('#hud-timer')).toHaveText('1:00');
-  await expect(page.locator('#hud-score')).toHaveText('0');
+  await expect(page.locator('#start-overlay')).toBeVisible();
+  await expect(page.locator('#btn-start-shift')).toBeVisible();
+  await expect(page.locator('#btn-start-tutorial')).toBeVisible();
 
-  // 1問目の品名を読み取り、正解の方向へ仕分ける
+  // 1問練習チュートリアルを起動し、X線透視とコーチバナーを確認
+  await page.locator('#btn-start-tutorial').click();
+  await expect(page.locator('#start-overlay')).toBeHidden();
+  await expect(page.locator('#coach-banner')).toBeVisible();
+  await expect(page.locator('#coach-step-badge')).toContainText('おためし練習');
+  await expect(page.locator('#coach-text')).toContainText('モバイルバッテリー');
+  await expect(page.locator('#item-name')).toHaveText('モバイルバッテリー');
+  await expect(page.locator('#btn-xray-toggle')).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.locator('#xray-telemetry')).toBeVisible();
+
+  // 練習問題を左（機内持ち込み）へ仕分けてクリア
+  await page.locator('.conveyor-middle [data-action="carry_on"]').click();
+  await expect(page.locator('#feedback-banner')).toHaveClass(/is-correct/);
+  await expect(page.locator('#feedback-badge')).toContainText('練習クリア');
+  await expect(page.locator('#coach-step-badge')).toContainText('第1問ガイド');
+
+  // X線透視ボタンのON/OFF切り替えを確認
+  await expect(page.locator('#btn-xray-toggle')).toHaveAttribute('aria-pressed', 'false');
+  await page.locator('#btn-xray-toggle').click();
+  await expect(page.locator('#btn-xray-toggle')).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.locator('#xray-telemetry')).toBeVisible();
+  await page.locator('#btn-xray-toggle').click();
+  await expect(page.locator('#btn-xray-toggle')).toHaveAttribute('aria-pressed', 'false');
+
+  // 本番1問目の品名を読み取り、正解の方向へ仕分ける
   const firstName = (await page.locator('#item-name').textContent()).trim();
   const firstItem = itemByName.get(firstName);
   expect(firstItem, `Unknown item: ${firstName}`).toBeTruthy();
@@ -122,8 +147,8 @@ test('手荷物ルール早見図鑑タブでカテゴリ絞り込み・検索�
   }
 });
 
-test('3原則ガイドダイアログの開閉、効果音トグル、3画面幅での横スクロール溢れゼロを満たす', async ({ page }) => {
-  for (const width of [390, 768, 1440]) {
+test('3原則ガイドダイアログの開閉、効果音トグル、4画面幅での横スクロール溢れゼロを満たす', async ({ page }) => {
+  for (const width of [360, 390, 768, 1440]) {
     await page.setViewportSize({ width, height: 844 });
     await page.goto(base);
 

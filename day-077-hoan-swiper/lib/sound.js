@@ -74,6 +74,10 @@ export function createSoundController() {
       playTone({ freq: 659.25, type: 'sine', duration: 0.08, delay: 0.07, gain: 0.11 });
       playTone({ freq: 783.99, type: 'sine', duration: 0.14, delay: 0.14, gain: 0.13 });
     },
+    playScan() {
+      playTone({ freq: 440, type: 'sine', duration: 0.09, delay: 0, gain: 0.09, endFreq: 880 });
+      playTone({ freq: 987.77, type: 'triangle', duration: 0.07, delay: 0.08, gain: 0.08 });
+    },
     playFinish() {
       playTone({ freq: 587.33, type: 'triangle', duration: 0.1, delay: 0, gain: 0.12 });
       playTone({ freq: 783.99, type: 'triangle', duration: 0.1, delay: 0.09, gain: 0.12 });
