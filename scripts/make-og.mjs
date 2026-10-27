@@ -8,9 +8,10 @@
 // 文言を変えるときは og-template.html を編集してから実行する。
 // 生成後は必ず画像を目視すること（CLAUDE.md 公開前チェック②）。
 
-import { existsSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
+import { effectiveStatus } from './lib/day-status.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const template = join(root, 'scripts', 'og-template.html');
@@ -40,7 +41,21 @@ if (!existsSync(template)) {
 
 const browser = await chromium.launch();
 const page = await browser.newPage({ viewport: { width: 1200, height: 630 }, deviceScaleFactor: 1, locale: 'ja-JP' });
-await page.goto(pathToFileURL(template).href, { waitUntil: 'networkidle' });
+// 絵の点灯数は、公開済みの最新のDay。meta.json から数える（手で数字を書かない）
+const latestDay = Math.max(0, ...readdirSync(root).filter((name) => /^day-\d{3}-/.test(name))
+  .map((dir) => ({ dir, meta: JSON.parse(readFileSync(join(root, dir, 'meta.json'), 'utf8')) }))
+  .filter(({ dir, meta }) => effectiveStatus(meta, dir) === 'published' || meta.externalUrl)
+  .map(({ dir, meta }) => Number(meta.day ?? dir.slice(4, 7))));
+await page.goto(`${pathToFileURL(template).href}?lit=${latestDay}`, { waitUntil: 'networkidle' });
+await page.evaluate(async () => {
+  await Promise.all([
+    document.fonts.load('800 156px "Big Shoulders Display"'),
+    document.fonts.load('400 20px "Geist Mono"')
+  ]);
+  await document.fonts.ready;
+  if (!document.fonts.check('800 156px "Big Shoulders Display"') ||
+      !document.fonts.check('400 20px "Geist Mono"')) throw new Error('同梱書体を読み込めませんでした');
+});
 await page.screenshot({ path: out, type: 'png' });
 await browser.close();
 
