@@ -7,8 +7,16 @@ const itemByName = new Map(ITEMS.map((item) => [item.name, item]));
 
 const pageErrors = new WeakMap();
 const externalRequests = new WeakMap();
+const actionTimeout = 15_000;
+// Raw keyboard/mouse APIs do not use actionTimeout, so bound those calls explicitly.
+const inputStep = (title, action) => test.step(title, action, { timeout: actionTimeout });
 
-test.use({ reducedMotion: 'reduce' });
+test.use({
+  reducedMotion: 'reduce',
+  actionTimeout,
+  // Keep DOM/API/source diagnostics without continuously reading back WebGL frames.
+  trace: { mode: 'retain-on-failure', screenshots: false, snapshots: true, sources: true },
+});
 
 test.beforeEach(async ({ page, baseURL }) => {
   const errors = [];
@@ -32,6 +40,8 @@ test.afterEach(async ({ page }) => {
 });
 
 test('初期表示でスタート画面が表示され、1問練習チュートリアル・X線透視・シフト開始から3方向仕分けが動く', async ({ page }) => {
+  // Multi-step WebGL scenarios need a separate total budget on software-rendered CI.
+  test.setTimeout(90_000);
   await page.goto(base);
 
   await expect(page.locator('.brand-title')).toHaveText('保安検査スワイパー');
@@ -84,7 +94,7 @@ test('初期表示でスタート画面が表示され、1問練習チュート�
   const wrongAction = ['carry_on', 'checked', 'prohibited'].find((a) => !secondItem.allowed.includes(a));
   const keyMap = { carry_on: 'ArrowLeft', checked: 'ArrowUp', prohibited: 'ArrowRight' };
   await expect(page.locator('#btn-checked')).toBeEnabled();
-  await page.keyboard.press(keyMap[wrongAction]);
+  await inputStep('キーボードで誤答を送る', () => page.keyboard.press(keyMap[wrongAction]));
 
   await expect(page.locator('#feedback-banner')).toHaveClass(/is-wrong/);
   await expect(page.locator('#feedback-badge')).toContainText('ミス');
@@ -92,6 +102,7 @@ test('初期表示でスタート画面が表示され、1問練習チュート�
 });
 
 test('厳選10問・研修シフトを完走するとリザルト・復習リスト・自己ベストが更新される', async ({ page }) => {
+  test.setTimeout(90_000);
   await page.goto(base);
 
   await page.locator('#mode-training').click();
@@ -110,7 +121,7 @@ test('厳選10問・研修シフトを完走するとリザルト・復習リス
         : item.allowed[0];
     const keyMap = { carry_on: 'ArrowLeft', checked: 'ArrowUp', prohibited: 'ArrowRight' };
     await expect(page.locator('#btn-checked')).toBeEnabled();
-    await page.keyboard.press(keyMap[action]);
+    await inputStep(`第${i + 1}問のキー入力`, () => page.keyboard.press(keyMap[action]));
   }
 
   await expect(page.locator('#result-panel')).toBeVisible();
@@ -176,6 +187,7 @@ test('3原則ガイドダイアログの開閉、効果音トグル、4画面幅
 
 
 test('実3Dの視点・X線が切り替わり、キャンセルしたドラッグは回答せず、スワイプで搬送される', async ({ page }) => {
+  test.setTimeout(90_000);
   await page.setViewportSize({ width: 1440, height: 1000 });
   await page.goto(base);
   const canvas = page.locator('#inspection-canvas');
@@ -189,16 +201,16 @@ test('実3Dの視点・X線が切り替わり、キャンセルしたドラッ�
   const area = await canvas.boundingBox();
   const x = area.x + area.width / 2;
   const y = area.y + area.height / 2;
-  await page.mouse.move(x, y);
-  await page.mouse.down();
-  await page.mouse.move(x + 100, y);
+  await inputStep('キャンセル用ドラッグの開始位置へ移動', () => page.mouse.move(x, y));
+  await inputStep('キャンセル用ドラッグを開始', () => page.mouse.down());
+  await inputStep('キャンセル用ドラッグを移動', () => page.mouse.move(x + 100, y));
   await page.locator('#security-tray').dispatchEvent('pointercancel', { pointerId: 1 });
-  await page.mouse.up();
+  await inputStep('キャンセル用ドラッグを離す', () => page.mouse.up());
   await expect(page.locator('#hud-timer')).toHaveText('1 / 10');
-  await page.mouse.move(x, y);
-  await page.mouse.down();
-  await page.mouse.move(x - 100, y, { steps: 8 });
-  await page.mouse.up();
+  await inputStep('スワイプの開始位置へ移動', () => page.mouse.move(x, y));
+  await inputStep('スワイプを開始', () => page.mouse.down());
+  await inputStep('スワイプを移動', () => page.mouse.move(x - 100, y, { steps: 8 }));
+  await inputStep('スワイプを離す', () => page.mouse.up());
   await expect(page.locator('#hud-timer')).toHaveText('2 / 10');
   await expect(canvas).toHaveAttribute('data-last-action', 'carry_on');
   await expect(canvas).toHaveAttribute('data-xray', 'false');
@@ -307,7 +319,7 @@ test('低いPC画面とスマホで中央のゲームスタートから明示的
     await expect(page.locator('#btn-start-shift')).toBeInViewport({ ratio: 1 });
     await expect(page.locator('#btn-start-shift')).toContainText('ゲームスタート');
     await expect(page.locator('#hud-timer')).toHaveText('開始前');
-    await page.keyboard.press('ArrowLeft');
+    await inputStep('開始前のキー入力', () => page.keyboard.press('ArrowLeft'));
     await expect(page.locator('#hud-timer')).toHaveText('開始前');
     await page.locator('#btn-start-shift').click();
     await expect(page.locator('#start-overlay')).toBeHidden();
