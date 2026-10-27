@@ -6,7 +6,7 @@
   - `scripts/lib/home-model.mjs`・`scripts/tests/home-model.test.mjs`（9件）。`fold`・`tagKey`＋別名・`splitTitle`・`quickTags`（占有率40%の境）・`buildMatrix`（100超・欠番・記録のみ）。画面側への埋め込みは `runInNewContext` で確認。
   - _Requirements: 2, 3, 4_
 - [x] 2. ページの組み立て（HTML・CSS・書体・メタ）
-  - `scripts/build.mjs` のページ部分・`scripts/site/home.css`。証拠：`dist/day-*` は本番のmainを再ビルドした結果と全ファイル一致（差は同梱書体4ファイルだけ）。HTMLは約540KB（本番484KB・gzip 151KB対138KB。制作メモは全文のまま）。
+  - `scripts/build.mjs` のページ部分・`scripts/site/home.css`。証拠：`dist/day-*` は本番のmainを再ビルドした結果と全ファイル一致（差は同梱書体4ファイルだけ）。HTMLは約547KB（本番484KB。gzip 153KB対138KB。制作メモは全文のまま）。
   - _Requirements: 1, 6, 7, 11_
 - [x] 3. 画面の挙動
   - `scripts/site/home.js`。計測は既存5イベントが同じ名前と値で出ることをE2Eで確認。
