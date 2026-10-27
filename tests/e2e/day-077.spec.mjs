@@ -11,6 +11,21 @@ const actionTimeout = 15_000;
 // Raw keyboard/mouse APIs do not use actionTimeout, so bound those calls explicitly.
 const inputStep = (title, action) => test.step(title, action, { timeout: actionTimeout });
 
+async function readPlayableItem(page) {
+  let item;
+  await expect.poll(async () => {
+    item = await page.evaluate(() => {
+      const button = document.getElementById('btn-checked');
+      return {
+        name: document.getElementById('item-name')?.textContent.trim() || '',
+        enabled: button instanceof HTMLButtonElement && !button.disabled,
+      };
+    });
+    return item.enabled;
+  }, { timeout: 5_000 }).toBe(true);
+  return item;
+}
+
 test.use({
   reducedMotion: 'reduce',
   actionTimeout,
@@ -39,7 +54,7 @@ test.afterEach(async ({ page }) => {
   expect(externalRequests.get(page)).toEqual([]);
 });
 
-test('初期表示でスタート画面が表示され、1問練習チュートリアル・X線透視・シフト開始から3方向仕分けが動く', async ({ page }) => {
+test('初回のスタート画面から1問練習を開始し、練習クリア後は本編ガイドとX線OFFに進む', async ({ page }) => {
   // Multi-step WebGL scenarios need a separate total budget on software-rendered CI.
   test.setTimeout(90_000);
   await page.goto(base);
@@ -66,6 +81,15 @@ test('初期表示でスタート画面が表示され、1問練習チュート�
   await expect(page.locator('#feedback-badge')).toContainText('練習クリア');
   await expect(page.locator('#coach-step-badge')).toContainText('第1問ガイド');
 
+  await expect(page.locator('#btn-xray-toggle')).toHaveAttribute('aria-pressed', 'false');
+});
+
+test('本編シフトでX線透視をONとOFFに切り替え、内部構造の説明を表示する', async ({ page }) => {
+  test.setTimeout(90_000);
+  await page.goto(base);
+  await expect(page.locator('#inspection-canvas')).toHaveAttribute('data-ready', 'true');
+  await page.locator('#btn-start-shift').click();
+
   // X線透視ボタンのON/OFF切り替えを確認
   await expect(page.locator('#btn-xray-toggle')).toHaveAttribute('aria-pressed', 'false');
   await page.locator('#btn-xray-toggle').click();
@@ -73,9 +97,16 @@ test('初期表示でスタート画面が表示され、1問練習チュート�
   await expect(page.locator('#xray-telemetry')).toBeVisible();
   await page.locator('#btn-xray-toggle').click();
   await expect(page.locator('#btn-xray-toggle')).toHaveAttribute('aria-pressed', 'false');
+});
+
+test('本編シフトの正解でコンボが増え、続くキーボード誤答で理由とコンボ解除を示す', async ({ page }) => {
+  test.setTimeout(90_000);
+  await page.goto(base);
+  await expect(page.locator('#inspection-canvas')).toHaveAttribute('data-ready', 'true');
+  await page.locator('#btn-start-shift').click();
 
   // 本番1問目の品名を読み取り、正解の方向へ仕分ける
-  const firstName = (await page.locator('#item-name').textContent()).trim();
+  const { name: firstName } = await readPlayableItem(page);
   const firstItem = itemByName.get(firstName);
   expect(firstItem, `Unknown item: ${firstName}`).toBeTruthy();
 
@@ -87,13 +118,12 @@ test('初期表示でスタート画面が表示され、1問練習チュート�
   await expect(page.locator('#hud-combo')).toHaveText('×1');
 
   // 2問目をキーボードでわざと誤答させる
-  const secondName = (await page.locator('#item-name').textContent()).trim();
+  const { name: secondName } = await readPlayableItem(page);
   const secondItem = itemByName.get(secondName);
   expect(secondItem).toBeTruthy();
 
   const wrongAction = ['carry_on', 'checked', 'prohibited'].find((a) => !secondItem.allowed.includes(a));
   const keyMap = { carry_on: 'ArrowLeft', checked: 'ArrowUp', prohibited: 'ArrowRight' };
-  await expect(page.locator('#btn-checked')).toBeEnabled();
   await inputStep('キーボードで誤答を送る', () => page.keyboard.press(keyMap[wrongAction]));
 
   await expect(page.locator('#feedback-banner')).toHaveClass(/is-wrong/);
@@ -111,7 +141,7 @@ test('厳選10問・研修シフトを完走するとリザルト・復習リス
   await expect(page.locator('#hud-timer')).toHaveText('1 / 10');
 
   for (let i = 0; i < 10; i += 1) {
-    const name = (await page.locator('#item-name').textContent()).trim();
+    const { name } = await readPlayableItem(page);
     const item = itemByName.get(name);
     expect(item).toBeTruthy();
     // 1問目だけわざと間違え、残り9問は正解させる
@@ -120,7 +150,6 @@ test('厳選10問・研修シフトを完走するとリザルト・復習リス
         ? ['carry_on', 'checked', 'prohibited'].find((a) => !item.allowed.includes(a))
         : item.allowed[0];
     const keyMap = { carry_on: 'ArrowLeft', checked: 'ArrowUp', prohibited: 'ArrowRight' };
-    await expect(page.locator('#btn-checked')).toBeEnabled();
     await inputStep(`第${i + 1}問のキー入力`, () => page.keyboard.press(keyMap[action]));
   }
 
