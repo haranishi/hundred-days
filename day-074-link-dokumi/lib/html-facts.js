@@ -63,7 +63,7 @@ export function extractHtmlFacts(input, baseUrl) {
     signals:{directoryListing:false,defaultPage:null,errorDisclosure:null,obfuscation:[],autoSubmit:false,noindex:false,metaReferrer:null,metaCsp:false},
     truncated:original.length > html.length
   };
-  let resolutions = 0;
+  let resolutions = 0, previousResolution = null;
   let pos = 0, count = 0, form = null, capture = null, captured = '', visible = '', effectiveBase = baseUrl;
   const append = (from, to) => {
     if (visible.length < 1600) visible += ' ' + html.slice(from,Math.min(to,from+1600-visible.length));
@@ -77,7 +77,11 @@ export function extractHtmlFacts(input, baseUrl) {
   const resolve = (src, base) => {
     if (resolutions >= 1500) return null;
     resolutions++;
-    return URLSafe(src,base);
+    // 同じ参照の連続でも予算は消費し、保持する解析結果はこの文書内の直前1件だけ。
+    if (previousResolution && previousResolution.src === src && previousResolution.base === base) return previousResolution.url;
+    const url = URLSafe(src,base);
+    previousResolution = {src,base,url};
+    return url;
   };
   const ref = (src, resolveRelative = false) => {
     if (resolutions >= 1500) return {host:null,scheme:'relative'};
