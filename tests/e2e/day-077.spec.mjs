@@ -7,7 +7,10 @@ const itemByName = new Map(ITEMS.map((item) => [item.name, item]));
 
 const pageErrors = new WeakMap();
 const externalRequests = new WeakMap();
-const actionTimeout = 15_000;
+// CIの実行機はソフトウェア描画で、実3Dの画面は操作1回ごとに約1.3秒かかる。
+// 2026-10-27の失敗の記録では、ボタンの押下に最大10.4秒、8分割の移動に14.4秒かかり、15秒の上限を超えた。
+// 上限は最悪の実測の3倍に広げる。固まった操作は、引き続きこの上限で検出する。
+const actionTimeout = 45_000;
 // Raw keyboard/mouse APIs do not use actionTimeout, so bound those calls explicitly.
 const inputStep = (title, action) => test.step(title, action, { timeout: actionTimeout });
 
@@ -216,7 +219,8 @@ test('3原則ガイドダイアログの開閉、効果音トグル、4画面幅
 
 
 test('実3Dの視点・X線が切り替わり、キャンセルしたドラッグは回答せず、スワイプで搬送される', async ({ page }) => {
-  test.setTimeout(90_000);
+  // 遅い実行機では、ここまでの操作だけで約60秒かかる。操作の上限（45秒）より長く取る。
+  test.setTimeout(150_000);
   await page.setViewportSize({ width: 1440, height: 1000 });
   await page.goto(base);
   const canvas = page.locator('#inspection-canvas');
@@ -238,7 +242,8 @@ test('実3Dの視点・X線が切り替わり、キャンセルしたドラッ�
   await expect(page.locator('#hud-timer')).toHaveText('1 / 10');
   await inputStep('スワイプの開始位置へ移動', () => page.mouse.move(x, y));
   await inputStep('スワイプを開始', () => page.mouse.down());
-  await inputStep('スワイプを移動', () => page.mouse.move(x - 100, y, { steps: 8 }));
+  // 分割1回ごとに描画を1回待つ。途中の移動を挟む判定は保ったまま、待つ描画を8回から4回に減らす。
+  await inputStep('スワイプを移動', () => page.mouse.move(x - 100, y, { steps: 4 }));
   await inputStep('スワイプを離す', () => page.mouse.up());
   await expect(page.locator('#hud-timer')).toHaveText('2 / 10');
   await expect(canvas).toHaveAttribute('data-last-action', 'carry_on');
