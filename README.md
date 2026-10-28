@@ -111,6 +111,7 @@ Day 051「ハコニワ」も外部公開アプリです。本体は独立リポ�
 | 075 | 雨雲倉庫番 — ひと雨ずつ、庭をほどく。 | [day-075-amegumo-sokoban/](day-075-amegumo-sokoban/) | [アプリを開く](https://hundred-days.pages.dev/day-075-amegumo-sokoban/) |
 | 076 | へんかんデスク | [day-076-henkan-desk/](day-076-henkan-desk/) | [アプリを開く](https://hundred-days.pages.dev/day-076-henkan-desk/) |
 | 077 | 保安検査スワイパー — その荷物、機内？預け？没収？ | [day-077-hoan-swiper/](day-077-hoan-swiper/) | [アプリを開く](https://hundred-days.pages.dev/day-077-hoan-swiper/) |
+| 078 | 先に100 — 足して、100を取り合う。 | [day-078-saki-ni-100/](day-078-saki-ni-100/) | [アプリを開く](https://hundred-days.pages.dev/day-078-saki-ni-100/) |
 <!-- day-index:end -->
 
 ## 1日アプリのルール

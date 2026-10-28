@@ -1,0 +1,25 @@
+{
+  "feature_name": "day-078-saki-ni-100",
+  "language": "ja",
+  "phase": "local-verified",
+  "approvals": {
+    "requirements": true,
+    "design": true,
+    "tasks": true
+  },
+  "approval_basis": "本人の2026-10-27の選択（先に100・Day78・ふつうの規模・公開まで）と、自律実行の共通ルール。Xの投稿は本人。",
+  "verification": {
+    "day_unit": 37,
+    "mutations_detected": "12/12",
+    "repository_check": "4,960 tests: 4,959 pass, 0 fail, 1 skip",
+    "day_e2e": 21,
+    "browsers": ["Chromium", "WebKit"],
+    "publish_gate": 310,
+    "widths": [390, 768, 1440],
+    "experience_review": "Opus, about 30 games: 17/20 pass",
+    "visual_review": "Opus, images only: round1 15/20, round2 16/20 pass",
+    "independent_code_review": "Codex (personal account, read-only) x2: no blocking findings; all findings addressed"
+  },
+  "release_tracking": "PRの状態・同じheadのCI・main のデプロイ・公開URLの観測を正とする。",
+  "release_merge_method": "merge"
+}

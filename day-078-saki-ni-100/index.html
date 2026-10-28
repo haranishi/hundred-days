@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f4efdf">
+  <meta name="description" content="足せる数をひとつ選んで、目標ちょうどを取り合う。小さな数から100まで、勝ち方を見つける12面の頭脳戦。">
+  <link rel="canonical" href="https://hundred-days.pages.dev/day-078-saki-ni-100/">
+  <meta property="og:url" content="https://hundred-days.pages.dev/day-078-saki-ni-100/">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="先に100 — 足して、100を取り合う。">
+  <meta property="og:description" content="数を足すだけ。なのに、勝ち方がある。算木の盤で遊ぶ12面の頭脳戦。">
+  <meta property="og:image" content="https://hundred-days.pages.dev/day-078-saki-ni-100/og.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="share:text" content="先に100 — 足して、100を取り合う。 数を足すだけ。なのに、勝ち方がある。12面の頭脳戦。">
+  <title>先に100 — 足して、100を取り合う。</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="shared/share.css">
+  <link rel="stylesheet" href="app.css">
+  <script defer src="shared/share.js"></script>
+  <script type="module" src="app.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#moves">数字を選ぶところへ</a>
+  <header class="masthead">
+    <a class="brand" href="./" aria-label="先に100 ホーム"><span class="seal" aria-hidden="true">百</span><span>先に100<small>さきに ひゃく</small></span></a>
+    <span class="edition">100日チャレンジ / 七十八日目</span>
+    <button id="help-button" aria-expanded="false" aria-controls="help-panel">遊びかた</button>
+  </header>
+  <section id="help-panel" hidden aria-label="遊びかたの説明">
+    <h2>ひとつ選んで、交代で足す。</h2>
+    <p>朱はあなた、藍はあいて（コンピューター）。<wbr>下の数字をひとつ選ぶと、合計に足されます。<wbr>次はあいての番。<wbr>目標ちょうどにした人の勝ちです。<wbr>「さかさま」の面だけは、目標にした人が負けます。</p>
+    <p>目標を超える数は選べません。<wbr>足せる数がなくなったら、その人の負け。<wbr>ヒントは1回目で勝ちの合計、<wbr>2回目でおすすめの数字を示します。</p>
+    <p>キーボードは数字の1〜9、0で10。<wbr>Tabでボタンを選び、Enterでも遊べます。<wbr>記録と音の設定は、この端末だけに残ります。</p>
+    <button id="help-close">説明を閉じる</button>
+  </section>
+  <main class="layout">
+    <section class="board" aria-label="数を足す盤">
+      <div class="board-top"><span class="board-label"><b id="board-stage">第1面</b><small id="board-chapter"></small></span><button id="sound-button" aria-pressed="false">音：なし</button></div>
+      <p id="intro">あいてと交代で、数を足していこう。</p>
+      <p id="rule-line" class="rule-line"></p>
+      <div class="total-area"><span class="total-label">いまの合計</span><strong id="total">0</strong><span id="remaining"></span></div>
+      <p id="turn" aria-live="polite" aria-atomic="true"></p>
+      <p id="last-move" class="last-move" aria-live="polite"></p>
+      <div class="bar-heading"><span><i class="human-dot"></i>あなた</span><span><i class="cpu-dot"></i>あいて（コンピューター）</span><span id="bar-legend" hidden><i class="mistake-dot"></i>金の枠＝勝ち筋を外した手</span><span id="bar-caption"></span></div>
+      <div class="bar-wrap" id="bar-wrap"><svg id="bar" viewBox="0 0 1000 64" role="img" aria-label="足した数の積み木バー" preserveAspectRatio="none"></svg></div>
+      <section id="result" hidden aria-live="polite" aria-atomic="true"><span id="stamp" class="stamp" aria-hidden="true" hidden>勝</span><p id="result-label"></p><h2 id="result-title"></h2><p id="review"></p><button id="next-button" hidden>次の面へ →</button></section>
+      <div class="play-controls">
+        <div id="move-area">
+          <div class="notebook-line"><span>いくつ、足す？</span><span class="keyboard-note">数字キーでも</span></div>
+          <div id="moves" aria-label="足す数を選ぶ"></div>
+          <p id="move-reason" class="move-reason"></p>
+          <p id="key-notice" class="sr-only" role="status" aria-live="polite"></p>
+        </div>
+        <div class="tools"><button id="hint-button">ヒントを見る（1/2）</button><button id="retry-button">もう一度</button></div>
+        <div id="hint-box" hidden><div id="hint-marks"><p>勝ちの合計（金の線と同じ位置）</p><div id="markers"></div></div><p id="hint-text" aria-live="polite"></p></div>
+      </div>
+      <section id="all-clear" hidden aria-live="polite"><span class="seal" aria-hidden="true">皆伝</span><h2>十二面、すべてクリア。</h2><p>今度は、あなたが教える番。<br>「先に100」、誰かとやってみよう。</p></section>
+    </section>
+    <aside class="notes" aria-label="面の選択・条件・手の記録">
+      <p class="eyebrow">数を足すだけ。なのに、勝ち方がある。</p>
+      <h1>ひと足し先を、<br>読んでみる。</h1>
+      <div class="notebook-line"><span>十二の手習い</span><span id="progress">0 / 12 クリア</span></div>
+      <nav id="stage-nav" aria-label="面を選ぶ"></nav>
+      <p class="nav-legend"><span>✓ クリア</span><span>◎ ヒントなしでクリア</span><span>◌ まだ選べない</span></p>
+      <div class="stage-heading"><h2 id="stage-title"></h2><span id="chapter"></span></div>
+      <dl class="conditions">
+        <div><dt>めざす数</dt><dd id="target"></dd></div>
+        <div><dt>足せる数</dt><dd id="allowed"></dd></div>
+        <div><dt>きまり</dt><dd id="rule"></dd></div>
+        <div><dt>はじめの番</dt><dd id="first"></dd></div>
+      </dl>
+      <section class="history-box" aria-labelledby="history-title"><div class="notebook-line"><h3 id="history-title">手のあと</h3><span>新しい順</span></div><ol id="history" aria-label="直近の手の履歴"></ol></section>
+    </aside>
+  </main>
+  <footer><p class="footer-copy">先に100 <span>足して、100を取り合う。</span></p><div id="share"></div><p class="privacy">通信なし・登録なし。進み具合はこの端末に保存されます。</p><a href="../">100日チャレンジの一覧へ</a></footer>
+</body>
+</html>
