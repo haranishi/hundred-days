@@ -415,3 +415,38 @@ test('PCの追従する検索の帯は不透明で、画面の上端に付く', 
   expect(style.background).toMatch(/^rgb\(/); // 透けない（rgba にならない）
   expect(style.height).toBeLessThanOrEqual(125);
 });
+
+// WebKit（Safari・iPhone）は、長いスムーズスクロールの最中に、通り過ぎるカードの遷移（出現・ホバー）が
+// 一斉に始まると、スクロールを途中で打ち切る（実測：約7,000pxの移動で約1割が目標の手前で止まる）。
+// CIはChromiumだけで、その失敗は起きない。そこで原因の側、「動いている間にカードの遷移が走らない」ことを見張る。
+test('マスから遠いカードへ動いている間は、カードの遷移が走らず、止まったあとは元に戻る', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto('/');
+  await page.evaluate(() => document.fonts.ready);
+  const far = released[Math.min(30, released.length - 1)];
+  await page.locator(`.matrix a.cell[data-day="${pad(far.day)}"]`).click();
+  const seen = await page.evaluate(() => new Promise((resolve) => {
+    const cardTransitions = () => document.getAnimations()
+      .filter((animation) => animation instanceof CSSTransition && animation.effect?.target?.closest?.('.card')).length;
+    const start = performance.now();
+    let last = scrollY;
+    let moving = 0;
+    let most = 0;
+    const tick = () => {
+      // 止まったあとに始まるホバーの遷移は数えない。スクロールが動いているフレームだけを見る
+      if (Math.abs(scrollY - last) > 1) {
+        moving += 1;
+        most = Math.max(most, cardTransitions());
+      }
+      last = scrollY;
+      if (performance.now() - start < 1800) requestAnimationFrame(tick);
+      else resolve({ moving, most });
+    };
+    tick();
+  }));
+  expect(seen.moving, '動いているフレームを十分に見た').toBeGreaterThanOrEqual(5);
+  expect(seen.most, '動いている間に走ったカードの遷移の数').toBe(0);
+  await expect(page.locator(`#day-${pad(far.day)}`)).toBeInViewport();
+  // 止めっぱなしにしない：動き終えたら、遷移は元に戻る
+  await expect.poll(() => page.locator('.card').first().evaluate((node) => getComputedStyle(node).transitionDuration)).not.toBe('0s');
+});
