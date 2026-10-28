@@ -1,7 +1,7 @@
 {
   "feature_name": "top-page-redesign",
   "created_at": "2026-10-27T22:10:00+09:00",
-  "updated_at": "2026-10-28T00:40:00+09:00",
+  "updated_at": "2026-10-28T11:50:00+09:00",
   "language": "ja",
   "phase": "implemented-verified",
   "approvals": {
@@ -44,7 +44,11 @@
       "x-post"
     ],
     "scope": "作業ブランチへのcommit・push・PR作成まで。マージ（＝本番反映）は本人。",
-    "status": "pr-ready"
+    "status": "merged",
+    "pr": 178,
+    "merged_at": "2026-10-28T10:26:35+09:00",
+    "deployed_at": "2026-10-28T10:53:55+09:00",
+    "merge_note": "マージと本番反映は、本人の依頼（2026-10-28）で行った。本番での確認は49項目すべて成功"
   },
   "validation": {
     "status": "verified",
@@ -55,6 +59,7 @@
     "lighthouse": "モバイル：アクセシビリティ・ベストプラクティス・SEO・Agentic Browsing すべて100",
     "performance": "CLS 0。遅い回線・4倍遅い端末のモバイルLCP 0.74秒",
     "independent_review": "別セッションのOpus（画面のみ）：第1周14/20→第2周18/20（合格・0点なし）。合格後の最後の直しは再採点していない",
-    "implementation_note": "実装はCodex。第1周は会社用、第2周は会社用がクレジット切れのため個人用（本人許可 10/25）。合格後の小さな直しは、メインが直接行った"
+    "implementation_note": "実装はCodex。第1周は会社用、第2周は会社用がクレジット切れのため個人用（本人許可 10/25）。合格後の小さな直しは、メインが直接行った",
+    "post_release": "本番での確認49/49（配信物の照合・Chromium/WebKit/スマホの主要操作）。公開後に、Safari系でマスを押す移動がまれに途中で止まる不具合を見つけ、直すPRを別に作った（tasks.md の9。実機のSafari・iPhoneは未確認）"
   }
 }

@@ -178,6 +178,23 @@
     }
   }
 
+  // マスから遠いカードへ動く間は、通り過ぎるカードの遷移（出現・ホバー）を止める。
+  // WebKit（Safari・iPhone）は、スムーズスクロールの最中にそれが一斉に始まると、スクロールを途中で打ち切る。
+  const root = document.documentElement;
+  let jumpTimer = 0;
+  function quietWhileJumping() {
+    clearTimeout(jumpTimer);
+    root.classList.add('is-jumping');
+    const finish = () => {
+      clearTimeout(jumpTimer);
+      window.removeEventListener('scrollend', finish);
+      root.classList.remove('is-jumping');
+    };
+    // scrollend の無いブラウザと、動かなかった（すでにその位置にいた）場合は、時間で戻す
+    window.addEventListener('scrollend', finish, { once: true });
+    jumpTimer = setTimeout(finish, 2000);
+  }
+
   cells.forEach((cell) => {
     cell.addEventListener('mouseenter', () => preview(cell));
     cell.addEventListener('focus', () => {
@@ -187,6 +204,7 @@
     cell.addEventListener('click', () => {
       const card = document.getElementById(`day-${cell.dataset.day}`);
       if (!card) return;
+      quietWhileJumping();
       if (card.hidden) clear();
       card.classList.remove('reveal');
       // アンカー移動後のTabも、その日のカードから続けられるようにする。
