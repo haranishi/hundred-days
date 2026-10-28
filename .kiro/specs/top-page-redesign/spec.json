@@ -1,0 +1,60 @@
+{
+  "feature_name": "top-page-redesign",
+  "created_at": "2026-10-27T22:10:00+09:00",
+  "updated_at": "2026-10-28T00:40:00+09:00",
+  "language": "ja",
+  "phase": "implemented-verified",
+  "approvals": {
+    "requirements": {
+      "generated": true,
+      "approved": true
+    },
+    "design": {
+      "generated": true,
+      "approved": true
+    },
+    "tasks": {
+      "generated": true,
+      "approved": true
+    }
+  },
+  "ready_for_implementation": true,
+  "approval_scope": {
+    "requirements": "本人の個別レビューは未実施。2026-10-27の本人の依頼「トップページをもっとかっこよく。スキルとハーネスを使って」と、2026-10-19の自律進行の指示に基づき、承認済みとして進める。",
+    "downstream": "設計・実装・検証・別セッションの採点・作業ブランチのcommit・push・PR作成まで。マージと本番反映は含まない（ハーネスの最終判定は本人）。",
+    "open_items": [
+      "配色（暖かい黒＋象牙＋朱）・書体（Big Shoulders Display）・「100マスのマップが目次を兼ねる」という発想は、見本ページでの比較から私が選んだ。好みと違えば、visual-spec.md の値を変えるだけで差し替えられる。",
+      "「全体の40%を超えて付くタグはクイック表示から外す」は私が決めた規則。vanilla-js と no-dependencies が外れる。ジャンル別の分類（ゲーム／地図／音…）は、作者の判断が要るので今回は入れていない。",
+      "ルール欄は README の「1日アプリのルール」をそのまま写す。README を変えたらここも合わせる。",
+      "第2周の採点で出た「ゲームとgame」などの言語の混在のうち、別名表で統合したのは5組だけ。ほかのタグの付け方を揃えるかは、作者の判断（meta.json の方針）。"
+    ]
+  },
+  "delivery": {
+    "repository": "haranishi/hundred-days",
+    "base": "main",
+    "branch": "feat/top-page-redesign",
+    "authorized_operations": [
+      "commit",
+      "push",
+      "PR"
+    ],
+    "not_authorized": [
+      "merge",
+      "deploy",
+      "x-post"
+    ],
+    "scope": "作業ブランチへのcommit・push・PR作成まで。マージ（＝本番反映）は本人。",
+    "status": "pr-ready"
+  },
+  "validation": {
+    "status": "verified",
+    "unit_tests": "npm run check 成功（単体テスト4,932件・失敗0・スキップ1）",
+    "e2e": "tests/e2e/home.spec.mjs 29件成功。既存の一覧を見る試験（external-days・day-007〜010・day-050・day-051・security-headers）も成功",
+    "mutation": "新しい試験の契約を延べ15か所壊して、すべて落ちることを確認した",
+    "build_identity": "本番のmainを再ビルドした結果と、dist/day-* の全ファイルが一致（差は同梱書体4ファイルだけ）",
+    "lighthouse": "モバイル：アクセシビリティ・ベストプラクティス・SEO・Agentic Browsing すべて100",
+    "performance": "CLS 0。遅い回線・4倍遅い端末のモバイルLCP 0.74秒",
+    "independent_review": "別セッションのOpus（画面のみ）：第1周14/20→第2周18/20（合格・0点なし）。合格後の最後の直しは再採点していない",
+    "implementation_note": "実装はCodex。第1周は会社用、第2周は会社用がクレジット切れのため個人用（本人許可 10/25）。合格後の小さな直しは、メインが直接行った"
+  }
+}
