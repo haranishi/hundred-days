@@ -71,7 +71,7 @@ function miniSite(t) {
     mkdirSync(dirname(join(site, file)), { recursive: true });
     writeFileSync(join(site, file), content);
   };
-  for (const file of ['build.mjs', 'lib/day-status.mjs', 'lib/dist-files.mjs']) {
+  for (const file of ['build.mjs', 'lib/day-status.mjs', 'lib/dist-files.mjs', 'lib/home-model.mjs', 'site/home.css', 'site/home.js']) {
     mkdirSync(dirname(join(site, 'scripts', file)), { recursive: true });
     copyFileSync(fileURLToPath(new URL(`../${file}`, import.meta.url)), join(site, 'scripts', file));
   }
