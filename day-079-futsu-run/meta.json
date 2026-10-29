@@ -7,25 +7,24 @@
     "ゲーム",
     "3D",
     "二択",
-    "Next.js",
     "three.js",
     "Web Audio"
   ],
-  "status": "external",
-  "externalUrl": "https://futsu-run.haranishi.workers.dev/",
-  "publicUrl": "https://futsu-run.haranishi.workers.dev/",
-  "screenshot": "screenshot.png",
+  "status": "published",
+  "publicUrl": "https://hundred-days.pages.dev/day-079-futsu-run/",
+  "screenshot": "og.png",
   "startedAt": "2026-10-28",
   "finishedAt": "2026-10-29",
+  "actualMinutes": 110,
   "aiHandled": [
-    "Next.js・TypeScript・three.jsで背面視点の3Dランナー、群衆、3カテゴリー各7問、左右入力、サバイバルと完走モードを実装",
-    "オリジナルの合成BGM・着地に同期した足音、問い別の回答名、テーマごとの景色、固定結果URLと共有・OGPを実装",
-    "3周の品質ハーネスに加え、Cloudflare Workersへのデプロイ・OGPフォント描画・本番E2Eテスト全5件合格を確認"
+    "TypeScript・three.jsで背面視点の3Dランナー、群衆、3カテゴリー各7問、左右入力、サバイバルと完走モードを実装",
+    "オリジナルの合成BGM・着地に同期した足音、問い別の回答名、テーマごとの景色、結果共有・OGPを実装",
+    "hundred-days本体の静的配信（Cloudflare Pages）への組み込み、公開契約・ブラウザ試験・品質確認を実施"
   ],
   "humanHandled": [
     "群衆と走りながら迫る二択の道を選ぶゲーム、カテゴリー、GoogleフォームやDMでのお題募集という方向を指示",
     "回答を一律の丸とバツにしないこと、風景・BGM・足音の作り込み、音の既定オン、複数回の品質確認を指示",
-    "Day79として公開まで進める指示（Cloudflare Workersへの外部公開）とマージの承認"
+    "他Dayと同様にhundred-days本体への組み込みとマージを指示"
   ],
   "failuresAndFixes": [
     {
@@ -41,19 +40,21 @@
       "fix": "開始ボタンの操作中に音声を準備する既定オンへ変更し、遅延した開始・停止・離脱時の解放も検証"
     },
     {
-      "problem": "Cloudflare Workers環境で動的OGP画像生成がタイムアウトした",
-      "fix": "ASSETSフェッチからフォントバイナリのインライン同期取得へ切り替え、0msでの安全な画像描画を実現"
+      "problem": "最初外部Worker（futsu-run.haranishi.workers.dev）として登録したが、他Dayと同じhundred-days.pages.dev配下での静的配信が求められた",
+      "fix": "クライアント側で完結するSPA構成へ再構築し、hundred-days本体の公開契約（canonical・OGP・共有欄・コントラスト）に完全適合させた"
     }
   ],
   "social": {
     "x": {
-      "summary": "二択のゲートを走る、1回7問の3Dゲーム。割合は練習用データ。",
+      "emoji": "🏃",
+      "summary": "群衆と走り、迫る二択ゲートを選ぶ3Dゲーム。日常・恋愛・お金の3コース各7問。練習用の割合からあなたの「普通度」を表示します。",
       "hashtags": [
-        "100日チャレンジ"
+        "#100日チャレンジ"
       ],
-      "body": "Day 79 / 100\n\n独り言、言う派？\n二択のゲートを選んで走る3Dゲーム「あなたの普通、何％？」を作りました。\n\n日常・恋愛・お金の3コース、1回7問。\nBGMと足音も付けました。\n※割合は練習データです。\n\nあなたなら、どっちに進む？\nhttps://futsu-run.haranishi.workers.dev/\n\n🤖実装・検証　🙋企画・方向決め\n#100日チャレンジ",
-      "ai": "3D・音・共有の実装と検証、Workersデプロイ",
-      "human": "企画・方向決め・公開判断"
+      "ai": "TypeScript・three.jsで3Dランナー、群衆、3カテゴリー各7問、左右入力、Web Audio音声を実装",
+      "human": "群衆と走る二択ゲームの企画、コース選定、風景・BGM・足音の作り込み、公開判断",
+      "failure": "最初外部Workerとしたが、他Dayと同じPages配下の静的配信へ再構築した",
+      "body": "Day 79 / 100\n\n独り言、言う派？\n二択のゲートを選んで走る3Dゲーム「あなたの普通、何％？」を作りました🏃\n\n日常・恋愛・お金の3コース、1回7問。\nオリジナルのBGMと足音も付けました。\n※割合は練習データです。\n\nあなたなら、どっちに進む？\n\n実際に触れます。リンクはリプ欄👇\n#100日チャレンジ"
     }
   }
 }
