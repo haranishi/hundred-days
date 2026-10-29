@@ -423,6 +423,9 @@ body::after {
 .card__foot { grid-row: 7; }
 .card:target .thumb::after { content: ""; position: absolute; inset: 0; border: 2px solid var(--signal); border-radius: inherit; pointer-events: none; animation: target-glow 1.8s ease-out forwards; }
 .card.reveal { opacity: 0; transform: translateY(16px); }
+/* マスから遠いカードへ動いている間は、遷移を止める（home.js の quietWhileJumping）。
+   WebKitは、スクロールの最中にカードの出現・ホバーの遷移が一斉に始まると、スクロールを途中で打ち切る */
+.is-jumping *, .is-jumping *::before, .is-jumping *::after { transition: none !important; }
 .thumb {
   position: relative;
   aspect-ratio: 16/10;

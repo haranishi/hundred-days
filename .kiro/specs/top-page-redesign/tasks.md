@@ -22,5 +22,8 @@
   - Lighthouse（モバイル）：アクセシビリティ・ベストプラクティス・SEO・Agentic Browsing すべて100。CLS 0。遅い回線・4倍遅い端末でのモバイルLCP 0.74秒（題名の文字）。キーボードだけで全操作、Safari（WebKit）でも同じ。
 - [x] 7. 別セッションの採点
   - 第1周 14/20（不合格）→ 実在した指摘を直す → 第2周 18/20（合格・0点なし）。合格後に、残った実在の指摘（段のそろい・追従帯・プレビューの高さ・下線・影のしみ・Xの入口）を直した。**この最後の直しは再採点していない**（テストと自分の画面確認で検証）。記録は `.agent-harness/runs/top-page-redesign.md`。
-- [ ] 8. 作業ブランチへのcommit・push・PR（マージと本番反映は本人）
+- [x] 8. 作業ブランチへのcommit・push・PR（マージと本番反映は本人）。PR #178 は、本人の依頼で2026-10-28に、CI成功のあとマージ・本番反映した（本番での確認は49項目すべて成功）
   - 公開前チェック5点：`npm run precheck`（OK）、新規ファイルの全文確認、書体の権利（OFL本文を同梱）、文言と数字の照合（README・`meta.json` と一致）、ビルドと実操作。
+- [ ] 9. 公開後の確認で見つかった不具合の修正（Safari系でマスを押す移動が、まれに途中で止まる）
+  - `scripts/site/home.js`（`quietWhileJumping`）・`scripts/site/home.css`（`.is-jumping`）・`tests/e2e/home.spec.mjs`（動いている間に走るカードの遷移が0）。証拠と限界は `.agent-harness/runs/top-page-redesign.md` の「公開後」。PRまで作る（マージは本人）。
+  - _Requirements: 2, 5_
