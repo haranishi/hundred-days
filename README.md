@@ -27,7 +27,7 @@ hundred-days/
 サーバー側APIが必要なDayは、[APIとDayの対応表](functions/README.md)から関連コードも探せます。
 
 Day 019・020は外部で公開するChrome拡張です。このリポジトリには制作記録と紹介素材を置いており、拡張のソースコードは含みません。
-Day 051「ハコニワ」とDay 079「あなたの普通、何％？」も外部公開アプリです。本体は独立リポジトリで管理し、ここには紹介情報と画面を登録しています。
+Day 051「ハコニワ」も外部公開アプリです。本体は独立リポジトリで管理し、ここには紹介情報と画面を登録しています。
 
 ## アプリ一覧
 
@@ -112,7 +112,7 @@ Day 051「ハコニワ」とDay 079「あなたの普通、何％？」も外部
 | 076 | へんかんデスク | [day-076-henkan-desk/](day-076-henkan-desk/) | [アプリを開く](https://hundred-days.pages.dev/day-076-henkan-desk/) |
 | 077 | 保安検査スワイパー — その荷物、機内？預け？没収？ | [day-077-hoan-swiper/](day-077-hoan-swiper/) | [アプリを開く](https://hundred-days.pages.dev/day-077-hoan-swiper/) |
 | 078 | 先に100 — 足して、100を取り合う。 | [day-078-saki-ni-100/](day-078-saki-ni-100/) | [アプリを開く](https://hundred-days.pages.dev/day-078-saki-ni-100/) |
-| 079 | あなたの普通、何％？ | [制作記録のみ](day-079-futsu-run/) | [紹介ページ](https://futsu-run.haranishi.workers.dev/) |
+| 079 | あなたの普通、何％？ | [day-079-futsu-run/](day-079-futsu-run/) | [アプリを開く](https://hundred-days.pages.dev/day-079-futsu-run/) |
 <!-- day-index:end -->
 
 ## 1日アプリのルール

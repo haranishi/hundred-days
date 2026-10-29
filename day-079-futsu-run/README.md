@@ -3,18 +3,16 @@
 群衆と走りながら、近づく二択ゲートで道を選ぶ3Dブラウザゲーム。
 日常・恋愛・お金の3コース、各7問。スワイプや矢印キーで道を選び、あなたの「普通度」を判定します。
 
-- [アプリを開く](https://futsu-run.haranishi.workers.dev/)
-- [制作管理リポジトリ（futsu-run）](https://github.com/haranishi/futsu-run)（ローカル正本: `/Volumes/Turso-SSD/development/futsu-run`）
-
-本体はNext.js App Router・three.js・Cloudflare Workersで独立管理・公開しています。
-100daysには外部公開アプリとして紹介情報・スクリーンショット・デモ動画を登録しています。
+- [アプリを開く](https://hundred-days.pages.dev/day-079-futsu-run/)
+- [開発リポジトリ（futsu-run）](https://github.com/haranishi/futsu-run)（ローカル開発元: `/Volumes/Turso-SSD/development/futsu-run`）
 
 ## 体験と機能
 - **背面3Dランナー**: 群衆とともに走り、迫り来る二択のゲートを左右に選ぶ。
 - **3つのカテゴリー**: 日常・恋愛・お金、各7問。
 - **2つのモード**: 少数派で脱落する「サバイバル」と最後まで走れる「7問完走」。
-- **オリジナルのサウンド**: 合成BGMと着地に連動した足音。
-- **固定結果URLと共有**: 結果ごとの固有URL、X・LINE共有、動的OGP画像に対応。
+- **オリジナルのサウンド**: 合成BGMと着地に連動した足音（Web Audio API）。
+- **結果の共有**: 普通度とタイプの判定、固有URL、X・LINE共有に対応。
+- **データと安心**: 回答はサーバーへ送信せず、すべて端末内と共有URLパラメータで完結。
 
 ## 割合と保存について
 現在の割合は練習用の架空データです。実参加者の集計ではなく、回答を実票へ加算・送信することはありません。
