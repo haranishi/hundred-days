@@ -1,0 +1,14 @@
+{
+  "feature_name": "day-079-futsu-run",
+  "phase": "validated-external-registration",
+  "updated_at": "2026-10-29",
+  "approval_basis": "本人のDay79として公開まで進める指示。Cloudflare Workersへの外部公開とマージ。",
+  "validation": {
+    "catalog_build": "passed; releasedCount 79",
+    "metadata": "external; publicUrl https://futsu-run.haranishi.workers.dev/",
+    "unit_tests": "4968 passed, 0 failed",
+    "syntax_check": "passed, 0 errors",
+    "precheck": "passed, 0 leaks",
+    "production_e2e": "5 passed on futsu-run"
+  }
+}
