@@ -3,6 +3,7 @@
 
 import { execFileSync } from 'node:child_process';
 import { verifyPublicPage } from './verify-public-page.mjs';
+import { fetchPublicUrl } from './lib/public-url.mjs';
 import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { basename, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -161,25 +162,32 @@ execFileSync(process.execPath, [join(root, 'scripts', 'precheck.mjs')], { cwd: r
 console.log('ビルドを実行');
 execFileSync(process.execPath, [join(root, 'scripts', 'build.mjs')], { cwd: root, stdio: 'inherit' });
 
+const canonicalBase = (process.env.HD_CANONICAL_BASE || 'https://rairakku.com/100days').replace(/\/+$/, '');
+
 const checkUrl = async (url, label, app = false) => {
   let response;
+  let fetchedUrl = url;
+  let dnsError = '';
   try {
-    response = await fetch(url, { redirect: 'follow', signal: AbortSignal.timeout(15000) });
+    ({ response, fetchedUrl, dnsError } = await fetchPublicUrl(url, { canonicalBase }));
   } catch (error) {
     fail(`${label}へ接続できない: ${error.cause?.code || error.message}`);
   }
-  if (!response.ok) fail(`${label}がHTTP ${response.status}: ${url}`);
+  if (dnsError) {
+    console.warn(`⚠ ${label}: この回線から ${new URL(url).host} の名前を引けない（${dnsError}）。行き先 ${fetchedUrl} で代わりに確認した。投稿の前に、別の回線（スマホ回線など）で ${url} を開いて確かめる`);
+  }
+  if (!response.ok) fail(`${label}がHTTP ${response.status}: ${fetchedUrl}`);
   let identity = {};
   if (app) {
     try {
-      identity = verifyPublicPage(await response.text(), url, meta.mount === false ? url : `${(process.env.HD_CANONICAL_BASE || 'https://rairakku.com/100days').replace(/\/+$/, '')}/${dir}/`);
+      identity = verifyPublicPage(await response.text(), fetchedUrl, meta.mount === false ? url : `${canonicalBase}/${dir}/`)
     } catch (error) {
       fail(`${label}の公開確認に失敗: ${error.message}`);
     }
   } else {
     await response.body?.cancel();
   }
-  return { url, status: response.status, ...identity };
+  return { url, status: response.status, ...identity, ...(dnsError ? { checkedVia: fetchedUrl } : {}) };
 };
 
 const urlChecks = [
@@ -246,6 +254,7 @@ const checklist = [
   '- [x] 公開前スキャン',
   '- [x] ビルド',
   '- [x] 公開URL・GitHub URL',
+  ...(urlChecks.some((check) => check.checkedVia) ? ['- [ ] 公開URLを別の回線（スマホ回線など）で開いて確認（この回線では名前を引けず、行き先で代わりに確認した）'] : []),
   '- [x] 本文・リプライ文字数',
   '- [x] 動画の縦横比・時間・メタデータ',
   '- [x] 動画の映り込み目視確認',
