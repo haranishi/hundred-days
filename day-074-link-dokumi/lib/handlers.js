@@ -40,7 +40,10 @@ async function rateLimit(request,ctx) {
   await previous;
   try {
     const ip = request.headers.get('cf-connecting-ip') ?? 'unknown';
-    const digest = (await hash(ip)).slice(0,32);
+    // 共通Middlewareが検証した識別だけを受ける。要求ヘッダーからは読まない。
+    const verified = ctx.apiAbuseClient;
+    const digest = typeof verified === 'string' && /^[a-f0-9]{64}$/.test(verified)
+      ? verified.slice(0,32) : (await hash(ip)).slice(0,32);
     const minute = Math.floor(clock(ctx)/60000);
     const key = cacheKey('rate',digest+'-'+minute);
     const stored = await read(ctx,key);

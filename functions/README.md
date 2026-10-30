@@ -14,6 +14,9 @@
 | 029 | [ちかくのWi-Fi](../day-029-nearby-wifi/) | [place.js](api/day-029/place.js) |
 | 030 | [せかいのまど](../day-030-world-window/) | [windy.js](api/day-030/windy.js) |
 | 035 | [きょうの一面](../day-035-front-page/) | [page.js](api/day-035/page.js) |
+| 044 | [Tokyo Railscape — 東京の電車を、眺める。](../day-044-train-here/) | [trains.js](api/day-044/trains.js) |
 | 074 | [リンクの毒見](../day-074-link-dokumi/) | [trace.js](api/day-074/trace.js)・[around.js](api/day-074/around.js) |
 
 共通の配信設定は [scripts/build.mjs](../scripts/build.mjs)、ブラウザテストは [tests/e2e/](../tests/e2e/) にあります。
+
+API配下の共通Middlewareで連打を抑える。設定・制約・CIの試験は [Bot対策の運用](../docs/bot-protection.md) を参照。

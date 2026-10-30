@@ -2,6 +2,7 @@ import { handleTrace, jsonResponse } from '../../../day-074-link-dokumi/lib/hand
 
 export const onRequestGet = context => handleTrace(context.request, {
   env:context.env, fetchImpl:fetch, cache:globalThis.caches?.default ?? null,
+  apiAbuseClient:context.data?.apiAbuseClient,
   now:() => Date.now(), waitUntil:context.waitUntil?.bind(context),
   selfHosts:[new URL(context.request.url).hostname]
 });

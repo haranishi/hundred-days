@@ -75,6 +75,28 @@ jobs:
       - name: Build site
         run: npm run build
 
+  api-abuse:
+    name: API Bot protection runtime
+    needs: checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Set up Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+      - name: Exercise actual Pages middleware without external API requests
+        run: npx --yes --package=wrangler@4.115.0 -- npm run test:api-abuse
+      - name: Save Pages runtime failure
+        if: failure()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
+        with:
+          name: api-bot-runtime-failure
+          path: .cache/api-abuse-runtime.log
+          retention-days: 7
+
   browser:
     name: Browser tests (${{ matrix.shard }}/4)
     needs: checks
@@ -164,7 +186,7 @@ jobs:
   test:
     name: Build and browser test
     if: ${{ always() }}
-    needs: [checks, browser, day080]
+    needs: [checks, browser, day080, api-abuse]
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
@@ -173,11 +195,13 @@ jobs:
           CHECKS_RESULT: ${{ needs.checks.result }}
           BROWSER_RESULT: ${{ needs.browser.result }}
           GAME_RESULT: ${{ needs.day080.result }}
+          API_RESULT: ${{ needs.api-abuse.result }}
         run: |
           printf 'Quick checks: %s\nBrowser tests: %s\n' "$CHECKS_RESULT" "$BROWSER_RESULT"
           test "$CHECKS_RESULT" = success
           test "$BROWSER_RESULT" = success
           test "$GAME_RESULT" = success
+          test "$API_RESULT" = success
 
   deploy:
     name: Deploy production

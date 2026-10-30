@@ -94,3 +94,8 @@ npx playwright show-trace path/to/test-results/test-name/trace.zip
 Day80のソース39件・固定lockからの公開物再生成・全40ブラウザも共通の必須集約に含める。sourceの検査が失敗するとデプロイへ進まない。
 
 Day80の公開版4件は、1番目のブラウザ分割で `/100days/` でも実行する。手元では `npx playwright test --config playwright.day080-mounted.config.mjs` で再現する。
+
+## APIのBot対策
+共通の単体テストに加え、API Bot protection runtimeジョブが固定したWranglerでPagesのMiddlewareを実行する。
+連打・署名偽装・Day74の個別制限・静的配信を外部取得なしで確認し、失敗すると必須の集約も失敗する。
+手元ではWranglerがあるPATHでnpm run test:api-abuseを実行する。

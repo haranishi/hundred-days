@@ -1,0 +1,37 @@
+{
+  "feature_name": "api-abuse-protection",
+  "language": "ja",
+  "phase": "implemented-verified-locally",
+  "created_at": "2026-10-30",
+  "approvals": {
+    "requirements": {
+      "generated": true,
+      "approved": true
+    },
+    "design": {
+      "generated": true,
+      "approved": true
+    },
+    "tasks": {
+      "generated": true,
+      "approved": true
+    }
+  },
+  "approval_basis": "公開サイトのBot対策を求めた依頼に沿って、既存APIの利用を維持する範囲で進める。",
+  "delivery": {
+    "repository": "haranishi/hundred-days",
+    "base": "main",
+    "branch": "fix/api-bot-protection"
+  },
+  "validation": {
+    "root_unit_pass": 5034,
+    "root_unit_skip": 1,
+    "guard_unit": 40,
+    "pages_runtime_cases": 41,
+    "proxy_unit_pass": 185,
+    "proxy_compiled_runtime": 1,
+    "dependency_projects": 12,
+    "known_advisories": 0,
+    "review_findings_fixed": 2
+  }
+}
