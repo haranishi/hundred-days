@@ -161,6 +161,7 @@ npx wrangler pages deploy dist --project-name=hundred-days
 
 同じ公開物を `hundred-days.pages.dev/` と `rairakku.com/100days/` で配信します。公開物のサイト内参照は文書相対にし、ルート直下の絶対パスを書かないでください（`/api/day-NNN/` だけ例外）。`npm run build` が検査します。
 canonical・OGPの基準は `SITE.canonicalBase`（既定 `https://rairakku.com/100days`、環境変数 `HD_CANONICAL_BASE` で変更可）です。`meta.json` の `mount:false` はサブパス配信の対象外を意味し、そのDayへのリンク・canonicalは元ホストを使い、sitemapには載せません。
+存在しないURLは、本物の404（`404.html`）を返し、案内のあと一覧へ自動で移ります（先頭が実在するDayなら、そのDayへ）。以前は存在しないURLにも一覧を200で返していたため、Xなどに貼られた古いリンクが一覧に着いていました。番号や名前を変えたDayの古いURLは、`static/_redirects` に301を足します（`scripts/tests/not-found.test.mjs` が、転送先の実在と輪の有無を検査します）。
 
 ## ライセンス
 

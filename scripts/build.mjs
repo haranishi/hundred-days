@@ -7,6 +7,7 @@ import { basename, join, relative, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { PUBLISH_CHECK_ENV, effectiveStatus, isPublishCheckOverride, unmatchedPublishCheckTargets } from './lib/day-status.mjs';
 import { findRootRelativeRefs } from './check-mount-safe.mjs';
+import { notFoundHtml } from './lib/not-found.mjs';
 import { isServedPath } from './lib/dist-files.mjs';
 
 const root = fileURLToPath(new URL('..', import.meta.url));
@@ -687,7 +688,7 @@ const entries = [`<url><loc>${esc(SITE.canonicalBase)}/</loc></url>`, ...sitemap
   return `<url><loc>${esc(SITE.canonicalBase)}/${esc(app.dir)}/</loc>${date ? `<lastmod>${date}</lastmod>` : ''}</url>`;
 })];
 writeFileSync(join(distDir, 'sitemap.xml'), `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${entries.join('\n')}</urlset>\n`);
-writeFileSync(join(distDir, '404.html'), `<!doctype html><html lang="ja"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><title>ページが見つかりません</title><style>body{font-family:system-ui,sans-serif;max-width:40em;margin:15vh auto;padding:1.5em;line-height:1.8}a{color:#6440ac}</style><h1>404 — ページが見つかりません</h1><p>URLをご確認ください。</p><a href="${esc(SITE.canonicalBase)}/">100日チャレンジの一覧へ</a></html>`);
+writeFileSync(join(distDir, '404.html'), notFoundHtml({ listUrl: `${SITE.canonicalBase}/`, days: apps.filter(app => app.published && !app.externalUrl).map(app => app.dir) }));
 const mountViolations = findRootRelativeRefs(distDir);
 if (mountViolations.length) {
   console.error(mountViolations.map(ref => `${ref.file}:${ref.line}: ${ref.value}`).join('\n'));
