@@ -11,9 +11,11 @@
 
 ## 最初に触るなら、この3本
 
-| [<img src="day-077-hoan-swiper/og.png" width="260" alt="保安検査スワイパーの3D画面">](https://hundred-days.pages.dev/day-077-hoan-swiper/) | [<img src="day-078-saki-ni-100/og.png" width="260" alt="先に100のタイトル画面">](https://hundred-days.pages.dev/day-078-saki-ni-100/) | [<img src="day-074-link-dokumi/og.png" width="260" alt="リンクの毒見のタイトル画面">](https://hundred-days.pages.dev/day-074-link-dokumi/) |
-|:--|:--|:--|
-| **Day 077 保安検査スワイパー**<br>3Dの空港で、荷物を「機内持ち込み」「預け荷物」「持込不可」に仕分けるゲーム。<br>[試す](https://hundred-days.pages.dev/day-077-hoan-swiper/) ・ [コード](day-077-hoan-swiper/) | **Day 078 先に100**<br>コンピューターと交代で数を足し、目標ちょうどを取り合う12面の頭脳戦。<br>[試す](https://hundred-days.pages.dev/day-078-saki-ni-100/) ・ [コード](day-078-saki-ni-100/) | **Day 074 リンクの毒見**<br>URLを貼ると、なりすましの兆候とサイトの守りの弱点を、平易な日本語で調べる。診断したURLの履歴は残さない。<br>[試す](https://hundred-days.pages.dev/day-074-link-dokumi/) ・ [コード](day-074-link-dokumi/) |
+[<img src="day-077-hoan-swiper/og.png" width="270" alt="保安検査スワイパーの3D画面">](https://hundred-days.pages.dev/day-077-hoan-swiper/) [<img src="day-078-saki-ni-100/og.png" width="270" alt="先に100のタイトル画面">](https://hundred-days.pages.dev/day-078-saki-ni-100/) [<img src="day-074-link-dokumi/og.png" width="270" alt="リンクの毒見のタイトル画面">](https://hundred-days.pages.dev/day-074-link-dokumi/)
+
+- **Day 077 保安検査スワイパー**：3Dの空港で、荷物を「機内持ち込み」「預け荷物」「持込不可」に仕分けるゲーム。[試す](https://hundred-days.pages.dev/day-077-hoan-swiper/) ・ [コード](day-077-hoan-swiper/)
+- **Day 078 先に100**：コンピューターと交代で数を足し、目標ちょうどを取り合う12面の頭脳戦。[試す](https://hundred-days.pages.dev/day-078-saki-ni-100/) ・ [コード](day-078-saki-ni-100/)
+- **Day 074 リンクの毒見**：URLを貼ると、なりすましの兆候とサイトの守りの弱点を、平易な日本語で調べる。診断したURLの履歴は残さない。[試す](https://hundred-days.pages.dev/day-074-link-dokumi/) ・ [コード](day-074-link-dokumi/)
 
 ## Dayからコードを探す
 
