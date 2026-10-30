@@ -9,7 +9,10 @@ import { CEIL_PAD } from '../../day-049-patanyan/lib/game.js';
 const DIR = 'day-049-patanyan';
 const ORIGIN = `http://127.0.0.1:${Number(process.env.PLAYWRIGHT_PORT || 4173)}`;
 const BASE = `${ORIGIN}/${DIR}/`;
+// 共有ボタンが出すURL: アプリのコード（lib/site.js）が直接持つ。第2段階で canonical から作る形へ直す。
 const SITE = `https://hundred-days.pages.dev/${DIR}/`;
+// canonical・OGP: ビルドが差し込む正式URL（rairakku.com/100days/ の下）。
+const CANONICAL = `https://rairakku.com/100days/${DIR}/`;
 const TEST_NOW = '2026-09-24T12:00:00+09:00';
 
 const note = (description) => test.info().annotations.push({ type: 'diagnostic', description });
@@ -153,10 +156,10 @@ test.describe('Day 049 ぱたにゃん：起動と入力', () => {
       card: document.querySelector('meta[name="twitter:card"]')?.content,
       lang: document.documentElement.lang,
     }));
-    assert.equal(meta.canonical, SITE);
+    assert.equal(meta.canonical, CANONICAL);
     assert.equal(meta.url, meta.canonical);
     assert.ok(meta.title && meta.desc);
-    assert.equal(meta.image, `${SITE}assets/og.png`);
+    assert.equal(meta.image, `${CANONICAL}assets/og.png`);
     assert.equal(meta.card, 'summary_large_image');
     assert.equal(meta.lang, 'ja');
     const og = await page.request.get(`${BASE}assets/og.png`);
