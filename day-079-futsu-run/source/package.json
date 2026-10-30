@@ -40,5 +40,10 @@
   "allowScripts": {
     "workerd@1.20261023.1": true,
     "esbuild@0.28.2": true
+  },
+  "overrides": {
+    "@node-minify/core": {
+      "glob": "10.5.0"
+    }
   }
 }

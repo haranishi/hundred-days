@@ -1,0 +1,577 @@
+{
+  "name": "Ninja Adventure Asset Pack",
+  "authors": [
+    "Pixel-Boy",
+    "AAA"
+  ],
+  "url": "https://pixel-boy.itch.io/ninja-adventure-asset-pack",
+  "license": "CC0-1.0",
+  "archive_sha256": "95a06f4fdcfd1882f061a45ff313b7c905dbe2de1e8512b281d7937df62a7b15",
+  "files": [
+    {
+      "file": "assets/people/lyca-walk.png",
+      "source": "Actor/Character/Boy/SeparateAnim/Walk.png",
+      "sha256": "9fdf3697e86005c64103805db9edc4a949d7d4aa6626c50f8d91d3ee916a3de2"
+    },
+    {
+      "file": "assets/people/lyca-idle.png",
+      "source": "Actor/Character/Boy/SeparateAnim/Idle.png",
+      "sha256": "b2e6a9ed86e8cd43bd9173d663e4c62fbc75b579bd504613d3a1880d4375a0ce"
+    },
+    {
+      "file": "assets/people/lyca-attack.png",
+      "source": "Actor/Character/Boy/SeparateAnim/Attack.png",
+      "sha256": "78e419f4c6b0db4d5ff05f1bd80e614d3f7a00049eb380e98e4571507c61d432"
+    },
+    {
+      "file": "assets/people/flame-walk.png",
+      "source": "Actor/Character/SamuraiRed/SeparateAnim/Walk.png",
+      "sha256": "b0a0b778651e9f93d5f7f1580659c6b676b0a4768e8bf7eb3b9c6da24d0b7f46"
+    },
+    {
+      "file": "assets/people/flame-idle.png",
+      "source": "Actor/Character/SamuraiRed/SeparateAnim/Idle.png",
+      "sha256": "bf05a0335344bbe7c781f0078bf849ad5ae35eb27b9f3f9481d190b8a36f4f78"
+    },
+    {
+      "file": "assets/people/flame-attack.png",
+      "source": "Actor/Character/SamuraiRed/SeparateAnim/Attack.png",
+      "sha256": "fc22b00476e19b0980ee7bdb67db51e4ed20a28d3d92d16737382163e0d1f1e0"
+    },
+    {
+      "file": "assets/people/tide-walk.png",
+      "source": "Actor/Character/SamuraiBlue/SeparateAnim/Walk.png",
+      "sha256": "7a380a2418f3c017b9e3572c04a204886a4ffd581c475132c8096dd1125cf15e"
+    },
+    {
+      "file": "assets/people/tide-idle.png",
+      "source": "Actor/Character/SamuraiBlue/SeparateAnim/Idle.png",
+      "sha256": "cf23f20b91fad0988646c4b5f5494533615a381ceb074cd8b50f5ce775ca044f"
+    },
+    {
+      "file": "assets/people/tide-attack.png",
+      "source": "Actor/Character/SamuraiBlue/SeparateAnim/Attack.png",
+      "sha256": "7cd27b394cdd08cc36982775459b3222866d643e3be0f9ad871ca3803a951de8"
+    },
+    {
+      "file": "assets/people/grove-walk.png",
+      "source": "Actor/Character/Hunter/SeparateAnim/Walk.png",
+      "sha256": "f24ec72534ef2418f1e2027376c2f571657883861bedaeeb18ec2b7710cf6a90"
+    },
+    {
+      "file": "assets/people/grove-idle.png",
+      "source": "Actor/Character/Hunter/SeparateAnim/Idle.png",
+      "sha256": "fc5c84df8a2ba641fe3444ec2cdd06827c646bbf723a433ccaea27bd65dc4ea9"
+    },
+    {
+      "file": "assets/people/grove-attack.png",
+      "source": "Actor/Character/Hunter/SeparateAnim/Attack.png",
+      "sha256": "536643fb3d2aff5771f14e364ec28880272c8dba5e0ae3bb5d1f254df23b5272"
+    },
+    {
+      "file": "assets/people/storm-walk.png",
+      "source": "Actor/Character/SorcererBlack/SeparateAnim/Walk.png",
+      "sha256": "398b39aa89835feccd2414a3ef8e8502f47bab703ce5dc637e4d94e207a26f2f"
+    },
+    {
+      "file": "assets/people/storm-idle.png",
+      "source": "Actor/Character/SorcererBlack/SeparateAnim/Idle.png",
+      "sha256": "0510e285f336e5597ad75cb1495f46ed8d46931d1c5b5ca99466839c1caa679f"
+    },
+    {
+      "file": "assets/people/storm-attack.png",
+      "source": "Actor/Character/SorcererBlack/SeparateAnim/Attack.png",
+      "sha256": "46a1d71a159bd2904fb310db6340440c23c7b6a98f1351c656d76c042dccdba7"
+    },
+    {
+      "file": "assets/people/nora-walk.png",
+      "source": "Actor/Character/Villager4/SeparateAnim/Walk.png",
+      "sha256": "8f8f7a89910081748095da91792f9965a18494583bcc054a22bc259741849c5a"
+    },
+    {
+      "file": "assets/people/nora-idle.png",
+      "source": "Actor/Character/Villager4/SeparateAnim/Idle.png",
+      "sha256": "d19215ae7abb9e9f7ba14fa622e58a71660efabbd0152cf405dafcead9329c49"
+    },
+    {
+      "file": "assets/people/nora-attack.png",
+      "source": "Actor/Character/Villager4/SeparateAnim/Attack.png",
+      "sha256": "d346b9ddec9dbe00c4fe6475a7287dc63d98473037ad7b0c04a9f185e22d183c"
+    },
+    {
+      "file": "assets/people/mira-walk.png",
+      "source": "Actor/Character/Princess/SeparateAnim/Walk.png",
+      "sha256": "c5b2abeaa85f087e2f94802884bdb60e1d6f6fc1889f61c0a3f1988b924e5b82"
+    },
+    {
+      "file": "assets/people/mira-idle.png",
+      "source": "Actor/Character/Princess/SeparateAnim/Idle.png",
+      "sha256": "c6fd09f553bcce7dc8da7fe31de436acd14fc667bf61cff2ccbf90eb19e728b7"
+    },
+    {
+      "file": "assets/people/mira-attack.png",
+      "source": "Actor/Character/Princess/SeparateAnim/Attack.png",
+      "sha256": "e35938cfb7772110619fa421b9966ed71ea7a32ed2aeceff4036641116e97d41"
+    },
+    {
+      "file": "assets/people/toma-walk.png",
+      "source": "Actor/Character/OldMan3/SeparateAnim/Walk.png",
+      "sha256": "e8aedc6d2613bb44f7fcecb2e7ecfd9d1707d83da952c254ee3d735c4a4e9f27"
+    },
+    {
+      "file": "assets/people/toma-idle.png",
+      "source": "Actor/Character/OldMan3/SeparateAnim/Idle.png",
+      "sha256": "04174eaeb594a60faae5ceda71f031a5162c61058b90f0229d55494251f9e30c"
+    },
+    {
+      "file": "assets/people/toma-attack.png",
+      "source": "Actor/Character/OldMan3/SeparateAnim/Attack.png",
+      "sha256": "c9c1ae2519e7ac68ce27d7f94f0586daf880014b1b7fcea4c6f6cf53f26ce628"
+    },
+    {
+      "file": "assets/people/merchant-walk.png",
+      "source": "Actor/Character/OldMan/SeparateAnim/Walk.png",
+      "sha256": "548e3e38992d8efd49b2902ed3091a35b2a88ad9e491d9300fd235ce91846d00"
+    },
+    {
+      "file": "assets/people/merchant-idle.png",
+      "source": "Actor/Character/OldMan/SeparateAnim/Idle.png",
+      "sha256": "cdfc13059800c9645b73da0aaf459939a3064504befdfdff91abcbff1ac1c4d6"
+    },
+    {
+      "file": "assets/people/merchant-attack.png",
+      "source": "Actor/Character/OldMan/SeparateAnim/Attack.png",
+      "sha256": "8b38b12a147f0484176b7f3749d511596a605e8e1ebc19102d740a2a72438ac3"
+    },
+    {
+      "file": "assets/people/inn-walk.png",
+      "source": "Actor/Character/Woman/SeparateAnim/Walk.png",
+      "sha256": "436143d8d7c751615d252f4a42a29c7620fbece546d296b5b86ae19fff20d241"
+    },
+    {
+      "file": "assets/people/inn-idle.png",
+      "source": "Actor/Character/Woman/SeparateAnim/Idle.png",
+      "sha256": "328eaf6fbcba3b976a3771e84232d5fd00ba90a79a8cfaf81a5d3f8c79abdc98"
+    },
+    {
+      "file": "assets/people/inn-attack.png",
+      "source": "Actor/Character/Woman/SeparateAnim/Attack.png",
+      "sha256": "b04c3c42a3c527bd80a8cacc2a0e57ac29090a79a769b8850489f2d6dd65d95d"
+    },
+    {
+      "file": "assets/people/king-walk.png",
+      "source": "Actor/Character/Master/SeparateAnim/Walk.png",
+      "sha256": "a4583c6736e3c6d3d0252137a13ad7a6c65976206a456ca12d043599e7857cda"
+    },
+    {
+      "file": "assets/people/king-idle.png",
+      "source": "Actor/Character/Master/SeparateAnim/Idle.png",
+      "sha256": "0e11c4257a5bbe523e21d969ec3df09b6818bc4a1531e8021361385489372171"
+    },
+    {
+      "file": "assets/people/king-attack.png",
+      "source": "Actor/Character/Master/SeparateAnim/Attack.png",
+      "sha256": "987b8408a61ffa8c6b15cfb17039e7f056166d2430c772dfa4dba3704715359f"
+    },
+    {
+      "file": "assets/people/sage-walk.png",
+      "source": "Actor/Character/OldWoman/SeparateAnim/Walk.png",
+      "sha256": "a4583c6736e3c6d3d0252137a13ad7a6c65976206a456ca12d043599e7857cda"
+    },
+    {
+      "file": "assets/people/sage-idle.png",
+      "source": "Actor/Character/OldWoman/SeparateAnim/Idle.png",
+      "sha256": "0e11c4257a5bbe523e21d969ec3df09b6818bc4a1531e8021361385489372171"
+    },
+    {
+      "file": "assets/people/sage-attack.png",
+      "source": "Actor/Character/OldWoman/SeparateAnim/Attack.png",
+      "sha256": "987b8408a61ffa8c6b15cfb17039e7f056166d2430c772dfa4dba3704715359f"
+    },
+    {
+      "file": "assets/people/demon-walk.png",
+      "source": "Actor/Character/DemonRed/SeparateAnim/Walk.png",
+      "sha256": "e8b4f45feb20cd2bb24dc225b6fe734905994cd9b2b16e46aea9f62207ecbd9a"
+    },
+    {
+      "file": "assets/people/demon-idle.png",
+      "source": "Actor/Character/DemonRed/SeparateAnim/Idle.png",
+      "sha256": "76f3867396f4c642151d4006c5263dd04bd7214aec624ea0d1285169ecd5482f"
+    },
+    {
+      "file": "assets/people/demon-attack.png",
+      "source": "Actor/Character/DemonRed/SeparateAnim/Attack.png",
+      "sha256": "cf35b5cf2016a64a1bdc6652127bd6b1a2e5f29e8070e359b8dcc3684300547d"
+    },
+    {
+      "file": "assets/people/citizen1-walk.png",
+      "source": "Actor/Character/Villager3/SeparateAnim/Walk.png",
+      "sha256": "c1f4af9fba85061924eae6eade7e4343115e52eaff7f229e8f7a5a73672e72c2"
+    },
+    {
+      "file": "assets/people/citizen1-idle.png",
+      "source": "Actor/Character/Villager3/SeparateAnim/Idle.png",
+      "sha256": "af309396832d364c79b6bf9efbf66b7dee744a1de2b2287b898e6b341311b2f2"
+    },
+    {
+      "file": "assets/people/citizen1-attack.png",
+      "source": "Actor/Character/Villager3/SeparateAnim/Attack.png",
+      "sha256": "f184bcb4e999ae5353398ed1ac7e29030f5c517063a1461fc34595e6376c8a00"
+    },
+    {
+      "file": "assets/people/citizen2-walk.png",
+      "source": "Actor/Character/Villager5/SeparateAnim/Walk.png",
+      "sha256": "73a1c75380577c5e65528a2bf4a2177163ee55a0bb114af02e62422964810b2e"
+    },
+    {
+      "file": "assets/people/citizen2-idle.png",
+      "source": "Actor/Character/Villager5/SeparateAnim/Idle.png",
+      "sha256": "82e9d5f12ee625183e64021758d1eef8408ce1ff5c2b4b4b65bc302e7c3dbc59"
+    },
+    {
+      "file": "assets/people/citizen2-attack.png",
+      "source": "Actor/Character/Villager5/SeparateAnim/Attack.png",
+      "sha256": "b906869f4ac453121ddb024a06ec90ba7a5777197b42c61e5e7081b06877d54d"
+    },
+    {
+      "file": "assets/people/guard-walk.png",
+      "source": "Actor/Character/Knight/SeparateAnim/Walk.png",
+      "sha256": "16aff7a67ec2787cd50210ba9596a78d22ec68e9870621a6b9cc80f3a2656951"
+    },
+    {
+      "file": "assets/people/guard-idle.png",
+      "source": "Actor/Character/Knight/SeparateAnim/Idle.png",
+      "sha256": "be4059602e70bfb6acac10bee39b566fdbcb757e8e4810bcf31f019940c2168f"
+    },
+    {
+      "file": "assets/people/guard-attack.png",
+      "source": "Actor/Character/Knight/SeparateAnim/Attack.png",
+      "sha256": "fa210c30dfed856b39efaac915fdae816c97adafeec53540f355d5b4a198e612"
+    },
+    {
+      "file": "assets/tiles/TilesetFloor.png",
+      "source": "Backgrounds/Tilesets/TilesetFloor.png",
+      "sha256": "e111065065edf806e7e893330086e68efc8755175d92f14d087b42d40a331e16"
+    },
+    {
+      "file": "assets/tiles/TilesetFloorDetail.png",
+      "source": "Backgrounds/Tilesets/TilesetFloorDetail.png",
+      "sha256": "eab91fc2a1d10191e3c26a6e936175a2492b6ef481c4ba7d984b717954bf1c01"
+    },
+    {
+      "file": "assets/tiles/TilesetField.png",
+      "source": "Backgrounds/Tilesets/TilesetField.png",
+      "sha256": "a519353dfdb4dfe8d2a1c67061be063056bbf0275eafa87ff711614e278c7261"
+    },
+    {
+      "file": "assets/tiles/TilesetHouse.png",
+      "source": "Backgrounds/Tilesets/TilesetHouse.png",
+      "sha256": "acdec09ff389883a48af18ebd344cac4081db0388154d4d13be0089cd376d508"
+    },
+    {
+      "file": "assets/tiles/TilesetNature.png",
+      "source": "Backgrounds/Tilesets/TilesetNature.png",
+      "sha256": "51eedd957ad4ac88988d170aa83a42404ef8fdebff9e6753b6fe80841ab3d5bb"
+    },
+    {
+      "file": "assets/tiles/TilesetElement.png",
+      "source": "Backgrounds/Tilesets/TilesetElement.png",
+      "sha256": "63d64985697d77033372256b9304ea85db7061f0fc19aafd0714492a9b57140e"
+    },
+    {
+      "file": "assets/tiles/TilesetWater.png",
+      "source": "Backgrounds/Tilesets/TilesetWater.png",
+      "sha256": "927e1fa1e793bb0398fdaad40cea22792c20f66703cdba80fb9462df7cbc275c"
+    },
+    {
+      "file": "assets/tiles/TilesetRelief.png",
+      "source": "Backgrounds/Tilesets/TilesetRelief.png",
+      "sha256": "9f4156d97efe449e161ec9065edd48f296e977cfd77f7e60474f2ddaae34c2e9"
+    },
+    {
+      "file": "assets/tiles/TilesetDungeon.png",
+      "source": "Backgrounds/Tilesets/TilesetDungeon.png",
+      "sha256": "03a4a4aa9002520a50cc3ab9c6ea63905826b2eca5d428c952e635dc3b24a798"
+    },
+    {
+      "file": "assets/tiles/TilesetInterior.png",
+      "source": "Backgrounds/Tilesets/Interior/TilesetInterior.png",
+      "sha256": "49b76b218b3fbb3308984f7579609822eb99d464557aaa6859296e11378f42ba"
+    },
+    {
+      "file": "assets/tiles/TilesetInteriorFloor.png",
+      "source": "Backgrounds/Tilesets/Interior/TilesetInteriorFloor.png",
+      "sha256": "e281598e2d90f43b31fd557b94c2d2abb00d307758a053b7df301575bf535e3a"
+    },
+    {
+      "file": "assets/tiles/TilesetWallSimple.png",
+      "source": "Backgrounds/Tilesets/Interior/TilesetWallSimple.png",
+      "sha256": "ad5eb80ab4d5e65dbcda9dc012f9981323b277717349cdab012fc65ce06e43b2"
+    },
+    {
+      "file": "assets/enemies/bramble.png",
+      "source": "Actor/Boss/GiantBamboo/Idle.png",
+      "sha256": "b6030c6c44f34445f354febbb75e0abdd3eab3c515d53453a4443c98ce565a10"
+    },
+    {
+      "file": "assets/enemies/demon.png",
+      "source": "Actor/Boss/DemonCyclop/Idle.png",
+      "sha256": "0bf748c6b777a2c0b77eead35b13e5e21e3a08e2bcbc69e8bc8b6fce52221a60"
+    },
+    {
+      "file": "assets/people/CatOrange.png",
+      "source": "Actor/Animal/CatOrange/SpriteSheet.png",
+      "sha256": "26daf4b518927a52dfbd7c12d35519dcb180dcc8583b119c5b3eccdafd202e4d"
+    },
+    {
+      "file": "assets/people/Chicken.png",
+      "source": "Actor/Animal/Chicken/SpriteSheetBlack.png",
+      "sha256": "515d8f1e59f93380677865965964949c40b4e2b94028b9ac28e2e35208d04514"
+    },
+    {
+      "file": "assets/people/Cat.png",
+      "source": "Actor/Animal/Cat/SpriteSheet.png",
+      "sha256": "87644265e9961e5c3cd47a7de2c92b2fd4279862c1a395530065e6e0efbafe55"
+    },
+    {
+      "file": "assets/fx/slash.png",
+      "source": "FX/Attack/CutX/SpriteSheet.png",
+      "sha256": "c2d7ca44e0f637bdca3dd23e6124907a2ac8f8320c58a4cc8d0c50765e874979"
+    },
+    {
+      "file": "assets/fx/fire.png",
+      "source": "FX/Elemental/Flam/SpriteSheet.png",
+      "sha256": "a46b49fdd9149cdee578acc9ebde50147f7c84faf8463ff265f3f54677e79e4d"
+    },
+    {
+      "file": "assets/fx/water.png",
+      "source": "FX/Elemental/Water/SpriteSheet.png",
+      "sha256": "69938ede7156a316dfa7ce72498758bad2223728221881bd2eaee7099e509079"
+    },
+    {
+      "file": "assets/fx/plant.png",
+      "source": "FX/Elemental/Plant/SpriteSheet.png",
+      "sha256": "f1fe0c5780b8aa6902f138702fd24b739e14774e057d8f2f414e768debfcf129"
+    },
+    {
+      "file": "assets/fx/thunder.png",
+      "source": "FX/Elemental/Thunder/SpriteSheet.png",
+      "sha256": "a6563e86290a06e44e005733786a8576b991f7dfda83b613f145372af1d2fe7d"
+    },
+    {
+      "file": "assets/fx/heal.png",
+      "source": "FX/Magic/Spirit/SpriteSheet.png",
+      "sha256": "7d4254b58ab5944d34698e68544a674116534a78ed5de4325de69bcd5cf81147"
+    },
+    {
+      "file": "assets/fx/shield.png",
+      "source": "FX/Magic/Shield/SpriteSheetBlue.png",
+      "sha256": "47efef506d7d00376f303662c4b43770d43e82989062a306bdd4b8c0e661ca0f"
+    },
+    {
+      "file": "assets/fx/burst.png",
+      "source": "FX/Elemental/Explosion/SpriteSheet.png",
+      "sha256": "98f3dfc6cdcdfaf122d7cf70b7cbc8e14c96f4e76f1e8f430099575d6b942219"
+    },
+    {
+      "file": "assets/music/town.ogg",
+      "source": "Audio/Musics/33 - Calm Village.ogg",
+      "sha256": "c8707cef6c90621a960e2e3bc2c3cc1a4e25c6e1509cd232aa5a162316623dfd"
+    },
+    {
+      "file": "assets/music/forest.ogg",
+      "source": "Audio/Musics/11 - Clearing.ogg",
+      "sha256": "16200b1a8f1d17aa45cf92b12db9c56bf03257dde1285435dbb1857edd5350f2"
+    },
+    {
+      "file": "assets/music/battle.ogg",
+      "source": "Audio/Musics/17 - Fight.ogg",
+      "sha256": "137f9a19a043c23c02179d722b14e9014bc3d73546db722a91640bd6181f1089"
+    },
+    {
+      "file": "assets/music/palace.ogg",
+      "source": "Audio/Musics/12 - Temple.ogg",
+      "sha256": "192890815e29be68e89242c705924482c10d0e29353d174f2fdd3a514ed83eb1"
+    },
+    {
+      "file": "assets/music/abyss.ogg",
+      "source": "Audio/Musics/10 - Dark Castle.ogg",
+      "sha256": "41fa5596c4fa928aed2f4b6ee96ea38b3270008fea852285ffc55e1e77aef427"
+    },
+    {
+      "file": "assets/people/lyca-face.png",
+      "source": "Actor/Character/Boy/Faceset.png",
+      "sha256": "9a7c2fe87351f94c21994a1257a9ac451b958306b022ad33f18558e7dcedc442"
+    },
+    {
+      "file": "assets/people/flame-face.png",
+      "source": "Actor/Character/SamuraiRed/Faceset.png",
+      "sha256": "a870cc1edbfc10dbd8ae3d291e159b8bde346d773d18c6043373cb24acde72c4"
+    },
+    {
+      "file": "assets/people/tide-face.png",
+      "source": "Actor/Character/SamuraiBlue/Faceset.png",
+      "sha256": "8e86854a240028e063d773561c62473e47a9a227e884a02a41a31d53ab68c942"
+    },
+    {
+      "file": "assets/people/grove-face.png",
+      "source": "Actor/Character/Hunter/Faceset.png",
+      "sha256": "c961b7d3aa9250616d6b648ff3ac702e93362e80058454fb049c91ed1f3f8555"
+    },
+    {
+      "file": "assets/people/storm-face.png",
+      "source": "Actor/Character/SorcererBlack/Faceset.png",
+      "sha256": "fab551cae1063afc0281fa6376121ce2eda24dc6c9d1b3c4d8b2341c89bb69d5"
+    },
+    {
+      "file": "assets/people/nora-face.png",
+      "source": "Actor/Character/Villager4/Faceset.png",
+      "sha256": "cedfa269e21e6712878d0955fc9dc6899bd4ed5962c06a0b306e8589a5f2561e"
+    },
+    {
+      "file": "assets/people/mira-face.png",
+      "source": "Actor/Character/Princess/Faceset.png",
+      "sha256": "89dde51ad712785f4d5aeadd6ad30c5679f0b51f900efd447219ab5b93e5ca20"
+    },
+    {
+      "file": "assets/people/toma-face.png",
+      "source": "Actor/Character/OldMan3/Faceset.png",
+      "sha256": "3e1a6a95088e3a4742765e59dd542d40c776a8619bec59a66380b7ca8b543bb3"
+    },
+    {
+      "file": "assets/people/merchant-face.png",
+      "source": "Actor/Character/OldMan/Faceset.png",
+      "sha256": "1fc8a30d27b6e324a733c5d13761a45fa90d88e8b47a130bbd96bbe348e83b04"
+    },
+    {
+      "file": "assets/people/inn-face.png",
+      "source": "Actor/Character/Woman/Faceset.png",
+      "sha256": "358744f38e355c57d00276aa546611e17b55523ff303e80544535ff69a9935d5"
+    },
+    {
+      "file": "assets/people/king-face.png",
+      "source": "Actor/Character/Master/Faceset.png",
+      "sha256": "123248ae36db8956197323284a34707a33c958d7cc816a35c3882e8abe479542"
+    },
+    {
+      "file": "assets/people/sage-face.png",
+      "source": "Actor/Character/OldWoman/Faceset.png",
+      "sha256": "3a6e2abbb0fe828c341ca3bbcc3ddd2146d70e628a40411d2d34467d7b5e1bfd"
+    },
+    {
+      "file": "assets/people/demon-face.png",
+      "source": "Actor/Boss/DemonCyclop/Faceset.png",
+      "sha256": "22c089ba89c40fa3874f3a9e74179f99a3e2203d8f9d0efe353935e3465d1b2f"
+    },
+    {
+      "file": "assets/people/citizen1-face.png",
+      "source": "Actor/Character/Villager3/Faceset.png",
+      "sha256": "3f8f86a1a246fb0014378ee08c84f6ff7e3003dd841a4ca6e22dddac850ffc8c"
+    },
+    {
+      "file": "assets/people/citizen2-face.png",
+      "source": "Actor/Character/Villager5/Faceset.png",
+      "sha256": "b7368f99b7bd10628c2ffa09aca1c25a2dd2846907174124b6e938aaaff00dc4"
+    },
+    {
+      "file": "assets/people/guard-face.png",
+      "source": "Actor/Character/Knight/Faceset.png",
+      "sha256": "dc1f6d3d6eb9c5f6f03afb635304e3b7438d1fb0e9c337f03767298882a5e338"
+    },
+    {
+      "file": "assets/people/bramble-face.png",
+      "source": "Actor/Boss/GiantBamboo/Faceset.png",
+      "sha256": "20408cdaea03f40fb8025f57219781d0c7d01acb901e585e49d6e0e8d1f7cdc4"
+    },
+    {
+      "file": "assets/sfx/click.wav",
+      "source": "Audio/Sounds/Menu/Move1.wav",
+      "sha256": "d5c773fc06555eca652dcf2728c9d487538e8263f53c5918c86dcabec85b12e9"
+    },
+    {
+      "file": "assets/sfx/confirm.wav",
+      "source": "Audio/Sounds/Menu/Accept4.wav",
+      "sha256": "ac809d93df1df424ecf3de13a92cd9a05d9fd9e5e7d43740e0b82b90c0e8a5a5"
+    },
+    {
+      "file": "assets/sfx/cancel.wav",
+      "source": "Audio/Sounds/Menu/Cancel2.wav",
+      "sha256": "3c33fc37c1d28bdd5cb0a1e77bb62f30ca7c82f505f6b314016d312eccce6a3f"
+    },
+    {
+      "file": "assets/sfx/coin.wav",
+      "source": "Audio/Sounds/Bonus/Coin2.wav",
+      "sha256": "8fe129feb63baafc2a65ad7f19dc184d6ec9e7d9d3df4a8a143740ffe009dfa6"
+    },
+    {
+      "file": "assets/sfx/grass1.wav",
+      "source": "Audio/Sounds/Elemental/Grass.wav",
+      "sha256": "3239b52ec804a2ef73813146135e22e72d822dc5827904bfca2648d68561a43a"
+    },
+    {
+      "file": "assets/sfx/grass2.wav",
+      "source": "Audio/Sounds/Elemental/Grass2.wav",
+      "sha256": "0009436706f8a1a2dd4c9d93d987644dcb02f2fbbd64925b84fcdb49141e4540"
+    },
+    {
+      "file": "assets/sfx/slash.wav",
+      "source": "Audio/Sounds/Whoosh & Slash/Sword2.wav",
+      "sha256": "779c2e934b7dd714ff068fd5c371e6848d4a1d940c6936ed42368a13df352daf"
+    },
+    {
+      "file": "assets/sfx/hit.wav",
+      "source": "Audio/Sounds/Hit & Impact/Hit1.wav",
+      "sha256": "56b206a2648109fa25761b7034c211903ef10f1a9b4ce2f6526f7a77a831328d"
+    },
+    {
+      "file": "assets/sfx/shield.wav",
+      "source": "Audio/Sounds/Hit & Impact/Impact2.wav",
+      "sha256": "b91154462ff838b4e3763169776222f7551000bc97f9898cdba68fbcb48917c6"
+    },
+    {
+      "file": "assets/sfx/heal.wav",
+      "source": "Audio/Sounds/Magic & Skill/Heal2.wav",
+      "sha256": "9464ca5a18ced45b1977cf5134219273eca6d14eb36d37f2eca10a6f27177f6c"
+    },
+    {
+      "file": "assets/sfx/magic.wav",
+      "source": "Audio/Sounds/Magic & Skill/Magic3.wav",
+      "sha256": "6e6baa8aa530a1aa64e2cd5def8c0e6bb875c9a312fdfd765d1a62f3fa09d9bb"
+    },
+    {
+      "file": "assets/sfx/victory.wav",
+      "source": "Audio/Jingles/Success1.wav",
+      "sha256": "025ffc87feca7630e813eb1e4673c7db44b4ad1d51a58ff216ea58656266518c"
+    },
+    {
+      "file": "assets/sfx/defeat.wav",
+      "source": "Audio/Jingles/GameOver4.wav",
+      "sha256": "8f3cfb0039c6bfa6a4faeccd6fc218894f9ee3f7caf0655f3d5ea0768f4231a5"
+    },
+    {
+      "file": "assets/sfx/level.wav",
+      "source": "Audio/Jingles/LevelUp1.wav",
+      "sha256": "e8a230647f435c7f4d8195acf95309cf369b3a2748be0e0d60d9d406192e9068"
+    },
+    {
+      "file": "assets/music/boss.ogg",
+      "source": "Audio/Musics/34  - Fight.ogg",
+      "sha256": "b4216d8d9a066c98f758c57287164745637c24294ebf4c0b03c77a86e173678c"
+    },
+    {
+      "file": "assets/music/ending.ogg",
+      "source": "Audio/Musics/8 - End Theme.ogg",
+      "sha256": "0e4405614154f1024d534b814cd7f4107149ea0bd228dbf9812cd205b7ee0705"
+    }
+  ],
+  "runtime_variants": "歩行と同じ人物のFacesetを使用し、髪・肌・衣服のパレットを描画時に共通適用。配布PNGは原本。タイルを合成して場面と戦闘背景を描画。",
+  "fonts": [
+    {
+      "file": "fonts/DotGothic16-Regular.ttf",
+      "source": "https://github.com/google/fonts/tree/main/ofl/dotgothic16",
+      "license": "SIL Open Font License 1.1",
+      "license_file": "fonts/OFL.txt",
+      "sha256": "3ad9af88726d42b40f7f365f0dcac785af73cf20ea6f1d5b44e57cc21150b8f1"
+    }
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "name": "fifth-prince",
+  "version": "0.7.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1 --port 4173",
+    "build": "tsc --noEmit && vite build --base ./",
+    "preview": "vite preview --host 127.0.0.1 --port 4174",
+    "typecheck": "tsc --noEmit",
+    "test": "node --import tsx --test tests/*.test.ts",
+    "test:e2e": "playwright test",
+    "release:static": "node ../tools/release.mjs"
+  },
+  "dependencies": {
+    "phaser": "4.2.1"
+  },
+  "devDependencies": {
+    "vite": "8.3.5",
+    "typescript": "5.9.3",
+    "tsx": "4.21.0",
+    "@playwright/test": "1.64.1",
+    "@types/node": "24.10.0"
+  },
+  "overrides": {
+    "esbuild": "0.28.1"
+  }
+}

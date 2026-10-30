@@ -1,0 +1,17 @@
+import {execFileSync,spawnSync} from 'node:child_process';
+import {readFileSync,writeFileSync} from 'node:fs';
+import {dirname,join} from 'node:path';
+import {fileURLToPath} from 'node:url';
+import assert from 'node:assert/strict';
+const here=dirname(fileURLToPath(import.meta.url)),out=join(here,'output'),file=join(out,'Day080_fifth_prince_promo.mp4');
+const probe=JSON.parse(execFileSync('ffprobe',['-v','error','-show_streams','-show_format','-of','json',file],{encoding:'utf8'}));
+const v=probe.streams.find(s=>s.codec_type==='video'),a=probe.streams.find(s=>s.codec_type==='audio');
+assert.equal(v.codec_name,'h264');assert.equal(v.width,1080);assert.equal(v.height,1920);assert.equal(v.pix_fmt,'yuv420p');assert.equal(v.r_frame_rate,'30/1');assert.equal(a.codec_name,'aac');assert.ok(Math.abs(Number(probe.format.duration)-36)<.1);assert.ok(Number(probe.format.size)<25*1024*1024);
+for(const key of ['artist','author','comment','copyright','description','location','make','model','title'])assert.ok(!probe.format.tags?.[key]);
+const black=spawnSync('ffmpeg',['-hide_banner','-i',file,'-vf','blackdetect=d=0.05:pix_th=0.08','-an','-f','null','-'],{encoding:'utf8',maxBuffer:8*1024*1024});assert.equal(black.status,0);assert.ok(!/black_start:/.test(black.stderr),'Black frame found');
+const level=spawnSync('ffmpeg',['-hide_banner','-i',file,'-vn','-af','ebur128=peak=true','-f','null','-'],{encoding:'utf8',maxBuffer:8*1024*1024});assert.equal(level.status,0);
+const first=execFileSync('ffmpeg',['-v','error','-i',file,'-t','0.1','-vn','-ac','1','-ar','48000','-f','f32le','pipe:1']);const samples=new Float32Array(first.buffer.slice(first.byteOffset,first.byteOffset+first.byteLength));const rms=Math.sqrt(samples.reduce((n,v)=>n+v*v,0)/samples.length);assert.ok(rms>.005,'Opening audio is silent');
+execFileSync('ffmpeg',['-v','error','-y','-i',file,'-frames:v','1',join(out,'first-frame.png')]);
+execFileSync('ffmpeg',['-v','error','-y','-i',file,'-vf','fps=1/4,scale=270:480,tile=3x3','-frames:v','1',join(out,'contact-sheet.jpg')]);
+const report={status:'passed',duration:Number(probe.format.duration),size:Number(probe.format.size),video:{codec:v.codec_name,width:v.width,height:v.height,fps:v.r_frame_rate},audio:{codec:a.codec_name,channels:a.channels,openingRms:rms,loudnessSummary:level.stderr.slice(-700)},blackFrames:false,metadata:probe.format.tags,capture:JSON.parse(readFileSync(join(out,'capture-report.json'),'utf8'))};
+writeFileSync(join(out,'audit-report.json'),JSON.stringify(report,null,2)+'\n');console.log(JSON.stringify({...report,capture:{frames:report.capture.frames,pageErrors:report.capture.pageErrors}},null,2));
