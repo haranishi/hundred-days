@@ -71,7 +71,7 @@ function miniSite(t) {
     mkdirSync(dirname(join(site, file)), { recursive: true });
     writeFileSync(join(site, file), content);
   };
-  for (const file of ['build.mjs', 'lib/day-status.mjs', 'lib/dist-files.mjs', 'lib/home-model.mjs', 'site/home.css', 'site/home.js']) {
+  for (const file of ['build.mjs', 'check-mount-safe.mjs', 'lib/day-status.mjs', 'lib/dist-files.mjs', 'lib/home-model.mjs', 'lib/not-found.mjs', 'site/home.css', 'site/home.js']) {
     mkdirSync(dirname(join(site, 'scripts', file)), { recursive: true });
     copyFileSync(fileURLToPath(new URL(`../${file}`, import.meta.url)), join(site, 'scripts', file));
   }
@@ -81,7 +81,7 @@ function miniSite(t) {
   write('day-002-beta/index.html', page('ベータ'));
   write('day-002-beta/meta.json', JSON.stringify({ day: 2, title: 'ベータ', status: 'draft' }));
   const env = { ...process.env };
-  for (const name of ['PUBLISH_CHECK_DAY', 'HUNDRED_DAYS_BUILD_DIR', 'GITHUB_ACTIONS']) delete env[name];
+  for (const name of ['PUBLISH_CHECK_DAY', 'HUNDRED_DAYS_BUILD_DIR', 'GITHUB_ACTIONS', 'HD_CANONICAL_BASE']) delete env[name];
   const build = (extra = {}) => {
     // 固まっても CI を止めないよう上限を付ける（小さな作業場のビルドは1秒もかからない）
     const run = spawnSync(process.execPath, [join(site, 'scripts', 'build.mjs')], { cwd: site, env: { ...env, ...extra }, encoding: 'utf8', timeout: 60_000 });
@@ -106,7 +106,7 @@ test('ビルド：指定が無ければ下書きを出さず、指定したと�
   assert.match(checked.output, /（検査用）公開済みとして扱う：day-002-beta/);
   assert.ok(existsSync(join(site, 'dist', 'day-002-beta', 'index.html')));
   assert.ok(read('_headers').includes('/day-002-beta/*'));
-  assert.match(read('day-002-beta/index.html'), /<link rel="canonical" href="https:\/\/hundred-days\.pages\.dev\/day-002-beta\/">/);
+  assert.match(read('day-002-beta/index.html'), /<link rel="canonical" href="https:\/\/rairakku\.com\/100days\/day-002-beta\/">/);
 
   // 打ち間違いは警告し、下書きは出さない。出力は指定なしのときと同じ
   const typo = build({ PUBLISH_CHECK_DAY: '20' });
@@ -137,4 +137,28 @@ test('ビルド：GitHub Actions で指定されたら、dist/ を消す前に�
   assert.notEqual(ci.status, 0);
   assert.match(ci.output, /GitHub Actions では使えません/);
   assert.ok(existsSync(join(site, 'dist', 'day-001-alpha', 'index.html')), '前のビルドが残っていること');
+});
+
+test('ビルド：mount例外、URL統一、sitemap、404と検査失敗', t => {
+  const { write, build, read } = miniSite(t);
+  write('day-001-alpha/index.html', '<head><link rel="canonical" href="https://hundred-days.pages.dev/day-001-alpha/"><meta property="og:url" content="https://hundred-days.pages.dev/day-001-alpha/"><meta property="og:image" content="https://hundred-days.pages.dev/day-001-alpha/og.png"><script type="application/ld+json">{"url":"https://hundred-days.pages.dev/day-001-alpha/"}</script></head>');
+  write('day-001-alpha/meta.json', JSON.stringify({ day: 1, status: 'published', finishedAt: '2026-10-30' }));
+  write('day-003-gamma/index.html', '<head></head><img src="/assets/legacy.png">');
+  write('day-003-gamma/meta.json', JSON.stringify({ day: 3, status: 'published', mount: false }));
+  assert.equal(build().status, 0);
+  assert.ok(read('index.html').includes('href="https://rairakku.com/100days/"'));
+  assert.ok(read('index.html').includes('href="https://hundred-days.pages.dev/day-003-gamma/"'));
+  assert.ok(read('day-003-gamma/index.html').includes('href="https://hundred-days.pages.dev/day-003-gamma/"'));
+  assert.ok(!read('day-001-alpha/index.html').includes('hundred-days.pages.dev'));
+  assert.ok(read('sitemap.xml').includes('<lastmod>2026-10-30</lastmod>'));
+  assert.ok(!/gamma|beta|tools/.test(read('sitemap.xml')));
+  assert.ok(read('404.html').includes('name="robots" content="noindex"'));
+  assert.ok(read('_headers').includes('/*/tools/*\n  X-Robots-Tag: noindex'));
+  assert.equal(build({ HD_CANONICAL_BASE: 'https://example.test/sub/' }).status, 0);
+  assert.ok(read('index.html').includes('href="https://example.test/sub/"'));
+  write('static/assets/x.js', '');
+  write('day-001-alpha/bad.css', 'a{background:url(/assets/x.png)}');
+  const bad = build();
+  assert.equal(bad.status, 1);
+  assert.match(bad.output, /day-001-alpha\/bad.css:1: \/assets\/x.png/);
 });

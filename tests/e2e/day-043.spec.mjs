@@ -164,7 +164,7 @@ test('フォーム操作は外部通信やURLへの入力埋め込みを発生�
 test('端末の共有シートにも固定のアプリ紹介だけを渡す', async ({ page }) => {
   await page.addInitScript(() => { Object.defineProperty(navigator, 'share', { value: async (value) => { window.shared = value; } }); });
   await ready(page); await page.locator('#invoice').fill('736521'); await page.getByRole('button', { name: '共有…', exact: true }).click();
-  const shared = await page.evaluate(() => window.shared); expect(shared.url).toBe('https://hundred-days.pages.dev/day-043-moveout-consult/');
+  const shared = await page.evaluate(() => window.shared); expect(shared.url).toBe('https://rairakku.com/100days/day-043-moveout-consult/');
   expect(JSON.stringify(shared)).not.toContain('736521');
 });
 

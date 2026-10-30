@@ -16,3 +16,8 @@ test('another app or missing identity cannot be called published',()=>{
  assert.throws(()=>verifyPublicPage('<link rel="canonical" href="/day-067-wagiri/">',app),/対象アプリではない/);
  assert.throws(()=>verifyPublicPage('<title>時刻表アリバイ</title>',app),/canonical/);
 });
+test('元ホストで取得しても、指定した中継先canonicalで同一Dayを確認できる', () => {
+ const canonical='https://rairakku.com/100days/day-068-timetable-alibi/';
+ assert.deepEqual(verifyPublicPage(`<link rel="canonical" href="${canonical}">`,app,canonical),{canonical});
+ assert.throws(()=>verifyPublicPage('<link rel="canonical" href="https://rairakku.com/100days/">',app,canonical),/対象アプリではない/);
+});

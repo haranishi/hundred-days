@@ -817,8 +817,8 @@ test.describe('Day74 リンクの毒見', () => {
       img: document.querySelectorAll('img').length,
       scripts: document.body.querySelectorAll('script').length,
       handlers: document.querySelectorAll('[onerror],[onload],[onclick]').length,
-      // リンクは http(s)・ページ内・同じサイト・数字だけの電話番号だけ
-      badLinks: [...document.querySelectorAll('a[href]')].filter((a) => !/^(https?:|#|\/|tel:(%23)?[0-9]+$)/.test(a.getAttribute('href'))).length,
+      // リンクは http(s)・ページ内・同じサイト（/ か、./ ../ の文書相対）・数字だけの電話番号だけ
+      badLinks: [...document.querySelectorAll('a[href]')].filter((a) => !/^(https?:|#|\/|\.\.?\/|tel:(%23)?[0-9]+$)/.test(a.getAttribute('href'))).length,
       bold: document.querySelectorAll('#result b').length
     }));
     expect(counts).toEqual({ img: 0, scripts: 0, handlers: 0, badLinks: 0, bold: 0 });

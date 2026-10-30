@@ -21,7 +21,7 @@ test('actual paintings and all three GLB models load without runtime or external
 test('sharing metadata has a bundled preview image and canonical URL',async({page,request})=>{
   await open(page);
   const canonical=await page.locator('link[rel="canonical"]').getAttribute('href');
-  expect(canonical).toBe('https://hundred-days.pages.dev/day-050-art-uncovered/');
+  expect(canonical).toBe('https://rairakku.com/100days/day-050-art-uncovered/');
   const preview=await request.get(`${base}screenshot.webp`);expect(preview.ok()).toBe(true);expect(preview.headers()['content-type']).toBe('image/webp');
 });
 test('portfolio links to the published Day050 app',async({page})=>{

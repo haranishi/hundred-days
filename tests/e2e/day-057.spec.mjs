@@ -100,7 +100,7 @@ test('a stable overflow gets its grace period, shares the actual score, and retr
   await page.clock.runFor(1600);await expect(page.locator('#veil')).toBeHidden();
   await page.clock.runFor(250);await expect(page.locator('#veil')).toBeVisible();
   const score=await page.locator('#score').innerText(),href=await page.locator('#sh-x').getAttribute('href');
-  expect(new globalThis.URL(href).searchParams.get('text')).toContain(score+'点');expect(new globalThis.URL(href).searchParams.get('url')).toBe('https://hundred-days.pages.dev/day-057-fruit-box/');
+  expect(new globalThis.URL(href).searchParams.get('text')).toContain(score+'点');expect(new globalThis.URL(href).searchParams.get('url')).toBe('https://rairakku.com/100days/day-057-fruit-box/');
   await page.locator('#sh-copy').click();await expect(page.locator('#share-said')).toContainText('コピー');
   await page.locator('#btn-again').click();await expect(page.locator('#veil')).toBeHidden();await expect(page.locator('#score')).toHaveText('0');await expect(page.locator('#frame')).toHaveAttribute('data-fruits','0');
 });

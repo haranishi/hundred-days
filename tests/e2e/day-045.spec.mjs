@@ -207,7 +207,7 @@ test('結果画面のX投稿リンクに点数・アプリ名・到達LVと講�
   await expect(x).toHaveAttribute('rel', 'noopener noreferrer');
   const href = await x.getAttribute('href');
   expect(href).toContain('https://x.com/intent/post?');
-  expect(href).toContain(encodeURIComponent('https://hundred-days.pages.dev/day-045-read-your-shots/'));
+  expect(href).toContain(encodeURIComponent('https://rairakku.com/100days/day-045-read-your-shots/'));
   const decoded = decodeURIComponent(href);
   expect(decoded).toContain('その撃ち方、読まれてる');
   expect(decoded).toContain(`${score}点`);

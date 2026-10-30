@@ -194,7 +194,7 @@ test('共有欄は全アプリ共通の部品が1つだけ。タイトルでは�
   await expect(page.locator('.title-col .share')).toHaveCount(1);
   const x = await share.getByRole('link', { name: 'Xで投稿' }).getAttribute('href');
   expect(decodeURIComponent(x)).toContain('江戸のクロスワード『ことば辻』。空いた辻に一字を入れる、腕試しでござる。');
-  expect(x).toContain(encodeURIComponent('https://hundred-days.pages.dev/day-053-kotoba-tsuji/'));
+  expect(x).toContain(encodeURIComponent('https://rairakku.com/100days/day-053-kotoba-tsuji/'));
   await page.click('[data-act="howto"]');
   await page.waitForSelector('[data-screen="howto"]');
   await expect(share).toHaveCount(1);

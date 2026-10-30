@@ -7,7 +7,7 @@ import { EXAMPLE, TAX_WALLS, AGE_BANDS, HEALTH, META, NOTES, SOURCES } from '../
 const DIR = 'day-069-nenshu-kabe';
 const PATH = `/${DIR}/`;
 const KEY = 'day069-nenshu-kabe:v1';
-const PUBLIC_URL = `https://hundred-days.pages.dev${PATH}`;
+const PUBLIC_URL = `https://rairakku.com/100days${PATH}`;
 const headers = existsSync('dist/_headers') ? readFileSync('dist/_headers', 'utf8') : '';
 const policy = (headers.split(`\n/${DIR}/*\n`)[1] ?? '').split('\n')[0].trim().replace('Content-Security-Policy: ', '');
 const yen = (value) => `${value.toLocaleString('ja-JP')}円`;
