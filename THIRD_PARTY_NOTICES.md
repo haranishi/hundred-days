@@ -169,3 +169,7 @@ PDF.jsのCMap・Foxitフォント・ICC・画像/色WASMは本体と別の許諾
 配布元・固定版・SHA-256はday-076-henkan-desk/source/vendor/liberation-fonts/provenance.mdを参照。
 公開物の許諾全文と各PDF資材への入口は[Day076のライセンス一覧](day-076-henkan-desk/licenses/index.html)。
 ユーザーの入力や結果の権利は移転せず、これらのライセンスを入力へ強制するものではない。
+
+## Day080 第五王子と、名もなき加護
+
+Pixel-Boy / AAAのNinja Adventure（CC0）、DotGothic16（OFL 1.1）、Phaser 4.2.1（MIT）を使用。詳細とライセンス全文は `day-080-fifth-prince/ASSETS.md`、`fonts/OFL.txt`、`licenses/phaser-LICENSE.md` を参照。

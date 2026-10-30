@@ -1,0 +1,21 @@
+import {test,expect,type Page} from '@playwright/test';
+import {freshState} from '../src/state';
+import {checkpoints} from './story-fixtures';
+import type {GameState} from '../src/types';
+async function boot(page:Page,state:GameState){await page.goto('/');await expect(page.locator('#loading')).toBeHidden();await page.evaluate(s=>localStorage.setItem('fifth-prince.save.v1',JSON.stringify(s)),state);await page.reload();await expect(page.locator('#loading')).toBeHidden();await page.locator('#continue').click();await expect(page.locator('#interact-button')).toBeEnabled();}
+const state=(page:Page)=>page.evaluate(()=>window.__FIFTH_PRINCE__());
+test('出入口の選択を矢印とEnterだけで取り消し・再表示・入退場できる',async({page})=>{
+ const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));await boot(page,{...freshState(),position:{x:696,y:344}});const before=(await state(page)).state.position;
+ await page.keyboard.press('e');const forward=page.locator('[data-choice="0"]'),back=page.locator('[data-choice="1"]');await expect(forward).toBeFocused();await page.keyboard.press('ArrowDown');await expect(back).toBeFocused();await page.waitForTimeout(100);expect((await state(page)).state.position).toEqual(before);await page.keyboard.press('Enter');await expect(page.locator('#modal')).toBeHidden();expect((await state(page)).state.zone).toBe('town');
+ await page.keyboard.press('e');await expect(forward).toBeFocused();await page.keyboard.press('ArrowUp');await expect(back).toBeFocused();await page.keyboard.press('ArrowLeft');await expect(forward).toBeFocused();await page.keyboard.press('ArrowRight');await expect(back).toBeFocused();await page.keyboard.press('Escape');await expect(page.locator('#modal')).toBeHidden();
+ await page.keyboard.press('e');await expect(forward).toBeFocused();await page.keyboard.press('Enter');await expect.poll(async()=>(await state(page)).state.zone).toBe('forest');
+ await page.keyboard.down('a');await expect.poll(async()=>(await state(page)).world.x).toBeLessThan(77);await page.keyboard.up('a');await expect(page.locator('#interact-button')).toBeEnabled();await page.keyboard.press('e');await expect(page.locator('#modal')).toContainText('王都へ戻る');await expect(forward).toBeFocused();await page.keyboard.press('Enter');await expect.poll(async()=>(await state(page)).state.zone).toBe('town');expect(errors).toEqual([]);
+});
+test('未解放の出入口では進むを選べず、矢印と決定で安全に戻れる',async({page})=>{
+ await boot(page,{...freshState(),position:{x:376,y:72}});await page.keyboard.press('e');const disabled=page.locator('[data-choice="0"]'),back=page.locator('[data-choice="1"]');await expect(disabled).toBeDisabled();await expect(back).toBeFocused();await page.keyboard.press('ArrowDown');await expect(back).toBeFocused();await page.keyboard.press('ArrowUp');await expect(back).toBeFocused();await page.keyboard.press('Enter');expect((await state(page)).state.zone).toBe('town');await expect(page.locator('#modal')).toBeHidden();
+});
+test('会話の三択も矢印で選べ、決定長押しで次の文を飛ばさず、320pxで選択が見える',async({page})=>{
+ await page.setViewportSize({width:320,height:740});await boot(page,{...checkpoints().bread,position:{x:184,y:264}});await page.keyboard.press('e');await page.keyboard.press('Enter');for(let i=0;i<4;i++)await page.keyboard.press('Enter');await expect(page.locator('.choice-list')).toBeVisible();await expect(page.locator('[data-choice="0"]')).toBeFocused();await page.keyboard.press('ArrowDown');await expect(page.locator('[data-choice="1"]')).toBeFocused();
+ expect(await page.locator('[data-choice="1"] .choice-cursor').evaluate(el=>getComputedStyle(el).opacity)).toBe('1');expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);await page.screenshot({path:'artifacts/v051-keyboard-choice-320.png'});
+ await page.keyboard.down('Space');await expect(page.locator('.dialogue-top')).toContainText('1 / 2');await expect(page.locator('#modal')).toContainText('エマさんとオルンさんなら');await page.keyboard.down('Space');await page.waitForTimeout(100);await expect(page.locator('.dialogue-top')).toContainText('1 / 2');await page.keyboard.up('Space');await page.keyboard.press('Enter');await expect(page.locator('.dialogue-top')).toContainText('2 / 2');await page.keyboard.press('e');await expect(page.locator('#modal')).toBeHidden();expect((await state(page)).state.flags).toContain('story:bread:order');
+});

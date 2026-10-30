@@ -113,6 +113,7 @@ Day 051「ハコニワ」も外部公開アプリです。本体は独立リポ�
 | 077 | 保安検査スワイパー — その荷物、機内？預け？没収？ | [day-077-hoan-swiper/](day-077-hoan-swiper/) | [アプリを開く](https://hundred-days.pages.dev/day-077-hoan-swiper/) |
 | 078 | 先に100 — 足して、100を取り合う。 | [day-078-saki-ni-100/](day-078-saki-ni-100/) | [アプリを開く](https://hundred-days.pages.dev/day-078-saki-ni-100/) |
 | 079 | あなたの普通、何％？ | [day-079-futsu-run/](day-079-futsu-run/) | [アプリを開く](https://hundred-days.pages.dev/day-079-futsu-run/) |
+| 080 | 第五王子と、名もなき加護 | [day-080-fifth-prince/](day-080-fifth-prince/) | [アプリを開く](https://hundred-days.pages.dev/day-080-fifth-prince/) |
 <!-- day-index:end -->
 
 ## 1日アプリのルール

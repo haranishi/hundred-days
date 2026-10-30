@@ -138,7 +138,8 @@ const codeFiles = (directory) => {
 };
 
 test('コードに書いてある接続先が、そのDayのCSPで許されている', () => {
-  const appsDir = fileURLToPath(new URL('../../', import.meta.url));
+  // 配信除外のsourceや開発ビルドを接続先と誤認しないよう、実際の公開物だけを読む。
+  const appsDir = dist;
   let checked = 0;
   for (const dir of publishedApps) {
     const sources = connectSources(dir);

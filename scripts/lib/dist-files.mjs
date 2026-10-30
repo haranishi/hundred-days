@@ -14,6 +14,7 @@ export const EXCLUDED_DIRS = ['tools/cache', 'tests', 'node_modules'];
 /* ソースから組み立てたビルド結果を同じフォルダに置いているDayは、ソースと生成ツールを配信しない。
    見るのはDayのフォルダ直下の名前だけ（リポジトリを置いた場所の名前に source が含まれていても外さない） */
 export const SOURCE_DIRS_BY_APP = {
+  'day-080-fifth-prince': ['source', 'tools'],
   'day-079-futsu-run': ['source', 'tools'],
   // Day76は固定lockfileから生成した静的成果物だけを配信する。
   'day-076-henkan-desk': ['source', 'tools'],

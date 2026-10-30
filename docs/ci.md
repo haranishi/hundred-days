@@ -12,6 +12,7 @@
 | 個人NGワード検査 | Secretsに登録した非公開語句の混入。同一リポジトリのPRとmainで実行 |
 | JavaScript構文チェック | 自作の `.js`・`.mjs`・`.cjs` の構文エラー |
 | 単体テスト | 各Dayのロジックと検査スクリプトの回帰 |
+| 依存監査 | ルート・source・動画toolsの全npm lockを照会し、high/critical・通信エラー・lock不整合を検出 |
 | ビルド | README一覧・共有ファイルの同期漏れと公開サイトの生成失敗 |
 | ブラウザテスト | 各Dayの既存テスト、共有機能、セキュリティヘッダなどの回帰 |
 
@@ -84,3 +85,10 @@ npx playwright show-trace path/to/test-results/test-name/trace.zip
 
 自動テストの成功は、これらの確認を済ませた証拠にはならない。
 未確認・問題が残る場合はPR本文に記載し、公開前チェックの方針に従って対応する。
+
+## 依存の継続監査
+`npm run audit:deps`は新しいDayも自動発見し、開発依存を含めて監査する。共通CIの必須チェックに接続し、別workflowでも毎日照会する。
+依存コードやinstall scriptは実行しない。勧告照会の通信失敗は成功扱いにせず、復旧後に再実行する。
+背景と再現は [.kiro/specs/dependency-audit-ci](../.kiro/specs/dependency-audit-ci/requirements.md) を参照。
+
+Day80のソース39件・固定lockからの公開物再生成・全40ブラウザも共通の必須集約に含める。sourceの検査が失敗するとデプロイへ進まない。

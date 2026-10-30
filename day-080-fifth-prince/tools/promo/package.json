@@ -1,0 +1,23 @@
+{
+  "name": "day080-promo",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "capture": "node --import ../../source/node_modules/tsx/dist/loader.mjs capture.ts",
+    "audio": "node --import ../../source/node_modules/tsx/dist/loader.mjs audio.ts",
+    "stills": "node render.mjs --stills",
+    "render": "node render.mjs",
+    "audit": "node audit.mjs"
+  },
+  "overrides": {
+    "fast-uri": "3.1.9",
+    "zod": "4.6.6"
+  },
+  "dependencies": {
+    "@remotion/bundler": "4.0.535",
+    "@remotion/renderer": "4.0.535",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
+    "remotion": "4.0.535"
+  }
+}

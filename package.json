@@ -8,12 +8,13 @@
     "index:sync": "node scripts/sync-day-index.mjs",
     "precheck": "node scripts/precheck.mjs",
     "check:syntax": "node scripts/check-syntax.mjs",
-    "check": "npm run precheck && npm run check:syntax && npm run test:unit && npm run build",
+    "check": "npm run precheck && npm run check:syntax && npm run test:unit && npm run audit:deps && npm run build",
     "test:unit": "node --test scripts/tests/*.test.mjs day-*/tests/",
     "test:e2e": "playwright test",
     "publish:check": "node scripts/publish-check.mjs",
     "x:prepare": "node scripts/prepare-x-post.mjs",
-    "shared:sync": "node scripts/sync-shared.mjs"
+    "shared:sync": "node scripts/sync-shared.mjs",
+    "audit:deps": "node scripts/audit-dependencies.mjs"
   },
   "devDependencies": {
     "@playwright/test": "1.62.1"

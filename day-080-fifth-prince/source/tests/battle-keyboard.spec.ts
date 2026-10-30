@@ -1,0 +1,39 @@
+import {test,expect,type Page} from '@playwright/test';
+import {freshState,maxHp} from '../src/state';
+import {checkpoints,finishEpisode} from './story-fixtures';
+import {openTalk} from './helpers';
+import type {GameState} from '../src/types';
+const snap=(p:Page)=>p.evaluate(()=>window.__FIFTH_PRINCE__());
+async function boot(p:Page,s:GameState){await p.goto('/');await expect(p.locator('#loading')).toBeHidden();await p.evaluate(s=>localStorage.setItem('fifth-prince.save.v1',JSON.stringify(s)),s);await p.reload();await expect(p.locator('#loading')).toBeHidden();await p.locator('#continue').click();await expect(p.locator('#interact-button')).toBeEnabled();}
+async function read(p:Page){for(let i=0;i<40;i++){const next=p.locator('[data-next]');if(!await next.isVisible())return;await p.keyboard.press('Enter');}}
+async function start(p:Page){await p.keyboard.press('e');await openTalk(p);await read(p);await p.keyboard.press('Enter');await expect(p.locator('.battle-v2')).toHaveClass(/visuals-ready/);await expect(p.locator('[data-command="attack"]')).toBeFocused();await expect(p.locator('.fighter-hero')).toHaveCSS('opacity','1');}
+async function nextTurn(p:Page,turn:number){await expect.poll(async()=>(await snap(p)).state.battle?.turn).toBe(turn);await expect(p.locator('[data-command="attack"]')).toBeEnabled();}
+test('戦闘の矢印選択は使用不可を飛ばし、演出中と長押しで次ターンを実行しない',async({page})=>{
+ await boot(page,{...freshState(),zone:'forest',position:{x:584,y:168},inventory:{wheat:0,herb:0,crystal:0,potion:0}});await start(page);await expect(page.locator('[data-command="support"]')).toBeDisabled();await expect(page.locator('[data-command="potion"]')).toBeDisabled();
+ await page.keyboard.press('ArrowRight');await expect(page.locator('[data-command="guard"]')).toBeFocused();await page.keyboard.press('ArrowDown');await expect(page.locator('[data-command="guard"]')).toBeFocused();
+ await page.keyboard.down('Enter');await page.keyboard.press('ArrowLeft');await page.keyboard.down('Enter');await nextTurn(page,2);await expect(page.locator('[data-command="guard"]')).toBeFocused();await page.keyboard.down('Enter');await page.waitForTimeout(150);expect((await snap(page)).state.battle!.turn).toBe(2);await page.keyboard.up('Enter');
+ await page.keyboard.press('Space');await nextTurn(page,3);await expect(page.locator('[data-command="guard"]')).toBeFocused();await page.screenshot({path:'artifacts/v052-battle-keyboard-desktop.png'});
+});
+test('人物の話題選択から試練へ進み、配置通りのコマンド選択と勝利後の決定ができる',async({page})=>{
+ await boot(page,{...checkpoints().trials,zone:'palace',position:{x:216,y:248}});await start(page);
+ await page.keyboard.press('ArrowRight');await page.keyboard.press('ArrowRight');await expect(page.locator('[data-command="support"]')).toBeFocused();await page.keyboard.press('Enter');await nextTurn(page,2);await expect(page.locator('[data-command="attack"]')).toBeFocused();
+ await page.keyboard.press('ArrowRight');await page.keyboard.press('Enter');await nextTurn(page,3);await expect(page.locator('[data-command="guard"]')).toBeFocused();
+ await page.keyboard.press('ArrowLeft');await page.keyboard.press('Enter');await nextTurn(page,4);await page.keyboard.press('ArrowRight');await page.keyboard.press('ArrowRight');await expect(page.locator('[data-command="support"]')).toBeFocused();await page.keyboard.press('Enter');await expect(page.locator('#battle-finish')).toBeVisible();await expect(page.locator('#battle-finish')).toBeFocused();
+ await page.keyboard.press('Enter');await read(page);await expect(page.locator('#modal')).toBeHidden();expect((await snap(page)).state.brothers).toContain('flame');await expect(page.locator('#interact-button')).toBeEnabled();await page.keyboard.press('e');await expect(page.locator('[data-choice-action="talk"]')).toBeFocused();await page.keyboard.press('Escape');await expect(page.locator('#modal')).toBeHidden();
+});
+test('320pxの最終戦で技を選べ、敗北後も再挑戦と冒険に戻るを矢印で決定できる',async({page})=>{
+ test.setTimeout(120000);await page.setViewportSize({width:320,height:740});const before=finishEpisode(checkpoints().citadel,'citadel');await boot(page,{...before,position:{x:376,y:200}});await start(page);
+ await page.keyboard.press('ArrowDown');await expect(page.locator('[data-command="support"]')).toBeFocused();await page.keyboard.press('ArrowRight');await expect(page.locator('[data-command="potion"]')).toBeFocused();await page.keyboard.press('ArrowUp');await expect(page.locator('[data-command="guard"]')).toBeFocused();await page.screenshot({path:'artifacts/v052-battle-keyboard-320.png'});expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+ // Attack only deliberately loses to the final boss; use normal actions to reach the result UI.
+ const lose=async()=>{for(let i=0;i<30;i++){const s=(await snap(page)).state;if(s.battle!.result!=='active')break;const attack=page.locator('[data-command="attack"]');if(!await attack.evaluate(el=>el===document.activeElement)){await page.keyboard.press('ArrowLeft');}await page.keyboard.press('Enter');await expect(page.locator('[data-command="attack"]:enabled,#battle-finish')).toBeVisible();}expect((await snap(page)).state.battle!.result).toBe('lost');await expect(page.locator('#battle-finish')).toBeVisible();};
+ await page.keyboard.press('ArrowLeft');await lose();await expect(page.locator('#battle-finish')).toBeFocused();await page.keyboard.press('ArrowRight');await expect(page.locator('#battle-retreat')).toBeFocused();await page.keyboard.press('ArrowLeft');await page.keyboard.down('Enter');await expect(page.locator('[data-command="attack"]')).toBeFocused();await page.keyboard.down('Enter');await page.waitForTimeout(200);expect((await snap(page)).state.battle!.turn).toBe(1);expect((await snap(page)).state.battle!.hp).toBe(maxHp((await snap(page)).state));await page.keyboard.up('Enter');
+ await lose();await page.keyboard.press('ArrowDown');await expect(page.locator('#battle-retreat')).toBeFocused();await page.screenshot({path:'artifacts/v052-battle-retreat-320.png'});const box=await page.locator('#battle-retreat').boundingBox();expect(box!.y+box!.height).toBeLessThanOrEqual(740);await page.keyboard.press('Enter');await expect(page.locator('#modal')).toBeHidden();expect((await snap(page)).state.battle).toBeNull();expect((await snap(page)).state.flags).not.toContain('ended');
+});
+test('話しかけた時点で話す・別れるを選べ、戻っただけでは発見報酬を受け取らない',async({page})=>{
+ await boot(page,{...freshState(),position:{x:280,y:440}});const before=(await snap(page)).state;await page.keyboard.press('e');await expect(page.locator('[data-choice-action="talk"]')).toBeFocused();await page.keyboard.press('Escape');await expect(page.locator('#modal')).toBeHidden();expect((await snap(page)).state.xp).toBe(before.xp);expect((await snap(page)).state.flags).toEqual(before.flags);
+ await page.keyboard.press('e');await page.keyboard.press('Enter');await expect(page.locator('#modal')).toContainText('パン屋のお姉ちゃん');await read(page);expect((await snap(page)).state.xp).toBe(before.xp+5);await page.keyboard.press('e');await page.keyboard.press('Enter');await read(page);expect((await snap(page)).state.xp).toBe(before.xp+5);
+});
+
+test('戦闘画像の読み込み失敗でも、キーボードで安全な記録へ再開できる',async({page})=>{
+ await boot(page,{...freshState(),zone:'forest',position:{x:584,y:168}});await page.route('**/assets/enemies/bramble.png',route=>route.abort());await page.keyboard.press('e');await page.keyboard.press('Enter');const recover=page.getByRole('button',{name:'戦闘前の記録から再開する'});await expect(recover).toBeVisible();await expect(recover).toBeFocused();await page.unroute('**/assets/enemies/bramble.png');await Promise.all([page.waitForEvent('load'),page.keyboard.press('Enter')]);await expect(page.locator('#loading')).toBeHidden();await expect(page.locator('#continue')).toBeVisible();expect((await snap(page)).state.battle).toBeNull();await page.locator('#continue').click();expect((await snap(page)).state.zone).toBe('forest');
+});

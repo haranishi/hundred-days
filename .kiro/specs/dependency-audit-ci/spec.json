@@ -1,0 +1,42 @@
+{
+  "feature_name": "dependency-audit-ci",
+  "language": "ja",
+  "phase": "implemented-verified-locally",
+  "created_at": "2026-10-30",
+  "approvals": {
+    "requirements": {
+      "generated": true,
+      "approved": true
+    },
+    "design": {
+      "generated": true,
+      "approved": true
+    },
+    "tasks": {
+      "generated": true,
+      "approved": true
+    }
+  },
+  "approval_basis": "本人の警告修正・原因調査・再発防止CIとテスト整備の明示依頼、および自律進行の共通ルールによる。",
+  "updated_at": "2026-10-30",
+  "delivery": {
+    "repository": "haranishi/hundred-days",
+    "base": "main",
+    "branch": "feat/day-080-fifth-prince",
+    "remote_evidence": "PR checks, merge state and deployment run are the authoritative release record"
+  },
+  "validation": {
+    "root_unit": {
+      "pass": 4981,
+      "skip": 1,
+      "fail": 0
+    },
+    "dependency_projects": 12,
+    "known_advisories": 0,
+    "game_unit": 39,
+    "production_cases": 4,
+    "publish_gate_cases": 318,
+    "independent_dependency_review": "passed after missing-graph/peer-only/invalid-type fixes",
+    "independent_media_review": "14 representative frames, then 6 corrected frames; no P1/P2; audio listening not performed"
+  }
+}
