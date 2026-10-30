@@ -25,7 +25,7 @@ export function findRootRelativeRefs(distDir) {
         // Quoted strings/attributes, unquoted attributes, and CSS url(). Match at
         // the start of a value, not arbitrary slashes inside an external URL.
         const refs = /["'`]\s*(\/[^\s"'`<>]*)|\burl\(\s*(\/[^\s)"']*)|=\s*(\/[^\s>"'`]*)/gi;
-        // サイトのルート（href="/"）は、1段下の配信では別のサイト（ライラックのホーム）を指す。JS内の "/" は対象にしない。
+        // サイトのルート（href="/"）は、1段下の配信では別のサイト（rairakku.com のホーム）を指す。JS内の "/" は対象にしない。
         if (extname(entry.name) === '.html') {
           for (const match of source.matchAll(/\b(?:href|src|action)\s*=\s*(["'])\/\1/gi)) {
             violations.push({ file: next.join('/'), line: source.slice(0, match.index).split('\n').length, value: '/' });
