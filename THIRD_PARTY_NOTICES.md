@@ -1,5 +1,18 @@
 # 第三者データ・素材
 
+## このリポジトリのライセンスと、MITの対象外になるもの
+
+このリポジトリのソースコードは、[LICENSE](LICENSE) の MIT ライセンスです。
+
+Day056の配信ビルドに含む第三者ライブラリ・移植実装・検索画像には、`day-056-dragon-rush/game/licenses/` の個別の許諾が適用されます。
+
+ただし `day-*/data/` と `day-*/tests/fixtures/` 配下の第三者データと、`day-053-kotoba-tsuji/fonts/` と `static/assets/fonts/` の書体（SIL Open Font License 1.1）、`day-054-what-vanished/assets/` の3Dモデルと質感画像（Poly Haven・CC0 1.0）は MIT の対象外で、それぞれ別のライセンスが適用されます。内訳は、このファイルの下表にあります。とくに次の2つは、再配布するときに条件が付きます。
+
+- `day-036-stroke-by-stroke/data/` は CC BY-SA 3.0（継承あり）
+- `day-008-vending-radar/data/`、`day-029-nearby-wifi/data/`、`day-030-world-window/data/` は ODbL 1.0（OpenStreetMap 由来）
+
+## 利用しているデータ・素材の一覧
+
 このリポジトリで利用している第三者のデータ・素材について、各アプリ内のREADME、画面上の出典表示、生成ツールおよび `meta.json` に記録されている範囲をまとめます。各データ・素材には、下表のライセンスまたは利用規約が適用されます。
 
 | Day | 使っているデータ・素材 | 提供元 | ライセンスまたは利用規約 | このリポジトリでの改変 |

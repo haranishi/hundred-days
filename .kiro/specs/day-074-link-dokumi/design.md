@@ -86,7 +86,8 @@ tests/e2e/day-074.spec.mjs
 4. 最終応答：許可リストのヘッダーだけ取り出す（`LIMITS`で値を切る）。`Set-Cookie`は名前と属性だけ（値は捨てる）。HTMLなら先頭64KiBを読み、`html-facts`で事実に落とす。HTML以外は本文を読まず`cancel()`。
 5. 返すJSONは `MAX_RESPONSE_BYTES` 以下。超えるなら配列を削る。
 6. `around`：転送先のホストについて、DNS（A/AAAA/TXT:SPF・_dmarc/CAA/DNSSEC）、RDAP登録日、`http://`の転送、`/.well-known/security.txt` を**並列**に取る。各々に`AUX_TIMEOUT_MS`。失敗は`unavailable`として返し、全体は200で返す。RDAPは登録ドメインごとに24時間キャッシュ（`.com`/`.net`はVerisign、ほかは`rdap.org`。先頭で取れない場合は`unavailable`）。DoHへ渡すのは名前だけで、パス・クエリは渡さない。
-7. キャッシュ・レート制限の鍵はURLや`CF-Connecting-IP`をそのまま使わず、SHA-256のハッシュにする。ログ（`console`）にURL・IP・ホストを出さない。
+7. 2026-10-30追加: 共通API Middlewareが検証したcontext.data.apiAbuseClientをPages入口で受け、12回/分の鍵にも使う。未検証の要求ヘッダーは使わない。共通の設計は../api-abuse-protection/design.md。
+8. キャッシュ・レート制限の鍵はURLや`CF-Connecting-IP`をそのまま使わず、SHA-256のハッシュにする。ログ（`console`）にURL・IP・ホストを出さない。
 
 ## ブラウザ
 - `app.js` は状態（phase）を持つ薄い制御だけ。描画は取得文字列を**必ず`textContent`**で入れる。`innerHTML`・`insertAdjacentHTML`・`outerHTML`・`document.write`・`eval`・`new Function`を使わない（単体テストでソースを走査して固定）。

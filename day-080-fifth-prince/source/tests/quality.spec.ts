@@ -13,9 +13,39 @@ test('戦闘絵の表示と二重入力の防止、ターン間の描画維持',
 test('歩行中と停止後に進行方向を向き、複数の歩行コマが使われる',async({page})=>{
  await page.goto('/');await expect(page.locator('#loading')).toBeHidden();await page.locator('#new-game').click();await finishOpening(page);
  for(const [key,facing] of [['d',3],['s',0],['a',2],['w',1]] as const){
-  const frames=new Set<number>();await page.keyboard.down(key);
-  for(let n=0;n<6;n++){await page.waitForTimeout(100);const {world}=await page.evaluate(()=>window.__FIFTH_PRINCE__());expect(world.facing).toBe(facing);expect(world.frame%4).toBe(facing);frames.add(world.frame);}
-  await page.keyboard.up(key);await page.waitForTimeout(80);const {world}=await page.evaluate(()=>window.__FIFTH_PRINCE__());expect(world.frame).toBe(facing);expect(frames.size).toBeGreaterThan(1);
+  // Node側の固定間隔では描画コマを取り逃すため、画面の更新ごとに観測する。
+  await page.evaluate(()=>{
+   const start=window.__FIFTH_PRINCE__().world;
+   const observed={frames:[] as number[],facings:[] as number[],distance:0,raf:0};
+   (window as any).__qualityWalk=observed;
+   const sample=()=>{
+    const {world}=window.__FIFTH_PRINCE__();
+    if(world.moving){
+     if(!observed.frames.includes(world.frame))observed.frames.push(world.frame);
+     if(!observed.facings.includes(world.facing))observed.facings.push(world.facing);
+     observed.distance=Math.max(observed.distance,Math.hypot(world.x-start.x,world.y-start.y));
+    }
+    observed.raf=requestAnimationFrame(sample);
+   };
+   observed.raf=requestAnimationFrame(sample);
+  });
+  await page.keyboard.down(key);
+  try{
+   await expect.poll(()=>page.evaluate(()=>(window as any).__qualityWalk.frames.length),{intervals:[25,50,100]}).toBeGreaterThan(1);
+   const observed=await page.evaluate(()=>{
+    const {frames,facings,distance}=(window as any).__qualityWalk;
+    return {frames:frames as number[],facings:facings as number[],distance:distance as number};
+   });
+   expect(observed.facings).toEqual([facing]);
+   expect(observed.frames.every(frame=>frame%4===facing)).toBe(true);
+   expect(observed.distance).toBeGreaterThan(1);
+  }finally{
+   await page.keyboard.up(key);
+   await page.evaluate(()=>{cancelAnimationFrame((window as any).__qualityWalk.raf);delete (window as any).__qualityWalk;});
+  }
+  await expect.poll(()=>page.evaluate(()=>{
+   const {world}=window.__FIFTH_PRINCE__();return {facing:world.facing,frame:world.frame,moving:world.moving};
+  }),{intervals:[25,50,100]}).toEqual({facing,frame:facing,moving:false});
  }
  await page.screenshot({path:'artifacts/v2-walking.png'});
 });

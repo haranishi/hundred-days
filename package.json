@@ -14,7 +14,8 @@
     "publish:check": "node scripts/publish-check.mjs",
     "x:prepare": "node scripts/prepare-x-post.mjs",
     "shared:sync": "node scripts/sync-shared.mjs",
-    "audit:deps": "node scripts/audit-dependencies.mjs"
+    "audit:deps": "node scripts/audit-dependencies.mjs",
+    "test:api-abuse": "node scripts/test-api-abuse-runtime.mjs"
   },
   "devDependencies": {
     "@playwright/test": "1.62.1"
