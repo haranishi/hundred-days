@@ -1,7 +1,7 @@
 {
   "feature_name": "api-abuse-protection",
   "language": "ja",
-  "phase": "implemented-verified-locally",
+  "phase": "implemented-verified-preview",
   "created_at": "2026-10-30",
   "approvals": {
     "requirements": {
@@ -21,7 +21,11 @@
   "delivery": {
     "repository": "haranishi/hundred-days",
     "base": "main",
-    "branch": "fix/api-bot-protection"
+    "branch": "fix/api-bot-protection",
+    "pull_request": 186,
+    "relay_pull_request": 39,
+    "production": "pending-owner-approval",
+    "remote_evidence": "PR checks, merge state and deployment history are authoritative"
   },
   "validation": {
     "root_unit_pass": 5034,
@@ -32,6 +36,13 @@
     "proxy_compiled_runtime": 1,
     "dependency_projects": 12,
     "known_advisories": 0,
-    "review_findings_fixed": 2
+    "review_findings_fixed": 2,
+    "paired_preview_cases": 16,
+    "preview_rate_200_before_429": 20,
+    "preview_recovery_after_seconds": 9,
+    "walking_normal_repeats": 3,
+    "walking_slow_frame_ms": 500,
+    "game_unit_pass": 39,
+    "static_release_diff_files": 0
   }
 }
