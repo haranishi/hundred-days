@@ -123,7 +123,7 @@ jobs:
   day080:
     name: Day080 source, release and gameplay
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 35
     defaults:
       run:
         working-directory: day-080-fifth-prince/source

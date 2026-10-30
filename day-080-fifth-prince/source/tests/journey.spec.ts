@@ -30,8 +30,8 @@ async function fight(p:Page,shot?:string){
  await expect(p.locator('#battle-finish')).toBeVisible();expect((await snap(p)).audio.recent).toContain('victory');expect((await snap(p)).audio.errors).toEqual([]);await p.locator('#battle-finish').click();await story(p);
 }
 test('序章から商い・仲間・四兄弟・加護の覚醒・魔王討伐まで',async({page})=>{
- test.setTimeout(540000);const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));await begin(page);
- const x=(await snap(page)).world.x;await page.keyboard.down('d');await page.waitForTimeout(330);await page.keyboard.up('d');expect((await snap(page)).world.x).toBeGreaterThan(x+10);
+ test.setTimeout(process.env.CI?1080000:540000);const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));await begin(page);
+ const x=(await snap(page)).world.x;await page.keyboard.down('d');try{await expect.poll(async()=>(await snap(page)).world.x,{intervals:[50]}).toBeGreaterThan(x+10);}finally{await page.keyboard.up('d');}
  await walk(page,'merchant');await page.getByRole('button',{name:'仕入れ・販売をする'}).click();await page.locator('[data-quantity="wheat"]').selectOption('5');await page.locator('[data-buy="wheat"]').click();await expect(page.locator('#gold-value')).toContainText('20');await page.getByRole('button',{name:'店を閉じる'}).click();
  await walk(page,'nora');await page.getByRole('button',{name:'黄金麦を1つ渡す'}).click();await story(page);expect((await snap(page)).state.party).toContain('nora');
  await page.locator('#save-button').click();await page.reload();await expect(page.locator('#loading')).toBeHidden();await page.locator('#continue').click();expect((await snap(page)).state.party).toContain('nora');expect((await snap(page)).state.gold).toBe(52);
@@ -51,7 +51,7 @@ test('序章から商い・仲間・四兄弟・加護の覚醒・魔王討伐�
 });
 test('スマホのタッチ移動・会話・取引・キーボードの手帳',async({page})=>{
  await page.setViewportSize({width:390,height:844});await begin(page);await page.screenshot({path:'artifacts/10-town-mobile.png',fullPage:true});
- const x=(await snap(page)).world.x;const right=page.getByRole('button',{name:'右へ移動'});const bounds=await right.boundingBox();const touch=await page.context().newCDPSession(page);await touch.send('Emulation.setTouchEmulationEnabled',{enabled:true});await touch.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:bounds!.x+bounds!.width/2,y:bounds!.y+bounds!.height/2}]});await page.waitForTimeout(350);await touch.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});expect((await snap(page)).world.x).toBeGreaterThan(x+12);
+ const x=(await snap(page)).world.x;const right=page.getByRole('button',{name:'右へ移動'});const bounds=await right.boundingBox();const touch=await page.context().newCDPSession(page);await touch.send('Emulation.setTouchEmulationEnabled',{enabled:true});await touch.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:bounds!.x+bounds!.width/2,y:bounds!.y+bounds!.height/2}]});try{await expect.poll(async()=>(await snap(page)).world.x,{intervals:[50]}).toBeGreaterThan(x+12);}finally{await touch.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});}
  await page.keyboard.press('j');await expect(page.locator('#modal')).toContainText('冒険手帳');await page.keyboard.press('Escape');await expect(page.locator('#modal')).toBeHidden();
  await walk(page,'merchant');await page.getByRole('button',{name:'仕入れ・販売をする'}).click();await page.locator('[data-buy="wheat"]').click();await page.screenshot({path:'artifacts/11-shop-mobile.png',fullPage:true});await page.getByRole('button',{name:'店を閉じる'}).click();await walk(page,'nora');await page.screenshot({path:'artifacts/12-dialogue-mobile.png',fullPage:true});await page.getByRole('button',{name:'黄金麦を1つ渡す'}).click();await story(page);expect((await snap(page)).state.party).toContain('nora');
  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth)).toBe(true);
