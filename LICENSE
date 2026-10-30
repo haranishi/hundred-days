@@ -1,20 +1,3 @@
-このリポジトリのソースコードは、以下の MIT ライセンスです。
-
-Day056の配信ビルドに含む第三者ライブラリ・移植実装・検索画像には、
-day-056-dragon-rush/game/licenses/ の個別の許諾が適用されます。
-
-ただし day-*/data/ と day-*/tests/fixtures/ 配下の第三者データと、
-day-053-kotoba-tsuji/fonts/ と static/assets/fonts/ の書体（SIL Open Font License 1.1）、
-day-054-what-vanished/assets/ の3Dモデルと質感画像（Poly Haven・CC0 1.0）は MIT の対象外で、
-それぞれ別のライセンスが適用されます。内訳は THIRD_PARTY_NOTICES.md にあります。
-とくに次の2つは、再配布するときに条件が付きます。
-
-  - day-036-stroke-by-stroke/data/ は CC BY-SA 3.0（継承あり）
-  - day-008-vending-radar/data/、day-029-nearby-wifi/data/、
-    day-030-world-window/data/ は ODbL 1.0（OpenStreetMap 由来）
-
----
-
 MIT License
 
 Copyright (c) 2026 haranishi
