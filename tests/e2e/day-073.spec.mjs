@@ -106,7 +106,7 @@ test('all controls fit 390, 768 and 1440px and shared links use the published UR
   await page.getByRole('button', { name: 'このアプリを共有する', exact: true }).click();
   await expect(page.locator('.share')).toHaveCount(1);
   const x = page.locator('.share').getByRole('link', { name: 'Xで投稿' });
-  expect(decodeURIComponent(await x.getAttribute('href'))).toContain('https://hundred-days.pages.dev/day-073-offbeat/');
+  expect(decodeURIComponent(await x.getAttribute('href'))).toContain('https://rairakku.com/100days/day-073-offbeat/');
 });
 
 

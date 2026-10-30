@@ -157,7 +157,7 @@ test('カレーライスを正直に答えると当たり、料理の絵と決�
   const href = new URL(await x.getAttribute('href'));
   expect(`${href.origin}${href.pathname}`).toBe('https://x.com/intent/post');
   expect(href.searchParams.get('text')).toBe(`いま食べたいもの、当てます — 水晶玉に「カレーライス」を${result.count}問で見抜かれた。`);
-  expect(href.searchParams.get('url')).toBe(`https://hundred-days.pages.dev/${DIR}/`);
+  expect(href.searchParams.get('url')).toBe(`https://rairakku.com/100days/${DIR}/`);
 
   const memory = await stored(page);
   expect(memory).toMatchObject({ v: 1, plays: 1, wins: 1, custom: [] });
@@ -795,7 +795,7 @@ test('共通の共有欄は1つだけで、結果の共有行はその外に置�
   await page.getByRole('button', { name: '結果をコピー' }).click();
   await expect(page.locator('#result-said')).toHaveText('結果をコピーしました');
   expect(await page.evaluate(() => navigator.clipboard.readText()))
-    .toBe(`いま食べたいもの、当てます — 水晶玉に「たこ焼き」を${count}問で見抜かれた。\nhttps://hundred-days.pages.dev/${DIR}/`);
+    .toBe(`いま食べたいもの、当てます — 水晶玉に「たこ焼き」を${count}問で見抜かれた。\nhttps://rairakku.com/100days/${DIR}/`);
 });
 
 test('「最初から」は舞台の右上にあり、3問以上答えていたら確かめてから始めの画面へ戻る', async ({ page }) => {

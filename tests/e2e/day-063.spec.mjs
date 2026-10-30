@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 import { RULES_LINE, S_TIME_LIMIT_SEC, STAGES } from '../../day-063-dark-patterns/lib/stages.js';
 
 const PATH = '/day-063-dark-patterns/';
-const CANONICAL = 'https://hundred-days.pages.dev/day-063-dark-patterns/';
+const CANONICAL = 'https://rairakku.com/100days/day-063-dark-patterns/';
 // 現場名のカットイン。この間は偽サイトが inert（操作できない）で、制限時間も進まない
 const CUTIN_MS = 1000;
 // 結果画面を出した直後に入力を受け付けない時間（app.js の RESULT_GUARD_MS）

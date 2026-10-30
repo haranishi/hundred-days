@@ -19,3 +19,5 @@ PR前の自動検査とマージ条件は [CI手順](docs/ci.md) を参照する
 - 本人が下書きを指定しない限り、公開ゲートを通した`status: "published"`の状態でPRを出す。マージとX投稿は本人が行う。
 - 下書きのまま出すときは、最終報告の冒頭で「このPRをマージしても本番には出ない」と伝える。
 - 公開時に新しい契約違反が見つかったら、同じPRで`scripts/lib/publish-contract.mjs`に契約として足す。理由と事故は [公開の契約](.kiro/steering/publish-contract.md) に残す。
+
+- 公開物の中のサイト内参照は文書相対にする。ルート直下の絶対パスを書かない（`/api/day-NNN/` だけ例外）。`npm run build` が検査する。

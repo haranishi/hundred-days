@@ -25,7 +25,7 @@ test('published path loads railway reconstruction, share links and only runtime 
  await page.addInitScript(state=>localStorage.setItem('day68-story-episode1-v1',JSON.stringify(state)),actOne());
  const response=await page.goto('./');expect(response.status()).toBe(200);
  await expect(page.locator('body')).toHaveAttribute('data-ready','true');
- await expect(page.locator('link[rel=canonical]')).toHaveAttribute('href','https://hundred-days.pages.dev/day-068-timetable-alibi/');
+ await expect(page.locator('link[rel=canonical]')).toHaveAttribute('href','https://rairakku.com/100days/day-068-timetable-alibi/');
  await page.locator('#rail-button').click();await page.locator('#rail-map-tab').click();
  await expect(page.locator('#world')).toHaveAttribute('data-ready','true');
  await expect(page.locator('.station-marker')).toHaveCount(5);

@@ -12,6 +12,7 @@
     "education"
   ],
   "status": "published",
+  "mount": false,
   "publicUrl": "https://hundred-days.pages.dev/day-064-breach-atlas/",
   "screenshot": "screenshot.png",
   "startedAt": "2026-10-11",

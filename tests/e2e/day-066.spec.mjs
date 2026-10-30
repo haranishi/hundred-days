@@ -18,7 +18,7 @@ import { PROTECTED_WORDS, PROTECTED_PATTERNS } from '../../day-066-hakokage-kait
 
 const DIR = 'day-066-hakokage-kaito';
 const PATH = `/${DIR}/`;
-const PUBLIC_URL = `https://hundred-days.pages.dev/${DIR}/`;
+const PUBLIC_URL = `https://rairakku.com/100days/${DIR}/`;
 const STORAGE = 'hakokageKaito.v1';
 const headers = readFileSync('dist/_headers', 'utf8');
 const policy = (headers.split(`\n/${DIR}/*\n`)[1] ?? '').split('\n')[0].trim().replace('Content-Security-Policy: ', '');

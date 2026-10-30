@@ -1,7 +1,7 @@
 // A static host can return the portfolio with HTTP 200 for a missing app.
 // The build injects the app's canonical URL, so require that exact identity.
-export function verifyPublicPage(html,expectedUrl){
- const expected=new URL(expectedUrl);expected.hash='';expected.search='';
+export function verifyPublicPage(html,expectedUrl,expectedCanonical=expectedUrl){
+ const expected=new URL(expectedCanonical);expected.hash='';expected.search='';
  const links=String(html).match(/<link\b[^>]*>/gi)||[];
  for(const link of links){
   const attrs=new Map();

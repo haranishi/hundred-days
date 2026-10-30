@@ -172,7 +172,7 @@ const checkUrl = async (url, label, app = false) => {
   let identity = {};
   if (app) {
     try {
-      identity = verifyPublicPage(await response.text(), url);
+      identity = verifyPublicPage(await response.text(), url, meta.mount === false ? url : `${(process.env.HD_CANONICAL_BASE || 'https://rairakku.com/100days').replace(/\/+$/, '')}/${dir}/`);
     } catch (error) {
       fail(`${label}の公開確認に失敗: ${error.message}`);
     }
