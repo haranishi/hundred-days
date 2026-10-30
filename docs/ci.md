@@ -92,3 +92,5 @@ npx playwright show-trace path/to/test-results/test-name/trace.zip
 背景と再現は [.kiro/specs/dependency-audit-ci](../.kiro/specs/dependency-audit-ci/requirements.md) を参照。
 
 Day80のソース39件・固定lockからの公開物再生成・全40ブラウザも共通の必須集約に含める。sourceの検査が失敗するとデプロイへ進まない。
+
+Day80の公開版4件は、1番目のブラウザ分割で `/100days/` でも実行する。手元では `npx playwright test --config playwright.day080-mounted.config.mjs` で再現する。
