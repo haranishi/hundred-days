@@ -20,6 +20,7 @@ const rows = readdirSync(root, { withFileTypes: true })
   .sort((a, b) => a.name.localeCompare(b.name))
   .map(({ name: dir }) => {
     const meta = JSON.parse(readFileSync(join(root, dir, 'meta.json'), 'utf8'));
+    if (meta.mount !== undefined && typeof meta.mount !== 'boolean') throw new Error(`mountはbooleanで指定してください: ${dir}`);
     const day = Number(dir.slice(4, 7));
     if (meta.day !== day || seen.has(day)) throw new Error(`Day番号の不一致または重複: ${dir}`);
     seen.add(day);

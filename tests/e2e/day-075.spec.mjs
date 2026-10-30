@@ -4,7 +4,7 @@ import {createState,move} from '../../day-075-amegumo-sokoban/lib/game.js';
 import {campaignEvents} from '../../day-075-amegumo-sokoban/lib/campaign-view.js';
 
 const base='/day-075-amegumo-sokoban/';
-const publicURL='https://hundred-days.pages.dev'+base;
+const publicURL='https://rairakku.com/100days'+base;
 const progressKey='amegumo-sokoban.v1',guideKey='amegumo-sokoban.guide.v1',audioKey='amegumo-sokoban.audio.v1';
 const keys={up:'ArrowUp',right:'ArrowRight',down:'ArrowDown',left:'ArrowLeft'};
 const legacy=Object.fromEntries(LEVELS.slice(0,3).map(level=>[level.id,level.par]));

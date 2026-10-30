@@ -14,7 +14,7 @@ import { stepIcons } from '../../day-065-teikoku-gohan/lib/recipes.js';
 
 const DIR = 'day-065-teikoku-gohan';
 const PATH = `/${DIR}/`;
-const PUBLIC_URL = `https://hundred-days.pages.dev/${DIR}/`;
+const PUBLIC_URL = `https://rairakku.com/100days/${DIR}/`;
 const headers = readFileSync('dist/_headers', 'utf8');
 const policy = (headers.split(`\n/${DIR}/*\n`)[1] ?? '').split('\n')[0].trim().replace('Content-Security-Policy: ', '');
 
@@ -262,7 +262,7 @@ test('共有の窓とOGP：帯の「共有する」から共通のシェア欄�
   await expect(page.locator('meta[name="twitter:card"]')).toHaveAttribute('content', 'summary_large_image');
   const image = await page.locator('meta[property="og:image"]').getAttribute('content');
   expect(image).toContain(DIR);
-  const shot = await page.request.get(image.replace('https://hundred-days.pages.dev', ''));
+  const shot = await page.request.get(image.replace('https://rairakku.com/100days', ''));
   expect(shot.ok(), `og:image が見つからない: ${image}`).toBe(true);
 
   const opener = page.getByRole('button', { name: 'このアプリを共有する', exact: true });

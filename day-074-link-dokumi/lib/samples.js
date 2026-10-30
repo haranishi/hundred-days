@@ -246,7 +246,7 @@ export const SAMPLES = [
           "inline": 0,
           "external": [
             {
-              "src": "/assets/app.js",
+              "src": "./assets/app.js",
               "host": null,
               "scheme": "relative",
               "sri": false,
@@ -261,7 +261,7 @@ export const SAMPLES = [
           "inline": 0,
           "external": [
             {
-              "href": "/assets/app.css",
+              "href": "./assets/app.css",
               "host": null,
               "scheme": "relative",
               "sri": false

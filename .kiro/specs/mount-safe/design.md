@@ -1,0 +1,9 @@
+# 設計
+
+ビルドのDayモデルに元metaを保持し、pageBaseでcanonical/OGP/共有用URLを決める。既存HTMLのURL属性とJSON-LD内の旧公開URLも出力時に更新する。タイトルなどの固有設定は保持する。sitemapは公開・内部・mount可能なDayだけを収録しfinishedAt（なければstartedAt）をlastmodにする。
+
+検査器はdist直下の名前とHTMLの拡張子なし別名を集め、対象拡張子の引用文字列・属性・CSS urlを走査する。Dayのmeta.mount:falseとvendor/toolsを除く。CLIとビルドで同じ関数を使う。
+
+依存なしHTTPサーバーをexportし、CLIとPlaywrightスモークから共有する。パスの境界・ファイル実体を確認し、Pages風リダイレクト、404、単一Range、ルートAPIスタブを実装する。スモークは全対象を個別contextで開き、取得失敗とJSエラーを集約する。
+
+公開確認処理は取得URLと期待canonicalを別引数にして、中継導入後も元ホストから同じDayを確認できるようにする。ソースを直接配信するDay070/071の専用テストは旧URLを維持し、distを読むテストだけ期待値を更新する。

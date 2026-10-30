@@ -18,7 +18,7 @@ import { PROTECTED_WORDS, PROTECTED_PATTERNS } from '../../day-066-hakokage-kait
 
 const DIR = 'day-066-hakokage-kaito';
 const PATH = `/${DIR}/`;
-const PUBLIC_URL = `https://hundred-days.pages.dev/${DIR}/`;
+const PUBLIC_URL = `https://rairakku.com/100days/${DIR}/`;
 const STORAGE = 'hakokageKaito.v1';
 const headers = readFileSync('dist/_headers', 'utf8');
 const policy = (headers.split(`\n/${DIR}/*\n`)[1] ?? '').split('\n')[0].trim().replace('Content-Security-Policy: ', '');
@@ -776,8 +776,8 @@ for (const motion of ['reduce', 'no-preference']) {
     const href = decodeURIComponent(await x.getAttribute('href'));
     expect(href).toContain('https://x.com/intent/post?text=');
     expect(href).toContain('箱影の怪盗 Day66｜面1「はじめの影」★3 10手で脱出 #100日チャレンジ #個人開発');
-    // 共有するURLは canonical（build が公開URLを入れる）。無ければ今のURL
-    expect(href).toMatch(/url=(https:\/\/hundred-days\.pages\.dev|http:\/\/127\.0\.0\.1:\d+)\/day-066-hakokage-kaito\//);
+    // 共有するURLは canonical（build が正式URL＝rairakku.com/100days/ の下を入れる）
+    expect(href).toMatch(/url=https:\/\/rairakku\.com\/100days\/day-066-hakokage-kaito\//);
     await expect(x).toHaveAttribute('rel', 'noopener noreferrer');
     await expect(x).toHaveAttribute('target', '_blank');
     const line = decodeURIComponent(await page.locator('#share-line').getAttribute('href'));

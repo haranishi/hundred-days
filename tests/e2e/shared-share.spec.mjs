@@ -38,7 +38,7 @@ async function openShare(page, dir) {
 
 for (const { dir, meta } of published) {
   test.describe(`Day ${String(meta.day).padStart(3, '0')} ${meta.title}`, () => {
-    const url = `https://hundred-days.pages.dev/${dir}/`;
+    const url = `${meta.mount === false ? 'https://hundred-days.pages.dev' : 'https://rairakku.com/100days'}/${dir}/`;
 
     test('リンクを貼ったときに中身が出る（OGPとcanonical）', async ({ page }) => {
       await page.goto(pathOf(dir));
@@ -50,7 +50,7 @@ for (const { dir, meta } of published) {
       // 画像は実在するものを指していること（存在しないURLだとリンクがのっぺらぼうになる）
       const image = await page.locator('meta[property="og:image"]').getAttribute('content');
       expect(image).toContain(dir);
-      const shot = await page.request.get(image.replace('https://hundred-days.pages.dev', ''));
+      const shot = await page.request.get(image.replace(/^https:\/\/(?:rairakku\.com\/100days|hundred-days\.pages\.dev)/, ''));
       expect(shot.ok(), `og:image が見つからない: ${image}`).toBe(true);
     });
 
@@ -156,11 +156,11 @@ test('コピーボタンは公開URLをそのまま渡す', async ({ page, conte
   test.skip(browserName !== 'chromium', 'クリップボードの許可はChromiumでだけ与えられる');
   await context.grantPermissions(['clipboard-read', 'clipboard-write']);
 
-  const { dir } = published[published.length - 1];
+  const { dir, meta } = published[published.length - 1];
   await openShare(page, dir);
   await page.getByRole('button', { name: 'リンクをコピー' }).click();
 
   await expect(page.locator('.share__said')).toHaveText('コピーしました');
   const copied = await page.evaluate(() => navigator.clipboard.readText());
-  expect(copied).toBe(`https://hundred-days.pages.dev/${dir}/`);
+  expect(copied).toBe(`${meta.mount === false ? 'https://hundred-days.pages.dev' : 'https://rairakku.com/100days'}/${dir}/`);
 });

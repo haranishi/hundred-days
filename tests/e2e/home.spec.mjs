@@ -62,7 +62,7 @@ for (const width of [390, 768, 1440]) {
       expect(await page.locator('a.btn').evaluateAll((nodes) => nodes.every((node) => node.closest('.card')))).toBe(true);
       const ids = await page.locator('[id]').evaluateAll((nodes) => nodes.map((node) => node.id));
       expect(new Set(ids).size).toBe(ids.length);
-      await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', 'https://hundred-days.pages.dev/');
+      await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', 'https://rairakku.com/100days/');
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
     });
 
@@ -220,6 +220,28 @@ for (const width of [390, 768, 1440]) {
     });
   });
 }
+
+for (const [label, init] of [['Do Not Track', () => Object.defineProperty(navigator, 'doNotTrack', { value: '1', configurable: true })], ['Global Privacy Control', () => Object.defineProperty(navigator, 'globalPrivacyControl', { value: true, configurable: true })]]) {
+  test(`${label} のブラウザでは、計測を読み込まず、gtag も作らない`, async ({ page }) => {
+    const requests = [];
+    page.on('request', (request) => { if (/googletagmanager\.com|google-analytics\.com|analytics\.google\.com/.test(request.url())) requests.push(request.url()); });
+    await page.addInitScript(init);
+    await page.goto('/');
+    await page.waitForTimeout(500);
+    expect(requests).toEqual([]);
+    expect(await page.evaluate(() => typeof window.gtag)).toBe('undefined');
+    expect(await page.evaluate(() => window.dataLayer ? window.dataLayer.length : 0)).toBe(0);
+  });
+}
+
+test('通常のブラウザでは、計測の読み込みを始める（gtag が作られ、タグを足す）', async ({ page }) => {
+  const requests = [];
+  await page.route(/googletagmanager\.com|google-analytics\.com|analytics\.google\.com/, (route) => { requests.push(route.request().url()); return route.abort(); });
+  await page.goto('/');
+  await expect.poll(() => requests.length).toBeGreaterThan(0);
+  expect(requests[0]).toContain('googletagmanager.com/gtag/js?id=G-');
+  expect(await page.evaluate(() => typeof window.gtag)).toBe('function');
+});
 
 test('既存の5イベントは同じ名前と値を送り、CTAとプレビューもDayの値を送る', async ({ page }) => {
   await page.route('https://www.googletagmanager.com/**', (route) => route.fulfill({ contentType: 'text/javascript', body: '' }));

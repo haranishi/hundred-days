@@ -6,6 +6,8 @@ import { copyFileSync, cpSync, existsSync, mkdirSync, readdirSync, readFileSync,
 import { basename, join, relative, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { PUBLISH_CHECK_ENV, effectiveStatus, isPublishCheckOverride, unmatchedPublishCheckTargets } from './lib/day-status.mjs';
+import { findRootRelativeRefs } from './check-mount-safe.mjs';
+import { notFoundHtml } from './lib/not-found.mjs';
 import { isServedPath } from './lib/dist-files.mjs';
 
 const root = fileURLToPath(new URL('..', import.meta.url));
@@ -16,6 +18,7 @@ if (distDir !== join(root, 'dist') && existsSync(distDir)) throw new Error('Cust
 
 const SITE = {
   origin: 'https://hundred-days.pages.dev',
+  canonicalBase: (process.env.HD_CANONICAL_BASE || 'https://rairakku.com/100days').replace(/\/+$/, ''),
   title: '100 DAYS / 100 APPS',
   tagline: '1日1個、Webアプリを作って公開する実験と記録',
   description: '1日1個Webアプリを作って公開する100日チャレンジ。作ったアプリと、AIに任せたこと・自分でやったこと・失敗の記録。',
@@ -60,6 +63,7 @@ const allApps = dirs.map((dir) => {
   const demo = meta.demo ? basename(String(meta.demo)) : '';
   return {
     dir,
+    meta,
     day: Number(meta.day ?? dir.slice(4, 7)),
     title: meta.title || dir,
     description: meta.description || '',
@@ -310,6 +314,7 @@ for (const app of apps.filter((a) => a.published)) {
   if (PERMISSIONS_BY_APP[app.dir]) headerLines.push('  ! Permissions-Policy', `  Permissions-Policy: ${PERMISSIONS_BY_APP[app.dir]}`);
   headerLines.push('');
 }
+headerLines.push('/*/tools/*', '  X-Robots-Tag: noindex', '');
 writeFileSync(join(distDir, '_headers'), headerLines.join('\n'));
 
 // ---------------------------------------------------------------- 集計（すべて meta.json の実値から）
@@ -352,15 +357,16 @@ const duration = (min) => {
 /* SNSでリンクを貼ったときに、タイトル・説明・スクリーンショットが出るようにする。
    共有機能（shared/share.js）が公開URLを知るための <link rel="canonical"> もここで入れる。
    10個のHTMLへ手で書くと必ずどれかが古くなるので、meta.json を出どころにして dist へ差し込む。
-   アプリ側が自分でog:タグを書いている場合は、そちらを優先して上書きしない。 */
+   アプリ固有の文言は保ち、URLは配信先の規則へ統一する。 */
+const pageBase = (app) => app.meta.mount === false ? SITE.origin : SITE.canonicalBase;
 function injectAppMeta(app) {
   const file = join(distDir, app.dir, 'index.html');
   if (!existsSync(file)) return false;
-  const html = readFileSync(file, 'utf8');
+  let html = readFileSync(file, 'utf8');
   if (!html.includes('</head>')) return false;
 
-  const pageUrl = `${SITE.origin}/${app.dir}/`;
-  const image = app.hasShot ? `${SITE.origin}/${app.dir}/${app.shot}` : `${SITE.origin}/assets/og.png`;
+  const pageUrl = `${pageBase(app)}/${app.dir}/`;
+  const image = app.hasShot ? `${pageBase(app)}/${app.dir}/${app.shot}` : `${pageBase(app)}/assets/og.png`;
   const description = app.description || SITE.description;
 
   const wanted = [
@@ -377,8 +383,18 @@ function injectAppMeta(app) {
     ['name="twitter:image"', `<meta name="twitter:image" content="${image}">`]
   ];
 
+  // URLだけを統一する。各Day固有のタイトル・説明・画像ファイル名は保つ。
+  html = html.replace(/<(?:link|meta)\b[^>]*>/gi, (tag) => {
+    if (!/\b(?:rel\s*=\s*["']canonical["']|(?:property|name)\s*=\s*["'](?:og:(?:url|image)|twitter:image)["'])/i.test(tag)) return tag;
+    return tag.replace(/\b(href|content)\s*=\s*(['"])(.*?)\2/gi, (attr, key, quote, value) => {
+      const url = /canonical|og:url/i.test(tag) ? pageUrl : value.replace(SITE.origin, pageBase(app));
+      return `${key}=${quote}${esc(url)}${quote}`;
+    });
+  });
+  html = html.replace(/(<script\b[^>]*type=["']application\/ld\+json["'][^>]*>)([\s\S]*?)(<\/script>)/gi,
+    (_, start, json, end) => start + json.replaceAll(SITE.origin, pageBase(app)) + end);
   const add = wanted.filter(([probe]) => !html.includes(probe)).map(([, tag]) => tag);
-  if (!add.length) return false;
+
   // 置換を文字列で渡すと、題名や説明の $& や $$ が特別な意味になる（$& は </head> に化ける）。関数で渡して、そのまま入れる
   writeFileSync(file, html.replace('</head>', () => `${add.map((tag) => `  ${tag}`).join('\n')}\n</head>`));
   return true;
@@ -408,7 +424,7 @@ const titleHtml = (title, prefix) => {
   return esc(main) + (title.includes(' — ') ? `${prefix === 'preview' ? '<span class="preview__separator"> — </span>' : ' — '}<span class="${prefix}__sub">${esc(sub)}</span>` : '');
 };
 const broadTags = new Set(catalog.filter((tag) => tag.count > apps.length * 0.4).map((tag) => tag.key));
-const openUrl = (app) => app.published ? `./${app.dir}/` : app.externalUrl || '';
+const openUrl = (app) => app.published ? (app.meta.mount === false ? `${SITE.origin}/${app.dir}/` : `./${app.dir}/`) : app.externalUrl || '';
 const shotUrl = (app) => app.hasShot ? `./${app.dir}/${app.shot}` : '';
 
 const cardHtml = (app) => {
@@ -427,7 +443,7 @@ const cardHtml = (app) => {
       ` data-poster="${app.hasShot ? `./${esc(app.dir)}/${esc(app.shot)}` : ''}">デモ<span class="sr-only">（Day ${num}・${esc(app.title)}）を再生</span></button>`
     : '';
   const inner = app.published
-    ? `<a class="thumb__link" href="./${esc(app.dir)}/" tabindex="-1" aria-hidden="true">${thumb}</a>`
+    ? `<a class="thumb__link" href="${esc(openUrl(app))}" tabindex="-1" aria-hidden="true">${thumb}</a>`
     : external
       ? `<a class="thumb__link" href="${esc(app.externalUrl)}" target="_blank" rel="noopener" tabindex="-1" aria-hidden="true">${thumb}</a>`
       : thumb;
@@ -450,7 +466,7 @@ const cardHtml = (app) => {
     : '';
 
   const primary = app.published
-    ? `<a class="btn btn--primary" href="./${esc(app.dir)}/">アプリを開く</a>`
+    ? `<a class="btn btn--primary" href="${esc(openUrl(app))}">アプリを開く</a>`
     : external
       ? `<a class="btn btn--primary" href="${esc(app.externalUrl)}" target="_blank" rel="noopener">紹介ページを開く<span class="sr-only">（Day ${num}・新しいタブで開く）</span></a>`
       : '<button class="btn btn--disabled" type="button" disabled>アプリ本体なし</button>';
@@ -504,13 +520,21 @@ const js = readFileSync(join(root, 'scripts/site/home.js'), 'utf8')
   .replace('/* HOME_MODEL */', () => `const TAG_ALIASES = ${JSON.stringify(TAG_ALIASES)};\n${fold.toString()}\n${tagKey.toString()}\n${splitTitle.toString()}`);
 
 // 計測タグ（この一覧ページ限定。SITE.analyticsId が空なら1行も出力しない）
+// Do Not Track・Global Privacy Control のブラウザでは、計測を読み込まず、何も送らない。
+// 一覧は rairakku.com/100days/ の下でも表示され、そのドメインのプライバシーポリシーが同じ約束をしているため（home.js は typeof gtag で見る）。
 const analyticsTag = SITE.analyticsId
-  ? `<script async src="https://www.googletagmanager.com/gtag/js?id=${esc(SITE.analyticsId)}"></script>
-<script>
-window.dataLayer = window.dataLayer || [];
-function gtag(){dataLayer.push(arguments);}
-gtag('js', new Date());
-gtag('config', '${esc(SITE.analyticsId)}');
+  ? `<script>
+(function () {
+  if (navigator.doNotTrack === '1' || navigator.globalPrivacyControl === true) return;
+  window.dataLayer = window.dataLayer || [];
+  window.gtag = function gtag() { window.dataLayer.push(arguments); };
+  window.gtag('js', new Date());
+  window.gtag('config', '${esc(SITE.analyticsId)}');
+  var tag = document.createElement('script');
+  tag.async = true;
+  tag.src = 'https://www.googletagmanager.com/gtag/js?id=${esc(SITE.analyticsId)}';
+  document.head.appendChild(tag);
+})();
 </script>`
   : '';
 const searchConsoleTag = SITE.searchConsoleToken
@@ -528,24 +552,24 @@ const html = `<!DOCTYPE html>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<link rel="preload" href="/assets/fonts/BigShouldersDisplay-latin-wght.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="preload" href="/assets/fonts/GeistMono-latin-wght.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="./assets/fonts/BigShouldersDisplay-latin-wght.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="./assets/fonts/GeistMono-latin-wght.woff2" as="font" type="font/woff2" crossorigin>
 <title>${esc(SITE.title)}</title>
 <meta name="description" content="${esc(SITE.description)}">
 <meta name="color-scheme" content="dark">
 <meta name="theme-color" content="#0f0e0d">
-<link rel="canonical" href="${esc(SITE.origin)}/">
+<link rel="canonical" href="${esc(SITE.canonicalBase)}/">
 <link rel="icon" href="${esc(favicon)}">
 <meta property="og:title" content="${esc(SITE.title)}">
 <meta property="og:description" content="${esc(SITE.tagline)}">
-<meta property="og:image" content="${esc(SITE.origin)}/assets/og.png">
-<meta property="og:url" content="${esc(SITE.origin)}/">
+<meta property="og:image" content="${esc(SITE.canonicalBase)}/assets/og.png">
+<meta property="og:url" content="${esc(SITE.canonicalBase)}/">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="${esc(SITE.title)}">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="${esc(SITE.title)}">
 <meta name="twitter:description" content="${esc(SITE.tagline)}">
-<meta name="twitter:image" content="${esc(SITE.origin)}/assets/og.png">${headExtras ? '\n' + headExtras : ''}
+<meta name="twitter:image" content="${esc(SITE.canonicalBase)}/assets/og.png">${headExtras ? '\n' + headExtras : ''}
 <style>@@CSS@@</style>
 <noscript><style>.tools{display:none}</style></noscript>
 </head>
@@ -620,10 +644,10 @@ const html = `<!DOCTYPE html>
     <span class="footer__links">
       <a href="${esc(SITE.repoUrl)}" target="_blank" rel="noopener">GitHub</a>
       <a href="${esc(SITE.xUrl)}" target="_blank" rel="noopener">X ${esc(SITE.xHandle)}</a>
-      <a href="/privacy.html">プライバシー</a>
+      <a href="./privacy">プライバシー</a>
     </span>
     ${SITE.analyticsId
-      ? '<p class="footer__note">このトップページだけ、Googleアナリティクスでアクセス数を見ています（閲覧者を特定する設定は使っていません）。各アプリのページにGoogleアナリティクスは入れていないので、アプリ内での操作がこの計測に残ることはありません。ただし外部サービスと通信するアプリはあり、何をどこへ送るかは<a href="/privacy.html">プライバシーポリシー</a>に1件ずつ書いています。</p>'
+      ? '<p class="footer__note">このトップページだけ、Googleアナリティクスでアクセス数を見ています（閲覧者を特定する設定は使っていません）。各アプリのページにGoogleアナリティクスは入れていないので、アプリ内での操作がこの計測に残ることはありません。ただし外部サービスと通信するアプリはあり、何をどこへ送るかは<a href="./privacy">プライバシーポリシー</a>に1件ずつ書いています。</p>'
       : ''}
   </footer>
 
@@ -656,3 +680,17 @@ console.log(
     (drafts.length ? `\n  draft のため一覧から除外: ${drafts.map((d) => d.dir).join(', ')}` : '') +
     (publishCheckOnly.length ? `\n  （検査用）公開済みとして扱う：${publishCheckOnly.map((d) => d.dir).join(', ')}` : '')
 );
+
+// XML escaping shares the HTML escape rules (including & and quotes).
+const sitemapApps = apps.filter(app => app.published && !app.externalUrl && app.meta.mount !== false);
+const entries = [`<url><loc>${esc(SITE.canonicalBase)}/</loc></url>`, ...sitemapApps.map(app => {
+  const date = app.finishedAt || app.startedAt;
+  return `<url><loc>${esc(SITE.canonicalBase)}/${esc(app.dir)}/</loc>${date ? `<lastmod>${date}</lastmod>` : ''}</url>`;
+})];
+writeFileSync(join(distDir, 'sitemap.xml'), `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${entries.join('\n')}</urlset>\n`);
+writeFileSync(join(distDir, '404.html'), notFoundHtml({ listUrl: `${SITE.canonicalBase}/`, days: apps.filter(app => app.published && !app.externalUrl).map(app => app.dir) }));
+const mountViolations = findRootRelativeRefs(distDir);
+if (mountViolations.length) {
+  console.error(mountViolations.map(ref => `${ref.file}:${ref.line}: ${ref.value}`).join('\n'));
+  process.exitCode = 1;
+}

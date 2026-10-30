@@ -2,3 +2,11 @@
 # Search Console の所有権確認ファイルは、Googleが要求する .html のURLで
 # そのまま200を返す必要があるため、リダイレクトさせず中身を返す（末尾の200が書き換え指定）。
 /google0bc49e21bba788f9.html  /google0bc49e21bba788f9  200
+
+# 番号や名前が変わったDayの、古いURL。Xなどに貼られたリンクが、一覧ではなく本来のDayへ着くようにする。
+# （これまでは、存在しないURLにも一覧を返していたため、古いリンクは一覧に着いていた）
+# day-046-cat-lightspeed → 今は Day047「ねこ、光になる」／day-059-laureate-age → 今は Day060「今年の受賞の解説」
+/day-046-cat-lightspeed/  /day-047-cat-lightspeed/  301
+/day-046-cat-lightspeed  /day-047-cat-lightspeed/  301
+/day-059-laureate-age/  /day-060-prize-explained/  301
+/day-059-laureate-age  /day-060-prize-explained/  301

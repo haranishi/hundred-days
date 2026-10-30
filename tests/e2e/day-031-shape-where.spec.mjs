@@ -410,7 +410,7 @@ test.describe('Day 031 この形、どこ？', () => {
     expect(href).toContain('https://x.com/intent/post?');
     const params = new URL(href).searchParams;
     expect(params.get('text')).toBe('この形、どこ？ 秋田県の市町村クイズ 10 / 10\n#100日チャレンジ');
-    expect(params.get('url')).toBe('https://hundred-days.pages.dev/day-031-shape-where/?p=05');
+    expect(params.get('url')).toBe('https://rairakku.com/100days/day-031-shape-where/?p=05');
     await expect(page.locator('#post-score')).toHaveAttribute('target', '_blank');
   });
 
@@ -428,7 +428,7 @@ test.describe('Day 031 この形、どこ？', () => {
     await expect(page.locator('#copy-note')).toHaveText('コピーしました');
     const text = await page.evaluate(() => navigator.clipboard.readText());
     expect(text.split('\n')[0]).toBe('この形、どこ？ 全国の市区町村クイズ 10 / 10');
-    expect(text).toContain('https://hundred-days.pages.dev/day-031-shape-where/');
+    expect(text).toContain('https://rairakku.com/100days/day-031-shape-where/');
     expect(text).toContain('#100日チャレンジ');
   });
 
