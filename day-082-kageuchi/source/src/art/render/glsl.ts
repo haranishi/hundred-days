@@ -1,22 +1,31 @@
 // OWNER: world-art
 // シェーダーで共有する関数：ハッシュ・値ノイズ・fbm・画素幅で積分した縞・網点・手続きの凹凸。
-// hash12 と画素幅で積分するパルスの式は、本人の dragon-rampage（src/render/shaders/noiseGlsl.ts・filterGlsl.ts）から写した。
+// 画素幅で積分するパルスの式は、本人の dragon-rampage（src/render/shaders/filterGlsl.ts）から写した。
+// ハッシュは MurmurHash3 の最終混合 fmix32（Austin Appleby・パブリックドメイン）。座標の float のビット列を混ぜて 0..1 にする。
+// 定数 0.1031 の「sin を使わない」系の式は、ライセンスの記載が出典ごとに異なるため使っていない。
 
 export const NOISE_GLSL = /* glsl */ `
-float kgHash12(vec2 p) {
-  vec3 p3 = fract(vec3(p.xyx) * 0.1031);
-  p3 += dot(p3, p3.yzx + 33.33);
-  return fract((p3.x + p3.y) * p3.z);
+uint kgMix(uint h) {
+  h ^= h >> 16;
+  h *= 0x85ebca6bu;
+  h ^= h >> 13;
+  h *= 0xc2b2ae35u;
+  h ^= h >> 16;
+  return h;
 }
-float kgHash13(vec3 p3) {
-  p3 = fract(p3 * 0.1031);
-  p3 += dot(p3, p3.zyx + 31.32);
-  return fract((p3.x + p3.y) * p3.z);
+float kgUnit(uint h) { return float(h >> 8) * (1.0 / 16777216.0); }
+float kgHash12(vec2 p) {
+  uvec2 b = floatBitsToUint(p);
+  return kgUnit(kgMix(b.x ^ kgMix(b.y)));
+}
+float kgHash13(vec3 p) {
+  uvec3 b = floatBitsToUint(p);
+  return kgUnit(kgMix(b.x ^ kgMix(b.y ^ kgMix(b.z))));
 }
 vec2 kgHash22(vec2 p) {
-  vec3 p3 = fract(vec3(p.xyx) * vec3(0.1031, 0.1030, 0.0973));
-  p3 += dot(p3, p3.yzx + 33.33);
-  return fract((p3.xx + p3.yz) * p3.zy);
+  uvec2 b = floatBitsToUint(p);
+  uint h = kgMix(b.x ^ kgMix(b.y));
+  return vec2(kgUnit(h), kgUnit(kgMix(h ^ 0x9e3779b9u)));
 }
 float kgNoise(vec2 p) {
   vec2 i = floor(p);

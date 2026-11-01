@@ -4395,20 +4395,27 @@ void kgSeeBush(vec3 wp) {
 		return pow2( saturate( 1.0 - kgU * kgU ) );
 	}
 	${By}`,Hy=`getPointLightInfo( pointLight, geometryPosition, directLight );`,Uy=`RE_Direct( directLight, geometryPosition, geometryNormal, geometryViewDir, geometryClearcoatNormal, material, reflectedLight );`,Wy=!1;function Gy(){if(Wy)return;let e=vc.lights_pars_begin;if(!e.includes(By))throw Error(`lightCurve: three の lights_pars_begin が想定と違う（版が変わった可能性）`);vc.lights_pars_begin=e.replace(By,Vy);let t=vc.lights_fragment_begin,n=t.indexOf(Hy),r=n<0?-1:t.indexOf(Uy,n);if(r<0)throw Error(`lightCurve: three の lights_fragment_begin の点光源の繰り返しが想定と違う`);vc.lights_fragment_begin=t.slice(0,r)+`if ( directLight.visible ) `+t.slice(r),Wy=!0}var Ky=`
-float kgHash12(vec2 p) {
-  vec3 p3 = fract(vec3(p.xyx) * 0.1031);
-  p3 += dot(p3, p3.yzx + 33.33);
-  return fract((p3.x + p3.y) * p3.z);
+uint kgMix(uint h) {
+  h ^= h >> 16;
+  h *= 0x85ebca6bu;
+  h ^= h >> 13;
+  h *= 0xc2b2ae35u;
+  h ^= h >> 16;
+  return h;
 }
-float kgHash13(vec3 p3) {
-  p3 = fract(p3 * 0.1031);
-  p3 += dot(p3, p3.zyx + 31.32);
-  return fract((p3.x + p3.y) * p3.z);
+float kgUnit(uint h) { return float(h >> 8) * (1.0 / 16777216.0); }
+float kgHash12(vec2 p) {
+  uvec2 b = floatBitsToUint(p);
+  return kgUnit(kgMix(b.x ^ kgMix(b.y)));
+}
+float kgHash13(vec3 p) {
+  uvec3 b = floatBitsToUint(p);
+  return kgUnit(kgMix(b.x ^ kgMix(b.y ^ kgMix(b.z))));
 }
 vec2 kgHash22(vec2 p) {
-  vec3 p3 = fract(vec3(p.xyx) * vec3(0.1031, 0.1030, 0.0973));
-  p3 += dot(p3, p3.yzx + 33.33);
-  return fract((p3.xx + p3.yz) * p3.zy);
+  uvec2 b = floatBitsToUint(p);
+  uint h = kgMix(b.x ^ kgMix(b.y));
+  return vec2(kgUnit(h), kgUnit(kgMix(h ^ 0x9e3779b9u)));
 }
 float kgNoise(vec2 p) {
   vec2 i = floor(p);
@@ -6073,10 +6080,19 @@ vec3 toSrgb(vec3 c) {
   return mix(lo, hi, step(vec3(0.0031308), c));
 }
 
+// MurmurHash3 の最終混合 fmix32（パブリックドメイン）。座標の float のビット列を混ぜて 0..1 にする
+uint gradeMix(uint h) {
+  h ^= h >> 16;
+  h *= 0x85ebca6bu;
+  h ^= h >> 13;
+  h *= 0xc2b2ae35u;
+  h ^= h >> 16;
+  return h;
+}
+
 float gradeHash(vec2 p) {
-  vec3 p3 = fract(vec3(p.xyx) * 0.1031);
-  p3 += dot(p3, p3.yzx + 33.33);
-  return fract((p3.x + p3.y) * p3.z);
+  uvec2 b = floatBitsToUint(p);
+  return float(gradeMix(b.x ^ gradeMix(b.y)) >> 8) * (1.0 / 16777216.0);
 }
 
 void mainImage(const in vec4 inputColor, const in vec2 uv, out vec4 outputColor) {

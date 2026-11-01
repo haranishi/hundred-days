@@ -47,10 +47,19 @@ vec3 toSrgb(vec3 c) {
   return mix(lo, hi, step(vec3(0.0031308), c));
 }
 
+// MurmurHash3 の最終混合 fmix32（パブリックドメイン）。座標の float のビット列を混ぜて 0..1 にする
+uint gradeMix(uint h) {
+  h ^= h >> 16;
+  h *= 0x85ebca6bu;
+  h ^= h >> 13;
+  h *= 0xc2b2ae35u;
+  h ^= h >> 16;
+  return h;
+}
+
 float gradeHash(vec2 p) {
-  vec3 p3 = fract(vec3(p.xyx) * 0.1031);
-  p3 += dot(p3, p3.yzx + 33.33);
-  return fract((p3.x + p3.y) * p3.z);
+  uvec2 b = floatBitsToUint(p);
+  return float(gradeMix(b.x ^ gradeMix(b.y)) >> 8) * (1.0 / 16777216.0);
 }
 
 void mainImage(const in vec4 inputColor, const in vec2 uv, out vec4 outputColor) {
