@@ -28,9 +28,9 @@ for (const { dir, meta } of introDays) {
     test('主ボタンは外部の公開先へ新しいタブで開く。コードのリンクもある', async ({ page }) => {
       await page.goto(path);
       await expect(page.getByRole('heading', { level: 1 })).toHaveText(meta.title);
-      // 最初と、注意のあとの2か所。どちらも同じ行き先
+      // 最初・注意のあと・フッターの3か所。どれも同じ行き先
       const opens = page.getByRole('link', { name: /アプリを開く/ });
-      await expect(opens).toHaveCount(2);
+      await expect(opens).toHaveCount(3);
       for (const open of await opens.all()) await expect(open).toHaveAttribute('href', meta.externalUrl);
       const open = opens.first();
       await expect(open).toHaveAttribute('target', '_blank');

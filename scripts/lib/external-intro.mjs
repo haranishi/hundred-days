@@ -7,6 +7,11 @@ const POSTER_FILE = /^[\w-]+(?:\.[\w-]+)*\.(?:webp|png|jpe?g)$/i;
 // 共有の文に入れる説明の長さ（Xの投稿画面に渡す文なので、長くしすぎない）
 const SHARE_SENTENCE_LIMIT = 70;
 const HASHTAG = '#100日チャレンジ';
+// 外部へ移ることを示す矢印。文字の ↗ は線が細く、太字のラベルと合わない。色は文字色に従う（currentColor）
+const ARROW =
+  '<svg class="icon icon--out" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 17 17 7M8.5 7H17v8.5" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+const ARROW_DOWN =
+  '<svg class="icon icon--down" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 5v14M6.5 13.5 12 19l5.5-5.5" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 
 const isHttps = (value) => {
   try {
@@ -99,11 +104,16 @@ export function renderIntroPage({ app, site }) {
     const [, y, m, d] = /^(\d{4})-(\d{2})-(\d{2})$/.exec(date) ?? [];
     return y ? `${Number(y)}年${Number(m)}月${Number(d)}日` : date;
   };
+  // 住所は、名前の途中（day-081- と pagecrate の間など）で折れないよう、パスの区切りごとにまとめる。
+  // <wbr> と span は文字を持たないので、コピーする住所（textContent）は変わらない
+  const url = new URL(pageUrl);
+  const urlHtml =
+    esc(url.origin) + url.pathname.split('/').filter(Boolean).map((part) => `/<wbr><span class="nobr">${esc(part)}</span>`).join('') + '/';
   const sr = (text) => `<span class="sr-only">${text}</span>`;
   const external = (href, label, className) =>
     `<a class="${className}" href="${esc(href)}" target="_blank" rel="noopener">${label}${sr('（新しいタブで開く）')}</a>`;
 
-  const openApp = external(app.externalUrl, 'アプリを開く<span class="btn__out" aria-hidden="true">↗</span>', 'btn btn--primary');
+  const openApp = external(app.externalUrl, `アプリを開く${ARROW}`, 'btn btn--primary');
   const again = `<div class="actions actions--again">${openApp}</div>`;
   const shot = app.hasShot
     ? `<figure class="shot"><img src="./${esc(app.shot)}" alt="${esc(app.title)}の画面" width="1200" height="750" decoding="async"></figure>`
@@ -123,7 +133,7 @@ export function renderIntroPage({ app, site }) {
     ? `<section class="block notice" aria-labelledby="h-notice"><h2 id="h-notice">使う前に</h2><p>${esc(intro.notice)}</p></section>`
     : '';
 
-  const memoRows = [
+  const memoMain = [
     app.aiHandled?.length ? `<div class="memo__row"><dt>AIに任せた</dt><dd>${list(app.aiHandled, 'memo__list')}</dd></div>` : '',
     app.humanHandled?.length ? `<div class="memo__row"><dt>自分でやった</dt><dd>${list(app.humanHandled, 'memo__list')}</dd></div>` : '',
     app.fixes?.length
@@ -136,6 +146,9 @@ export function renderIntroPage({ app, site }) {
           )
           .join('')}</ul></dd></div>`
       : '',
+  ].join('');
+  // 期間とタグは、制作メモの項目（AI・自分・失敗）とは別のまとまりにして、区切り線で分ける
+  const memoFacts = [
     app.startedAt || app.finishedAt
       ? `<div class="memo__row"><dt>期間</dt><dd>${[app.startedAt, app.finishedAt]
           .filter(Boolean)
@@ -144,7 +157,10 @@ export function renderIntroPage({ app, site }) {
       : '',
     app.tags?.length ? `<div class="memo__row"><dt>タグ</dt><dd><ul class="tags">${app.tags.map((tag) => `<li>#${esc(tag)}</li>`).join('')}</ul></dd></div>` : '',
   ].join('');
-  const memo = memoRows ? `<section class="block" aria-labelledby="h-memo"><h2 id="h-memo">制作メモ</h2><dl class="memo">${memoRows}</dl></section>` : '';
+  const memoRows = memoMain + memoFacts;
+  const memo = memoRows
+    ? `<section class="block" aria-labelledby="h-memo"><h2 id="h-memo">制作メモ</h2>${memoMain ? `<dl class="memo">${memoMain}</dl>` : ''}${memoFacts ? `<dl class="memo memo--facts">${memoFacts}</dl>` : ''}</section>`
+    : '';
 
   const share =
     `<section class="block share" aria-labelledby="h-share"><h2 id="h-share">このページを共有</h2>` +
@@ -155,7 +171,7 @@ export function renderIntroPage({ app, site }) {
     `<li><button class="btn btn--small" type="button" data-share="native" hidden>ほかのアプリで共有</button></li>` +
     `</ul>` +
     `<p class="note">Instagramなどへは、コピーしたリンクを貼って渡してください。</p>` +
-    `<p class="share__url"><span class="share__label">このページのURL</span><code id="share-url">${esc(pageUrl)}</code></p>` +
+    `<p class="share__url"><span class="share__label">このページのURL</span><code id="share-url">${urlHtml}</code></p>` +
     `<p class="sr-only" role="status" aria-live="polite" id="share-status"></p></section>`;
 
   return `<!DOCTYPE html>
@@ -195,8 +211,9 @@ export function renderIntroPage({ app, site }) {
   <h1 class="title">${esc(app.title)}</h1>
   <p class="lead">${leadLines}</p>
   <div class="actions">
-    ${openApp}${intro?.codeUrl ? `\n    ${external(intro.codeUrl, 'コードを見る', 'btn')}` : ''}
+    ${openApp}${intro?.codeUrl ? `\n    ${external(intro.codeUrl, `コードを見る${ARROW}`, 'btn')}` : ''}
   </div>
+  ${memoRows ? '<p class="jump"><a href="#h-memo">制作メモを読む' + ARROW_DOWN + '</a></p>' : ''}
   ${shot}
   ${demo}
   ${highlights}
@@ -207,8 +224,7 @@ export function renderIntroPage({ app, site }) {
 </article>
 </main>
 <footer class="foot wrap">
-  <p><a href="../">100日チャレンジの一覧を見る</a></p>
-  <p class="foot__links"><a href="${esc(site.xUrl)}" target="_blank" rel="noopener">Xでフォロー ${esc(site.xHandle)}</a><a href="${esc(site.repoUrl)}" target="_blank" rel="noopener">GitHub</a></p>
+  <p class="foot__links"><a href="../">100日チャレンジの一覧を見る</a>${external(app.externalUrl, `アプリを開く${ARROW}`, 'foot__open')}${external(site.xUrl, `Xでフォロー ${esc(site.xHandle)}${ARROW}`, 'foot__x')}${external(site.repoUrl, `GitHub${ARROW}`, 'foot__repo')}</p>
 </footer>
 <script src="./intro.js" defer></script>
 </body>
