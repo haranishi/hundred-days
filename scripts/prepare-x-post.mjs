@@ -49,7 +49,9 @@ const candidates = readdirSync(appsDir, { withFileTypes: true })
 if (candidates.length !== 1) fail(`Day ${day}のmeta.jsonを一意に特定できない`);
 
 const { dir, meta } = candidates[0];
-if (meta.status !== 'published') fail(`Day ${day}はpublishedではないためX公開を準備できない`);
+// 外部で公開するDay（status: external ＋ externalUrl）も準備できる。本体は外部のサイトにあるので、公開URLの確認はそのページ自身の身元で行う
+const external = meta.status === 'external' && typeof meta.externalUrl === 'string' && meta.externalUrl.startsWith('https://');
+if (meta.status !== 'published' && !external) fail(`Day ${day}はpublishedでも外部公開（external）でもないためX公開を準備できない`);
 if (!meta.title || !meta.publicUrl) fail('meta.jsonのtitleまたはpublicUrlが空');
 
 const aiHandled = meta.aiHandled?.find((value) => typeof value === 'string' && value.trim());
@@ -118,6 +120,8 @@ const sshGithubPrefix = ['git', 'github.com:'].join('@');
 const repoUrl = remote.startsWith(sshGithubPrefix)
   ? `https://github.com/${remote.slice(sshGithubPrefix.length).replace(/\.git$/, '')}`
   : remote.replace(/\.git$/, '');
+// 外部Dayのコードが別のリポジトリにあるときは、intro.codeUrl を案内する。このリポジトリのURLでは、コードが無いリンクになる
+const codeUrl = external && meta.intro?.codeUrl ? meta.intro.codeUrl : repoUrl;
 
 /* タイトルは鉤括弧で囲む。囲まないと、タイトルの終わり方によって文がつながって読めなくなる
    （「バイトの法律、原文はこう」→「…原文はこうはこちら」／「潮、いまどっち？」→「…どっち？はこちら」） */
@@ -126,7 +130,7 @@ const reply = [
   meta.publicUrl,
   '',
   'コードも公開しています',
-  repoUrl
+  codeUrl
 ].join('\n');
 
 const countPlain = (text) => Array.from(text).reduce(
@@ -178,7 +182,17 @@ const checkUrl = async (url, label, app = false) => {
   }
   if (!response.ok) fail(`${label}がHTTP ${response.status}: ${fetchedUrl}`);
   let identity = {};
-  if (app) {
+  if (app === 'external') {
+    // 外部のページは、このサイトの canonical を持たない。自分の canonical が公開URLと一致するか、canonical が無ければ題名で見分ける
+    const html = await response.text();
+    try {
+      identity = verifyPublicPage(html, fetchedUrl, url);
+    } catch (error) {
+      const title = (html.match(/<title[^>]*>([\s\S]*?)<\/title>/i)?.[1] ?? '').replace(/\s+/g, ' ').trim();
+      if (/canonical URLがありません/.test(error.message) && title.toLowerCase().includes(String(meta.title).toLowerCase())) identity = { title };
+      else fail(`${label}の公開確認に失敗: ${error.message}`);
+    }
+  } else if (app) {
     try {
       identity = verifyPublicPage(await response.text(), fetchedUrl, meta.mount === false ? url : `${canonicalBase}/${dir}/`)
     } catch (error) {
@@ -191,8 +205,8 @@ const checkUrl = async (url, label, app = false) => {
 };
 
 const urlChecks = [
-  await checkUrl(meta.publicUrl, '公開URL', true),
-  await checkUrl(repoUrl, 'GitHubリポジトリ')
+  await checkUrl(meta.publicUrl, '公開URL', external ? 'external' : true),
+  await checkUrl(codeUrl, 'GitHubリポジトリ')
 ];
 
 const videoPath = resolve(videoOption);
