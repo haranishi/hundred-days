@@ -126,6 +126,7 @@ Day 051「ハコニワ」も外部公開アプリです。本体は独立リポ�
 | 078 | 先に100 — 足して、100を取り合う。 | [day-078-saki-ni-100/](day-078-saki-ni-100/) | [アプリを開く](https://hundred-days.pages.dev/day-078-saki-ni-100/) |
 | 079 | あなたの普通、何％？ | [day-079-futsu-run/](day-079-futsu-run/) | [アプリを開く](https://hundred-days.pages.dev/day-079-futsu-run/) |
 | 080 | 第五王子と、名もなき加護 | [day-080-fifth-prince/](day-080-fifth-prince/) | [アプリを開く](https://rairakku.com/100days/day-080-fifth-prince/) |
+| 081 | PageCrate | [制作記録のみ](day-081-pagecrate/) | 未公開 |
 <!-- day-index:end -->
 
 ## 1日アプリのルール
