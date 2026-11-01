@@ -21,6 +21,12 @@ const EXTERNAL_DAYS = [
     title: 'モザイカー',
     dir: 'day-020-mozaiker',
     url: 'https://rairakku.vercel.app/mozaiker'
+  },
+  {
+    day: '081',
+    title: 'PageCrate',
+    dir: 'day-081-pagecrate',
+    url: 'https://day81.rairakku.com/'
   }
 ];
 
