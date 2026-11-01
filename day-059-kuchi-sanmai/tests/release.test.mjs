@@ -28,7 +28,7 @@ test('meta.json と、画面の名前・題名がそろっている', () => {
   assert.equal(meta.day, 59);
   assert.equal(meta.name, 'day-059-kuchi-sanmai');
   assert.equal(meta.status, 'published');
-  assert.equal(meta.publicUrl, 'https://hundred-days.pages.dev/day-059-kuchi-sanmai/');
+  assert.equal(meta.publicUrl, 'https://rairakku.com/100days/day-059-kuchi-sanmai/');
   assert.ok(appName, 'source/src/appName.ts に APP_NAME がない');
   assert.equal(meta.title, appName);
   assert.match(html, new RegExp(`<title>${appName}</title>`));

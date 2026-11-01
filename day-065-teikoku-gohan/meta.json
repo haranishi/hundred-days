@@ -5,7 +5,7 @@
   "description": "食材を積んだ列車の出発順と分岐の向きだけを決めて、切る・焼く・煮るの駅を通し、注文の料理を締切までに届ける1画面のパズル。通った駅の順番がレシピになり、火の駅で待たされると焦げる。全6面。",
   "tags": ["game", "puzzle", "train", "audio", "localstorage"],
   "status": "published",
-  "publicUrl": "https://hundred-days.pages.dev/day-065-teikoku-gohan/",
+  "publicUrl": "https://rairakku.com/100days/day-065-teikoku-gohan/",
   "screenshot": "screenshot.webp",
   "startedAt": "2026-10-12",
   "finishedAt": "2026-10-12",

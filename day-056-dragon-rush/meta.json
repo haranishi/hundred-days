@@ -5,7 +5,7 @@
   "description": "3体の怪獣を選び、3分で夕暮れの架空の湾岸都市を壊す3Dアクション。PCとスマホの横向きタッチ操作に対応。",
   "tags": ["three-js", "webgl2", "3d-action", "procedural-audio", "pc-game", "touch-game"],
   "status": "published",
-  "publicUrl": "https://hundred-days.pages.dev/day-056-dragon-rush/",
+  "publicUrl": "https://rairakku.com/100days/day-056-dragon-rush/",
   "screenshot": "screenshot.webp",
   "demo": "demo.mp4",
   "startedAt": "2026-09-30",

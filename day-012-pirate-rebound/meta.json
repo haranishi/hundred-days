@@ -100,7 +100,7 @@
       "fix": "`.page[data-state=\"playing\"]` に直した。他の `[data-state] .stage` 等は .stage が子孫なので正しく効いていた。同じ書き方に見えて、当たるものと当たらないものが混ざっていた"
     }
   ],
-  "publicUrl": "https://hundred-days.pages.dev/day-012-pirate-rebound/",
+  "publicUrl": "https://rairakku.com/100days/day-012-pirate-rebound/",
   "repoPath": "day-012-pirate-rebound",
   "screenshot": "screenshot.webp",
   "demo": "demo-with-audio.mp4",

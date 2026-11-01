@@ -5,7 +5,7 @@
   "description": "退去費用の請求内容・気になる点・手元の資料を整理して、相談に持っていけるメモを作る。わからない項目は空欄のままでよく、コピー・テキスト保存・印刷に対応。請求の妥当性や支払義務は判断しない。",
   "tags": ["暮らし", "相談準備", "プライバシー", "vanilla-js", "no-dependencies"],
   "status": "published",
-  "publicUrl": "https://hundred-days.pages.dev/day-043-moveout-consult/",
+  "publicUrl": "https://rairakku.com/100days/day-043-moveout-consult/",
   "screenshot": "screenshot.webp",
   "demo": "demo.mp4",
   "startedAt": "2026-09-19",

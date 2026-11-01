@@ -48,7 +48,7 @@
       "fix": "状態をインデックスではなく金額そのもので持ち、切り替え先に同じ額が無ければ最も近い額に寄せるようにした（64,000→60,000）"
     }
   ],
-  "publicUrl": "https://hundred-days.pages.dev/day-004-scholarship-repay/",
+  "publicUrl": "https://rairakku.com/100days/day-004-scholarship-repay/",
   "repoPath": "day-004-scholarship-repay",
   "screenshot": "screenshot.webp",
   "demo": "demo.mp4",

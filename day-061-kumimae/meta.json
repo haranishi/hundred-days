@@ -5,7 +5,7 @@
   "description": "自分で入力したPCパーツの寸法・規格を、3Dの模式図と数字で確認。組合せの注意点、電力の目安、価格メモをまとめる。初期値は架空の作例。",
   "tags": ["3d", "pc", "localstorage", "react", "typescript"],
   "status": "published",
-  "publicUrl": "https://hundred-days.pages.dev/day-061-kumimae/",
+  "publicUrl": "https://rairakku.com/100days/day-061-kumimae/",
   "screenshot": "screenshot.webp",
   "demo": "demo.mp4",
   "startedAt": "2026-10-08",

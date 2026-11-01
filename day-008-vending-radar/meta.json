@@ -26,7 +26,7 @@
       "fix": "振り付けスクリプト内で小さなローカルHTTPサーバーを立て、そこから開き直して収録した"
     }
   ],
-  "publicUrl": "https://hundred-days.pages.dev/day-008-vending-radar/",
+  "publicUrl": "https://rairakku.com/100days/day-008-vending-radar/",
   "repoPath": "day-008-vending-radar",
   "screenshot": "screenshot.webp",
   "demo": "demo-with-audio.mp4",

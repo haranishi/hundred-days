@@ -12,7 +12,7 @@
   "aiHandled": ["要件定義と実装"],
   "humanHandled": ["作るもの・機能範囲の判断", "1作目を不採用にする判断"],
   "failuresAndFixes": [{ "problem": "1作目のスクショ整形が微妙", "fix": "夜に花火へ作り直し" }],
-  "publicUrl": "https://hundred-days.pages.dev/day-003-tap-fireworks/",
+  "publicUrl": "https://rairakku.com/100days/day-003-tap-fireworks/",
   "repoPath": "day-003-tap-fireworks",
   "screenshot": "screenshot.webp",
   "demo": "demo.mp4",
