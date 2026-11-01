@@ -1,0 +1,163 @@
+{
+  "name": "mizunuki",
+  "note": "水抜き穴の道。南の通りを東へ走り、東の小路を北へ。北東の塀の水抜き穴をしゃがんでくぐり、蔵の陰から信長の東の茂みへ。蘭丸が南西（中門の方）を向いた隙に、信長の背後へ寄って討つ。",
+  "seed": 1,
+  "steps": [
+    {
+      "do": "goto",
+      "x": 40,
+      "z": 37.5,
+      "move": "run",
+      "note": "南の通りを東へ"
+    },
+    {
+      "do": "goto",
+      "x": 40,
+      "z": -27.1,
+      "move": "run",
+      "note": "東の小路を北へ"
+    },
+    {
+      "do": "goto",
+      "x": 37.6,
+      "z": -27.1,
+      "move": "crouch",
+      "note": "水抜き穴の前でしゃがむ"
+    },
+    {
+      "do": "goto",
+      "x": 34.4,
+      "z": -27.1,
+      "move": "crouch",
+      "note": "穴をくぐる"
+    },
+    {
+      "do": "goto",
+      "x": 32,
+      "z": -22,
+      "move": "walk",
+      "note": "蔵の陰（暗い）"
+    },
+    {
+      "do": "waitUntil",
+      "until": {
+        "any": [
+          {
+            "guard": "garden-patrol",
+            "x": [
+              -40,
+              8
+            ]
+          },
+          {
+            "guard": "garden-patrol",
+            "x": [
+              8,
+              19
+            ],
+            "view": [
+              100,
+              260
+            ]
+          }
+        ]
+      },
+      "timeout": 90,
+      "note": "奥庭の提灯持ちが西にいるか、西へ去っていく"
+    },
+    {
+      "do": "goto",
+      "x": 31.2,
+      "z": -20.2,
+      "move": "walk",
+      "note": "蔵の南東の角"
+    },
+    {
+      "do": "goto",
+      "x": 22,
+      "z": -20.2,
+      "move": "walk",
+      "note": "蔵の南を西へ"
+    },
+    {
+      "do": "goto",
+      "x": 14.5,
+      "z": -21,
+      "move": "crouch",
+      "note": "茂み（書院の東）"
+    },
+    {
+      "do": "goto",
+      "x": 11,
+      "z": -19.4,
+      "move": "crouch",
+      "note": "茂み（信長の東）で待つ"
+    },
+    {
+      "do": "waitUntil",
+      "until": {
+        "all": [
+          {
+            "guard": "ranmaru",
+            "view": [
+              110,
+              152
+            ]
+          },
+          {
+            "any": [
+              {
+                "guard": "garden-patrol",
+                "x": [
+                  -40,
+                  -6
+                ]
+              },
+              {
+                "guard": "garden-patrol",
+                "x": [
+                  16,
+                  30
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "timeout": 90,
+      "note": "蘭丸が南西（中門の方）を向き、奥庭の提灯持ちが遠い"
+    },
+    {
+      "do": "goto",
+      "x": 4.8,
+      "z": -19.1,
+      "move": "walk",
+      "tol": 0.35,
+      "note": "蘭丸の背後を抜ける"
+    },
+    {
+      "do": "goto",
+      "x": 2.9,
+      "z": -18.9,
+      "move": "crouch",
+      "tol": 0.2,
+      "note": "最後はしゃがんで信長の背後へ"
+    },
+    {
+      "do": "waitUntil",
+      "until": {
+        "prompt": "assassinate"
+      },
+      "timeout": 2
+    },
+    {
+      "do": "tap",
+      "code": "KeyE",
+      "note": "討ち取る"
+    },
+    {
+      "do": "end",
+      "timeout": 3
+    }
+  ]
+}

@@ -1,0 +1,34 @@
+{
+  "id": "rock_surface",
+  "title": "Rock Surface",
+  "author": "Amal Kumar",
+  "source": "https://polyhaven.com/a/rock_surface",
+  "license": "CC0-1.0",
+  "licenseUrl": "https://polyhaven.com/license",
+  "retrieved": "2026-10-06T06:55:39.000Z",
+  "resolution": "1k",
+  "via": "3d-assets MCP (arielshad/3d-asset-server @1e7eae7)",
+  "intendedUse": "cut and rough stone (PART.stone.*)",
+  "sha256": {
+    "rock_surface_diff_1k.jpg": "07edda2bbe4715b01aae2e4bac9f21f204cf4aae37b4733ef01de33281e5e60e",
+    "rock_surface_nor_gl_1k.jpg": "c645af7f6a20bf77421765e6f998873834821e1950a3a0a21c5ee9ced32cecc1"
+  },
+  "derived": {
+    "tool": "tools/art/texture-derive.mjs",
+    "note": "Shipped files. Originals above are kept for provenance and are not referenced by the code.",
+    "rock_surface_lum_1k.jpg": {
+      "from": "rock_surface_diff_1k.jpg",
+      "fromSha256": "07edda2bbe4715b01aae2e4bac9f21f204cf4aae37b4733ef01de33281e5e60e",
+      "method": "linear luminance (Rec.709 weights), sRGB-encoded 8-bit grayscale JPEG, quality 88, no ICC/Exif",
+      "bytes": 471607,
+      "sha256": "6cc24a5ba7fa65edd6192b734d0ca5bd06b327c332e806c6567a5c4912ea8431"
+    },
+    "rock_surface_nor_gl_512.jpg": {
+      "from": "rock_surface_nor_gl_1k.jpg",
+      "fromSha256": "c645af7f6a20bf77421765e6f998873834821e1950a3a0a21c5ee9ced32cecc1",
+      "method": "2x2 box average to 512px, JPEG quality 85, no ICC/Exif",
+      "bytes": 146993,
+      "sha256": "239ec4576eb8f79811e9594f37d4fc1ec11086052d4eb1ebb2ff9c9db7b4e8a9"
+    }
+  }
+}
