@@ -180,7 +180,11 @@ test('共有は4手段。XとLINEは住所と #100日チャレンジ を含み�
   assert.ok(copy?.attrs.has('hidden'), 'コピーはJSが出す');
   assert.ok(native?.attrs.has('hidden'), '端末の共有は使えるときだけJSが出す');
   assert.match(html, /Instagramなどへは、コピーしたリンクを貼って渡してください/);
-  assert.ok(html.includes(PAGE_URL), '住所を本文にも書く（JSなしでも写せる）');
+  // 折り返しの印（<wbr>・span）は文字を持たないので、コピーする住所（textContent）は変わらない。JSなしでも写せる
+  const urlCode = html.match(/<code id="share-url">([\s\S]*?)<\/code>/)[1];
+  assert.equal(urlCode.replace(/<[^>]+>/g, ''), PAGE_URL, '住所を本文にも書く');
+  // 折り返しはスラッシュの位置で。名前の途中（day-081- と pagecrate の間など）では折れない
+  assert.ok(urlCode.includes('/<wbr><span class="nobr">day-081-pagecrate</span>'));
 });
 
 test('項目が無ければ、その節ごと出さない（空の見出しを残さない）', () => {
@@ -188,6 +192,7 @@ test('項目が無ければ、その節ごと出さない（空の見出しを�
   for (const heading of ['できること', '使う前に', '制作メモ', 'デモ動画', 'コードを見る']) assert.ok(!html.includes(heading), `${heading} を出さない`);
   assert.ok(html.includes('このページを共有'), '共有は常に出す');
   assert.ok(!/<h2[^>]*>\s*<\/h2>/.test(html), '空のh2が無い');
+  assert.ok(!html.includes('href="#h-memo"'), '制作メモが無ければ、そこへのジャンプも出さない');
   const bare = render({ hasShot: false, shot: '' });
   assert.ok(!bare.includes('<figure'), 'スクリーンショットが無ければ figure も無い');
 });
@@ -238,6 +243,42 @@ test('「アプリを開く」は、最初と、注意のあとの2か所にあ�
   assert.deepEqual(links, [APP_URL, APP_URL]);
   const at = (text) => html.indexOf(text);
   assert.ok(at('id="h-notice"') < at('actions--again') && at('actions--again') < at('id="h-memo"'), '注意 → 2つ目のボタン → 制作メモ の順');
+});
+
+test('矢印は線の太い図（SVG）で、読み上げない。文字の ↗ は使わない', () => {
+  const html = render();
+  assert.ok(!html.includes('↗'));
+  const icons = tagsOf(html).filter((tag) => tag.name === 'svg');
+  const kinds = (name) => icons.filter((icon) => icon.attrs.get('class') === `icon icon--${name}`).length;
+  assert.equal(kinds('out'), 6, '外部へ移るリンク：アプリ（最初・注意のあと・フッター）・コード・Xのフォロー・GitHub');
+  assert.equal(kinds('down'), 1, '制作メモへのジャンプ');
+  assert.equal(icons.length, 7, '矢印はこの2種類だけ（同じ線の太さ）');
+  for (const icon of icons) {
+    assert.equal(icon.attrs.get('aria-hidden'), 'true');
+    assert.ok(!icon.attrs.has('style'));
+  }
+});
+
+test('制作メモがあるときだけ、そこへのジャンプを出す。フッターから、一覧・アプリ・X・GitHubへ行ける', () => {
+  const html = render();
+  assert.match(html, /<a href="#h-memo">制作メモを読む/);
+  const footer = html.match(/<footer[\s\S]*?<\/footer>/)[0];
+  const hrefs = [...footer.matchAll(/<a [^>]*href="([^"]+)"/g)].map((m) => m[1]);
+  assert.deepEqual(hrefs, ['../', APP_URL, SITE.xUrl, SITE.repoUrl]);
+  assert.match(footer, /<a class="foot__open"[^>]*rel="noopener"/);
+});
+
+test('期間とタグは、制作メモの項目（AI・自分・失敗）とは別のまとまりで、区切りがある', () => {
+  const html = render();
+  const memo = html.match(/<dl class="memo">([\s\S]*?)<\/dl>/)[1];
+  const facts = html.match(/<dl class="memo memo--facts">([\s\S]*?)<\/dl>/)[1];
+  for (const label of ['AIに任せた', '自分でやった', '失敗と修正']) assert.ok(memo.includes(label) && !facts.includes(label), label);
+  for (const label of ['期間', 'タグ']) assert.ok(facts.includes(label) && !memo.includes(label), label);
+  // 期間とタグだけがあるDayでも、制作メモの節は出る（メモの項目は出さない）
+  const onlyFacts = render({ aiHandled: [], humanHandled: [], fixes: [] });
+  assert.ok(onlyFacts.includes('id="h-memo"') && onlyFacts.includes('memo memo--facts') && !onlyFacts.includes('<dl class="memo">'));
+  // 何も無ければ、節ごと出さない
+  assert.ok(!render({ aiHandled: [], humanHandled: [], fixes: [], tags: [], startedAt: '', finishedAt: '' }).includes('h-memo'));
 });
 
 test('紹介文は文ごとに行を分け、失敗と修正は「修正」を別の行にする', () => {
