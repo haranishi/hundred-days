@@ -2,7 +2,7 @@
 ## 方針
 完成済みの静的ゲームをday-075-amegumo-sokobanへ移植し、共通ビルドとCIへ接続する。
 既存20面と全解、音・図解・手帖を維持する。個人向け開発記録やローカルサーバーは公開対象に移さない。
-公開URL：https://hundred-days.pages.dev/day-075-amegumo-sokoban/
+公開URL：https://rairakku.com/100days/day-075-amegumo-sokoban/（元の住所は `https://hundred-days.pages.dev/day-075-amegumo-sokoban/`。住所の決まりは [公開の住所](../../steering/public-urls.md)）
 ## UX5階層
 戦略：考えるパズルをすぐ遊べる。要件：20面/図解/設定/共有。構造：既存の庭と四章。
 骨格・表層：既存の紙・緑・自作SVGを維持し、紹介画像の三景表記を二十の庭へ更新する。

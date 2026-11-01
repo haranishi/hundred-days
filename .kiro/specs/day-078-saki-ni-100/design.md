@@ -4,7 +4,7 @@
 
 静的な1ページのゲーム。ルールの判定・必勝の計算・あいての手は、画面に依存しない純粋な関数に分け、単体テストで固める。画面は状態を1か所で持ち、描画は状態から作る。外部通信・外部ライブラリ・外部フォントは使わない。
 
-公開URL：https://hundred-days.pages.dev/day-078-saki-ni-100/
+公開URL：https://rairakku.com/100days/day-078-saki-ni-100/（元の住所は `https://hundred-days.pages.dev/day-078-saki-ni-100/`。住所の決まりは [公開の住所](../../steering/public-urls.md)）
 
 ## 12面（計算で確認済み。あなたが必ず勝てる側）
 
