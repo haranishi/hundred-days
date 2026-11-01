@@ -18,7 +18,13 @@ test('meta.json と、ゲームの中の名前・公開URLがそろっている'
   assert.equal(meta.status, 'published');
   assert.match(html, new RegExp(`<title>${meta.title}</title>`));
   assert.match(site, new RegExp(`SITE_NAME = '${meta.title}'`));
-  assert.match(site, new RegExp(`SITE_URL = '${meta.publicUrl}'`));
+  // 公開先の正は meta.json の publicUrl（rairakku.com/100days/）。ゲーム内のシェアURL（SITE_URL）はビルド結果の assets/ に
+  // 焼き込まれていて、作り直すまで旧住所のまま。旧住所も同じDayを指すので、新住所か同じDayの旧住所のどちらかであればよい。
+  const direct = `https://hundred-days.pages.dev/${meta.name}/`;
+  assert.ok(
+    [meta.publicUrl, direct].some((url) => site.includes(`SITE_URL = '${url}'`)),
+    `SITE_URL が meta.json の publicUrl（${meta.publicUrl}）でも、同じDayの旧住所（${direct}）でもない`,
+  );
   assert.ok(existsSync(root + meta.screenshot), `${meta.screenshot} がない`);
   // 制作時間は計っていない。0 のままにして、推測の数字を入れない
   assert.equal(meta.actualMinutes, 0);

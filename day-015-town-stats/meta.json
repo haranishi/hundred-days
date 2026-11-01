@@ -17,7 +17,7 @@
   ],
   "difficulty": "B",
   "status": "published",
-  "publicUrl": "https://hundred-days.pages.dev/day-015-town-stats/",
+  "publicUrl": "https://rairakku.com/100days/day-015-town-stats/",
   "screenshot": "screenshot.webp",
   "demo": "demo.mp4",
   "sourceOfIdea": "2026-08-22、本人が外部のアイデアランキングから「e-Stat × 国土地理院」の組み合わせを指定。着手前に規約と法務を一次情報で確認（e-Stat=CC BY互換・商用可、地理院タイルはリアルタイム読込なら申請不要、統計の数値データは著作権の対象外）し、国勢調査xlsxと面積調CSVを実際にダウンロード・パースして1,741市区町村分が取れることを確かめてから作った",

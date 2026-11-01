@@ -52,7 +52,7 @@
       "fix": "1-t^2 に変えて、最初はほとんど薄れず終わりぎわで消えるようにした。ユニットテストが先に捕まえた"
     }
   ],
-  "publicUrl": "https://hundred-days.pages.dev/day-010-wikipedia-live/",
+  "publicUrl": "https://rairakku.com/100days/day-010-wikipedia-live/",
   "repoPath": "day-010-wikipedia-live",
   "screenshot": "screenshot.webp",
   "demo": "demo-with-audio.mp4",

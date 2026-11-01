@@ -17,7 +17,7 @@
   ],
   "difficulty": "A",
   "status": "published",
-  "publicUrl": "https://hundred-days.pages.dev/day-024-unreadable-places/",
+  "publicUrl": "https://rairakku.com/100days/day-024-unreadable-places/",
   "screenshot": "screenshot.webp",
   "demo": "demo-with-audio.mp4",
   "sourceOfIdea": "本人から「難しい地名がバッと出てきて、近づいてきて、打てたらはじけて次に行く」という指定。参照作として『漢字でGO!』（PLiCy）が挙がった。当初は難読地名のランキングアプリとして要件定義していたが、ゲームに切り替えた。ランキングのために作った難読度アルゴリズムは、そのままステージの難易度と『なぜ読めないか』の説明に転用している",

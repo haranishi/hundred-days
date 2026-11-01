@@ -117,7 +117,7 @@
       "fix": "表札・大きさ・画像の3行を2枚で共有する行にそろえ、表札には2行ぶんの高さを最初から与えて行数を固定した（subgridが無い環境でもずれない）。画像は共通の 4:3 の枠に object-fit: contain で収め、上端と下端の両方を一致させた。E2Eは上端だけでなく、下端・表札の高さ・大きさの表示の位置も測るようにした（いずれも実測0px差）"
     }
   ],
-  "publicUrl": "https://hundred-days.pages.dev/day-011-photo-metadata/",
+  "publicUrl": "https://rairakku.com/100days/day-011-photo-metadata/",
   "repoPath": "day-011-photo-metadata",
   "screenshot": "screenshot.webp",
   "demo": "demo.mp4",

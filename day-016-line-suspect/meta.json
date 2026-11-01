@@ -15,7 +15,7 @@
   ],
   "difficulty": "B",
   "status": "published",
-  "publicUrl": "https://hundred-days.pages.dev/day-016-line-suspect/",
+  "publicUrl": "https://rairakku.com/100days/day-016-line-suspect/",
   "screenshot": "screenshot.webp",
   "demo": "demo.mp4",
   "sourceOfIdea": "自宅の回線が夜だけ極端に遅くなる件を4日間・73回の自動測定で切り分けた経験から。そのとき役に立ったのは単発の速度の数字ではなく「上りと下りの非対称」「通信中に遅延が跳ねるか」「時間帯でどう変わるか」の3つで、既存の速度テストはどれも数字を出して終わっていた。判定の部分だけを誰でも使える形にした",

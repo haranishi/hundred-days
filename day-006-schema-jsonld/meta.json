@@ -34,7 +34,7 @@
       "fix": "廃止の2ボタンに「廃止」の文字バッジを足して、線と色だけに頼るのをやめた。灰色は #788983 から #5F726C に濃くして、紙の上で4.66:1・カードの上で5.11:1にした。ついでにコピーボタンの高さを36pxから44pxにし、種類の5択を role=radiogroup にして矢印キーだけで選べるようにした。営業時間の平日一括入力は機能追加なので今回は入れていない"
     }
   ],
-  "publicUrl": "https://hundred-days.pages.dev/day-006-schema-jsonld/",
+  "publicUrl": "https://rairakku.com/100days/day-006-schema-jsonld/",
   "repoPath": "day-006-schema-jsonld",
   "screenshot": "screenshot.webp",
   "demo": "demo.mp4",

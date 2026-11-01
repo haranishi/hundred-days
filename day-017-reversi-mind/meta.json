@@ -16,7 +16,7 @@
   ],
   "difficulty": "B",
   "status": "published",
-  "publicUrl": "https://hundred-days.pages.dev/day-017-reversi-mind/",
+  "publicUrl": "https://rairakku.com/100days/day-017-reversi-mind/",
   "screenshot": "screenshot.webp",
   "demo": "demo.mp4",
   "sourceOfIdea": "ボードゲームを作って公開していいのかという法務確認から始まった。「オセロ」は登録商標だがルールは19世紀末のリバーシで保護されていないと分かり、名称と配色を本家に寄せなければ作れると確定した。ただしリバーシの実装は無数にあるので、既存にない切り口として「AIの評価値を盤に重ねる」を選び、さらに反復深化で読みが深まる過程まで見せることにした",

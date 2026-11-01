@@ -5,7 +5,7 @@
   "description": "あなたとあいて（コンピューター）が交代で数を足し、目標ちょうどを取り合う12面の頭脳戦。ヒントは2段階。負けた手には印が付き、勝ちの合計とくり返しの形も教えてくれる。",
   "tags": ["パズル", "ゲーム", "頭脳戦", "必勝法", "vanilla-js", "Web Audio"],
   "status": "published",
-  "publicUrl": "https://hundred-days.pages.dev/day-078-saki-ni-100/",
+  "publicUrl": "https://rairakku.com/100days/day-078-saki-ni-100/",
   "screenshot": "og.png",
   "startedAt": "2026-10-27",
   "finishedAt": "2026-10-27",

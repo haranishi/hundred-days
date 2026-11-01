@@ -15,7 +15,7 @@
   ],
   "difficulty": "A",
   "status": "published",
-  "publicUrl": "https://hundred-days.pages.dev/day-025-nearby-parking/",
+  "publicUrl": "https://rairakku.com/100days/day-025-nearby-parking/",
   "screenshot": "screenshot.webp",
   "demo": "demo-with-audio.mp4",
   "sourceOfIdea": "本人が「近くの駐車場を出すアプリ」を発案。OpenStreetMapの駐車場タグの埋まり具合を先に実測し、金額はほぼ書かれていない（0〜0.5%）ことを確認したうえで、金額比較はやらず3値だけを正直に出す設計にした",
