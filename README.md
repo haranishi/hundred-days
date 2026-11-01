@@ -5,17 +5,17 @@
 1日1個、AIと一緒にWebアプリを作って公開する100日チャレンジです。登録なし・無料で、開いたその場で使えます。
 このリポジトリでは、アプリのソースコードと、各Dayの制作記録（`meta.json`）を読めます。記録には、AIに任せたこと・自分で決めたこと・失敗と直し方を書いています。テストは、プルリクエストのたびにCIで回しています。
 
-**[公開ページを開く](https://hundred-days.pages.dev/)** ・ [全アプリの一覧とコード](#アプリ一覧)
+**[公開ページを開く](https://rairakku.com/100days/)** ・ [全アプリの一覧とコード](#アプリ一覧)
 
 > **English** — One web app a day for 100 days, built together with AI. Free, no sign-up: open one and use it. Read each app's source and its build log: what the AI did, what I decided, and what broke. CI runs the tests on every pull request. The apps are in Japanese.
 
 ## 最初に触るなら、この3本
 
-[<img src="day-077-hoan-swiper/og.png" width="270" alt="保安検査スワイパーの3D画面">](https://hundred-days.pages.dev/day-077-hoan-swiper/) [<img src="day-078-saki-ni-100/og.png" width="270" alt="先に100のタイトル画面">](https://hundred-days.pages.dev/day-078-saki-ni-100/) [<img src="day-074-link-dokumi/og.png" width="270" alt="リンクの毒見のタイトル画面">](https://hundred-days.pages.dev/day-074-link-dokumi/)
+[<img src="day-077-hoan-swiper/og.png" width="270" alt="保安検査スワイパーの3D画面">](https://rairakku.com/100days/day-077-hoan-swiper/) [<img src="day-078-saki-ni-100/og.png" width="270" alt="先に100のタイトル画面">](https://rairakku.com/100days/day-078-saki-ni-100/) [<img src="day-074-link-dokumi/og.png" width="270" alt="リンクの毒見のタイトル画面">](https://rairakku.com/100days/day-074-link-dokumi/)
 
-- **Day 077 保安検査スワイパー**：3Dの空港で、荷物を「機内持ち込み」「預け荷物」「持込不可」に仕分けるゲーム。<br>[試す](https://hundred-days.pages.dev/day-077-hoan-swiper/) ・ [コード](day-077-hoan-swiper/)
-- **Day 078 先に100**：コンピューターと交代で数を足し、目標ちょうどを取り合う12面の頭脳戦。<br>[試す](https://hundred-days.pages.dev/day-078-saki-ni-100/) ・ [コード](day-078-saki-ni-100/)
-- **Day 074 リンクの毒見**：URLを貼ると、なりすましの兆候とサイトの守りの弱点を、平易な日本語で調べる。診断したURLの履歴は残さない。<br>[試す](https://hundred-days.pages.dev/day-074-link-dokumi/) ・ [コード](day-074-link-dokumi/)
+- **Day 077 保安検査スワイパー**：3Dの空港で、荷物を「機内持ち込み」「預け荷物」「持込不可」に仕分けるゲーム。<br>[試す](https://rairakku.com/100days/day-077-hoan-swiper/) ・ [コード](day-077-hoan-swiper/)
+- **Day 078 先に100**：コンピューターと交代で数を足し、目標ちょうどを取り合う12面の頭脳戦。<br>[試す](https://rairakku.com/100days/day-078-saki-ni-100/) ・ [コード](day-078-saki-ni-100/)
+- **Day 074 リンクの毒見**：URLを貼ると、なりすましの兆候とサイトの守りの弱点を、平易な日本語で調べる。診断したURLの履歴は残さない。<br>[試す](https://rairakku.com/100days/day-074-link-dokumi/) ・ [コード](day-074-link-dokumi/)
 
 ## Dayからコードを探す
 
@@ -173,7 +173,7 @@ npx wrangler pages deploy dist --project-name=hundred-days
 
 ## rairakku.com/100days/ へ中継される
 
-同じ公開物を `hundred-days.pages.dev/` と `rairakku.com/100days/` で配信します。公開物のサイト内参照は文書相対にし、ルート直下の絶対パスを書かないでください（`/api/day-NNN/` だけ例外）。`npm run build` が検査します。
+同じ公開物を `hundred-days.pages.dev/`（元）と `rairakku.com/100days/`（正の住所。canonical・サイトマップ・Xの返信リンクが指す）で配信します。住所の全体像と判断の理由は [公開の住所と配信の構成](.kiro/steering/public-urls.md) にあります。公開物のサイト内参照は文書相対にし、ルート直下の絶対パスを書かないでください（`/api/day-NNN/` だけ例外）。`npm run build` が検査します。
 canonical・OGPの基準は `SITE.canonicalBase`（既定 `https://rairakku.com/100days`、環境変数 `HD_CANONICAL_BASE` で変更可）です。`meta.json` の `mount:false` はサブパス配信の対象外を意味し、そのDayへのリンク・canonicalは元ホストを使い、sitemapには載せません。
 存在しないURLは、本物の404（`404.html`）を返し、案内のあと一覧へ自動で移ります（先頭が実在するDayなら、そのDayへ）。以前は存在しないURLにも一覧を200で返していたため、Xなどに貼られた古いリンクが一覧に着いていました。番号や名前を変えたDayの古いURLは、`static/_redirects` に301を足します（`scripts/tests/not-found.test.mjs` が、転送先の実在と輪の有無を検査します）。
 

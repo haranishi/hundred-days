@@ -47,7 +47,7 @@ flowchart LR
 ビルドは、ソースに無いcanonical・OGPのタグを `meta.json` から足す（`injectAppMeta`）。ソースに書いてあるタグは上書きしない。
 だから静的な検査は、**ソースに書かれた値**を検査し、書かれていないタグは「ビルドが正しく足す」とみなす。
 
-- canonical が `https://hundred-days.pages.dev/<フォルダ名>/` と一致する。
+- ソースに書かれた canonical が、元の住所 `https://hundred-days.pages.dev/<フォルダ名>/` と一致する（配信先の基準 `HD_CANONICAL_BASE` へは、ビルドがそろえる。[公開の住所](../../steering/public-urls.md)）。
 - `og:title` が `meta.json` の題名と一致する。`og:url` が canonical と一致する。`twitter:card` が `summary_large_image`。
 - `og:image` がそのDayのフォルダを指し、指す先のファイルが実在して、**ビルドが配信する**（`tests/`・`tools/` などは配信されない）。書かれていなければ `meta.json` の `screenshot` が同じ条件を満たす（ビルドはそれを足す。無いとサイト共通の画像になり、横断specが落ちる）。
 - 共有文（`share:text`。無ければ `<title>` の `|` より前）が、`meta.json` の題名をそのまま含む。
