@@ -23,7 +23,7 @@ Day71（影証言）では、Xの共有文が正式な題名「影証言 — 灯
 
 | id | 確かめること | 写した元のテスト |
 |---|---|---|
-| `canonical` | 書かれていれば `https://hundred-days.pages.dev/<フォルダ名>/` と一致 | OGPとcanonical |
+| `canonical` | 書かれていれば `https://hundred-days.pages.dev/<フォルダ名>/`（元の住所）と一致。配信先の基準へは、ビルドがそろえる（[公開の住所](public-urls.md)） | OGPとcanonical |
 | `og-title` | 書かれていれば `meta.json` の題名と一致 | OGPとcanonical |
 | `og-url` | 書かれていれば、ページのURLと一致 | OGPとcanonical |
 | `twitter-card` | 書かれていれば `summary_large_image` | OGPとcanonical |

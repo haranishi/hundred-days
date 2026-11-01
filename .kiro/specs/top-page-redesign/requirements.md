@@ -1,7 +1,7 @@
 # 要件定義：トップページの作り直し
 
 ## Introduction
-`https://hundred-days.pages.dev/`（`scripts/build.mjs` が生成する一覧ページ）は、機能は足りているが、見た目が量産品に近い。
+`https://rairakku.com/100days/`（元の住所は `https://hundred-days.pages.dev/`。`scripts/build.mjs` が生成する一覧ページ）は、機能は足りているが、見た目が量産品に近い。
 等幅の見出し・青いボタン・同じ形のカードが77枚並ぶだけで、「毎日1本、77本続けた」という最大の強みが一目で伝わらない。
 スマホでは、最初のアプリまで3,500px以上あり、その大半は225個のタグのチップが占める。
 この仕様は、一覧ページを「作品として見せられるページ」に作り直す。アプリ本体と `meta.json` は変えない。
@@ -48,4 +48,4 @@
 - カード：`article.card` に `data-day`（3桁）・`data-title`・`data-tags`。カード内の `img` は1つだけ（スクショ。`loading="lazy"`）。
 - `a.btn[href="./day-NNN-…/"]` は、そのDayのカードの「アプリを開く」だけ（ほかの場所で `.btn` を使わない。新しいDayのテストが厳密一致で見る）。外部Dayは「紹介ページを開く」でカード内の `.badge` は1つ（「外部で公開」）。
 - `.thumb__link`（サムネの `a`）・`.thumb__play`（`data-demo`・名前に「Day NNN」「題名」「再生」）・`.card__title`・`.progress__now`（数字だけ）・`.pill`・`.footer__links a`・`.about__link a`・`.memo`。
-- `<link rel="canonical" href="https://hundred-days.pages.dev/">`。
+- `<link rel="canonical" href="https://rairakku.com/100days/">`（`HD_CANONICAL_BASE` の値。元の住所ではなく、正の住所）。
