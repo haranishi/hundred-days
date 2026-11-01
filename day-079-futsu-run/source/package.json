@@ -42,8 +42,12 @@
     "esbuild@0.28.2": true
   },
   "overrides": {
-    "@node-minify/core": {
-      "glob": "10.5.0"
+    "glob": {
+      ".": "14.0.2",
+      "minimatch": "11.0.1"
+    },
+    "@typescript-eslint/typescript-estree": {
+      "minimatch": "11.0.1"
     }
   }
 }

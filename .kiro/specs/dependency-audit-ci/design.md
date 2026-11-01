@@ -1,7 +1,7 @@
 # 設計
 既存の公開前検査は秘密値と個人情報の検査であり、依存の勧告を照会していなかった。
 Day79は移行前のNext/OpenNextソースも保存したため、静的配信には不要なCLI依存がlockに残った。
-依存を削除して旧構成を失う代わりに、node-minify/coreのglobだけを10.5.0へoverrideする。
+依存を削除して旧構成を失う代わりに、node-minify/coreのglobだけを10.5.0へoverrideする。（2026-11-01：globの修正が14系にしか無くなり、glob 14.0.2の固定に置き換えた。[追加の対応](../dev-deps-security-2026-10/followup-2026-11-01.md)）
 
 ## 検査の境界
 Gitが管理するファイルと未追跡の非ignoreファイルから、package.jsonとpackage-lock.jsonを発見する。
