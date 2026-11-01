@@ -11,7 +11,9 @@
     "ログイン不要",
     "Cloudflare Workers"
   ],
-  "status": "draft",
+  "status": "external",
+  "externalUrl": "https://day81.rairakku.com/",
+  "publicUrl": "https://day81.rairakku.com/",
   "screenshot": "screenshot.webp",
   "demo": "demo.mp4",
   "startedAt": "2026-10-31",
