@@ -8,6 +8,7 @@ import { fileURLToPath } from 'node:url';
 import { PUBLISH_CHECK_ENV, effectiveStatus, isPublishCheckOverride, unmatchedPublishCheckTargets } from './lib/day-status.mjs';
 import { findRootRelativeRefs } from './check-mount-safe.mjs';
 import { notFoundHtml } from './lib/not-found.mjs';
+import { readIntro, renderIntroPage } from './lib/external-intro.mjs';
 import { isServedPath } from './lib/dist-files.mjs';
 
 const root = fileURLToPath(new URL('..', import.meta.url));
@@ -61,6 +62,8 @@ const allApps = dirs.map((dir) => {
   // screenshot / demo はアプリフォルダ内の相対ファイル名だけを受け付ける（パス指定の混入を防ぐ）
   const shot = meta.screenshot ? basename(String(meta.screenshot)) : '';
   const demo = meta.demo ? basename(String(meta.demo)) : '';
+  const externalUrl =
+    typeof meta.externalUrl === 'string' && meta.externalUrl.trim().startsWith('https://') ? meta.externalUrl.trim() : '';
   return {
     dir,
     meta,
@@ -77,10 +80,10 @@ const allApps = dirs.map((dir) => {
     xPostUrl: typeof meta.xPostUrl === 'string' ? meta.xPostUrl.trim() : '',
     // Chrome拡張など、このサイトの外で公開しているDayのリンク先（紹介ページ）。
     // status を published 以外にしたうえで externalUrl を書くと、カードがここへ飛ぶ
-    externalUrl:
-      typeof meta.externalUrl === 'string' && meta.externalUrl.trim().startsWith('https://')
-        ? meta.externalUrl.trim()
-        : '',
+    externalUrl,
+    // 外部Dayが、このサイトの中に持つ紹介ページ（.kiro/specs/external-intro-pages/）。
+    // 下書きはどこにも出ないので確かめない。公開に切り替えるときに、前提が足りなければここで止まる
+    intro: status === 'draft' ? null : readIntro(meta, { dir, status, externalUrl }),
     startedAt: isDate(meta.startedAt) ? meta.startedAt : '',
     finishedAt: isDate(meta.finishedAt) ? meta.finishedAt : '',
     aiHandled: toStringArray(meta.aiHandled),
@@ -123,6 +126,13 @@ for (const app of apps) {
     mkdirSync(join(distDir, app.dir), { recursive: true });
     if (app.hasShot) copyFileSync(join(appsDir, app.dir, app.shot), join(distDir, app.dir, app.shot));
     if (app.hasDemo) copyFileSync(join(appsDir, app.dir, app.demo), join(distDir, app.dir, app.demo));
+  }
+  // 紹介ページの動画のポスター（画面写真とは別の絵）。名前を書いたのに無い、という静かな失敗を避けるため、無ければ止める
+  if (app.intro?.poster) {
+    const poster = join(appsDir, app.dir, app.intro.poster);
+    if (!existsSync(poster)) throw new Error(`${app.dir}/meta.json の intro.poster「${app.intro.poster}」が、フォルダの中にありません`);
+    mkdirSync(join(distDir, app.dir), { recursive: true });
+    copyFileSync(poster, join(distDir, app.dir, app.intro.poster));
   }
 }
 
@@ -309,7 +319,8 @@ const headerLines = [
 // パス末尾のアスタリスクは空文字にも当たるので、この1本でアプリの正式なURL
 // （/day-010-wikipedia-live/）と配下のファイルの両方に掛かる。
 // wrangler pages dev で実測して確認済み（末尾なしのパスも併記するとCSPが二重に付く）。
-for (const app of apps.filter((a) => a.published)) {
+// 外部Dayの紹介ページ（intro）も、公開済みのDayと同じCSPで配る。インラインのscript・styleを持たない作りにしてある
+for (const app of apps.filter((a) => a.published || a.intro)) {
   headerLines.push(`/${app.dir}/*`, `  Content-Security-Policy: ${appCsp(app.dir)}`);
   if (PERMISSIONS_BY_APP[app.dir]) headerLines.push('  ! Permissions-Policy', `  Permissions-Policy: ${PERMISSIONS_BY_APP[app.dir]}`);
   headerLines.push('');
@@ -473,6 +484,10 @@ const cardHtml = (app) => {
   const xLink = app.xPostUrl
     ? `<a class="post-link" href="${esc(app.xPostUrl)}" target="_blank" rel="noopener">X投稿<span class="sr-only">（Day ${num}・新しいタブで開く）</span></a>`
     : '';
+  // 外部Dayが紹介ページを持つときだけ、このサイトの中へ入る副リンクを足す（主ボタンとサムネは外部のまま）
+  const introLink = app.intro
+    ? `<a class="post-link" href="./${esc(app.dir)}/">制作の記録<span class="sr-only">（Day ${num}）</span></a>`
+    : '';
 
   const memoRows = [
     app.aiHandled.length ? memoBlock('AIに任せた', esc(app.aiHandled.join('／'))) : '',
@@ -498,7 +513,7 @@ const cardHtml = (app) => {
     ${tags ? `<ul class="card__tags">${tags}</ul>` : ''}
     ${durationRow}
     <div class="card__foot">
-      <div class="card__actions">${primary}${xLink}</div>
+      <div class="card__actions">${primary}${xLink}${introLink}</div>
       ${memo}
     </div>
 </article>`;
@@ -673,22 +688,36 @@ const html = `<!DOCTYPE html>
 `.replace(/^[ \t]+/gm, '').replace(/>\n\s*</g, '><').replace('@@CSS@@', () => css).replace('@@JS@@', () => js);
 
 writeFileSync(join(distDir, 'index.html'), html);
+
+// 外部Dayの紹介ページ（.kiro/specs/external-intro-pages/）。スクリーンショットと動画は、上の複写で dist/ に入っている
+const introApps = apps.filter((app) => app.intro);
+const introCss = readFileSync(join(root, 'scripts/site/intro.css'), 'utf8');
+const introJs = readFileSync(join(root, 'scripts/site/intro.js'), 'utf8');
+for (const app of introApps) {
+  mkdirSync(join(distDir, app.dir), { recursive: true });
+  writeFileSync(join(distDir, app.dir, 'index.html'), renderIntroPage({ app, site: { ...SITE, favicon } }));
+  writeFileSync(join(distDir, app.dir, 'intro.css'), introCss);
+  writeFileSync(join(distDir, app.dir, 'intro.js'), introJs);
+}
+
 console.log(
   `build: ${apps.length} day(s) / 公開 ${releasedCount}（うち外部 ${releasedCount - publishedCount}） / スクショ ${apps.filter((a) => a.hasShot).length}` +
     ` / 動画 ${apps.filter((a) => a.hasDemo).length} / OGP付与 ${metaInjected} -> ${process.env.HUNDRED_DAYS_BUILD_DIR ? "custom output/" : "dist/"}` +
     // 除外したものは必ず名前を出す（黙って落とすと「全部載っている」と誤解する）
+    (introApps.length ? `\n  外部Dayの紹介ページ: ${introApps.map((d) => d.dir).join(', ')}` : '') +
     (drafts.length ? `\n  draft のため一覧から除外: ${drafts.map((d) => d.dir).join(', ')}` : '') +
     (publishCheckOnly.length ? `\n  （検査用）公開済みとして扱う：${publishCheckOnly.map((d) => d.dir).join(', ')}` : '')
 );
 
 // XML escaping shares the HTML escape rules (including & and quotes).
-const sitemapApps = apps.filter(app => app.published && !app.externalUrl && app.meta.mount !== false);
+// 外部Dayは本体を配信しないので載せない。ただし紹介ページ（intro）を持つDayは、そのページを載せる
+const sitemapApps = apps.filter(app => (app.published && !app.externalUrl && app.meta.mount !== false) || app.intro);
 const entries = [`<url><loc>${esc(SITE.canonicalBase)}/</loc></url>`, ...sitemapApps.map(app => {
   const date = app.finishedAt || app.startedAt;
   return `<url><loc>${esc(SITE.canonicalBase)}/${esc(app.dir)}/</loc>${date ? `<lastmod>${date}</lastmod>` : ''}</url>`;
 })];
 writeFileSync(join(distDir, 'sitemap.xml'), `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${entries.join('\n')}</urlset>\n`);
-writeFileSync(join(distDir, '404.html'), notFoundHtml({ listUrl: `${SITE.canonicalBase}/`, days: apps.filter(app => app.published && !app.externalUrl).map(app => app.dir) }));
+writeFileSync(join(distDir, '404.html'), notFoundHtml({ listUrl: `${SITE.canonicalBase}/`, days: apps.filter(app => (app.published && !app.externalUrl) || app.intro).map(app => app.dir) }));
 const mountViolations = findRootRelativeRefs(distDir);
 if (mountViolations.length) {
   console.error(mountViolations.map(ref => `${ref.file}:${ref.line}: ${ref.value}`).join('\n'));

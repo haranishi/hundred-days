@@ -1,10 +1,7 @@
 import assert from 'node:assert/strict';
-import { spawnSync } from 'node:child_process';
-import { copyFileSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
-import { tmpdir } from 'node:os';
-import { dirname, join } from 'node:path';
+import { existsSync } from 'node:fs';
+import { join } from 'node:path';
 import { test } from 'node:test';
-import { fileURLToPath } from 'node:url';
 import {
   effectiveStatus,
   isPublishCheckOverride,
@@ -13,6 +10,7 @@ import {
   unmatchedPublishCheckTargets,
 } from '../lib/day-status.mjs';
 import { parseHtml } from '../lib/publish-contract.mjs';
+import { miniSite } from './helpers.mjs';
 
 const DIR = 'day-071-kage-shogen';
 const draft = { status: 'draft' };
@@ -64,33 +62,6 @@ test('どのDayも指さない指定を拾う（番号の打ち間違いに気�
 
 /* build.mjs を小さな作業場へ写して流す。リポジトリの dist/ には触れない。
    下書きが公開済みとして扱われるのは環境変数があるときだけで、無いときの出力が変わらないことを確かめる */
-function miniSite(t) {
-  const site = mkdtempSync(join(tmpdir(), 'hundred-days-status-'));
-  t.after(() => rmSync(site, { recursive: true, force: true }));
-  const write = (file, content) => {
-    mkdirSync(dirname(join(site, file)), { recursive: true });
-    writeFileSync(join(site, file), content);
-  };
-  for (const file of ['build.mjs', 'check-mount-safe.mjs', 'lib/day-status.mjs', 'lib/dist-files.mjs', 'lib/home-model.mjs', 'lib/not-found.mjs', 'site/home.css', 'site/home.js']) {
-    mkdirSync(dirname(join(site, 'scripts', file)), { recursive: true });
-    copyFileSync(fileURLToPath(new URL(`../${file}`, import.meta.url)), join(site, 'scripts', file));
-  }
-  const page = (title) => `<!doctype html><html><head><title>${title}</title></head><body></body></html>`;
-  write('day-001-alpha/index.html', page('アルファ'));
-  write('day-001-alpha/meta.json', JSON.stringify({ day: 1, title: 'アルファ', status: 'published' }));
-  write('day-002-beta/index.html', page('ベータ'));
-  write('day-002-beta/meta.json', JSON.stringify({ day: 2, title: 'ベータ', status: 'draft' }));
-  const env = { ...process.env };
-  for (const name of ['PUBLISH_CHECK_DAY', 'HUNDRED_DAYS_BUILD_DIR', 'GITHUB_ACTIONS', 'HD_CANONICAL_BASE']) delete env[name];
-  const build = (extra = {}) => {
-    // 固まっても CI を止めないよう上限を付ける（小さな作業場のビルドは1秒もかからない）
-    const run = spawnSync(process.execPath, [join(site, 'scripts', 'build.mjs')], { cwd: site, env: { ...env, ...extra }, encoding: 'utf8', timeout: 60_000 });
-    return { status: run.status, output: run.stdout + run.stderr };
-  };
-  const read = (file) => readFileSync(join(site, 'dist', file), 'utf8');
-  return { site, write, build, read };
-}
-
 test('ビルド：指定が無ければ下書きを出さず、指定したときだけ公開済みとして組み立てる', (t) => {
   const { site, build, read } = miniSite(t);
 
