@@ -1,7 +1,7 @@
 # Day82「影討ち」の紹介動画
 
 36秒・縦1080×1920・30fps・H.264（yuv420p・bt709）・AAC 192k。本物の遊びの画面だけで作り、闇と灯り、小石で釣る、背後の当て身、信長の討ち取りと燃え上がる本能寺を見せる。
-本編は Day 直下の `demo.mp4`（BGM は A 案）。BGM 違いの B 案などの出力は、git の追跡外の `output/` に置く。
+本編は Day 直下の `demo.mp4`（BGM は B 案。2026-11-02 に本人が選んだ。`PROMO_MAIN_BGM=a` で A 案を本編にできる）。BGM 違いの A 案などの出力は、git の追跡外の `output/` に置く。
 
 | 秒 | 映像（実際に映っているもの） | 字幕 |
 |---|---|---|
@@ -34,7 +34,7 @@
 ## 曲（BGM）
 コードで作ったオリジナル曲（`audio.mjs`。サンプルや外の音源は使わない）。D の陰旋法（都節：D・E♭・G・A・B♭）、90 BPM（1拍＝2/3秒）。映像の切り替え（10.0・11.33・14.0・18.0・20.0・24.0秒＝15・17・21・27・30・36拍目）、当て身の E（16.0秒＝24拍目）、討ち取りの E（26.0秒＝39拍目）、終わりの画面（31.33秒＝47拍目）はすべて拍の上にあり、そこに太鼓を置いた。
 - 構成：導入（0–10秒。低いドローンと撥弦の動機、遠い太鼓）→高まり（10–18秒。1拍ごとの撥弦、切り替えに太鼓と拍子木）→張りつめ（18–24秒。A と B♭ の刻み、太鼓の連打）→息をのむ（24–26秒。ドローンと高い一音）→討ち取りの一打と山（26–31.3秒）→余韻（31.3–36秒。最後の1.2秒でフェードアウト）。1コマ目から鳴っている。
-- A 案（本編）＝静かな緊張：低いドローン＋撥弦（Karplus–Strong）＋遠い太鼓。B 案＝脈打つ太鼓が中心：半拍ごとの太鼓と締め太鼓、撥弦は合いの手だけ。
+- A 案＝静かな緊張：低いドローン＋撥弦（Karplus–Strong）＋遠い太鼓。B 案（本編）＝脈打つ太鼓が中心：半拍ごとの太鼓と締め太鼓、撥弦は合いの手だけ。
 - 音量は ffmpeg の `ebur128` で測って −17 LUFS・真のピーク −2 dBTP 以下に合わせる（先読みのリミッターで、切り詰めはしない）。直流は 25Hz の高域通過で除く。
 
 ## 作り直す手順
@@ -45,9 +45,9 @@ node capture.mjs atemi
 node capture.mjs ura           # output/takes/<場面>/ に JPEG の連番・states.jsonl・take.json
 node audio.mjs                 # output/bgm-a.wav・bgm-b.wav・audio.json
 node subtitles.mjs             # output/subs/*.png・layout.json
-node render.mjs                # ../../demo.mp4・output/promo.mp4・promo-b.mp4・promo-clean.mp4・first-frame.png・timeline.json
+node render.mjs                # ../../demo.mp4（B案）・output/promo.mp4・promo-a.mp4・promo-b.mp4・promo-clean.mp4・first-frame.png・timeline.json
 node audit.mjs                 # 関門（不合格なら終了コード 1）。output/contact-sheet.jpg・audit-demo.json
-node audit.mjs output/promo-b.mp4
+node audit.mjs output/promo-a.mp4
 node render.mjs --break sub-shift && node audit.mjs output/broken-sub-shift.mp4   # 落ちることの確認
 node render.mjs --break loud && node audit.mjs output/broken-loud.mp4
 ```

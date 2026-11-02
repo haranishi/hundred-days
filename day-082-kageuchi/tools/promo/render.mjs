@@ -1,5 +1,5 @@
 // 描画：撮影のコマ（output/takes）を絵コンテ（edit.mjs）どおりにつなぎ、字幕（output/subs）を重ね、曲（output/bgm-*.wav）を付けて書き出す。
-//   node render.mjs                    → ../../demo.mp4（本編・A案）・output/promo.mp4（同じもの）・output/promo-b.mp4（B案）・
+//   node render.mjs                    → ../../demo.mp4（本編。曲は既定で B 案。PROMO_MAIN_BGM=a で A 案）・output/promo.mp4（同じもの）・output/promo-a.mp4（A案）・output/promo-b.mp4（B案）・
 //                                         output/promo-clean.mp4（字幕なし・音なし。検査が字幕の入れ替わりを測る基準）・output/first-frame.png・output/timeline.json
 //   node render.mjs --break sub-shift  → output/broken-sub-shift.mp4（字幕を 1 秒遅らせる。検査が落ちることを確かめる用）
 //   node render.mjs --break loud       → output/broken-loud.mp4（音を 6dB 上げる。同上）
@@ -9,6 +9,10 @@ import { copyFileSync, existsSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { CLIPS, DURATION, ENDCARD, FADE, FIRST_NO_FADE_IN, FPS, HEIGHT, SUBTITLES, WIDTH, BEAT } from './edit.mjs';
 import { DAY, OUT } from './lib/harness.mjs';
+
+/** 本編（demo.mp4）の曲。2026-11-02 に本人が B 案を選んだ。PROMO_MAIN_BGM=a で A 案にできる。 */
+const MAIN_BGM = (process.env.PROMO_MAIN_BGM ?? 'b').toLowerCase();
+if (!['a', 'b'].includes(MAIN_BGM)) throw new Error(`PROMO_MAIN_BGM は a か b（いま "${process.env.PROMO_MAIN_BGM}"）`);
 
 const args = process.argv.slice(2);
 const breakMode = args.includes('--break') ? args[args.indexOf('--break') + 1] : null;
@@ -145,16 +149,18 @@ async function main() {
   // 1) 字幕なし（検査の基準）
   const clean = path.join(OUT, 'promo-clean.mp4');
   await ff([...imgIn, '-vf', `format=gbrp,${GRADE},${TO709}`, ...X264, '-an', '-t', String(DURATION), clean], feed(frames));
-  // 2) 本編（字幕・A案）
+  // 2) 字幕つきの映像（音なし）
   const { inputs, graph } = subtitleFilter(0);
   const silentVideo = path.join(OUT, 'promo-video.mp4');
   await ff([...imgIn, ...inputs, '-filter_complex', graph, '-map', '[v]', ...X264, '-an', '-t', String(DURATION), silentVideo], feed(frames));
   const demo = path.join(DAY, 'demo.mp4');
   const AAC = ['-c:a', 'aac', '-b:a', '192k', '-ar', '48000', '-ac', '2'];
-  await ff(['-i', silentVideo, '-i', bgmA, '-map', '0:v', '-map', '1:a', '-c:v', 'copy', ...AAC, '-t', String(DURATION), '-movflags', '+faststart', demo]);
+  const mux = (bgm, out) => ff(['-i', silentVideo, '-i', bgm, '-map', '0:v', '-map', '1:a', '-c:v', 'copy', ...AAC, '-t', String(DURATION), '-movflags', '+faststart', out]);
+  // 3) 曲違いの2本（映像は同じ。音だけ替える）。本編（demo.mp4・promo.mp4）は MAIN_BGM の曲
+  await mux(bgmA, path.join(OUT, 'promo-a.mp4'));
+  await mux(bgmB, path.join(OUT, 'promo-b.mp4'));
+  copyFileSync(path.join(OUT, `promo-${MAIN_BGM}.mp4`), demo);
   copyFileSync(demo, path.join(OUT, 'promo.mp4'));
-  // 3) B案（映像は同じ。音だけ替える）
-  await ff(['-i', silentVideo, '-i', bgmB, '-map', '0:v', '-map', '1:a', '-c:v', 'copy', ...AAC, '-t', String(DURATION), '-movflags', '+faststart', path.join(OUT, 'promo-b.mp4')]);
   // 4) 1コマ目
   await ff(['-i', demo, '-frames:v', '1', path.join(OUT, 'first-frame.png')]);
   writeFileSync(path.join(OUT, 'timeline.json'), JSON.stringify({ clips, events }, null, 2));

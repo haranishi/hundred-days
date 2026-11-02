@@ -1,6 +1,6 @@
 // 検査（関門）：書き出した動画を測り、どれか1つでも外れたら失敗（終了コード 1）にする。
 //   node audit.mjs                                  ../../demo.mp4 を、字幕なしの基準 output/promo-clean.mp4 と比べて調べる
-//   node audit.mjs output/promo-b.mp4               B案
+//   node audit.mjs output/promo-a.mp4               A案（本編は B 案）
 //   node audit.mjs output/broken-sub-shift.mp4      わざと壊した版（落ちるはず）
 // 調べること：長さ 36.0±0.05 秒／1080×1920／30fps／H.264 yuv420p（bt709）／音声あり（AAC）／積分ラウドネス −17±1 LUFS／真のピーク −1 dBTP 以下／
 // 1コマ目と数コマ後で絵が変わる／黒・真っ白のコマが無い（各秒とコマの平均輝度）／字幕が上下左右 10% の内側（配置の記録と、動画の画素の両方）／
