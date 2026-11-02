@@ -113,10 +113,19 @@ float toSrgb1( float c ) {
   return c <= 0.0031308 ? c * 12.92 : 1.055 * pow( c, 1.0 / 2.4 ) - 0.055;
 }
 
+// MurmurHash3 の最終混合 fmix32（パブリックドメイン）。座標の float のビット列を混ぜて 0..1 にする
+uint dayHashMix( uint h ) {
+  h ^= h >> 16;
+  h *= 0x85ebca6bu;
+  h ^= h >> 13;
+  h *= 0xc2b2ae35u;
+  h ^= h >> 16;
+  return h;
+}
+
 float hash12( vec2 p ) {
-  vec3 p3 = fract( vec3( p.xyx ) * 0.1031 );
-  p3 += dot( p3, p3.yzx + 33.33 );
-  return fract( ( p3.x + p3.y ) * p3.z );
+  uvec2 b = floatBitsToUint( p );
+  return float( dayHashMix( b.x ^ dayHashMix( b.y ) ) >> 8 ) * ( 1.0 / 16777216.0 );
 }
 
 void main() {
