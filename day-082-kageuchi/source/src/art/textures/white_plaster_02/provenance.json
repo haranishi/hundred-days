@@ -1,0 +1,34 @@
+{
+  "id": "white_plaster_02",
+  "title": "White Plaster 02",
+  "author": "Rob Tuytel",
+  "source": "https://polyhaven.com/a/white_plaster_02",
+  "license": "CC0-1.0",
+  "licenseUrl": "https://polyhaven.com/license",
+  "retrieved": "2026-10-06T06:55:39.000Z",
+  "resolution": "1k",
+  "via": "3d-assets MCP (arielshad/3d-asset-server @1e7eae7)",
+  "intendedUse": "white plaster walls (PART.plaster.white / town)",
+  "sha256": {
+    "white_plaster_02_diff_1k.jpg": "a1ebbe091bd1ae93d2abd5de8d69f9003a8d0ee6532bcf9a87c2492c97051f23",
+    "white_plaster_02_nor_gl_1k.jpg": "eb572ca3630d5bfde72e2601b1f02412da23ca005cd19384dced8690be4cb783"
+  },
+  "derived": {
+    "tool": "tools/art/texture-derive.mjs",
+    "note": "Shipped files. Originals above are kept for provenance and are not referenced by the code.",
+    "white_plaster_02_lum_1k.jpg": {
+      "from": "white_plaster_02_diff_1k.jpg",
+      "fromSha256": "a1ebbe091bd1ae93d2abd5de8d69f9003a8d0ee6532bcf9a87c2492c97051f23",
+      "method": "linear luminance (Rec.709 weights), sRGB-encoded 8-bit grayscale JPEG, quality 88, no ICC/Exif",
+      "bytes": 463902,
+      "sha256": "d337babde808e87ffb93195fd9537b73df427d55fd9040cb79879abbd451b82f"
+    },
+    "white_plaster_02_nor_gl_512.jpg": {
+      "from": "white_plaster_02_nor_gl_1k.jpg",
+      "fromSha256": "eb572ca3630d5bfde72e2601b1f02412da23ca005cd19384dced8690be4cb783",
+      "method": "2x2 box average to 512px, JPEG quality 85, no ICC/Exif",
+      "bytes": 72531,
+      "sha256": "bebcc28436c1d91eb1c5fc7f761fbb1bfd28164599d230a9a9ff1e4e43bd716f"
+    }
+  }
+}

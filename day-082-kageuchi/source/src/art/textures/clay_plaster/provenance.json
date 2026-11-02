@@ -1,0 +1,34 @@
+{
+  "id": "clay_plaster",
+  "title": "Clay Plaster",
+  "author": "Amal Kumar",
+  "source": "https://polyhaven.com/a/clay_plaster",
+  "license": "CC0-1.0",
+  "licenseUrl": "https://polyhaven.com/license",
+  "retrieved": "2026-10-06T06:55:39.000Z",
+  "resolution": "1k",
+  "via": "3d-assets MCP (arielshad/3d-asset-server @1e7eae7)",
+  "intendedUse": "earthen walls (PART.plaster.dobei)",
+  "sha256": {
+    "clay_plaster_diff_1k.jpg": "82e43c68bddebb55a18577ae3cb0d01c02c23f086d342a854ff8a174d9f4fd73",
+    "clay_plaster_nor_gl_1k.jpg": "359f814292005ab16be86807678a4a51e8256a87c282ebf5f5333ce18c428fba"
+  },
+  "derived": {
+    "tool": "tools/art/texture-derive.mjs",
+    "note": "Shipped files. Originals above are kept for provenance and are not referenced by the code.",
+    "clay_plaster_lum_1k.jpg": {
+      "from": "clay_plaster_diff_1k.jpg",
+      "fromSha256": "82e43c68bddebb55a18577ae3cb0d01c02c23f086d342a854ff8a174d9f4fd73",
+      "method": "linear luminance (Rec.709 weights), sRGB-encoded 8-bit grayscale JPEG, quality 88, no ICC/Exif",
+      "bytes": 118727,
+      "sha256": "fadd9ea030079f304400b06b0d95ec1b4e8b7318288a99ed487b3bef4448e817"
+    },
+    "clay_plaster_nor_gl_512.jpg": {
+      "from": "clay_plaster_nor_gl_1k.jpg",
+      "fromSha256": "359f814292005ab16be86807678a4a51e8256a87c282ebf5f5333ce18c428fba",
+      "method": "2x2 box average to 512px, JPEG quality 85, no ICC/Exif",
+      "bytes": 81795,
+      "sha256": "aab3d6fd0a52b97b70cc9c76d8170d65adcbbbc060081058edb3bdee9a3c53d1"
+    }
+  }
+}

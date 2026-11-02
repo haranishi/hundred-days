@@ -1,0 +1,18 @@
+{
+  "extends": "./tsconfig.json",
+  "include": [
+    "src/contract",
+    "src/stage",
+    "src/config",
+    "src/sim",
+    "src/game",
+    "src/ui",
+    "src/input",
+    "src/camera",
+    "src/view",
+    "src/audio",
+    "src/main.ts",
+    "tests",
+    "src/art/render/n8ao.d.ts"
+  ]
+}

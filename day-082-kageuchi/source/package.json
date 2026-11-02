@@ -1,0 +1,40 @@
+{
+  "name": "kageuchi",
+  "private": true,
+  "version": "0.0.1",
+  "description": "影討ち（仮題）— 歴史の転換点に忍び込み、敵将をひそかに討つブラウザ3Dステルスアクション。第一面は本能寺の変",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --port 5401 --strictPort",
+    "dev:art": "VITE_CACHE_DIR=node_modules/.vite-art vite --port 5405 --strictPort",
+    "dev:chars": "VITE_CACHE_DIR=node_modules/.vite-chars vite --port 5407 --strictPort",
+    "build": "tsc --noEmit -p tsconfig.json && vite build",
+    "build:day082": "node tools/build-day082.mjs",
+    "preview": "vite preview --port 5402 --strictPort",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "typecheck:core": "tsc --noEmit -p tsconfig.core.json",
+    "typecheck:world": "tsc --noEmit -p tsconfig.world.json",
+    "typecheck:chars": "tsc --noEmit -p tsconfig.chars.json",
+    "test": "vitest run",
+    "e2e": "playwright test",
+    "capture": "node tools/capture.mjs",
+    "play": "node tools/play.mjs",
+    "capture:art": "node tools/art/capture.mjs",
+    "capture:chars": "node tools/chars/capture.mjs",
+    "perf": "node tools/perf.mjs"
+  },
+  "dependencies": {
+    "n8ao": "2.0.1",
+    "postprocessing": "6.39.5",
+    "three": "0.186.1"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.63.0",
+    "@types/node": "24.x",
+    "@types/three": "0.186.0",
+    "pngjs": "7.0.0",
+    "typescript": "~6.0.3",
+    "vite": "8.3.5",
+    "vitest": "5.0.5"
+  }
+}

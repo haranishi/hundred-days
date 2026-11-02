@@ -1,0 +1,157 @@
+{
+  "name": "ura",
+  "note": "裏門の道。南の通りから西の小路を北へ走り、裏門の提灯持ちが南を向いて離れた隙に入って竹林の獣道へ。板塀の西の切れ目から奥庭に出て、中門の番兵の背中側を東へ。信長の南西でしゃがんで待ち、蘭丸が北東を、信長が北西を向いた隙に、信長の南東へ寄って討つ。",
+  "seed": 1,
+  "steps": [
+    {
+      "do": "goto",
+      "x": -40,
+      "z": 37.5,
+      "move": "run",
+      "note": "南の通りを西へ"
+    },
+    {
+      "do": "goto",
+      "x": -40,
+      "z": 9.6,
+      "move": "run",
+      "note": "西の小路を北へ（裏門の前）"
+    },
+    {
+      "do": "waitUntil",
+      "until": {
+        "guard": "ura-patrol",
+        "z": [
+          13.5,
+          20
+        ],
+        "view": [
+          20,
+          160
+        ]
+      },
+      "timeout": 60,
+      "note": "裏門の提灯持ちが南を向いて離れた"
+    },
+    {
+      "do": "goto",
+      "x": -34.6,
+      "z": 9.6,
+      "move": "walk",
+      "note": "裏門をくぐる"
+    },
+    {
+      "do": "goto",
+      "x": -34.6,
+      "z": -5,
+      "move": "walk",
+      "note": "塀ぞいに北へ"
+    },
+    {
+      "do": "goto",
+      "x": -33,
+      "z": -10,
+      "move": "walk",
+      "note": "竹林の獣道"
+    },
+    { "do": "wait", "sec": 0.4, "note": "板戸の手前で止まる" },
+    { "do": "tap", "code": "KeyE", "note": "竹林の板戸を開く" },
+    { "do": "waitUntil", "until": { "interaction": "bamboo-door", "used": true }, "timeout": 5 },
+    { "do": "waitUntil", "until": { "not": { "guard": "bamboo-sentry", "view": [240, 300] } }, "timeout": 30 },
+    { "do": "waitUntil", "until": { "guard": "bamboo-sentry", "view": [260, 280] }, "timeout": 30, "note": "竹林の見張りが北を向き始めた隙に抜ける" },
+    {
+      "do": "goto",
+      "x": -32.5,
+      "z": -13.6,
+      "move": "crouch",
+      "note": "板塀の西の切れ目"
+    },
+    {
+      "do": "goto",
+      "x": -20,
+      "z": -14.4,
+      "move": "crouch",
+      "note": "奥庭の南を東へ（苔は静か）"
+    },
+    {
+      "do": "goto",
+      "x": -7,
+      "z": -14.6,
+      "move": "walk",
+      "note": "中門の番兵の背中側"
+    },
+    { "do": "waitUntil", "until": { "guard": "garden-patrol", "z": [-30, -19.5] }, "timeout": 90, "note": "奥庭の提灯持ちが書院側へ離れるのを待つ" },
+    {
+      "do": "goto",
+      "x": -0.6,
+      "z": -15.0,
+      "move": "crouch",
+      "note": "中門の番兵の背後・信長の南西でしゃがんで待つ"
+    },
+    {
+      "do": "waitUntil",
+      "until": {
+        "all": [
+          {
+            "guard": "ranmaru",
+            "view": [
+              258,
+              108
+            ]
+          },
+          {
+            "guard": "nobunaga",
+            "view": [
+              195,
+              235
+            ]
+          },
+          {
+            "any": [
+              {
+                "guard": "garden-patrol",
+                "x": [
+                  12,
+                  30
+                ]
+              },
+              {
+                "guard": "garden-patrol",
+                "x": [
+                  -40,
+                  -14
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "timeout": 90,
+      "note": "蘭丸が北東を、信長が北西を向き、奥庭の提灯持ちが遠い"
+    },
+    {
+      "do": "goto",
+      "x": 2.2,
+      "z": -17.4,
+      "move": "crouch",
+      "tol": 0.3,
+      "note": "しゃがんだまま信長の南東へ"
+    },
+    {
+      "do": "waitUntil",
+      "until": {
+        "prompt": "assassinate"
+      },
+      "timeout": 2
+    },
+    {
+      "do": "tap",
+      "code": "KeyE",
+      "note": "討ち取る"
+    },
+    {
+      "do": "end",
+      "timeout": 3
+    }
+  ]
+}
