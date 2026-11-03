@@ -1,0 +1,20 @@
+{
+  "feature_name": "day-082-mobile-touch",
+  "created_at": "2026-11-03T09:00:44Z",
+  "updated_at": "2026-11-03T09:00:44Z",
+  "language": "ja",
+  "phase": "tasks-generated",
+  "approvals": {
+    "requirements": { "generated": true, "approved": true },
+    "design": { "generated": true, "approved": true },
+    "tasks": { "generated": true, "approved": true }
+  },
+  "approval_basis": "本人の依頼（2026-11-03「Day82をスマホでも遊べるように。スマホの操作も加えて。スキルとハーネスを使って」）と、cc-sddの自律進行の共通ルールによる。設計書の「入れない：スマホ操作」は、この依頼で変更する。",
+  "ready_for_implementation": true,
+  "delivery": {
+    "repository": "haranishi/hundred-days",
+    "base": "main",
+    "branch": "feat/day-082-mobile-touch",
+    "merge": "本人（AGENTS.md）。PRまでが作業の範囲"
+  }
+}
