@@ -1,8 +1,30 @@
 // OWNER: core
 // E2E の共通：コンソールのエラーと捕まらなかった例外を集める、起動を待つ、window.__state を読む。
-import type { Page } from '@playwright/test';
+// 共有欄の部品（shared/share.css・share.js）は、配信先の hundred-days が足すもので、ゲーム単体のプレビューには無い。
+// 無いと 404 がコンソールのエラーに数えられ全件が落ちるので、隣のフォルダ（day-082-kageuchi/shared/）の実物を返す。
+// 2026-11-03: hundred-days へ取り込んだあとの試験が、この食い違いで全件落ちていた（スマホ対応の基準線を取るときに見つけた）
+import { existsSync, readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
+import { test as base, type Page } from '@playwright/test';
 
-export { expect, test, type Page } from '@playwright/test';
+export { expect, type Page } from '@playwright/test';
+
+const SHARED_DIR = fileURLToPath(new URL('../../shared/', import.meta.url));
+
+export const test = base.extend({
+  page: async ({ page }, use) => {
+    await page.route('**/shared/share.*', async (route) => {
+      const name = new URL(route.request().url()).pathname.split('/').pop() ?? '';
+      const file = `${SHARED_DIR}${name}`;
+      if (!/^share\.(css|js)$/.test(name) || !existsSync(file)) {
+        await route.fulfill({ status: 404, body: '' });
+        return;
+      }
+      await route.fulfill({ body: readFileSync(file), contentType: name.endsWith('.css') ? 'text/css' : 'text/javascript' });
+    });
+    await use(page);
+  },
+});
 
 /** WebKit が、移動で捨てる側の文書の取得の失敗に付ける文（遊びの中の失敗ではないので数えない）。 */
 const LEAVING_FETCH = /^Fetch API cannot load .+ due to access control checks\.$/;
