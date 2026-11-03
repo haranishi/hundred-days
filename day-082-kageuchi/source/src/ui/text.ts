@@ -4,6 +4,7 @@ import type { Rank } from '../config/rules';
 import type { LightTier } from '../sim/query';
 import type { DetectRecord } from '../sim/types';
 import type { SurfaceKind } from '../stage/types';
+import type { GameStateOut } from '../game/state';
 
 export const TIER_LABEL: Record<LightTier, string> = { dark: '闇', dim: '薄明', lit: '灯り' };
 export const SURFACE_LABEL: Record<SurfaceKind, string> = { gravel: '白砂', stone: '石畳', moss: '苔', dirt: '土' };
@@ -108,3 +109,81 @@ export const CONTROLS: [string, string][] = [
   ['Q 長押し', '小石を狙う・離して投げる（右クリックか Esc でやめる）'],
   ['Esc', '一時停止　　R　やり直す'],
 ];
+
+// ---------------------------------------------------------------- タッチ操作の文言（2026-11-03 スマホ対応・tasks 3.2）
+// タッチのときは、画面のどこにもキー名（Enter・Esc・R・WASD・E・F・Q・C・Shift・Ctrl・M）を出さない（requirements 6.3）。
+// 規則やステージの文（src/sim・src/stage）は書き換えられないので、画面に出す直前に touchWording で言い換える。
+
+/** 画面の文にキー名・マウスの操作が含まれていれば true（試験と、言い換えの漏れの検出用）。 */
+export function hasKeyName(s: string): boolean {
+  return /Enter|Esc|Shift|Ctrl|WASD|W A S D|右クリック|ホイール|マウス|(?<![A-Za-z])[EFQRCMWASD](?![A-Za-z])/.test(s);
+}
+
+/** 規則・ステージの文の、キー名を含む言い回しを、タッチのボタンの名前に言い換える。決まった言い回しを先に、残りは1文字ずつ。 */
+const TOUCH_PHRASES: [RegExp, string][] = [
+  [/「E 討ち取る」が出たら、Eキーを押す。/g, '当て身のボタンが「討つ」に変わったら押す。'],
+  [/背後に近づいて E/g, '背後に近づいて当て身'],
+  [/背後で E/g, '背後で当て身'],
+  [/Eの背後制圧/g, '当て身での背後制圧'],
+  [/正面攻撃は F/g, '正面からは「攻撃」'],
+  [/を E で開く/g, 'を「使う」で開く'],
+  [/Eで消灯・補充・偵察/g, '「使う」で消灯・補充・偵察'],
+  [/討たれたら R で再挑戦/g, '討たれたら「やり直す」で再挑戦'],
+];
+const TOUCH_LETTERS: [RegExp, string][] = [
+  [/(?<![A-Za-z])E\s?キー/g, '当て身'],
+  [/(?<![A-Za-z])E(?![A-Za-z])/g, '当て身'],
+  [/(?<![A-Za-z])F(?![A-Za-z])/g, '「攻撃」'],
+  [/(?<![A-Za-z])Q(?![A-Za-z])/g, '「小石」'],
+  [/(?<![A-Za-z])C(?![A-Za-z])/g, '「しゃがむ」'],
+  [/(?<![A-Za-z])R(?![A-Za-z])/g, '「やり直す」'],
+];
+
+export function touchWording(s: string): string {
+  let out = s;
+  for (const [re, to] of TOUCH_PHRASES) out = out.replace(re, to);
+  for (const [re, to] of TOUCH_LETTERS) out = out.replace(re, to);
+  return out;
+}
+
+/** 評価と再挑戦の案内（タッチ）。 */
+export const MISSION_HELP_TOUCH = {
+  ...MISSION_HELP,
+  retry: '見つかっても、逃げ切れば続行できる。討たれたら「やり直す」で再挑戦。',
+} as const;
+
+/** 説明の画面の「操作」（タッチ）。左がボタン・なぞる場所、右が働き。 */
+export const CONTROLS_TOUCH: [string, string][] = [
+  ['左をなぞる', '歩く（倒した分だけ速く。いちばん外の輪まで倒すと走る・足音が大きい）'],
+  ['右をなぞる', '見回す'],
+  ['しゃがむ', 'しゃがむ（切り替え）'],
+  ['当て身', '背後で討つ・制圧。板戸・消灯・補充・偵察の前では「使う」に変わる。作業中に動くと中断'],
+  ['攻撃', '正面から攻撃。番兵は2撃で制圧（音が出る）'],
+  ['小石', '押している間ねらい、離して投げる。ちょんと押せばねらいを保つ。「やめる」で投げずに戻る'],
+  ['右上の二本線', '一時停止'],
+];
+
+/** 狙っている間の添え書き（タッチ）。2行に分けて出す。 */
+export const AIM_HINT_TOUCH: readonly [string, string] = ['離して投げる　ちょん押しなら「投げる」', '「やめる」で中止　なぞって向きと遠近'];
+
+/** 遊び始めに一度だけ出す操作のヒント（タッチ）。 */
+export const TOUCH_HINT_LINES: readonly [string, string] = ['左をなぞって歩く　右をなぞって見回す', 'いちばん外の輪まで　倒すと走る'];
+
+/** 縦向きのときの注記（タイトル・選択・説明）。 */
+export const PORTRAIT_NOTE = 'スマホは横向きで遊びます';
+
+/** 「いまできること」のひとこと。touch が偽ならキーボードの文（変更前と同じ）、真ならキー名を含まない文。 */
+export function promptText(st: Pick<GameStateOut, 'player' | 'mission' | 'guards'>, touch: boolean): string {
+  const guardNear = st.guards.some((g) => !g.down && g.id !== 'nobunaga' && Math.hypot(st.player.x - g.x, st.player.z - g.z) < 2.5);
+  const p = st.player.prompt;
+  const it = st.mission.interaction;
+  const pct = Math.floor(st.mission.progress * 100);
+  if (!touch) {
+    return p === 'assassinate' ? 'E　討ち取る' : p === 'takedown' ? 'E　背後から制圧　／　F　近接攻撃'
+      : it ? (st.mission.progress > 0 ? `${it}　${pct}%（移動で中断）` : `E　${it}`)
+      : guardNear ? 'F　近接攻撃　／　背後へ回ると E で制圧' : '';
+  }
+  return p === 'assassinate' ? '背後から討ち取る' : p === 'takedown' ? '背後から「当て身」　／　正面から「攻撃」'
+    : it ? (st.mission.progress > 0 ? `${it}　${pct}%（動くと中断）` : `「使う」で${it}`)
+    : guardNear ? '正面から「攻撃」／背後へ回って「当て身」' : '';
+}

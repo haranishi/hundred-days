@@ -31,10 +31,16 @@ body {
 #game {
   position: fixed;
   inset: 0;
-  width: 100vw;
-  height: 100vh;
+  width: 100%;
+  height: 100%;
   display: block;
   outline: none;
+}
+/* 2026-11-03 スマホ対応：ブラウザの帯が出入りしても、見えている高さに合わせる（PC では 100vh と同じ） */
+@supports (height: 100dvh) {
+  #game {
+    height: 100dvh;
+  }
 }
 
 .kg-ui {
@@ -522,6 +528,9 @@ body {
 }
 .kg-radar {
   display: block;
+  /* 2026-11-03：大きさを radar.ts の style 属性からここへ移した（タッチで縮めるため。値は変更前と同じ） */
+  width: 196px;
+  height: 196px;
 }
 /* レーダーの下の添え書き：朱の三角＝信長の方角と、信長までの距離 */
 .kg-radar-cap {

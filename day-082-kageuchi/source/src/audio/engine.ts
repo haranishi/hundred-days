@@ -57,7 +57,9 @@ export class AudioEngine {
   /** 最初の操作の中で呼ぶ（ブラウザは操作なしに音を出させない）。2回目からは止まっていれば再開するだけ。 */
   start(): boolean {
     if (this.ctx) {
-      if (this.ctx.state === 'suspended') void this.ctx.resume();
+      // iOS の Safari は、着信やアプリの切り替えのあと 'interrupted'（標準の型に無い）になる。次の操作で再開する
+      const st: string = this.ctx.state;
+      if (st === 'suspended' || st === 'interrupted') this.ctx.resume().catch(() => undefined);
       return false;
     }
     const Ctx = window.AudioContext ?? (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;

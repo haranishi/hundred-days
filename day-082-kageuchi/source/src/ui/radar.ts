@@ -39,8 +39,7 @@ export class Radar {
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
     this.canvas.width = size * dpr;
     this.canvas.height = size * dpr;
-    this.canvas.style.width = `${size}px`;
-    this.canvas.style.height = `${size}px`;
+    // 表示の大きさは CSS（style.css の .kg-radar＝196px。タッチでは touch.css が縮める。描画の解像度は変えない）
     this.canvas.className = 'kg-radar';
     this.canvas.dataset.testid = 'radar';
     this.g = this.canvas.getContext('2d')!;
