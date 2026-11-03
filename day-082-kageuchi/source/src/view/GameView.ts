@@ -16,6 +16,11 @@ export interface GameView {
   update(dt: number, snap: SimSnapshot, camera: THREE.PerspectiveCamera, simDt: number): void;
   render(dt: number): void;
   resize(width: number, height: number): void;
+  /** 描画だけの段階（0〜3）。仮の表示は対応しなくてよい。 */
+  setQuality?(tier: number): void;
+  qualityTier?(): number;
+  /** 環境遮蔽（AO）の段が、いま実際に働いているか（段階の表の値ではなく、描画の実際の状態。試験が「軽くなった」ことを確かめるため）。 */
+  aoEnabled?(): boolean;
   /** 描画の命令数・三角形数・作ったシェーダーの数（撮影と計測の記録用。シェーダーの数が遊びの途中で増えたら、先作りの漏れ）。 */
   stats(): { calls: number; triangles: number; programs: number };
   /** 描く準備（シェーダーの先作り）が終わったら解決する。撮影はこれを待ってから数える。 */

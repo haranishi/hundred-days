@@ -7,6 +7,7 @@
 import * as THREE from 'three';
 import { createCharacter } from '../art/characters';
 import type { KgPost } from '../art/render/post';
+import { QUALITY_TIERS } from '../art/render/quality';
 import { setBushHole } from '../art/render/seeThrough';
 import { buildWorld, createPost, createRenderer, createSeeThrough, warmUp, type KgWorld } from '../art/world';
 import { ambientFactorAt } from '../art/world/worldMap';
@@ -46,6 +47,9 @@ export class ArtView implements GameView {
   private readonly ready: Promise<void>;
   private isReady = false;
   private shot = false;
+  private quality = 0;
+  private viewportWidth: number;
+  private viewportHeight: number;
   private lastSnapT = -1;
   /** 飾り（炎・揺らぎ・霧）の時計：sim の時刻＋sim が止まっていた間の実時間。撮影では sim の時刻そのもの。 */
   private freeT = 0;
@@ -71,6 +75,9 @@ export class ArtView implements GameView {
     // 先作りの1コマ（隠れている物まで描く）を見せないよう、準備ができるまで画面を出さない
     canvas.style.opacity = '0';
     this.renderer = createRenderer(canvas);
+    const size = this.renderer.getSize(new THREE.Vector2());
+    this.viewportWidth = size.x;
+    this.viewportHeight = size.y;
     this.world = buildWorld(this.scene, this.renderer, stage);
     this.overlayRoot.name = 'overlays';
     this.scene.add(this.overlayRoot);
@@ -279,9 +286,30 @@ export class ArtView implements GameView {
   }
 
   resize(width: number, height: number): void {
+    this.viewportWidth = width;
+    this.viewportHeight = height;
     this.renderer.setSize(width, height, false);
     this.post.setSize(width, height);
     this.world.setViewportHeight(height * this.renderer.getPixelRatio());
+  }
+
+  setQuality(tier: number): void {
+    if (!Number.isInteger(tier)) return;
+    const settings = QUALITY_TIERS[tier];
+    if (!settings) return;
+    this.quality = tier;
+    this.post.setAoEnabled(settings.ao);
+    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, settings.maxPixelRatio));
+    // mobile-touch 2.2：画素比だけでは合成器のバッファは変わらないので、同じ論理寸法でも取り直す。
+    this.resize(this.viewportWidth, this.viewportHeight);
+  }
+
+  qualityTier(): number {
+    return this.quality;
+  }
+
+  aoEnabled(): boolean {
+    return this.post.ao.enabled;
   }
 
   stats(): { calls: number; triangles: number; programs: number } {

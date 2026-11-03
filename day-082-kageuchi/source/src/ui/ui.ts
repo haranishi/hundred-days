@@ -3,6 +3,9 @@
 // 文字はヒラギノ明朝。小さいキーの表記（W A S D・Shift・E など）だけヒラギノ角ゴ（外のフォントは読み込まない）。色は墨黒・朱・金・生成り。
 // r02-fix-play: レーダーの下に信長までの距離、説明の画面に見取り図、発見に入ったとき一度だけの逃げ方の案内を足した。
 // r03-fix-play: 発見中に誰にも見られていない間は、帯を墨と金に変えて「見られていない　残り N 秒」と出す。
+// 2026-11-03 スマホ対応（tasks 3.2）：setTouchMode(true) で、画面の文からキー名を消し（ボタンの見出し・操作の一覧・ステージの文）、
+//   一時停止に音の入切と画質の表示、縦向きの注記、遊び始めの操作のヒントを足す。タッチでないときは、見える画面と文を変えない（見えない要素と class を足すだけ）。
+//   HUD の置き場所は touch.css（.kg-touch 配下）が決める。
 import './style.css';
 import { FINALE } from '../config/rules';
 import type { SimSnapshot } from '../contract/snapshot';
@@ -13,7 +16,29 @@ import { STAGE_LIST } from '../stage';
 import type { StageDef } from '../stage/types';
 import { Radar } from './radar';
 import { drawStageMap } from './stageMap';
-import { AIM_HINT, ALERT_TIP, CONTROLS, HUD_KEYS, MISSION_HELP, PHASE_LABEL, RANK_TEXT, TIER_LABEL, WATCH_LABEL, captureText, causeText, formatTime, hintText } from './text';
+import { onTap } from './tap';
+import {
+  AIM_HINT,
+  AIM_HINT_TOUCH,
+  ALERT_TIP,
+  CONTROLS,
+  CONTROLS_TOUCH,
+  HUD_KEYS,
+  MISSION_HELP,
+  MISSION_HELP_TOUCH,
+  PHASE_LABEL,
+  PORTRAIT_NOTE,
+  RANK_TEXT,
+  TIER_LABEL,
+  TOUCH_HINT_LINES,
+  WATCH_LABEL,
+  captureText,
+  causeText,
+  formatTime,
+  hintText,
+  promptText,
+  touchWording,
+} from './text';
 
 export interface UiHandlers {
   start(): void;
@@ -23,6 +48,11 @@ export interface UiHandlers {
   restart(): void;
   toSelect(): void;
   toTitle(): void;
+  /** 一時停止の「音」ボタン（タッチのときだけ出る）。 */
+  toggleMute?(): void;
+  muted?(): boolean;
+  /** 一時停止に小さく出す画質の名前（タッチのときだけ出る）。 */
+  qualityLabel?(): string;
 }
 
 /** 「クリックで視点をつかむ」を出しておく秒数（ゲーム内）。 */
@@ -31,6 +61,8 @@ const LOCK_HINT_SECONDS = 6;
 const ALERT_TIP_SECONDS = 6;
 /** 説明の画面の見取り図の大きさ（CSS の px）。ステージの外周（88m×76m）の縦横の比に合わせる */
 const MAP_SIZE = { width: 232, height: 201 };
+/** 遊び始めの操作のヒント（タッチ）を出しておく時間（ms）。最後の 1 秒で消える（CSS の移り変わり）ので、出てから 8 秒以内に消える。 */
+const TOUCH_HINT_MS = 6800;
 
 function el<K extends keyof HTMLElementTagNameMap>(tag: K, cls?: string, text?: string): HTMLElementTagNameMap[K] {
   const e = document.createElement(tag);
@@ -39,11 +71,36 @@ function el<K extends keyof HTMLElementTagNameMap>(tag: K, cls?: string, text?: 
   return e;
 }
 
+/**
+ * 文を句ごとの箱（.kg-ph。タッチのとき inline-block）に分ける。狭い所で語の途中で折り返さないように。
+ * 全角の空白で区切った所だけ、箱の間に空き（.kg-ph-gap）を入れる（「。」「、」「／」「・」の後と「（」の前は詰める）。
+ */
+function phraseSpans(text: string): HTMLElement[] {
+  const out: HTMLElement[] = [];
+  let gap = false;
+  for (const part of text.split(/(　+)|(?<=[／。、・])|(?=（)/)) {
+    if (part === undefined || part === '') continue;
+    if (/^　+$/.test(part)) {
+      gap = true;
+      continue;
+    }
+    out.push(el('span', gap && out.length > 0 ? 'kg-ph kg-ph-gap' : 'kg-ph', part));
+    gap = false;
+  }
+  return out;
+}
+
+function phraseLine(text: string, cls = ''): HTMLElement {
+  const line = el('div', cls);
+  line.append(...phraseSpans(text));
+  return line;
+}
+
 function button(text: string, testId: string, onClick: () => void, cls = 'kg-btn'): HTMLButtonElement {
   const b = el('button', cls, text);
   b.type = 'button';
   b.dataset.testid = testId;
-  b.addEventListener('click', (e) => {
+  onTap(b, (e) => {
     e.stopPropagation();
     onClick();
   });
@@ -83,6 +140,28 @@ export class Ui {
   private alertTipShown = false;
   private lastKey = '';
   private lastTargetM = -1;
+  /** 明るさの目盛りの3つの欄（闇・薄明・灯り）。いまの段に kg-active を付ける（タッチのCSSが濃淡で示す。見た目の採点 第1周）。 */
+  private readonly hudMeterSegs = new Map<string, HTMLElement>();
+  private lastLightTier = '';
+  // ---- タッチ（2026-11-03）
+  private touch = false;
+  /** キー名を含みうる文の要素と、元の（キーボードの）文。タッチに切り替えたら言い換える。 */
+  private readonly keyed: { el: HTMLElement; text: string; touchText?: string; phrase: boolean }[] = [];
+  private controlsDl: HTMLElement | null = null;
+  private titleBox: HTMLElement | null = null;
+  private selectScreen: HTMLElement | null = null;
+  private briefBox: HTMLElement | null = null;
+  private pausePanel: HTMLElement | null = null;
+  private muteBtn: HTMLButtonElement | null = null;
+  private qualityLine: HTMLElement | null = null;
+  private readonly touchHint: HTMLElement;
+  /** 遊び始めの操作のヒント：まだ出していない → 出している（until まで）→ 出し終えた（やり直しでは出さない）。 */
+  private touchHintState: 'pending' | 'showing' | 'done' = 'pending';
+  private touchHintUntil = 0;
+  private lastAimKey = '';
+  private lastPrompt = '';
+  /** 描画の準備（シェーダーの先作り）が終わったか。操作のヒントは、絵が出てから数え始める。 */
+  private viewReady = false;
 
   constructor(root: HTMLElement, stage: StageDef, private readonly h: UiHandlers) {
     this.root = root;
@@ -105,6 +184,10 @@ export class Ui {
     const tl = el('div', 'kg-hud-tl');
     tl.append(el('div', 'kg-objective', stage.meta.objective ?? '敵将を討て'));
     tl.append(el('div', 'kg-objective-detail', `${stage.meta.mission.destination}へ。背後に近づいて E`), el('div', 'kg-objective-clear', MISSION_HELP.hudClear));
+    // 遊び始めの操作のヒント（タッチのときだけ。touch.css で置き場所を決める）
+    this.touchHint = el('div', 'kg-touchhint');
+    this.touchHint.dataset.testid = 'touch-hint';
+    for (const line of TOUCH_HINT_LINES) this.touchHint.append(phraseLine(line));
     this.hudTime = el('div', 'kg-time', '0:00');
     this.hudMission = el('div', 'kg-mission-stage');
     this.hudMission.dataset.testid = 'mission-stage';
@@ -132,6 +215,7 @@ export class Ui {
     for (const [cls, label] of [['dark', '闇'], ['dim', '薄明'], ['lit', '灯り']] as const) {
       const seg = el('div', `kg-meter-seg kg-${cls}`);
       seg.append(el('span', '', label));
+      this.hudMeterSegs.set(cls, seg);
       bar.append(seg);
     }
     this.hudMeterMark = el('div', 'kg-meter-mark');
@@ -150,7 +234,7 @@ export class Ui {
     bc.append(this.hudPrompt, this.hudAim);
     this.toast = el('div', 'kg-toast');
     this.lockHint = el('div', 'kg-lockhint', 'クリックで視点をつかむ（マウスで見回す）');
-    this.hud.append(tl, tr, this.hudPhase, this.alertTip, bl, br, bc, this.toast, this.lockHint);
+    this.hud.append(tl, tr, this.hudPhase, this.alertTip, bl, br, bc, this.toast, this.lockHint, this.touchHint);
 
     // 討ち取り演出の重ね
     this.finale = el('div', 'kg-finale');
@@ -175,13 +259,14 @@ export class Ui {
     const s = this.screen('title', 'kg-title');
     const box = el('div', 'kg-title-box');
     box.append(
-      el('div', 'kg-title-sub', '歴史の転換点に忍び込み、名のある武将をひそかに討つ'),
+      this.ph(el('div', 'kg-title-sub', '歴史の転換点に忍び込み、名のある武将をひそかに討つ')),
       el('h1', 'kg-logo', '影討ち'),
       el('div', 'kg-title-en', 'KAGEUCHI'),
-      el('div', 'kg-title-goal', stage.meta.mission.goal),
+      this.ph(el('div', 'kg-title-goal', stage.meta.mission.goal)),
       button('はじめる', 'btn-start', () => this.h.start()),
-      el('div', 'kg-hint', 'Enter でも進める'),
+      el('div', 'kg-hint kg-keyhint', 'Enter でも進める'),
     );
+    this.titleBox = box;
     s.append(box);
     return s;
   }
@@ -196,24 +281,25 @@ export class Ui {
       c.dataset.testid = `stage-${m.id}`;
       c.disabled = !m.playable;
       const rule = el('div', 'kg-card-rule');
-      rule.append(el('div', 'kg-card-rulename', `隠れ方　${m.rule.name}`), el('div', 'kg-card-ruletext', m.rule.text));
+      rule.append(this.ph(el('div', 'kg-card-rulename', `隠れ方　${m.rule.name}`)), this.ph(el('div', 'kg-card-ruletext', m.rule.text)));
       const mission = el('div', 'kg-card-mission');
       mission.append(
-        el('div', 'kg-card-objective', m.objective),
-        el('div', 'kg-card-role', `操作する人物　${m.mission.player}`),
-        el('div', 'kg-card-route', `目指す場所　${m.mission.destination}`),
-        el('div', 'kg-card-clear', `クリア条件${m.playable ? '' : '（予定）'}　${m.mission.clearCondition}`),
+        this.ph(el('div', 'kg-card-objective', m.objective)),
+        this.ph(el('div', 'kg-card-role', `操作する人物　${m.mission.player}`)),
+        this.ph(el('div', 'kg-card-route', `目指す場所　${m.mission.destination}`)),
+        this.ph(el('div', 'kg-card-clear', `クリア条件${m.playable ? '' : '（予定）'}　${m.mission.clearCondition}`)),
       );
       c.append(el('div', 'kg-card-era', m.era), el('div', 'kg-card-name', m.title), el('div', 'kg-card-place', m.place), mission, rule);
       if (!m.playable) c.append(el('div', 'kg-card-badge', '準備中'));
       else c.append(el('div', 'kg-card-badge kg-go', '選ぶ'));
-      c.addEventListener('click', (e) => {
+      onTap(c, (e) => {
         e.stopPropagation();
         if (m.playable) this.h.selectStage(m.id);
       });
       cards.append(c);
     }
     s.append(cards, button('タイトルへ', 'btn-to-title', () => this.h.toTitle(), 'kg-btn kg-btn-ghost'));
+    this.selectScreen = s;
     return s;
   }
 
@@ -223,18 +309,23 @@ export class Ui {
     const box = el('div', 'kg-brief-box');
     box.append(el('div', 'kg-brief-date', `${m.dateText}　${m.place}`), el('h1', 'kg-brief-tagline', m.tagline ?? m.title), el('div', 'kg-brief-objective', `目的　${m.objective ?? ''}`));
     const body = el('div', 'kg-brief-body');
-    body.append(el('p', 'kg-brief-role', `あなたは${m.mission.player}。狙うのは、${m.mission.destination}にいる${m.mission.target}。`));
-    for (const p of m.briefing ?? []) body.append(el('p', '', p));
+    body.append(this.ph(el('p', 'kg-brief-role', `あなたは${m.mission.player}。狙うのは、${m.mission.destination}にいる${m.mission.target}。`)));
+    for (const p of m.briefing ?? []) body.append(this.ph(el('p', '', p)));
     const mission = el('section', 'kg-mission');
     mission.setAttribute('aria-label', 'クリアまでの流れ');
     mission.append(el('h3', '', 'クリアまでの流れ'));
     const steps = el('ol', 'kg-mission-steps');
     for (const [name, detail] of m.mission.steps) {
       const li = el('li');
-      li.append(el('strong', '', name), el('span', '', detail));
+      li.append(this.k(el('strong', '', name)), this.k(el('span', '', detail), undefined, true));
       steps.append(li);
     }
-    mission.append(steps, el('p', 'kg-mission-clear', m.mission.clearCondition), el('p', 'kg-mission-note', MISSION_HELP.rating), el('p', 'kg-mission-note', MISSION_HELP.retry));
+    mission.append(
+      steps,
+      this.k(el('p', 'kg-mission-clear', m.mission.clearCondition), undefined, true),
+      this.k(el('p', 'kg-mission-note', MISSION_HELP.rating), undefined, true),
+      this.k(el('p', 'kg-mission-note', MISSION_HELP.retry), MISSION_HELP_TOUCH.retry, true),
+    );
     const cols = el('div', 'kg-brief-cols');
     const scout = el('section', 'kg-brief-scout');
     scout.append(el('h3', '', '物見の報告'));
@@ -245,7 +336,7 @@ export class Ui {
       const li = el('li');
       const cut = r.indexOf('　');
       if (cut > 0) li.append(el('span', 'kg-scout-place', r.slice(0, cut)));
-      for (const line of r.slice(cut + 1).split(/(?<=。)/)) if (line) li.append(el('span', 'kg-scout-line', line));
+      for (const line of r.slice(cut + 1).split(/(?<=。)/)) if (line) li.append(this.k(el('span', 'kg-scout-line', line), undefined, true));
       ul.append(li);
     }
     // 見取り図（上が北）：塀・入り口・信長・開始地点をステージのデータから描く
@@ -263,8 +354,10 @@ export class Ui {
     const dl = el('dl');
     for (const [k, v] of CONTROLS) dl.append(el('dt', 'kg-key', k), el('dd', '', v));
     ctl.append(dl);
+    this.controlsDl = dl;
     cols.append(scout, ctl);
-    box.append(body, mission, cols, button('出陣する（Enter）', 'btn-begin', () => this.h.begin()));
+    box.append(body, mission, cols, this.k(button('出陣する（Enter）', 'btn-begin', () => this.h.begin()), '出陣する'));
+    this.briefBox = box;
     s.append(box);
     return s;
   }
@@ -274,10 +367,11 @@ export class Ui {
     const box = el('div', 'kg-panel');
     box.append(
       el('h2', 'kg-h2', '一時停止'),
-      button('再開する（Esc）', 'btn-resume', () => this.h.resume()),
-      button('はじめからやり直す（R）', 'btn-restart', () => this.h.restart(), 'kg-btn kg-btn-ghost'),
+      this.k(button('再開する（Esc）', 'btn-resume', () => this.h.resume()), '再開する'),
+      this.k(button('はじめからやり直す（R）', 'btn-restart', () => this.h.restart(), 'kg-btn kg-btn-ghost'), 'はじめからやり直す'),
       button('ステージ選択へ', 'btn-to-select', () => this.h.toSelect(), 'kg-btn kg-btn-ghost'),
     );
+    this.pausePanel = box;
     s.append(box);
     return s;
   }
@@ -289,7 +383,7 @@ export class Ui {
     box.append(
       el('h1', 'kg-go-title', '討たれた'),
       body,
-      button('やり直す（R）', 'btn-retry', () => this.h.restart()),
+      this.k(button('やり直す（R）', 'btn-retry', () => this.h.restart()), 'やり直す'),
       button('ステージ選択へ', 'btn-go-select', () => this.h.toSelect(), 'kg-btn kg-btn-ghost'),
     );
     s.append(box);
@@ -304,11 +398,91 @@ export class Ui {
       el('div', 'kg-rs-head', `${stage.meta.title}　${stage.meta.dateText}`),
       el('div', 'kg-mission-complete', `任務達成　${stage.meta.mission.completion}`),
       body,
-      button('もう一度（R）', 'btn-again', () => this.h.restart()),
+      this.k(button('もう一度（R）', 'btn-again', () => this.h.restart()), 'もう一度'),
       button('ステージ選択へ', 'btn-rs-select', () => this.h.toSelect(), 'kg-btn kg-btn-ghost'),
     );
     s.append(box);
     return { screen: s, body };
+  }
+
+  /** キー名を含みうる文を覚える（タッチに切り替えたら、touchText か touchWording(元の文) に差し替える）。 */
+  private k<T extends HTMLElement>(e: T, touchText?: string, phrase = false): T {
+    this.keyed.push({ el: e, text: e.textContent ?? '', touchText, phrase });
+    return e;
+  }
+
+  /** 長い文：タッチのとき句ごとの箱に分けて、狭い画面で語の途中で折り返さないようにする（キー名の言い換えもする）。 */
+  private ph<T extends HTMLElement>(e: T): T {
+    return this.k(e, undefined, true);
+  }
+
+  /**
+   * タッチの文言と、タッチだけの部品（一時停止の音と画質・縦向きの注記）。一度入れたら戻さない（main.ts の方針と同じ）。
+   * on が偽のときは何もしない（キーボードの文と DOM は変更前のまま）。
+   */
+  setTouchMode(on: boolean): void {
+    if (!on || this.touch) return;
+    this.touch = true;
+    for (const k of this.keyed) {
+      const t = k.touchText ?? touchWording(k.text);
+      if (k.phrase) k.el.replaceChildren(...phraseSpans(t));
+      else k.el.textContent = t;
+    }
+    // 逃げ方の案内も句に分ける
+    this.alertTip.replaceChildren(...phraseSpans(ALERT_TIP));
+    if (this.controlsDl) {
+      this.controlsDl.replaceChildren();
+      for (const [k, v] of CONTROLS_TOUCH) {
+        const dd = el('dd');
+        dd.append(...phraseSpans(v));
+        this.controlsDl.append(el('dt', 'kg-key kg-touch-key', k), dd);
+      }
+    }
+    // 縦向きのときだけ見える注記（touch.css の orientation で出し分ける）
+    const note = (): HTMLElement => {
+      const n = el('div', 'kg-portrait-note', PORTRAIT_NOTE);
+      n.dataset.testid = 'portrait-note';
+      return n;
+    };
+    this.titleBox?.append(note());
+    this.selectScreen?.querySelector('.kg-h2')?.after(note());
+    this.briefBox?.prepend(note());
+    // 一時停止：音の入切と画質
+    if (this.pausePanel) {
+      this.muteBtn = button('', 'btn-mute', () => {
+        this.h.toggleMute?.();
+        this.refreshPause();
+      }, 'kg-btn kg-btn-ghost kg-btn-mute');
+      this.qualityLine = el('div', 'kg-quality');
+      this.qualityLine.dataset.testid = 'quality-label';
+      this.pausePanel.append(this.muteBtn, this.qualityLine);
+      this.refreshPause();
+    }
+    this.lastAimKey = '';
+  }
+
+  isTouch(): boolean {
+    return this.touch;
+  }
+
+  /** 一時停止の「音」と「画質」の文を今の状態に合わせる。 */
+  private refreshPause(): void {
+    if (this.muteBtn) {
+      const muted = this.h.muted?.() ?? false;
+      this.muteBtn.textContent = muted ? '音：切　（押すと入）' : '音：入　（押すと切）';
+      this.muteBtn.setAttribute('aria-pressed', String(!muted));
+    }
+    if (this.qualityLine) this.qualityLine.textContent = `画質　${this.h.qualityLabel?.() ?? ''}`;
+  }
+
+  /** 描画の準備が終わった（main.ts が呼ぶ）。 */
+  markViewReady(): void {
+    this.viewReady = true;
+  }
+
+  /** 遊び始めの操作のヒントを、指で歩いて見回したら早めに消す。 */
+  dismissTouchHint(now: number): void {
+    if (this.touchHintState === 'showing') this.touchHintUntil = Math.min(this.touchHintUntil, now);
   }
 
   // ------------------------------------------------------------------ 切り替え
@@ -333,15 +507,25 @@ export class Ui {
     this.hud.classList.toggle('kg-on', inPlay);
     this.finale.classList.toggle('kg-on', screen === 'finale');
     this.root.dataset.screen = screen;
+    if (screen === 'pause') this.refreshPause();
+    // タッチ：低い画面では遊べる札が下に隠れるので、選択に入ったら見える所までスクロールする
+    if (screen === 'select' && this.touch) this.selectScreen?.querySelector('.kg-card:not(:disabled)')?.scrollIntoView({ block: 'nearest' });
   }
 
   showGameover(capture: DetectRecord | null, first: DetectRecord | null): void {
     const b = this.gameoverBody;
     b.replaceChildren();
-    if (first) b.append(el('p', 'kg-go-cause', causeText(first)));
-    if (capture && capture.cause !== 'debug') b.append(el('p', 'kg-go-capture', captureText(capture)));
-    else if (capture) b.append(el('p', 'kg-go-capture', causeText(capture)));
-    b.append(el('p', 'kg-go-hint', hintText(first)));
+    // タッチのときは句ごとの箱に分ける（568px の画面で「立ち止まっ／ていた」と語の途中で折り返さないように）。キーボードの文と DOM は今まで通り
+    const line = (cls: string, text: string): HTMLElement => {
+      const p = el('p', cls);
+      if (this.touch) p.append(...phraseSpans(text));
+      else p.textContent = text;
+      return p;
+    };
+    if (first) b.append(line('kg-go-cause', causeText(first)));
+    if (capture && capture.cause !== 'debug') b.append(line('kg-go-capture', captureText(capture)));
+    else if (capture) b.append(line('kg-go-capture', causeText(capture)));
+    b.append(line('kg-go-hint', hintText(first)));
   }
 
   showResult(r: ResultInfo): void {
@@ -350,7 +534,14 @@ export class Ui {
     const rank = el('div', 'kg-rank');
     const phrase = el('div', 'kg-rank-text');
     // 一言は「。」で行を分ける（語の途中で折り返さないように）
-    for (const line of RANK_TEXT[r.rank].split(/(?<=。)/)) if (line) phrase.append(el('div', '', line));
+    // タッチのときは、さらに「、」で句に分ける（低い横画面で、長い一言が「、」の所で折り返せるように）
+    for (const line of RANK_TEXT[r.rank].split(/(?<=。)/)) {
+      if (!line) continue;
+      const row = el('div');
+      if (this.touch) row.append(...phraseSpans(line));
+      else row.textContent = line;
+      phrase.append(row);
+    }
     rank.append(el('div', 'kg-rank-char', r.rank), phrase);
     const stats = el('dl', 'kg-rs-stats');
     const rows: [string, string][] = [
@@ -377,7 +568,7 @@ export class Ui {
   /** HUD を毎コマ合わせる。 */
   updateHud(st: GameStateOut, snap: SimSnapshot, camYaw: number, pointerLocked: boolean, now: number): void {
     this.hudMission.textContent = `${st.mission.step} / 4　${st.mission.label}`;
-    this.hudMissionHint.textContent = st.mission.hint;
+    this.hudMissionHint.textContent = this.touch ? touchWording(st.mission.hint) : st.mission.hint;
     this.hudMissionMessage.textContent = st.mission.message;
     this.hudTime.textContent = formatTime(st.t);
     const phaseName = PHASE_LABEL[st.phase];
@@ -396,25 +587,48 @@ export class Ui {
     this.hudMeterMark.style.left = `${Math.min(100, Math.max(0, st.player.light * 100))}%`;
     this.hudTier.textContent = TIER_LABEL[st.player.lightTier];
     this.hudTier.dataset.tier = st.player.lightTier;
+    if (st.player.lightTier !== this.lastLightTier) {
+      this.lastLightTier = st.player.lightTier;
+      for (const [tier, seg] of this.hudMeterSegs) seg.classList.toggle('kg-active', tier === st.player.lightTier);
+    }
     const key = `${st.player.stones}`;
     if (key !== this.lastKey) {
       this.lastKey = key;
       this.hudStones.replaceChildren(el('span', 'kg-stones-label', '小石'));
       for (let i = 0; i < 5; i++) this.hudStones.append(el('span', `kg-stone${i < st.player.stones ? ' kg-have' : ''}`));
     }
-    const guardNear = st.guards.some((g) => !g.down && g.id !== 'nobunaga' && Math.hypot(st.player.x - g.x, st.player.z - g.z) < 2.5);
-    const prompt = st.player.prompt === 'assassinate' ? 'E　討ち取る' : st.player.prompt === 'takedown' ? 'E　背後から制圧　／　F　近接攻撃'
-      : st.mission.interaction ? (st.mission.progress > 0 ? `${st.mission.interaction}　${Math.floor(st.mission.progress * 100)}%（移動で中断）` : `E　${st.mission.interaction}`)
-      : guardNear ? 'F　近接攻撃　／　背後へ回ると E で制圧' : '';
-    this.hudPrompt.textContent = prompt;
+    const prompt = promptText(st, this.touch);
+    if (!this.touch) this.hudPrompt.textContent = prompt;
+    else if (prompt !== this.lastPrompt) {
+      // タッチ：句ごとの箱に分ける（狭い帯で語の途中で折り返さない）。変わったときだけ組み直す
+      this.lastPrompt = prompt;
+      this.hudPrompt.replaceChildren(...phraseSpans(prompt));
+    }
     this.hudPrompt.classList.toggle('kg-on', !!prompt);
     this.hudPrompt.classList.toggle('kg-kill', st.player.prompt === 'assassinate');
     this.hudAim.classList.toggle('kg-on', !!snap.aim);
-    this.hudAim.textContent = snap.aim ? (snap.aim.valid ? AIM_HINT : 'そこへは投げられない') : '';
+    if (!this.touch) this.hudAim.textContent = snap.aim ? (snap.aim.valid ? AIM_HINT : 'そこへは投げられない') : '';
+    else {
+      // タッチ：2行（離して投げる／やめる・なぞる）。変わったときだけ組み直す
+      const aimKey = snap.aim ? (snap.aim.valid ? 'ok' : 'ng') : '';
+      if (aimKey !== this.lastAimKey) {
+        this.lastAimKey = aimKey;
+        if (aimKey === 'ok') this.hudAim.replaceChildren(phraseLine(AIM_HINT_TOUCH[0]), phraseLine(AIM_HINT_TOUCH[1]));
+        else if (aimKey === 'ng') this.hudAim.replaceChildren(phraseLine('そこへは投げられない'), phraseLine(AIM_HINT_TOUCH[1]));
+        else this.hudAim.replaceChildren();
+      }
+    }
     // 視点をつかむ案内は、遊び始めの数秒だけ（頭上の印と重ならないように）
     this.lockHint.classList.toggle('kg-on', st.screen === 'play' && !pointerLocked && st.t < LOCK_HINT_SECONDS && now >= this.alertTipUntil);
     this.toast.classList.toggle('kg-on', now < this.toastUntil);
     this.alertTip.classList.toggle('kg-on', now < this.alertTipUntil && st.phase === 'alert');
+    // 遊び始めの操作のヒント（タッチ）：読み込み後の最初の遊びで一度だけ。やり直しでは出さない
+    if (this.touch && this.touchHintState === 'pending' && st.screen === 'play' && this.viewReady) {
+      this.touchHintState = 'showing';
+      this.touchHintUntil = now + TOUCH_HINT_MS;
+    }
+    if (this.touchHintState === 'showing' && now >= this.touchHintUntil + 1200) this.touchHintState = 'done';
+    this.touchHint.classList.toggle('kg-on', this.touchHintState === 'showing' && now < this.touchHintUntil);
     this.radar.draw(snap, camYaw);
     const dm = Radar.distanceToTarget(snap);
     const m = dm === null ? -1 : Math.round(dm);

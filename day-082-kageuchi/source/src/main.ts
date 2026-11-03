@@ -7,6 +7,14 @@
 //   ?overlays=0（扇・印・物音の輪を出さない。重ねが地面の明るさを変えていないかの見比べ用。r02-fix-play 追加）
 // 小石の狙い（Q 長押し）は、右クリックか Esc で投げずにやめられる（r03-fix-play）
 // 自動操作の口：window.__input（down・up・tap・look・clear）／ デバッグの口：window.__game（teleport・win・lose ほか）
+// 2026-11-03 スマホ対応：?touch=1|0（タッチ操作を強制的に入・切。無ければ指の端末で入、それ以外は最初のタッチで入）。
+//   タッチの正本は <html> の kg-touch クラス。入のときだけ TouchControls（src/input/touch.ts）を作り、#game と #ui の間に置く。
+//   遊びを止める経路（一時停止ボタン・縦向き・ページが隠れた・blur）は interruptPlay() を通す。Esc の経路は変えない。
+//   試験の口：window.__touch（active・info・stickTo・press・release・lookBy）
+// 描画の段階（A2・tasks 3.1）：?quality=high|mid|low|min（起動時の段階を決める。自動の引き下げは止まる）。
+//   タッチのときは mid から始め、重ければ自動で1段ずつ下げる（QualityGovernor）。デスクトップ（タッチ切）では setQuality を呼ばない。
+//   自動操作（navigator.webdriver）では引き下げない。?adaptive=1 なら自動操作でも引き下げる（試験・測定用。?quality=・?shot=・?perf= があれば働かない）。
+//   試験の口：window.__quality（tier・id・label・pixelRatio・ao・explicit・adaptive・history・set）
 import { CAMERA } from './config/camera';
 import { TICK } from './config/rules';
 import { getShot } from './contract/shots';
@@ -18,7 +26,10 @@ import { Game } from './game/game';
 import { SHOT_PLANS, isShotName, type ShotPlan } from './game/shots';
 import { buildState } from './game/state';
 import { InputState } from './input/input';
-import { CAPTURE, FINALE } from './config/rules';
+import { QUALITY_TIERS, QualityGovernor, adaptiveAllowed, initialTier } from './art/render/quality';
+import { TOUCH_CLASS, TouchControls, detectTouchMode, makeNotice, type TouchButtonName } from './input/touch';
+import { meleeAssistYaw } from './input/touchAssist';
+import { CAPTURE, FINALE, MELEE } from './config/rules';
 import { VIEW } from './config/view';
 import { idleInput, type SimInput } from './sim/types';
 import { getStage } from './stage';
@@ -40,6 +51,8 @@ const perfSpot = params.get('perf');
 const PERF_FRAMES = 360;
 const viewKind = params.get('view') ?? 'art';
 const overlaysOff = params.get('overlays') === '0';
+const qualityParam = params.get('quality');
+const adaptiveParam = params.get('adaptive') === '1';
 
 function gpuName(gl: WebGLRenderingContext | WebGL2RenderingContext): string {
   const ext = gl.getExtension('WEBGL_debug_renderer_info');
@@ -63,6 +76,8 @@ function boot(): void {
   const startAudio = (): void => audio.start();
   window.addEventListener('pointerdown', startAudio, { capture: true });
   window.addEventListener('keydown', startAudio, { capture: true });
+  // iOS の Safari は pointerdown の中では音を始めさせないことがあるので、離した瞬間とクリックでも呼ぶ（何度呼んでも安全）
+  for (const type of ['pointerup', 'touchend', 'click'] as const) window.addEventListener(type, startAudio, { capture: true });
   const titleShot = getShot('title')!;
   const fireShot = getShot('fire')!;
   rig.setOrbit(titleShot);
@@ -75,8 +90,63 @@ function boot(): void {
   let finaleCam: 'none' | 'close' | 'wide' = 'none';
   /** 狙いをやめる（右クリック・Esc・窓を離れた）。次の刻みで sim へ渡す。r03-fix-play 追加 */
   let cancelAimReq = false;
+  /** タッチ操作が入っているか（正本は <html> の kg-touch クラス。入れたら戻さない）。 */
+  let touchOn = false;
+  let touch: TouchControls | null = null;
+
+  // ---- 描画の段階（tasks 3.1）。タッチの判定より前に作る（enableTouch から呼ぶため）
+  const qualityInit = initialTier({ touch: detectTouchMode(params) === 'on', param: qualityParam });
+  const automation = navigator.webdriver === true && !adaptiveParam;
+  const shotOrPerf = shotName !== null || !!perfSpot;
+  const governor = new QualityGovernor();
+  /** 自動の引き下げが働いているか（governor.start 済み）。 */
+  let governing = false;
+  let viewReady = false;
+  const qualityHistory: { at: number; from: number; to: number }[] = [];
+  /** いまの段階。表示が段階を持たない（仮の表示）なら、起動時に決めた段階か 0。 */
+  let tierFallback = 0;
+  const qualityNow = (): number => view.qualityTier?.() ?? tierFallback;
+  const setTier = (to: number, now: number): void => {
+    const from = qualityNow();
+    if (!QUALITY_TIERS[to]) return;
+    view.setQuality?.(to);
+    tierFallback = to;
+    if (from !== to) qualityHistory.push({ at: Math.round(now), from, to });
+  };
+  const adaptiveNow = (): boolean => adaptiveAllowed({ touch: touchOn, explicit: qualityInit.explicit, automation, shotOrPerf });
+  const startGovernor = (): void => {
+    if (governing || !viewReady || !adaptiveNow()) return;
+    governing = true;
+    governor.start(qualityNow(), performance.now());
+  };
+  /** 止まった・戻った・向きや大きさが変わった：その前後のコマの間隔を、重さの判定に入れない。 */
+  const qualityGap = (): void => {
+    if (governing) governor.discontinuity(performance.now());
+  };
+  const qualityOnTouch = (): void => {
+    if (!viewReady) return; // 起動中なら、下の whenReady のあとで決める
+    if (!qualityInit.explicit && qualityNow() === 0) setTier(QUALITY_TIERS.findIndex((q) => q.id === 'mid'), performance.now());
+    startGovernor();
+  };
+  window.__quality = {
+    tier: () => qualityNow(),
+    id: () => QUALITY_TIERS[qualityNow()]?.id ?? '',
+    label: () => QUALITY_TIERS[qualityNow()]?.label ?? '',
+    pixelRatio: () => view.renderer.getPixelRatio(),
+    ao: () => view.aoEnabled?.() ?? QUALITY_TIERS[qualityNow()]?.ao ?? false,
+    explicit: () => qualityInit.explicit,
+    adaptive: () => governing,
+    history: () => qualityHistory.map((h) => ({ ...h })),
+    set: (i: number) => {
+      if (!Number.isInteger(i) || !QUALITY_TIERS[i]) return;
+      setTier(i, performance.now());
+      if (governing) governor.start(i, performance.now());
+    },
+  };
 
   const requestLock = (): void => {
+    // タッチ操作では視点をなぞって動かすので、ポインタロックは使わない（マウスでも視点の領域をなぞれる）
+    if (touchOn) return;
     if (game.screen !== 'play' || document.pointerLockElement === canvas) return;
     wantLock = true;
     try {
@@ -96,6 +166,8 @@ function boot(): void {
     const p = game.sim.player;
     rig.resetFollow(p.x, p.z, p.yaw);
     input.clearPresses();
+    // 物理キーの R などでやり直すとき、タッチの押下（押しっぱなしのスティック・ねらい）を持ち越さない。ねらいの取り消しはこの直後に false へ戻す
+    touch?.releaseAll();
     acc = 0;
     finaleCam = 'none';
     cancelAimReq = false;
@@ -121,11 +193,17 @@ function boot(): void {
     },
     toSelect: () => game.toSelect(),
     toTitle: () => game.toTitle(),
+    toggleMute: () => audio.toggleMute(),
+    muted: () => audio.debug().muted,
+    qualityLabel: () => QUALITY_TIERS[qualityNow()]?.label ?? '',
   });
 
   game.onScreen((to) => {
+    // 止まる・戻る前後のコマの間隔は、重さの判定に入れない
+    qualityGap();
     ui.setScreen(to);
     input.clearPresses();
+    touch?.setActive(to === 'play');
     if (to === 'title' || to === 'select' || to === 'briefing') rig.setOrbit(titleShot, rig.mode === 'orbit' ? undefined : 0);
     if (to !== 'play') releaseLock();
     if (to === 'gameover') ui.showGameover(game.sim.capture, game.sim.firstDetect);
@@ -152,9 +230,119 @@ function boot(): void {
   canvas.addEventListener('mousedown', (e) => {
     if (e.button === 2 && game.screen === 'play' && game.sim.player.aiming) cancelAimReq = true;
   });
-  // 窓を離れると押していたキーが全部離される。そのまま投げないよう、狙いをやめる
-  window.addEventListener('blur', () => {
-    if (game.sim.player.aiming) cancelAimReq = true;
+  /**
+   * 遊びを止める共通の経路（一時停止ボタン・縦向き・ページが隠れた・blur）。2026-11-03 スマホ対応。
+   * 狙っていれば投げずにやめる要求を立て → タッチと物理の押下を全部離し → pause なら一時停止にする。
+   */
+  const interruptPlay = (o: { pause: boolean }): void => {
+    if (game.screen === 'play' && game.sim.player.aiming) cancelAimReq = true;
+    touch?.releaseAll();
+    input.releaseAll();
+    if (o.pause && game.screen === 'play') {
+      releaseLock();
+      game.pause();
+    }
+  };
+  // 窓を離れると押していたキーが全部離される。そのまま投げないよう、狙いをやめる（止めはしない）
+  window.addEventListener('blur', () => interruptPlay({ pause: false }));
+  // タッチ操作のとき、ページが隠れたら（アプリの切り替え・画面を消す）止める
+  document.addEventListener('visibilitychange', () => {
+    qualityGap();
+    if (document.hidden && touchOn) interruptPlay({ pause: true });
+  });
+
+  // 縦向きの案内（タッチ操作のときだけ）。縦向きで遊ぶ画面になったら止め、遊ぶ・一時停止の間は案内を出す。
+  // 横に戻すと案内が消え、一時停止の画面から「再開する」で続ける（自動では再開しない）。見た目の仕上げは A2
+  let rotateNotice: HTMLElement | null = null;
+  const guardOrientation = (): void => {
+    if (!touchOn) return;
+    const portrait = window.innerHeight > window.innerWidth;
+    if (portrait && game.screen === 'play') interruptPlay({ pause: true });
+    const show = portrait && (game.screen === 'play' || game.screen === 'pause');
+    if (show && !rotateNotice) {
+      rotateNotice = makeNotice('kg-rotate', 'rotate-prompt', ['スマホを横向きにしてください', '横にすると、続きから遊べます']);
+      // スマホの輪郭が横へ回る絵（CSS だけで描く。動きを減らす設定では止める）
+      const phone = document.createElement('div');
+      phone.className = 'kg-rotate-phone';
+      phone.setAttribute('aria-hidden', 'true');
+      rotateNotice.firstElementChild?.prepend(phone);
+      // 見出しは句の箱に分けて、狭い縦の画面では「横向きに／してください」で折り返す（語の途中で切らない）
+      const head = rotateNotice.querySelector('.kg-notice-main');
+      if (head) {
+        head.replaceChildren();
+        for (const t of ['スマホを横向きに', 'してください']) {
+          const sp = document.createElement('span');
+          sp.className = 'kg-ph';
+          sp.textContent = t;
+          head.append(sp);
+        }
+      }
+      document.body.append(rotateNotice);
+    }
+    rotateNotice?.classList.toggle('kg-on', show);
+  };
+
+  const enableTouch = (): void => {
+    if (touchOn) return;
+    touchOn = true;
+    document.documentElement.classList.add(TOUCH_CLASS);
+    releaseLock();
+    touch = new TouchControls(input, {
+      cancelAim: () => {
+        cancelAimReq = true;
+      },
+      pause: () => interruptPlay({ pause: true }),
+      stones: () => game.sim.player.stones,
+    });
+    uiRoot.before(touch.layer);
+    touch.setActive(game.screen === 'play');
+    ui.setTouchMode(true);
+    guardOrientation();
+    // 最初のタッチで入ったとき：明示の ?quality= が無ければ、触れる端末の段階（やや軽い）へ下げ、自動の引き下げを始める
+    qualityOnTouch();
+  };
+  const touchMode = detectTouchMode(params);
+  if (touchMode === 'on') enableTouch();
+  // 起動時の段階：先に画素比を決めてから、表示の準備（シェーダーの先作り）を待つ
+  if (qualityInit.explicit || touchOn) {
+    view.setQuality?.(qualityInit.tier);
+    tierFallback = qualityInit.tier;
+  }
+  else if (touchMode === 'auto') {
+    // 指の端末と判定できなかったときは、最初のタッチ（またはペン）で入れる（読み込み直さない・以後は戻さない）
+    const onFirstPointer = (e: PointerEvent): void => {
+      if (e.pointerType !== 'touch' && e.pointerType !== 'pen') return;
+      window.removeEventListener('pointerdown', onFirstPointer, { capture: true });
+      enableTouch();
+    };
+    window.addEventListener('pointerdown', onFirstPointer, { capture: true });
+  }
+  const touchButtons: readonly TouchButtonName[] = ['action', 'attack', 'crouch', 'stone', 'cancel', 'pause'];
+  const asButton = (name: string): TouchButtonName | null => (touchButtons as readonly string[]).includes(name) ? (name as TouchButtonName) : null;
+  window.__touch = {
+    active: () => touchOn && !!touch && touch.isActive(),
+    info: () => (touch ? touch.info() : null),
+    stickTo: (x, y, run) => input.injectStick(x, y, run),
+    press: (name) => {
+      const b = asButton(name);
+      if (b && touch) touch.press(b);
+    },
+    release: (name) => {
+      const b = asButton(name);
+      if (b && touch) touch.release(b);
+    },
+    lookBy: (dx, dy) => touch?.lookBy(dx, dy),
+  };
+
+  // 描画の文脈を失ったら（GPU の都合）、案内と読み込み直しのボタンを出す。自動での復帰は試みない
+  let ctxNotice: HTMLElement | null = null;
+  canvas.addEventListener('webglcontextlost', () => {
+    interruptPlay({ pause: true });
+    if (ctxNotice) return; // 何度失っても案内は1つだけ
+    const n = makeNotice('kg-ctxlost', 'ctx-lost', ['描画が止まりました。読み込み直してください'], { text: '読み込み直す', testId: 'btn-reload', onClick: () => location.reload() });
+    n.classList.add('kg-on');
+    document.body.append(n);
+    ctxNotice = n;
   });
 
   const onResize = (): void => {
@@ -162,9 +350,21 @@ function boot(): void {
     const h = window.innerHeight;
     view.resize(w, h);
     rig.setAspect(w / Math.max(1, h));
+    qualityGap();
   };
   window.addEventListener('resize', onResize);
   onResize();
+  // 縦横の切り替えとブラウザの帯の出入り（スマホ対応）
+  const onViewport = (): void => {
+    onResize();
+    guardOrientation();
+  };
+  window.addEventListener('orientationchange', onViewport);
+  // PC のトラックパッドでの拡大でも visualViewport は変わるので、タッチのときだけ扱う（タッチがオフなら今と同じ）
+  window.visualViewport?.addEventListener('resize', () => {
+    if (touchOn) onViewport();
+  });
+  window.addEventListener('resize', guardOrientation);
 
   /** Q を押している（小石が残っている）。sim へ渡す狙いの入力。 */
   const aimHeld = (): boolean => game.screen === 'play' && input.held('aim') && game.sim.player.stones > 0;
@@ -177,14 +377,25 @@ function boot(): void {
     const aim = aimHeld();
     const cancelAim = cancelAimReq;
     cancelAimReq = false;
+    // キーとスティックを足して -1〜1 に切る（スティックの長さがそのまま速さの割合。走りは held('run') がスティックの外側の輪も含む）
+    const stick = input.stick();
+    const clamp1 = (v: number): number => Math.min(1, Math.max(-1, v));
+    const attack = input.consumeTickPress('attack');
+    // タッチの攻撃：カメラの向きでなく、間合いの中の最も近い番兵へ向ける（視点を回す指と攻撃の指が同じ右手で、向けるのが難しいため）。
+    // 間合いの外は今まで通り（カメラの向き）。規則（sim）は変えず、攻撃の刻みの camYaw だけを差し替える（src/input/touchAssist.ts）
+    let camYaw = rig.yaw;
+    if (attack && touchOn) {
+      const a = meleeAssistYaw(game.sim.player, game.sim.guards, MELEE.range, (x0, z0, x1, z1) => game.sim.q.blocked(x0, z0, x1, z1));
+      if (a !== null) camYaw = a;
+    }
     return {
-      moveX: k('right') - k('left'),
-      moveY: k('forward') - k('back'),
-      camYaw: rig.yaw,
+      moveX: clamp1(k('right') - k('left') + stick.x),
+      moveY: clamp1(k('forward') - k('back') + stick.y),
+      camYaw,
       run: input.held('run'),
       crouchToggle: input.consumeTickPress('crouch'),
       interact: input.consumeTickPress('interact'),
-      attack: input.consumeTickPress('attack'),
+      attack,
       aim,
       aimPoint: aim && !game.sim.player.aimCancelled ? rig.groundAim() : null,
       cancelAim,
@@ -296,8 +507,9 @@ function boot(): void {
 
   let pilot: Autopilot | null = null;
   window.__autopilot = {
-    start: (route) => {
-      pilot = new Autopilot(route, window.__input!, CAMERA.lookSensitivity);
+    // io を渡せばそれで操作する（tools/lib/touchBot.mjs が本物のタッチで動かすため）。無ければ __input
+    start: (route, io) => {
+      pilot = new Autopilot(route, io ?? window.__input!, CAMERA.lookSensitivity);
     },
     stop: () => {
       pilot?.releaseAll();
@@ -313,6 +525,11 @@ function boot(): void {
   view.whenReady().then(
     () => {
       window.__viewReady = true;
+      viewReady = true;
+      ui.markViewReady();
+      // 起動の後に最初のタッチで入っていた（auto）なら、ここで段階を決める
+      if (touchOn && !qualityInit.explicit && qualityNow() === 0) setTier(QUALITY_TIERS.findIndex((q) => q.id === 'mid'), performance.now());
+      startGovernor();
     },
     (e: unknown) => {
       window.__appError = String(e instanceof Error ? `${e.message}\n${e.stack}` : e);
@@ -351,12 +568,21 @@ function boot(): void {
   };
 
   const frame = (now: number): void => {
-    const rdt = Math.min(0.1, Math.max(0, (now - last) / 1000));
+    // 重さの判定には、切り詰める前の実際の間隔を渡す（250ms 超の外れ値を見分けるため）
+    const rawMs = now - last;
+    const rdt = Math.min(0.1, Math.max(0, rawMs / 1000));
     last = now;
+    if (governing && !document.hidden && game.screen !== 'pause') {
+      // 時計は performance.now() に揃える（start・discontinuity と同じ。rAF の時刻は少し早く、巻き戻りの分岐に入ることがある）
+      const tNow = performance.now();
+      const next = governor.sample(rawMs, tNow);
+      if (next !== null) setTier(next, tNow);
+    }
     const cpu0 = performance.now();
     try {
       // 自動操作は、前のコマの __state を見て、このコマの入力を決める（人と同じ遅れ）
       if (pilot && window.__state && pilot.status === 'running') pilot.update(window.__state);
+      guardOrientation();
       if (!frozen) handleFlowKeys();
       const m = input.consumeMotion();
       if (game.screen === 'play' && !frozen) {
@@ -404,6 +630,11 @@ function boot(): void {
       view.render(rdt);
       const st = buildState(s, { screen: game.screen, seed: game.seed, camera: rig.info() });
       window.__state = st;
+      touch?.sync(st);
+      if (touch && game.screen === 'play') {
+        const u = touch.usage();
+        if (u.stick && u.look) ui.dismissTouchHint(now);
+      }
       if (game.screen === 'play' || game.screen === 'pause') ui.updateHud(st, snap, rig.yaw, document.pointerLockElement === canvas, now);
       if (game.screen === 'finale') ui.updateFinale(s.finale ?? 0);
       if (debugMap && frames % 3 === 0) debugMap.draw(s, snap);

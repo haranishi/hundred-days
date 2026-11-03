@@ -1,0 +1,1212 @@
+/* OWNER: core
+   タッチ操作（スマホ）の部品とページの基礎。2026-11-03 スマホ対応で新設（tasks 2.3・2.4）。
+   ほぼすべて <html class="kg-touch"> の配下に置く。クラスが無いとき（デスクトップ）は、何も変わらない。
+   例外は画面いっぱいの案内（.kg-notice）だけ：描画が止まったときはデスクトップでも出すため。
+   色は style.css の墨黒・朱・金・生成り。半透明にして、背後の闇と灯りを邪魔しない。
+   部品の位置と大きさは下の CSS 変数で外から動かせる（A2：HUD の再配置のときに上書きする）。 */
+
+.kg-touch {
+  /* ボタンの群れ（右下の弧）の基準：右と下の余白。安全域（ノッチ）を足して使う */
+  --kg-touch-btn-right: 14px;
+  --kg-touch-btn-bottom: 12px;
+  /* 大きさ（CSS px）。当て身は 64 以上、ほかは 44 以上（requirements 4.5） */
+  --kg-touch-action-size: 76px;
+  --kg-touch-btn-size: 60px;
+  --kg-touch-btn-gap: 12px;
+  /* 一時停止（右上の隅） */
+  --kg-touch-pause-size: 44px;
+  --kg-touch-pause-top: 8px;
+  --kg-touch-pause-right: 8px;
+  /* 指がないときのスティックの目印（左下） */
+  --kg-touch-hint-left: 28px;
+  --kg-touch-hint-bottom: 24px;
+  --kg-touch-hint-size: 92px;
+  /* 安全域を足した基準（ここは直接上書きしない） */
+  --kg-safe-top: env(safe-area-inset-top, 0px);
+  --kg-safe-right: env(safe-area-inset-right, 0px);
+  --kg-safe-bottom: env(safe-area-inset-bottom, 0px);
+  --kg-safe-left: env(safe-area-inset-left, 0px);
+}
+
+/* ---------------------------------------------------------------- ページの基礎（タッチモードのとき） */
+html.kg-touch,
+html.kg-touch body {
+  overscroll-behavior: none;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+/* 遊ぶ層以外の長い画面は、指で縦にだけスクロールできる（収まりの仕上げは A2） */
+.kg-touch .kg-screen {
+  touch-action: pan-y;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+/* 視点をつかむ案内（クリック・マウス）は、タッチでは出さない */
+.kg-touch .kg-lockhint.kg-on {
+  display: none;
+}
+
+/* ---------------------------------------------------------------- タッチ層 */
+.kg-touch-layer {
+  position: fixed;
+  inset: 0;
+  display: none;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+.kg-touch .kg-touch-layer.kg-on {
+  display: block;
+}
+.kg-touch-look-zone {
+  position: absolute;
+  inset: 0;
+  touch-action: none;
+}
+.kg-touch-stick-zone {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 45%;
+  height: 75%;
+  touch-action: none;
+}
+
+/* スティック：触れた所（--sx・--sy）に出る。--r が半径 R */
+.kg-stick {
+  --r: 52px;
+  position: absolute;
+  left: var(--sx, 0px);
+  top: var(--sy, 0px);
+  width: 0;
+  height: 0;
+  display: none;
+  pointer-events: none;
+}
+.kg-stick.kg-on {
+  display: block;
+}
+.kg-stick-ring,
+.kg-stick-run {
+  position: absolute;
+  left: 0;
+  top: 0;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  box-sizing: border-box;
+}
+.kg-stick-ring {
+  width: calc(var(--r) * 2);
+  height: calc(var(--r) * 2);
+  border: 2px solid rgba(239, 230, 210, 0.55);
+  background: rgba(20, 17, 15, 0.28);
+}
+/* 外側の細い破線の輪（半径 1.4R＝src/config/touch.ts の runEnter）。ここまで倒すと走る（つまみが動ける上限は 1.5R） */
+.kg-stick-run {
+  width: calc(var(--r) * 2.8);
+  height: calc(var(--r) * 2.8);
+  border: 1px dashed rgba(201, 167, 91, 0.6);
+}
+.kg-stick-run-label {
+  position: absolute;
+  left: 50%;
+  top: -4px;
+  transform: translate(-50%, -100%);
+  font-family: var(--mincho);
+  font-size: 12px;
+  color: var(--kin);
+  text-shadow: 0 0 4px rgba(0, 0, 0, 0.9);
+}
+.kg-stick-knob {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  transform: translate(calc(-50% + var(--kx, 0px)), calc(-50% + var(--ky, 0px)));
+  background: rgba(239, 230, 210, 0.72);
+  border: 2px solid var(--kinari);
+  color: var(--sumi);
+  font-family: var(--mincho);
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+}
+/* 走っている間は朱（文字「走る」も出す＝色だけで示さない） */
+.kg-stick.kg-run .kg-stick-ring,
+.kg-stick.kg-run .kg-stick-run {
+  border-color: var(--shu);
+  border-style: solid;
+}
+.kg-stick.kg-run .kg-stick-knob {
+  background: var(--shu);
+  border-color: #ffb08f;
+  color: var(--kinari);
+}
+.kg-stick.kg-run .kg-stick-run-label {
+  color: #ffb08f;
+}
+
+/* 指がないときの薄い目印（左下）：輪と「歩く」 */
+.kg-stick-hint {
+  position: absolute;
+  left: calc(var(--kg-touch-hint-left) + var(--kg-safe-left));
+  bottom: calc(var(--kg-touch-hint-bottom) + var(--kg-safe-bottom));
+  width: var(--kg-touch-hint-size);
+  height: var(--kg-touch-hint-size);
+  border-radius: 50%;
+  border: 2px solid rgba(239, 230, 210, 0.3);
+  background: rgba(20, 17, 15, 0.18);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  box-sizing: border-box;
+}
+.kg-stick-hint.kg-off {
+  display: none;
+}
+.kg-stick-hint-text {
+  font-family: var(--mincho);
+  font-size: 14px;
+  letter-spacing: 0.2em;
+  color: rgba(239, 230, 210, 0.7);
+  text-shadow: 0 0 4px rgba(0, 0, 0, 0.9);
+}
+
+/* ---------------------------------------------------------------- ボタン（右下の弧） */
+.kg-touch-btns {
+  position: absolute;
+  right: calc(var(--kg-touch-btn-right) + var(--kg-safe-right));
+  bottom: calc(var(--kg-touch-btn-bottom) + var(--kg-safe-bottom));
+  width: 0;
+  height: 0;
+}
+.kg-tbtn {
+  position: absolute;
+  box-sizing: border-box;
+  width: var(--kg-touch-btn-size);
+  height: var(--kg-touch-btn-size);
+  border-radius: 50%;
+  border: 2px solid rgba(201, 167, 91, 0.7);
+  background: rgba(20, 17, 15, 0.55);
+  color: var(--kinari);
+  font-family: var(--mincho);
+  font-size: 14px;
+  letter-spacing: 0.04em;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  cursor: pointer;
+  pointer-events: auto;
+  white-space: nowrap;
+}
+.kg-tbtn.kg-down {
+  background: rgba(201, 167, 91, 0.45);
+}
+.kg-tbtn.kg-dim {
+  opacity: 0.45;
+}
+.kg-tbtn-label {
+  pointer-events: none;
+}
+/* 当て身：一番右下・いちばん大きい */
+.kg-tbtn-action {
+  right: 0;
+  bottom: 0;
+  width: var(--kg-touch-action-size);
+  height: var(--kg-touch-action-size);
+  font-size: 17px;
+  letter-spacing: 0.12em;
+}
+/* 押せるとき（討つ・制圧・使う）：朱の縁と影。文字と形でも分かる（kg-dim が外れて濃くなる） */
+.kg-tbtn-action.kg-ready {
+  border-color: var(--shu);
+  border-width: 3px;
+  box-shadow: 0 0 14px rgba(200, 64, 44, 0.6);
+}
+.kg-tbtn-action.kg-kill {
+  color: #ffd3b0;
+  background: rgba(80, 18, 10, 0.6);
+}
+/* しゃがむ：当て身の左 */
+.kg-tbtn-crouch {
+  right: calc(var(--kg-touch-action-size) + var(--kg-touch-btn-gap));
+  bottom: 0;
+}
+.kg-tbtn-crouch.kg-pressed {
+  background: rgba(201, 167, 91, 0.35);
+  border-color: var(--kin);
+  border-style: double;
+  border-width: 4px;
+}
+/* 小石：左上の斜め */
+.kg-tbtn-stone {
+  right: calc(var(--kg-touch-action-size) + 4px);
+  bottom: calc(var(--kg-touch-action-size) + 4px);
+}
+.kg-tbtn-stone.kg-aiming {
+  border-color: var(--kin);
+  background: rgba(201, 167, 91, 0.3);
+}
+.kg-tbtn-count {
+  position: absolute;
+  right: -2px;
+  top: -2px;
+  min-width: 20px;
+  height: 20px;
+  border-radius: 10px;
+  background: var(--sumi);
+  border: 1px solid rgba(201, 167, 91, 0.7);
+  font-family: var(--gothic);
+  font-size: 12px;
+  line-height: 18px;
+  text-align: center;
+  box-sizing: border-box;
+  pointer-events: none;
+}
+/* 攻撃：当て身の上 */
+.kg-tbtn-attack {
+  right: 8px;
+  bottom: calc(var(--kg-touch-action-size) + 14px);
+}
+/* やめる：狙っている間だけ、小石の左に出す */
+.kg-tbtn-cancel {
+  display: none;
+  right: calc(var(--kg-touch-action-size) + var(--kg-touch-btn-size) + 16px);
+  bottom: calc(var(--kg-touch-action-size) + 4px);
+  border-style: dashed;
+}
+.kg-tbtn-cancel.kg-on {
+  display: flex;
+}
+/* 一時停止：右上の隅。二本線は CSS で描く */
+.kg-tbtn-pause {
+  position: absolute;
+  top: calc(var(--kg-touch-pause-top) + var(--kg-safe-top));
+  right: calc(var(--kg-touch-pause-right) + var(--kg-safe-right));
+  width: var(--kg-touch-pause-size);
+  height: var(--kg-touch-pause-size);
+  border-radius: 8px;
+}
+.kg-tbtn-pause-bars {
+  width: 14px;
+  height: 16px;
+  border-left: 4px solid var(--kinari);
+  border-right: 4px solid var(--kinari);
+  box-sizing: border-box;
+  pointer-events: none;
+}
+
+/* ---------------------------------------------------------------- 画面いっぱいの案内（縦向き・描画の停止） */
+.kg-notice {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: rgba(5, 7, 13, 0.92);
+  color: var(--kinari);
+  font-family: var(--mincho);
+  text-align: center;
+  padding: 24px;
+  box-sizing: border-box;
+  touch-action: none;
+}
+.kg-notice.kg-on {
+  display: flex;
+}
+.kg-notice-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  max-width: 92vw;
+}
+.kg-notice-main {
+  margin: 0;
+  font-size: 20px;
+  letter-spacing: 0.12em;
+}
+.kg-notice-sub {
+  margin: 0;
+  font-size: 14px;
+  color: var(--kinari-dim);
+}
+.kg-notice .kg-btn {
+  pointer-events: auto;
+  min-height: 44px;
+}
+
+/* ================================================================ スマホ向けの HUD（A2・tasks 3.2）
+   基準は横向き 844×390、最小は 568×320。安全域の内側に置く。DESIGN.md の骨格（左上＝目的、右上＝レーダー、上中央＝構えと明るさ）を守り、
+   親指の下（左下のスティック・右下のボタンの弧）には、見たい物を置かない。HUD とタッチ部品は重ならない（e2e/touch.spec.ts の監査）。
+     左上：目的・攻略段階・ヒント（2行まで）・経過時間（幅 --kg-tl-w 以内）
+     右上：一時停止（隅）の左にレーダー（--kg-radar）と「信長 N m」
+     上中央：構え・明るさの目盛り・明るさの段（常に見える）、その下に寺の構え（警戒・捜索・発見）
+     下中央：「いまできること」と狙いの案内（スティックの目印とボタンの弧の間）
+   すべて .kg-touch の配下。クラスが無いとき（デスクトップ）は style.css のまま。 */
+.kg-touch {
+  --kg-tl-w: 236px;
+  --kg-radar: 112px;
+  /* 右上の列の幅：一時停止の右の余白＋一時停止＋間＋レーダー */
+  --kg-tr-w: calc(var(--kg-touch-pause-right) + var(--kg-touch-pause-size) + 8px + var(--kg-radar));
+  /* 下中央の帯：左はスティックの目印の右、右はボタンの弧（しゃがむ・小石）の左 */
+  --kg-bc-left: calc(var(--kg-touch-hint-left) + var(--kg-touch-hint-size) + 10px);
+  --kg-bc-right: calc(var(--kg-touch-btn-right) + var(--kg-touch-action-size) + var(--kg-touch-btn-gap) + var(--kg-touch-btn-size) + 14px);
+}
+@media (min-width: 900px) and (min-height: 420px) {
+  .kg-touch {
+    --kg-radar: 128px;
+  }
+}
+
+/* 左上：目的・段階・ヒント・時間 */
+.kg-touch .kg-hud-tl {
+  left: calc(8px + var(--kg-safe-left));
+  top: calc(6px + var(--kg-safe-top));
+  width: var(--kg-tl-w);
+  box-sizing: border-box;
+  padding: 5px 12px 6px 10px;
+}
+.kg-touch .kg-objective {
+  font-size: 15px;
+  letter-spacing: 0.12em;
+}
+.kg-touch .kg-objective-detail,
+.kg-touch .kg-objective-clear {
+  display: none;
+}
+.kg-touch .kg-mission-stage {
+  margin-top: 3px;
+  font-size: 13px;
+}
+.kg-touch .kg-mission-hint,
+.kg-touch .kg-mission-message {
+  max-width: none;
+  letter-spacing: 0;
+  text-wrap: pretty;
+  margin-top: 2px;
+  font-size: 12px;
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+}
+.kg-touch .kg-mission-message:empty {
+  display: none;
+}
+.kg-touch .kg-time {
+  font-size: 12px;
+  margin-top: 1px;
+}
+
+/* 右上：レーダー（描画の解像度は元のまま、表示だけ縮める）と信長までの距離 */
+.kg-touch .kg-hud-tr {
+  right: calc(var(--kg-touch-pause-right) + var(--kg-touch-pause-size) + 8px + var(--kg-safe-right));
+  top: calc(6px + var(--kg-safe-top));
+  width: var(--kg-radar);
+}
+.kg-touch .kg-radar {
+  width: var(--kg-radar);
+  height: var(--kg-radar);
+}
+.kg-touch .kg-radar-cap {
+  font-size: 12px;
+  margin-top: 0;
+}
+
+/* 上中央：構え・明るさ（常に見える）。左上の枠と右上の列の間で、真ん中に寄せる */
+.kg-touch .kg-hud-bl,
+.kg-touch .kg-hud-tc {
+  left: calc(8px + var(--kg-tl-w) + 8px + var(--kg-safe-left));
+  right: calc(var(--kg-tr-w) + 8px + var(--kg-safe-right));
+  margin-inline: auto;
+  width: fit-content;
+  box-sizing: border-box;
+  transform: none;
+}
+.kg-touch .kg-hud-bl {
+  top: calc(6px + var(--kg-safe-top));
+  bottom: auto;
+  display: grid;
+  grid-template-columns: max-content 1fr max-content; /* auto だと、幅を決めたとき（下の 162px）に字を入れる両端の列が 0 幅になり、字が枠の外へはみ出した */
+  grid-template-areas: 'stance label tier' 'bar bar bar';
+  align-items: baseline;
+  gap: 2px 8px;
+  padding: 4px 10px 10px;
+  background: var(--sumi-a);
+  border-top: 2px solid rgba(201, 167, 91, 0.55);
+}
+.kg-touch .kg-meter {
+  display: contents;
+}
+.kg-touch .kg-stance,
+.kg-touch .kg-tier,
+.kg-touch .kg-meter-label {
+  white-space: nowrap;
+}
+.kg-touch .kg-stance {
+  grid-area: stance;
+  font-size: 15px;
+  letter-spacing: 0.08em;
+  min-width: 0;
+}
+.kg-touch .kg-meter-label {
+  grid-area: label;
+  font-size: 12px;
+  text-align: center;
+  letter-spacing: 0.1em;
+}
+.kg-touch .kg-tier {
+  grid-area: tier;
+  font-size: 15px;
+  min-width: 0;
+  text-align: right;
+}
+.kg-touch .kg-meter-bar {
+  grid-area: bar;
+  width: 140px;
+  height: 15px;
+  margin-top: 2px;
+}
+.kg-touch .kg-meter-seg {
+  font-size: 12px;
+  color: var(--kinari);
+}
+/* 針は、欄の文字を横切らないよう、帯の下に置く小さな三角にする（見た目の採点 第2周） */
+.kg-touch .kg-meter-mark {
+  top: auto;
+  bottom: -7px;
+  width: 11px;
+  height: 7px;
+  margin-left: -5.5px;
+  clip-path: polygon(50% 0, 0 100%, 100% 100%);
+  box-shadow: none;
+}
+/* 寺の構え（警戒・捜索・発見）：明るさの帯の下 */
+.kg-touch .kg-hud-tc {
+  top: calc(66px + var(--kg-safe-top));
+  padding: 3px 12px 4px;
+  gap: 2px 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+  white-space: normal;
+  text-align: center;
+}
+.kg-touch .kg-phase-name {
+  font-size: 17px;
+  letter-spacing: 0.3em;
+}
+.kg-touch .kg-phase-left {
+  font-size: 12px;
+}
+/* 発見に入ったときの逃げ方の案内。幅 700px 以下（568×320 など）は、中央の列が狭いので、画面の中ほどより少し下（主人公の足元の下）。
+   右は、狙っているときに出る「やめる」の列までよける。幅 701px 以上は、下の @media で、寺の構え（発見）の帯の直下へ移す */
+.kg-touch .kg-alert-tip {
+  top: 66%;
+  left: calc(var(--kg-bc-left) + var(--kg-safe-left));
+  right: calc(var(--kg-bc-right) + var(--kg-touch-btn-size) + 8px + var(--kg-safe-right));
+  margin-inline: auto;
+  width: fit-content;
+  transform: none;
+  white-space: normal;
+  text-align: center;
+  font-size: 14px;
+  letter-spacing: 0.02em;
+  line-height: 1.5;
+  padding: 4px 10px;
+}
+/* 叫び（「曲者じゃ！」）：左上の枠より下 */
+.kg-touch .kg-toast {
+  top: 44%;
+  font-size: 26px;
+}
+
+/* 右下の小石の数とキー一覧は出さない（小石の数はボタンの角の数字に統合） */
+.kg-touch .kg-hud-br {
+  display: none;
+}
+.kg-touch .kg-lockhint {
+  display: none;
+}
+
+/* 下中央：いまできること・狙いの案内（スティックの目印とボタンの弧の間に収める。文字は 14px 以上） */
+.kg-touch .kg-hud-bc {
+  left: calc(var(--kg-bc-left) + var(--kg-safe-left));
+  right: calc(var(--kg-bc-right) + var(--kg-safe-right));
+  bottom: calc(10px + var(--kg-safe-bottom));
+  transform: none;
+  gap: 4px;
+}
+.kg-touch .kg-prompt,
+.kg-touch .kg-aimhint {
+  white-space: normal;
+  text-align: center;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+.kg-touch .kg-prompt.kg-on {
+  font-size: 15px;
+  letter-spacing: 0.08em;
+  line-height: 1.45;
+  padding: 4px 12px;
+}
+.kg-touch .kg-aimhint.kg-on {
+  font-size: 14px;
+  letter-spacing: 0;
+  line-height: 1.45;
+  padding: 3px 10px;
+}
+/* 狙っている間は、いまできることを隠し、狙いの案内だけにする。右は「やめる」の列までよける */
+.kg-touch .kg-hud-bc:has(.kg-aimhint.kg-on) .kg-prompt {
+  display: none;
+}
+.kg-touch .kg-hud-bc:has(.kg-aimhint.kg-on) {
+  right: calc(var(--kg-bc-right) + var(--kg-touch-btn-size) + 8px + var(--kg-safe-right));
+}
+
+/* 遊び始めの操作のヒント（読み込み後の最初の遊びで一度だけ。8秒以内に消える） */
+.kg-touchhint {
+  display: none;
+}
+.kg-touch .kg-touchhint {
+  display: block;
+  position: absolute;
+  top: 50%;
+  left: calc(var(--kg-bc-left) + var(--kg-safe-left));
+  right: calc(var(--kg-bc-right) + var(--kg-touch-btn-size) + 8px + var(--kg-safe-right));
+  margin-inline: auto;
+  width: fit-content;
+  font-family: var(--mincho);
+  font-size: 15px;
+  letter-spacing: 0.08em;
+  line-height: 1.6;
+  text-align: center;
+  color: var(--kinari);
+  background: rgba(20, 17, 15, 0.78);
+  border-top: 1px solid var(--kin);
+  border-bottom: 1px solid var(--kin);
+  padding: 5px 16px;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 1s, visibility 0s linear 1s;
+}
+.kg-touch .kg-touchhint.kg-on {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.3s;
+}
+.kg-touch .kg-touchhint > div:last-child {
+  font-size: 14px;
+  color: var(--kin);
+}
+/* 狙っている間は、逃げ方の案内を隠す（狙いの案内と縦に重なるため。狙いをやめれば、残りの時間だけまた出る） */
+.kg-touch .kg-hud:has(.kg-aimhint.kg-on) .kg-alert-tip {
+  visibility: hidden;
+}
+/* 逃げ方の案内が出ている間・遊ぶ画面以外では、操作のヒントを隠す（同じ枠を使うため） */
+.kg-touch .kg-hud:has(.kg-alert-tip.kg-on) .kg-touchhint,
+.kg-touch .kg-hud:has(.kg-aimhint.kg-on) .kg-touchhint,
+.kg-touch .kg-ui:not([data-screen='play']) .kg-touchhint {
+  visibility: hidden;
+}
+/* 文は句ごとに折り返す（語の途中で切らない）。ui.ts が句を .kg-ph の箱に分けて入れる */
+.kg-touch .kg-ph {
+  display: inline-block;
+}
+.kg-touch .kg-ph-gap {
+  margin-left: 0.6em;
+}
+/* 一時停止の間は HUD を隠す（一時停止の札と重ねない。画質の名前は札の中に出す） */
+.kg-touch .kg-ui[data-screen='pause'] .kg-hud {
+  display: none;
+}
+
+/* ================================================================ 各画面（タッチのとき）：キー名の案内を消し、小さい横向き画面に収める */
+.kg-touch .kg-keyhint {
+  display: none;
+}
+.kg-touch .kg-title-sub,
+.kg-touch .kg-title-goal {
+  text-align: center;
+}
+.kg-portrait-note {
+  display: none;
+}
+@media (orientation: portrait) {
+  /* 縦向きの説明：題字と本文を幅に合わせる（語の途中で折り返さない大きさ） */
+  .kg-touch .kg-brief-tagline {
+    font-size: clamp(28px, 8.5vw, 72px);
+  }
+  .kg-touch .kg-brief-body {
+    font-size: 15px;
+  }
+  .kg-touch .kg-portrait-note {
+    display: block;
+    font-family: var(--mincho);
+    font-size: 14px;
+    letter-spacing: 0.1em;
+    color: var(--kin);
+    padding: 2px 0;
+    text-align: center;
+  }
+}
+.kg-touch .kg-btn {
+  min-height: 44px;
+}
+.kg-touch .kg-touch-key {
+  font-family: var(--mincho);
+}
+/* 一時停止：音の入切と画質 */
+.kg-touch .kg-quality {
+  font-size: 12px;
+  color: var(--kinari-dim);
+  letter-spacing: 0.12em;
+}
+/* 長い画面は、上端から並べて指でスクロールできる（中身は margin:auto で縦に真ん中） */
+.kg-touch .kg-screen {
+  justify-content: flex-start;
+  pointer-events: none;
+  padding: calc(12px + var(--kg-safe-top)) calc(12px + var(--kg-safe-right)) calc(12px + var(--kg-safe-bottom)) calc(12px + var(--kg-safe-left));
+}
+.kg-touch .kg-screen.kg-on {
+  pointer-events: auto;
+}
+.kg-touch .kg-screen > :first-child {
+  margin-top: auto;
+}
+.kg-touch .kg-screen > :last-child {
+  margin-bottom: auto;
+}
+.kg-touch .kg-brief-box {
+  max-height: none;
+  overflow: visible;
+}
+/* 「出陣する」は下に固定され、低い画面では本文の上に重なる（元の設計）。画面の下に暗い帯（下ほど濃い）を敷き、ボタンの下へ潜る本文が帯に溶けて、字がボタンの縁に直接触れないようにする。ボタンは帯より前 */
+.kg-touch .kg-briefing.kg-on::after {
+  content: '';
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: calc(84px + var(--kg-safe-bottom));
+  background: linear-gradient(to top, rgba(5, 7, 13, 0.96) 0%, rgba(5, 7, 13, 0.9) 50%, rgba(5, 7, 13, 0) 100%);
+  pointer-events: none;
+  z-index: 0;
+}
+.kg-touch .kg-brief-box > .kg-btn {
+  z-index: 1;
+}
+
+/* ================================================================ 縦向きの案内（遊ぶ・一時停止の画面で縦にしたとき） */
+.kg-notice.kg-rotate {
+  background: #05070d;
+}
+.kg-rotate .kg-notice-box {
+  gap: 14px;
+}
+.kg-rotate .kg-notice-main {
+  font-size: 24px;
+  line-height: 1.5;
+  letter-spacing: 0.04em;
+}
+.kg-rotate .kg-notice-sub {
+  font-size: 15px;
+}
+/* スマホの輪郭（縦→横に回る）。画面の窓と、横向きのときの下＝右側にボタンの点 */
+.kg-rotate-phone {
+  position: relative;
+  width: 46px;
+  height: 80px;
+  margin: 8px 0 18px;
+  border: 3px solid var(--kinari);
+  border-radius: 9px;
+  box-sizing: border-box;
+  animation: kg-rotate-phone 2.4s ease-in-out infinite;
+}
+.kg-rotate-phone::before {
+  content: '';
+  position: absolute;
+  inset: 7px 4px 12px;
+  border-radius: 2px;
+  background: rgba(201, 167, 91, 0.35);
+}
+.kg-rotate-phone::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: 3px;
+  width: 6px;
+  height: 6px;
+  margin-left: -3px;
+  border-radius: 50%;
+  background: var(--kinari);
+}
+@keyframes kg-rotate-phone {
+  0%,
+  20% {
+    transform: rotate(0deg);
+  }
+  55%,
+  85% {
+    transform: rotate(-90deg);
+    border-color: var(--kin);
+  }
+  100% {
+    transform: rotate(0deg);
+  }
+}
+/* 動きを減らす設定では回さず、横向きの姿で止める */
+@media (prefers-reduced-motion: reduce) {
+  .kg-rotate-phone {
+    animation: none;
+    transform: rotate(-90deg);
+    border-color: var(--kin);
+  }
+}
+
+/* ================================================================ 小さい横向き画面（高さ 500 以下）の各画面 */
+@media (max-height: 500px) {
+  .kg-touch .kg-screen {
+    gap: 8px;
+  }
+  .kg-touch .kg-h2 {
+    font-size: 22px;
+    letter-spacing: 0.24em;
+  }
+  .kg-touch .kg-panel {
+    padding: 12px 22px;
+    gap: 8px;
+  }
+  .kg-touch .kg-btn {
+    font-size: 16px;
+    padding: 8px 22px;
+    min-width: 200px;
+  }
+  /* タイトル */
+  .kg-touch .kg-title-box {
+    gap: 6px;
+  }
+  .kg-touch .kg-title-sub {
+    font-size: 13px;
+    letter-spacing: 0.12em;
+    text-align: center;
+  }
+  .kg-touch .kg-logo {
+    font-size: clamp(48px, 15vh, 76px);
+  }
+  .kg-touch .kg-title-en {
+    margin-bottom: 4px;
+  }
+  .kg-touch .kg-title-goal {
+    font-size: 15px;
+    max-width: 100%;
+    margin-bottom: 4px;
+  }
+  /* 選択 */
+  .kg-touch .kg-cards {
+    gap: 10px;
+    margin: 4px 0;
+  }
+  /* 札は横長の2列（左＝名前と任務、右＝隠れ方）にして、低い画面に収める */
+  .kg-touch .kg-card {
+    width: min(540px, 100%);
+    min-height: 0;
+    padding: 10px 14px 44px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 16px;
+    row-gap: 2px;
+    align-content: start;
+  }
+  .kg-touch .kg-card > * {
+    grid-column: 1;
+  }
+  /* 準備中の札は、名前と時代だけの細い札にする（遊べる札を上へ寄せる） */
+  .kg-touch .kg-card.kg-soon {
+    padding-bottom: 10px;
+  }
+  .kg-touch .kg-card.kg-soon .kg-card-mission,
+  .kg-touch .kg-card.kg-soon .kg-card-rule {
+    display: none;
+  }
+  .kg-touch .kg-card.kg-soon .kg-card-badge {
+    bottom: 10px;
+  }
+  .kg-touch .kg-card > .kg-card-rule {
+    grid-column: 2;
+    grid-row: 1 / span 4;
+    margin-top: 0;
+    padding: 0 0 0 14px;
+    border-top: none;
+    border-left: 1px solid rgba(239, 230, 210, 0.2);
+  }
+  .kg-touch .kg-card-name {
+    font-size: 21px;
+  }
+  .kg-touch .kg-card-mission {
+    margin: 8px 0;
+    padding-top: 8px;
+  }
+  .kg-touch .kg-card-objective {
+    font-size: 16px;
+  }
+  /* 説明 */
+  .kg-touch .kg-brief-tagline {
+    font-size: clamp(30px, 10vh, 44px);
+  }
+  .kg-touch .kg-brief-objective {
+    font-size: 16px;
+  }
+  .kg-touch .kg-brief-body {
+    font-size: 14px;
+    line-height: 1.7;
+  }
+  /* 討たれた・結果 */
+  .kg-touch .kg-go-title {
+    font-size: 40px;
+  }
+  .kg-touch .kg-go-body {
+    font-size: 15px;
+    line-height: 1.7;
+  }
+  .kg-touch .kg-rs-body {
+    gap: 8px 24px;
+    margin: 0;
+  }
+  .kg-touch .kg-rank-char {
+    font-size: 64px;
+  }
+  .kg-touch .kg-rank-text {
+    font-size: 14px;
+    line-height: 1.6;
+  }
+  .kg-touch .kg-rs-stats {
+    font-size: 16px;
+    gap: 2px 18px;
+  }
+  .kg-touch .kg-mission-complete {
+    font-size: 16px;
+  }
+  .kg-touch .kg-rs-head {
+    font-size: 14px;
+    letter-spacing: 0.1em;
+    text-align: center;
+  }
+}
+
+/* ================================================================ 共有欄（タイトルと結果に出る）：小さい横向き画面では細くして右に寄せ、画面の中身はその左に並べる */
+.kg-touch {
+  /* 共有欄の幅（style.css の #share と同じ式）。横向きの画面では、タイトルと結果の中身をこの左に並べる */
+  --kg-share-w: min(320px, calc(100vw - 32px));
+}
+@media (orientation: landscape) and (max-width: 1100px) {
+  .kg-touch .kg-ui[data-screen='title'] .kg-title,
+  .kg-touch .kg-ui[data-screen='result'] .kg-result {
+    padding-right: calc(var(--kg-share-w) + 16px + var(--kg-safe-right));
+  }
+}
+@media (orientation: landscape) and (max-height: 500px) {
+  .kg-touch {
+    --kg-share-w: min(260px, 40vw);
+  }
+  .kg-touch #share {
+    right: calc(8px + var(--kg-safe-right));
+    bottom: calc(8px + var(--kg-safe-bottom));
+    width: var(--kg-share-w);
+    padding: 0 10px 8px;
+  }
+  .kg-touch #share .share {
+    margin-top: 6px;
+    padding-top: 8px;
+  }
+  .kg-touch #share .share__label {
+    margin-bottom: 6px;
+  }
+  .kg-touch #share .share__row {
+    gap: 6px;
+  }
+  .kg-touch #share .share__button {
+    padding: 0 10px;
+  }
+  .kg-touch #share .share__said {
+    min-height: 0;
+    margin-top: 2px;
+  }
+  .kg-touch #share .share__note {
+    font-size: 12px;
+    line-height: 1.5;
+  }
+}
+
+/* ================================================================ 幅 640 以下（568×320 など）：左上の枠を少し広げ、上中央の帯を詰める。
+   上の一般の規則より後に置く（同じ強さの規則は後が勝つ） */
+@media (max-width: 640px) {
+  .kg-touch {
+    --kg-tl-w: 208px;
+  }
+  .kg-touch .kg-hud-tl {
+    padding-right: 6px;
+  }
+  .kg-touch .kg-hud-bl {
+    padding-inline: 8px;
+  }
+  .kg-touch .kg-meter-bar {
+    width: 136px;
+  }
+}
+
+/* ================================================================ 見た目の採点 第1周（2026-11-03）で採った修正 */
+/* 明るさの目盛り：地の色は固定の目盛り（闇・薄明・灯り）で、いまの明るさではない。
+   いまの段（kg-active。ui.ts が付ける）だけ濃く縁を付け、ほかは薄くして、「いま」を一目で読めるようにする */
+.kg-touch .kg-meter-seg {
+  opacity: 0.7;
+}
+.kg-touch .kg-meter-seg.kg-active {
+  opacity: 1;
+  box-shadow: inset 0 0 0 1px rgba(239, 230, 210, 0.9);
+}
+/* 選択の札の「選ぶ」：小さい金の札だったのを、ほかの主ボタンと同じ生成りの塗り・高さ44px以上にする（札全体も押せる） */
+.kg-touch .kg-card-badge.kg-go {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  min-width: 96px;
+  min-height: 44px;
+  padding: 0 16px;
+  font-size: 17px;
+  background: var(--kinari);
+  border: 1px solid var(--kin);
+}
+/* 「しゃがむ」の文字が丸い縁すれすれだった：一段小さく（12px以上は守る） */
+.kg-touch .kg-tbtn-crouch .kg-tbtn-label {
+  font-size: 13px;
+  letter-spacing: 0;
+}
+/* 一時停止の画質の行：灰色が薄かったので生成りに近づける */
+.kg-touch .kg-quality {
+  color: var(--kinari);
+  opacity: 0.85;
+}
+/* 結果（高さ 340px 以下＝568×320 など）：位と統計を横に並べ、2つのボタンも横に並べて、主ボタンが画面の下にはみ出さないようにする。
+   第1周の採点で、568×320 の結果画面の「もう一度」「ステージ選択へ」が画面の外に切れていた */
+@media (orientation: landscape) and (max-height: 340px) {
+  .kg-touch .kg-result .kg-panel-wide {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 6px 10px;
+    padding: 8px 12px 10px;
+    justify-items: center;
+    align-items: center;
+    /* 共有欄の左の領域に収める（はみ出して、左は画面の外・右は共有欄に隠れた） */
+    width: 100%;
+    max-width: 300px;
+    min-width: 0;
+    box-sizing: border-box;
+  }
+  .kg-touch .kg-result .kg-panel-wide > .kg-rs-head,
+  .kg-touch .kg-result .kg-panel-wide > .kg-mission-complete,
+  .kg-touch .kg-result .kg-panel-wide > .kg-rs-body {
+    grid-column: 1 / -1;
+  }
+  .kg-touch .kg-result .kg-panel-wide > .kg-btn {
+    width: 100%;
+    min-width: 0; /* ボタンの共通の最小幅（200〜220px）が列からはみ出す原因だった */
+    box-sizing: border-box;
+    padding-inline: 8px;
+  }
+  .kg-touch .kg-result .kg-rs-body {
+    flex-wrap: nowrap;
+    gap: 12px;
+    margin: 0;
+    max-width: 100%;
+  }
+  .kg-touch .kg-result .kg-rank {
+    max-width: 172px; /* 位の一言（14字）が折り返さずに収まる幅 */
+  }
+  .kg-touch .kg-result .kg-rank-char {
+    font-size: 48px;
+    line-height: 1.1;
+  }
+  .kg-touch .kg-result .kg-rank-text {
+    font-size: 12px;
+    line-height: 1.5;
+    white-space: normal; /* 一言は「、」の所で折り返せる（梟・狐は17〜18字で、172px の列に1行では入らず、統計の欄に食い込んでいた） */
+  }
+  .kg-touch .kg-result .kg-rs-stats {
+    font-size: 14px;
+    gap: 1px 12px;
+  }
+  .kg-touch .kg-result .kg-mission-complete {
+    font-size: 14px;
+  }
+  .kg-touch .kg-result .kg-panel-wide > .kg-btn {
+    font-size: 15px;
+    letter-spacing: 0.04em;
+    min-height: 44px;
+  }
+}
+
+/* ================================================================ 幅 701px 以上（844×390 など）：案内を上部へ移す（体験評価の第1周）
+   逃げ方の案内は画面の中ほどで主人公と「曲者じゃ！」に重なり、狙いの案内は、カメラが狙いの点へ寄って主人公が画面の下寄りに映るので足元を隠した。
+   どちらも、上部の中央の列（左上の枠とレーダーの間）の、寺の構えの帯の直下に置く。幅 700px 以下は、この列が狭すぎて折り返しが悪くなるので、上の基本のまま */
+@media (min-width: 701px) {
+  /* 寺の構えの帯（top 66px・1行で約36px、「見られていない　残り N 秒」で2行なら約54px）の下に、重ならずに置く */
+  .kg-touch .kg-alert-tip {
+    top: calc(122px + var(--kg-safe-top));
+    left: calc(8px + var(--kg-tl-w) + 8px + var(--kg-safe-left));
+    right: calc(var(--kg-tr-w) + 8px + var(--kg-safe-right));
+    font-size: 13px;
+    line-height: 1.45;
+    padding: 3px 10px;
+  }
+  .kg-touch .kg-aimhint.kg-on {
+    position: fixed;
+    top: calc(122px + var(--kg-safe-top));
+    left: calc(8px + var(--kg-tl-w) + 8px + var(--kg-safe-left));
+    right: calc(var(--kg-tr-w) + 8px + var(--kg-safe-right));
+    margin-inline: auto;
+    width: fit-content;
+  }
+}
+
+/* 幅 700px 以下（568×320 など）：中央の列が狭いので、案内を詰める。
+   ・逃げ方の案内を出している間（6秒）は、「いまできること」を隠す（案内が下の帯に重なっていた）。逃げる間は要らない
+   ・狙いの案内は、1行目の「離して投げる」と2行目の「やめるで中止」だけにする（「ちょん押しなら…」は押すとボタンが「投げる」に変わる、
+     「なぞって…」は説明の画面にある）。主人公の足元を隠す高さを減らす */
+@media (max-width: 700px) {
+  .kg-touch .kg-hud:has(.kg-alert-tip.kg-on) .kg-prompt {
+    display: none;
+  }
+  .kg-touch .kg-aimhint .kg-ph-gap {
+    display: none;
+  }
+}
+
+/* ================================================================ 見た目の採点 第2周（2026-11-03）で採った修正（続き） */
+/* 一時停止の4つのボタンは、いちばん広いものに幅をそろえる（枠の縁が1本の縦線になる） */
+.kg-touch .kg-pause .kg-panel {
+  align-items: stretch;
+}
+.kg-touch .kg-pause .kg-panel > * {
+  text-align: center;
+}
+/* 選択：遊べる札の「選ぶ」（右下に絶対配置の44px）と、その上の最後の行を離す。短い横画面は右の列が空いているので不要 */
+@media (min-height: 501px) {
+  .kg-touch .kg-card:not(:disabled) {
+    padding-bottom: 74px;
+  }
+}
+
+/* 明るさの帯と構えは、左上の枠と右上のレーダーの間の「右寄せ」にする。前方の番兵の「？」「！」が出る真ん中を塞がないため（体験の採点 第2周）。
+   「明るさ」の字は出さない（欄の字で分かる。568×320 で構えの字と重なっていた） */
+.kg-touch .kg-hud-bl {
+  margin-inline: auto 0;
+}
+.kg-touch .kg-meter-label {
+  display: none;
+}
+
+/* 討たれた：低い横画面（高さ340px以下）では、見出し・本文・2つのボタンを1画面に収め、ボタンは横に並べる（568×320 で「ステージ選択へ」が下に切れていた） */
+@media (orientation: landscape) and (max-height: 340px) {
+  .kg-touch .kg-gameover .kg-panel-wide {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 6px 10px;
+    padding: 8px 14px 10px;
+    justify-items: center;
+    width: 100%;
+    max-width: 520px;
+    box-sizing: border-box;
+  }
+  .kg-touch .kg-gameover .kg-panel-wide > .kg-go-title,
+  .kg-touch .kg-gameover .kg-panel-wide > .kg-go-body {
+    grid-column: 1 / -1;
+  }
+  .kg-touch .kg-gameover .kg-go-title {
+    font-size: 30px;
+    letter-spacing: 0.3em;
+    margin: 0 0 0 0.3em;
+  }
+  .kg-touch .kg-gameover .kg-go-body {
+    font-size: 14px;
+    line-height: 1.5;
+  }
+  .kg-touch .kg-gameover .kg-go-body p {
+    margin: 2px 0;
+  }
+  .kg-touch .kg-gameover .kg-go-hint {
+    font-size: 13px;
+    margin-top: 4px !important;
+  }
+  .kg-touch .kg-gameover .kg-panel-wide > .kg-btn {
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    padding-inline: 8px;
+    font-size: 15px;
+    letter-spacing: 0.04em;
+    min-height: 44px;
+  }
+}
+
+/* ================================================================ 見た目の採点 第3周（2026-11-03）で採った修正 */
+/* 明るさの帯の幅は、目盛りの幅（約140px）に固定する。構えや段の字が変わっても枠が動かず、前（約209px）より狭いので、番兵の印を隠す面も減る */
+.kg-touch .kg-hud-bl {
+  /* 目盛り 140px＋枠 2px＋左右の余白 10px×2。min-content にすると、構えと段の字を入れる列が 0 幅になって字が枠の外へはみ出した（測って気づいた） */
+  width: 162px;
+  /* 後ろの世界（番兵の頭上の「？」）が透けて見える薄さにする。字は生成りで、この濃さでも読める */
+  background: rgba(20, 17, 15, 0.5);
+}
+@media (max-width: 640px) {
+  .kg-touch .kg-hud-bl {
+    width: 154px; /* 目盛り 136px＋枠 2px＋左右の余白 8px×2 */
+  }
+}
+/* 寺の構え（発見・捜索・警戒）の帯は、明るさの帯と6px以上あける。2行のときも、狙いの案内（下の 130px）に届かない */
+.kg-touch .kg-hud-tc {
+  top: calc(72px + var(--kg-safe-top));
+}
+/* 左上の枠の文は、句の切れ目で折り返す（Chromium の word-break: auto-phrase。「…時点／でクリア」で行頭に「で」が来ていた。ほかは今まで通り） */
+.kg-touch .kg-hud-tl {
+  word-break: auto-phrase;
+}
+/* 説明の「出陣する」の下の帯は、もっと濃く・高く（本文が透けて見えた） */
+.kg-touch .kg-briefing.kg-on::after {
+  height: calc(100px + var(--kg-safe-bottom));
+  background: linear-gradient(to top, rgba(5, 7, 13, 1) 0%, rgba(5, 7, 13, 0.97) 55%, rgba(5, 7, 13, 0) 100%);
+}
+@media (min-width: 701px) {
+  /* 発見中の逃げ方の案内は、真ん中（門の番兵の「！」が出る所）を避けて、左上の枠の下へ置く */
+  .kg-touch .kg-alert-tip {
+    top: calc(108px + var(--kg-safe-top));
+    left: calc(8px + var(--kg-safe-left));
+    right: auto;
+    width: var(--kg-tl-w);
+    margin-inline: 0;
+    box-sizing: border-box;
+    text-align: left;
+  }
+  .kg-touch .kg-aimhint.kg-on {
+    top: calc(130px + var(--kg-safe-top));
+  }
+}

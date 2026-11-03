@@ -105,6 +105,8 @@ export interface KgPost extends ArtPost {
   readonly grade: GradeEffect;
   /** N8AO の段（確認ページの ?ao=0 で切る。r03-fix-visual 追加） */
   readonly ao: N8AOPostPass;
+  /** 描画の段階：AO の描画だけを止め、炎に渡す深度と最後の仕上げは残す。 */
+  setAoEnabled(on: boolean): void;
   /** 撮影：AO を何コマも積算してノイズを消し、粒の種を固定する。 */
   setShotMode(on: boolean): void;
   /** 0→1：捕まったときの色抜き（r01-integrate。契約の外の口）。 */
@@ -149,6 +151,9 @@ export function createPostChain(renderer: WebGLRenderer, scene: Scene, camera: P
     composer,
     grade,
     ao,
+    setAoEnabled(on: boolean): void {
+      ao.enabled = on;
+    },
     render(dt: number): void {
       renderer.info.reset();
       if (!shot) grade.grainSeed = (frame++ % 97) + 1;
