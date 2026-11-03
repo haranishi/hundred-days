@@ -96,7 +96,8 @@ test('Day82で信長を討つと、炎上の演出を経て結果画面に位が
    タッチ部品・一時停止・縦向きの案内は表示の種類に依らない。スティックは CDP の本物のタッチで倒す（Chromium）。
    本番と同じCSPを当てるので、インラインの style 属性などでCSPに止められないことも、ここで分かる */
 test('Day82をスマホ（横向き・タッチ）で遊べる：スティックで歩き、しゃがむ・一時停止・縦向きの案内が働く（外部通信・エラー無し・キー名無し）', async ({ browser, baseURL }) => {
-  test.setTimeout(120_000);
+  // この1本は操作の呼び出しが約50回ある。CI が遅い回は、Evaluate や expect の1回に2〜4秒かかり（トレースで確認）、120秒を少し超えて落ちた（2026-11-03）。手元は約10秒
+  test.setTimeout(300_000);
   const context = await browser.newContext({ viewport: { width: 844, height: 390 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true, baseURL });
   try {
     const page = await context.newPage();
