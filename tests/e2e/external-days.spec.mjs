@@ -27,6 +27,13 @@ const EXTERNAL_DAYS = [
     title: 'PageCrate',
     dir: 'day-081-pagecrate',
     url: 'https://day81.rairakku.com/'
+  },
+  {
+    day: '083',
+    title: 'カー360',
+    dir: 'day-083-car360',
+    url: 'https://day83.rairakku.com/',
+    demo: false // 紹介動画はまだ無い。カードはスクリーンショットだけで、デモ再生ボタンは出さない
   }
 ];
 
@@ -54,9 +61,13 @@ for (const d of EXTERNAL_DAYS) {
       // スクショの実体が配信されている（カードが「DAY 019」のプレースホルダに落ちていないこと）
       const shot = await page.request.get(`/${d.dir}/screenshot.webp`);
       expect(shot.ok(), `スクショが見つからない: /${d.dir}/screenshot.webp`).toBe(true);
+
+      // 動画の無いDayは、デモ再生ボタンを出さない
+      if (d.demo === false) await expect(card.locator('.thumb__play')).toHaveCount(0);
     });
 
     test('プロモ動画がデモ再生ボタンから見られる', async ({ page }) => {
+      test.skip(d.demo === false, 'このDayには紹介動画がまだ無い');
       await page.goto('/');
       const card = page.locator(`.card[data-day="${d.day}"]`);
       const play = card.locator('.thumb__play');
