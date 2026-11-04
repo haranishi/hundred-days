@@ -4,6 +4,7 @@
 import { execFileSync } from 'node:child_process';
 import { verifyPublicPage } from './verify-public-page.mjs';
 import { fetchPublicUrl } from './lib/public-url.mjs';
+import { buildLinkReply } from './lib/x-reply.mjs';
 import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { basename, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -120,18 +121,12 @@ const sshGithubPrefix = ['git', 'github.com:'].join('@');
 const repoUrl = remote.startsWith(sshGithubPrefix)
   ? `https://github.com/${remote.slice(sshGithubPrefix.length).replace(/\.git$/, '')}`
   : remote.replace(/\.git$/, '');
-// 外部Dayのコードが別のリポジトリにあるときは、intro.codeUrl を案内する。このリポジトリのURLでは、コードが無いリンクになる
-const codeUrl = external && meta.intro?.codeUrl ? meta.intro.codeUrl : repoUrl;
+// 外部Dayは明示されたコードのURLだけを案内する。非公開ならURLの確認も省く。
+const codeUrl = xConfig?.codePublished === false || (external && !meta.intro?.codeUrl)
+  ? ''
+  : (external ? meta.intro.codeUrl : repoUrl);
 
-/* タイトルは鉤括弧で囲む。囲まないと、タイトルの終わり方によって文がつながって読めなくなる
-   （「バイトの法律、原文はこう」→「…原文はこうはこちら」／「潮、いまどっち？」→「…どっち？はこちら」） */
-const reply = [
-  `👇 「${meta.title}」はこちら`,
-  meta.publicUrl,
-  '',
-  'コードも公開しています',
-  codeUrl
-].join('\n');
+const reply = buildLinkReply({ meta, codeUrl, external });
 
 const countPlain = (text) => Array.from(text).reduce(
   (total, char) => total + (char.codePointAt(0) <= 0x7f ? 1 : 2),
@@ -206,7 +201,7 @@ const checkUrl = async (url, label, app = false) => {
 
 const urlChecks = [
   await checkUrl(meta.publicUrl, '公開URL', external ? 'external' : true),
-  await checkUrl(codeUrl, 'GitHubリポジトリ')
+  ...(codeUrl ? [await checkUrl(codeUrl, 'GitHubリポジトリ')] : [])
 ];
 
 const videoPath = resolve(videoOption);
@@ -267,7 +262,7 @@ const checklist = [
   '',
   '- [x] 公開前スキャン',
   '- [x] ビルド',
-  '- [x] 公開URL・GitHub URL',
+  codeUrl ? '- [x] 公開URL・GitHub URL' : '- [x] 公開URL',
   ...(urlChecks.some((check) => check.checkedVia) ? ['- [ ] 公開URLを別の回線（スマホ回線など）で開いて確認（この回線では名前を引けず、行き先で代わりに確認した）'] : []),
   '- [x] 本文・リプライ文字数',
   '- [x] 動画の縦横比・時間・メタデータ',
@@ -275,7 +270,7 @@ const checklist = [
   '- [ ] 投稿先が100日チャレンジ用Xアカウントか確認',
   '- [ ] 本文と動画の最終プレビュー',
   '- [ ] 本文＋動画を公開',
-  '- [ ] 公開URL＋GitHub URLをリプライ',
+  codeUrl ? '- [ ] 公開URL＋GitHub URLをリプライ' : '- [ ] 公開URLをリプライ',
   ...extraReplies.map((_, index) => `- [ ] reply-${index + 2}.txt を続けてリプライ`),
   '- [ ] 公開後にX投稿URLをmeta.jsonへ記録'
 ].join('\n');
