@@ -579,10 +579,16 @@ function compose() {
   const nightMask = join(framesDir, 'night-mask.png'), nightFrom = bar(9.5) + 7 * BEAT, nightTo = bar(12);
   execFileSync('ffmpeg', ['-hide_banner', '-loglevel', 'error', '-y', '-f', 'lavfi', '-i',
     `color=c=black:s=1080x1920,format=gray,geq=lum='255*exp(-pow(pow((X-${cx})/${rx},2)+pow((Y-${cy})/${ry},2),${falloff}))'`, '-frames:v', '1', nightMask]);
+  // 重ねの絵を、すべて同じ形式（rgba）にそろえる。終わりのカード（全面が不透明）の絵だけ、ブラウザが透明度のない rgb24 で保存する。
+  // 連番の途中で形式が変わると、ffmpeg が合成の仕組みを組み直し、その直前の1〜2コマで重ねが抜ける（アプリの素のヘッダーが一瞬見えた）。
+  const overlayDir = join(framesDir, 'overlay-rgba');
+  rmSync(overlayDir, { recursive: true, force: true }); mkdirSync(overlayDir, { recursive: true });
+  execFileSync('ffmpeg', ['-hide_banner', '-loglevel', 'error', '-y', '-framerate', String(FPS), '-i', join(framesDir, 'overlay', 'o%05d.png'),
+    '-vf', 'format=rgba', '-start_number', '0', join(overlayDir, 'o%05d.png')]);
   const encode = (out, withAudio) => execFileSync('ffmpeg', [
     '-hide_banner', '-loglevel', 'warning', '-y',
     '-framerate', String(FPS), '-i', join(seq, 'r%05d.png'),
-    '-framerate', String(FPS), '-i', join(framesDir, 'overlay', 'o%05d.png'),
+    '-framerate', String(FPS), '-i', join(overlayDir, 'o%05d.png'),
     '-loop', '1', '-framerate', String(FPS), '-t', String(DURATION_SECONDS), '-i', nightMask,
     ...(withAudio ? ['-i', audio] : []),
     '-filter_complex', `[0:v]scale=1080:1920:flags=lanczos,setsar=1${HOOK_LIFT[0] ? `,eq=gamma=${HOOK_LIFT[0]}:saturation=${HOOK_LIFT[1]}:enable='lt(t,${bar(2)})'` : ''},split=2[base][raw];[raw]eq=gamma=${gamma}:saturation=${saturation}[lift];[2:v]format=gray[mk];[lift][mk]alphamerge[la];[base][la]overlay=0:0:format=auto:enable='between(t,${nightFrom},${nightTo})'[b];[b][1:v]overlay=0:0:format=auto,format=yuv420p[v]`,
