@@ -1,7 +1,12 @@
-# rairakku.com/day<番号>/ を day<番号>.rairakku.com へ転送する Worker（外部Day共通）。出し方は README.md。
+# 外部Dayのアプリへ転送する Worker（外部Day共通）。出し方は README.md。
 # アカウントは環境変数 CLOUDFLARE_ACCOUNT_ID で指す（ここには書かない）。
+# 経路：① rairakku.com/day*（全外部Day）② rairakku.com/100days/<フォルダ名>*（紹介ページを持たない外部Dayを、1本ずつ）。
+#   🔴 ②を `rairakku.com/100days/*` のように広げない。全Dayの訪問がこの Worker（無料枠）を通ってしまう。scripts/tests/day-redirect.test.mjs が見張る。
 name = "rairakku-day-redirect"
 main = "worker.mjs"
 compatibility_date = "2026-11-01"
 workers_dev = false   # 公開の *.workers.dev の住所は作らない
-routes = [{ pattern = "rairakku.com/day*", zone_name = "rairakku.com" }]
+routes = [
+  { pattern = "rairakku.com/day*", zone_name = "rairakku.com" },
+  { pattern = "rairakku.com/100days/day-083-car360*", zone_name = "rairakku.com" },
+]

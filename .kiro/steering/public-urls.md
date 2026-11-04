@@ -22,6 +22,7 @@
 | canonical・OGP・sitemap・404 の基準は `HD_CANONICAL_BASE`（既定 `https://rairakku.com/100days`）。ソースに書く値は元の住所のままでよく、ビルドが基準へそろえる | `scripts/build.mjs`（`injectAppMeta`）・[公開の契約](publish-contract.md) |
 | 公開物の中のサイト内参照は文書相対。ルート直下の絶対パスは書かない（`/api/day-NNN/` だけ例外） | `npm run build`（`check-mount-safe`） |
 | 外部Dayの本体は、このリポジトリで配信しない。紹介ページを持つときは `meta.json` に `intro` を書く | ビルドが前提を確かめ、足りなければ止まる |
+| 紹介ページ（`intro`）が無い外部Dayは、正の住所 `rairakku.com/100days/<フォルダ名>/` が404にならないよう、アプリへ302で転送する（`EXTERNAL_DAYS` の `folder`・`wrangler.toml` の経路を、Dayごとに1本） | `scripts/tests/day-redirect.test.mjs`（`meta.json`・経路との突き合わせ。経路を広げると落ちる） |
 | `day<番号>.rairakku.com` で出す外部Dayは、`rairakku.com/day<番号>/` からも見られるようにする（`infra/day-redirect/worker.mjs` の `EXTERNAL_DAYS` に番号を足す） | `scripts/tests/day-redirect.test.mjs`（`meta.json` と表の突き合わせ） |
 | 名前を変えたDayの古い住所は、`static/_redirects` に301を足す。存在しない住所は本物の404 | `scripts/tests/not-found.test.mjs` |
 
