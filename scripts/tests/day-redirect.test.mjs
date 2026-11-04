@@ -19,7 +19,14 @@ test('外部Dayの番号だけ、day<番号>.rairakku.com へ転送する（パ�
 test('紹介ページを持たない外部Dayは、100日の正の住所（/100days/<フォルダ名>/）からもアプリへ転送する', () => {
   assert.equal(target('/100days/day-083-car360'), 'https://day83.rairakku.com/');
   assert.equal(target('/100days/day-083-car360/'), 'https://day83.rairakku.com/');
-  assert.equal(target('/100days/day-083-car360/drive/?x=1'), 'https://day83.rairakku.com/drive/?x=1');
+  assert.equal(target('/100days/day-083-car360?x=1'), 'https://day83.rairakku.com/?x=1');
+  assert.equal(target('/100days/day-083-car360/?x=1'), 'https://day83.rairakku.com/?x=1', '問い合わせは引き継ぐ');
+});
+
+test('100日の正の住所の下の素材（カードの画像など）は転送しない（転送すると一覧のカードの画像が壊れる）', () => {
+  for (const path of ['/100days/day-083-car360/screenshot.webp', '/100days/day-083-car360/meta.json', '/100days/day-083-car360/drive/', '/100days/day-083-car360//']) {
+    assert.equal(target(path), null, path);
+  }
 });
 
 test('紹介ページを持つ外部Day（Day81）・ほかのDay・似た名前は、100日の正の住所を転送しない', () => {
@@ -48,7 +55,8 @@ test('fetch：GET・HEAD は302で転送し、他の方法・表に無いもの�
     }
     assert.equal(await (await worker.fetch(new Request('https://rairakku.com/day83/', { method: 'POST', body: 'x' }))).text(), 'origin');
     assert.equal(await (await worker.fetch(new Request('https://rairakku.com/day84/'))).text(), 'origin');
-    assert.deepEqual(passed, ['POST /day83/', 'GET /day84/']);
+    assert.equal(await (await worker.fetch(new Request('https://rairakku.com/100days/day-083-car360/screenshot.webp'))).text(), 'origin', 'カードの画像は元のサイトへ');
+    assert.deepEqual(passed, ['POST /day83/', 'GET /day84/', 'GET /100days/day-083-car360/screenshot.webp']);
   } finally { globalThis.fetch = original; }
 });
 
