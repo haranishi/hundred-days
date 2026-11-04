@@ -32,3 +32,4 @@ npx wrangler deploy --config infra/day-redirect/wrangler.toml          # 別デ�
 - 経路は `rairakku.com/day*` と、紹介ページを持たない外部Dayの `rairakku.com/100days/<フォルダ名>*`（1本ずつ）。**`/100days/*` のように広げない**（全Dayの訪問が Workers の無料枠を通ってしまう。試験が見張る）。表に無い番号や `/daytime` のような別のパスは、`fetch(request)` で元のサイトへそのまま渡す（Workers を1回通るだけで、応答は変わらない）。
 - `www.rairakku.com` は、元から `rairakku.com` へ301で転送されるので、経路を足さない。
 - 公開の `*.workers.dev` の住所は作らない（`workers_dev = false`）。
+- **100日の正の住所は、フォルダの直下だけ転送する**（`/100days/<フォルダ名>` と `/100days/<フォルダ名>/`）。その下の素材（`screenshot.webp` など、100日の一覧のカードが使うもの）は、元のサイトへ素通しする。下まで転送すると、カードの画像が `day<番号>.rairakku.com/screenshot.webp` へ飛んで 404 になり、一覧のカードが壊れる（2026-11-04 に Day83 で実際に起きた。`scripts/tests/day-redirect.test.mjs` が見張る）。
