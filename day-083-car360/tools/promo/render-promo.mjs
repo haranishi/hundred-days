@@ -47,6 +47,13 @@ const HOOK_PICK = Number(arg('--hook-pick', 48));
 const HOOK_THEME = arg('--hook-theme', 'sunset'), HOOK_DIR = arg('--hook-dir', 'hook');
 const HOOK_LIFT = (arg('--hook-lift', '0') || '0').split(',').map(Number);
 const RUNUP_FRAMES = 90;
+// 指で運転（S5）の場所：PA へ戻るカーブの入口（街並み・大黒 PA の標識・高架が見えてくる）。夕暮れ。
+// 直線の終わり（5,131m まで）まではアクセル（キー）で速度を乗せ、カーブはハンドルを指で切って曲がる
+const FINGER = { theme: 'sunset', cruiseUntil: 4900, from: 5118, kmh: 100 };
+// 夜のショット（24.0〜25.6秒）：車が暗く沈むので、合成のとき、車の周りだけをふんわり持ち上げる（街灯の光が当たったように）。
+// 画面全体にガンマを掛けると、路面と空まで車以上に明るくなって霞み、夜に見えない（ガンマ1.3で試して、霞んで夜に見えなかった）。
+// 追従視点では車は画面の同じ所にあるので、そこに柔らかい楕円の窓を掛ける。車は約2倍、路面は約1.2倍、空は変わらない（README）
+const NIGHT_LIFT = { gamma: 1.5, saturation: 1.15, center: [540, 1165], radius: [330, 300], falloff: 1.6 };
 // 出だしの2ショット目。場所はコースを試し撮りして選んだ（README）
 const HOOK2 = { dir: 'hook2', theme: 'day', cruiseUntil: 4785, from: 4975, frames: frameAt(bar(2)) - frameAt(bar(1)) };
 // 走行（S4）のショット：場所ごとのモンタージュ。lap は周回（コース 1周 ≒5.8km）。撮らずにシミュレーションを先へ進めて移る
@@ -385,10 +392,11 @@ async function shootFinger(browser) {
     await click(page, `#colors [aria-label="${SWATCHES.at(-1)}"]`);
     await click(page, '#btn-city'); await driveReady(page); await settle(page);
     await click(page, '[data-drive-camera="chase"]');
+    await click(page, `[data-drive-theme="${FINGER.theme}"]`);
     await click(page, '#drive-cruise');
-    await fastForward(page, 1150, { cruise: true });
+    await fastForward(page, FINGER.cruiseUntil, { cruise: true });
     await click(page, '#drive-cruise');                       // 手動へ（ここからはアクセルを自分で）
-    let held = await fastForward(page, 1478, { targetKmh: 105 });
+    let held = await fastForward(page, FINGER.from, { targetKmh: FINGER.kmh });
     if (held) await page.keyboard.up('KeyW');
     await click(page, '#drive-guide-close');
     const cdp = await context.newCDPSession(page);
@@ -476,7 +484,7 @@ function overlayHtml() {
   .flash { position: absolute; inset: 0; background: #fff; opacity: 0; }
   /* 黄緑のボタン（ドライブを始める）の上でも見えるよう、白い輪＋紺のふち */
   .tap { position: absolute; width: 64px; height: 64px; margin: -32px; border-radius: 50%; border: 3.5px solid #fff; background: rgba(255,255,255,.28); box-shadow: 0 0 0 3px rgba(11,16,32,.7), 0 0 18px rgba(11,16,32,.5); box-sizing: border-box; opacity: 0; }
-  .finger { position: absolute; width: 50px; height: 50px; margin: -25px; border-radius: 50%; background: rgba(255,255,255,.38); border: 2.5px solid rgba(255,255,255,.95); box-shadow: 0 0 0 7px rgba(220,235,179,.28), 0 4px 18px rgba(0,0,0,.35); box-sizing: border-box; display: none; }
+  .finger { position: absolute; width: 76px; height: 76px; margin: -38px; border-radius: 50%; background: rgba(255,255,255,.38); border: 2.5px solid rgba(255,255,255,.95); box-shadow: 0 0 0 7px rgba(220,235,179,.28), 0 4px 18px rgba(0,0,0,.35); box-sizing: border-box; display: none; }
   .end { position: absolute; inset: 0; display: none; overflow: hidden; background: var(--navy); }
   .end-bg { position: absolute; inset: -40px; width: calc(100% + 80px); height: calc(100% + 80px); object-fit: cover; filter: blur(16px) brightness(.42) saturate(1.1); }
   .end-shade { position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 40%, #0b102055, #0b1020e6 75%); }
@@ -566,13 +574,19 @@ function compose() {
     symlinkSync(file, join(seq, `r${String(g).padStart(5, '0')}.png`));
   }
   mkdirSync(output, { recursive: true });
+  // 夜の持ち上げの窓：車の周りの柔らかい楕円（中心が白・縁へなだらかに黒）。ffmpeg の geq で作る（外部の画像は使わない）
+  const { gamma, saturation, center: [cx, cy], radius: [rx, ry], falloff } = NIGHT_LIFT;
+  const nightMask = join(framesDir, 'night-mask.png'), nightFrom = bar(9.5) + 7 * BEAT, nightTo = bar(12);
+  execFileSync('ffmpeg', ['-hide_banner', '-loglevel', 'error', '-y', '-f', 'lavfi', '-i',
+    `color=c=black:s=1080x1920,format=gray,geq=lum='255*exp(-pow(pow((X-${cx})/${rx},2)+pow((Y-${cy})/${ry},2),${falloff}))'`, '-frames:v', '1', nightMask]);
   const encode = (out, withAudio) => execFileSync('ffmpeg', [
     '-hide_banner', '-loglevel', 'warning', '-y',
     '-framerate', String(FPS), '-i', join(seq, 'r%05d.png'),
     '-framerate', String(FPS), '-i', join(framesDir, 'overlay', 'o%05d.png'),
+    '-loop', '1', '-framerate', String(FPS), '-t', String(DURATION_SECONDS), '-i', nightMask,
     ...(withAudio ? ['-i', audio] : []),
-    '-filter_complex', `[0:v]scale=1080:1920:flags=lanczos,setsar=1${HOOK_LIFT[0] ? `,eq=gamma=${HOOK_LIFT[0]}:saturation=${HOOK_LIFT[1]}:enable='lt(t,${bar(2)})'` : ''}[b];[b][1:v]overlay=0:0:format=auto,format=yuv420p[v]`,
-    '-map', '[v]', ...(withAudio ? ['-map', '2:a:0', '-c:a', 'aac', '-b:a', '192k', '-ar', '48000', '-af', `apad=whole_dur=${DURATION_SECONDS}`] : []),
+    '-filter_complex', `[0:v]scale=1080:1920:flags=lanczos,setsar=1${HOOK_LIFT[0] ? `,eq=gamma=${HOOK_LIFT[0]}:saturation=${HOOK_LIFT[1]}:enable='lt(t,${bar(2)})'` : ''},split=2[base][raw];[raw]eq=gamma=${gamma}:saturation=${saturation}[lift];[2:v]format=gray[mk];[lift][mk]alphamerge[la];[base][la]overlay=0:0:format=auto:enable='between(t,${nightFrom},${nightTo})'[b];[b][1:v]overlay=0:0:format=auto,format=yuv420p[v]`,
+    '-map', '[v]', ...(withAudio ? ['-map', '3:a:0', '-c:a', 'aac', '-b:a', '192k', '-ar', '48000', '-af', `apad=whole_dur=${DURATION_SECONDS}`] : []),
     '-t', String(DURATION_SECONDS), '-r', String(FPS),
     '-c:v', 'libx264', '-preset', 'slow', '-crf', '18', '-profile:v', 'high', '-pix_fmt', 'yuv420p',
     '-movflags', '+faststart', '-map_metadata', '-1', out,
