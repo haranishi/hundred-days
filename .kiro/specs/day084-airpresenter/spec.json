@@ -1,0 +1,40 @@
+{
+  "name": "day084-airpresenter",
+  "phase": "validated",
+  "approvals": {
+    "requirements": {
+      "generated": true,
+      "approved": true
+    },
+    "design": {
+      "generated": true,
+      "approved": true
+    },
+    "tasks": {
+      "generated": true,
+      "approved": true
+    }
+  },
+  "approval_basis": "本人のDay84 PR作成・マージ依頼と自律進行指示",
+  "source_revision": "cf0b92f",
+  "base_revision": "4145917",
+  "task_graph_review": {
+    "mode": "independent",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "local_app_tests": 12,
+    "distribution_tests": 3,
+    "repo_unit_passed": 5090,
+    "repo_unit_existing_skipped": 1,
+    "dependency_projects": 15,
+    "dependency_failures": 0,
+    "publish_gate_passed": 329,
+    "publish_gate_existing_skipped": 1,
+    "page_e2e_passed": 2,
+    "public_images": "own sample; QR/room removed; PNG has no extra metadata",
+    "production": "PR/merge/CI/deploy pending",
+    "independent_review": "APPROVED",
+    "ui_score": "19/20; no zero scores"
+  }
+}

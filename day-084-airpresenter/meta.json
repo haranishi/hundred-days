@@ -1,0 +1,38 @@
+{
+  "day": 84,
+  "season": 3,
+  "title": "AirPresenter",
+  "description": "同じWi-Fiのスマホをプレゼンのリモコンに。MacのPCで動かすローカル版で、PDF・PowerPointの送り、暗転、ポインター、カンペと時間を手元で操作する。",
+  "tags": [
+    "プレゼン",
+    "スマホ",
+    "ローカル",
+    "PDF",
+    "PowerPoint"
+  ],
+  "status": "published",
+  "publicUrl": "https://rairakku.com/100days/day-084-airpresenter/",
+  "screenshot": "preview.png",
+  "startedAt": "2026-11-03",
+  "finishedAt": "2026-11-05",
+  "aiHandled": [
+    "ローカルサーバー・認証付き接続・資料変換とプレビュー・リモコン画面を実装",
+    "読み込み進捗と全画面の重なりを修正し、合成資料と提供資料で検証",
+    "公開案内・配布ZIP・公開前検査を整備"
+  ],
+  "humanHandled": [
+    "スマホを発表のリモコンにする方針とPowerPointの表示崩れを指摘",
+    "実資料を提供し、差し替え待機表示と重なり修正を依頼",
+    "Day84としてPR作成とマージを依頼"
+  ],
+  "failuresAndFixes": [
+    {
+      "problem": "PowerPointの背景や日本語が元の資料と変わった",
+      "fix": "原本を書き換える補正を外し、SVGから描画。全ページを確認してから採用できるようにした。完全一致は保証せずPDF出力も案内する"
+    },
+    {
+      "problem": "差し替え中の進み具合が分からず、全画面の操作表示が重なった",
+      "fix": "段階・経過時間・生成枚数を表示。新しい画像の準備を待って確認画面を閉じ、操作バーの表示を画面端とキーボードに限定した"
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+node_modules/
+.runtime/
+.artifacts/
+artifacts/
+coverage/
+*.log
+.DS_Store
+temp_uploaded_*
+temp_patched_*
+.runtime
+.artifacts
+node_modules
+node_modules.local-check-backup/
