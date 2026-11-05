@@ -1,0 +1,35 @@
+{
+  "feature_name": "day-086-chakuchiten",
+  "language": "ja",
+  "phase": "local-verified",
+  "approvals": {
+    "requirements": true,
+    "design": true,
+    "tasks": true
+  },
+  "approval_basis": "本人のDay086実装依頼と企画メモ、自律進行の指示に基づく。公開用PRまで進め、マージ・SNS投稿は含めない。",
+  "updated_at": "2026-11-05",
+  "verification": {
+    "day_unit": 41,
+    "day_e2e": 37,
+    "repository_tests": {
+      "total": 5129,
+      "passed": 5128,
+      "failed": 0,
+      "skipped": 1
+    },
+    "publish_gate": {
+      "total": 330,
+      "passed": 329,
+      "skipped": 1
+    },
+    "widths": [
+      390,
+      768,
+      1440
+    ],
+    "independent_code_review": "2 findings fixed and reverified, including real Chrome BFCache",
+    "experience_self_review": "19/20",
+    "visual_review": "independent images 16/16 (8 items); 2 interactive items verified by main"
+  }
+}

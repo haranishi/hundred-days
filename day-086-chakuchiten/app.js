@@ -1,0 +1,309 @@
+import { COMPANIONS, QUESTIONS, MOODS, completeAnswers } from './lib/choices.js';
+import { point, recommend, categoryLabel, mapsUrl } from './lib/recommend.js';
+import { searchNearby, searchPlaces } from './lib/openpoi.js';
+
+const $ = (id) => document.getElementById(id);
+const state = { phase: 'companion', step: 0, companion: '', answers: {}, location: null, results: [], index: 0, error: null };
+const mainTask = { id: 0, controller: null };
+const placeTask = { id: 0, controller: null };
+let searchAfterLocation = false;
+
+function cancel(task) { task.id += 1; task.controller?.abort(); task.controller = null; }
+function begin(task) {
+  cancel(task);
+  task.controller = new AbortController();
+  return { id: task.id, signal: task.controller.signal };
+}
+const current = (task, id) => task.id === id;
+const announce = (text) => { $('announcement').textContent = text; };
+
+function icon(name) {
+  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  svg.classList.add('icon');
+  svg.setAttribute('aria-hidden', 'true');
+  const use = document.createElementNS('http://www.w3.org/2000/svg', 'use');
+  use.setAttribute('href', `./assets/icons.svg#${name}`);
+  svg.append(use);
+  return svg;
+}
+
+function choices(host, items, name, selected, onChange) {
+  host.replaceChildren(...items.map((item) => {
+    const label = document.createElement('label');
+    label.className = 'choice';
+    const input = document.createElement('input');
+    input.type = 'radio'; input.name = name; input.value = item.id; input.checked = item.id === selected;
+    const inner = document.createElement('span');
+    inner.className = 'choice-inner';
+    const copy = document.createElement('span'); copy.className = 'choice-copy';
+    const strong = document.createElement('strong'); strong.textContent = item.label;
+    const small = document.createElement('small'); small.textContent = item.detail;
+    copy.append(strong, small);
+    const mark = document.createElement('span'); mark.className = 'choice-mark'; mark.setAttribute('aria-hidden', 'true');
+    inner.append(icon(item.icon), copy, mark); label.append(input, inner);
+    input.addEventListener('change', () => { if (input.checked) onChange(item.id); });
+    return label;
+  }));
+}
+
+function render(focus = false) {
+  document.documentElement.dataset.phase = state.phase;
+  document.querySelectorAll('.screen').forEach((screen) => { screen.hidden = screen.id !== `${state.phase}-screen`; });
+  $('restart').hidden = state.phase === 'companion';
+  $('location-trigger').disabled = state.phase === 'loading';
+  $('location-label').textContent = state.location?.label || '探す場所を選ぶ';
+  $('stage-label').textContent = state.phase === 'companion' ? 'まずは、ここから'
+    : state.phase === 'question' ? `STEP ${state.step + 1} / 3`
+      : state.phase === 'loading' ? '探しています' : 'あなたの着地点';
+  document.querySelectorAll('.progress li').forEach((li, index) => {
+    const active = state.phase === 'question' && index === state.step;
+    li.classList.toggle('active', active);
+    li.classList.toggle('done', state.phase !== 'companion' && (state.phase !== 'question' || index < state.step));
+    if (active) li.setAttribute('aria-current', 'step'); else li.removeAttribute('aria-current');
+  });
+  if (state.phase === 'companion') {
+    choices($('companion-options'), COMPANIONS, 'companion', state.companion, (id) => {
+      state.companion = id; $('companion-next').disabled = false;
+    });
+    $('companion-next').disabled = !state.companion;
+  }
+  if (state.phase === 'question') {
+    const question = QUESTIONS[state.step];
+    $('question-title').textContent = question.title;
+    $('question-copy').textContent = question.subtitle;
+    $('handoff').textContent = state.step === 0 && state.companion !== 'solo' ? '相手にスマホを渡して、答えてもらおう。' : '';
+    choices($('question-options'), question.choices, question.id, state.answers[question.id], (id) => {
+      state.answers[question.id] = id; $('question-next').disabled = false;
+    });
+    $('question-next').disabled = !state.answers[question.id];
+    $('question-next').querySelector('span').textContent = state.step === 2
+      ? state.location ? 'この場所で着地点を探す' : '現在地で着地点を探す' : '次へ進む';
+    $('search-consent').hidden = state.step !== 2;
+    $('search-consent').querySelector('p').textContent = state.location
+      ? '選んだ場所の座標をOpenPOI APIへ送って検索します。アプリには保存しません。'
+      : '現在地の座標をOpenPOI APIへ送って検索します。アプリには保存しません。';
+  }
+  if (state.phase === 'result') renderResult();
+  if (state.phase === 'empty') {
+    $('empty-copy').textContent = `${state.location.label}の選んだ徒歩圏では、気分に合う施設が見つかりませんでした。データに載っていない場所もあります。`;
+    $('empty-expand').hidden = state.answers.walk !== 'near';
+  }
+  if (state.phase === 'error') {
+    $('error-title').textContent = state.error.title;
+    $('error-copy').textContent = state.error.message;
+    $('retry').textContent = state.error.location ? '位置情報をもう一度試す' : 'もう一度探す';
+  }
+  if (focus) {
+    const screen = $(`${state.phase}-screen`);
+    screen.querySelector('h2, legend')?.focus({ preventScroll: true });
+    if (matchMedia('(max-width: 800px)').matches) $('workspace').scrollIntoView({ block: 'start', behavior: 'instant' });
+  }
+}
+
+function renderResult() {
+  const place = state.results[state.index];
+  $('candidate-counter').textContent = `候補 ${state.index + 1} / ${state.results.length}`;
+  $('result-icon').setAttribute('href', `./assets/icons.svg#${MOODS[state.answers.mood].icon}`);
+  $('result-category').textContent = categoryLabel(place, state.answers.mood);
+  $('result-name').textContent = place.name;
+  $('result-address').textContent = place.address || '住所の詳しい情報はGoogle マップで確認してください。';
+  $('result-time').textContent = `徒歩 約${place.minutes}分`;
+  $('result-distance').textContent = `（直線 ${Math.max(1, Math.round(place.distance))}m）`;
+  $('maps-link').href = mapsUrl(place);
+  $('maps-link').setAttribute('aria-label', `${place.name}に向かう。Google マップで徒歩案内を開く`);
+  $('answer-summary').replaceChildren(...QUESTIONS.map((question) => {
+    const span = document.createElement('span');
+    span.textContent = question.choices.find((item) => item.id === state.answers[question.id]).label;
+    return span;
+  }));
+  const atEnd = state.index + 1 === state.results.length;
+  $('next-place').disabled = atEnd;
+  $('last-candidate').hidden = !atEnd;
+  const accuracy = state.location.accuracy;
+  $('accuracy-note').hidden = !accuracy || accuracy <= 180;
+  if (accuracy > 180) $('accuracy-note').textContent = `現在地の精度は約${Math.round(accuracy)}mです。場所がずれているときは、駅名・場所から指定してください。`;
+  announce(`候補${state.index + 1}、${place.name}。徒歩約${place.minutes}分。`);
+}
+
+const connectionErrors = {
+  timeout: ['少し時間がかかっています', '検索が時間内に終わりませんでした。通信環境を確認して、もう一度お試しください。'],
+  busy: ['検索先が混み合っています', '少し待ってから、もう一度探してください。選んだ気分は残っています。'],
+  invalid: ['施設情報を読み取れませんでした', '検索先の情報を受け取れませんでした。時間をおいて、もう一度お試しください。'],
+};
+function connectionMessage(error) {
+  return connectionErrors[error?.code] || ['検索先につながりませんでした', '通信環境を確認して、もう一度探してください。回答はそのまま残っています。'];
+}
+function gpsError(error) {
+  if (error.code === 1) return ['位置情報が許可されていません', '駅名・場所から探せます。現在地を使う場合は、ブラウザの位置情報を許可してから、もう一度お試しください。'];
+  if (error.code === 3) return ['現在地の取得に時間がかかっています', '駅名・場所を指定するか、電波の届く場所でもう一度お試しください。'];
+  return ['現在地を取得できませんでした', 'この端末で位置情報が使えないか、位置がわかりませんでした。駅名・場所から探すこともできます。'];
+}
+
+function getPosition(signal) {
+  return new Promise((resolve, reject) => {
+    if (!navigator.geolocation) { reject({ code: 2 }); return; }
+    let settled = false;
+    const finish = (fn, value) => {
+      if (settled) return;
+      settled = true; clearTimeout(timer); signal.removeEventListener('abort', aborted); fn(value);
+    };
+    const aborted = () => finish(reject, { code: 'aborted' });
+    const timer = setTimeout(() => finish(reject, { code: 3 }), 12000);
+    signal.addEventListener('abort', aborted, { once: true });
+    if (signal.aborted) { aborted(); return; }
+    navigator.geolocation.getCurrentPosition(
+      (position) => finish(resolve, position), (error) => finish(reject, error),
+      { enableHighAccuracy: false, timeout: 10000, maximumAge: 60000 },
+    );
+  });
+}
+
+function loading(title, copy) {
+  state.phase = 'loading'; $('loading-title').textContent = title; $('loading-copy').textContent = copy;
+  render(true); announce(title);
+}
+async function findNearby() {
+  if (!state.location || !completeAnswers(state.answers)) return;
+  const { id, signal } = begin(mainTask);
+  const center = { ...state.location }; const answers = { ...state.answers }; const companion = state.companion;
+  loading('近くの着地点を探しています', '気分に合う場所を、少しだけ。');
+  try {
+    const values = await searchNearby(center, answers, { signal });
+    if (!current(mainTask, id)) return;
+    state.results = recommend(values, center, answers, companion); state.index = 0;
+    state.phase = state.results.length ? 'result' : 'empty';
+    render(true);
+    if (!state.results.length) announce('この徒歩圏では、気分に合う施設が見つかりませんでした。');
+  } catch (error) {
+    if (!current(mainTask, id) || error.code === 'aborted') return;
+    const [title, message] = connectionMessage(error);
+    state.error = { title, message, location: false }; state.phase = 'error'; render(true); announce(title);
+  }
+}
+
+function setPlaceBusy(busy) {
+  $('gps-button').disabled = busy; $('place-submit').disabled = busy; $('place-query').disabled = busy;
+  $('cancel-place-request').hidden = !busy;
+  $('place-options').querySelectorAll('button').forEach((button) => { button.disabled = busy; });
+}
+function chooseLocation(location) {
+  const shouldSearch = searchAfterLocation;
+  state.location = location; state.results = []; state.index = 0;
+  $('location-dialog').close();
+  if (shouldSearch && completeAnswers(state.answers)) findNearby();
+  else render();
+  announce(`${location.label}を探す場所にしました。`);
+}
+async function useGps(inDialog = false) {
+  const task = inDialog ? placeTask : mainTask;
+  const { id, signal } = begin(task);
+  if (inDialog) { setPlaceBusy(true); $('place-status').textContent = '現在地を確認しています…'; }
+  else loading('いまいる場所を確認しています', '位置情報の利用を許可してください。');
+  try {
+    const position = await getPosition(signal);
+    if (!current(task, id)) return;
+    const coordinates = point({ lat: position.coords.latitude, lng: position.coords.longitude });
+    if (!coordinates) throw { code: 2 };
+    const location = { ...coordinates, label: '現在地周辺', accuracy: Number(position.coords.accuracy) || null };
+    if (inDialog) chooseLocation(location);
+    else { state.location = location; findNearby(); }
+  } catch (error) {
+    if (!current(task, id) || error.code === 'aborted') return;
+    const [title, message] = gpsError(error);
+    if (inDialog) $('place-status').textContent = `${title}。${message}`;
+    else { state.error = { title, message, location: true }; state.phase = 'error'; render(true); announce(title); }
+  } finally {
+    if (inDialog && current(task, id)) setPlaceBusy(false);
+  }
+}
+
+function openLocation(thenSearch = ['result', 'empty', 'error'].includes(state.phase)) {
+  searchAfterLocation = thenSearch;
+  $('place-status').textContent = '';
+  $('place-options').replaceChildren();
+  setPlaceBusy(false);
+  $('location-dialog').showModal();
+}
+function editAnswers(step = 0) {
+  cancel(mainTask); state.phase = 'question'; state.step = step; render(true);
+}
+
+$('companion-form').addEventListener('submit', (event) => {
+  event.preventDefault(); if (!state.companion) return;
+  state.phase = 'question'; state.step = 0; render(true);
+});
+$('question-form').addEventListener('submit', (event) => {
+  event.preventDefault();
+  if (!state.answers[QUESTIONS[state.step].id]) return;
+  if (state.step < 2) { state.step += 1; render(true); }
+  else if (state.location) findNearby(); else useGps();
+});
+$('question-back').addEventListener('click', () => {
+  if (state.step > 0) state.step -= 1; else state.phase = 'companion'; render(true);
+});
+$('restart').addEventListener('click', () => {
+  cancel(mainTask); cancel(placeTask);
+  Object.assign(state, { phase: 'companion', step: 0, companion: '', answers: {}, results: [], index: 0, error: null });
+  render(true);
+});
+$('cancel-search').addEventListener('click', () => editAnswers(2));
+$('location-trigger').addEventListener('click', () => openLocation());
+$('question-manual').addEventListener('click', () => openLocation(true));
+$('gps-button').addEventListener('click', () => useGps(true));
+$('close-location').addEventListener('click', () => $('location-dialog').close());
+$('location-dialog').addEventListener('close', () => {
+  cancel(placeTask); setPlaceBusy(false); searchAfterLocation = false;
+});
+$('cancel-place-request').addEventListener('click', () => {
+  cancel(placeTask); setPlaceBusy(false); $('place-status').textContent = '取得を取り消しました。場所を入力するか、現在地をもう一度お試しください。';
+});
+$('place-form').addEventListener('submit', async (event) => {
+  event.preventDefault();
+  const query = $('place-query').value.trim();
+  if (query.length < 2) { $('place-status').textContent = '駅名や場所を2文字以上で入力してください。'; return; }
+  const { id, signal } = begin(placeTask);
+  setPlaceBusy(true); $('place-options').replaceChildren(); $('place-status').textContent = '場所を探しています…';
+  try {
+    const places = await searchPlaces(query, { signal });
+    if (!current(placeTask, id)) return;
+    $('place-status').textContent = places.length ? '探す中心にする場所を選んでください。' : '場所が見つかりませんでした。都道府県や駅名を加えてお試しください。';
+    $('place-options').replaceChildren(...places.map((place) => {
+      const li = document.createElement('li'); const button = document.createElement('button');
+      button.type = 'button'; button.className = 'place-option';
+      const name = document.createElement('strong'); name.textContent = place.name.slice(0, 180);
+      const address = document.createElement('small'); address.textContent = typeof place.address === 'string' ? place.address.slice(0, 360) : '住所情報なし';
+      button.append(name, address); button.addEventListener('click', () => chooseLocation({ ...point(place), label: place.name.slice(0, 180) }));
+      li.append(button); return li;
+    }));
+  } catch (error) {
+    if (!current(placeTask, id) || error.code === 'aborted') return;
+    const [title, message] = connectionMessage(error); $('place-status').textContent = `${title}。${message}`;
+  } finally { if (current(placeTask, id)) setPlaceBusy(false); }
+});
+$('next-place').addEventListener('click', () => {
+  if (state.index + 1 >= state.results.length) return;
+  state.index += 1; render(true);
+});
+$('review-answers').addEventListener('click', () => editAnswers());
+$('result-change-place').addEventListener('click', () => openLocation(true));
+$('empty-edit').addEventListener('click', () => editAnswers());
+$('empty-place').addEventListener('click', () => openLocation(true));
+$('empty-expand').addEventListener('click', () => { state.answers.walk = 'stroll'; findNearby(); });
+$('error-manual').addEventListener('click', () => openLocation(true));
+$('error-edit').addEventListener('click', () => editAnswers());
+$('retry').addEventListener('click', () => { if (state.error.location) useGps(); else findNearby(); });
+window.addEventListener('pagehide', () => { cancel(mainTask); cancel(placeTask); });
+window.addEventListener('pageshow', (event) => {
+  if (!event.persisted) return;
+  // BFCache keeps the DOM after pagehide canceled its in-flight operations.
+  if (state.phase === 'loading') {
+    editAnswers(2);
+    announce('取得を取り消しました。回答は残っています。もう一度探せます。');
+  }
+  if ($('location-dialog').open) {
+    setPlaceBusy(false);
+    $('place-status').textContent = '取得を取り消しました。現在地や場所をもう一度指定できます。';
+  }
+});
+render();
+document.documentElement.dataset.ready = 'true';

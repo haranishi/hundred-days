@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#f7f3ea">
+  <meta name="description" content="「なんでもいい」の、その先へ。3つの質問と今いる場所から、次の行き先をひとつ。カフェ、ごはん、一杯、公園。気分を合わせて出かけよう。">
+  <meta name="share:text" content="ふたりの着地点 — 「なんでもいい」を3問で。気分と今いる場所から、次の行き先をひとつ。">
+  <title>ふたりの着地点 | 100日チャレンジ Day86</title>
+  <link rel="icon" href="./favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./app.css">
+  <link rel="stylesheet" href="./shared/share.css">
+  <script src="./shared/share.js" defer></script>
+  <script type="module" src="./app.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#workspace">質問へスキップ</a>
+  <header class="site-header">
+    <a class="brand" href="./" aria-label="ふたりの着地点 ホーム"><img src="./favicon.svg" width="34" height="34" alt=""><span>ふたりの着地点</span></a>
+    <span class="day-label">100 DAYS <span>/ 086</span></span>
+    <button id="restart" class="text-button" type="button" hidden>最初から</button>
+  </header>
+  <main class="layout">
+    <section class="intro" aria-labelledby="intro-title">
+      <p class="eyebrow"><span></span> THE NEXT STOP, TOGETHER</p>
+      <h1 id="intro-title">「なんでもいい」に、<br><em>ちょうどいい</em>答えを。</h1>
+      <p class="intro-copy">3つの質問で、近くの行き先をひとつ。<br>気分を合わせて、そのまま出かけよう。</p>
+      <img class="route-art" src="./assets/next-stop.svg" width="480" height="290" alt="ふたつの足どりが、街角の小さなカフェにたどり着くイラスト">
+      <p class="intro-foot"><span>01 答える</span><i aria-hidden="true"></i><span>02 見つかる</span><i aria-hidden="true"></i><span>03 出かける</span></p>
+    </section>
+
+    <section id="workspace" class="workspace" aria-label="行き先を見つける" tabindex="-1">
+      <div class="panel-top"><button id="location-trigger" class="location-trigger" type="button"><svg class="icon" aria-hidden="true"><use href="./assets/icons.svg#pin"></use></svg><span id="location-label">探す場所を選ぶ</span><span aria-hidden="true">⌄</span></button><span id="stage-label">まずは、ここから</span></div>
+      <ol class="progress" aria-label="質問の進み具合"><li>気分</li><li>空間</li><li>距離</li></ol>
+      <div class="panel-body">
+        <section id="companion-screen" class="screen">
+          <p class="overline">LET’S GO SOMEWHERE</p>
+          <h2 tabindex="-1">今日は、誰と？</h2>
+          <p class="screen-copy">一緒にいる人を選んでください。</p>
+          <form id="companion-form">
+            <fieldset><legend class="sr-only">一緒にいる人</legend><div id="companion-options" class="companion-grid"></div></fieldset>
+            <button id="companion-next" type="submit" class="button primary" disabled>3つの質問に答える<svg class="icon" aria-hidden="true"><use href="./assets/icons.svg#arrow"></use></svg></button>
+          </form>
+          <p class="panel-note">登録なし。迷ったら、直感で。</p>
+        </section>
+
+        <section id="question-screen" class="screen" hidden>
+          <form id="question-form">
+            <fieldset><legend id="question-title" tabindex="-1"></legend><p id="question-copy" class="screen-copy"></p><p id="handoff" class="handoff"></p><div id="question-options" class="question-options"></div></fieldset>
+            <button id="question-next" class="button primary" type="submit" disabled><span>次へ進む</span><svg class="icon" aria-hidden="true"><use href="./assets/icons.svg#arrow"></use></svg></button>
+          </form>
+          <div id="search-consent" hidden><p class="privacy-note">現在地の座標をOpenPOI APIへ送って検索します。アプリには保存しません。</p><button id="question-manual" type="button" class="text-button">駅名・場所から探す</button></div>
+          <button id="question-back" class="text-button back-button" type="button">← 戻る</button>
+        </section>
+
+        <section id="loading-screen" class="screen loading-screen" hidden aria-labelledby="loading-title">
+          <div class="search-mark" aria-hidden="true"><svg viewBox="0 0 80 80"><circle cx="40" cy="40" r="31"/><path d="M40 18a16 16 0 0 0-16 16c0 13 16 27 16 27s16-14 16-27a16 16 0 0 0-16-16Z"/><circle cx="40" cy="34" r="5"/></svg></div>
+          <p class="overline">FINDING YOUR NEXT STOP</p>
+          <h2 id="loading-title" tabindex="-1">近くの着地点を探しています</h2>
+          <p id="loading-copy" class="screen-copy">気分に合う場所を、少しだけ。</p>
+          <button id="cancel-search" class="text-button" type="button">取り消して戻る</button>
+        </section>
+
+        <section id="result-screen" class="screen" hidden>
+          <div class="result-heading"><p class="overline">TODAY’S NEXT STOP</p><span id="candidate-counter"></span></div>
+          <p class="result-intro">今日の着地点は、ここ。</p>
+          <article class="place-card">
+            <div class="place-illustration" aria-hidden="true"><span class="place-orbit orbit-one"></span><span class="place-orbit orbit-two"></span><svg class="place-icon"><use id="result-icon" href="./assets/icons.svg#cup"></use></svg><span class="illustration-caption">a little stop, a good time.</span></div>
+            <div class="place-content"><span id="result-category" class="category-tag"></span><h2 id="result-name" tabindex="-1"></h2><p id="result-address" class="address"></p><div class="place-distance"><svg class="icon" aria-hidden="true"><use href="./assets/icons.svg#walk"></use></svg><strong id="result-time"></strong><span id="result-distance"></span></div><p class="distance-note">徒歩時間は目安です。距離は直線で計算。</p></div>
+          </article>
+          <div id="answer-summary" class="answer-summary" aria-label="選んだ気分と条件"></div>
+          <p id="accuracy-note" class="notice" hidden></p>
+          <a id="maps-link" class="button primary maps-link" href="https://www.google.com/maps/" target="_blank" rel="noopener noreferrer"><svg class="icon" aria-hidden="true"><use href="./assets/icons.svg#pin"></use></svg><span>ここに向かう<small>Google マップで徒歩案内 ↗</small></span></a>
+          <button id="next-place" class="button secondary" type="button"><svg class="icon" aria-hidden="true"><use href="./assets/icons.svg#refresh"></use></svg><span>別の場所にする</span></button>
+          <p id="last-candidate" class="panel-note" hidden>候補はここまで。気分や距離を変えて探せます。</p>
+          <div class="result-edit"><button id="review-answers" class="text-button" type="button">気分・距離を変える</button><button id="result-change-place" class="text-button" type="button">場所を変える</button></div>
+          <details class="data-note"><summary>徒歩の目安・施設情報について</summary><p>直線距離を1.3倍し、毎分80mで歩くとした概算です。道順・坂・信号で変わります。静かさや営業状況は取得できないため、Google マップで確認してください。イラストは施設の写真や地図ではありません。</p></details>
+        </section>
+
+        <section id="empty-screen" class="screen state-screen" hidden>
+          <svg class="state-icon" aria-hidden="true"><use href="./assets/icons.svg#leaf"></use></svg><p class="overline">A LITTLE CHANGE OF PLANS</p><h2 tabindex="-1">もう少し、探し方を変えてみよう。</h2><p id="empty-copy" class="screen-copy"></p><button id="empty-expand" type="button" class="button primary">徒歩10分に広げて探す</button><button id="empty-edit" type="button" class="button secondary">気分を変えて探す</button><button id="empty-place" type="button" class="text-button">場所を変える</button>
+        </section>
+
+        <section id="error-screen" class="screen state-screen" hidden>
+          <svg class="state-icon" aria-hidden="true"><use href="./assets/icons.svg#pin"></use></svg><p class="overline">LET’S TRY AGAIN</p><h2 id="error-title" tabindex="-1"></h2><p id="error-copy" class="screen-copy"></p><button id="retry" type="button" class="button primary">もう一度探す</button><button id="error-manual" type="button" class="button secondary">駅名・場所から探す</button><button id="error-edit" type="button" class="text-button">回答を見直す</button>
+        </section>
+      </div>
+      <p id="announcement" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></p>
+    </section>
+  </main>
+  <footer class="site-footer"><div class="footer-top"><p>行き先が決まると、時間が動きだす。</p><a href="../">100日チャレンジへ ↗</a></div><div id="share"></div><p class="credits">施設データ：<a href="https://openpoiapi.com/attribution.html" target="_blank" rel="noopener noreferrer">OpenPOI API</a> <span>100 DAYS / 086</span></p></footer>
+
+  <dialog id="location-dialog" aria-labelledby="location-title">
+    <div class="dialog-top"><p class="overline">YOUR STARTING POINT</p><button id="close-location" class="icon-button" type="button" aria-label="場所の選択を閉じる"><svg class="icon" aria-hidden="true"><use href="./assets/icons.svg#close"></use></svg></button></div>
+    <h2 id="location-title">どのあたりで探す？</h2><p class="screen-copy">現在地でも、待ち合わせ場所でも。</p>
+    <button id="gps-button" class="button primary" type="button"><svg class="icon" aria-hidden="true"><use href="./assets/icons.svg#pin"></use></svg>現在地を使う</button>
+    <p class="dialog-divider">または、場所を指定</p>
+    <form id="place-form"><label for="place-query">駅名・場所</label><div class="place-search"><input id="place-query" type="search" name="place" placeholder="例：渋谷駅、秋田駅" minlength="2" maxlength="80" required autocomplete="off"><button id="place-submit" class="button secondary" type="submit">検索</button></div></form>
+    <p id="place-status" class="place-status" role="status" aria-live="polite"></p><ul id="place-options" class="place-options" aria-label="場所の候補"></ul>
+    <button id="cancel-place-request" class="text-button" type="button" hidden>取得を取り消す</button>
+    <p class="privacy-note">現在地の座標や入力した場所をOpenPOI APIへ送って検索します。アプリには保存しません。選んだ場所の周辺を探します。</p>
+  </dialog>
+  <noscript><p class="noscript">このアプリはJavaScriptを使います。ブラウザの設定で有効にして、もう一度開いてください。</p></noscript>
+</body>
+</html>

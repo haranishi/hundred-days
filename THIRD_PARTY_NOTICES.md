@@ -198,3 +198,7 @@ PDF.jsのCMap・Foxitフォント・ICC・画像/色WASMは本体と別の許諾
 ## Day080 第五王子と、名もなき加護
 
 Pixel-Boy / AAAのNinja Adventure（CC0）、DotGothic16（OFL 1.1）、Phaser 4.2.1（MIT）を使用。詳細とライセンス全文は `day-080-fifth-prince/ASSETS.md`、`fonts/OFL.txt`、`licenses/phaser-LICENSE.md` を参照。
+
+## Day086: OpenPOI API
+
+施設検索は [OpenPOI API](https://openpoiapi.com/attribution.html) を使用。元データの帰属・ライセンスとFoursquare通知は [Day086のNOTICE](day-086-chakuchiten/NOTICE.txt) を参照。画面のイラストは独自制作。
