@@ -130,6 +130,7 @@ Day 051「ハコニワ」も外部公開アプリです。本体は独立リポ�
 | 082 | 影討ち | [day-082-kageuchi/](day-082-kageuchi/) | [アプリを開く](https://rairakku.com/100days/day-082-kageuchi/) |
 | 083 | カー360 | [制作記録のみ](day-083-car360/) | [紹介ページ](https://day83.rairakku.com/) |
 | 084 | AirPresenter | [day-084-airpresenter/](day-084-airpresenter/) | [アプリを開く](https://rairakku.com/100days/day-084-airpresenter/) |
+| 085 | 最小ワリカン | [day-085-warikan/](day-085-warikan/) | [アプリを開く](https://rairakku.com/100days/day-085-warikan/) |
 <!-- day-index:end -->
 
 ## 1日アプリのルール
