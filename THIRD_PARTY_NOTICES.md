@@ -198,3 +198,9 @@ PDF.jsのCMap・Foxitフォント・ICC・画像/色WASMは本体と別の許諾
 ## Day080 第五王子と、名もなき加護
 
 Pixel-Boy / AAAのNinja Adventure（CC0）、DotGothic16（OFL 1.1）、Phaser 4.2.1（MIT）を使用。詳細とライセンス全文は `day-080-fifth-prince/ASSETS.md`、`fonts/OFL.txt`、`licenses/phaser-LICENSE.md` を参照。
+
+## Day084 AirPresenter
+
+公開画像は自作サンプル画面です。配布ZIPはアプリのソースと合成試験だけを含み、実資料・フォント・変換ツールを含みません。
+Playwright/Chromium、LibreOffice、Poppler、qrencode、Fontconfigは利用者の環境で別途取得します。
+Macのインストール済みフォントは変換中に参照するだけで、再配布しません。

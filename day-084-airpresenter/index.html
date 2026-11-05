@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="AirPresenterは、Macで開いた資料を同じWi-Fiのスマホから操作するローカルアプリ。ページ送り、暗転、ポインター、カンペとタイマーを手元に。">
+  <meta name="share:text" content="AirPresenter — スマホが、発表のリモコンに。Macで使うローカル版。">
+  <title>AirPresenter | スマホが、発表のリモコンに。</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="shared/share.css">
+  <script defer src="shared/share.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#setup">起動手順へ進む</a>
+  <div class="page-shell">
+    <header class="site-header">
+      <a class="brand" href="./" aria-label="AirPresenter ホーム"><img src="favicon.svg" width="32" height="32" alt=""><span>AirPresenter</span></a>
+      <a class="back-link" href="../">100日チャレンジ <span aria-hidden="true">↗</span></a>
+    </header>
+    <main>
+      <section class="hero" aria-labelledby="hero-title">
+        <div class="hero-copy">
+          <p class="eyebrow">DAY 084 <span aria-hidden="true">/</span> 100 <span class="edition">macOS ローカル版</span></p>
+          <h1 id="hero-title">スマホが、<br>発表の<span>リモコンに。</span></h1>
+          <p class="hero-description">Macで開いた資料を、手元のスマホで操作。<br class="desktop-break">PCを離れて、聴衆を見ながら話せます。</p>
+          <div class="hero-actions">
+            <a class="button button-primary" id="download" href="airpresenter-local.zip" download="airpresenter-local.zip">Mac用ローカル版を入手 <span aria-hidden="true">↓</span></a>
+            <a class="text-link" id="setup-link" href="#setup">起動手順を見る <span aria-hidden="true">↘</span></a>
+          </div>
+          <p class="download-note">ZIP・ソース一式。Macへの環境設定が必要です。</p>
+        </div>
+        <figure class="product-preview">
+          <div class="preview-label"><span class="status-dot" aria-hidden="true"></span> PCとスマホの連携画面</div>
+          <img id="preview" src="preview.png" alt="AirPresenterのPC画面とスマホ用リモコン。自作のサンプル資料を表示しています。" width="1440" height="1000" fetchpriority="high">
+          <figcaption>自作サンプルを使った画面例です。資料は起動後に選べます。</figcaption>
+        </figure>
+      </section>
+
+      <section class="features section-line" aria-labelledby="features-title">
+        <div class="section-intro"><p class="eyebrow">発表を、手元から。</p><h2 id="features-title">操作も、原稿も、時間も。</h2></div>
+        <dl class="feature-list">
+          <div><dt>大きなボタンで、ページ送り。</dt><dd>送り・戻り、暗転、長押しポインター。スマホの画面から操作できます。</dd></div>
+          <div><dt>カンペとタイマーを、手元に。</dt><dd>Macで保存したページごとの原稿と、共通の経過時間をスマホに表示します。</dd></div>
+          <div><dt>資料の変換は、発表するMacで。</dt><dd>資料を外部サービスへ送信しません。差し替え中は進行状況を確認できます。</dd></div>
+        </dl>
+      </section>
+
+      <section id="requirements" class="requirements section-line" aria-labelledby="requirements-title">
+        <div class="section-intro"><p class="eyebrow">始める前に</p><h2 id="requirements-title">Macとスマホを、<span class="keep-phrase">同じWi-Fiへ。</span></h2></div>
+        <div class="section-body">
+          <p>このページはローカル版の配布ページです。ZIPを入手してMacでサーバーを起動すると、スマホを接続できます。</p>
+          <dl class="environment-list">
+            <div><dt>動作確認した環境</dt><dd>macOS、Node.js 22以上</dd></div>
+            <div><dt>セットアップ</dt><dd>Homebrew、Poppler、qrencode、Fontconfig、LibreOffice、PlaywrightのChromium</dd></div>
+            <div><dt>接続</dt><dd>同じWi-Fiに接続したMacとスマホ。端末間通信を禁止しているWi-Fiでは接続できません。</dd></div>
+          </dl>
+        </div>
+      </section>
+
+      <section id="setup" class="setup section-line" aria-labelledby="setup-title">
+        <div class="section-intro"><p class="eyebrow">GET STARTED</p><h2 id="setup-title">使い始めるまでの3ステップ。</h2><p>Macのターミナルで設定します。<br>Node.jsとHomebrewを先に用意してください。</p></div>
+        <ol class="setup-steps">
+          <li><span class="step-number" aria-hidden="true">01</span><div class="step-body"><h3>ZIPを展開する。</h3><p>「Mac用ローカル版を入手」から保存し、ZIPを展開します。中の<code>airpresenter</code>フォルダでターミナルを開いてください。</p></div></li>
+          <li><span class="step-number" aria-hidden="true">02</span><div class="step-body"><h3>必要なツールを入れる。</h3><p>次のコマンドを順番に実行します。パッケージと描画用ブラウザのダウンロードが行われます。</p><pre tabindex="0" aria-label="インストールのコマンド"><code>brew install poppler qrencode fontconfig
+brew install --cask libreoffice
+npm ci
+npx playwright install chromium</code></pre></div></li>
+          <li><span class="step-number" aria-hidden="true">03</span><div class="step-body"><h3>Macで起動して、スマホでQRを読む。</h3><pre tabindex="0" aria-label="起動のコマンド"><code>npm start</code></pre><p>Macのブラウザで <code>http://localhost:3084/?mode=dual</code> を開き、資料を選びます。同じWi-Fiのスマホで、その画面のQRを読み取ってください。</p><p class="small-note">QRには操作権限が含まれます。接続する人だけに見せてください。終了はターミナルで <kbd>Ctrl</kbd>＋<kbd>C</kbd>。再起動後は新しいQRから接続します。</p></div></li>
+        </ol>
+      </section>
+
+      <section id="formats" class="formats section-line" aria-labelledby="formats-title">
+        <div class="section-intro"><p class="eyebrow">資料について</p><h2 id="formats-title">PDF・PowerPointに対応。</h2></div>
+        <div class="section-body"><p>PDF・PPTX・PPTを選べます。1ファイル25 MiB、100ページまで。PowerPointは変換結果の全ページを元の資料と見比べてから採用できます。</p><p>PowerPointとは描画エンジンが異なるため、完全一致は保証できません。見た目を優先する場合は、元のPowerPointで「エクスポート」または「名前を付けて保存」からPDFを書き出し、そのPDFを選んでください。</p><p>アニメーション・動画は静止画になります。資料・カンペ・変換データは、サーバーを通常終了すると消去されます。</p><a class="text-link" href="https://github.com/haranishi/hundred-days/tree/main/day-084-airpresenter/source" target="_blank" rel="noopener noreferrer">ソースと詳しい使い方 <span aria-hidden="true">↗</span></a></div>
+      </section>
+    </main>
+    <footer class="site-footer"><div class="footer-heading"><a class="brand" href="./">AirPresenter</a><span>DAY 084 / 100</span></div><div id="share"></div></footer>
+  </div>
+</body>
+</html>
