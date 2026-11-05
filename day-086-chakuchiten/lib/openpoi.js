@@ -1,4 +1,4 @@
-import { searchQuery, walkRange, completeAnswers } from './choices.js';
+import { searchQuery, walkRange, completeAnswers, MAX_SEARCH_RADIUS } from './choices.js';
 import { point } from './recommend.js';
 
 const BASE = 'https://api.openpoiapi.com';
@@ -34,12 +34,15 @@ async function request(path, params, { signal, fetcher = fetch, timeout = 10000 
   }
 }
 
-export async function searchNearby(center, answers, options) {
+export async function searchNearby(center, answers, options = {}) {
   const position = point(center);
-  if (!position || !completeAnswers(answers)) throw new PoiError('input');
+  const radius = options.radius ?? walkRange(answers.walk)?.radius;
+  const scope = options.scope ?? 'dish';
+  if (!position || !completeAnswers(answers) || !Number.isFinite(radius) || radius <= 0 || radius > MAX_SEARCH_RADIUS
+    || !['dish', 'genre'].includes(scope) || (scope === 'genre' && answers.mood === 'outside')) throw new PoiError('input');
   const body = await request('/v1/search', {
-    q: searchQuery(answers), center: `${position.lng},${position.lat}`,
-    radius: String(walkRange(answers.walk).radius), limit: '100',
+    q: searchQuery(answers, scope), center: `${position.lng},${position.lat}`,
+    radius: String(radius), limit: '100',
   }, options);
   if (!Array.isArray(body.results)) throw new PoiError('invalid');
   return body.results.slice(0, 200);

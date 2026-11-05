@@ -7,15 +7,15 @@
     "design": true,
     "tasks": true
   },
-  "approval_basis": "2026-11-05の本人の追加依頼「食べたいものを選択し、質問をどんどん狭める」に基づき、3問固定を可変の分岐へ更新。",
+  "approval_basis": "2026-11-05の本人の再依頼「おすすめの店はここ、マップまでの案内」を根拠に、0件時の段階検索と具体的な店名・地図ボタンの表示を追加。",
   "updated_at": "2026-11-05",
   "verification": {
-    "day_unit": 92,
-    "day_e2e": 76,
+    "day_unit": 107,
+    "day_e2e": 82,
     "food_leaves_e2e": 36,
     "repository_tests": {
-      "total": 5183,
-      "passed": 5182,
+      "total": 5198,
+      "passed": 5197,
       "failed": 0,
       "skipped": 1
     },
@@ -29,9 +29,10 @@
       768,
       1440
     ],
-    "independent_code_review": "food matching and category findings fixed; reverified PASS",
-    "visual_review": "independent 8 items 16/16; keyboard, targets, reduced motion and CSP verified by main",
-    "experience_self_review": "19/20"
+    "independent_code_review": "Bounded search, matching, cancellation: PASS; long-name phone layout finding fixed and covered by E2E",
+    "visual_review": "Independent 8 static items 16/16; actual map destination, CSP, keyboard and phone viewport checked separately",
+    "experience_self_review": "19/20",
+    "store_result_regression": "Old implementation failed; fixed implementation passed including expansion, genre alternative and concrete destination"
   },
   "pull_request": "https://github.com/haranishi/hundred-days/pull/205",
   "ci_source": "Latest head checks on PR205"

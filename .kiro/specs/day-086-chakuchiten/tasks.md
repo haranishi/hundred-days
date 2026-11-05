@@ -56,3 +56,15 @@ PR: https://github.com/haranishi/hundred-days/pull/205 。CIの合否はPRの最
   - _Requirements: 1.2,1.3,1.4,1.5,1.6,3.7,3.8,3.9,4.3,4.4_
 
 追加依頼の証拠: `.agent-harness/runs/day086-food-refinement.md`。92単体、全36葉を含む76E2E、公開ゲートが成功。
+
+## 追加依頼: おすすめの店名から地図まで（2026-11-05）
+- [x] 8. 0件時の段階検索と結果導線を実装する
+  - 希望圏→1.5km→5km、最後に同ジャンルの別案。実距離と拡大・別案を明示する。
+  - 店名の近くにGoogleマップ徒歩案内を置き、全0件・通信失敗・取消の復帰を維持する。
+  - _Boundary: Day086 lib/search.js,openpoi.js,recommend.js,app.js,index.html,app.css,tests_
+  - _Requirements: 3.1,3.4,3.5,3.7,3.8,3.9,3.10,3.11,4.3_
+- [x] 9. 回帰・実API・3幅を検証し、既存PRとObsidianへ反映する
+  - 再現テストの失敗→成功、段階検索の上限、実店名と地図URL、公開ゲートを記録する。
+  - _Depends: 8_ / _Requirements: 3.7,3.10,3.11,4.4_
+
+店名と地図の証拠: `.agent-harness/runs/day086-store-recommendation.md`。107単体、82E2E、全体check・公開ゲートが成功。

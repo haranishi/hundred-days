@@ -49,7 +49,7 @@
             <p id="question-trail" class="question-trail" hidden></p><fieldset><legend id="question-title" tabindex="-1"></legend><p id="question-copy" class="screen-copy"></p><p id="handoff" class="handoff"></p><div id="question-options" class="question-options"></div></fieldset>
             <button id="question-next" class="button primary" type="submit" disabled><span>次へ進む</span><svg class="icon" aria-hidden="true"><use href="./assets/icons.svg#arrow"></use></svg></button>
           </form>
-          <div id="search-consent" hidden><p class="privacy-note">現在地の座標をOpenPOI APIへ送って検索します。アプリには保存しません。</p><button id="question-manual" type="button" class="text-button">駅名・場所から探す</button></div>
+          <div id="search-consent" hidden><p class="search-policy">近くに候補がなければ半径5kmまで、必要に応じて近いジャンルも探します。</p><p class="privacy-note">現在地の座標をOpenPOI APIへ送って検索します。アプリには保存しません。</p><button id="question-manual" type="button" class="text-button">駅名・場所から探す</button></div>
           <button id="question-back" class="text-button back-button" type="button">← 戻る</button>
         </section>
 
@@ -63,15 +63,14 @@
 
         <section id="result-screen" class="screen" hidden>
           <div class="result-heading"><p class="overline">TODAY’S NEXT STOP</p><span id="candidate-counter"></span></div>
-          <p id="result-intro" class="result-intro">今日の着地点は、ここ。</p>
+          <p id="result-intro" class="result-intro">あなたにおすすめのお店</p><p id="result-reason" class="result-reason"></p>
           <article class="place-card">
             <div class="place-illustration" aria-hidden="true"><span class="place-orbit orbit-one"></span><span class="place-orbit orbit-two"></span><svg class="place-icon"><use id="result-icon" href="./assets/icons.svg#cup"></use></svg><span class="illustration-caption">a little stop, a good time.</span></div>
-            <div class="place-content"><span id="result-category" class="category-tag"></span><h2 id="result-name" tabindex="-1"></h2><p id="result-address" class="address"></p><div class="place-distance"><svg class="icon" aria-hidden="true"><use href="./assets/icons.svg#walk"></use></svg><strong id="result-time"></strong><span id="result-distance"></span></div><p class="distance-note">徒歩時間は目安です。距離は直線で計算。</p></div>
+            <div class="place-content"><span id="result-category" class="category-tag"></span><h2 id="result-name" tabindex="-1"></h2><p id="result-address" class="address"></p><div class="place-distance"><svg class="icon" aria-hidden="true"><use href="./assets/icons.svg#walk"></use></svg><strong id="result-time"></strong><span id="result-distance"></span></div><p class="distance-note">徒歩時間は目安です。距離は直線で計算。</p><p id="expanded-note" class="expanded-note" hidden></p><a id="maps-link" class="button primary maps-link" href="https://www.google.com/maps/" target="_blank" rel="noopener noreferrer"><svg class="icon" aria-hidden="true"><use href="./assets/icons.svg#pin"></use></svg><span><span id="maps-label">Google マップでこの店へ</span><small>徒歩のルートを開く ↗</small></span></a></div>
           </article>
           <div id="answer-summary" class="answer-summary" aria-label="選んだ気分と条件"></div>
           <p id="result-food-note" class="food-note" hidden>料理名で検索した候補です。提供メニューはGoogle マップで確認してください。</p>
           <p id="accuracy-note" class="notice" hidden></p>
-          <a id="maps-link" class="button primary maps-link" href="https://www.google.com/maps/" target="_blank" rel="noopener noreferrer"><svg class="icon" aria-hidden="true"><use href="./assets/icons.svg#pin"></use></svg><span>ここに向かう<small>Google マップで徒歩案内 ↗</small></span></a>
           <button id="next-place" class="button secondary" type="button"><svg class="icon" aria-hidden="true"><use href="./assets/icons.svg#refresh"></use></svg><span>別の場所にする</span></button>
           <p id="last-candidate" class="panel-note" hidden>候補はここまで。気分や距離を変えて探せます。</p>
           <div class="result-edit"><button id="review-answers" class="text-button" type="button">食べたいもの・条件を変える</button><button id="result-change-place" class="text-button" type="button">場所を変える</button></div>
@@ -79,7 +78,7 @@
         </section>
 
         <section id="empty-screen" class="screen state-screen" hidden>
-          <svg class="state-icon" aria-hidden="true"><use href="./assets/icons.svg#leaf"></use></svg><p class="overline">A LITTLE CHANGE OF PLANS</p><h2 id="empty-title" tabindex="-1">もう少し、探し方を変えてみよう。</h2><p id="empty-copy" class="screen-copy"></p><button id="empty-expand" type="button" class="button primary">徒歩10分に広げて探す</button><button id="empty-edit" type="button" class="button secondary">食べたいものを選び直す</button><a data-maps-search class="button secondary" target="_blank" rel="noopener noreferrer" hidden></a><button id="empty-place" type="button" class="text-button">場所を変える</button>
+          <svg class="state-icon" aria-hidden="true"><use href="./assets/icons.svg#leaf"></use></svg><p class="overline">A LITTLE CHANGE OF PLANS</p><h2 id="empty-title" tabindex="-1">もう少し、探し方を変えてみよう。</h2><p id="empty-copy" class="screen-copy"></p><button id="empty-edit" type="button" class="button secondary">食べたいものを選び直す</button><a data-maps-search class="button secondary" target="_blank" rel="noopener noreferrer" hidden></a><button id="empty-place" type="button" class="text-button">場所を変える</button>
         </section>
 
         <section id="error-screen" class="screen state-screen" hidden>

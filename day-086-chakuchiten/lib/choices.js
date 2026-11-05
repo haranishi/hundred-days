@@ -1,4 +1,5 @@
 import { FOOD_GROUPS, selectedGroup, selectedDish } from './food.js';
+export const MAX_SEARCH_RADIUS = 5000;
 export const COMPANIONS = [
   { id: 'partner', icon: 'pair', label: 'パートナー', detail: 'ふたりで、いい時間を' },
   { id: 'friends', icon: 'friends', label: '友達', detail: 'このあと、どこ行こう' },
@@ -69,6 +70,7 @@ export function completeAnswers(answers) {
   return questionsFor(answers).every((question) => question.choices.some((choice) => choice.id === answers[question.id]));
 }
 
-export function searchQuery(answers) {
+export function searchQuery(answers, scope = 'dish') {
+  if (scope === 'genre') return selectedGroup(answers)?.dishes.map((item) => item.query).join(' ') || '';
   return answers.mood === 'outside' ? MOODS.outside.query : selectedDish(answers)?.query || '';
 }

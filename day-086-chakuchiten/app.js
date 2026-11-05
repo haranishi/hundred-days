@@ -1,10 +1,11 @@
 import { COMPANIONS, MOODS, completeAnswers, questionsFor, chooseAnswer } from './lib/choices.js';
-import { point, recommend, categoryLabel, mapsUrl, mapsSearchUrl } from './lib/recommend.js';
-import { searchNearby, searchPlaces } from './lib/openpoi.js';
-import { selectedDish } from './lib/food.js';
+import { point, categoryLabel, mapsUrl, mapsSearchUrl } from './lib/recommend.js';
+import { searchPlaces } from './lib/openpoi.js';
+import { selectedDish, selectedGroup } from './lib/food.js';
+import { findRecommendations } from './lib/search.js';
 
 const $ = (id) => document.getElementById(id);
-const state = { phase: 'companion', step: 0, companion: '', answers: {}, location: null, results: [], index: 0, error: null };
+const state = { phase: 'companion', step: 0, companion: '', answers: {}, location: null, results: [], index: 0, search: null, error: null };
 const mainTask = { id: 0, controller: null };
 const placeTask = { id: 0, controller: null };
 let searchAfterLocation = false;
@@ -107,7 +108,8 @@ function render(focus = false) {
     $('question-next').querySelector('span').textContent = last
       ? state.location ? 'この場所で着地点を探す' : '現在地で着地点を探す' : '次へ進む';
     $('search-consent').hidden = !last;
-    $('search-consent').querySelector('p').textContent = state.location
+    $('search-consent').querySelector('.search-policy').textContent = `近くに候補がなければ半径5kmまで${selectedDish(state.answers) ? '、必要に応じて近いジャンルも' : ''}探します。`;
+    $('search-consent').querySelector('.privacy-note').textContent = state.location
       ? '選んだ場所の座標をOpenPOI APIへ送って検索します。アプリには保存しません。'
       : '現在地の座標をOpenPOI APIへ送って検索します。アプリには保存しません。';
   }
@@ -115,8 +117,7 @@ function render(focus = false) {
   if (state.phase === 'empty') {
     const food = selectedDish(state.answers)?.label;
     $('empty-title').textContent = food ? `「${food}」で、もう少し探そう。` : 'もう少し、探し方を変えてみよう。';
-    $('empty-copy').textContent = `${state.location.label}の選んだ徒歩圏では、${food ? `「${food}」の` : '気分に合う'}候補が見つかりませんでした。徒歩圏や場所を変えるか、Google マップでも探せます。`;
-    $('empty-expand').hidden = state.answers.walk !== 'near';
+    $('empty-copy').textContent = `${state.location.label}から半径5kmまで${food ? '、近いジャンルも含めて' : ''}探しましたが、候補が見つかりませんでした。${food ? '食べたいもの' : '気分'}や場所を変えるか、Google マップでも探せます。`;
   }
   if (state.phase === 'error') {
     $('error-title').textContent = state.error.title;
@@ -135,7 +136,16 @@ function renderResult() {
   const place = state.results[state.index];
   $('candidate-counter').textContent = `候補 ${state.index + 1} / ${state.results.length}`;
   const food = selectedDish(state.answers);
-  $('result-intro').textContent = food ? `「${food.label}」なら、ここ。` : '今日の着地点は、ここ。';
+  const related = state.search.scope === 'genre';
+  $('result-intro').textContent = food ? 'あなたにおすすめのお店' : '今日の着地点は、ここ。';
+  $('result-reason').textContent = related ? `「${food.label}」は見つからず、近い「${selectedGroup(state.answers).label}」から。`
+    : food ? `「${food.label}」で探した候補です。` : '気分に合う公園から、ひとつ。';
+  const expanded = place.distance > state.search.preferredRadius;
+  $('expanded-note').hidden = !expanded;
+  $('expanded-note').textContent = expanded ? '希望の徒歩圏では見つからなかったため、範囲を広げた候補です。' : '';
+  $('result-food-note').textContent = related
+    ? `選んだジャンルの別案です。「${food.label}」を提供しているかはGoogle マップで確認してください。`
+    : '料理名で検索した候補です。提供メニューはGoogle マップで確認してください。';
   $('result-food-note').hidden = !food;
   $('result-icon').setAttribute('href', `./assets/icons.svg#${food?.icon || MOODS[state.answers.mood].icon}`);
   $('result-category').textContent = categoryLabel(place, state.answers.mood);
@@ -144,6 +154,7 @@ function renderResult() {
   $('result-time').textContent = `徒歩 約${place.minutes}分`;
   $('result-distance').textContent = `（直線 ${Math.max(1, Math.round(place.distance))}m）`;
   $('maps-link').href = mapsUrl(place);
+  $('maps-label').textContent = food ? 'Google マップでこの店へ' : 'Google マップでここへ';
   $('maps-link').setAttribute('aria-label', `${place.name}に向かう。Google マップで徒歩案内を開く`);
   $('answer-summary').replaceChildren(...questionsFor(state.answers).map((question) => {
     const span = document.createElement('span');
@@ -203,12 +214,16 @@ async function findNearby() {
   const food = selectedDish(answers);
   loading(food ? `${food.label}のお店を探しています` : '近くの着地点を探しています', '選んだ気分のまま、近くの候補を。');
   try {
-    const values = await searchNearby(center, answers, { signal });
+    const result = await findRecommendations(center, answers, companion, { signal, onProgress: ({ radius, scope }) => {
+      if (!current(mainTask, id)) return;
+      $('loading-copy').textContent = scope === 'genre' ? '料理の候補がないため、近いジャンルのお店も探しています。'
+        : radius > 600 ? `近くに候補がないため、半径${radius / 1000}kmまで広げて探しています。` : 'まずは、希望の徒歩圏から。';
+    } });
     if (!current(mainTask, id)) return;
-    state.results = recommend(values, center, answers, companion); state.index = 0;
+    state.search = result; state.results = result.places; state.index = 0;
     state.phase = state.results.length ? 'result' : 'empty';
     render(true);
-    if (!state.results.length) announce('この徒歩圏では、気分に合う施設が見つかりませんでした。');
+    if (!state.results.length) announce('半径5kmまで探しましたが、候補が見つかりませんでした。');
   } catch (error) {
     if (!current(mainTask, id) || error.code === 'aborted') return;
     const [title, message] = connectionMessage(error);
@@ -279,7 +294,7 @@ $('question-back').addEventListener('click', () => {
 });
 $('restart').addEventListener('click', () => {
   cancel(mainTask); cancel(placeTask);
-  Object.assign(state, { phase: 'companion', step: 0, companion: '', answers: {}, results: [], index: 0, error: null });
+  Object.assign(state, { phase: 'companion', step: 0, companion: '', answers: {}, results: [], index: 0, search: null, error: null });
   render(true);
 });
 $('cancel-search').addEventListener('click', () => editAnswers(questionsFor(state.answers).length - 1));
@@ -324,7 +339,6 @@ $('review-answers').addEventListener('click', () => editAnswers());
 $('result-change-place').addEventListener('click', () => openLocation(true));
 $('empty-edit').addEventListener('click', () => editAnswers());
 $('empty-place').addEventListener('click', () => openLocation(true));
-$('empty-expand').addEventListener('click', () => { state.answers.walk = 'stroll'; findNearby(); });
 $('error-manual').addEventListener('click', () => openLocation(true));
 $('error-edit').addEventListener('click', () => editAnswers());
 $('retry').addEventListener('click', () => { if (state.error.location) useGps(); else findNearby(); });

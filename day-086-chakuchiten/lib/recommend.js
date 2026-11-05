@@ -1,5 +1,5 @@
-import { walkRange, completeAnswers } from './choices.js';
-import { selectedDish, dishMatchScore } from './food.js';
+import { walkRange, completeAnswers, MAX_SEARCH_RADIUS } from './choices.js';
+import { selectedDish, selectedGroup, dishMatchScore } from './food.js';
 
 function coordinate(value) {
   if (!['string', 'number'].includes(typeof value) || String(value).trim() === '') return NaN;
@@ -54,14 +54,23 @@ function preferencePenalty(place, answers, companion) {
 }
 
 const nameKey = (value) => value.normalize('NFKC').toLowerCase().replace(/[\s・･.,、。ー‐-]/g, '');
-export function recommend(values, center, answers, companion) {
+function matchScore(place, answers, scope) {
+  if (answers.mood === 'outside') return matches(place) ? 1 : 0;
+  if (scope !== 'genre') return dishMatchScore(place, answers);
+  return Math.max(...selectedGroup(answers).dishes.map((dish) => dishMatchScore(place, { ...answers, dish: dish.id })));
+}
+
+export function recommend(values, center, answers, companion, options = {}) {
   if (!point(center) || !completeAnswers(answers) || !Array.isArray(values)) return [];
-  const radius = walkRange(answers.walk).radius;
+  const radius = options.radius ?? walkRange(answers.walk).radius;
+  const scope = options.scope ?? 'dish';
+  if (!Number.isFinite(radius) || radius <= 0 || radius > MAX_SEARCH_RADIUS || !['dish', 'genre'].includes(scope)
+    || (scope === 'genre' && answers.mood === 'outside')) return [];
   const candidates = values.map(facility).filter(Boolean)
-    .filter((place) => answers.mood === 'outside' ? matches(place) : dishMatchScore(place, answers) > 0)
-    .map((place) => ({ ...place, distance: distanceMeters(center, place) }))
+    .map((place) => ({ ...place, matchScore: matchScore(place, answers, scope), distance: distanceMeters(center, place) }))
+    .filter((place) => place.matchScore > 0)
     .filter((place) => place.distance <= radius)
-    .sort((a, b) => (dishMatchScore(b, answers) - dishMatchScore(a, answers))
+    .sort((a, b) => (b.matchScore - a.matchScore)
       || (a.distance + preferencePenalty(a, answers, companion))
       - (b.distance + preferencePenalty(b, answers, companion)) || a.distance - b.distance);
   const unique = [];
