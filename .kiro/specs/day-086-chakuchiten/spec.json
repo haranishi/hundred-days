@@ -1,7 +1,7 @@
 {
   "feature_name": "day-086-chakuchiten",
   "language": "ja",
-  "phase": "local-verified",
+  "phase": "pull-request-created",
   "approvals": {
     "requirements": true,
     "design": true,
@@ -31,5 +31,7 @@
     "independent_code_review": "2 findings fixed and reverified, including real Chrome BFCache",
     "experience_self_review": "19/20",
     "visual_review": "independent images 16/16 (8 items); 2 interactive items verified by main"
-  }
+  },
+  "pull_request": "https://github.com/haranishi/hundred-days/pull/205",
+  "ci_source": "Latest head checks on PR205"
 }

@@ -30,7 +30,7 @@
   - _Depends: 1.1,1.2,2,3_
   - _Boundary: tests/e2e/day-086.spec.mjs,証拠,仕様・実行記録_
   - _Requirements: 1.1,1.2,1.3,1.4,2.1,2.2,2.3,2.4,3.1,3.2,3.3,3.4,3.5,3.6,4.1,4.2,4.3,4.4_
-- [ ] 5. 変更を確認しPRを作成する
+- [x] 5. 変更を確認しPRを作成する
   - 全文・権利・漏洩・事実を照合し、commit/push/公開用PRと同一headのCIを確認する。
   - Obsidianへ作業先と結果を記録する。マージとSNS投稿は本人に残す。
   - _Depends: 4_
@@ -38,3 +38,5 @@
   - _Requirements: 4.4_
 
 検証の証拠: `.agent-harness/runs/day086-chakuchiten.md`。41単体、37E2E、全体checkと公開ゲートが成功。
+
+PR: https://github.com/haranishi/hundred-days/pull/205 。CIの合否はPRの最新headを正とする。マージ・SNS投稿は未実施。
