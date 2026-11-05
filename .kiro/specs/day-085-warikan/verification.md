@@ -67,3 +67,9 @@
 公開用画像は `day-085-warikan/screenshot.png`。架空の見本のみで、PNGはIHDR/IDAT/IENDのみ。
 3幅画像と31場面の記録はローカルの `.cache/day085-review/`、E2E画像は `test-results/`。
 iOS/Android実機、実際の送金、公開後の応答は未確認。実送金はアプリの対象外。
+
+## PRのCIで見つかった誤検知
+初回CIのGitleaksが、端末保存用の公開識別名を2か所でgeneric-api-keyと判定した。
+値はlocalStorageの保存・復元にのみ使われ、認証・通信・権限を持たないことを確認。
+既存Day75/80の方針に従い、導入コミット・パス・ルール・行を限定して例外にした。
+検査ルール全体は変更せず、ローカルでもGit履歴の検査を実行する。
