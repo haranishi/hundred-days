@@ -1,3 +1,4 @@
+import { FOOD_GROUPS, selectedGroup, selectedDish } from './food.js';
 export const COMPANIONS = [
   { id: 'partner', icon: 'pair', label: 'パートナー', detail: 'ふたりで、いい時間を' },
   { id: 'friends', icon: 'friends', label: '友達', detail: 'このあと、どこ行こう' },
@@ -42,6 +43,32 @@ export function walkRange(id) {
   return QUESTIONS[2].choices.find((choice) => choice.id === id);
 }
 
+export function questionsFor(answers) {
+  const flow = [QUESTIONS[0]];
+  const groups = FOOD_GROUPS[answers.mood];
+  if (groups) {
+    flow.push({ id: 'genre', title: answers.mood === 'meal' ? 'まず、どれが食べたい？' : 'もう少し、気分を聞かせて。',
+      subtitle: 'いまの気分に近いものを、ひとつ。', choices: groups });
+    const selected = selectedGroup(answers);
+    flow.push({ id: 'dish', title: selected?.title || '食べたいものを絞ろう。',
+      subtitle: 'これなら食べたい、と思うものを。', choices: selected?.dishes || [] });
+  }
+  return [...flow, QUESTIONS[1], QUESTIONS[2]];
+}
+
+export function chooseAnswer(answers, id, value) {
+  const question = questionsFor(answers).find((item) => item.id === id);
+  if (!question?.choices.some((item) => item.id === value)) return answers;
+  const next = { ...answers, [id]: value };
+  if (id === 'mood' && answers.mood !== value) { delete next.genre; delete next.dish; }
+  if (id === 'genre' && answers.genre !== value) delete next.dish;
+  return next;
+}
+
 export function completeAnswers(answers) {
-  return QUESTIONS.every((question) => question.choices.some((choice) => choice.id === answers[question.id]));
+  return questionsFor(answers).every((question) => question.choices.some((choice) => choice.id === answers[question.id]));
+}
+
+export function searchQuery(answers) {
+  return answers.mood === 'outside' ? MOODS.outside.query : selectedDish(answers)?.query || '';
 }

@@ -40,3 +40,19 @@
 検証の証拠: `.agent-harness/runs/day086-chakuchiten.md`。41単体、37E2E、全体checkと公開ゲートが成功。
 
 PR: https://github.com/haranishi/hundred-days/pull/205 。CIの合否はPRの最新headを正とする。マージ・SNS投稿は未実施。
+
+
+## 追加依頼: 食べたいものを質問で絞る（2026-11-05）
+- [x] 6. 料理の分岐と検索の条件を実装する
+  - 気分→ジャンル→料理・飲み物を定義し、親の選び直しで下位回答をリセットする。
+  - 同じ質問定義を画面・完了判定・要約で使い、料理名を検索へ反映する。
+  - _Boundary: lib/food.js,choices.js,recommend.js,openpoi.js,app.js,index.html,app.css_
+  - _Requirements: 1.2,1.3,1.4,1.5,1.6,3.1,3.2,3.7,3.8,3.9_
+- [x] 7. 分岐と復帰を検証し、説明とPRを更新する
+  - 36の葉、親変更、料理の検索・0件・取消・BFCache、3幅の実操作を検証する。
+  - 3問固定の説明・OG画像・Obsidianを更新し、公開ゲートとPR差分を確認する。
+  - _Depends: 6_
+  - _Boundary: Day086 tests,E2E,meta,README,og,仕様・証拠、既存PR205_
+  - _Requirements: 1.2,1.3,1.4,1.5,1.6,3.7,3.8,3.9,4.3,4.4_
+
+追加依頼の証拠: `.agent-harness/runs/day086-food-refinement.md`。92単体、全36葉を含む76E2E、公開ゲートが成功。

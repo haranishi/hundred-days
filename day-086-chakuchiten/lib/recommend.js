@@ -1,4 +1,5 @@
-import { MOODS, walkRange, completeAnswers } from './choices.js';
+import { walkRange, completeAnswers } from './choices.js';
+import { selectedDish, dishMatchScore } from './food.js';
 
 function coordinate(value) {
   if (!['string', 'number'].includes(typeof value) || String(value).trim() === '') return NaN;
@@ -32,29 +33,15 @@ export function facility(value) {
   // Town-level geocodes cannot support a 3-minute walking suggestion.
   if (!position || !name || (Number(value.level) > 0 && Number(value.level) <= 3)) return null;
   return {
-    ...position, name, address: text(value.address, 360), category: text(value.category, 60),
+    ...position, name, address: text(value.address, 360), category: text(value.category, 60), brand: text(value.brand, 180),
     licenses: list(value.licenses), attributions: list(value.attributions),
   };
 }
 
-const cafeName = /カフェ|珈琲|コーヒー|喫茶|茶房|ベーカリー|cafe|coffee|bakery/i;
-// Bar-like syllables inside hamburger or a family restaurant name are not drinking venues.
-const drinkName = /居酒屋|酒場|立呑|立ち飲み|ビアホール|ビアガーデン|ワインバー|ダイニングバー|ショットバー|ビアバー|(?:^|[\s・「『])バー(?!ガー|グ|ミヤン|ベキュー|ム|コード|ゲン)|バー(?:$|[\s・」』])|(?:^|[\s・「『])バル(?:$|[\s・」』])|(?:^|[\s・])パブ|\bbar\b|\bpub\b/i;
-const mealName = /レストラン|食堂|定食|ラーメン|らーめん|蕎麦|そば|うどん|寿司|鮨|焼肉|焼き肉|中華|カレー|ダイニング|restaurant/i;
-const outsideName = /公園|緑地|庭園|\bpark\b|\bgarden\b/i;
-
-function matches(place, mood) {
-  const category = place.category;
-  if (mood === 'outside') {
-    return ['tourism', 'public_facility', 'unknown', ''].includes(category) && outsideName.test(place.name)
-      && !/駅|公園前|駐車|管理|事務|売店|営業所|ショップ|ホテル|旅館|不動産/.test(place.name);
-  }
-  if (mood === 'cafe') return ['cafe', 'bakery'].includes(category)
-    || (['restaurant', 'unknown', ''].includes(category) && cafeName.test(place.name));
-  if (mood === 'drink') return category === 'bar_izakaya'
-    || (['restaurant', 'unknown', ''].includes(category) && drinkName.test(place.name));
-  return ['restaurant', 'fast_food'].includes(category) && !drinkName.test(place.name)
-    || (['unknown', ''].includes(category) && mealName.test(place.name));
+function matches(place) {
+  return ['tourism', 'public_facility', 'unknown', ''].includes(place.category)
+    && /公園|緑地|庭園|\bpark\b|\bgarden\b/i.test(place.name)
+    && !/駅|公園前|駐車|管理|事務|売店|営業所|ショップ|ホテル|旅館|不動産/.test(place.name);
 }
 
 function preferencePenalty(place, answers, companion) {
@@ -71,10 +58,11 @@ export function recommend(values, center, answers, companion) {
   if (!point(center) || !completeAnswers(answers) || !Array.isArray(values)) return [];
   const radius = walkRange(answers.walk).radius;
   const candidates = values.map(facility).filter(Boolean)
-    .filter((place) => matches(place, answers.mood))
+    .filter((place) => answers.mood === 'outside' ? matches(place) : dishMatchScore(place, answers) > 0)
     .map((place) => ({ ...place, distance: distanceMeters(center, place) }))
     .filter((place) => place.distance <= radius)
-    .sort((a, b) => (a.distance + preferencePenalty(a, answers, companion))
+    .sort((a, b) => (dishMatchScore(b, answers) - dishMatchScore(a, answers))
+      || (a.distance + preferencePenalty(a, answers, companion))
       - (b.distance + preferencePenalty(b, answers, companion)) || a.distance - b.distance);
   const unique = [];
   for (const place of candidates) {
@@ -87,7 +75,8 @@ export function recommend(values, center, answers, companion) {
 
 export function categoryLabel(place, mood) {
   return ({ restaurant: '飲食店', cafe: 'カフェ', fast_food: 'ファストフード', bakery: 'ベーカリー',
-    bar_izakaya: '居酒屋・バー' })[place.category] || MOODS[mood]?.label || '施設';
+    bar_izakaya: '居酒屋・バー', grocery: '食品店', retail_other: '物販店',
+    tourism: '公園・観光施設', public_facility: '公共施設' })[place.category] || '種類不明';
 }
 
 export function mapsUrl(place) {
@@ -95,5 +84,14 @@ export function mapsUrl(place) {
   if (!position) throw new TypeError('Invalid destination');
   return `https://www.google.com/maps/dir/?${new URLSearchParams({
     api: '1', destination: `${position.lat},${position.lng}`, travelmode: 'walking',
+  })}`;
+}
+
+export function mapsSearchUrl(center, answers) {
+  const position = point(center);
+  const query = selectedDish(answers)?.label || (answers.mood === 'outside' ? '公園' : '');
+  if (!position || !query) throw new TypeError('Invalid search');
+  return `https://www.google.com/maps/search/?${new URLSearchParams({
+    api: '1', query: `${query} near ${position.lat},${position.lng}`,
   })}`;
 }

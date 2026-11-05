@@ -1,4 +1,4 @@
-import { MOODS, walkRange, completeAnswers } from './choices.js';
+import { searchQuery, walkRange, completeAnswers } from './choices.js';
 import { point } from './recommend.js';
 
 const BASE = 'https://api.openpoiapi.com';
@@ -38,7 +38,7 @@ export async function searchNearby(center, answers, options) {
   const position = point(center);
   if (!position || !completeAnswers(answers)) throw new PoiError('input');
   const body = await request('/v1/search', {
-    q: MOODS[answers.mood].query, center: `${position.lng},${position.lat}`,
+    q: searchQuery(answers), center: `${position.lng},${position.lat}`,
     radius: String(walkRange(answers.walk).radius), limit: '100',
   }, options);
   if (!Array.isArray(body.results)) throw new PoiError('invalid');

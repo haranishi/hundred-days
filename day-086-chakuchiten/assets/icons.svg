@@ -14,4 +14,9 @@
 <symbol id="refresh" viewBox="0 0 32 32"><path d="M26 13A10 10 0 0 0 8 8l-3 4M5 5v7h7M6 19a10 10 0 0 0 18 5l3-4M27 27v-7h-7"/></symbol>
 <symbol id="close" viewBox="0 0 32 32"><path d="m9 9 14 14M23 9 9 23"/></symbol>
 <symbol id="check" viewBox="0 0 32 32"><path d="m7 16 6 6L26 9"/></symbol>
+<symbol id="rice" viewBox="0 0 32 32"><path d="M5 17h22c-1 7-5 10-11 10S6 24 5 17ZM11 27v2h10v-2M7 17c-1-5 3-8 5-7 1-6 8-6 9-1 4-1 7 4 4 8M13 11l-1 3M18 9v3M21 14h1"/></symbol>
+<symbol id="fork" viewBox="0 0 32 32"><path d="M7 4v10a4 4 0 0 0 8 0V4M11 4v25M7 10h8M25 4c-5 3-6 8-6 14h6V4v25"/></symbol>
+<symbol id="fish" viewBox="0 0 32 32"><path d="M4 16c6-10 16-10 22 0-6 10-16 10-22 0ZM26 16l4-5v10l-4-5M14 8l3-4 3 5M15 24l3 3 3-5M10 10c3 4 3 8 0 12"/><circle cx="7.5" cy="15" r=".8"/></symbol>
+<symbol id="cake" viewBox="0 0 32 32"><path d="M5 15h22v13H5zM5 20c3-4 5 4 8 0s5 4 8 0 4 0 6-1M8 15v-4h16v4M16 11V7M16 7c-5-2-3-5 0-6 3 2 4 4 0 6Z"/></symbol>
+<symbol id="bread" viewBox="0 0 32 32"><path d="M7 14c-7-2-4-10 2-10h14c6 0 9 8 2 10v14H7V14ZM12 10l-1 5M18 10l-1 5M10 23h12"/></symbol>
 </svg>

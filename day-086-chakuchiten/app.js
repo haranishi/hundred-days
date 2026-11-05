@@ -1,6 +1,7 @@
-import { COMPANIONS, QUESTIONS, MOODS, completeAnswers } from './lib/choices.js';
-import { point, recommend, categoryLabel, mapsUrl } from './lib/recommend.js';
+import { COMPANIONS, MOODS, completeAnswers, questionsFor, chooseAnswer } from './lib/choices.js';
+import { point, recommend, categoryLabel, mapsUrl, mapsSearchUrl } from './lib/recommend.js';
 import { searchNearby, searchPlaces } from './lib/openpoi.js';
+import { selectedDish } from './lib/food.js';
 
 const $ = (id) => document.getElementById(id);
 const state = { phase: 'companion', step: 0, companion: '', answers: {}, location: null, results: [], index: 0, error: null };
@@ -46,21 +47,40 @@ function choices(host, items, name, selected, onChange) {
   }));
 }
 
+function renderProgress() {
+  const flow = questionsFor(state.answers);
+  $('stage-label').textContent = state.phase === 'companion' ? 'まずは、ここから'
+    : state.phase === 'question' ? `STEP ${state.step + 1}${state.answers.mood ? ` / ${flow.length}` : ''}`
+      : state.phase === 'loading' ? '探しています' : 'あなたの着地点';
+  const labels = { mood: '気分', genre: 'ジャンル', dish: '食べたいもの', space: '空間', walk: '距離' };
+  $('question-progress').replaceChildren(...flow.map((question, index) => {
+    const li = document.createElement('li'); li.textContent = labels[question.id];
+    li.classList.toggle('active', state.phase === 'question' && index === state.step);
+    li.classList.toggle('done', state.phase !== 'companion' && (state.phase !== 'question' || index < state.step));
+    if (state.phase === 'question' && index === state.step) li.setAttribute('aria-current', 'step');
+    return li;
+  }));
+}
+
+function renderSearchLinks() {
+  const available = state.location && completeAnswers(state.answers) && !(state.phase === 'error' && state.error?.location);
+  document.querySelectorAll('[data-maps-search]').forEach((link) => {
+    link.hidden = !available;
+    if (available) {
+      const food = selectedDish(state.answers)?.label || '公園';
+      link.textContent = `Google マップで「${food}」を探す ↗`;
+      link.href = mapsSearchUrl(state.location, state.answers);
+    }
+  });
+}
+
 function render(focus = false) {
   document.documentElement.dataset.phase = state.phase;
   document.querySelectorAll('.screen').forEach((screen) => { screen.hidden = screen.id !== `${state.phase}-screen`; });
   $('restart').hidden = state.phase === 'companion';
   $('location-trigger').disabled = state.phase === 'loading';
   $('location-label').textContent = state.location?.label || '探す場所を選ぶ';
-  $('stage-label').textContent = state.phase === 'companion' ? 'まずは、ここから'
-    : state.phase === 'question' ? `STEP ${state.step + 1} / 3`
-      : state.phase === 'loading' ? '探しています' : 'あなたの着地点';
-  document.querySelectorAll('.progress li').forEach((li, index) => {
-    const active = state.phase === 'question' && index === state.step;
-    li.classList.toggle('active', active);
-    li.classList.toggle('done', state.phase !== 'companion' && (state.phase !== 'question' || index < state.step));
-    if (active) li.setAttribute('aria-current', 'step'); else li.removeAttribute('aria-current');
-  });
+  renderProgress();
   if (state.phase === 'companion') {
     choices($('companion-options'), COMPANIONS, 'companion', state.companion, (id) => {
       state.companion = id; $('companion-next').disabled = false;
@@ -68,24 +88,34 @@ function render(focus = false) {
     $('companion-next').disabled = !state.companion;
   }
   if (state.phase === 'question') {
-    const question = QUESTIONS[state.step];
+    const flow = questionsFor(state.answers);
+    const question = flow[state.step];
+    const last = state.step === flow.length - 1;
     $('question-title').textContent = question.title;
-    $('question-copy').textContent = question.subtitle;
+    $('question-copy').textContent = last && selectedDish(state.answers)
+      ? `${selectedDish(state.answers).label}で決まり。近くのお店を探そう。` : question.subtitle;
+    const trail = flow.slice(0, state.step).filter((item) => ['mood', 'genre', 'dish'].includes(item.id))
+      .map((item) => item.choices.find((choice) => choice.id === state.answers[item.id])?.label).filter(Boolean);
+    $('question-trail').textContent = trail.join(' › ');
+    $('question-trail').hidden = !trail.length;
     $('handoff').textContent = state.step === 0 && state.companion !== 'solo' ? '相手にスマホを渡して、答えてもらおう。' : '';
     choices($('question-options'), question.choices, question.id, state.answers[question.id], (id) => {
-      state.answers[question.id] = id; $('question-next').disabled = false;
+      state.answers = chooseAnswer(state.answers, question.id, id);
+      $('question-next').disabled = false; renderProgress();
     });
     $('question-next').disabled = !state.answers[question.id];
-    $('question-next').querySelector('span').textContent = state.step === 2
+    $('question-next').querySelector('span').textContent = last
       ? state.location ? 'この場所で着地点を探す' : '現在地で着地点を探す' : '次へ進む';
-    $('search-consent').hidden = state.step !== 2;
+    $('search-consent').hidden = !last;
     $('search-consent').querySelector('p').textContent = state.location
       ? '選んだ場所の座標をOpenPOI APIへ送って検索します。アプリには保存しません。'
       : '現在地の座標をOpenPOI APIへ送って検索します。アプリには保存しません。';
   }
   if (state.phase === 'result') renderResult();
   if (state.phase === 'empty') {
-    $('empty-copy').textContent = `${state.location.label}の選んだ徒歩圏では、気分に合う施設が見つかりませんでした。データに載っていない場所もあります。`;
+    const food = selectedDish(state.answers)?.label;
+    $('empty-title').textContent = food ? `「${food}」で、もう少し探そう。` : 'もう少し、探し方を変えてみよう。';
+    $('empty-copy').textContent = `${state.location.label}の選んだ徒歩圏では、${food ? `「${food}」の` : '気分に合う'}候補が見つかりませんでした。徒歩圏や場所を変えるか、Google マップでも探せます。`;
     $('empty-expand').hidden = state.answers.walk !== 'near';
   }
   if (state.phase === 'error') {
@@ -93,6 +123,7 @@ function render(focus = false) {
     $('error-copy').textContent = state.error.message;
     $('retry').textContent = state.error.location ? '位置情報をもう一度試す' : 'もう一度探す';
   }
+  renderSearchLinks();
   if (focus) {
     const screen = $(`${state.phase}-screen`);
     screen.querySelector('h2, legend')?.focus({ preventScroll: true });
@@ -103,7 +134,10 @@ function render(focus = false) {
 function renderResult() {
   const place = state.results[state.index];
   $('candidate-counter').textContent = `候補 ${state.index + 1} / ${state.results.length}`;
-  $('result-icon').setAttribute('href', `./assets/icons.svg#${MOODS[state.answers.mood].icon}`);
+  const food = selectedDish(state.answers);
+  $('result-intro').textContent = food ? `「${food.label}」なら、ここ。` : '今日の着地点は、ここ。';
+  $('result-food-note').hidden = !food;
+  $('result-icon').setAttribute('href', `./assets/icons.svg#${food?.icon || MOODS[state.answers.mood].icon}`);
   $('result-category').textContent = categoryLabel(place, state.answers.mood);
   $('result-name').textContent = place.name;
   $('result-address').textContent = place.address || '住所の詳しい情報はGoogle マップで確認してください。';
@@ -111,7 +145,7 @@ function renderResult() {
   $('result-distance').textContent = `（直線 ${Math.max(1, Math.round(place.distance))}m）`;
   $('maps-link').href = mapsUrl(place);
   $('maps-link').setAttribute('aria-label', `${place.name}に向かう。Google マップで徒歩案内を開く`);
-  $('answer-summary').replaceChildren(...QUESTIONS.map((question) => {
+  $('answer-summary').replaceChildren(...questionsFor(state.answers).map((question) => {
     const span = document.createElement('span');
     span.textContent = question.choices.find((item) => item.id === state.answers[question.id]).label;
     return span;
@@ -166,7 +200,8 @@ async function findNearby() {
   if (!state.location || !completeAnswers(state.answers)) return;
   const { id, signal } = begin(mainTask);
   const center = { ...state.location }; const answers = { ...state.answers }; const companion = state.companion;
-  loading('近くの着地点を探しています', '気分に合う場所を、少しだけ。');
+  const food = selectedDish(answers);
+  loading(food ? `${food.label}のお店を探しています` : '近くの着地点を探しています', '選んだ気分のまま、近くの候補を。');
   try {
     const values = await searchNearby(center, answers, { signal });
     if (!current(mainTask, id)) return;
@@ -234,8 +269,9 @@ $('companion-form').addEventListener('submit', (event) => {
 });
 $('question-form').addEventListener('submit', (event) => {
   event.preventDefault();
-  if (!state.answers[QUESTIONS[state.step].id]) return;
-  if (state.step < 2) { state.step += 1; render(true); }
+  const flow = questionsFor(state.answers);
+  if (!state.answers[flow[state.step].id]) return;
+  if (state.step < flow.length - 1) { state.step += 1; render(true); }
   else if (state.location) findNearby(); else useGps();
 });
 $('question-back').addEventListener('click', () => {
@@ -246,7 +282,7 @@ $('restart').addEventListener('click', () => {
   Object.assign(state, { phase: 'companion', step: 0, companion: '', answers: {}, results: [], index: 0, error: null });
   render(true);
 });
-$('cancel-search').addEventListener('click', () => editAnswers(2));
+$('cancel-search').addEventListener('click', () => editAnswers(questionsFor(state.answers).length - 1));
 $('location-trigger').addEventListener('click', () => openLocation());
 $('question-manual').addEventListener('click', () => openLocation(true));
 $('gps-button').addEventListener('click', () => useGps(true));
@@ -297,7 +333,7 @@ window.addEventListener('pageshow', (event) => {
   if (!event.persisted) return;
   // BFCache keeps the DOM after pagehide canceled its in-flight operations.
   if (state.phase === 'loading') {
-    editAnswers(2);
+    editAnswers(questionsFor(state.answers).length - 1);
     announce('取得を取り消しました。回答は残っています。もう一度探せます。');
   }
   if ($('location-dialog').open) {

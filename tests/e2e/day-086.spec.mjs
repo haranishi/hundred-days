@@ -1,5 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { readFileSync, mkdirSync } from 'node:fs';
+import { FOOD_GROUPS } from '../../day-086-chakuchiten/lib/food.js';
 import { createMountedServer } from '../../scripts/serve-mounted.mjs';
 
 const DIR = 'day-086-chakuchiten';
@@ -8,10 +9,11 @@ const center = { latitude: 35.68, longitude: 139.76 };
 const position = { lat: center.latitude, lng: center.longitude };
 const makePlace = (name, offset, category = 'cafe') => ({ name, lat: position.lat + offset, lng: position.lng, category, address: '試験市 テスト町1-1', licenses: ['CC0-1.0'], attributions: ['自作の試験データ'] });
 const places = [
-  makePlace('試験カフェ ひと息', .0002), makePlace('試験喫茶 まどべ', .0006), makePlace('試験ベーカリー', .001, 'bakery'),
+  makePlace('試験カフェ ひと息', .0002), makePlace('試験喫茶 まどべ', .0006), makePlace('試験コーヒースタンド', .001),
   makePlace('試験食堂', .0003, 'restaurant'), makePlace('試験定食', .0007, 'restaurant'),
-  makePlace('試験居酒屋', .0003, 'bar_izakaya'), makePlace('試験バー', .0008, 'bar_izakaya'),
+  makePlace('試験カクテル酒場', .0003, 'bar_izakaya'), makePlace('試験カクテルバー', .0008, 'bar_izakaya'),
   makePlace('試験公園', .0003, 'tourism'), makePlace('試験庭園', .0007, 'public_facility'),
+  makePlace('試験ラーメン', .0004, 'restaurant'), makePlace('試験寿司', .0004, 'restaurant'),
   makePlace('薬局は候補外', 0, 'medical'), makePlace('遠方のカフェは候補外', 1),
 ];
 const suggestions = [{ name: '試験駅', address: '試験市 テスト町', category: 'station', ...position }];
@@ -50,9 +52,20 @@ async function open(page, path = PATH) {
   await expect(page.locator('html')).toHaveAttribute('data-ready', 'true');
 }
 const pick = async (page, text) => page.getByText(text, { exact: true }).click();
-async function throughQuestions(page, { companion = 'パートナー', mood = '軽め・お茶したい', space = '静かにゆっくり', walk = 'すぐそこがいい', submit = true } = {}) {
+const defaultFood = { 'ガッツリ満腹': ['meal', 'rice', 'teishoku'], '軽め・お茶したい': ['cafe', 'drinks', 'coffee'], 'ちょっと一杯': ['drink', 'alcohol', 'cocktail'] };
+async function foodSteps(page, moodLabel, genre, dish) {
+  const defaults = defaultFood[moodLabel];
+  if (!defaults) return;
+  const group = FOOD_GROUPS[defaults[0]].find(item => item.id === (genre || defaults[1]));
+  await pick(page, group.label); await page.locator('#question-next').click();
+  await pick(page, group.dishes.find(item => item.id === (dish || defaults[2])).label);
+  await page.locator('#question-next').click();
+}
+async function throughQuestions(page, { companion = 'パートナー', mood = '軽め・お茶したい', genre, dish,
+  space = '静かにゆっくり', walk = 'すぐそこがいい', submit = true } = {}) {
   await pick(page, companion); await page.locator('#companion-next').click();
   await pick(page, mood); await page.locator('#question-next').click();
+  await foodSteps(page, mood, genre, dish);
   await pick(page, space); await page.locator('#question-next').click();
   await pick(page, walk);
   if (submit) await page.locator('#question-next').click();
@@ -72,7 +85,7 @@ test('開始時は通信せず、同行者を選ぶまで進めない', async ({
   expect(outside).toEqual([]);
   await pick(page, '友達'); await expect(page.locator('#companion-next')).toBeEnabled();
 });
-for (const [mood, title] of [['ガッツリ満腹', '試験食堂'], ['軽め・お茶したい', '試験カフェ ひと息'], ['ちょっと一杯', '試験居酒屋'], ['外でリフレッシュ', '試験公園']]) {
+for (const [mood, title] of [['ガッツリ満腹', '試験食堂'], ['軽め・お茶したい', '試験カフェ ひと息'], ['ちょっと一杯', '試験カクテル酒場'], ['外でリフレッシュ', '試験公園']]) {
   for (const space of ['静かにゆっくり', '賑やかでもOK']) {
     for (const walk of ['すぐそこがいい', '少し散歩してもいい']) {
       test(`${mood} / ${space} / ${walk} → 現在地の結果と道案内`, async ({ page }) => {
@@ -96,7 +109,7 @@ test('候補は1軒ずつ表示し、最後で止まり、APIを呼び直さな�
   await open(page); await throughQuestions(page);
   await expect(page.locator('#candidate-counter')).toHaveText('候補 1 / 3');
   await page.locator('#next-place').click(); await expect(page.locator('#result-name')).toHaveText('試験喫茶 まどべ');
-  await page.locator('#next-place').click(); await expect(page.locator('#result-name')).toHaveText('試験ベーカリー');
+  await page.locator('#next-place').click(); await expect(page.locator('#result-name')).toHaveText('試験コーヒースタンド');
   await expect(page.locator('#next-place')).toBeDisabled(); await expect(page.locator('#last-candidate')).toBeVisible();
   expect(runs.get(page).search).toHaveLength(1);
 });
@@ -105,11 +118,12 @@ test('前の問へ戻っても回答を保持し、結果から気分を直せ�
   await expect(page.locator('#question-next')).toBeDisabled();
   await pick(page, '軽め・お茶したい'); await page.locator('#question-next').click();
   await page.locator('#question-back').click(); await expect(page.locator('input[value="cafe"]')).toBeChecked();
-  await page.locator('#question-next').click(); await pick(page, '静かにゆっくり'); await page.locator('#question-next').click();
+  await page.locator('#question-next').click(); await foodSteps(page, '軽め・お茶したい'); await pick(page, '静かにゆっくり'); await page.locator('#question-next').click();
   await pick(page, 'すぐそこがいい'); await page.locator('#question-next').click();
   await expect(page.locator('#result-screen')).toBeVisible();
   await page.locator('#review-answers').click(); await expect(page.locator('input[value="cafe"]')).toBeChecked();
   await pick(page, 'ガッツリ満腹'); await page.locator('#question-next').click();
+  await foodSteps(page, 'ガッツリ満腹');
   await expect(page.locator('input[value="quiet"]')).toBeChecked(); await page.locator('#question-next').click();
   await expect(page.locator('input[value="near"]')).toBeChecked(); await page.locator('#question-next').click();
   await expect(page.locator('#result-name')).toHaveText('試験食堂');
@@ -265,4 +279,62 @@ test('BFCacheから場所取得dialogへ戻ったとき、取得をやり直せ�
   });
   await expect(page.locator('#place-submit')).toBeEnabled();
   await expect(page.locator('#place-status')).toContainText('もう一度指定できます');
+});
+
+for (const [moodId, groups] of Object.entries(FOOD_GROUPS)) for (const group of groups) for (const dish of group.dishes) {
+  const mood = ({ meal: 'ガッツリ満腹', cafe: '軽め・お茶したい', drink: 'ちょっと一杯' })[moodId];
+  test(`${group.label}→${dish.label}の分岐を店探しに使う`, async ({ page }) => {
+    let query;
+    await page.route('**/v1/search?**', route => {
+      query = new URL(route.request().url()).searchParams.get('q');
+      return route.fulfill({ json: { results: [makePlace(`試験 ${dish.label}の店`, .0003, 'restaurant')] } });
+    });
+    await open(page); await throughQuestions(page, { mood, genre: group.id, dish: dish.id });
+    await expect(page.locator('#result-name')).toHaveText(`試験 ${dish.label}の店`);
+    await expect(page.locator('#result-intro')).toContainText(dish.label);
+    await expect(page.locator('#answer-summary')).toContainText(dish.label);
+    expect(query).toBe(dish.query);
+  });
+}
+test('麺類から魚料理へ変えるとラーメンを消し、寿司を選び直せる', async ({ page }) => {
+  await open(page); await throughQuestions(page, { mood: 'ガッツリ満腹', genre: 'noodles', dish: 'ramen', submit: false });
+  await expect(page.locator('#stage-label')).toHaveText('STEP 5 / 5');
+  await page.locator('#question-back').click(); await page.locator('#question-back').click();
+  await expect(page.locator('input[value="ramen"]')).toBeChecked();
+  await page.locator('#question-back').click(); await pick(page, '魚料理'); await page.locator('#question-next').click();
+  await expect(page.locator('#question-title')).toHaveText('魚なら、どんな一皿？');
+  await expect(page.locator('#question-next')).toBeDisabled();
+  await expect(page.locator('input[value="ramen"]')).toHaveCount(0);
+  await pick(page, '寿司'); await page.locator('#question-next').click(); await page.locator('#question-next').click();
+  await page.locator('#question-next').click(); await expect(page.locator('#result-name')).toHaveText('試験寿司');
+  expect(runs.get(page).search[0].searchParams.get('q')).toBe('寿司');
+});
+test('食事から外出へ変えると料理を聞かず、3問の流れに切り替わる', async ({ page }) => {
+  await open(page); await pick(page, 'パートナー'); await page.locator('#companion-next').click();
+  await pick(page, 'ガッツリ満腹'); await page.locator('#question-next').click();
+  await pick(page, '麺類'); await page.locator('#question-next').click(); await pick(page, 'ラーメン');
+  await page.locator('#question-back').click(); await page.locator('#question-back').click();
+  await pick(page, '外でリフレッシュ'); await page.locator('#question-next').click();
+  await expect(page.locator('#question-title')).toHaveText('どんな空間がいい？');
+  await expect(page.locator('#stage-label')).toHaveText('STEP 2 / 3');
+  await expect(page.locator('#question-progress li')).toHaveCount(3);
+  await pick(page, '静かにゆっくり'); await page.locator('#question-next').click();
+  await pick(page, 'すぐそこがいい'); await page.locator('#question-next').click();
+  await expect(page.locator('#result-name')).toHaveText('試験公園');
+  await expect(page.locator('#answer-summary')).not.toContainText('ラーメン');
+});
+test('0件でも料理を保持し、同じラーメンで徒歩圏と地図検索を変えられる', async ({ page }) => {
+  const queries = [];
+  await page.route('**/v1/search?**', route => {
+    queries.push(new URL(route.request().url()));
+    return route.fulfill({ json: { results: [makePlace('近くの寿司店', .0001, 'restaurant')] } });
+  });
+  await open(page); await throughQuestions(page, { mood: 'ガッツリ満腹', genre: 'noodles', dish: 'ramen' });
+  await expect(page.locator('#empty-title')).toContainText('ラーメン');
+  const search = page.locator('#empty-screen [data-maps-search]');
+  await expect(search).toContainText('ラーメン');
+  expect(new URL(await search.getAttribute('href')).searchParams.get('query')).toBe('ラーメン near 35.68,139.76');
+  await page.locator('#empty-expand').click(); await expect(page.locator('#empty-screen')).toBeVisible();
+  expect(queries.map(url => url.searchParams.get('q'))).toEqual(['ラーメン', 'ラーメン']);
+  expect(queries.map(url => url.searchParams.get('radius'))).toEqual(['180', '600']);
 });

@@ -238,7 +238,7 @@ dialog .privacy-note { margin: 20px 0 0; border-top: 1px solid var(--line); padd
 #share .share { min-width: 0; max-width: 100%; }
 
 #candidate-counter { font-size: 11px; }
-.answer-summary::before { content: '選んだ気分'; width: 100%; font-size: 10px; line-height: 1.8; color: var(--muted); }
+.answer-summary::before { content: '選んだ条件'; width: 100%; font-size: 10px; line-height: 1.8; color: var(--muted); }
 @media (max-width: 800px) {
   html:not([data-phase="companion"]) .intro { display: none; }
   .companion-grid .choice-copy small, .choice-copy small, .data-note, .distance-note { font-size: 11px; }
@@ -246,3 +246,7 @@ dialog .privacy-note { margin: 20px 0 0; border-top: 1px solid var(--line); padd
 }
 
 #result-name { word-break: keep-all; }
+
+.question-trail { margin: 0 0 16px; padding: 8px 11px; background: #f2e9dd; color: #715b46; border-radius: 7px; font-size: 11px; line-height: 1.9; overflow-wrap: anywhere; }
+.food-note { margin: 0 0 15px; color: var(--muted); font-size: 11px; line-height: 1.9; }
+.result-edit { gap: 12px; }

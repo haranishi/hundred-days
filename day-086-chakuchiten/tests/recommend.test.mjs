@@ -4,7 +4,8 @@ import { point, facility, distanceMeters, walkMinutes, recommend, mapsUrl, categ
 import { QUESTIONS, COMPANIONS, completeAnswers } from '../lib/choices.js';
 
 const center = { lat: 35.68, lng: 139.76 };
-const answers = { mood: 'cafe', space: 'quiet', walk: 'near' };
+const answers = { mood: 'cafe', genre: 'drinks', dish: 'coffee', space: 'quiet', walk: 'near' };
+const forMood = (mood) => ({ ...answers, mood, ...({ meal: { genre: 'rice', dish: 'teishoku' }, drink: { genre: 'alcohol', dish: 'cocktail' } }[mood] || {}) });
 const place = (name, offset = 0.0005, category = 'cafe', extra = {}) => ({
   name, lat: center.lat + offset, lng: center.lng, category, address: '試験市 テスト町1-1', ...extra,
 });
@@ -53,23 +54,24 @@ test('表記ゆれした同一店の重複を落とし、離れた同名店は�
 });
 for (const [mood, values, expected] of [
   ['cafe', [place('薬局', 0, 'medical'), place('テストカフェ', .0001), place('喫茶テスト', .0002, 'restaurant')], ['テストカフェ', '喫茶テスト']],
-  ['meal', [place('居酒屋テスト', 0, 'restaurant'), place('テスト食堂', .0001, 'restaurant'), place('ラーメンテスト', .0002, 'unknown')], ['テスト食堂', 'ラーメンテスト']],
-  ['drink', [place('テスト酒場', .0001, 'bar_izakaya'), place('バー試験', .0002, 'restaurant'), place('テストカフェ', 0)], ['テスト酒場', 'バー試験']],
+  ['meal', [place('居酒屋テスト', 0, 'restaurant'), place('テスト食堂', .0001, 'restaurant'), place('ラーメンテスト', .0002, 'unknown')], ['テスト食堂']],
+  ['drink', [place('カクテル酒場', .0001, 'bar_izakaya'), place('カクテルバー', .0002, 'restaurant'), place('テストカフェ', 0)], ['カクテル酒場', 'カクテルバー']],
   ['outside', [place('テスト公園', .0001, 'tourism'), place('公園前駅', 0, 'station'), place('公園前薬局', 0, 'medical'), place('公園管理事務所', 0, 'public_facility')], ['テスト公園']],
 ]) {
   test(`${mood}の候補に無関係な施設を混ぜない`, () => {
-    assert.deepEqual(recommend(values, center, { ...answers, mood }).map((p) => p.name), expected);
+    assert.deepEqual(recommend(values, center, forMood(mood)).map((p) => p.name), expected);
   });
 }
 test('空間の選択で同じ距離のカフェとベーカリーの優先を変える', () => {
-  const values = [place('ベーカリーテスト', .0001, 'bakery'), place('カフェテスト', .0001, 'cafe')];
-  assert.equal(recommend(values, center, answers)[0].name, 'カフェテスト');
-  assert.equal(recommend(values, center, { ...answers, space: 'lively' })[0].name, 'ベーカリーテスト');
+  const values = [place('ベーカリーテスト', .0001, 'bakery'), place('パンカフェテスト', .0001, 'cafe')];
+  const bread = { ...answers, genre: 'light', dish: 'bread' };
+  assert.equal(recommend(values, center, bread)[0].name, 'パンカフェテスト');
+  assert.equal(recommend(values, center, { ...bread, space: 'lively' })[0].name, 'ベーカリーテスト');
 });
 test('家族・パートナーは同程度の距離で飲食店をファストフードより優先する', () => {
-  const values = [place('ファストフード', .0001, 'fast_food'), place('食堂テスト', .0001, 'restaurant')];
-  const a = { ...answers, mood: 'meal', space: 'lively' };
-  assert.equal(recommend(values, center, a, 'friends')[0].name, 'ファストフード');
+  const values = [place('定食ファストフード', .0001, 'fast_food'), place('食堂テスト', .0001, 'restaurant')];
+  const a = { ...forMood('meal'), space: 'lively' };
+  assert.equal(recommend(values, center, a, 'friends')[0].name, '定食ファストフード');
   assert.equal(recommend(values, center, a, 'family')[0].name, '食堂テスト');
 });
 test('不正な回答・場所では候補を返さない', () => {
@@ -89,11 +91,12 @@ test('地図URLには目的地と徒歩指定だけを含み、現在地・回�
   assert.equal(url.searchParams.get('destination'), '35.6805,139.76');
   assert.equal(url.searchParams.has('origin'), false);
   assert.throws(() => mapsUrl({ lat: 'bad', lng: 1 }), TypeError);
-  assert.equal(categoryLabel({ category: 'unknown' }, 'outside'), '外でリフレッシュ');
+  assert.equal(categoryLabel({ category: 'unknown' }, 'outside'), '種類不明');
 });
 
 test('ハンバーグ・ハンバーガー・バーミヤンを酒場へ誤分類しない', () => {
   const values = [place('試験ハンバーガー店', .0001, 'fast_food'), place('試験ハンバーグ食堂', .0002, 'restaurant'), place('バーミヤン 試験店', .0003, 'restaurant')];
-  assert.equal(recommend(values, center, { ...answers, mood: 'meal' }).length, 3);
-  assert.equal(recommend(values, center, { ...answers, mood: 'drink' }).length, 0);
+  assert.equal(recommend(values, center, { ...answers, genre: 'light', dish: 'burger' })[0].name, '試験ハンバーガー店');
+  assert.equal(recommend(values, center, { ...answers, mood: 'meal', genre: 'meat', dish: 'hamburg' })[0].name, '試験ハンバーグ食堂');
+  assert.equal(recommend(values, center, forMood('drink')).length, 0);
 });

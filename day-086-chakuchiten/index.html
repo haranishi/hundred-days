@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#f7f3ea">
-  <meta name="description" content="「なんでもいい」の、その先へ。3つの質問と今いる場所から、次の行き先をひとつ。カフェ、ごはん、一杯、公園。気分を合わせて出かけよう。">
-  <meta name="share:text" content="ふたりの着地点 — 「なんでもいい」を3問で。気分と今いる場所から、次の行き先をひとつ。">
+  <meta name="description" content="「なんでもいい」の、その先へ。食べたいものと今いる場所から、次の行き先をひとつ。カフェ、ごはん、一杯、公園。気分を合わせて出かけよう。">
+  <meta name="share:text" content="ふたりの着地点 — 気分からジャンル、料理へ。質問に答えて食べたいものと近くのお店を見つけよう。">
   <title>ふたりの着地点 | 100日チャレンジ Day86</title>
   <link rel="icon" href="./favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="./app.css">
@@ -24,14 +24,14 @@
     <section class="intro" aria-labelledby="intro-title">
       <p class="eyebrow"><span></span> THE NEXT STOP, TOGETHER</p>
       <h1 id="intro-title">「なんでもいい」に、<br><em>ちょうどいい</em>答えを。</h1>
-      <p class="intro-copy">3つの質問で、近くの行き先をひとつ。<br>気分を合わせて、そのまま出かけよう。</p>
+      <p class="intro-copy">気分をたどって、食べたいものをひとつ。<br>気分を合わせて、そのまま出かけよう。</p>
       <img class="route-art" src="./assets/next-stop.svg" width="480" height="290" alt="ふたつの足どりが、街角の小さなカフェにたどり着くイラスト">
       <p class="intro-foot"><span>01 答える</span><i aria-hidden="true"></i><span>02 見つかる</span><i aria-hidden="true"></i><span>03 出かける</span></p>
     </section>
 
     <section id="workspace" class="workspace" aria-label="行き先を見つける" tabindex="-1">
       <div class="panel-top"><button id="location-trigger" class="location-trigger" type="button"><svg class="icon" aria-hidden="true"><use href="./assets/icons.svg#pin"></use></svg><span id="location-label">探す場所を選ぶ</span><span aria-hidden="true">⌄</span></button><span id="stage-label">まずは、ここから</span></div>
-      <ol class="progress" aria-label="質問の進み具合"><li>気分</li><li>空間</li><li>距離</li></ol>
+      <ol id="question-progress" class="progress" aria-label="質問の進み具合"><li>気分</li><li>空間</li><li>距離</li></ol>
       <div class="panel-body">
         <section id="companion-screen" class="screen">
           <p class="overline">LET’S GO SOMEWHERE</p>
@@ -39,14 +39,14 @@
           <p class="screen-copy">一緒にいる人を選んでください。</p>
           <form id="companion-form">
             <fieldset><legend class="sr-only">一緒にいる人</legend><div id="companion-options" class="companion-grid"></div></fieldset>
-            <button id="companion-next" type="submit" class="button primary" disabled>3つの質問に答える<svg class="icon" aria-hidden="true"><use href="./assets/icons.svg#arrow"></use></svg></button>
+            <button id="companion-next" type="submit" class="button primary" disabled>気分を選んではじめる<svg class="icon" aria-hidden="true"><use href="./assets/icons.svg#arrow"></use></svg></button>
           </form>
           <p class="panel-note">登録なし。迷ったら、直感で。</p>
         </section>
 
         <section id="question-screen" class="screen" hidden>
           <form id="question-form">
-            <fieldset><legend id="question-title" tabindex="-1"></legend><p id="question-copy" class="screen-copy"></p><p id="handoff" class="handoff"></p><div id="question-options" class="question-options"></div></fieldset>
+            <p id="question-trail" class="question-trail" hidden></p><fieldset><legend id="question-title" tabindex="-1"></legend><p id="question-copy" class="screen-copy"></p><p id="handoff" class="handoff"></p><div id="question-options" class="question-options"></div></fieldset>
             <button id="question-next" class="button primary" type="submit" disabled><span>次へ進む</span><svg class="icon" aria-hidden="true"><use href="./assets/icons.svg#arrow"></use></svg></button>
           </form>
           <div id="search-consent" hidden><p class="privacy-note">現在地の座標をOpenPOI APIへ送って検索します。アプリには保存しません。</p><button id="question-manual" type="button" class="text-button">駅名・場所から探す</button></div>
@@ -63,26 +63,27 @@
 
         <section id="result-screen" class="screen" hidden>
           <div class="result-heading"><p class="overline">TODAY’S NEXT STOP</p><span id="candidate-counter"></span></div>
-          <p class="result-intro">今日の着地点は、ここ。</p>
+          <p id="result-intro" class="result-intro">今日の着地点は、ここ。</p>
           <article class="place-card">
             <div class="place-illustration" aria-hidden="true"><span class="place-orbit orbit-one"></span><span class="place-orbit orbit-two"></span><svg class="place-icon"><use id="result-icon" href="./assets/icons.svg#cup"></use></svg><span class="illustration-caption">a little stop, a good time.</span></div>
             <div class="place-content"><span id="result-category" class="category-tag"></span><h2 id="result-name" tabindex="-1"></h2><p id="result-address" class="address"></p><div class="place-distance"><svg class="icon" aria-hidden="true"><use href="./assets/icons.svg#walk"></use></svg><strong id="result-time"></strong><span id="result-distance"></span></div><p class="distance-note">徒歩時間は目安です。距離は直線で計算。</p></div>
           </article>
           <div id="answer-summary" class="answer-summary" aria-label="選んだ気分と条件"></div>
+          <p id="result-food-note" class="food-note" hidden>料理名で検索した候補です。提供メニューはGoogle マップで確認してください。</p>
           <p id="accuracy-note" class="notice" hidden></p>
           <a id="maps-link" class="button primary maps-link" href="https://www.google.com/maps/" target="_blank" rel="noopener noreferrer"><svg class="icon" aria-hidden="true"><use href="./assets/icons.svg#pin"></use></svg><span>ここに向かう<small>Google マップで徒歩案内 ↗</small></span></a>
           <button id="next-place" class="button secondary" type="button"><svg class="icon" aria-hidden="true"><use href="./assets/icons.svg#refresh"></use></svg><span>別の場所にする</span></button>
           <p id="last-candidate" class="panel-note" hidden>候補はここまで。気分や距離を変えて探せます。</p>
-          <div class="result-edit"><button id="review-answers" class="text-button" type="button">気分・距離を変える</button><button id="result-change-place" class="text-button" type="button">場所を変える</button></div>
+          <div class="result-edit"><button id="review-answers" class="text-button" type="button">食べたいもの・条件を変える</button><button id="result-change-place" class="text-button" type="button">場所を変える</button></div>
           <details class="data-note"><summary>徒歩の目安・施設情報について</summary><p>直線距離を1.3倍し、毎分80mで歩くとした概算です。道順・坂・信号で変わります。静かさや営業状況は取得できないため、Google マップで確認してください。イラストは施設の写真や地図ではありません。</p></details>
         </section>
 
         <section id="empty-screen" class="screen state-screen" hidden>
-          <svg class="state-icon" aria-hidden="true"><use href="./assets/icons.svg#leaf"></use></svg><p class="overline">A LITTLE CHANGE OF PLANS</p><h2 tabindex="-1">もう少し、探し方を変えてみよう。</h2><p id="empty-copy" class="screen-copy"></p><button id="empty-expand" type="button" class="button primary">徒歩10分に広げて探す</button><button id="empty-edit" type="button" class="button secondary">気分を変えて探す</button><button id="empty-place" type="button" class="text-button">場所を変える</button>
+          <svg class="state-icon" aria-hidden="true"><use href="./assets/icons.svg#leaf"></use></svg><p class="overline">A LITTLE CHANGE OF PLANS</p><h2 id="empty-title" tabindex="-1">もう少し、探し方を変えてみよう。</h2><p id="empty-copy" class="screen-copy"></p><button id="empty-expand" type="button" class="button primary">徒歩10分に広げて探す</button><button id="empty-edit" type="button" class="button secondary">食べたいものを選び直す</button><a data-maps-search class="button secondary" target="_blank" rel="noopener noreferrer" hidden></a><button id="empty-place" type="button" class="text-button">場所を変える</button>
         </section>
 
         <section id="error-screen" class="screen state-screen" hidden>
-          <svg class="state-icon" aria-hidden="true"><use href="./assets/icons.svg#pin"></use></svg><p class="overline">LET’S TRY AGAIN</p><h2 id="error-title" tabindex="-1"></h2><p id="error-copy" class="screen-copy"></p><button id="retry" type="button" class="button primary">もう一度探す</button><button id="error-manual" type="button" class="button secondary">駅名・場所から探す</button><button id="error-edit" type="button" class="text-button">回答を見直す</button>
+          <svg class="state-icon" aria-hidden="true"><use href="./assets/icons.svg#pin"></use></svg><p class="overline">LET’S TRY AGAIN</p><h2 id="error-title" tabindex="-1"></h2><p id="error-copy" class="screen-copy"></p><button id="retry" type="button" class="button primary">もう一度探す</button><button id="error-manual" type="button" class="button secondary">駅名・場所から探す</button><a data-maps-search class="button secondary" target="_blank" rel="noopener noreferrer" hidden></a><button id="error-edit" type="button" class="text-button">回答を見直す</button>
         </section>
       </div>
       <p id="announcement" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></p>

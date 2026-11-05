@@ -7,20 +7,21 @@
     "design": true,
     "tasks": true
   },
-  "approval_basis": "本人のDay086実装依頼と企画メモ、自律進行の指示に基づく。公開用PRまで進め、マージ・SNS投稿は含めない。",
+  "approval_basis": "2026-11-05の本人の追加依頼「食べたいものを選択し、質問をどんどん狭める」に基づき、3問固定を可変の分岐へ更新。",
   "updated_at": "2026-11-05",
   "verification": {
-    "day_unit": 41,
-    "day_e2e": 37,
+    "day_unit": 92,
+    "day_e2e": 76,
+    "food_leaves_e2e": 36,
     "repository_tests": {
-      "total": 5129,
-      "passed": 5128,
+      "total": 5183,
+      "passed": 5182,
       "failed": 0,
       "skipped": 1
     },
     "publish_gate": {
-      "total": 330,
-      "passed": 329,
+      "total": 334,
+      "passed": 333,
       "skipped": 1
     },
     "widths": [
@@ -28,9 +29,9 @@
       768,
       1440
     ],
-    "independent_code_review": "2 findings fixed and reverified, including real Chrome BFCache",
-    "experience_self_review": "19/20",
-    "visual_review": "independent images 16/16 (8 items); 2 interactive items verified by main"
+    "independent_code_review": "food matching and category findings fixed; reverified PASS",
+    "visual_review": "independent 8 items 16/16; keyboard, targets, reduced motion and CSP verified by main",
+    "experience_self_review": "19/20"
   },
   "pull_request": "https://github.com/haranishi/hundred-days/pull/205",
   "ci_source": "Latest head checks on PR205"

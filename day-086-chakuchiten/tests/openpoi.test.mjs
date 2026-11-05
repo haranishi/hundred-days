@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { searchNearby, searchPlaces } from '../lib/openpoi.js';
 
 const center = { lat: 35.68, lng: 139.76 };
-const answers = { mood: 'cafe', space: 'quiet', walk: 'near' };
+const answers = { mood: 'cafe', genre: 'drinks', dish: 'coffee', space: 'quiet', walk: 'near' };
 const ok = (body) => ({ ok: true, json: async () => body });
 
 test('nearbyはcenterを経度,緯度で送り、選択した半径と検索語を使う', async () => {
@@ -13,7 +13,7 @@ test('nearbyはcenterを経度,緯度で送り、選択した半径と検索語�
     assert.equal(url.pathname, '/v1/search');
     assert.equal(url.searchParams.get('center'), '139.76,35.68');
     assert.equal(url.searchParams.get('radius'), '180');
-    assert.ok(url.searchParams.get('q').includes('カフェ'));
+    assert.equal(url.searchParams.get('q'), 'コーヒー');
     assert.equal(options.credentials, 'omit');
     assert.equal(options.referrerPolicy, 'no-referrer');
     return ok({ results });
@@ -72,4 +72,13 @@ test('場所指定は入力語だけを送り、有効な座標と名前の候�
     return ok({ suggestions: [valid, { name: '座標なし', lat: '', lng: '' }, { ...center }] });
   } });
   assert.deepEqual(places, [valid]);
+});
+
+test('選んだ料理を検索語にし、レストランなどへ広げない', async () => {
+  await searchNearby(center, { ...answers, mood: 'meal', genre: 'noodles', dish: 'ramen' }, { fetcher: async (url) => {
+    assert.equal(url.searchParams.get('q'), 'ラーメン'); return ok({ results: [] });
+  } });
+});
+test('料理を選び終わっていなければ検索しない', async () => {
+  await assert.rejects(searchNearby(center, { mood: 'meal', space: 'quiet', walk: 'near' }, { fetcher: () => assert.fail('must not fetch') }), { code: 'input' });
 });
