@@ -1,7 +1,7 @@
 {
   "feature_name": "day084-browser",
   "language": "ja",
-  "phase": "tasks-generated",
+  "phase": "implementation",
   "updated_at": "2026-11-05",
   "approvals": {
     "requirements": {

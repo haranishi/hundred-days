@@ -56,6 +56,7 @@ flowchart LR
 ### 1. Relay
 - POST api/rooms（同origin・JSON・部屋作成rate limit）→{room,hostToken,remoteToken,expiresAt}。128bitのroom、各256bitのtoken。
 - GET api/rooms/{room}/socket：WebSocket subprotocol airpresenter.v1とcredential.<token>。Origin検査、tokenはqueryに入れない。サーバーはairpresenter.v1だけを応答する。
+- POST api/rooms/{room}/status（同origin・JSON body:{}・Bearer）は認証済みroleとexpiresAtだけを返す。404/410/401をWS前にブラウザへ伝え、終了済み/期限切れ/無効なQRで再接続を繰り返さない。
 - 1ホスト＋1スマホ。同roleの新接続は旧接続を4001で置換し、旧クライアントは再接続競争を止める。
 - 受信は{type:'packet',iv,data}のみ。ivは12byteのbase64url、dataはAES-GCM暗号文。JSON全体64KiB以下・1接続毎秒40件まで。
 - 中継は{type:'packet',from:'host'|'remote',iv,data}。fromはサーバーが決定し、peerの申告を使わない。
@@ -64,7 +65,7 @@ flowchart LR
 ### 2. Secure session
 - AES256-GCM鍵はPCで生成し、remote URLのfragmentにroom/token/keyを持つ。権限・鍵はページメモリだけ。Referrer-Policy:no-referrer。
 - 暗号のadditionalDataはroomと実際のfrom role。平文は{type:'COMMAND'|'STATE'|'SYNC'|'ACK',id,...}。COMMANDのidをPC側で重複排除する。
-- 接続の切断で保留ACKを破棄し、古いコマンドを再送しない。再接続は0.5〜5秒、期限/置換/終了は停止。接続復帰時はSYNC/現在STATEを送る。
+- 接続の切断で保留ACKを破棄し、古いコマンドを再送しない。再接続は0.5〜5秒、期限/置換/終了は停止。WS初回/再接続の前にstatusを認証付きで確認し、401/403/404/410は停止、通信失敗だけ再試行。終端close codeは4001置換・4002期限・4003終了。接続復帰時はSYNC/現在STATEを送る。
 ### 3. Browser API
 - createBrowserApi({onSnapshot,onConnection,onError}) → {session,remoteUrl,qrUrl,request,close}。初期化時にfragmentでremote/hostを区別する。
 - request(resource,options)は既存app.jsの/api/info, command, upload, accept, discard, qrcodeとスライド画像のResponseをブラウザ内で返す。/api/uploadのfileはfetchで送らずPDF importへ渡す。
