@@ -6,7 +6,7 @@
 - [x] 1. 認証・期限・制限を持つ暗号文中継を実Workers runtimeで実装・検証する。
   - _Boundary: Relay_ / _Requirements: 3.1,3.3,3.4,3.5,4.2,4.3_
   - _Depends: 0_
-- [ ] 2. ブラウザ内PDF/状態・AES通信・仮想APIを実装・検証する。
+- [x] 2. ブラウザ内PDF/状態・AES通信・仮想APIを実装・検証する。
   - _Boundary: Browser_ / _Requirements: 1.2,2.1,2.2,2.3,3.2,3.3,3.4,3.5_
   - _Depends: 1_
 - [ ] 3. 既存画面を接続し、別ブラウザで資料/操作/読込/全画面の実動作を確認する。
@@ -21,3 +21,4 @@
 - Setup：独立設計レビューAPPROVED。固定依存の導入・vendor生成・root build・precheck成功。PDF.js6のrender/destroyは現行APIに従う。
 - Relayクライアントはstatus APIで無効/終了済みQRを判別する。close codeは4001/4002/4003。Miniflare5のNode WS close通知差のため終端3ケースは実Chromeで検証し、CIもnpm test前にChromiumを入れる。
 - Relay：独立レビューAPPROVED。実Miniflare/Chromeの15/15成功・skip0、構文PASS。idle alarmの自動配送時刻は未検証で、保存時刻/期限拒否/明示配送を分けて確認した。
+- Browser：実Miniflare/Chromeの13/13成功・skip0、構文PASS、独立レビューAPPROVED。日本語PDF・wire境界・暗号/AAD・75連続操作・ACK timeout・自分/相手切断・再同期・終了を確認。
