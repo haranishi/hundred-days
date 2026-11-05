@@ -149,7 +149,7 @@ for (const width of [390, 768, 1440]) {
       await expect(visibleCards(page)).toHaveCount(apps.length);
     });
 
-    test('検索は全角・Day番号・かなに対応し、0件から戻れて並び順も変わる', async ({ page }) => {
+    test('検索は全角・Day番号・かなに対応し、0件から戻れる', async ({ page }) => {
       const search = page.getByRole('searchbox', { name: 'アプリを探す（題名・タグ・Day番号）' });
       const sample = apps.find((app) => app.day === 34) || latest;
       for (const query of [String(sample.day), pad(sample.day), `Day${sample.day}`,
@@ -172,6 +172,12 @@ for (const width of [390, 768, 1440]) {
       await page.getByRole('button', { name: '条件をクリア' }).click();
       await expect(visibleCards(page)).toHaveCount(apps.length);
       await expect(search).toBeFocused();
+    });
+
+    // CIのtraceでは各操作が成功しても、この後の操作まで含めると30秒を超えた。
+    // 検証と各操作の待ち時間を維持し、独立した利用場面ごとに試験する。
+    test('検索のキーボード操作と並べ替えが働く', async ({ page }) => {
+      const search = page.getByRole('searchbox', { name: 'アプリを探す（題名・タグ・Day番号）' });
       await search.fill('clear me');
       await page.keyboard.press('Escape');
       await expect(search).toHaveValue('');
