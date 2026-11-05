@@ -1,0 +1,49 @@
+{
+  "name": "day084-airpresenter",
+  "main": "worker.mjs",
+  "compatibility_date": "2026-11-01",
+  "workers_dev": false,
+  "routes": [
+    {
+      "pattern": "rairakku.com/100days/day-084-airpresenter/*",
+      "zone_name": "rairakku.com"
+    }
+  ],
+  "assets": {
+    "directory": "../../dist/day-084-airpresenter",
+    "binding": "ASSETS",
+    "base_path": "/100days/day-084-airpresenter",
+    "run_worker_first": [
+      "/100days/day-084-airpresenter/api/*"
+    ]
+  },
+  "durable_objects": {
+    "bindings": [
+      {
+        "name": "ROOMS",
+        "class_name": "PresentationRoom"
+      }
+    ]
+  },
+  "migrations": [
+    {
+      "tag": "v1",
+      "new_sqlite_classes": [
+        "PresentationRoom"
+      ]
+    }
+  ],
+  "ratelimits": [
+    {
+      "name": "CREATE_LIMIT",
+      "namespace_id": "840084",
+      "simple": {
+        "limit": 6,
+        "period": 60
+      }
+    }
+  ],
+  "observability": {
+    "enabled": false
+  }
+}

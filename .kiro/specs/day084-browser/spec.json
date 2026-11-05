@@ -1,0 +1,22 @@
+{
+  "feature_name": "day084-browser",
+  "language": "ja",
+  "phase": "tasks-generated",
+  "updated_at": "2026-11-05",
+  "approvals": {
+    "requirements": {
+      "generated": true,
+      "approved": true
+    },
+    "design": {
+      "generated": true,
+      "approved": true
+    },
+    "tasks": {
+      "generated": true,
+      "approved": true
+    }
+  },
+  "approval_basis": "本人のブラウザ完結化・共通ルール追記指示と、会話で継続しているDay84の実装/PR/マージ/公開確認の許可",
+  "review": "Independent design/task review APPROVED after packet-size and CSP repairs"
+}
