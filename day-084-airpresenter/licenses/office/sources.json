@@ -1,0 +1,509 @@
+{
+  "schemaVersion": 1,
+  "records": [
+    {
+      "file": "emscripten/LICENSE",
+      "url": "https://raw.githubusercontent.com/allotropia/emscripten/949ee1d40467b80e90a9fdc67155d443426fef2d/LICENSE",
+      "sha256": "620a78084fc7ca97c0b5dea9abf891f3ffcadfdbf305276f099c9c4e12fc1d86",
+      "bytes": 5093
+    },
+    {
+      "file": "emscripten/system/lib/compiler-rt/LICENSE.TXT",
+      "url": "https://raw.githubusercontent.com/allotropia/emscripten/949ee1d40467b80e90a9fdc67155d443426fef2d/system/lib/compiler-rt/LICENSE.TXT",
+      "sha256": "1a8f1058753f1ba890de984e48f0242a3a5c29a6a8f2ed9fd813f36985387e8d",
+      "bytes": 16708
+    },
+    {
+      "file": "emscripten/system/lib/libc/musl/COPYRIGHT",
+      "url": "https://raw.githubusercontent.com/allotropia/emscripten/949ee1d40467b80e90a9fdc67155d443426fef2d/system/lib/libc/musl/COPYRIGHT",
+      "sha256": "f9bc4423732350eb0b3f7ed7e91d530298476f8fec0c6c427a1c04ade22655af",
+      "bytes": 6204
+    },
+    {
+      "file": "emscripten/system/lib/libcxx/LICENSE.TXT",
+      "url": "https://raw.githubusercontent.com/allotropia/emscripten/949ee1d40467b80e90a9fdc67155d443426fef2d/system/lib/libcxx/LICENSE.TXT",
+      "sha256": "539dd7aed86e8a4f12cbdd0e6c50c189c7d74847e4fecc64ce2c6ee3a01da38b",
+      "bytes": 16703
+    },
+    {
+      "file": "emscripten/system/lib/libcxxabi/LICENSE.TXT",
+      "url": "https://raw.githubusercontent.com/allotropia/emscripten/949ee1d40467b80e90a9fdc67155d443426fef2d/system/lib/libcxxabi/LICENSE.TXT",
+      "sha256": "e2b35be49f7284a45b7baca8fc7b3ab7440e7902392b2528a457816b5bb2a15c",
+      "bytes": 16706
+    },
+    {
+      "file": "emscripten/system/lib/libunwind/LICENSE.TXT",
+      "url": "https://raw.githubusercontent.com/allotropia/emscripten/949ee1d40467b80e90a9fdc67155d443426fef2d/system/lib/libunwind/LICENSE.TXT",
+      "sha256": "b5efebcaca80879234098e52d1725e6d9eb8fb96a19fce625d39184b705f7b6d",
+      "bytes": 16706
+    },
+    {
+      "file": "libreoffice/COPYING",
+      "url": "https://raw.githubusercontent.com/LibreOffice/core/efaf0670b4d055f838a2849becb10f08aa06a257/COPYING",
+      "sha256": "8ceb4b9ee5adedde47b31e975c1d90c73ad27b6b165a1dcd80c7c545eb65b903",
+      "bytes": 35147
+    },
+    {
+      "file": "libreoffice/COPYING.LGPL",
+      "url": "https://raw.githubusercontent.com/LibreOffice/core/efaf0670b4d055f838a2849becb10f08aa06a257/COPYING.LGPL",
+      "sha256": "a853c2ffec17057872340eee242ae4d96cbf2b520ae27d903e1b2fef1a5f9d1c",
+      "bytes": 7639
+    },
+    {
+      "file": "libreoffice/COPYING.MPL",
+      "url": "https://raw.githubusercontent.com/LibreOffice/core/efaf0670b4d055f838a2849becb10f08aa06a257/COPYING.MPL",
+      "sha256": "1f256ecad192880510e84ad60474eab7589218784b9a50bc7ceee34c2b91f1d5",
+      "bytes": 16725
+    },
+    {
+      "file": "libreoffice/LICENSE.html",
+      "url": "https://raw.githubusercontent.com/LibreOffice/core/efaf0670b4d055f838a2849becb10f08aa06a257/readlicense_oo/license/license.xml",
+      "sha256": "0fc511d0cdf0b1098b2000f186840629f4a4740a0efe9a8cf60753d7de0f6af8",
+      "bytes": 588864
+    },
+    {
+      "file": "libreoffice/NOTICE",
+      "url": "https://raw.githubusercontent.com/LibreOffice/core/efaf0670b4d055f838a2849becb10f08aa06a257/readlicense_oo/license/NOTICE",
+      "sha256": "710268df71b1ace277778e12d308aed448bc592f0bd808a3117fa83bf2a43001",
+      "bytes": 2534
+    },
+    {
+      "file": "libreoffice/README.wasm.md",
+      "url": "https://raw.githubusercontent.com/LibreOffice/core/efaf0670b4d055f838a2849becb10f08aa06a257/static/README.wasm.md",
+      "sha256": "0b3daab9598b67f6f9b2d88956aae7f529196c238acfdf52f1bd3c5613e1a378",
+      "bytes": 19701
+    },
+    {
+      "file": "noto/LICENSE",
+      "url": "https://raw.githubusercontent.com/notofonts/noto-cjk/f8d157532fbfaeda587e826d4cd5b21a49186f7c/Sans/LICENSE",
+      "sha256": "6a73f9541c2de74158c0e7cf6b0a58ef774f5a780bf191f2d7ec9cc53efe2bf2",
+      "bytes": 4301
+    },
+    {
+      "file": "qt/LICENSE.GPL2",
+      "url": "https://raw.githubusercontent.com/allotropia/qtbase/a320678c85ec8029d5394bcd673d4c208af1de3a/LICENSE.GPL2",
+      "sha256": "8177f97513213526df2cf6184d8ff986c675afb514d4e68a404010521b880643",
+      "bytes": 18092
+    },
+    {
+      "file": "qt/LICENSE.GPL3",
+      "url": "https://raw.githubusercontent.com/allotropia/qtbase/a320678c85ec8029d5394bcd673d4c208af1de3a/LICENSE.GPL3",
+      "sha256": "8ceb4b9ee5adedde47b31e975c1d90c73ad27b6b165a1dcd80c7c545eb65b903",
+      "bytes": 35147
+    },
+    {
+      "file": "qt/LICENSE.GPL3-EXCEPT",
+      "url": "https://raw.githubusercontent.com/allotropia/qtbase/a320678c85ec8029d5394bcd673d4c208af1de3a/LICENSE.GPL3-EXCEPT",
+      "sha256": "0dbe024961f6ab5c52689cbd036c977975d0d0f6a67ff97762d96cb819dd5652",
+      "bytes": 36363
+    },
+    {
+      "file": "qt/LICENSE.LGPL3",
+      "url": "https://raw.githubusercontent.com/allotropia/qtbase/a320678c85ec8029d5394bcd673d4c208af1de3a/LICENSE.LGPL3",
+      "sha256": "da7eabb7bafdf7d3ae5e9f223aa5bdc1eece45ac569dc21b3b037520b4464768",
+      "bytes": 7651
+    },
+    {
+      "file": "qt/src/3rdparty/android/LICENSE",
+      "url": "https://raw.githubusercontent.com/allotropia/qtbase/a320678c85ec8029d5394bcd673d4c208af1de3a/src/3rdparty/android/LICENSE",
+      "sha256": "4a51cf7f724f51bedb5fa4f9583a2762f1db8d05e43a577e2487c7aab2fdce18",
+      "bytes": 525
+    },
+    {
+      "file": "qt/src/3rdparty/android/qt_attribution.json",
+      "url": "https://raw.githubusercontent.com/allotropia/qtbase/a320678c85ec8029d5394bcd673d4c208af1de3a/src/3rdparty/android/qt_attribution.json",
+      "sha256": "280ad3f07024dcaa1ae833aa945dd0c575861109f8b7bed49af0a452809c9800",
+      "bytes": 325
+    },
+    {
+      "file": "qt/src/3rdparty/angle/KHRONOS_LICENSE",
+      "url": "https://raw.githubusercontent.com/allotropia/qtbase/a320678c85ec8029d5394bcd673d4c208af1de3a/src/3rdparty/angle/KHRONOS_LICENSE",
+      "sha256": "02aa1fb7dc3aabd8dc348b480724569623bd96a90cdf1b53df8377b7f5507f07",
+      "bytes": 1086
+    },
+    {
+      "file": "qt/src/3rdparty/angle/LICENSE",
+      "url": "https://raw.githubusercontent.com/allotropia/qtbase/a320678c85ec8029d5394bcd673d4c208af1de3a/src/3rdparty/angle/LICENSE",
+      "sha256": "77af9c9fc2710ee66b8282291a9392a9a61f1d5b3ad6e478d0b6c544de5f9aca",
+      "bytes": 1655
+    },
+    {
+      "file": "qt/src/3rdparty/angle/qt_attribution.json",
+      "url": "https://raw.githubusercontent.com/allotropia/qtbase/a320678c85ec8029d5394bcd673d4c208af1de3a/src/3rdparty/angle/qt_attribution.json",
+      "sha256": "c04e5a710498ce5a8b370b9f75f16cdbbf9eed3dbbc9738a698d656850084595",
+      "bytes": 3289
+    },
+    {
+      "file": "qt/src/3rdparty/angle/src/third_party/compiler/LICENSE",
+      "url": "https://raw.githubusercontent.com/allotropia/qtbase/a320678c85ec8029d5394bcd673d4c208af1de3a/src/3rdparty/angle/src/third_party/compiler/LICENSE",
+      "sha256": "a08ba10adec47027ef8078848729837b1c5a42f140718d7afd65c23f1eeec392",
+      "bytes": 1262
+    },
+    {
+      "file": "qt/src/3rdparty/angle/SYSTEMINFO_LICENSE",
+      "url": "https://raw.githubusercontent.com/allotropia/qtbase/a320678c85ec8029d5394bcd673d4c208af1de3a/src/3rdparty/angle/SYSTEMINFO_LICENSE",
+      "sha256": "9f76204b1885bb7884cb807ef23ee51033d2273a166daeb6487cad89fc727d77",
+      "bytes": 1260
+    },
+    {
+      "file": "qt/src/3rdparty/angle/TRACEEVENT_LICENSE",
+      "url": "https://raw.githubusercontent.com/allotropia/qtbase/a320678c85ec8029d5394bcd673d4c208af1de3a/src/3rdparty/angle/TRACEEVENT_LICENSE",
+      "sha256": "4a8d0e854494c7d2b1f6a66c431542955e88fab4a4982210cd33faf2cc984d3b",
+      "bytes": 1481
+    },
+    {
+      "file": "qt/src/3rdparty/double-conversion/LICENSE",
+      "url": "https://raw.githubusercontent.com/allotropia/qtbase/a320678c85ec8029d5394bcd673d4c208af1de3a/src/3rdparty/double-conversion/LICENSE",
+      "sha256": "4af93c12062c58058378de2397dc1c92bbff9ddfb1d583a01c84127557ce97ca",
+      "bytes": 1527
+    },
+    {
+      "file": "qt/src/3rdparty/double-conversion/qt_attribution.json",
+      "url": "https://raw.githubusercontent.com/allotropia/qtbase/a320678c85ec8029d5394bcd673d4c208af1de3a/src/3rdparty/double-conversion/qt_attribution.json",
+      "sha256": "fbf846074dc3fd6eb9e5d4fe75a268dcac3364c9d8db5ed715112c6da307d793",
+      "bytes": 662
+    },
+    {
+      "file": "qt/src/3rdparty/easing/LICENSE",
+      "url": "https://raw.githubusercontent.com/allotropia/qtbase/a320678c85ec8029d5394bcd673d4c208af1de3a/src/3rdparty/easing/LICENSE",
+      "sha256": "92fac99458f1754b73edf50f9c9983e0efaa06ad96e2afd5e538c79f45b4b191",
+      "bytes": 1505
+    },
+    {
+      "file": "qt/src/3rdparty/easing/qt_attribution.json",
+      "url": "https://raw.githubusercontent.com/allotropia/qtbase/a320678c85ec8029d5394bcd673d4c208af1de3a/src/3rdparty/easing/qt_attribution.json",
+      "sha256": "a84396684cf6ac348fe953579cbaf3e72e87d43717ea4a9e00069d06afb61fa3",
+      "bytes": 441
+    },
+    {
+      "file": "qt/src/3rdparty/forkfd/LICENSE",
+      "url": "https://raw.githubusercontent.com/allotropia/qtbase/a320678c85ec8029d5394bcd673d4c208af1de3a/src/3rdparty/forkfd/LICENSE",
+      "sha256": "d0d683ae18e78fbef90eb41168fb781920da2d12bf80704490f0882915c18ae0",
+      "bytes": 1148
+    },
+    {
+      "file": "qt/src/3rdparty/forkfd/qt_attribution.json",
+      "url": "https://raw.githubusercontent.com/allotropia/qtbase/a320678c85ec8029d5394bcd673d4c208af1de3a/src/3rdparty/forkfd/qt_attribution.json",
+      "sha256": "ef8712b7bcc60b99b7de14754e023053ab9820a053b3f3b5d24b0e80a971d87b",
+      "bytes": 450
+    },
+    {
+      "file": "qt/src/3rdparty/freebsd/LICENSE",
+      "url": "https://raw.githubusercontent.com/allotropia/qtbase/a320678c85ec8029d5394bcd673d4c208af1de3a/src/3rdparty/freebsd/LICENSE",
+      "sha256": "dc2caba29eb862f6c1720aecb18e16f4e19d61227ee408be37fb0e9c3d00994f",
+      "bytes": 1686
+    },
+    {
+      "file": "qt/src/3rdparty/freebsd/qt_attribution.json",
+      "url": "https://raw.githubusercontent.com/allotropia/qtbase/a320678c85ec8029d5394bcd673d4c208af1de3a/src/3rdparty/freebsd/qt_attribution.json",
+      "sha256": "49ab2d008b0f1c9ce762611bd043c951f8b9499487d772c4ddc2e003bc9bfa3c",
+      "bytes": 823
+    },
+    {
+      "file": "qt/src/3rdparty/freetype/BDF-LICENSE.txt",
+      "url": "https://raw.githubusercontent.com/allotropia/qtbase/a320678c85ec8029d5394bcd673d4c208af1de3a/src/3rdparty/freetype/BDF-LICENSE.txt",
+      "sha256": "e4e792f29e66750f2e410fd7b50a567652c180f6ee15e1a4dfa0bb5cde524537",
+      "bytes": 2305
+    },
+    {
+      "file": "qt/src/3rdparty/freetype/LICENSE.txt",
+      "url": "https://raw.githubusercontent.com/allotropia/qtbase/a320678c85ec8029d5394bcd673d4c208af1de3a/src/3rdparty/freetype/LICENSE.txt",
+      "sha256": "4f71138144d60a66129064e348532a923e7a45d1f1c863af4c1c13ad74b0b229",
+      "bytes": 26377
+    },
+    {
+      "file": "qt/src/3rdparty/freetype/PCF-LICENSE.txt",
+      "url": "https://raw.githubusercontent.com/allotropia/qtbase/a320678c85ec8029d5394bcd673d4c208af1de3a/src/3rdparty/freetype/PCF-LICENSE.txt",
+      "sha256": "830c4725df0110593b78bd2a2fa5a7c2752c94a9b57d8236c9f32a2ea1d54fb8",
+      "bytes": 1071
+    },
+    {
+      "file": "qt/src/3rdparty/freetype/qt_attribution.json",
+      "url": "https://raw.githubusercontent.com/allotropia/qtbase/a320678c85ec8029d5394bcd673d4c208af1de3a/src/3rdparty/freetype/qt_attribution.json",
+      "sha256": "91cb60362e3634e84a1ccc98e386e443f56f952bbe9879e8d8bb03be5ddf6a5e",
+      "bytes": 2527
+    },
+    {
+      "file": "qt/src/3rdparty/freetype/ZLIB-LICENSE.txt",
+      "url": "https://raw.githubusercontent.com/allotropia/qtbase/a320678c85ec8029d5394bcd673d4c208af1de3a/src/3rdparty/freetype/ZLIB-LICENSE.txt",
+      "sha256": "2b1f5d615382a151af3eb71462ad17d89e2efee8fa7664058d35d3d9237ebb19",
+      "bytes": 962
+    },
+    {
+      "file": "qt/src/3rdparty/gradle/LICENSE-GRADLEW.txt",
+      "url": "https://raw.githubusercontent.com/allotropia/qtbase/a320678c85ec8029d5394bcd673d4c208af1de3a/src/3rdparty/gradle/LICENSE-GRADLEW.txt",
+      "sha256": "034f6dc665180948cc53319d6e477a5043b529df992c89d1dcb44f010593fbef",
+      "bytes": 51625
+    },
+    {
+      "file": "qt/src/3rdparty/gradle/qt_attribution.json",
+      "url": "https://raw.githubusercontent.com/allotropia/qtbase/a320678c85ec8029d5394bcd673d4c208af1de3a/src/3rdparty/gradle/qt_attribution.json",
+      "sha256": "10b4bc9f0f5fe6c5f22c992d892229300533b1f23f398cd26a46fbed321c2383",
+      "bytes": 479
+    },
+    {
+      "file": "qt/src/3rdparty/harfbuzz-ng/COPYING",
+      "url": "https://raw.githubusercontent.com/allotropia/qtbase/a320678c85ec8029d5394bcd673d4c208af1de3a/src/3rdparty/harfbuzz-ng/COPYING",
+      "sha256": "2a886915de4f296cdae5ed67064f86dba01d0c55286d86e8487f2a5caaf40216",
+      "bytes": 1690
+    },
+    {
+      "file": "qt/src/3rdparty/harfbuzz-ng/qt_attribution.json",
+      "url": "https://raw.githubusercontent.com/allotropia/qtbase/a320678c85ec8029d5394bcd673d4c208af1de3a/src/3rdparty/harfbuzz-ng/qt_attribution.json",
+      "sha256": "0de5997f03fb931a698265a76d6e263cbb769362160ec05f03d8896e48d71ef0",
+      "bytes": 1008
+    },
+    {
+      "file": "qt/src/3rdparty/harfbuzz/COPYING",
+      "url": "https://raw.githubusercontent.com/allotropia/qtbase/a320678c85ec8029d5394bcd673d4c208af1de3a/src/3rdparty/harfbuzz/COPYING",
+      "sha256": "ed7c20569a8f7daa06d2032b21bf240c5b6d8a0acb572d775bc6e78e61811191",
+      "bytes": 1241
+    },
+    {
+      "file": "qt/src/3rdparty/harfbuzz/qt_attribution.json",
+      "url": "https://raw.githubusercontent.com/allotropia/qtbase/a320678c85ec8029d5394bcd673d4c208af1de3a/src/3rdparty/harfbuzz/qt_attribution.json",
+      "sha256": "a5a14caf3f79ed780941d2de5a583b6d0e0052bb0ac754cc65b75f801d59bc9e",
+      "bytes": 601
+    },
+    {
+      "file": "qt/src/3rdparty/iaccessible2/LICENSE",
+      "url": "https://raw.githubusercontent.com/allotropia/qtbase/a320678c85ec8029d5394bcd673d4c208af1de3a/src/3rdparty/iaccessible2/LICENSE",
+      "sha256": "603fb8e9a443c95cb56c0e458a0ad17fdcadfc5bbb7e580d2199ee0145882746",
+      "bytes": 1668
+    },
+    {
+      "file": "qt/src/3rdparty/iaccessible2/qt_attribution.json",
+      "url": "https://raw.githubusercontent.com/allotropia/qtbase/a320678c85ec8029d5394bcd673d4c208af1de3a/src/3rdparty/iaccessible2/qt_attribution.json",
+      "sha256": "ec98fa966c4955a1fad114f9b27555d9d8763d1fa50a4cee9d6dd87510c53b7a",
+      "bytes": 916
+    },
+    {
+      "file": "qt/src/3rdparty/icc/LICENSE.txt",
+      "url": "https://raw.githubusercontent.com/allotropia/qtbase/a320678c85ec8029d5394bcd673d4c208af1de3a/src/3rdparty/icc/LICENSE.txt",
+      "sha256": "9e34ff47b3a44814e183342e7e198d127a6740e29d20e8381fba7688dafc79dd",
+      "bytes": 463
+    },
+    {
+      "file": "qt/src/3rdparty/icc/qt_attribution.json",
+      "url": "https://raw.githubusercontent.com/allotropia/qtbase/a320678c85ec8029d5394bcd673d4c208af1de3a/src/3rdparty/icc/qt_attribution.json",
+      "sha256": "3099ef5b1b1d0d24d7783e42a80a26721949fedc9d2353f3c04e3befc0e8e6c0",
+      "bytes": 650
+    },
+    {
+      "file": "qt/src/3rdparty/libjpeg/LICENSE",
+      "url": "https://raw.githubusercontent.com/allotropia/qtbase/a320678c85ec8029d5394bcd673d4c208af1de3a/src/3rdparty/libjpeg/LICENSE",
+      "sha256": "0b7a24c3906d26dfbe24e96e9415549b387c3227140dc6b7ab2fb924254e37a1",
+      "bytes": 5209
+    },
+    {
+      "file": "qt/src/3rdparty/libjpeg/qt_attribution.json",
+      "url": "https://raw.githubusercontent.com/allotropia/qtbase/a320678c85ec8029d5394bcd673d4c208af1de3a/src/3rdparty/libjpeg/qt_attribution.json",
+      "sha256": "dd2c2efe381203d072f992e234a4e1733e89e80eb8745a623fd5c0ac966d83da",
+      "bytes": 948
+    },
+    {
+      "file": "qt/src/3rdparty/libpng/LICENSE",
+      "url": "https://raw.githubusercontent.com/allotropia/qtbase/a320678c85ec8029d5394bcd673d4c208af1de3a/src/3rdparty/libpng/LICENSE",
+      "sha256": "bf5e22b9dce8464064ae17a48ea1133c3369ac9e1d80ef9e320e5219aa14ea9b",
+      "bytes": 5345
+    },
+    {
+      "file": "qt/src/3rdparty/libpng/qt_attribution.json",
+      "url": "https://raw.githubusercontent.com/allotropia/qtbase/a320678c85ec8029d5394bcd673d4c208af1de3a/src/3rdparty/libpng/qt_attribution.json",
+      "sha256": "2f5cca195908845ddc3f82ca2c25165b1897a9f2b2d4bec71cf93d860cd597e7",
+      "bytes": 1320
+    },
+    {
+      "file": "qt/src/3rdparty/md4/qt_attribution.json",
+      "url": "https://raw.githubusercontent.com/allotropia/qtbase/a320678c85ec8029d5394bcd673d4c208af1de3a/src/3rdparty/md4/qt_attribution.json",
+      "sha256": "f4f774b80cee07a56b8190831174e95e9431bc91fac7f7d0e5f0649253024d95",
+      "bytes": 577
+    },
+    {
+      "file": "qt/src/3rdparty/md4c/LICENSE.md",
+      "url": "https://raw.githubusercontent.com/allotropia/qtbase/a320678c85ec8029d5394bcd673d4c208af1de3a/src/3rdparty/md4c/LICENSE.md",
+      "sha256": "51cb6ce22ad3ab29ad12fe8586184e89cee5cc610513b8007b57b75f640333a1",
+      "bytes": 1096
+    },
+    {
+      "file": "qt/src/3rdparty/md4c/qt_attribution.json",
+      "url": "https://raw.githubusercontent.com/allotropia/qtbase/a320678c85ec8029d5394bcd673d4c208af1de3a/src/3rdparty/md4c/qt_attribution.json",
+      "sha256": "bb74660d1d6856a98e28921281f59f8ae8b3da1165b6cf4d083744966a55a6ab",
+      "bytes": 521
+    },
+    {
+      "file": "qt/src/3rdparty/md5/qt_attribution.json",
+      "url": "https://raw.githubusercontent.com/allotropia/qtbase/a320678c85ec8029d5394bcd673d4c208af1de3a/src/3rdparty/md5/qt_attribution.json",
+      "sha256": "99d59714bacbaa0cff17ed821ae65832a7ba9129420d9c49049d19d3594bf007",
+      "bytes": 449
+    },
+    {
+      "file": "qt/src/3rdparty/pcre2/LICENCE",
+      "url": "https://raw.githubusercontent.com/allotropia/qtbase/a320678c85ec8029d5394bcd673d4c208af1de3a/src/3rdparty/pcre2/LICENCE",
+      "sha256": "9cb35e4fe442e49d1fbe9c7e07d9601ac959774b24e1884665a3e2f88b7f0831",
+      "bytes": 3456
+    },
+    {
+      "file": "qt/src/3rdparty/pcre2/LICENCE-SLJIT",
+      "url": "https://raw.githubusercontent.com/allotropia/qtbase/a320678c85ec8029d5394bcd673d4c208af1de3a/src/3rdparty/pcre2/LICENCE-SLJIT",
+      "sha256": "48b7773d240da636ed7be0ec470df49de0665f660bba7cb913403bf90e007fb1",
+      "bytes": 1419
+    },
+    {
+      "file": "qt/src/3rdparty/pcre2/qt_attribution.json",
+      "url": "https://raw.githubusercontent.com/allotropia/qtbase/a320678c85ec8029d5394bcd673d4c208af1de3a/src/3rdparty/pcre2/qt_attribution.json",
+      "sha256": "3f993f8df6afb96dc5d0b2c1e1ae6a444b4d321940f61992e80bd875b7416dcc",
+      "bytes": 1521
+    },
+    {
+      "file": "qt/src/3rdparty/pixman/LICENSE",
+      "url": "https://raw.githubusercontent.com/allotropia/qtbase/a320678c85ec8029d5394bcd673d4c208af1de3a/src/3rdparty/pixman/LICENSE",
+      "sha256": "942c4f2a80394d3f53599b8382e9f27349b95c45d92b69b84f26d404f4dd74a5",
+      "bytes": 1092
+    },
+    {
+      "file": "qt/src/3rdparty/pixman/qt_attribution.json",
+      "url": "https://raw.githubusercontent.com/allotropia/qtbase/a320678c85ec8029d5394bcd673d4c208af1de3a/src/3rdparty/pixman/qt_attribution.json",
+      "sha256": "46f11c249deb2191fe949f260dde687715024ce9b2f4781bc18e0057e3bd1d87",
+      "bytes": 476
+    },
+    {
+      "file": "qt/src/3rdparty/rfc6234/LICENSE",
+      "url": "https://raw.githubusercontent.com/allotropia/qtbase/a320678c85ec8029d5394bcd673d4c208af1de3a/src/3rdparty/rfc6234/LICENSE",
+      "sha256": "7ccebd514aaabc86192f957d773cebf06577c12fe9f25ecd419c6cac5da7a14c",
+      "bytes": 1568
+    },
+    {
+      "file": "qt/src/3rdparty/rfc6234/qt_attribution.json",
+      "url": "https://raw.githubusercontent.com/allotropia/qtbase/a320678c85ec8029d5394bcd673d4c208af1de3a/src/3rdparty/rfc6234/qt_attribution.json",
+      "sha256": "ff74cc750ac04dddc72e0e76cd5b9dca2ea1516ef102eff1c3990e992ef24452",
+      "bytes": 633
+    },
+    {
+      "file": "qt/src/3rdparty/sha1/qt_attribution.json",
+      "url": "https://raw.githubusercontent.com/allotropia/qtbase/a320678c85ec8029d5394bcd673d4c208af1de3a/src/3rdparty/sha1/qt_attribution.json",
+      "sha256": "6dac3a89f50e6680063d171dfed9bd65ca19f2230c93385ee2a6c7a8c82e8eac",
+      "bytes": 427
+    },
+    {
+      "file": "qt/src/3rdparty/sha3/BRG_ENDIAN_LICENSE",
+      "url": "https://raw.githubusercontent.com/allotropia/qtbase/a320678c85ec8029d5394bcd673d4c208af1de3a/src/3rdparty/sha3/BRG_ENDIAN_LICENSE",
+      "sha256": "2fed6f252ca4a7e813811de3cd3cd08183edd4138bdee909410ef6eee394e82c",
+      "bytes": 645
+    },
+    {
+      "file": "qt/src/3rdparty/sha3/CC0_LICENSE",
+      "url": "https://raw.githubusercontent.com/allotropia/qtbase/a320678c85ec8029d5394bcd673d4c208af1de3a/src/3rdparty/sha3/CC0_LICENSE",
+      "sha256": "1f2786e2c5befeb4dcba6638db6528bf96ef5d2cf24bc85ab5a81ef00abef59d",
+      "bytes": 7013
+    },
+    {
+      "file": "qt/src/3rdparty/sha3/qt_attribution.json",
+      "url": "https://raw.githubusercontent.com/allotropia/qtbase/a320678c85ec8029d5394bcd673d4c208af1de3a/src/3rdparty/sha3/qt_attribution.json",
+      "sha256": "c5a60aad31df4e0bdfe90d3d64883af4efc207b82c1bf5f139daa29dfdf9a411",
+      "bytes": 1817
+    },
+    {
+      "file": "qt/src/3rdparty/sqlite/qt_attribution.json",
+      "url": "https://raw.githubusercontent.com/allotropia/qtbase/a320678c85ec8029d5394bcd673d4c208af1de3a/src/3rdparty/sqlite/qt_attribution.json",
+      "sha256": "574bb87bf234bdf752288236892a6939043151db6b3dd053fd2140934d6acfd8",
+      "bytes": 616
+    },
+    {
+      "file": "qt/src/3rdparty/tinycbor/LICENSE",
+      "url": "https://raw.githubusercontent.com/allotropia/qtbase/a320678c85ec8029d5394bcd673d4c208af1de3a/src/3rdparty/tinycbor/LICENSE",
+      "sha256": "3c6ba0b5bfa7830505301ffb336a17b0748e0d61c4d34216e9dc98f10e40395e",
+      "bytes": 1074
+    },
+    {
+      "file": "qt/src/3rdparty/tinycbor/qt_attribution.json",
+      "url": "https://raw.githubusercontent.com/allotropia/qtbase/a320678c85ec8029d5394bcd673d4c208af1de3a/src/3rdparty/tinycbor/qt_attribution.json",
+      "sha256": "483f1bf5cc453dd64bca31930225d7f6adf754d2ec01d1ab0c8c2904eb1d0171",
+      "bytes": 473
+    },
+    {
+      "file": "qt/src/3rdparty/VulkanMemoryAllocator/LICENSE.txt",
+      "url": "https://raw.githubusercontent.com/allotropia/qtbase/a320678c85ec8029d5394bcd673d4c208af1de3a/src/3rdparty/VulkanMemoryAllocator/LICENSE.txt",
+      "sha256": "e21477eed484b07902a861a1b18d1e4ecd3e6f22fa81e2410f0770cfb67290e8",
+      "bytes": 1099
+    },
+    {
+      "file": "qt/src/3rdparty/VulkanMemoryAllocator/qt_attribution.json",
+      "url": "https://raw.githubusercontent.com/allotropia/qtbase/a320678c85ec8029d5394bcd673d4c208af1de3a/src/3rdparty/VulkanMemoryAllocator/qt_attribution.json",
+      "sha256": "c53feebd09f9c62ddb1b333fa65e805589f5a888790b88c8e61bba483741999c",
+      "bytes": 566
+    },
+    {
+      "file": "qt/src/3rdparty/wasm/DEJAVU-LICENSE",
+      "url": "https://raw.githubusercontent.com/allotropia/qtbase/a320678c85ec8029d5394bcd673d4c208af1de3a/src/3rdparty/wasm/DEJAVU-LICENSE",
+      "sha256": "7a083b136e64d064794c3419751e5c7dd10d2f64c108fe5ba161eae5e5958a93",
+      "bytes": 8816
+    },
+    {
+      "file": "qt/src/3rdparty/wasm/qt_attribution.json",
+      "url": "https://raw.githubusercontent.com/allotropia/qtbase/a320678c85ec8029d5394bcd673d4c208af1de3a/src/3rdparty/wasm/qt_attribution.json",
+      "sha256": "394bd3a281a972ec417c9ecf6991d854cec61030ff4554d2e8d0552f2e9314ae",
+      "bytes": 1210
+    },
+    {
+      "file": "qt/src/3rdparty/wasm/VERA-LICENSE",
+      "url": "https://raw.githubusercontent.com/allotropia/qtbase/a320678c85ec8029d5394bcd673d4c208af1de3a/src/3rdparty/wasm/VERA-LICENSE",
+      "sha256": "71a7629ae51eab38d483b6d5c86a34ab7d459f5319a16746684acca768e38c47",
+      "bytes": 2332
+    },
+    {
+      "file": "qt/src/3rdparty/wintab/LICENSE.txt",
+      "url": "https://raw.githubusercontent.com/allotropia/qtbase/a320678c85ec8029d5394bcd673d4c208af1de3a/src/3rdparty/wintab/LICENSE.txt",
+      "sha256": "c10225ebbd5191bfdd761b0d7752c785f2453ab665d6c454473fb12d254668aa",
+      "bytes": 139
+    },
+    {
+      "file": "qt/src/3rdparty/wintab/qt_attribution.json",
+      "url": "https://raw.githubusercontent.com/allotropia/qtbase/a320678c85ec8029d5394bcd673d4c208af1de3a/src/3rdparty/wintab/qt_attribution.json",
+      "sha256": "51fcb2c1d69565c7bc764e4d0cb4df06dde5faca4d548d012582437bb00c687e",
+      "bytes": 570
+    },
+    {
+      "file": "qt/src/3rdparty/xcb/LICENSE",
+      "url": "https://raw.githubusercontent.com/allotropia/qtbase/a320678c85ec8029d5394bcd673d4c208af1de3a/src/3rdparty/xcb/LICENSE",
+      "sha256": "82775191bc05f85b40404d77bb69b1edeaeb4033f48387e9e5eab4dd67f5d6f1",
+      "bytes": 1246
+    },
+    {
+      "file": "qt/src/3rdparty/xcb/qt_attribution.json",
+      "url": "https://raw.githubusercontent.com/allotropia/qtbase/a320678c85ec8029d5394bcd673d4c208af1de3a/src/3rdparty/xcb/qt_attribution.json",
+      "sha256": "d63656d5c61932c0fa4d7b4f92179a22572140eb5f706437d1e4a7e45cd06611",
+      "bytes": 692
+    },
+    {
+      "file": "qt/src/3rdparty/zlib/LICENSE",
+      "url": "https://raw.githubusercontent.com/allotropia/qtbase/a320678c85ec8029d5394bcd673d4c208af1de3a/src/3rdparty/zlib/LICENSE",
+      "sha256": "d7e3139972874dc8abdbbfce27ec1e6f942b28279dd7d27453630a8b4610e080",
+      "bytes": 1465
+    },
+    {
+      "file": "qt/src/3rdparty/zlib/qt_attribution.json",
+      "url": "https://raw.githubusercontent.com/allotropia/qtbase/a320678c85ec8029d5394bcd673d4c208af1de3a/src/3rdparty/zlib/qt_attribution.json",
+      "sha256": "7f932834df9ced4b6d55cbd78f34f2acb52e3db414aa170efa6caa9c87326a0b",
+      "bytes": 495
+    },
+    {
+      "file": "zetajs/docs/start.md",
+      "url": "https://raw.githubusercontent.com/allotropia/zetajs/57360bcb0e7726ffa0e66567c8041261b959f8dd/docs/start.md",
+      "sha256": "35cf958d3135c93b0f9cdd77ab6b4448841499953bead6c659b0fe7a3cc92c4d",
+      "bytes": 12516
+    },
+    {
+      "file": "zetajs/LICENSE",
+      "url": "https://raw.githubusercontent.com/allotropia/zetajs/57360bcb0e7726ffa0e66567c8041261b959f8dd/LICENSE",
+      "sha256": "a8c9b7d037ed112c3b9f85d5a1122aedd218947b21cf3f2c4200d13d7fe1a7d9",
+      "bytes": 1098
+    },
+    {
+      "file": "zetajs/README.md",
+      "url": "https://raw.githubusercontent.com/allotropia/zetajs/57360bcb0e7726ffa0e66567c8041261b959f8dd/README.md",
+      "sha256": "9cf8ba7c4ca7705de106c340df6355302e8de675769b936526dd5f2d209e6701",
+      "bytes": 7326
+    }
+  ]
+}

@@ -3,7 +3,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "node --test worker.test.mjs",
+    "test": "node --test worker.test.mjs office-assets.test.mjs",
     "test:browser": "node --test browser.test.mjs",
     "test:e2e": "node e2e.mjs",
     "build": "node build.mjs",

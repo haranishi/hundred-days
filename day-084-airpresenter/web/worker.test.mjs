@@ -14,7 +14,7 @@ const options = (extra = {}) => convertV4MiniflareOptions({
   name: WORKER_NAME,
   unsafeInspectDurableObjects: true,
   modulesRoot: fileURLToPath(new URL('.', import.meta.url)),
-  modules: ['worker.mjs','policy.mjs'].map(name => ({type:'ESModule',path:fileURLToPath(new URL('./'+name,import.meta.url))})),
+  modules: ['worker.mjs','policy.mjs','office-assets.mjs'].map(name => ({type:'ESModule',path:fileURLToPath(new URL('./'+name,import.meta.url))})),
   compatibilityDate: '2026-11-01',
   durableObjects: {ROOMS: {className: 'PresentationRoom', useSQLite: true}},
   ratelimits: {CREATE_LIMIT: {namespace_id: '840084', simple: {limit: 6, period: 60}}},
@@ -342,7 +342,7 @@ test('saved alarm and explicit runtime delivery close idle Chrome peers and clea
   const name='day084-alarm-handler-test';
   const alarmMf=new Miniflare(options({
     name,
-    modules:['test-fixtures/alarm-worker.mjs','worker.mjs','policy.mjs'].map(file=>({type:'ESModule',path:fileURLToPath(new URL('./'+file,import.meta.url))})),
+    modules:['test-fixtures/alarm-worker.mjs','worker.mjs','policy.mjs','office-assets.mjs'].map(file=>({type:'ESModule',path:fileURLToPath(new URL('./'+file,import.meta.url))})),
     durableObjects:{ROOMS:{className:'AlarmTestRoom',useSQLite:true}},
     bindings:{AIRPRESENTER_TEST_TTL_MS:'1200'},
   }));

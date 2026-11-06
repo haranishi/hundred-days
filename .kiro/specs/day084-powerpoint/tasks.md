@@ -1,6 +1,6 @@
 # 実装タスク案
 
-- [ ] 1.1 固定版アセットのビルドとストリーム配信、専用CSPを実装する。
+- [x] 1.1 固定版アセットのビルドとストリーム配信、専用CSPを実装する。
   - _Boundary: Assets/Delivery_ / _Requirements: 2.2,3.1,3.2_
   - 固定ハッシュ/ライセンス、全part20MiB以下、GET/HEAD、不正パス/欠損の試験。
 - [ ] 2.1 変換用フレームを所有するPPTX/PPT importerを実装する。
@@ -17,3 +17,7 @@
 - [ ] 5.1 公開ゲート/CI/PR/マージ/本番確認、X草案・宣伝素材・保存先メモを対応形式に合わせる。
   - _Boundary: Integration_ / _Requirements: 3.6_
   - _Depends: 4.1_
+
+## Implementation Notes
+- Task1.1：独立APPROVED。23/23配信・relay、13/13browser、既存UI14工程、7資産/8part/84許諾ハッシュ一致。新PPTX統合・本番は後続タスク。
+- 配信manifestはschemaVersion1/base/assets、登録したnameをbaseへ連結する。bodyはBrotli/gzipを保持しencodeBody:manualで返す。

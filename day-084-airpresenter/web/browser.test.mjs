@@ -13,7 +13,7 @@ function options(extra = {}) {
   return convertV4MiniflareOptions({
     name:'day084-browser-test', unsafeInspectDurableObjects:true,
     modulesRoot:fileURLToPath(new URL('.', import.meta.url)),
-    modules:['worker.mjs','policy.mjs'].map(file => ({type:'ESModule',path:fileURLToPath(new URL(file,import.meta.url))})),
+    modules:['worker.mjs','policy.mjs','office-assets.mjs'].map(file => ({type:'ESModule',path:fileURLToPath(new URL(file,import.meta.url))})),
     compatibilityDate:'2026-11-01',
     durableObjects:{ROOMS:{className:'PresentationRoom',useSQLite:true}},
     ratelimits:{CREATE_LIMIT:{namespace_id:'840084',simple:{limit:6,period:60}}},

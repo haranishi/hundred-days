@@ -13,7 +13,7 @@ assert.equal(deployment.assets.base_path,undefined,'production must not require 
 await mkdir(evidence,{recursive:true});
 const mf=new Miniflare(convertV4MiniflareOptions({
  name:'day084-ui-test',modulesRoot:here,
- modules:['worker.mjs','policy.mjs'].map(name=>({type:'ESModule',path:join(here,name)})),
+ modules:['worker.mjs','policy.mjs','office-assets.mjs'].map(name=>({type:'ESModule',path:join(here,name)})),
  compatibilityDate:'2026-11-01',
  durableObjects:{ROOMS:{className:'PresentationRoom',useSQLite:true}},
  ratelimits:{CREATE_LIMIT:{namespace_id:'840084',simple:{limit:6,period:60}}},
