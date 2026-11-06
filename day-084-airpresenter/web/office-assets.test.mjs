@@ -12,7 +12,7 @@ import {buildOfficeAssets} from './build-office.mjs';
 import {APP_PATH, CONTENT_SECURITY_POLICY, SECURITY_HEADERS} from './policy.mjs';
 
 const ORIGIN='https://airpresenter.test', ASSET_PATH=APP_PATH+'/vendor/office';
-const VERSION='zetaoffice-24.2.8.0.beta1-zetajs-1.2.0-noto-f8d15753';
+const VERSION='zetaoffice-24.2.8.0.beta1-zetajs-1.2.0-noto-f8d15753-stream-v2';
 const BASE=ASSET_PATH+'/'+VERSION;
 const sha=bytes=>createHash('sha256').update(bytes).digest('hex');
 async function temporaryDirectory(prefix) {
@@ -20,7 +20,7 @@ async function temporaryDirectory(prefix) {
   await mkdir(cache,{recursive:true});return mkdtemp(join(cache,prefix));
 }
 const raw=Buffer.from('Public fixture: Japanese font and browser office bytes. '.repeat(8));
-function fixture(encoding='br') {
+function fixture(encoding='br',{holdOpen=false}={}) {
   const compressed=encoding==='br'?brotliCompressSync(raw):gzipSync(raw);
   const split=Math.floor(compressed.length/2);
   const chunks=[compressed.subarray(0,split),compressed.subarray(split)];
@@ -35,8 +35,9 @@ function fixture(encoding='br') {
     const value=files.get(path);
     if(!value)return new Response(null,{status:404});
     if(request.method==='HEAD')return new Response(null,{headers:{'Content-Length':String(value.length)}});
+    let sent=false;
     const body=path.endsWith('manifest.json')?value:new ReadableStream({
-      pull(controller) {reads.push(path);controller.enqueue(new Uint8Array(value));controller.close();},
+      pull(controller) {if(sent)return new Promise(()=>{});sent=true;reads.push(path);controller.enqueue(new Uint8Array(value));if(!holdOpen)controller.close();},
       cancel() {cancels.push(path);}
     },{highWaterMark:0});
     return new Response(body,{headers:{'Content-Length':String(value.length),'Content-Security-Policy':CONTENT_SECURITY_POLICY}});
@@ -44,7 +45,7 @@ function fixture(encoding='br') {
   return {name,manifest,compressed,parts,files,calls,reads,cancels,ASSETS};
 }
 async function serve(path,env,init={}) {
-  const response=await serveOfficeAsset(new Request(ORIGIN+path,init),env);
+  const response=await serveOfficeAsset(new Request(ORIGIN+path,init),env,()=>new TransformStream());
   assert.ok(response,'office route must handle registered requests');return response;
 }
 
@@ -95,19 +96,23 @@ test('HEAD checks every part but never reads asset bodies',async()=>{
   assert.deepEqual(f.calls.filter(c=>c.path!==ASSET_PATH+'/manifest.json').map(c=>c.method),['HEAD','HEAD']);
 });
 
-test('backpressure does not read ahead and cancellation stops the active reader',async()=>{
-  const f=fixture(),response=await serve(BASE+'/'+f.name,f);
+test('backpressure bounds native prefetch and cancellation stops the active source',async()=>{
+  const f=fixture('br',{holdOpen:true}),response=await serve(BASE+'/'+f.name,f);
   await new Promise(resolve=>setTimeout(resolve,10));
-  assert.equal(f.reads.length,0,'response creation must not consume part bodies');
+  assert.ok(f.reads.length<=1,'native piping may prefetch at most the active source chunk');
+  assert.ok(!f.calls.some(c=>c.method==='GET'&&c.path===BASE+'/'+f.parts[1].file));
   const reader=response.body.getReader();
   assert.deepEqual(Buffer.from((await reader.read()).value),f.compressed.subarray(0,f.parts[0].bytes));
   await new Promise(resolve=>setTimeout(resolve,10));
-  assert.equal(f.reads.length,1,'next part waits for downstream demand');
+  assert.equal(f.reads.length,1,'next part waits for the active source to complete');
   await reader.cancel('consumer stopped');
+  await new Promise(resolve=>setTimeout(resolve,10));
+  assert.deepEqual(f.cancels,[BASE+'/'+f.parts[0].file]);
   assert.ok(!f.calls.some(c=>c.method==='GET'&&c.path===BASE+'/'+f.parts[1].file));
   // Cancel before the first read proves cancellation reaches an open source reader.
-  const second=fixture(),unread=await serve(BASE+'/'+second.name,second);
+  const second=fixture('br',{holdOpen:true}),unread=await serve(BASE+'/'+second.name,second);
   await unread.body.cancel('consumer stopped');
+  await new Promise(resolve=>setTimeout(resolve,10));
   assert.deepEqual(second.cancels,[BASE+'/'+second.parts[0].file]);
 });
 
@@ -173,9 +178,9 @@ test('real Worker and static binding preserve compressed wire bytes and scoped h
     const wire=await new Promise((resolve,reject)=>get(address.origin+BASE+'/'+f.name,{headers:{'Accept-Encoding':'br'}},response=>{
       const chunks=[];response.on('data',chunk=>chunks.push(chunk));response.on('end',()=>resolve({status:response.statusCode,headers:response.headers,body:Buffer.concat(chunks)}));response.on('error',reject);
     }).on('error',reject));
-    assert.equal(wire.status,200);assert.equal(wire.headers['content-encoding'],'br');assert.deepEqual(wire.body,f.compressed);
+    assert.equal(wire.status,200);assert.equal(wire.headers['content-length'],String(f.compressed.length),'encoded length must survive real HTTP');assert.equal(wire.headers['content-encoding'],'br');assert.deepEqual(wire.body,f.compressed);
     assert.deepEqual(brotliDecompressSync(wire.body),raw,'workerd must not apply a second Brotli layer');
-    const head=await fetch(address.origin+BASE+'/'+f.name,{method:'HEAD'});assert.equal(head.status,200);assert.equal((await head.arrayBuffer()).byteLength,0);
+    const head=await fetch(address.origin+BASE+'/'+f.name,{method:'HEAD'});assert.equal(head.status,200);assert.equal(head.headers.get('Content-Length'),String(f.compressed.length));assert.equal((await head.arrayBuffer()).byteLength,0);
     const main=await fetch(address.origin+APP_PATH+'/');assert.equal(main.headers.get('Content-Security-Policy'),CONTENT_SECURITY_POLICY);
     assert.equal(main.headers.get('Cross-Origin-Embedder-Policy'),'require-corp');
     const engine=await fetch(address.origin+APP_PATH+'/office/engine.html');assert.equal(engine.status,200);
@@ -184,4 +189,44 @@ test('real Worker and static binding preserve compressed wire bytes and scoped h
     const thread=await fetch(address.origin+APP_PATH+'/office/engine-thread.js');assert.match(thread.headers.get('Content-Security-Policy'),/connect-src 'self'(?:;|$)/);
     assert.equal((await fetch(address.origin+BASE+'/'+f.parts[0].file)).status,404);
   } finally {await mf?.dispose();await rm(directory,{recursive:true,force:true});}
+});
+
+
+async function faultRuntime(f,mode) {
+  return new Miniflare(convertV4MiniflareOptions({name:'day084-office-'+mode,modulesRoot:fileURLToPath(new URL('.',import.meta.url)),
+    modules:['test-fixtures/office-stream-worker.mjs','office-assets.mjs','policy.mjs'].map(file=>({type:'ESModule',path:fileURLToPath(new URL('./'+file,import.meta.url))})),
+    compatibilityDate:'2026-11-01',bindings:{OFFICE_STREAM_FIXTURE:JSON.stringify({base:BASE,name:f.name,parts:f.parts,mode,
+      files:[...f.files].map(([path,bytes])=>[path,[...bytes]])})},log:new Log(LogLevel.NONE)}));
+}
+function wireRequest(url,onHeaders=()=>{}) {
+  return new Promise((resolve,reject)=>get(url,{headers:{'Accept-Encoding':'br'}},response=>{
+    onHeaders(response);const chunks=[];
+    response.on('data',chunk=>chunks.push(chunk));response.on('end',()=>resolve(Buffer.concat(chunks)));
+    response.on('aborted',()=>reject(new Error('HTTP body aborted')));response.on('error',reject);
+  }).on('error',reject));
+}
+
+test('real fixed-length HTTP rejects both truncated and excessive part bodies',async()=>{
+  for(const mode of ['short','long']) {
+    const f=fixture(),mf=await faultRuntime(f,mode);let status,length;
+    try {
+      const address=await mf.ready;
+      await assert.rejects(wireRequest(address.origin+BASE+'/'+f.name,response=>{status=response.statusCode;length=response.headers['content-length'];}));
+      assert.ok(status===undefined||status===200,'invalid bodies must abort before or after response headers');
+      if(status===200)assert.equal(length,String(f.compressed.length));
+      const stats=await (await fetch(address.origin+'/_test/stats')).json();
+      assert.deepEqual(stats.gets,f.parts.map(part=>BASE+'/'+part.file));
+    } finally {await mf.dispose();}
+  }
+});
+
+test('native Workerd body cancellation stops the pending asset source',async()=>{
+  const f=fixture(),mf=await faultRuntime(f,'cancel');
+  try {
+    const address=await mf.ready;
+    const response=await fetch(address.origin+'/_test/cancel'),stats=await response.json();
+    assert.equal(response.status,200);
+    assert.deepEqual(stats.cancelled,[BASE+'/'+f.parts[0].file]);
+    assert.deepEqual(stats.gets,[BASE+'/'+f.parts[0].file]);
+  } finally {await mf.dispose();}
 });

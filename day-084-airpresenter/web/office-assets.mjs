@@ -56,52 +56,38 @@ function partMatches(response,part) {
   const length=response.headers.get('Content-Length');
   return response.status===200 && (length===null || Number(length)===part.bytes) && !response.headers.get('Content-Encoding');
 }
-async function streamAsset(env,origin,asset,headers,head) {
-  // Detect a missing later part before returning a successful response or any bytes.
+async function streamAsset(env,origin,asset,headers,head,createStream) {
+  // Verify every part before sending successful headers or beginning the transfer.
   for(const part of asset.parts) {
     const response=await staticFetch(env,origin,BASE+'/'+part.file,'HEAD');
     if(!partMatches(response,part))return failure(502);
   }
   if(head)return new Response(null,{headers,encodeBody:'manual'});
-  let index=0,readBytes=0,reader=null,cancelled=false;
-  async function openPart() {
-    const part=asset.parts[index];
+  async function openPart(part) {
     const response=await staticFetch(env,origin,BASE+'/'+part.file);
-    if(!partMatches(response,part) || !response.body){await response.body?.cancel();throw new Error('Office asset unavailable');}
-    if(cancelled){await response.body.cancel();return;}
-    reader=response.body.getReader();readBytes=0;
+    if(!partMatches(response,part)||!response.body) {
+      await response.body?.cancel();throw new Error('Office asset unavailable');
+    }
+    return response;
   }
-  await openPart();
-  const body=new ReadableStream({
-    async pull(controller) {
-      try {
-        while(!cancelled) {
-          const {done,value}=await reader.read();
-          if(cancelled)return;
-          if(!done) {
-            readBytes+=value.byteLength;
-            if(readBytes>asset.parts[index].bytes)throw new Error('Office asset size mismatch');
-            controller.enqueue(value);return;
-          }
-          reader.releaseLock();reader=null;
-          if(readBytes!==asset.parts[index].bytes)throw new Error('Office asset size mismatch');
-          index++;
-          if(index===asset.parts.length){controller.close();return;}
-          await openPart();
-        }
-      } catch(error) {
-        await reader?.cancel().catch(()=>{});reader=null;
-        if(!cancelled)controller.error(error);
+  const first=await openPart(asset.parts[0]);
+  const {readable,writable}=createStream(asset.bytes);
+  // FixedLengthStream provides a real wire Content-Length. Native piping avoids
+  // a JavaScript callback for every chunk and preserves downstream cancellation.
+  void (async()=>{
+    try {
+      for(let index=0;index<asset.parts.length;index++) {
+        const response=index===0?first:await openPart(asset.parts[index]);
+        await response.body.pipeTo(writable,{preventClose:true});
       }
-    },
-    async cancel(reason) {cancelled=true;await reader?.cancel(reason);reader=null;}
-  },{highWaterMark:0});
-  // The body already contains upstream Brotli/gzip. Workerd must not encode it again.
-  return new Response(body,{headers,encodeBody:'manual'});
+      await writable.close();
+    } catch(error) {await writable.abort(error).catch(()=>{});}
+  })();
+  return new Response(readable,{headers,encodeBody:'manual'});
 }
 
 /** Only public office paths are handled here; room credentials never enter this route. */
-export async function serveOfficeAsset(request,env) {
+export async function serveOfficeAsset(request,env,createStream=length=>new FixedLengthStream(length)) {
   const url=new URL(request.url),path=url.pathname;
   if(!path.startsWith(OFFICE_PATH+'/') && !path.startsWith(ENGINE_ASSET_PATH+'/'))return null;
   if(request.method!=='GET'&&request.method!=='HEAD')return failure(405,true);
@@ -126,6 +112,6 @@ export async function serveOfficeAsset(request,env) {
     }
     const name=path.slice(BASE.length+1),asset=manifest.assets[name];
     if(!asset)return failure(404);
-    return await streamAsset(env,url.origin,asset,assetHeaders(asset,name),request.method==='HEAD');
+    return await streamAsset(env,url.origin,asset,assetHeaders(asset,name),request.method==='HEAD',createStream);
   } catch {return failure(502);}
 }

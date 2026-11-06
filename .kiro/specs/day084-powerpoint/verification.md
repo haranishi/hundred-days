@@ -41,6 +41,10 @@
 証拠は非配信の`.cache/day084-powerpoint-integration-*.log`、`day084-powerpoint-webkit.log`、`day084-private-final/result.json`。
 私的な原本・生成PDF・画像は独立レビューへ渡していない。実資料の目視と書体埋込確認はROOTの確認範囲。
 
+## 公開時の追加確認
+
+初回マージ後に間欠的なエンジン途中切れを検出した。Task5.2の[配信再検証](delivery-verification.md)へ引き継ぎ、公開後の完了を先取りしない。
+
 ## 制約と公開後
 
 アニメーション・動画は静止画。書体がないPCでは代替書体になるため、採用前に全ページを確認する。

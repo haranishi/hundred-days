@@ -48,3 +48,10 @@ npm固定版のintegrityを照合した。WASM147,416,331B、data99,735,918B。
 
 ## 使用した補助手順
 cc-sddの要件→設計→タスク→実装→検証を維持する。prototypeは本番経路と分離した実変換実験、source-driven-developmentは固定版の現物/API確認に使用した。
+
+## 公開時の途中切れ（Task5.2）
+PR209の全必須CI成功/マージ後の実公開で、WASMがHTTP200/loadingFinishedでもraw120,503,064B等に欠ける例を実Chromeで捕捉した。期待raw161,667,499B。
+標準/PC書体や旧Worker終了待ちに依存せず、curl/単独ブラウザーの取得は固定SHAと一致する場合もある。直接原因は間欠的な配信欠損。CPU/通信層の根因は未確定。
+Cloudflareは通常ReadableStreamの手動Content-Lengthを無視する。FixedLengthStreamとnative pipeToへ変更し、wire長の実保証とJS chunk処理の削減を行う。
+一次資料：[Response](https://developers.cloudflare.com/workers/runtime-apis/response/)、[FixedLengthStream](https://developers.cloudflare.com/workers/runtime-apis/streams/transformstream/)。
+証拠：非配信.cache/day084-post-release-review/、day084-native-fonts-desktop-debug.log、day084-public-asset-audit.log。公開確認が終わるまで新機能のリリース完了とはしない。
