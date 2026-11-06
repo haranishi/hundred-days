@@ -268,7 +268,7 @@ window.addEventListener('keydown', event => {
     if (snapshot?.presentation) void sendCommand({ type:'PRESENTATION', active:false });
     return;
   }
-  if (event.target.closest('button') && event.key === ' ') return;
+  if (event.target.closest('button, summary, a, [role=button]') && event.key === ' ') return;
   const action = { ' ':execNext, ArrowRight:execNext, PageDown:execNext, ArrowLeft:execPrev, PageUp:execPrev, b:execToggleBlackout, B:execToggleBlackout, f:toggleFullscreen, F:toggleFullscreen }[event.key];
   if (action) { event.preventDefault(); void action(); }
 });
