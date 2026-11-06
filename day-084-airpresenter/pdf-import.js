@@ -11,12 +11,11 @@ function canvasBlob(canvas, type, quality) {
 }
 
 /** Render a local File, sequentially on one canvas. No document URL enters fetch. */
-export async function importPdf(file, {signal, onProgress = () => {}} = {}) {
+export async function importPdf(file, {signal, onProgress = () => {}, maxInputBytes = MAX_INPUT} = {}) {
   checkAbort(signal);
   if (!(file instanceof Blob)) throw fault(400, 'PDFファイルを選んでください。');
-  if (/\.(pptx|ppt)$/i.test(file.name || '')) throw fault(422, 'PowerPointは「エクスポート」または「名前を付けて保存」でPDFに書き出してから選んでください。アニメーション・動画は静止画になります。');
-  if (!/\.pdf$/i.test(file.name || '')) throw fault(415, 'PDFを選んでください。PowerPointはPDFに書き出してから選べます。');
-  if (file.size > MAX_INPUT) throw fault(413, '25 MiB以下のPDFを選んでください。');
+  if (!/\.pdf$/i.test(file.name || '')) throw fault(415, 'PDF形式の資料を選んでください。');
+  if (file.size > Math.min(64*1024*1024,maxInputBytes)) throw fault(413, '25 MiB以下のPDFを選んでください。');
   if (!file.size) throw fault(422, '空のPDFは読み込めません。別のPDFを選んでください。');
   const pages = [], canvas = document.createElement('canvas');
   let loadingTask, renderTask, destroyPromise, password = false, bytes = 0;

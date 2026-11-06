@@ -1,7 +1,7 @@
 {
   "feature_name": "day084-browser",
   "language": "ja",
-  "phase": "implementation",
+  "phase": "validated",
   "updated_at": "2026-11-06",
   "approvals": {
     "requirements": {
@@ -18,5 +18,20 @@
     }
   },
   "approval_basis": "本人のブラウザ完結化・共通ルール追記指示と、会話で継続しているDay84の実装/PR/マージ/公開確認の許可",
-  "review": "Independent design/task review APPROVED after packet-size and CSP repairs"
+  "review": "Independent design/task review APPROVED after packet-size and CSP repairs",
+  "validation": {
+    "relay_tests": "15/15; no skips",
+    "browser_tests": "13/13; no skips",
+    "ui_flow_steps": 14,
+    "native_keyboard_review": "APPROVED",
+    "production_record": "PR208; record below is before the native-keyboard patch",
+    "production_verified_at": "2026-11-06T03:13:07.506Z",
+    "production_steps": 9,
+    "production_version": "0222037b-8931-4143-a1ca-79cd372317ac",
+    "production_page_errors": 0,
+    "production_csp_violations": 0,
+    "pdf_upload_requests": 0,
+    "latest_production_evidence": "https://github.com/haranishi/hundred-days/pull/208#production-verification",
+    "limits": "physical phone QR scan / physical Safari / subjective audio unverified"
+  }
 }

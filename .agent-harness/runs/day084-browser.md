@@ -1,50 +1,45 @@
 # Day84 ブラウザ版の進行記録
 
-## 目的と現在地
-本人の「ダウンロードでなくURLから使う」「Webアプリは基本ブラウザだけで完結」に対応する。
-既存の公開URLを維持し、Node/ZIPを通常導線から外す。PPTX直接変換は使わず、元のPowerPointからPDF出力して表示する。
-共通原則を個人の共通ハーネスとcc-sdd共通手順へ追記済み（リポジトリへ個人設定は転載しない）。
+新しいPowerPoint直接入力は[追加記録](day084-powerpoint.md)へ引き継ぐ。以下は初期ブラウザー版の履歴。
 
-## 作業場所
-- 専用worktree：~/Projects/hundred-days-day084-web、SSD実体。
-- branch：feat/day084-browser、起点main3d5ccd3309ef01c4432ca0ebb1c464b338dd1ae0。
-- Setup commit：5855757。元のローカル3084・ソース・私的原本は維持する。
-- 仕様：.kiro/specs/day084-browser/。要件16件・設計/タスクは独立APPROVED。
-- 設計レビューでwireサイズとCSP生成元を修正済み。
+## 現在地（2026-11-06）
 
-## 検証済みの準備
-- PDF.js6.5.438 legacy、qrcode-generator2.0.4、Wrangler4.157.0、Miniflare5.20261103.0-betaを固定してSSDへ導入。
-- npm run build（webから実行）がvendorを生成し、rootの84Day出力とWorker用_headersを生成できる。
-- precheckは秘密情報/個人NGの検出なし。依存由来の既存連絡先警告は公開情報で、元パッケージとLICENSEを保持する。
-- 予定のCSPで自作日本語PDF3ページをChrome内描画。文字取得・背景/配置・PNG実見、pageerror0・CSP違反0。
-- 証拠：.cache/day084-pdf-probe/。元PDFは旧プロモ用の自作資料で、本人の研究資料ではない。
+ブラウザ版は既存URLで公開済み。ダウンロードや利用者のNode/ローカルサーバー起動は不要。
+PR207/208をマージし、version0222037bで正式routeへ反映。本番9工程が成功した。
+その後native summaryのSpace開閉とページ送りの重なりを見つけ、1行修正＋14工程GREEN・独立APPROVED。
+追加キー修正の最新CI・正式反映・本番再確認を続ける。最新の公開結果は[PR208](https://github.com/haranishi/hundred-days/pull/208#production-verification)へ追記する。
 
-## 実装と検証
-- Task1 Relay：実Miniflare/Chromeの15/15成功・skip0、構文PASS、独立レビューAPPROVED。権限・別部屋・status・期限拒否・中継・制限・終了を確認。idle alarmは保存時刻と実handler明示配送を検証し、秒単位自動配送時刻は未検証。
-- Task2 Browser：13/13、skip0、独立レビューAPPROVED。PDF・wire境界・暗号化・burst・切断/再同期・終了を実runtime/Chromeで確認。
-- Task3 UI：独立レビューAPPROVED。実2ブラウザ12工程成功、pageerror/CSP違反0。レビューでQR Spaceの二重操作とinline dblclickを修正した。
-- 3幅のoverflowなし・44pxを確認。独立評価はUI18/20・体験19/20、全項目1点以上。3幅の44px・footer contrast7.73:1を実見済み。本番はまだ完成扱いしない。
-- Miniflare5はworkers配列schema。実配布のconvertV4MiniflareOptionsで旧形式を正式変換して使う。
-- Task4：meta/説明/共有CSP/CIをブラウザ版へ整備中。root unit初回7件のREDは独立ビルドでDay84のpolicyを常時importしたため。含有Dayが84の時だけ読む形にし、関連31件の回帰検査で修正を確認。
-- 次：全体check・公開ゲート・PR/必須CI・マージ・専用routeの本番確認。
+## 作業場所と境界
 
-## 公開の契約
-- このDayのパスだけのWorker route、専用root内の実prefix階層、APIだけrun_worker_first。事業用の既存認証を使う。
-- Web/policy.mjsをroot/Worker共通CSPにし、同じCSP下でPDFとWSを実行する。
-- wireは現在ページのノートと画像だけ、平文47KiB・外枠64KiB。DBに平文・暗号鍵・資料・暗号文を保存しない。
-- 完成後、旧プロモ/投稿文のMacローカル版という説明もWeb版と一致させる。
+- 専用worktree：~/Projects/hundred-days-day084-web、外部SSDのAPFS実体。
+- 現branch：fix/day084-native-keyboard、起点main ea64ae7。
+- 仕様：.kiro/specs/day084-browser/。PDFのみ、PowerPointは元のPowerPointでPDF出力する。
+- 元の3084・ローカル実装・本人の私的原本は操作対象に含めない。
+- 共通ブラウザ完結方針は個人の共通ハーネス/cc-sddへ反映済み。個人設定はrepoへ転載しない。
 
-## 公開前の検査
-- 全体check：構文0・unit5092件（5091成功/既存skip1）・16プロジェクト依存監査high/critical0・build成功。
-- 静的Day84：固有port4184で2/2成功。既存4173の旧worktree配信を再利用した初回失敗とは分離した。
-- Worker dry-run：229assets/17.77KiB、DO・rate・assets bindings成功。
-- Relay再検証：15/15、skip0。Task4コードの独立レビューAPPROVED。
-- 公開gate初回はgyro permissionsの新例外を既存検査が未対応。payment/USBもdenyを維持し、Day84専用assertを追加して再検証中。
+## 検証の証拠
 
-## 最初の本番配信
-- PR207 head f8e7edfの全必須CI42146693725はsuccess。main5ce6cafへsquashマージした。
-- 221assets upload後、Cloudflare scripts APIが100343（このaccountでnon-root assets.base_path未有効）を返した。公開完了ではない。
-- fix/day084-worker-assetsをmainから作成。専用root内に公開prefixを実配置し、base_pathなしで同じURL/asset-firstを維持する設計へ更新中。
-- 初回main公開run42150200081は入口だけ先に更新しないため意図的にcancel。修正版の必須CI/マージ後の公開へ一本化する。
-- 再設計の独立レビューAPPROVED。専用rootのclean copy・root/_headersだけ・実config由来のE2Eで実装する。
-- 配信修正のコードレビューAPPROVED。親build/実config E2E13工程成功、pageerror/CSP0。独立側はread-only制約でbuild不可だったため、221fileのbytes・tree構造・実行記録を照合。
+- Relay15/15、Browser13/13、skip0。実Miniflare/SQLite/Chrome、独立APPROVED。
+- UIは実Wrangler設定を使い、全SECURITY_HEADERS・配信除外・資料/スマホ/全画面/切断復帰を確認。
+- native-key REDは本番summaryOpen=false/1→2と追加E2E失敗。修正後14工程、例外/CSP0、独立APPROVED。
+- UI18/20・体験19/20、全項目1点以上。3幅overflowなし・44px・footer contrast約7.73:1。
+- ChromeとモバイルWebKitの相互操作、WebKitの日本語PDF表示成功。物理Safariとは区別する。
+- 初期共通checkはunit5092件（5091成功/既存skip1）、16依存監査high/critical0、構文0・build成功。
+- 公開gate329成功/既存skip1。静的Day84 E2E2/2、共通/専用headersのfixtureも成功。
+
+## 配信の履歴
+
+- 初期案はnon-root assets.base_path。dry-run/Miniflareは成功したが、実accountが100343で拒否。
+- PR207 head f8e7edfのCI42146693725はsuccess、main5ce6cafへmerge。初回main run42150200081は途中状態の公開を避けて意図的にcancelした。
+- 専用root内の実prefix階層へ変更。rootをcleanしDay84だけcopy、root/_headersを実runtimeで適用。独立設計/コードレビューAPPROVED。
+- 非公開受付でversion74c42b7fを確認。routesなし/workers.dev・preview無効で対象なし。有料化/account flag変更なし。
+- PR208 head80c6e00の全必須CI42152119707 success、main ea64ae7へmerge。
+- version0222037b-8931-4143-a1ca-79cd372317acを既存Day84 routeへ反映。
+- 03:13UTCの本番9工程PASS：暗号化接続、日本語PDF、操作、復帰、差替、共有/全画面、終了/旧QR無効化、非配信範囲。例外/CSP0、frame46、PDFupload0。
+- 証拠：.cache/day084-production/result.json、day084-deploy.log、verification.md。
+
+## 残る作業と制約
+
+- キー修正版の最新CI/反映/本番確認、main Pages/catalogueの公開結果、成果物の最終記録を確定する。
+- ブラウザ版動画は視覚/技術QCの独立APPROVED、Drive保存・サイズ/親/時刻の読戻し済み。Xは245/280、返信99/280、URL/32秒動画のx:prepare成功。SNS未投稿。
+- 物理スマホQR・iOS/Safari実機、idle alarm自動配送時刻、主観音の通し聴きは未確認。期限拒否/実handler明示配送は検証した。

@@ -12,7 +12,7 @@
 - [x] 3. 既存画面を接続し、別ブラウザで資料/操作/読込/全画面の実動作を確認する。
   - _Boundary: UI_ / _Requirements: 1.1,1.2,2.4,4.1,4.2_
   - _Depends: 2_
-- [ ] 4. 公開ゲート・独立レビュー・Git/CI・専用routeへ反映し、既存URLの実接続を検証する。
+- [x] 4. 公開ゲート・独立レビュー・Git/CI・専用routeへ反映し、既存URLの実接続を検証する。
   - meta/README/OGP・共通共有・配信除外・既存Day84試験・CIをWeb版へ対応させる。
   - _Boundary: Integration_ / _Requirements: 1.3,4.3,4.4_
   - _Depends: 3_
@@ -23,4 +23,10 @@
 - Relay：独立レビューAPPROVED。実Miniflare/Chromeの15/15成功・skip0、構文PASS。idle alarmの自動配送時刻は未検証で、保存時刻/期限拒否/明示配送を分けて確認した。
 - Browser：実Miniflare/Chromeの13/13成功・skip0、構文PASS、独立レビューAPPROVED。日本語PDF・wire境界・暗号/AAD・75連続操作・ACK timeout・自分/相手切断・再同期・終了を確認。
 - UI：独立レビューAPPROVED。実2ブラウザ12工程成功、pageerror/CSP違反0。QRのSpaceコピーとダブルクリック全画面を修正し、390/768/1440pxの44px操作領域も再検証した。
-- 公開再検証：最初の実配信はaccount側のbase_path未有効（100343）で失敗。Task4は未完了。実prefix階層の専用assets rootへ変更し、実configのE2Eと再デプロイで確認する。
+- 公開再検証：初回100343を実prefix階層で解消。PR208最新headの全必須CI成功後にマージし、version0222037bの本番9工程が成功。Task4完了。
+
+- [x] 5. native summaryのSpace操作をページ送りから分け、回帰検証する。
+  - _Boundary: UI_ / _Requirements: 4.1_
+  - 本番でsummaryOpen=false、1/5→2/5を再現。ブラウザ本来の開閉操作を保ち、スライドは動かさない。
+  - RED：本番summaryOpen=false/1→2を再現し、追加E2Eも失敗。GREEN：開閉時は頁不変、body Space/ArrowLeftは通常動作。14工程・例外/CSP0、独立APPROVED。
+  - キー修正版の最新CI・公開後記録は修正PRと[公開記録](https://github.com/haranishi/hundred-days/pull/208)へ追記する。

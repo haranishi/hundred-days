@@ -1,0 +1,23 @@
+{
+  "feature_name": "day084-powerpoint",
+  "language": "ja",
+  "phase": "release-verification",
+  "updated_at": "2026-11-06",
+  "approvals": {
+    "requirements": {
+      "generated": true,
+      "approved": true
+    },
+    "design": {
+      "generated": true,
+      "approved": true
+    },
+    "tasks": {
+      "generated": true,
+      "approved": true
+    }
+  },
+  "approval_basis": "本人の初期SDD継承・PowerPoint直接選択・ブラウザ完結と、自律実行/PR/マージ/反映確認の明示指示",
+  "research": "Fixed official Qt engine verified with 29-page private deck in completed local app; source unchanged and no original HTTP uploads",
+  "review": "Independent design/tasks and implementation Tasks 1.1-4.1 APPROVED; all local runtime suites passed; Task5.1 CI/merge/production/media updates pending and recorded in PR"
+}

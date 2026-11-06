@@ -13,7 +13,7 @@ assert.equal(deployment.assets.base_path,undefined,'production must not require 
 await mkdir(evidence,{recursive:true});
 const mf=new Miniflare(convertV4MiniflareOptions({
  name:'day084-ui-test',modulesRoot:here,
- modules:['worker.mjs','policy.mjs'].map(name=>({type:'ESModule',path:join(here,name)})),
+ modules:['worker.mjs','policy.mjs','office-assets.mjs'].map(name=>({type:'ESModule',path:join(here,name)})),
  compatibilityDate:'2026-11-01',
  durableObjects:{ROOMS:{className:'PresentationRoom',useSQLite:true}},
  ratelimits:{CREATE_LIMIT:{namespace_id:'840084',simple:{limit:6,period:60}}},
@@ -80,6 +80,19 @@ try {
   assert.equal(await host.evaluate(()=>navigator.clipboard.readText()),remoteUrl);
   await expect(host.locator('#footerCounter')).toHaveText('1 / 5');
   await host.locator('#qrBadge').evaluate(element=>element.blur());
+  step('native-disclosure-keyboard');
+  await host.locator('summary').focus();
+  await host.keyboard.press('Space');
+  await expect(host.locator('details').first()).toHaveAttribute('open','');
+  await expect(host.locator('#footerCounter')).toHaveText('1 / 5');
+  await host.keyboard.press('Space');
+  await expect(host.locator('details').first()).not.toHaveAttribute('open');
+  await expect(host.locator('#footerCounter')).toHaveText('1 / 5');
+  await host.locator('summary').evaluate(element=>element.blur());
+  await host.keyboard.press('Space');
+  await expect(host.locator('#footerCounter')).toHaveText('2 / 5');
+  await host.keyboard.press('ArrowLeft');
+  await expect(host.locator('#footerCounter')).toHaveText('1 / 5');
   step('sample-navigation');
   await phone.locator('#btnNext').click();
   await expect(host.locator('#footerCounter')).toHaveText('2 / 5');

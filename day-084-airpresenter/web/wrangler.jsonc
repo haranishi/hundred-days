@@ -13,7 +13,9 @@
     "directory": "../../.cache/day084-worker-assets",
     "binding": "ASSETS",
     "run_worker_first": [
-      "/100days/day-084-airpresenter/api/*"
+      "/100days/day-084-airpresenter/api/*",
+      "/100days/day-084-airpresenter/office/*",
+      "/100days/day-084-airpresenter/vendor/office/*"
     ]
   },
   "durable_objects": {

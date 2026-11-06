@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>AirPresenter | スマホが、発表のリモコンに。</title>
   <meta name="referrer" content="no-referrer">
-  <meta name="description" content="リンクを開いてPDFを選び、スマホをQRで接続。ブラウザだけで使えるプレゼン用リモコンです。">
+  <meta name="description" content="リンクを開いてPowerPointやPDFをそのまま選び、スマホをQRで接続。ブラウザーだけで使えるプレゼン用リモコンです。">
   <meta name="share:text" content="AirPresenter — スマホが、発表のリモコンに。インストール不要。">
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="shared/share.css">
@@ -1009,7 +1009,7 @@
     </div>
 
     <div style="display: flex; align-items: center; gap: 12px;">
-      <button class="btn-fullscreen-toggle" id="choosePdf" data-action="chooseFile" data-upload>PDFを選ぶ</button>
+      <button class="btn-fullscreen-toggle" id="choosePdf" data-action="chooseFile" data-upload>資料を選ぶ</button>
       <button class="btn-fullscreen-toggle" data-action="toggleFullscreen" title="スライドを全画面で大迫力プレゼン表示">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
           <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/>
@@ -1072,13 +1072,13 @@
                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
               </svg>
             </div>
-            <h3 style="font-size: 16px; font-weight: 700; margin-bottom: 6px;">PDFをドロップ</h3>
+            <h3 style="font-size: 16px; font-weight: 700; margin-bottom: 6px;">PowerPoint・PDFをドロップ</h3>
             <p style="font-size: 12px; color: var(--text-muted); max-width: 440px; margin-bottom: 16px; line-height: 1.6;">
-              このPCのブラウザでPDFを表示します。最大25 MiB・100ページ。PowerPointはPDFに書き出してから選んでください。
+              PPTX・PPT・PDFをそのまま選べます。最大25 MiB・100ページ。このPC内で表示の準備を行います。
             </p>
             <label class="btn-tool" style="cursor: pointer; padding: 8px 18px; background: var(--brand-red); color:#fff; font-weight:600; font-size:12px;">
               ファイルを選択
-              <input type="file" id="filePicker" accept=".pdf" style="display:none;">
+              <input type="file" id="filePicker" accept=".pdf,.pptx,.ppt" style="display:none;">
             </label>
             <button class="btn-tool" data-action="hideDropZone" style="margin-top: 14px; background:transparent; border:none; color:var(--text-dim); text-decoration:underline;">
               閉じる・現在の資料を続ける
@@ -1141,15 +1141,18 @@
         </div>
 
         <section id="hostTools" class="host-tools">
-          <div class="intro-row"><div><h2>資料を開いて、QRで接続。</h2><p>スマホでQRを読み取ってください。元のPDFはPC内で表示し、プレビューとカンペは暗号化して中継します。</p></div>
+          <div class="intro-row"><div><h2>資料を開いて、QRで接続。</h2><p>スマホでQRを読み取ってください。元の資料はPC内で表示し、プレビューとカンペは暗号化して中継します。</p></div>
             <button class="btn-tool" data-action="chooseFile" data-upload>資料を選ぶ</button>
           </div>
-          <p class="helper-text browser-intro">PCでPDFを選び、スマホでQRを読み取る。インストール不要。</p>
+          <p class="helper-text browser-intro">PCでPowerPointやPDFを選び、スマホでQRを読み取る。インストール不要。</p>
           <div class="intro-row session-actions"><button class="btn-tool" id="endSession" data-action="endSession">接続を終了</button><button class="btn-tool" id="restartSession" data-action="restartSession" hidden>新しく始める</button><span class="helper-text">接続は最長4時間です。</span></div>
           <div id="importStatus" hidden><span id="importStatusSummary" role="status"></span><button id="importStatusButton" class="btn-tool" data-action="openImportStatus">進行状況を見る</button></div>
-          <details id="pdfHelp"><summary>PowerPointの見た目を保ちたいとき</summary>
-            <p>PowerPointの「ファイル → エクスポート（または名前を付けて保存）→ PDF」で書き出し、このPDFを読み込んでください。変換で背景・フォントを推測して書き換えることはありません。アニメーション・動画は静止画になります。</p>
-            <p>PPTX・PPTの直接変換は行いません。元のPDFはこのPCで表示し、スマホへ渡すプレビューとカンペは暗号化して中継します。</p>
+          <details id="pdfHelp"><summary>PowerPointの表示とフォントについて</summary>
+            <p>PPTX・PPTはそのまま選べます。PDFへの書き出しは不要です。初回は表示エンジンを読み込むため、準備に時間がかかることがあります。</p>
+            <p>アニメーション・動画は静止画になります。PCにない書体は代わりの書体で表示する場合があるため、全ページを確認してから採用してください。元の背景やフォント指定を書き換えることはありません。</p>
+            <button id="localFontsButton" class="btn-tool" data-action="toggleLocalFonts" data-host aria-pressed="false" hidden>PCのフォントを使う</button>
+            <p id="localFontStatus" role="status">標準の日本語フォントを使います。対応ブラウザーでは、許可したPCの書体も利用できます。</p>
+            <p>資料とフォントはこのPC内で処理します。スマホへのプレビュー・カンペ・操作状態は暗号化して中継します。見た目が合わない場合は、PowerPointからPDFを書き出す方法も使えます。</p>
           </details>
           <label for="noteEditor" id="noteLabel">このページのカンペ（スマホだけに表示）</label>
           <textarea id="noteEditor" maxlength="4000" rows="3" placeholder="話す内容や補足をメモ…"></textarea>
@@ -1290,11 +1293,11 @@
   <dialog id="importProgress" aria-labelledby="importHeading" aria-describedby="importHint">
     <p class="import-eyebrow">資料の準備</p>
     <h2 id="importHeading">新しい資料を読み込み中</h2>
-    <p id="importStage" role="status">資料を送信しています</p>
+    <p id="importStage" role="status">資料を読み込んでいます</p>
     <progress id="importProgressBar" aria-label="資料の準備の進み具合"></progress>
     <div class="import-meta"><span id="importCount">処理を開始しています</span><span id="importElapsed">経過 00:00</span></div>
     <p id="importHint">準備が終わるまでお待ちください。</p>
-    <div class="import-actions"><button id="importRetry" class="btn-fullscreen-toggle" data-action="retryImport" hidden>再試行する</button><button id="importHide" class="btn-tool" data-action="hideImportProgress">現在の資料に戻る</button></div>
+    <div class="import-actions"><button id="importCancel" class="btn-tool" data-action="cancelImport" hidden>読込を取り消す</button><button id="importRetry" class="btn-fullscreen-toggle" data-action="retryImport" hidden>再試行する</button><button id="importHide" class="btn-tool" data-action="hideImportProgress">現在の資料に戻る</button></div>
   </dialog>
   <dialog id="conversionPreview" aria-labelledby="previewHeading">
     <div class="preview-header"><h2 id="previewHeading">資料を確認</h2>

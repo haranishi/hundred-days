@@ -1,5 +1,6 @@
 import {DurableObject} from 'cloudflare:workers';
 import {APP_PATH, SECURITY_HEADERS} from './policy.mjs';
+import {serveOfficeAsset} from './office-assets.mjs';
 
 const API_PATH = APP_PATH + '/api';
 const ROOM_TTL_MS = 4 * 60 * 60 * 1000;
@@ -228,6 +229,8 @@ export class PresentationRoom extends DurableObject {
 export default {
   async fetch(request, env) {
     try {
+      const office = await serveOfficeAsset(request, env);
+      if (office) return office;
       const url = new URL(request.url);
       if (!url.pathname.startsWith(API_PATH + '/')) return env.ASSETS ? env.ASSETS.fetch(request) : json(404, {error: 'ページがありません。'});
       if (url.search) throw new HttpError(400, '接続情報をURLのクエリに含めないでください。');

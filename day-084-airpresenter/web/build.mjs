@@ -3,6 +3,7 @@ import {fileURLToPath} from 'node:url';
 import {resolve, dirname, join} from 'node:path';
 import {execFileSync} from 'node:child_process';
 import {APP_PATH, SECURITY_HEADERS} from './policy.mjs';
+import {buildOfficeAssets} from './build-office.mjs';
 const here=dirname(fileURLToPath(import.meta.url));
 const root=resolve(here,'../..');
 const day=resolve(here,'..');
@@ -22,6 +23,7 @@ const qrHeader=(await readFile(join(here,'node_modules/qrcode-generator/dist/qrc
 const mit=(await readFile(join(root,'LICENSE'),'utf8')).replace(/^Copyright[^\n]*$/m,'Copyright (c) 2009 Kazuhiko Arase');
 await writeFile(join(vendor,'qrcode-LICENSE'),qrHeader+'\n\n'+mit);
 await writeFile(join(vendor,'README.txt'),'PDF.js 6.5.438 legacy + worker + resource directories; preserve each LICENSE. QR generator 2.0.4 MIT. No CDN.\n');
+await buildOfficeAssets();
 execFileSync(process.execPath,[join(root,'scripts/build.mjs')],{cwd:root,stdio:'inherit'});
 const headers=[APP_PATH+'/*',...Object.entries(SECURITY_HEADERS).map(([name,value])=>'  '+name+': '+value),''].join('\n');
 const published=join(root,'dist/day-084-airpresenter');

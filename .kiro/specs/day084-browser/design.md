@@ -1,5 +1,7 @@
 # ブラウザ版の設計
 
+PowerPoint直接入力は[day084-powerpoint](../day084-powerpoint/design.md)が優先する。以下のPDF限定部分は初期Web版の記録。
+
 ## Overview
 利用者はPCでURLを開き、PDFを選択し、スマホからQRで接続する。
 ブラウザ表示と暗号化通信に分け、既存app.js/index.htmlの画面・採用/取消・操作を再利用する。

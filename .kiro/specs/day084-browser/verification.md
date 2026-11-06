@@ -1,41 +1,50 @@
 # Day84 ブラウザ版の検証
 
 2026-11-06。本人の原本・私的資料は使わず、自作の日本語PDF3ページで確認した。
+最新の配信後結果は[PR208の公開記録](https://github.com/haranishi/hundred-days/pull/208#production-verification)へ追記する。
 
-## 実装の検証
+## 実装と統合
 
 | 対象 | 結果と証拠 |
 |---|---|
-| Relay | 実Miniflare/SQLite/Chrome 15/15成功、skip0。認証・別部屋・制限・終了・期限。独立APPROVED |
-| Browser | 実Chrome/Miniflare 13/13成功、skip0。日本語PDF・暗号/AAD・wire境界・再同期・ACK・終了。独立APPROVED |
-| UI | 実2ブラウザ12工程成功、pageerror/CSP違反0。QRキーボード、採用/取消/失敗、全画面、切断復帰、終了を確認。独立APPROVED |
-| UI評価 | 18/20、体験19/20、全項目1点以上。3幅のoverflowなし・操作44px以上、footer contrast約7.73:1 |
-| 全体check | 構文エラー0、unit5092件中5091成功/既存skip1/失敗0、16プロジェクト依存監査high/critical0、build成功 |
-| 専用配信 | Wrangler dry-run成功、229assets・17.77KiB Worker。SQLite DO・rate・assets設定を確認 |
-| 静的E2E | 固有port4184で2/2成功。PDF案内・インストール不要・3幅・公開URLコピー・非配信範囲 |
+| Relay | 実Miniflare/SQLite/Chrome15/15、skip0。認証・別部屋・制限・終了・期限。独立APPROVED |
+| Browser | 実Chrome/Miniflare13/13、skip0。日本語PDF・暗号/AAD・wire境界・再同期・ACK・終了。独立APPROVED |
+| UI | 実configの2ブラウザE2E14工程、例外/CSP違反0。独立APPROVED |
+| UI評価 | 18/20、体験19/20、全項目1点以上。3幅のoverflowなし・44px以上、footer contrast約7.73:1 |
+| 共通check | Day85取込前のローカルunit5092件（5091成功/既存skip1）、構文0、16依存監査high/critical0、build成功 |
+| 最新の配信修正CI | PR208 head80c6e00の[必須CI42152119707](https://github.com/haranishi/hundred-days/actions/runs/42152119707)が全成功 |
+| 静的公開ゲート | 329成功/既存skip1、契約・build・復元成功。固有portのDay84静的E2E2/2成功 |
+| 互換性 | ChromeとモバイルWebKitの相互操作、WebKitによる日本語PDF表示成功。実機Safariとは区別する |
 
-## レビューで直した点
+## 本番公開の記録（ネイティブキー修正前）
 
-- inline dblclickがCSPで拒否されたためapp.jsでイベント登録し、実全画面とCSP違反0を追加検証。
-- QRでSpaceコピーしたとき共通ショートカットも働いたため、処理済みイベントを除外。ページ不変を検証。
+PR207は5ce6cafへ、配信修正PR208はea64ae7へマージ。
+初回のnon-root assets.base_pathは実accountの100343で拒否されたため、実prefix階層へ変更した。
+同名Workerの非公開受付を先に確認し、最新CI成功後に正式routeへ反映した。有料化やaccount flag変更はない。
+
+- URL：https://rairakku.com/100days/day-084-airpresenter/
+- Worker version：0222037b-8931-4143-a1ca-79cd372317ac。
+- 2026-11-06 03:13 UTC、実URLからPC/スマホの別ブラウザ9工程が成功。
+- 暗号化接続、日本語PDF確認/採用、カンペ/時計/暗転/タッチポインター、切断復帰、差替取消/失敗/再試行、3幅/公開コピー/実全画面、終了、古いQR無効化、非配信範囲を確認。
+- ページ例外0・CSP違反0・暗号化frame46・PDFのHTTP upload0。元PDFはPC内で処理。
+- 証拠：.cache/day084-production/result.json、public-app.png、day084-deploy.log。
+- mainのPages/catalogue公開処理は別途進行。最新の状態は上のPR公開記録で確認する。
+
+## 回帰修正
+
+- inline dblclickをイベント登録へ移し、実全画面/CSP違反0を検証。
+- QRのSpaceコピーでページが進まないよう、処理済みイベントを除外。
 - 補助ボタン/summaryを44px以上にし、小さいページ番号のコントラストを改善。
-- Day84を含まない隔離ビルドでpolicyを読まないようにし、関連31/31と新fixture1/1を確認。
-- 共通権限検査にDay84のセンサー限定を追加。マイク・カメラ・位置・支払・USBのdenyと他Dayの制限を維持。
+- Day84を含まない隔離buildの依存読込を修正し、関連31/31と新fixture1/1を確認。
+- 専用asset rootを毎回cleanし、Day84だけcopy。rootの_headers実適用とsource/web/tools/tests/他Dayの404を実configのE2Eで確認。
+- native summaryのSpaceで1/5→2/5となる追加不具合を本番で再現。回帰E2EもRED。
+- native controlのSpace既定動作を保つ1行修正後、開閉時の頁不変と通常の送り/戻りを含む14工程がGREEN。独立レビューAPPROVED。
+- 証拠：.cache/day084-native-disclosure-red.log、day084-native-disclosure-green.log。キー修正版の公開後結果はPR公開記録へ追記する。
 
-## 公開後に確定する項目
+## 制約
 
-最新head必須CI、マージ、専用Worker route反映、本番URLの実2ブラウザ接続は実施結果で記録する。
-現時点では本番動作の完了を主張しない。SNS投稿は行わない。
-
-## 確認していない環境・限界
-
-- iOS/Safari実機、物理スマホのQR読み取りは未検証。
-- idle alarmの自動配送時刻は未検証。保存時刻・期限拒否・実handler明示配送を区別して確認。
-- PPTX/PPT直接読込は非対応。PowerPointからPDFに書き出して使用する。
-- PDF・カンペはページメモリだけ。再読込/タブ終了で失われる。接続は最長4時間。
-
-## 配信設定の修正
-
-PR207のCI成功・マージ後、実accountのbase_path未有効（100343）で配信が拒否された。
-専用rootの実prefix階層へ変更し、実Wrangler設定を使う13工程E2Eと全SECURITY_HEADERS・開発用/他Day404が成功。独立コードレビューAPPROVED。
-初回main公開処理は途中状態の配信を避けるため意図的に停止。修正PRの最新CIと実配信成功を確認してから公開完了とする。
+- 実機iPhone/Safari、物理スマホのQR読み取りは未検証。
+- idle alarmの自動配送時刻は未検証。保存時刻・期限拒否・実handler明示配送は確認した。
+- 初期公開時はPDFのみ。PowerPoint直接入力の復元と最新検証は[追加仕様の検証](../day084-powerpoint/verification.md)を参照する。
+- PDF/カンペはページメモリだけ。再読込/タブ終了で失われ、接続は最長4時間。
+- 動画は視覚/技術QCを確認したが、主観的な通し聴きは未実施。SNSは未投稿。
