@@ -47,9 +47,9 @@ test('download contains only reviewed source, and matches the source exactly',as
   assert.deepEqual((await walk(join(day,'source'))).sort(),expected,'unreviewed source must not enter the repository or archive');
 });
 
-test('public site serves the download, not the server source or packaging tools',()=>{
-  for(const file of ['index.html','preview.png','airpresenter-local.zip','shared/share.js']) assert.equal(isServedPath('day-084-airpresenter',file),true,file);
-  for(const file of ['source','source/server.js','source/tests/server.test.cjs','tools','tools/package.py','tests/distribution.test.mjs']) assert.equal(isServedPath('day-084-airpresenter',file),false,file);
+test('public site serves browser assets and the archive, not runtime source or test tools',()=>{
+  for(const file of ['index.html','preview.png','airpresenter-local.zip','shared/share.js','app.js','browser-api.js','vendor/pdfjs/pdf.worker.min.mjs']) assert.equal(isServedPath('day-084-airpresenter',file),true,file);
+  for(const file of ['source','source/server.js','source/tests/server.test.cjs','tools','tools/package.py','tests/distribution.test.mjs','web','web/worker.mjs','web/package-lock.json','web/e2e.mjs','web/test-fixtures/japanese-presentation.pdf']) assert.equal(isServedPath('day-084-airpresenter',file),false,file);
 });
 
 test('the actual downloaded app can boot and authenticate from an extracted archive',async()=>{

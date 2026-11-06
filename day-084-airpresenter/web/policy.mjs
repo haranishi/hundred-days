@@ -12,7 +12,7 @@ export const CONTENT_SECURITY_POLICY = [
   "frame-ancestors 'none'",
   "form-action 'self'"
 ].join('; ');
-export const PERMISSIONS_POLICY = 'camera=(), microphone=(), geolocation=(), accelerometer=(self), gyroscope=(self), magnetometer=(self)';
+export const PERMISSIONS_POLICY = 'camera=(), microphone=(), geolocation=(), payment=(), usb=(), accelerometer=(self), gyroscope=(self), magnetometer=(self)';
 export const SECURITY_HEADERS = {
   'Content-Security-Policy': CONTENT_SECURITY_POLICY,
   'Permissions-Policy': PERMISSIONS_POLICY,

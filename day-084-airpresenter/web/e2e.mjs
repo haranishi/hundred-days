@@ -146,7 +146,7 @@ try {
   for(const width of [390,768,1440]){
    await host.setViewportSize({width,height:width===390?844:1000});await wait(100);
    assert.ok(await host.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
-   for(const selector of ['#choosePdf','#endSession','#saveNote','.remote-extras button']){
+   for(const selector of ['#choosePdf','#endSession','#saveNote','.remote-extras button','summary']){
     for(const box of await host.locator(selector).evaluateAll(elements=>elements.filter(el=>el.getClientRects().length).map(el=>({w:el.getBoundingClientRect().width,h:el.getBoundingClientRect().height}))))assert.ok(box.w>=44&&box.h>=44,selector+' must offer a 44px target');
    }
    await capture(width);

@@ -1,44 +1,50 @@
 # Day084 AirPresenter
 
-Macで開いた資料を、同じWi-Fiのスマホから操作するローカルアプリです。
-公開ページは、macOS向けローカル版の案内と配布を行います。
-
-- 公開ページ： https://rairakku.com/100days/day-084-airpresenter/
-- 配布物： `airpresenter-local.zip`
-- ソースと起動手順： [source/README.md](source/README.md)
+スマホをプレゼンのリモコンにするWebアプリです。
+[AirPresenterを開く](https://rairakku.com/100days/day-084-airpresenter/)
 
 ## 使い始める
 
-Node.js 22以上とHomebrewを用意し、ZIPを展開します。
-中の`airpresenter`フォルダでターミナルを開き、次を実行します。
+1. PCのブラウザでリンクを開き、「PDFを選ぶ」から資料を選びます。
+2. ページを確認して「この資料で発表する」を押します。
+3. スマホでPC画面のQRを読み取ります。接続リンクのコピーも使えます。
+4. ページ送り・戻り、暗転、長押しポインター、カンペ、タイマーを手元で操作します。
+
+インストールやアカウント登録は不要です。PC・スマホともネット接続が必要です。
+QRと接続リンクには操作権限があるため、接続する人だけに見せてください。
+
+## 資料と接続
+
+- PDF：25 MiB・100ページまで。PowerPointは元のPowerPointからPDFに書き出して選びます。
+- PPTX・PPTの直接変換には対応しません。アニメーション・動画は静止画になります。
+- 差し替え中は処理段階・経過時間・ページ数を表示し、採用前に確認できます。
+- 失敗・取消では元の資料を維持します。
+- 元のPDFはPCのブラウザ内で処理します。スマホへのプレビューとカンペは暗号化して中継します。
+- 接続は最長4時間。「接続を終了」で無効にし、資料・カンペを消去します。
+- 資料・カンペは保存しません。PCの再読み込み・タブを閉じる操作で失われます。
+- 切断中の操作は送らず、再接続時にPCの現在の状態へ戻ります。
+
+Chromeで実際のPDF表示と別ブラウザ間の操作を検証しています。
+Safari実機での動作は未検証です。
+
+## 開発と配信
+
+開発用の手順です。利用者は実行する必要がありません。
+Node.js 24で、リポジトリルートの`npm ci`後に次を実行します。
 
 ```sh
-brew install poppler qrencode fontconfig
-brew install --cask libreoffice
-npm ci
+cd day-084-airpresenter/web
+npm ci --ignore-scripts
 npx playwright install chromium
-npm start
+npm test
+npm run test:browser
+npm run build
+npm run test:e2e
+npm run dev
 ```
 
-Macで http://localhost:3084/?mode=dual を開き、資料を選びます。
-同じWi-Fiのスマホで、Mac画面のQRを読み取ってください。
-QRは操作権限を含むため、接続する人だけに見せます。
-終了はターミナルでCtrl+C。再起動後は新しいQRから接続します。
-
-## 操作できること
-
-ページ送り・戻り、暗転、長押しポインター、ページ別のカンペ、共通タイマーを使えます。
-PDF・PPTX・PPT、25 MiB・100ページまで対応します。
-差し替え中は処理段階・経過時間・生成枚数を確認でき、PowerPointは変換結果を見てから採用します。
-
-PowerPointとは描画エンジンが異なるため、完全一致は保証できません。
-見た目を優先するときは、元のPowerPointからPDFを書き出して読み込みます。
-アニメーション・動画は静止画になります。
-資料はMacで処理し、外部サービスへ送りません。
-端末間通信を禁止するWi-Fiではスマホを接続できません。
-
-## 公開物
-
-`source/`には配布するアプリと合成試験、`tools/`にはZIP作成の道具を置きます。
-公開ページの画像は自作サンプルです。実資料・変換画像・接続用QR・過去のGit履歴は配布しません。
-配布物はMIT Licenseです。外部ツール・パッケージ・既存フォントそのものは同梱しません。
+`web/`にWorkers/DOと検証、直下にブラウザ実装、`vendor/`に固定版PDF.js等を置きます。
+公開先はこのDayだけのWorker routeです。PDF・カンペ・暗号鍵を中継側に保存しません。
+`source/`・`tools/`・配布ZIPは旧ローカル版の履歴で、通常の利用導線では使いません。
+公開画像・試験PDFは自作です。本人の実資料や接続用QRは含みません。
+外部コードと同梱リソースのライセンスは[第三者表記](../THIRD_PARTY_NOTICES.md)を参照してください。
