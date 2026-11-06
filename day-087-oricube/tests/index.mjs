@@ -1,0 +1,10 @@
+import './sheet.test.mjs';
+import './ops.test.mjs';
+import './model.test.mjs';
+import './mutations.test.mjs';
+import './contract.test.mjs';
+import './crease.test.mjs';
+import './frame-extras.test.mjs';
+import './review-hardening.test.mjs';
+import './timeline.test.mjs';
+import './tray.test.mjs';

@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<title>OriCube OGP</title>
+<style>
+  :root { color-scheme: light; }
+  * { box-sizing: border-box; margin: 0; }
+  html, body { width: 1200px; height: 630px; overflow: hidden; background: #f7f3ea; color: #2b2623;
+    font-family: "Hiragino Sans", "Yu Gothic UI", system-ui, sans-serif; }
+  .card { display: grid; grid-template-columns: 1fr 560px; height: 630px; }
+  .copy { padding: 64px 40px 56px 72px; display: flex; flex-direction: column; justify-content: space-between; }
+  .eyebrow { font-size: 22px; letter-spacing: .2em; color: #d6452d; font-weight: 700; }
+  h1 { font-family: "Hiragino Mincho ProN", "Yu Mincho", serif; font-size: 132px; line-height: 1; letter-spacing: .01em; font-weight: 700; }
+  .tag { font-family: "Hiragino Mincho ProN", "Yu Mincho", serif; font-size: 46px; line-height: 1.35; font-weight: 600; }
+  .sub { font-size: 26px; line-height: 1.6; color: #5d5249; }
+  .chips { display: flex; gap: 14px; flex-wrap: wrap; }
+  .chip { font-size: 24px; font-weight: 700; padding: 10px 22px; border: 2px solid #2b2623; border-radius: 999px; background: #fffdf8; }
+  .stage { position: relative; margin: 36px 36px 36px 0; border-radius: 28px; overflow: hidden; background: #f1e9da; }
+  /* 紙を大きく見せるため、描画面を枠より大きくして中央を切り出す */
+  canvas { position: absolute; left: -22%; top: -18%; display: block; width: 144%; height: 144%; }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="copy">
+    <div class="eyebrow">100 DAYS / 087</div>
+    <div>
+      <h1>OriCube</h1>
+      <p class="tag" style="margin-top:14px">折り紙の折り方を、<br>3Dで見る。</p>
+    </div>
+    <div>
+      <p class="sub" style="margin-bottom:22px">止めて、戻して、回して。<br>重なりの中まで見える。</p>
+      <div class="chips" id="chips"></div>
+    </div>
+  </div>
+  <div class="stage"><canvas id="view"></canvas>
+  </div>
+</div>
+<script type="module">
+import { loadModels } from '../lib/engine-adapter.js';
+import { createViewer } from '../lib/viewer.js';
+const q = new URLSearchParams(location.search);
+const models = await loadModels();
+document.getElementById('chips').replaceChildren(...models.map((m) => Object.assign(document.createElement('span'), { className: 'chip', textContent: m.name })));
+const model = models.find((m) => m.id === (q.get('m') || 'plane')) || models[0];
+const step = Math.min(Math.max((Number(q.get('s')) || model.steps.length) - 1, 0), model.steps.length - 1);
+const t = q.has('t') ? Number(q.get('t')) : 1;
+const viewer = createViewer({ canvas: document.getElementById('view'), testGfx: false, reducedMotion: () => true, onTick: () => false });
+viewer.setModel(model, { view: q.get('view') || 'iso' });
+viewer.setPose(step, t, []);
+viewer.wake();
+await new Promise((r) => setTimeout(r, 900));
+document.body.dataset.ready = 'true';
+</script>
+</body>
+</html>
