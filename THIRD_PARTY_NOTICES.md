@@ -201,6 +201,9 @@ Pixel-Boy / AAAのNinja Adventure（CC0）、DotGothic16（OFL 1.1）、Phaser 4
 
 ## Day084 AirPresenter
 
-公開画像は自作サンプル画面です。配布ZIPはアプリのソースと合成試験だけを含み、実資料・フォント・変換ツールを含みません。
-Playwright/Chromium、LibreOffice、Poppler、qrencode、Fontconfigは利用者の環境で別途取得します。
-Macのインストール済みフォントは変換中に参照するだけで、再配布しません。
+公開画像・試験PDFは自作サンプルです。本人の実資料・変換画像・操作権限を含みません。
+ブラウザ版はPDF.js 6.5.438（Apache-2.0）とqrcode-generator 2.0.4（MIT、Kazuhiko Arase）を同梱します。
+PDF.jsのCMaps、標準フォント、WASM、ICCには個別のライセンスがあります。
+Adobe CMaps、Foxit、Liberation（GPL-2.0＋フォント例外）、OpenJPEG、QCMS、ICCの表記を含め、`vendor/pdfjs/`各ディレクトリのLICENSEと`vendor/qrcode-LICENSE`を保持しています。
+Playwright/Chromium・Wrangler・Miniflareは開発・検証用で、利用者のインストールは不要です。
+旧ローカル版ZIPはソースと合成試験のみを含みます。LibreOffice・Poppler・qrencode・Fontconfig・Macフォントは含みません。

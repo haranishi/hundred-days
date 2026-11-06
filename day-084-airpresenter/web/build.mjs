@@ -1,0 +1,28 @@
+import {cp, mkdir, readFile, writeFile, rm} from 'node:fs/promises';
+import {fileURLToPath} from 'node:url';
+import {resolve, dirname, join} from 'node:path';
+import {execFileSync} from 'node:child_process';
+import {APP_PATH, SECURITY_HEADERS} from './policy.mjs';
+const here=dirname(fileURLToPath(import.meta.url));
+const root=resolve(here,'../..');
+const day=resolve(here,'..');
+const vendor=join(day,'vendor');
+await mkdir(vendor,{recursive:true});
+const pdfRoot=join(here,'node_modules/pdfjs-dist');
+const pdfOut=join(vendor,'pdfjs');
+await mkdir(pdfOut,{recursive:true});
+for(const name of ['pdf.min.mjs','pdf.worker.min.mjs']) {
+  const source=await readFile(join(pdfRoot,'legacy/build',name),'utf8');
+  await writeFile(join(pdfOut,name),source.replace(/\n?\/\/[#@] sourceMappingURL=.*$/gm,''));
+}
+for(const name of ['cmaps','standard_fonts','wasm','iccs']) await cp(join(pdfRoot,name),join(pdfOut,name),{recursive:true});
+await cp(join(pdfRoot,'LICENSE'),join(pdfOut,'LICENSE'));
+await cp(join(here,'node_modules/qrcode-generator/dist/qrcode.mjs'),join(vendor,'qrcode.mjs'));
+const qrHeader=(await readFile(join(here,'node_modules/qrcode-generator/dist/qrcode.mjs'),'utf8')).split('\n').slice(0,17).join('\n');
+const mit=(await readFile(join(root,'LICENSE'),'utf8')).replace(/^Copyright[^\n]*$/m,'Copyright (c) 2009 Kazuhiko Arase');
+await writeFile(join(vendor,'qrcode-LICENSE'),qrHeader+'\n\n'+mit);
+await writeFile(join(vendor,'README.txt'),'PDF.js 6.5.438 legacy + worker + resource directories; preserve each LICENSE. QR generator 2.0.4 MIT. No CDN.\n');
+execFileSync(process.execPath,[join(root,'scripts/build.mjs')],{cwd:root,stdio:'inherit'});
+const headers=[APP_PATH+'/*',...Object.entries(SECURITY_HEADERS).map(([name,value])=>'  '+name+': '+value),''].join('\n');
+await writeFile(join(root,'dist/day-084-airpresenter/_headers'),headers);
+console.log('Day84 browser assets and shared security policy built.');

@@ -14,8 +14,8 @@ export const EXCLUDED_DIRS = ['tools/cache', 'tests', 'node_modules'];
 /* ソースから組み立てたビルド結果を同じフォルダに置いているDayは、ソースと生成ツールを配信しない。
    見るのはDayのフォルダ直下の名前だけ（リポジトリを置いた場所の名前に source が含まれていても外さない） */
 export const SOURCE_DIRS_BY_APP = {
-  // Day84のNodeサーバーは配布ZIPからPC上で起動する。Webには案内とZIPだけを配信する。
-  'day-084-airpresenter': ['source', 'tools'],
+  // Day84はブラウザ用アセットを配信し、旧NodeソースとWorker/検証ツールは配信しない。
+  'day-084-airpresenter': ['source', 'tools', 'web'],
   // Day82は source/ から作った index.html と assets/ だけを配信する（写真の質感の原本・開発用の道具・試験は配らない）
   'day-082-kageuchi': ['source'],
   'day-080-fifth-prince': ['source', 'tools'],
