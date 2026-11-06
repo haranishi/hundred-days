@@ -6,7 +6,7 @@ const remoteRole = params.get('mode') === 'remote' && fragment.has('token');
 const clientId = [...crypto.getRandomValues(new Uint8Array(12))].map(n => n.toString(16).padStart(2, '0')).join('');
 const samples = [
   ['スマホが、発表のリモコンに。', 'PCで資料を開いて、QRを読み取る。', ['アプリのインストール不要', 'PCとスマホをインターネットに接続', '右タップで次へ、左タップで戻る']],
-  ['資料の見た目を大切に。', 'PowerPointから書き出したPDFがおすすめです。', ['PDFをブラウザ内で表示', '全ページを確認してから採用', 'PowerPointはPDFに書き出して使用']],
+  ['PowerPointを、そのまま。', 'PPTX・PPT・PDFを選ぶだけ。', ['表示の準備はアプリが自動で', '全ページを確認してから採用', '資料はこのPC内で処理']],
   ['聴衆を見ながら、話す。', '大きな操作面でページを送る。', ['暗転して話に集中', 'ポインターは押している間だけ', '対応端末では操作成功時に短く振動']],
   ['手元には、原稿と時間。', '投影画面にはスライドだけ。', ['PCでページごとのカンペを保存', 'スマホに同じページの原稿を表示', '開始・停止・リセットできる共通タイマー']],
   ['準備ができたら、発表へ。', 'PCの「全画面プレゼン」を押して開始。', ['接続状態を確認', '資料の全ページを確認', '終了すると資料とカンペを消去']]
@@ -44,6 +44,10 @@ let recoveredImportId = null;
 let recoveringPreview = false;
 let finalizingImage = false;
 let retryAction = 'file';
+let activeImportController = null;
+let localFontModule = null;
+let localFontsEnabled = false;
+let fontPermissionPending = false;
 let laserHeld = false;
 let laserInterval;
 let pointerOrigin = null;
@@ -69,14 +73,21 @@ async function api(resource, options = {}) {
   return response;
 }
 async function readData(resource, options = {}, type = 'json', timeout = 20000) {
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), timeout);
-  try { return await (await api(resource, { ...options, signal:controller.signal }))[type](); }
-  catch (error) {
-    if (controller.signal.aborted) throw new Error('通信に時間がかかっています。接続を確認して再試行してください。');
+  const controller = new AbortController(), external = options.signal;
+  let timedOut = false;
+  const abort = () => controller.abort();
+  external?.addEventListener('abort',abort,{once:true});
+  if (external?.aborted) abort();
+  const timer = setTimeout(() => {timedOut=true;controller.abort();}, timeout);
+  try {
+    if (controller.signal.aborted) throw new DOMException('資料の読込を取り消しました。','AbortError');
+    return await (await api(resource, { ...options, signal:controller.signal }))[type]();
+  } catch (error) {
+    if (external?.aborted) throw new DOMException('資料の読込を取り消しました。','AbortError');
+    if (timedOut) throw new Error('処理に時間がかかっています。通信を確認し、資料を選び直してください。');
     if (error instanceof TypeError) throw new Error('通信できませんでした。接続を確認して再試行してください。');
     throw error;
-  } finally { clearTimeout(timer); }
+  } finally {clearTimeout(timer);external?.removeEventListener('abort',abort);}
 }
 function canOperate() { return connected && snapshot && (!remoteRole || snapshot.peers.host > 0); }
 function setConnected(value, message) {
@@ -91,6 +102,7 @@ function setConnected(value, message) {
   if (snapshot) { $('btnPrev').disabled = !operating || snapshot.current === 0; $('btnNext').disabled = !operating || snapshot.current === snapshot.total - 1; }
   for (const element of document.querySelectorAll('[data-host],#noteEditor')) element.disabled = !connected || remoteRole || loading;
   for (const element of document.querySelectorAll('[data-upload],#filePicker')) element.disabled = !connected || remoteRole || loading;
+  $('localFontsButton').disabled = !connected || remoteRole || loading || fontPermissionPending;
   $('acceptPreview').disabled = !connected || !previewReady || previewBusy;
   $('discardPreview').disabled = !connected || previewBusy;
 }
@@ -315,7 +327,7 @@ function updateImportView() {
   const ready = previewReady && importState.status === 'awaiting_confirmation';
   const completed = importDisplayed && importState.status === 'completed';
   const discarded = importState.status === 'discarded';
-  const labels = { receiving:'資料を送信しています', preparing:'資料を確認しています', converting:'スライドを変換しています', rendering:'スライド画像を作成しています', finalizing:'表示の準備をしています', preview:'プレビューを読み込んでいます', applying:'新しい資料に切り替えています', ready:'変換が完了しました' };
+  const labels = { receiving:'資料を読み込んでいます', loading_engine:'表示エンジンを読み込んでいます', initializing_engine:'表示エンジンを準備しています', preparing:'資料を確認しています', converting:'スライドを変換しています', rendering:'スライド画像を作成しています', finalizing:'表示の準備をしています', preview:'プレビューを読み込んでいます', applying:'新しい資料に切り替えています', ready:'変換が完了しました' };
   const label = failed ? '資料の準備を完了できませんでした' : completed ? '新しい資料に切り替わりました' : discarded ? '取消しました。現在の資料を続けられます' : ready ? '準備完了・確認して切り替えてください' : labels[phase.stage] || '表示の準備をしています';
   const status = failed ? 'failed' : ready ? 'awaiting_confirmation' : completed ? 'completed' : discarded ? 'discarded' : 'processing';
   $('importStatus').hidden = false;
@@ -333,7 +345,9 @@ function updateImportView() {
   $('importProgressBar').hidden = failed;
   $('importCount').textContent = total > 0 ? `${count} / ${total} ページ` : '資料のサイズや内容によって時間が変わります';
   updateImportElapsed();
-  $('importHint').textContent = failed ? phase.error || importState.error : phase.stage === 'preview' ? '画像を準備しています。完了後、変換結果を確認してから資料を切り替えます。' : '準備中も現在の資料を使えます。「現在の資料に戻る」で閉じても、処理は続きます。';
+  $('importHint').textContent = failed ? phase.error || importState.error : ['loading_engine','initializing_engine'].includes(phase.stage) ? '初回は表示エンジンの準備に時間がかかります。資料はこのPC内で処理します。「現在の資料に戻る」で閉じても処理は続きます。' : phase.stage === 'preview' ? '画像を準備しています。完了後、変換結果を確認してから資料を切り替えます。' : '準備中も現在の資料を使えます。「現在の資料に戻る」で閉じても、処理は続きます。';
+  $('importCancel').hidden = !activeImportController || importState.status !== 'processing';
+  $('importCancel').disabled = Boolean(activeImportController?.signal.aborted);
   $('importRetry').hidden = !failed;
   $('importRetry').textContent = retryAction === 'file' ? '別の資料を選ぶ' : retryAction === 'image' ? 'スライドを再表示' : 'プレビューを再読込';
   $('importHide').textContent = failed ? '閉じる' : '現在の資料に戻る';
@@ -400,19 +414,25 @@ async function processFile(file) {
   if (remoteRole) return;
   if (loading) { openImportStatus(); return; }
   if (!connected) { showToast('接続が戻ってから資料を選んでください。'); return; }
-  if (!/\.pdf$/i.test(file.name)) { showToast('PowerPointはPDFに書き出してから選んでください。'); return; }
+  if (!/\.(pdf|pptx|ppt)$/i.test(file.name)) { showToast('PDF・PPTX・PPTの資料を選んでください。'); return; }
   if (file.size > 25 * 1024 * 1024) { showToast('25 MiB以下の資料を選んでください。'); return; }
+  const controller = new AbortController();activeImportController = controller;
   closePreview(); hideDropZone(); hideFullscreenHud();
   activeUploadId = [...crypto.getRandomValues(new Uint8Array(16))].map(n => n.toString(16).padStart(2,'0')).join('');
   importState = { id:activeUploadId, status:'processing', stage:'receiving', completed:0, total:null, startedAt:Date.now() };
   localProgress = null; importDismissed = false; importDisplayed = false; retryAction = 'file';
   loading = true; setConnected(connected); updateImportView(); showDialog($('importProgress'));
   try {
-    const data = await readData(`/api/upload?filename=${encodeURIComponent(file.name)}`, { method:'POST', headers:{'X-AirPresenter-Import':activeUploadId}, body:file }, 'json', 125000);
+    const data = await readData(`/api/upload?filename=${encodeURIComponent(file.name)}`, { method:'POST', headers:{'X-AirPresenter-Import':activeUploadId}, body:file, signal:controller.signal }, 'json', /\.pdf$/i.test(file.name) ? 125000 : 450000);
     if (data.state) applySnapshot(data.state);
     if (data.preview) await openPreview(data.preview);
     else await finishImport();
   } catch (error) {
+    if (sessionEnded) return;
+    if (error.name === 'AbortError') {
+      loading=false;localProgress=null;importDismissed=true;closePreview();closeDialog($('importProgress'));
+      showToast('読み込みを取り消しました。現在の資料を続けられます。');return;
+    }
     // The upload response may be lost after the server has already finished it.
     let data;
     try {
@@ -427,10 +447,11 @@ async function processFile(file) {
     else failImport(progress.error || error.message);
   }
   finally {
+    if (activeImportController === controller) activeImportController = null;
     activeUploadId = null;
     if (!localProgress?.error && !finalizingImage) loading = false;
     if (!localProgress?.error) syncImportProgress(snapshot?.import);
-    setConnected(connected); updateImportView();
+    if(!sessionEnded){setConnected(connected);updateImportView();}
   }
 }
 async function openPreview(candidate) {
@@ -569,7 +590,7 @@ window.addEventListener('deviceorientation', event => {
   if (performance.now() - pointerSentAt > 60) { pointerSentAt = performance.now(); sendPointer(); }
 });
 function clearSessionView(message = '接続を終了しました。PCで新しく始めてください。') {
-  sessionEnded = true; connectionEpoch++; laserHeld = false; clearInterval(laserInterval);
+  sessionEnded = true;activeImportController?.abort();activeImportController=null;localFontModule?.resetLocalFonts();localFontsEnabled=false; connectionEpoch++; laserHeld = false; clearInterval(laserInterval);
   imageVersion++; imagePath = null;
   if (imageBlob) URL.revokeObjectURL(imageBlob);
   imageBlob = ''; noteDrafts.clear(); noteDirty = false; notePage = -1;
@@ -594,9 +615,30 @@ async function endSession() {
   clearSessionView();
   try { await browserApi.close(); } catch { showToast('この端末の接続を閉じました。'); }
 }
+function cancelImport() {activeImportController?.abort();}
+async function toggleLocalFonts() {
+  if (sessionEnded || remoteRole || loading || fontPermissionPending || !localFontModule) return;
+  if (localFontsEnabled) {
+    localFontModule.resetLocalFonts();localFontsEnabled=false;
+    $('localFontStatus').textContent='次に選ぶ資料では標準の日本語フォントを使います。';
+  } else {
+    fontPermissionPending=true;setConnected(connected);
+    try {
+      const count=await localFontModule.enableLocalFonts();
+      if(sessionEnded){localFontModule.resetLocalFonts();return;}
+      localFontsEnabled=count>0;
+      $('localFontStatus').textContent=count>0?'次に選ぶ資料から、このPCの書体も使います。':'対象の書体がありません。標準の日本語フォントを使います。';
+    } catch {
+      localFontModule.resetLocalFonts();localFontsEnabled=false;
+      $('localFontStatus').textContent='標準の日本語フォントで続けられます。PCの書体を使う場合は、ブラウザーでアクセスを許可してください。';
+    } finally {fontPermissionPending=false;if(!sessionEnded)setConnected(connected);}
+  }
+  $('localFontsButton').setAttribute('aria-pressed',String(localFontsEnabled));
+  $('localFontsButton').textContent=localFontsEnabled?'標準フォントに戻す':'PCのフォントを使う';
+}
 function chooseFile() { $('filePicker').click(); }
 function restartSession() { location.reload(); }
-const uiActions = {setMode,toggleFullscreen,execPrev,execNext,execToggleBlackout,showDropZone,hideDropZone,copyRemoteUrl,chooseFile,openImportStatus,saveNote,onRemotePrev,onRemoteNext,onRemoteBlackout,onRemoteFullscreen,toggleTimer,resetTimer,enableGyro,retryImport,hideImportProgress,chooseAnotherFile,discardPreview,acceptPreview,endSession,restartSession};
+const uiActions = {cancelImport,toggleLocalFonts,setMode,toggleFullscreen,execPrev,execNext,execToggleBlackout,showDropZone,hideDropZone,copyRemoteUrl,chooseFile,openImportStatus,saveNote,onRemotePrev,onRemoteNext,onRemoteBlackout,onRemoteFullscreen,toggleTimer,resetTimer,enableGyro,retryImport,hideImportProgress,chooseAnotherFile,discardPreview,acceptPreview,endSession,restartSession};
 document.addEventListener('click', event => {
   const target = event.target.closest('[data-action]');
   if (!target || !uiActions[target.dataset.action]) return;
@@ -618,6 +660,8 @@ async function boot() {
   $('hostTools').prepend($('qrBadge'));
   try {
     const {createBrowserApi} = await import('./browser-api.js');
+    localFontModule = await import('./local-fonts.js');
+    $('localFontsButton').hidden = remoteRole || !localFontModule.supportsLocalFonts();
     browserApi = await createBrowserApi({
       onSnapshot(state) { if (!sessionEnded && state) applySnapshot(state); },
       onConnection(value, message) {

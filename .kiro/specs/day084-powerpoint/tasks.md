@@ -7,7 +7,7 @@
   - _Boundary: Import/Engine_ / _Requirements: 1.1,1.2,1.3,2.1,2.4,2.5,2.6,2.7_
   - 初期化/ページ上限/変換/64MiB/取消/期限/終了とPDF描画へ接続する。
   - _Depends: 1.1_
-- [ ] 3.1 選択・段階/経過時間・中断・全ページ確認のUIと説明を更新する。
+- [x] 3.1 選択・段階/経過時間・中断・全ページ確認のUIと説明を更新する。
   - _Boundary: UI/Browser_ / _Requirements: 1.1,1.4,1.5,2.3,2.4_
   - _Depends: 2.1_
 - [ ] 4.1 実エンジン・2ブラウザ・私的資料のローカル確認と独立レビューを行う。
@@ -22,3 +22,4 @@
 - Task1.1：独立APPROVED。23/23配信・relay、13/13browser、既存UI14工程、7資産/8part/84許諾ハッシュ一致。新PPTX統合・本番は後続タスク。
 - 配信manifestはschemaVersion1/base/assets、登録したnameをbaseへ連結する。bodyはBrotli/gzipを保持しencodeBody:manualで返す。
 - Task2.1：独立APPROVED。実APIのRED422→実PPTX/PPT・色/頁・容量/101頁/破損・準備/変換中断の3/3成功。終了時フォント解放1/1、既存13/13・23/23も成功。UI/本番は後続。
+- Task3.1：独立APPROVED。UI9工程・例外/CSP/スマホengine取得0、UI18/20・体験19/20。新UI7工程と既存PDF/全画面等14工程も成功。証拠QRはopacity0で隠して差替済み。
