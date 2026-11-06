@@ -45,6 +45,6 @@ PR207は5ce6cafへ、配信修正PR208はea64ae7へマージ。
 
 - 実機iPhone/Safari、物理スマホのQR読み取りは未検証。
 - idle alarmの自動配送時刻は未検証。保存時刻・期限拒否・実handler明示配送は確認した。
-- PPTX/PPT直接読込は非対応。元のPowerPointからPDFに書き出して使用する。
+- 初期公開時はPDFのみ。PowerPoint直接入力の復元と最新検証は[追加仕様の検証](../day084-powerpoint/verification.md)を参照する。
 - PDF/カンペはページメモリだけ。再読込/タブ終了で失われ、接続は最長4時間。
 - 動画は視覚/技術QCを確認したが、主観的な通し聴きは未実施。SNSは未投稿。

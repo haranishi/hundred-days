@@ -8,7 +8,9 @@
     "test:e2e": "node e2e.mjs",
     "build": "node build.mjs",
     "dev": "wrangler dev --port 8784",
-    "deploy": "wrangler deploy"
+    "deploy": "wrangler deploy",
+    "test:powerpoint": "node --test powerpoint.test.mjs",
+    "test:powerpoint-ui": "node powerpoint-ui.mjs"
   },
   "dependencies": {
     "pdfjs-dist": "6.5.438",
