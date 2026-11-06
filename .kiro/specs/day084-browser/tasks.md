@@ -23,3 +23,4 @@
 - Relay：独立レビューAPPROVED。実Miniflare/Chromeの15/15成功・skip0、構文PASS。idle alarmの自動配送時刻は未検証で、保存時刻/期限拒否/明示配送を分けて確認した。
 - Browser：実Miniflare/Chromeの13/13成功・skip0、構文PASS、独立レビューAPPROVED。日本語PDF・wire境界・暗号/AAD・75連続操作・ACK timeout・自分/相手切断・再同期・終了を確認。
 - UI：独立レビューAPPROVED。実2ブラウザ12工程成功、pageerror/CSP違反0。QRのSpaceコピーとダブルクリック全画面を修正し、390/768/1440pxの44px操作領域も再検証した。
+- 公開再検証：最初の実配信はaccount側のbase_path未有効（100343）で失敗。Task4は未完了。実prefix階層の専用assets rootへ変更し、実configのE2Eと再デプロイで確認する。

@@ -29,7 +29,7 @@
 - 次：全体check・公開ゲート・PR/必須CI・マージ・専用routeの本番確認。
 
 ## 公開の契約
-- このDayのパスだけのWorker route、assets.base_path、APIだけrun_worker_first。事業用の既存認証を使う。
+- このDayのパスだけのWorker route、専用root内の実prefix階層、APIだけrun_worker_first。事業用の既存認証を使う。
 - Web/policy.mjsをroot/Worker共通CSPにし、同じCSP下でPDFとWSを実行する。
 - wireは現在ページのノートと画像だけ、平文47KiB・外枠64KiB。DBに平文・暗号鍵・資料・暗号文を保存しない。
 - 完成後、旧プロモ/投稿文のMacローカル版という説明もWeb版と一致させる。
@@ -40,3 +40,11 @@
 - Worker dry-run：229assets/17.77KiB、DO・rate・assets bindings成功。
 - Relay再検証：15/15、skip0。Task4コードの独立レビューAPPROVED。
 - 公開gate初回はgyro permissionsの新例外を既存検査が未対応。payment/USBもdenyを維持し、Day84専用assertを追加して再検証中。
+
+## 最初の本番配信
+- PR207 head f8e7edfの全必須CI42146693725はsuccess。main5ce6cafへsquashマージした。
+- 221assets upload後、Cloudflare scripts APIが100343（このaccountでnon-root assets.base_path未有効）を返した。公開完了ではない。
+- fix/day084-worker-assetsをmainから作成。専用root内に公開prefixを実配置し、base_pathなしで同じURL/asset-firstを維持する設計へ更新中。
+- 初回main公開run42150200081は入口だけ先に更新しないため意図的にcancel。修正版の必須CI/マージ後の公開へ一本化する。
+- 再設計の独立レビューAPPROVED。専用rootのclean copy・root/_headersだけ・実config由来のE2Eで実装する。
+- 配信修正のコードレビューAPPROVED。親build/実config E2E13工程成功、pageerror/CSP0。独立側はread-only制約でbuild不可だったため、221fileのbytes・tree構造・実行記録を照合。

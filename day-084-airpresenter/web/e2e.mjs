@@ -7,6 +7,9 @@ import {Miniflare,Log,LogLevel,convertV4MiniflareOptions} from 'miniflare';
 import {APP_PATH,SECURITY_HEADERS} from './policy.mjs';
 const here=dirname(fileURLToPath(import.meta.url)),root=resolve(here,'../..');
 const evidence=join(root,'.cache/day084-browser-e2e');
+const deployment=JSON.parse(await readFile(join(here,'wrangler.jsonc'),'utf8'));
+const assetsDirectory=resolve(here,deployment.assets.directory);
+assert.equal(deployment.assets.base_path,undefined,'production must not require an account-gated base_path');
 await mkdir(evidence,{recursive:true});
 const mf=new Miniflare(convertV4MiniflareOptions({
  name:'day084-ui-test',modulesRoot:here,
@@ -14,9 +17,8 @@ const mf=new Miniflare(convertV4MiniflareOptions({
  compatibilityDate:'2026-11-01',
  durableObjects:{ROOMS:{className:'PresentationRoom',useSQLite:true}},
  ratelimits:{CREATE_LIMIT:{namespace_id:'840084',simple:{limit:6,period:60}}},
- assets:{directory:join(root,'dist/day-084-airpresenter'),binding:'ASSETS',
-  run_worker_first:[APP_PATH+'/api/*'],routerConfig:{has_user_worker:true},assetConfig:{base_path:APP_PATH,
-   headers:{version:2,rules:{[APP_PATH+'/*']:{set:SECURITY_HEADERS}}}}},
+ assets:{directory:assetsDirectory,binding:deployment.assets.binding,
+  run_worker_first:deployment.assets.run_worker_first,routerConfig:{has_user_worker:true}},
  log:new Log(LogLevel.NONE)
 }));
 let browser,stage='boot';
@@ -51,7 +53,11 @@ try {
  await expect(host.locator('#filePicker')).toHaveCount(1,{timeout:1500});
  await expect(host.locator('#choosePdf')).toBeVisible();
  assert.ok(!await host.locator('a#download').count(),'the primary interface opens documents instead of downloading the app');
- assert.equal(response.headers()['content-security-policy'],SECURITY_HEADERS['Content-Security-Policy']);
+ for(const [name,value] of Object.entries(SECURITY_HEADERS))assert.equal(response.headers()[name.toLowerCase()],value,name+' must come from the package root _headers');
+ step('prefix-and-private-assets');
+ for(const path of ['source/server.js','web/worker.mjs','tests/distribution.test.mjs','tools/package.py'])assert.equal((await hostContext.request.get(base+path)).status(),404,path);
+ assert.equal((await hostContext.request.get(address.origin+'/100days/day-085-warikan/')).status(),404,'other Days are not in this asset collection');
+ assert.equal((await hostContext.request.get(address.origin+'/app.js')).status(),404,'assets must exist only at the public prefix');
  if(process.argv.includes('--entry')){console.log('Browser entry PASS');}
  else if(process.argv.includes('--visual')) {
   await expect(host.locator('#connectionStatus')).toHaveAttribute('data-connected','true',{timeout:12000});

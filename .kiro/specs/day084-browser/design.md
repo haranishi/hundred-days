@@ -33,8 +33,8 @@ flowchart LR
   Relay <-->|AES-GCM暗号文| Phone[スマホブラウザ]
 ```
 依存方向は UI → Browser API → PDF import / Secure session → Relay。RelayはUIや資料形式に依存しない。
-- Worker routeはこのDayの/100days/day-084-airpresenter/*だけ。assets.base_pathは同prefix、run_worker_firstは同prefix/api/*だけ。
-- 静的アセットはasset-first。本番の100日Pagesを経由せず同じURLでWorkerが実アプリを返す。root buildのDay出力を同一assetsとして使う。
+- Worker routeはこのDayの/100days/day-084-airpresenter/*だけ。run_worker_firstは同prefix/api/*だけ。assets.base_pathは使わず、配布root内に100days/day-084-airpresenter/を実配置する。
+- 静的アセットはasset-first。本番の100日Pagesを経由せず同じURLでWorkerが実アプリを返す。web buildはroot buildのDay出力だけを.cache/day084-worker-assets/100days/day-084-airpresenter/へコピーし、他Day・開発用ファイルを含めない。
 - PC内のPDF原本は送らない。スマホへは長辺480px・20KiB以下の現在ページ画像と状態を暗号化して中継する。ページ変更/再同期時だけ画像を送る。
 - 最長4時間のSQLiteメタデータは権限のSHA256・作成/失効時刻のみ。原本・画像・カンペ・暗号鍵・暗号文をDBやログへ保存しない。alarmで失効・削除する。
 
@@ -79,7 +79,8 @@ flowchart LR
 - browser-apiをbootで読み込み、既存のapi/connectを差し替える。inline handlerはdata-action等へ置換し、script-src selfで操作できるようにする。
 - 初期画面から資料選択とQR接続ができる。PowerPoint直接選択の対処・接続鍵の扱い・4時間/再読込/終了を短く表示する。
 - share.js/cssを継承。canonical/OGPはroot buildが生成する。web/policy.mjsをDay84のCSP/permissions/referrer/nosniffの単一の生成元にする。scripts/build.mjsはDay84だけこのpolicyを適用してdist/_headersへ書く。
-- web/build.mjsは同じpolicyから、公開prefixを持つ_headersをdist/day-084-airpresenter/へ書く。Worker assetsはこのDay出力を使う。両方のCSPが同一であることを検査し、そのCSP下でPDF/WSを実行する。
+- web/build.mjsはDay出力を専用rootの公開prefix階層へコピーし、同じpolicyの_headersを専用root直下へ置く。Worker assets.directoryはこのrootを指す。共通/専用CSPの一致を検査し、そのCSP下でPDF/WSを実行する。
+- 本番APIがnon-root base_pathを100343で拒否したため、アカウント設定の変更なしで使える実階層へ変更。E2Eはwrangler.jsoncを読み、同じassets.directory/run_worker_firstを実Miniflareに渡す。専用rootはclean後Day84だけcopyし、_headersはrootの1本を実runtimeに読ませ、全SECURITY_HEADERSと非配信範囲を確認する。
 - CSPはscript-src selfとwasm-unsafe-eval（JSのunsafe-eval/inline scriptは禁止）、worker-src self blob:、font-src self blob: data:、img-src self blob: data:、connect-src self wss://rairakku.com、style-src self unsafe-inline。object-src none/base-uri self/frame-ancestors noneを付ける。referrerはno-referrer。permissionsは明示操作するorientationセンサーだけself、camera/microphone/geolocationは無効。
 
 ## Requirements Traceability
