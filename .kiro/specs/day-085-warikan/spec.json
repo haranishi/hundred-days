@@ -1,0 +1,39 @@
+{
+  "name": "day-085-warikan",
+  "phase": "validated",
+  "approvals": {
+    "requirements": {
+      "generated": true,
+      "approved": true
+    },
+    "design": {
+      "generated": true,
+      "approved": true
+    },
+    "tasks": {
+      "generated": true,
+      "approved": true
+    }
+  },
+  "approval_basis": "Day085企画の作成依頼と自律進行指示。既存静的基盤と厳密な最小回数計算を採用",
+  "task_graph_review": {
+    "mode": "self-check",
+    "verdict": "PASS",
+    "dependencies": "model -> UI/storage -> sharing -> verification"
+  },
+  "validation": {
+    "day_unit_passed": 15,
+    "day_e2e_passed": 19,
+    "repo_unit_passed": 5105,
+    "repo_unit_existing_skipped": 1,
+    "dependency_projects": 15,
+    "publish_gate_passed": 333,
+    "publish_gate_existing_skipped": 1,
+    "walkthrough_seconds": 312,
+    "walkthrough_steps": 31,
+    "ui_self_check": "18/20",
+    "experience_self_check": "18/20",
+    "review_mode": "self-check",
+    "production": "not merged or deployed"
+  }
+}
