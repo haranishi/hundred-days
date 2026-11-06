@@ -3,7 +3,7 @@
 - [x] 1.1 固定版アセットのビルドとストリーム配信、専用CSPを実装する。
   - _Boundary: Assets/Delivery_ / _Requirements: 2.2,3.1,3.2_
   - 固定ハッシュ/ライセンス、全part20MiB以下、GET/HEAD、不正パス/欠損の試験。
-- [ ] 2.1 変換用フレームを所有するPPTX/PPT importerを実装する。
+- [x] 2.1 変換用フレームを所有するPPTX/PPT importerを実装する。
   - _Boundary: Import/Engine_ / _Requirements: 1.1,1.2,1.3,2.1,2.4,2.5,2.6,2.7_
   - 初期化/ページ上限/変換/64MiB/取消/期限/終了とPDF描画へ接続する。
   - _Depends: 1.1_
@@ -21,3 +21,4 @@
 ## Implementation Notes
 - Task1.1：独立APPROVED。23/23配信・relay、13/13browser、既存UI14工程、7資産/8part/84許諾ハッシュ一致。新PPTX統合・本番は後続タスク。
 - 配信manifestはschemaVersion1/base/assets、登録したnameをbaseへ連結する。bodyはBrotli/gzipを保持しencodeBody:manualで返す。
+- Task2.1：独立APPROVED。実APIのRED422→実PPTX/PPT・色/頁・容量/101頁/破損・準備/変換中断の3/3成功。終了時フォント解放1/1、既存13/13・23/23も成功。UI/本番は後続。

@@ -46,6 +46,7 @@ UNOはHidden/ReadOnly、MacroExecutionMode=NEVER_EXECUTE、UpdateDocMode=NO_UPDA
 100ページ超はstoreToURL前に拒否する。impress_pdf_ExportでPDFを生成し、doc.closeとFS.unlink後にArrayBufferをportで親へtransferする。
 engine内のprint/console/例外は内容をログへ出さず、親への失敗は一般向けメッセージにする。外部画像/リンク更新とマクロを実行しない。
 親はport/messageerror/初期化失敗/timeoutで保留をrejectして破棄する。中断は処理側の応答を待たない。
+フレーム除去だけではWorkerが残ったため、固定SDKのwindow.PThreadのdata descriptorにあるterminateAllThreadsと所有した標準Worker.terminateを同期実行し、portを閉じてから除去する。Module.PThreadは非公開getterでabortするため参照しない。試作で2→0を確認した。
 
 ## PCフォント
 UIの任意ボタンだけがqueryLocalFontsを呼ぶ。未許可/未対応は標準のNoto JPへ戻せる。

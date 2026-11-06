@@ -25,7 +25,7 @@ function options(extra = {}) {
 before(async () => {
   assetDirectory=await mkdtemp(fileURLToPath(new URL('./test-fixtures/.browser-assets-',import.meta.url)));
   await mkdir(assetDirectory+'/web/test-fixtures',{recursive:true});
-  for(const file of ['browser-api.js','session.js','pdf-import.js','vendor']) await cp(fileURLToPath(new URL('../'+file,import.meta.url)),assetDirectory+'/'+file,{recursive:true});
+  for(const file of ['browser-api.js','session.js','pdf-import.js','presentation-import.js','powerpoint-import.js','local-fonts.js','office','vendor']) await cp(fileURLToPath(new URL('../'+file,import.meta.url)),assetDirectory+'/'+file,{recursive:true});
   for(const file of ['browser-harness.html','browser-harness.mjs']) await cp(fileURLToPath(new URL('./test-fixtures/'+file,import.meta.url)),assetDirectory+'/web/test-fixtures/'+file);
   await writeFile(assetDirectory+'/_headers',[APP_PATH+'/*',...Object.entries(SECURITY_HEADERS).map(([name,value])=>'  '+name+': '+value),''].join('\n'));
   mf = new Miniflare(options()); address = (await mf.ready).origin;
@@ -233,7 +233,7 @@ test('PDF import renders Japanese pages locally, reports real progress and prese
     assert.equal(await phone.evaluate(async ()=>(await api.request(state.slides[0])).headers.get('Content-Type')),'image/jpeg');
     const invalid=await upload(pc,Buffer.from('not a PDF'),'broken.pdf','broken-import');assert.equal(invalid.status,422);
     assert.deepEqual((await request(pc,'/api/info')).value.state.slides,oldSlides);
-    for(const name of ['slides.pptx','slides.ppt']) {const result=await upload(pc,Buffer.from('powerpoint'),name);assert.equal(result.status,422);assert.match(result.value.error,/PDF/);}
+    for(const name of ['slides.pptx','slides.ppt']) {const result=await upload(pc,Buffer.from('powerpoint'),name);assert.equal(result.status,422);assert.match(result.value.error,/PowerPoint/);assert.doesNotMatch(result.value.error,/PDF.*書き出/);assert.deepEqual((await request(pc,'/api/info')).value.state.slides,oldSlides);}
     assert.equal((await upload(pc,Buffer.alloc(25*1024*1024+1),'too-big.pdf')).status,413);
     const cancelled=await upload(pc,pdf(2),'cancel.pdf','discard-later');await request(pc,'/api/discard',{id:cancelled.value.preview.id});
     assert.deepEqual((await request(pc,'/api/info')).value.state.slides,oldSlides);

@@ -1,5 +1,7 @@
 import {createSecureSession, MAX_PLAINTEXT_BYTES} from './session.js';
-import {importPdf, createThumbnail} from './pdf-import.js';
+import {createThumbnail} from './pdf-import.js';
+import {importPresentation} from './presentation-import.js';
+import {resetLocalFonts} from './local-fonts.js';
 import {qrcode} from './vendor/qrcode.mjs';
 
 const BASE = new URL('./',import.meta.url);
@@ -147,7 +149,7 @@ export async function createBrowserApi({onSnapshot = () => {}, onConnection = ()
   }
   function release() {
     if (closed) return;
-    closed = true; transportEpoch++; importAbort?.abort(); importAbort = null;
+    closed = true; transportEpoch++; importAbort?.abort(); importAbort = null; resetLocalFonts();
     stopLaser(); activeDeck?.dispose(); candidate?.dispose();activeDeck=candidate=null;
     remoteImages.clear(); thumbnails.clear(); processed.clear(); lastSentSlide='';
     qrBlob=null; if(qrUrl) URL.revokeObjectURL(qrUrl); qrUrl='';
@@ -227,19 +229,19 @@ export async function createBrowserApi({onSnapshot = () => {}, onConnection = ()
       candidate?.dispose();candidate=null;
       state.import={id,status:'processing',stage:'preparing',completed:0,total:null,startedAt:Date.now(),updatedAt:Date.now()};publish();
       try {
-        const deck = await importPdf(options.body,{signal:controller.signal,onProgress:progress=>updateImport(id,progress)});
+        const deck = await importPresentation(options.body,{signal:controller.signal,onProgress:progress=>updateImport(id,progress)});
         if (closed || controller.signal.aborted) {deck.dispose();throw new DOMException('資料の読込を取り消しました。','AbortError');}
         candidate=deck;updateImport(id,{status:'awaiting_confirmation',stage:'ready',completed:deck.total,total:deck.total});
         return json({state:snapshot(),preview:preview()});
       } catch (error) {
-        updateImport(id,error?.name==='AbortError' ? {status:'discarded',stage:'ready'} : {status:'failed',stage:'failed',error:error?.status?error.message:'PDFを読み込めませんでした。'});
+        updateImport(id,error?.name==='AbortError' ? {status:'discarded',stage:'ready'} : {status:'failed',stage:'failed',error:error?.status?error.message:'資料を読み込めませんでした。'});
         throw error;
       } finally {options.signal?.removeEventListener('abort',abort);if(importAbort===controller) importAbort=null;}
     }
     if (['/api/accept','/api/discard'].includes(path) && method==='POST') {
-      if(importAbort) throw fault(409,'PDFを読み込み中です。完了までお待ちください。');
+      if(importAbort) throw fault(409,'資料を読み込み中です。完了までお待ちください。');
       const body=parseBody(options.body);
-      if(!candidate || candidate.id!==body.id) throw fault(404,'確認待ちの資料がありません。PDFを選び直してください。');
+      if(!candidate || candidate.id!==body.id) throw fault(404,'確認待ちの資料がありません。資料を選び直してください。');
       const deck=candidate;candidate=null;
       if(path==='/api/accept') {
         const previous=activeDeck;activeDeck=deck;stopLaser();thumbnails.clear();
