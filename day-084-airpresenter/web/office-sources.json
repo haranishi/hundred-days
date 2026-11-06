@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "version": "zetaoffice-24.2.8.0.beta1-zetajs-1.2.0-noto-f8d15753",
+  "version": "zetaoffice-24.2.8.0.beta1-zetajs-1.2.0-noto-f8d15753-stream-v2",
   "provenance": "Unmodified official ZetaOffice Qt/WASM binary distribution; CDN alias is mutable, so raw SHA256 is mandatory and fail-closed. Transport compression/parts do not modify decoded files.",
   "components": {
     "ZetaOffice": {

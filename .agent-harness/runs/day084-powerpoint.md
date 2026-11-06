@@ -32,3 +32,9 @@ ROOTだけが非公開ローカルで29頁資料を検証した。標準/PC書�
 Task5.1で全必須CI→PRマージ→同Day route反映→本番の自作PPTX/PPT操作を行う。
 新しいPowerPoint版の宣伝動画とX草案、Drive/Obsidianの記録を更新する。旧PDF版/ローカル版の成果物は履歴として保持する。
 新しい有料サービスや契約変更は行わず、SNSへは投稿しない。公開結果の数値とURLはPRの記録へ追記する。
+
+## 公開時の追加修正
+
+PR209は全必須CI42174231055成功後にmain722399fへmerge。main CI42177023831も成功。Worker c19b9b2cへ反映した。
+公開で標準PPTX/PPT・PDF9工程は成功したが、巨大WASMがHTTP200でも途中切れする例を捕捉した。Task5.1の公開完了は保留し、Task5.2へ継続する。
+FixedLengthStream/native pipeとstream-v2の配信pathへ変更。詳細と本番再確認の範囲は[配信検証](../../.kiro/specs/day084-powerpoint/delivery-verification.md)を参照。

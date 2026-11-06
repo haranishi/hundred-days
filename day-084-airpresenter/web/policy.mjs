@@ -1,7 +1,7 @@
 export const APP_PATH = '/100days/day-084-airpresenter';
 export const OFFICE_PATH = APP_PATH + '/office';
 export const ENGINE_ASSET_PATH = APP_PATH + '/vendor/office';
-export const OFFICE_ASSET_VERSION = 'zetaoffice-24.2.8.0.beta1-zetajs-1.2.0-noto-f8d15753';
+export const OFFICE_ASSET_VERSION = 'zetaoffice-24.2.8.0.beta1-zetajs-1.2.0-noto-f8d15753-stream-v2';
 export const OFFICE_CONTENT_SECURITY_POLICY = [
   "default-src 'self'",
   "script-src 'self' 'unsafe-eval' 'wasm-unsafe-eval'",

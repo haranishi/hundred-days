@@ -57,9 +57,11 @@ UIの任意ボタンだけがqueryLocalFontsを呼ぶ。未許可/未対応は�
 ## 配信契約
 公開資産はvendor/office/の固定版に置く。公式CDN/固定ソースからbuild時だけ取得しraw SHA256を照合する。ブラウザは同一originだけに接続する。
 WASM/dataは公式のBrotliを保ち、フォントはgzipで圧縮し、全partを20MiB以下にする。manifestは登録した資産名/MIME/encoding/partsのみ。
+公開時に不完全な200応答が残り得たため、配信版のpathに-stream-v2を付けて旧immutableキャッシュを再利用しない。SDK・原本・raw SHAは変更しない。
 仮想資産GETはmanifestの許可名だけを選び、ASSETSのpartを順にstream結合する。全体のarrayBuffer結合はしない。
 Content-Encoding、適切なMIME、版付きcache-control、encodeBody:manualを指定する。HEADはbodyなし、他method/不正パス/欠損partは拒否する。
-streamはbackpressureを守り、ブラウザ取消時に実行中のpart readerをcancelする。ブラウザが通常の圧縮展開とWASM streaming compileを行う。
+streamは圧縮wire総量のFixedLengthStreamを使用する。各ASSETS bodyをpipeTo({preventClose:true})で順に接続し、最後にcloseする。JSで各chunkを読み書きしない。
+FixedLengthStreamの実Content-Lengthで不足/超過をエラーにし、取消/失敗はpipeToの既定のcancel/abortで伝える。ブラウザが通常の圧縮展開とWASM streaming compileを行う。
 run_worker_firstは同Dayのoffice/*とvendor/office/*だけを追加する。既存API/他Dayの経路を変更しない。
 変換HTML/JSの応答CSPはscript-src self unsafe-eval wasm-unsafe-eval、connect-src self、worker-src self blob:、frame-ancestors self。object/formは禁止する。
 mainのJS unsafe-eval/inline禁止は維持する。全Day84にCOOP same-originとCOEP require-corpを適用して共有メモリを許可する。
