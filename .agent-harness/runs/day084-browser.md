@@ -19,11 +19,14 @@
 - 予定のCSPで自作日本語PDF3ページをChrome内描画。文字取得・背景/配置・PNG実見、pageerror0・CSP違反0。
 - 証拠：.cache/day084-pdf-probe/。元PDFは旧プロモ用の自作資料で、本人の研究資料ではない。
 
-## 実装中
+## 実装と検証
 - Task1 Relay：実Miniflare/Chromeの15/15成功・skip0、構文PASS、独立レビューAPPROVED。権限・別部屋・status・期限拒否・中継・制限・終了を確認。idle alarmは保存時刻と実handler明示配送を検証し、秒単位自動配送時刻は未検証。
-- Browser/UI/本番の接続はまだ完成扱いしない。
+- Task2 Browser：13/13、skip0、独立レビューAPPROVED。PDF・wire境界・暗号化・burst・切断/再同期・終了を実runtime/Chromeで確認。
+- Task3 UI：独立レビューAPPROVED。実2ブラウザ12工程成功、pageerror/CSP違反0。レビューでQR Spaceの二重操作とinline dblclickを修正した。
+- 3幅のoverflowなし・44pxを確認。独立UI/体験評価は進行中、本番はまだ完成扱いしない。
 - Miniflare5はworkers配列schema。実配布のconvertV4MiniflareOptionsで旧形式を正式変換して使う。
-- 次：Task2 Browser API、Task3 UI接続、Task4公開/CI/本番確認。
+- Task4：meta/説明/共有CSP/CIをブラウザ版へ整備中。root unit初回7件のREDは独立ビルドでDay84のpolicyを常時importしたため。含有Dayが84の時だけ読む形にし、関連37件の回帰検査で修正を確認。
+- 次：全体check・公開ゲート・PR/必須CI・マージ・専用routeの本番確認。
 
 ## 公開の契約
 - このDayのパスだけのWorker route、assets.base_path、APIだけrun_worker_first。事業用の既存認証を使う。

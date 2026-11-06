@@ -1,81 +1,1305 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="AirPresenterは、Macで開いた資料を同じWi-Fiのスマホから操作するローカルアプリ。ページ送り、暗転、ポインター、カンペとタイマーを手元に。">
-  <meta name="share:text" content="AirPresenter — スマホが、発表のリモコンに。Macで使うローカル版。">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>AirPresenter | スマホが、発表のリモコンに。</title>
+  <meta name="referrer" content="no-referrer">
+  <meta name="description" content="リンクを開いてPDFを選び、スマホをQRで接続。ブラウザだけで使えるプレゼン用リモコンです。">
+  <meta name="share:text" content="AirPresenter — スマホが、発表のリモコンに。インストール不要。">
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="shared/share.css">
-  <script defer src="shared/share.js"></script>
+  <script src="app.js" defer></script>
+  <script src="shared/share.js" defer></script>
+  <style>
+    /* Reset & Base Variables */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg-dark: #08090c;
+      --card-bg: #14161c;
+      --card-subtle: #1c202a;
+      --border: #232733;
+      --border-subtle: #191c24;
+      --brand-red: #ff334b;
+      --brand-glow: rgba(255, 51, 75, 0.45);
+      --text-main: #f1f5f9;
+      --text-muted: #94a3b8;
+      --text-dim: #64748b;
+    }
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      user-select: none;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+    /* Header Nav */
+    header {
+      height: 56px;
+      border-bottom: 1px solid var(--border);
+      background: rgba(10, 11, 14, 0.85);
+      backdrop-filter: blur(12px);
+      padding: 0 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+    .brand-logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .logo-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, #ff334b, #f97316);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 12px var(--brand-glow);
+    }
+    .badge {
+      font-size: 10px;
+      font-family: monospace;
+      padding: 2px 6px;
+      border-radius: 4px;
+      background: rgba(255, 51, 75, 0.12);
+      color: var(--brand-red);
+      border: 1px solid rgba(255, 51, 75, 0.25);
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+    .mode-tabs {
+      display: flex;
+      background: #14161c;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 3px;
+      gap: 4px;
+    }
+    .tab-btn {
+      padding: 6px 14px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.15s ease;
+    }
+    .tab-btn.active {
+      background: var(--brand-red);
+      color: #fff;
+      box-shadow: 0 2px 8px var(--brand-glow);
+    }
+    .room-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      font-family: monospace;
+      background: rgba(16, 185, 129, 0.1);
+      color: #34d399;
+      border: 1px solid rgba(16, 185, 129, 0.2);
+      padding: 4px 10px;
+      border-radius: 9999px;
+    }
+    .pulse-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #34d399;
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.85); }
+    }
+
+    /* Main Container */
+    main {
+      flex: 1;
+      padding: 24px;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+    }
+    .stage-container {
+      width: 100%;
+      max-width: 1240px;
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 32px;
+      align-items: start;
+    }
+    .stage-container.mode-host {
+      grid-template-columns: 1fr;
+      max-width: 1100px;
+    }
+    .stage-container.mode-remote {
+      display: flex;
+      justify-content: center;
+      padding: 0;
+    }
+
+    /* Section Headings */
+    .section-label {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .section-title {
+      font-weight: 600;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* PC Screen Frame */
+    .pc-frame {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      background: #000;
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+    .slide-stage {
+      flex: 1;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      background: #050507;
+    }
+
+    /* PDF View Frame */
+    .pdf-frame-view {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      border: none;
+      display: none;
+      background: #000;
+    }
+    .pdf-frame-view.active {
+      display: block;
+    }
+
+    /* Converted slide image */
+    .slide-image-view {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      background: #020617;
+      display: none;
+      z-index: 5;
+    }
+    .slide-image-view.active {
+      display: block;
+    }
+
+    /* DOM Slide Card */
+    .slide-card {
+      width: 100%;
+      height: 100%;
+      padding: 40px 48px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      background-size: cover;
+      background-position: center;
+      overflow-y: auto;
+    }
+    .slide-badge {
+      display: inline-block;
+      font-size: 11px;
+      font-family: monospace;
+      font-weight: 600;
+      color: var(--brand-red);
+      background: rgba(255, 51, 75, 0.1);
+      border: 1px solid rgba(255, 51, 75, 0.2);
+      padding: 3px 8px;
+      border-radius: 6px;
+      letter-spacing: 0.05em;
+    }
+    .slide-heading {
+      font-size: 32px;
+      font-weight: 800;
+      color: #fff;
+      line-height: 1.25;
+      margin-bottom: 12px;
+    }
+    .slide-subheading {
+      font-size: 16px;
+      color: var(--text-muted);
+      line-height: 1.6;
+      max-width: 650px;
+      margin-bottom: 24px;
+    }
+    .slide-bullets {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .slide-bullets li {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 14px;
+      color: #e2e8f0;
+    }
+    .bullet-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--brand-red);
+      flex-shrink: 0;
+    }
+
+    /* Architecture Diagram */
+    .arch-diagram {
+      width: 100%;
+      background: rgba(20, 22, 28, 0.9);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      margin-top: 10px;
+    }
+    .arch-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 6px;
+    }
+    .arch-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .arch-line {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+    .flow-bar {
+      width: 120px;
+      height: 2px;
+      background: linear-gradient(90deg, #38bdf8, var(--brand-red));
+    }
+
+    /* Laser Dot */
+    .laser-dot {
+      position: absolute;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: #ff334b;
+      box-shadow: 0 0 16px 4px #ff334b, 0 0 32px 10px rgba(255, 51, 75, 0.6);
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      z-index: 30;
+      opacity: 0;
+      transition: opacity 0.15s ease;
+    }
+    .laser-dot.active {
+      opacity: 1;
+    }
+
+    /* Blackout Screen */
+    .blackout-overlay {
+      position: absolute;
+      inset: 0;
+      background: #000;
+      z-index: 25;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+    }
+    .blackout-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    /* PC Footer */
+    .pc-footer {
+      height: 32px;
+      background: rgba(10, 11, 14, 0.9);
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      padding: 0 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 11px;
+      color: var(--text-dim);
+      font-family: monospace;
+    }
+
+    /* QR Overlay Badge - Real QR Code */
+    .qr-badge {
+      position: absolute;
+      bottom: 44px;
+      right: 16px;
+      z-index: 20;
+      background: rgba(20, 22, 28, 0.95);
+      backdrop-filter: blur(8px);
+      padding: 10px 14px;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .qr-badge:hover {
+      border-color: var(--brand-red);
+      transform: scale(1.02);
+    }
+    .qr-image-container {
+      width: 72px;
+      height: 72px;
+      background: #fff;
+      padding: 4px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .qr-image-container img {
+      width: 100%;
+      height: 100%;
+      display: block;
+      image-rendering: pixelated;
+    }
+
+    /* Drop Zone Overlay */
+    .drop-overlay {
+      position: absolute;
+      inset: 12px;
+      border-radius: 12px;
+      background: rgba(10, 11, 14, 0.98);
+      border: 2px dashed #475569;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 24px;
+      z-index: 35;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+    }
+    .drop-overlay.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    /* Mobile Remote Phone Frame */
+    .phone-mockup {
+      width: 340px;
+      height: 680px;
+      background: #000;
+      border-radius: 48px;
+      padding: 12px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8), 0 0 0 4px #232733;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+    .phone-screen {
+      flex: 1;
+      background: #0a0b0e;
+      border-radius: 38px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      padding: 24px 12px 16px 12px;
+      position: relative;
+    }
+
+    /* Standalone Mobile Fullscreen Remote Mode */
+    body.standalone-remote {
+      background: #0a0b0e;
+      overflow: hidden;
+      height: 100vh;
+    }
+    body.standalone-remote header {
+      display: none;
+    }
+    body.standalone-remote main {
+      padding: 0;
+      height: 100vh;
+      align-items: stretch;
+    }
+    body.standalone-remote #stageContainer {
+      width: 100%;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      padding: 0;
+    }
+    body.standalone-remote #phoneCol {
+      width: 100%;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    body.standalone-remote #phoneCol .section-label,
+    body.standalone-remote #phoneCol > p {
+      display: none;
+    }
+    body.standalone-remote .phone-mockup {
+      width: 100%;
+      height: 100vh;
+      max-height: 100vh;
+      border-radius: 0;
+      padding: 0;
+      box-shadow: none;
+      border: none;
+    }
+    body.standalone-remote .phone-screen {
+      border-radius: 0;
+      padding: max(env(safe-area-inset-top), 16px) 12px max(env(safe-area-inset-bottom), 16px) 12px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    body.standalone-remote .phone-notch {
+      display: none;
+    }
+
+    /* Phone Notch */
+    .phone-notch {
+      position: absolute;
+      top: 14px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 110px;
+      height: 20px;
+      background: #14161c;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 40;
+    }
+    .notch-speaker {
+      width: 40px;
+      height: 4px;
+      background: #2a2f3e;
+      border-radius: 4px;
+    }
+
+    /* Remote Top Status Widget */
+    .remote-widget {
+      height: 64px;
+      background: rgba(20, 22, 28, 0.8);
+      border: 1px solid rgba(35, 39, 51, 0.8);
+      border-radius: 16px;
+      padding: 0 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 12px;
+      margin-bottom: 8px;
+    }
+    .widget-title {
+      font-size: 10px;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      font-family: monospace;
+      letter-spacing: 0.05em;
+    }
+    .widget-value {
+      font-size: 20px;
+      font-weight: 700;
+      font-family: monospace;
+      color: #fff;
+    }
+    .widget-slide {
+      font-size: 18px;
+      font-weight: 700;
+      font-family: monospace;
+      color: var(--brand-red);
+    }
+
+    /* Speaker Note Bar */
+    .note-bar {
+      padding: 6px 12px;
+      background: rgba(0, 0, 0, 0.4);
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* Touch Navigation Area (Split 2-zone) */
+    .touch-area {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin: 4px 0;
+    }
+    .touch-btn {
+      border: none;
+      outline: none;
+      cursor: pointer;
+      border-radius: 18px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s ease;
+      position: relative;
+      overflow: hidden;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .touch-btn:active {
+      transform: scale(0.97);
+    }
+    .btn-prev {
+      background: linear-gradient(180deg, #14161c, #0d0f14);
+      border: 1px solid rgba(35, 39, 51, 0.8);
+      color: var(--text-muted);
+    }
+    .btn-prev:active {
+      border-color: #64748b;
+      color: #fff;
+    }
+    .btn-next {
+      background: linear-gradient(180deg, #1c1f2b, #141622);
+      border: 1px solid rgba(255, 51, 75, 0.4);
+      color: #fff;
+      box-shadow: inset 0 0 20px rgba(255, 51, 75, 0.08);
+    }
+    .btn-next:active {
+      border-color: var(--brand-red);
+      background: linear-gradient(180deg, #2a2028, #18121a);
+    }
+    .icon-circle {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.05);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 10px;
+    }
+    .btn-next .icon-circle {
+      background: rgba(255, 51, 75, 0.15);
+      color: var(--brand-red);
+      box-shadow: 0 0 15px rgba(255, 51, 75, 0.2);
+    }
+    .btn-label {
+      font-size: 13px;
+      font-weight: 700;
+      font-family: monospace;
+      letter-spacing: 0.05em;
+    }
+    .btn-sub {
+      font-size: 10px;
+      color: var(--text-dim);
+      margin-top: 4px;
+    }
+
+    /* Bottom Utility Bar */
+    .utility-bar {
+      height: 72px;
+      display: grid;
+      grid-template-columns: 84px 1fr;
+      gap: 10px;
+      margin-top: 8px;
+      padding-top: 4px;
+      border-top: 1px solid rgba(35, 39, 51, 0.5);
+    }
+    .btn-blackout {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      color: var(--text-muted);
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      font-size: 10px;
+      font-family: monospace;
+    }
+    .btn-blackout:active {
+      background: var(--card-subtle);
+      color: #fff;
+    }
+    .btn-laser {
+      background: linear-gradient(135deg, rgba(60, 10, 18, 0.8), rgba(20, 22, 28, 0.9));
+      border: 1px solid rgba(255, 51, 75, 0.4);
+      border-radius: 16px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      padding: 0 16px;
+      box-shadow: 0 4px 15px rgba(255, 51, 75, 0.15);
+    }
+    .btn-laser:active {
+      background: rgba(255, 51, 75, 0.25);
+      border-color: var(--brand-red);
+    }
+    .laser-icon-glow {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: rgba(255, 51, 75, 0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .laser-icon-center {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--brand-red);
+      box-shadow: 0 0 8px var(--brand-red);
+    }
+    /* Home Bar */
+    .home-indicator {
+      width: 120px;
+      height: 4px;
+      background: rgba(148, 163, 184, 0.3);
+      border-radius: 4px;
+      align-self: center;
+      margin-top: 10px;
+    }
+    /* Tool Buttons */
+    .btn-tool {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      padding: 4px 10px;
+      border-radius: 8px;
+      font-size: 11px;
+      cursor: pointer;
+    }
+    .btn-tool:hover {
+      color: #fff;
+      background: var(--card-subtle);
+    }
+    /* Toast Notification */
+    .toast {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-50px);
+      background: rgba(20, 22, 28, 0.95);
+      border: 1px solid var(--brand-red);
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 600;
+      z-index: 100;
+      opacity: 0;
+      transition: all 0.3s ease;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+
+    /* =================================================== */
+    /* FULLSCREEN PRESENTATION MODE (Edge-to-Edge Display) */
+    /* =================================================== */
+    :fullscreen, ::backdrop {
+      background: #000 !important;
+    }
+
+    body.in-fullscreen {
+      margin: 0 !important;
+      padding: 0 !important;
+      overflow: hidden !important;
+      background: #000 !important;
+      width: 100vw !important;
+      height: 100vh !important;
+    }
+
+    body.in-fullscreen #mainHeader,
+    body.in-fullscreen #phoneCol,
+    body.in-fullscreen .window-bar,
+    body.in-fullscreen .section-label,
+    body.in-fullscreen #pcCol > p {
+      display: none !important;
+    }
+
+    body.in-fullscreen .stage-container {
+      display: block !important;
+      width: 100vw !important;
+      height: 100vh !important;
+      max-width: none !important;
+      padding: 0 !important;
+      margin: 0 !important;
+    }
+
+    body.in-fullscreen #pcCol {
+      width: 100vw !important;
+      height: 100vh !important;
+      max-width: none !important;
+      padding: 0 !important;
+      margin: 0 !important;
+    }
+
+    body.in-fullscreen .pc-frame {
+      width: 100vw !important;
+      height: 100vh !important;
+      border: none !important;
+      border-radius: 0 !important;
+      box-shadow: none !important;
+      background: #000 !important;
+    }
+
+    body.in-fullscreen .slide-stage {
+      width: 100vw !important;
+      height: 100vh !important;
+      border-radius: 0 !important;
+      background: #000 !important;
+    }
+
+    body.in-fullscreen .slide-image-view {
+      width: 100vw !important;
+      height: 100vh !important;
+      object-fit: contain !important;
+      border-radius: 0 !important;
+      background: #000 !important;
+    }
+
+    /* Fullscreen controls appear at the viewport edges or on keyboard focus. */
+    .fullscreen-hud {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      z-index: 90;
+    }
+    .fullscreen-hud.visible {
+      opacity: 1;
+    }
+
+    .fullscreen-hud-top {
+      position: absolute;
+      top: 24px;
+      right: 28px;
+      pointer-events: auto;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .fullscreen-hud-bar {
+      position: absolute;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(15, 23, 42, 0.88);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 100px;
+      padding: 8px 24px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      color: #fff;
+      font-size: 13px;
+      pointer-events: auto;
+      box-shadow: 0 16px 36px rgba(0, 0, 0, 0.6);
+    }
+
+    .btn-fullscreen-toggle {
+      background: linear-gradient(135deg, var(--brand-red), #e11d48);
+      color: #fff;
+      border: none;
+      padding: 7px 18px;
+      border-radius: 10px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 4px 14px rgba(255, 51, 75, 0.35);
+      transition: all 0.2s ease;
+    }
+    .btn-fullscreen-toggle:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 18px rgba(255, 51, 75, 0.5);
+    }
+
+    button, [role="button"], summary { touch-action: manipulation; }
+    button:focus-visible, summary:focus-visible, [tabindex]:focus-visible, textarea:focus-visible { outline: 3px solid #38bdf8; outline-offset: 3px; }
+    button:disabled { opacity: .38; cursor: not-allowed; }
+    [hidden] { display: none !important; }
+    .host-tools { margin-top: 18px; padding: 20px; background: var(--card-bg); border: 1px solid var(--border); border-radius: 16px; }
+    .host-tools h2 { font-size: 18px; margin-bottom: 6px; }
+    .host-tools p, .host-tools details, .helper-text { font-size: 12px; color: #b2bdcf; line-height: 1.7; }
+    .host-tools details { margin: 16px 0; }
+    .host-tools details p { margin: 10px 0; }
+    .host-tools label { display:block; font-size: 13px; margin: 12px 0 8px; }
+    .host-tools textarea { width:100%; background:#08090c; color:#f1f5f9; border:1px solid #64748b; border-radius:8px; padding:12px; font:inherit; resize:vertical; user-select:text; }
+    .intro-row { display:flex; gap:12px; justify-content:space-between; align-items:center; flex-wrap:wrap; }
+    .intro-row button { min-height:44px; }
+    .connection-status { font-size:12px; color:#fbbf24; text-align:center; min-height:20px; padding:4px; }
+    .connection-status[data-connected="true"] { color:#6ee7b7; }
+    .note-bar { white-space:pre-wrap; max-height:100px; min-height:32px; overflow:auto; font-size:13px; line-height:1.5; user-select:text; }
+    .remote-extras { display:flex; gap:6px; flex-wrap:wrap; margin:8px 0 4px; }
+    .remote-extras button { min-height:44px; flex:1; }
+    #pointerHint { font-size:10px; text-align:center; }
+    #laserBtn { touch-action:none; user-select:none; }
+    .touch-area { min-height:160px; }
+    .slide-body h1 { font-size:clamp(22px,3vw,42px); letter-spacing:-.03em; line-height:1.4; margin-bottom:20px; }
+    .slide-body p { color:#cbd5e1; font-size:clamp(14px,1.5vw,20px); line-height:1.7; }
+    .slide-bullets { margin-top:20px; }
+    body.in-fullscreen #hostTools, body.in-fullscreen .pc-footer, body.in-fullscreen #qrBadge { display:none !important; }
+    body.in-fullscreen main { padding:0 !important; }
+    body.in-fullscreen .slide-card { width:100%; height:100%; max-width:unset; border-radius:0; padding:8vw; }
+    #conversionPreview, #importProgress { color:#f1f5f9; background:#14161c; border:1px solid #475569; border-radius:16px; width:min(960px,94vw); max-height:90dvh; margin:auto; padding:24px; }
+    #conversionPreview::backdrop, #importProgress::backdrop { background:rgba(0,0,0,.85); }
+    .preview-header h2 { font-size:22px; margin-bottom:12px; }
+    .preview-header p { font-size:13px; color:#b2bdcf; line-height:1.8; }
+    #previewPages { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px; padding:20px 0; }
+    #previewPages figure { margin:0; min-width:0; }
+    #previewPages img { width:100%; background:#000; border-radius:8px; display:block; }
+    #previewPages figcaption { margin-top:6px; font-size:12px; color:#cbd5e1; }
+    .preview-actions { position:sticky; bottom:-24px; padding:16px 0; display:flex; gap:12px; justify-content:flex-end; background:#14161c; flex-wrap:wrap; }
+    #importProgress { width:min(500px,92vw); padding:28px; }
+    #importProgress h2 { font-size:22px; line-height:1.5; margin:12px 0; }
+    .import-eyebrow { color:#fda4af; font-size:12px; font-weight:700; letter-spacing:.08em; }
+    #importProgress progress { display:block; width:100%; height:9px; margin:20px 0 12px; accent-color:var(--brand-red); }
+    .import-meta { display:flex; flex-wrap:wrap; gap:12px; justify-content:space-between; color:#cbd5e1; font-size:13px; font-variant-numeric:tabular-nums; }
+    #importHint { font-size:13px; line-height:1.8; color:#b2bdcf; margin:20px 0; overflow-wrap:anywhere; }
+    .import-actions { display:flex; flex-wrap:wrap; justify-content:flex-end; gap:12px; }
+    .import-actions button { min-height:44px; }
+    #importStatus { margin-top:16px; padding:12px 14px; border:1px solid #475569; border-radius:10px; display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; }
+    #importStatusSummary, #previewStatus { font-size:13px; line-height:1.7; color:#cbd5e1; }
+    #importStatus[data-status="failed"] { border-color:#fb7185; }
+    #importProgress[data-status="failed"] #importStage { color:#fda4af; }
+    body.has-dialog .fullscreen-hud { visibility:hidden; }
+    .qr-badge { max-width:calc(100% - 32px); }
+    #remoteUrlDisplay { overflow-wrap:anywhere; }
+    .section-label { flex-wrap:wrap; gap:10px; }
+    @media(max-width:1000px) { header { height:auto; min-height:56px; gap:12px; flex-wrap:wrap; padding:12px; } .stage-container { gap:20px; grid-template-columns:minmax(0,1fr) 300px; } .phone-mockup { width:300px; } }
+    @media(max-width:780px) { .stage-container { grid-template-columns:minmax(0,1fr); } #phoneCol { justify-self:center; } main { padding:16px; } #previewPages { grid-template-columns:1fr; } .qr-badge { position:static; margin:12px; width:fit-content; } }
+    body.standalone-remote, body.standalone-remote main, body.standalone-remote #stageContainer, body.standalone-remote #phoneCol, body.standalone-remote .phone-mockup { height:100dvh; max-height:100dvh; }
+    body.standalone-remote .phone-screen { min-height:0; padding-top:max(env(safe-area-inset-top),8px); padding-bottom:max(env(safe-area-inset-bottom),8px); }
+    body.standalone-remote .touch-area { min-height:100px; }
+    body.standalone-remote .utility-bar { flex-shrink:0; height:64px; }
+    body.standalone-remote .remote-widget { flex-shrink:0; margin-top:0; }
+    body.standalone-remote .note-bar { flex-shrink:0; }
+    @media(max-height:620px) { body.standalone-remote #remotePreviewBox, body.standalone-remote #pointerHint { display:none !important; } body.standalone-remote .note-bar { max-height:50px; } }
+    @media(prefers-reduced-motion:reduce) { *, *::before, *::after { animation:none !important; transition:none !important; } }
+    .fullscreen-hud { display:none; }
+    body.in-fullscreen .fullscreen-hud { display:block; }
+    .fullscreen-hud:not(.visible) .fullscreen-hud-bar, .fullscreen-hud:not(.visible) .fullscreen-hud-top { pointer-events:none; }
+    #laserBtn { gap:6px; padding:8px; }
+    #laserBtn .laser-icon-glow { width:20px; height:20px; flex-shrink:0; }
+    #laserBtn .laser-icon-center { width:8px; height:8px; }
+    #laserBtn > div:last-child > div { white-space:nowrap; }
+  
+    .qr-badge { position:static; margin:0 0 16px; width:fit-content; max-width:100%; }
+    #qrBadge .qr-image-container { width:160px !important; height:160px !important; flex-shrink:0; }
+    .qr-badge [style*="font-family"] { overflow-wrap:anywhere; }
+    button, .btn-tool, .tab-btn { min-height:44px; min-width:44px; }
+    .btn-fullscreen-toggle, .tab-btn.active { background:#c7193b; color:#fff; }
+    #mainHeader { gap:12px; flex-wrap:wrap; height:auto; min-height:56px; padding-top:8px; padding-bottom:8px; }
+    #hostTools .helper-text { line-height:1.7; }
+    #browserShare { margin:12px 32px 32px; padding-top:20px; border-top:1px solid var(--border); }
+    body.in-fullscreen #browserShare, body.standalone-remote #browserShare { display:none; }
+    .browser-intro { margin:12px 0; color:var(--text-main); }
+    #choosePdf { white-space:nowrap; flex-shrink:0; }
+    #mainHeader .btn-fullscreen-toggle, #pcCol [data-action="toggleFullscreen"] { background:#c7193b !important; border-color:#c7193b !important; color:#fff !important; }
+    @media(max-width:480px) { #mainHeader .room-pill { display:none; } }
+    @media(max-width:480px) { .qr-badge { flex-wrap:wrap; } #browserShare { margin:16px; } .mode-tabs { max-width:100%; } }
+  </style>
 </head>
 <body>
-  <a class="skip-link" href="#setup">起動手順へ進む</a>
-  <div class="page-shell">
-    <header class="site-header">
-      <a class="brand" href="./" aria-label="AirPresenter ホーム"><img src="favicon.svg" width="32" height="32" alt=""><span>AirPresenter</span></a>
-      <a class="back-link" href="../">100日チャレンジ <span aria-hidden="true">↗</span></a>
-    </header>
-    <main>
-      <section class="hero" aria-labelledby="hero-title">
-        <div class="hero-copy">
-          <p class="eyebrow">DAY 084 <span aria-hidden="true">/</span> 100 <span class="edition">macOS ローカル版</span></p>
-          <h1 id="hero-title">スマホが、<br>発表の<span>リモコンに。</span></h1>
-          <p class="hero-description">Macで開いた資料を、手元のスマホで操作。<br class="desktop-break">PCを離れて、聴衆を見ながら話せます。</p>
-          <div class="hero-actions">
-            <a class="button button-primary" id="download" href="airpresenter-local.zip" download="airpresenter-local.zip">Mac用ローカル版を入手 <span aria-hidden="true">↓</span></a>
-            <a class="text-link" id="setup-link" href="#setup">起動手順を見る <span aria-hidden="true">↘</span></a>
-          </div>
-          <p class="download-note">ZIP・ソース一式。Macへの環境設定が必要です。</p>
-        </div>
-        <figure class="product-preview">
-          <div class="preview-label"><span class="status-dot" aria-hidden="true"></span> PCとスマホの連携画面</div>
-          <img id="preview" src="preview.png" alt="AirPresenterのPC画面とスマホ用リモコン。自作のサンプル資料を表示しています。" width="1440" height="1000" fetchpriority="high">
-          <figcaption>自作サンプルを使った画面例です。資料は起動後に選べます。</figcaption>
-        </figure>
-      </section>
 
-      <section class="features section-line" aria-labelledby="features-title">
-        <div class="section-intro"><p class="eyebrow">発表を、手元から。</p><h2 id="features-title">操作も、原稿も、時間も。</h2></div>
-        <dl class="feature-list">
-          <div><dt>大きなボタンで、ページ送り。</dt><dd>送り・戻り、暗転、長押しポインター。スマホの画面から操作できます。</dd></div>
-          <div><dt>カンペとタイマーを、手元に。</dt><dd>Macで保存したページごとの原稿と、共通の経過時間をスマホに表示します。</dd></div>
-          <div><dt>資料の変換は、発表するMacで。</dt><dd>資料を外部サービスへ送信しません。差し替え中は進行状況を確認できます。</dd></div>
-        </dl>
-      </section>
-
-      <section id="requirements" class="requirements section-line" aria-labelledby="requirements-title">
-        <div class="section-intro"><p class="eyebrow">始める前に</p><h2 id="requirements-title">Macとスマホを、<span class="keep-phrase">同じWi-Fiへ。</span></h2></div>
-        <div class="section-body">
-          <p>このページはローカル版の配布ページです。ZIPを入手してMacでサーバーを起動すると、スマホを接続できます。</p>
-          <dl class="environment-list">
-            <div><dt>動作確認した環境</dt><dd>macOS、Node.js 22以上</dd></div>
-            <div><dt>セットアップ</dt><dd>Homebrew、Poppler、qrencode、Fontconfig、LibreOffice、PlaywrightのChromium</dd></div>
-            <div><dt>接続</dt><dd>同じWi-Fiに接続したMacとスマホ。端末間通信を禁止しているWi-Fiでは接続できません。</dd></div>
-          </dl>
-        </div>
-      </section>
-
-      <section id="setup" class="setup section-line" aria-labelledby="setup-title">
-        <div class="section-intro"><p class="eyebrow">GET STARTED</p><h2 id="setup-title">使い始めるまでの3ステップ。</h2><p>Macのターミナルで設定します。<br>Node.jsとHomebrewを先に用意してください。</p></div>
-        <ol class="setup-steps">
-          <li><span class="step-number" aria-hidden="true">01</span><div class="step-body"><h3>ZIPを展開する。</h3><p>「Mac用ローカル版を入手」から保存し、ZIPを展開します。中の<code>airpresenter</code>フォルダでターミナルを開いてください。</p></div></li>
-          <li><span class="step-number" aria-hidden="true">02</span><div class="step-body"><h3>必要なツールを入れる。</h3><p>次のコマンドを順番に実行します。パッケージと描画用ブラウザのダウンロードが行われます。</p><pre tabindex="0" aria-label="インストールのコマンド"><code>brew install poppler qrencode fontconfig
-brew install --cask libreoffice
-npm ci
-npx playwright install chromium</code></pre></div></li>
-          <li><span class="step-number" aria-hidden="true">03</span><div class="step-body"><h3>Macで起動して、スマホでQRを読む。</h3><pre tabindex="0" aria-label="起動のコマンド"><code>npm start</code></pre><p>Macのブラウザで <code>http://localhost:3084/?mode=dual</code> を開き、資料を選びます。同じWi-Fiのスマホで、その画面のQRを読み取ってください。</p><p class="small-note">QRには操作権限が含まれます。接続する人だけに見せてください。終了はターミナルで <kbd>Ctrl</kbd>＋<kbd>C</kbd>。再起動後は新しいQRから接続します。</p></div></li>
-        </ol>
-      </section>
-
-      <section id="formats" class="formats section-line" aria-labelledby="formats-title">
-        <div class="section-intro"><p class="eyebrow">資料について</p><h2 id="formats-title">PDF・PowerPointに対応。</h2></div>
-        <div class="section-body"><p>PDF・PPTX・PPTを選べます。1ファイル25 MiB、100ページまで。PowerPointは変換結果の全ページを元の資料と見比べてから採用できます。</p><p>PowerPointとは描画エンジンが異なるため、完全一致は保証できません。見た目を優先する場合は、元のPowerPointで「エクスポート」または「名前を付けて保存」からPDFを書き出し、そのPDFを選んでください。</p><p>アニメーション・動画は静止画になります。資料・カンペ・変換データは、サーバーを通常終了すると消去されます。</p><a class="text-link" href="https://github.com/haranishi/hundred-days/tree/main/day-084-airpresenter/source" target="_blank" rel="noopener noreferrer">ソースと詳しい使い方 <span aria-hidden="true">↗</span></a></div>
-      </section>
-    </main>
-    <footer class="site-footer"><div class="footer-heading"><a class="brand" href="./">AirPresenter</a><span>DAY 084 / 100</span></div><div id="share"></div></footer>
+  <!-- Toast Element -->
+  <div class="toast" id="toastMessage" role="status" aria-live="polite">
+    <span style="color:var(--brand-red);">●</span>
+    <span id="toastText">通知</span>
   </div>
+
+  <!-- Header -->
+  <header id="mainHeader">
+    <div class="brand-logo">
+      <div class="logo-icon">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="2"/>
+          <path d="M16.2 7.8c2.3 2.3 2.3 6.1 0 8.5"/>
+          <path d="M7.8 16.2c-2.3-2.3-2.3-6.1 0-8.5"/>
+          <path d="M19.1 4.9C23 8.8 23 15.1 19.1 19"/>
+          <path d="M4.9 19.1C1 15.2 1 8.9 4.9 5"/>
+        </svg>
+      </div>
+      <div style="display:flex; align-items:center; gap:8px;">
+        <strong style="font-size: 15px; letter-spacing: -0.02em;">AirPresenter</strong>
+        <span class="badge">Day 84</span>
+      </div>
+    </div>
+
+    <!-- Mode Switcher Tabs -->
+    <div class="mode-tabs">
+      <button class="tab-btn active" id="tabDual" data-action="setMode" data-value="dual">連携プレビュー</button>
+      <button class="tab-btn" id="tabHost" data-action="setMode" data-value="host">PC全画面</button>
+      <button class="tab-btn" id="tabRemote" data-action="setMode" data-value="remote">スマホ単体</button>
+    </div>
+
+    <div style="display: flex; align-items: center; gap: 12px;">
+      <button class="btn-fullscreen-toggle" id="choosePdf" data-action="chooseFile" data-upload>PDFを選ぶ</button>
+      <button class="btn-fullscreen-toggle" data-action="toggleFullscreen" title="スライドを全画面で大迫力プレゼン表示">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/>
+        </svg>
+        <span>全画面プレゼン (F)</span>
+      </button>
+      <div class="room-pill">
+        <span class="pulse-dot"></span>
+        <span>ROOM: <strong id="roomCodeText">接続前</strong></span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Fullscreen controls, revealed at the top/bottom edge or by keyboard focus. -->
+  <div class="fullscreen-hud" id="fullscreenHud">
+    <div class="fullscreen-hud-top">
+      <button class="btn-tool" data-action="toggleFullscreen" style="background:rgba(15,23,42,0.85); backdrop-filter:blur(10px); border:1px solid rgba(255,255,255,0.2); color:#fff; padding:8px 16px; border-radius:10px; font-size:12px; font-weight:600; cursor:pointer;">
+        ✕ 全画面終了 (Esc)
+      </button>
+    </div>
+    <div class="fullscreen-hud-bar">
+      <button data-action="execPrev" data-value="true" style="background:transparent; border:none; color:#fff; font-size:18px; cursor:pointer; padding:4px 8px;" title="前へ (←)">◀</button>
+      <span id="hudSlideCounter" style="font-weight:700; color:#38bdf8; font-size:15px; min-width:60px; text-align:center;">1 / 5</span>
+      <button data-action="execNext" data-value="true" style="background:transparent; border:none; color:#fff; font-size:18px; cursor:pointer; padding:4px 8px;" title="次へ (→)">▶</button>
+      <span style="color:rgba(255,255,255,0.2);">|</span>
+      <span id="hudTimer" style="color:#94a3b8; font-family:monospace;">00:00</span>
+      <span style="color:rgba(255,255,255,0.2);">|</span>
+      <button data-action="execToggleBlackout" data-value="true" style="background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2); color:#e2e8f0; font-size:11px; font-weight:600; padding:4px 10px; border-radius:6px; cursor:pointer;" title="暗転 (B)">暗転 (B)</button>
+    </div>
+  </div>
+
+  <!-- Main Canvas -->
+  <main>
+    <div class="stage-container" id="stageContainer">
+
+      <!-- LEFT: PC Display Presentation Screen -->
+      <div id="pcCol">
+        <div class="section-label">
+          <div class="section-title">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/>
+            </svg>
+            <span>PC画面（プロジェクター投影ビュー）</span>
+            <span style="color: var(--text-dim); font-size: 11px; margin-left: 4px;">— ここにスライドが表示されます</span>
+          </div>
+          <div style="display: flex; gap: 8px;">
+            <button class="btn-tool" data-action="toggleFullscreen" style="background:var(--brand-red); color:#fff; border-color:var(--brand-red); font-weight:700;">⛶ 全画面 (F)</button>
+            <button class="btn-tool" data-action="execToggleBlackout">暗転 (B)</button>
+            <button class="btn-tool" data-action="showDropZone" data-upload style="border-color:rgba(255,255,255,0.2); color:#fff;">＋ 資料ドロップ</button>
+          </div>
+        </div>
+
+        <!-- PC Screen Frame -->
+        <div class="pc-frame" id="pcFrame">
+
+          <!-- Drop Overlay -->
+          <div class="drop-overlay" id="dropOverlay" hidden>
+            <div style="width: 56px; height: 56px; border-radius: 14px; background: var(--card-bg); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; margin-bottom: 12px; color: var(--brand-red);">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
+              </svg>
+            </div>
+            <h3 style="font-size: 16px; font-weight: 700; margin-bottom: 6px;">PDFをドロップ</h3>
+            <p style="font-size: 12px; color: var(--text-muted); max-width: 440px; margin-bottom: 16px; line-height: 1.6;">
+              このPCのブラウザでPDFを表示します。最大25 MiB・100ページ。PowerPointはPDFに書き出してから選んでください。
+            </p>
+            <label class="btn-tool" style="cursor: pointer; padding: 8px 18px; background: var(--brand-red); color:#fff; font-weight:600; font-size:12px;">
+              ファイルを選択
+              <input type="file" id="filePicker" accept=".pdf" style="display:none;">
+            </label>
+            <button class="btn-tool" data-action="hideDropZone" style="margin-top: 14px; background:transparent; border:none; color:var(--text-dim); text-decoration:underline;">
+              閉じる・現在の資料を続ける
+            </button>
+          </div>
+
+          <!-- Slide Stage (Double-click for Fullscreen) -->
+          <div class="slide-stage" id="slideStage" title="ダブルクリックで全画面プレゼン開始">
+
+            <!-- Converted slide image -->
+            <img id="slideImgView" hidden class="slide-image-view active"  alt="スライド">
+
+            <div class="slide-card" id="slideCard">
+              <span class="slide-badge" id="slideBadge">AIRPRESENTER</span>
+              <div class="slide-body">
+                <h1 id="slideHeading">スマホが、発表のリモコンに。</h1>
+                <p id="slideSubheading">PCで資料を開いて、QRを読み取る。</p>
+                <ul class="slide-bullets" id="slideBullets"></ul>
+              </div>
+              <span id="slideCounterBottom">1 / 5</span>
+            </div>
+
+            <!-- Blackout Overlay -->
+            <div class="blackout-overlay" id="blackoutOverlay">
+
+            </div>
+
+            <!-- Laser Dot -->
+            <div aria-hidden="true" class="laser-dot" id="laserDot" style="left: 65%; top: 35%;"></div>
+          </div>
+
+          <!-- PC Footer -->
+          <div class="pc-footer">
+            <span id="footerTitle">サンプル</span>
+            <div style="display: flex; gap: 16px;">
+              <span id="footerCounter">1 / 5</span>
+              <span id="footerTimer">00:00</span>
+            </div>
+          </div>
+
+          <!-- Floating QR Badge - REAL HIGH-RES QR CODE -->
+          <div class="qr-badge" id="qrBadge" role="button" tabindex="0" data-action="copyRemoteUrl" title="クリックしてURLをコピー">
+            <div class="qr-image-container" style="width: 84px; height: 84px;">
+              <img id="qrImg"  alt="QR Code" style="width:100%; height:100%; object-fit:contain;">
+            </div>
+            <div>
+              <div style="display:flex; align-items:center; gap:6px;">
+                <span style="display:inline-block; width:6px; height:6px; border-radius:50%; background:#10b981;"></span>
+                <p style="font-size: 11px; font-weight:700; color: #f8fafc;">スマホで即起動</p>
+              </div>
+              <p style="font-size: 11px; font-weight: 700; font-family: monospace; color: #38bdf8; margin: 2px 0;" id="remoteUrlDisplay">PCで接続を開始してください</p>
+              <div style="display:flex; gap:8px; font-size:9px; color:var(--text-muted); margin-top:2px;">
+                <span style="color:var(--brand-red); font-weight:600;">📋 タップでURLコピー</span>
+                <span>•</span>
+                <span>QRは接続相手だけに共有</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <section id="hostTools" class="host-tools">
+          <div class="intro-row"><div><h2>資料を開いて、QRで接続。</h2><p>スマホでQRを読み取ってください。元のPDFはPC内で表示し、プレビューとカンペは暗号化して中継します。</p></div>
+            <button class="btn-tool" data-action="chooseFile" data-upload>資料を選ぶ</button>
+          </div>
+          <p class="helper-text browser-intro">PCでPDFを選び、スマホでQRを読み取る。インストール不要。</p>
+          <div class="intro-row session-actions"><button class="btn-tool" id="endSession" data-action="endSession">接続を終了</button><button class="btn-tool" id="restartSession" data-action="restartSession" hidden>新しく始める</button><span class="helper-text">接続は最長4時間です。</span></div>
+          <div id="importStatus" hidden><span id="importStatusSummary" role="status"></span><button id="importStatusButton" class="btn-tool" data-action="openImportStatus">進行状況を見る</button></div>
+          <details id="pdfHelp"><summary>PowerPointの見た目を保ちたいとき</summary>
+            <p>PowerPointの「ファイル → エクスポート（または名前を付けて保存）→ PDF」で書き出し、このPDFを読み込んでください。変換で背景・フォントを推測して書き換えることはありません。アニメーション・動画は静止画になります。</p>
+            <p>PPTX・PPTの直接変換は行いません。元のPDFはこのPCで表示し、スマホへ渡すプレビューとカンペは暗号化して中継します。</p>
+          </details>
+          <label for="noteEditor" id="noteLabel">このページのカンペ（スマホだけに表示）</label>
+          <textarea id="noteEditor" maxlength="4000" rows="3" placeholder="話す内容や補足をメモ…"></textarea>
+          <div class="intro-row"><button class="btn-tool" data-action="saveNote" id="saveNote" data-host>カンペを保存</button><span class="helper-text" id="noteSaveStatus" role="status">資料とカンペはこのタブに保持します。終了・再読込・タブを閉じると消えます。</span></div>
+        </section>
+        <p style="font-size: 11px; color: var(--text-dim); margin-top: 8px;">
+          キーボード操作: <kbd style="background:var(--card-bg); border:1px solid var(--border); padding:2px 6px; border-radius:4px; color:#cbd5e1;">Space</kbd> / <kbd style="background:var(--card-bg); border:1px solid var(--border); padding:2px 6px; border-radius:4px; color:#cbd5e1;">→</kbd> 次へ &bull; <kbd style="background:var(--card-bg); border:1px solid var(--border); padding:2px 6px; border-radius:4px; color:#cbd5e1;">←</kbd> 前へ &bull; <kbd style="background:var(--card-bg); border:1px solid var(--border); padding:2px 6px; border-radius:4px; color:#cbd5e1;">B</kbd> 暗転
+        </p>
+      </div>
+
+      <!-- RIGHT: Phone Remote Mockup -->
+      <div id="phoneCol">
+        <div class="section-label">
+          <div class="section-title">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/>
+            </svg>
+            <span>スマホ用リモコン</span>
+          </div>
+          <span style="font-size: 11px; color: #34d399;" id="remoteStatusIndicator" role="status">接続待ち</span>
+        </div>
+
+        <!-- Phone Shell -->
+        <div class="phone-mockup" id="phoneMockup">
+          <div class="phone-notch">
+            <div class="notch-speaker"></div>
+          </div>
+
+          <!-- Inside Phone Screen -->
+          <div class="phone-screen">
+
+            <p class="connection-status" id="connectionStatus" role="status" aria-live="polite">接続準備中…</p>
+            <!-- Top Header Widget: Timer & Slide -->
+            <div class="remote-widget">
+              <div>
+                <div class="widget-title">Elapsed Time</div>
+                <div class="widget-value" id="remoteTimer">00:00</div>
+              </div>
+              <div style="text-align: right;">
+                <div class="widget-title">Slide</div>
+                <div class="widget-slide" id="remoteSlide">1 <span style="font-size: 11px; color: var(--text-dim);">/ 5</span></div>
+              </div>
+            </div>
+
+            <!-- Presenter Slide Thumbnail (Shows exact slide on hand) -->
+            <div id="remotePreviewBox" style="margin: 0 16px 10px; background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 6px 10px; display: flex; align-items: center; gap: 10px;">
+              <div style="width: 72px; aspect-ratio: 16/9; background: #020617; border-radius: 4px; overflow: hidden; border: 1px solid rgba(255,255,255,0.15); flex-shrink: 0;">
+                <img id="remoteSlideThumb" hidden  style="width:100%; height:100%; object-fit:contain;" alt="投影中サムネイル">
+              </div>
+              <div style="overflow: hidden; text-align: left;">
+                <div style="font-size: 9px; color: #38bdf8; font-weight: 700; text-transform: uppercase;">投影中スライド</div>
+                <div style="font-size: 11px; font-weight: 600; color: #f1f5f9; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" id="remoteCurrentTitle">サンプル</div>
+                <div style="font-size: 9px; color: var(--text-dim);" id="remoteNextTitle">右タップで次へ</div>
+              </div>
+            </div>
+
+            <!-- Speaker Note Bar -->
+            <div class="note-bar" id="speakerNote">
+              PCでページごとのカンペを保存できます。
+            </div>
+
+            <!-- TOUCH AREA (Split 2-zone) -->
+            <div class="touch-area">
+
+              <!-- PREV (Left Zone) -->
+              <button class="touch-btn btn-prev" id="btnPrev" data-action="onRemotePrev" data-value="event">
+                <div class="icon-circle">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <polyline points="15 18 9 12 15 6"/>
+                  </svg>
+                </div>
+                <span class="btn-label">PREV</span>
+                <span class="btn-sub">戻る</span>
+              </button>
+
+              <!-- NEXT (Right Zone - Primary) -->
+              <button class="touch-btn btn-next" id="btnNext" data-action="onRemoteNext" data-value="event">
+                <div class="icon-circle">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <polyline points="9 18 15 12 9 6"/>
+                  </svg>
+                </div>
+                <span class="btn-label">NEXT</span>
+                <span class="btn-sub">進む（タップ）</span>
+              </button>
+            </div>
+
+            <!-- UTILITY BAR: Blackout & Fullscreen & Laser -->
+            <div class="utility-bar" style="grid-template-columns: 1fr 1fr 1.3fr; gap: 8px;">
+              <!-- Blackout -->
+              <button class="btn-blackout" data-action="onRemoteBlackout" data-value="event" style="padding: 10px 8px; font-size: 11px;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
+                  <line x1="1" y1="1" x2="23" y2="23"/>
+                </svg>
+                <span>暗転 (B)</span>
+              </button>
+
+              <!-- Remote Fullscreen Trigger -->
+              <button id="remotePresentation" class="btn-blackout" data-action="onRemoteFullscreen" data-value="event" style="padding: 10px 8px; font-size: 11px; border-color: rgba(56, 189, 248, 0.4); color: #38bdf8;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/>
+                </svg>
+                <span>投影表示</span>
+              </button>
+
+              <!-- Laser Button -->
+              <button class="btn-laser" id="laserBtn" aria-label="長押ししてポインター、押したまま指を動かす">
+                <div class="laser-icon-glow">
+                  <div class="laser-icon-center"></div>
+                </div>
+                <div style="text-align: left;">
+                  <div style="color: #fff; font-size: 11px; font-weight: 700;">ポインター</div>
+                  <div style="color: rgba(255, 51, 75, 0.9); font-size: 8px;">長押し＋指で移動</div>
+                </div>
+              </button>
+            </div>
+
+            <div class="remote-extras">
+              <button class="btn-tool" id="timerToggle" data-action="toggleTimer">タイマー開始</button>
+              <button class="btn-tool" data-action="resetTimer" data-command>リセット</button>
+              <button class="btn-tool" id="gyroEnable" data-action="enableGyro">傾き操作を有効にする</button>
+            </div>
+            <p id="pointerHint" class="helper-text">ポインターは長押ししたまま指を動かします。</p>
+            <!-- Home Indicator -->
+            <div class="home-indicator"></div>
+          </div>
+        </div>
+
+        <p style="font-size: 11px; color: var(--text-dim); text-align: center; margin-top: 10px;">
+          画面を見ずに親指で「右タップ＝進む」「左タップ＝戻る」
+        </p>
+      </div>
+
+    </div>
+  </main>
+
+  <dialog id="importProgress" aria-labelledby="importHeading" aria-describedby="importHint">
+    <p class="import-eyebrow">資料の準備</p>
+    <h2 id="importHeading">新しい資料を読み込み中</h2>
+    <p id="importStage" role="status">資料を送信しています</p>
+    <progress id="importProgressBar" aria-label="資料の準備の進み具合"></progress>
+    <div class="import-meta"><span id="importCount">処理を開始しています</span><span id="importElapsed">経過 00:00</span></div>
+    <p id="importHint">準備が終わるまでお待ちください。</p>
+    <div class="import-actions"><button id="importRetry" class="btn-fullscreen-toggle" data-action="retryImport" hidden>再試行する</button><button id="importHide" class="btn-tool" data-action="hideImportProgress">現在の資料に戻る</button></div>
+  </dialog>
+  <dialog id="conversionPreview" aria-labelledby="previewHeading">
+    <div class="preview-header"><h2 id="previewHeading">資料を確認</h2>
+      <p>全ページを確認してから切り替えます。取消すると、今の資料を続けられます。</p></div>
+    <p id="previewStatus" role="status"></p>
+    <div id="previewPages"></div>
+    <div class="preview-actions"><button class="btn-tool" data-action="chooseAnotherFile" data-upload>別の資料を選ぶ</button><button id="discardPreview" class="btn-tool" data-action="discardPreview">取消・元の資料を続ける</button><button id="acceptPreview" class="btn-fullscreen-toggle" data-action="acceptPreview">この資料で発表する</button></div>
+  </dialog>
+<footer id="browserShare"><div id="share"></div></footer>
 </body>
 </html>
