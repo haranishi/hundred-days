@@ -17,7 +17,7 @@ export const pochi={
     {id:'lid-crease',title:'ふたに折り目をつける',text:'上の角を手前に折り、中心に合わせてから開きます。',ops:[
       {type:'crease',line:{point:[0,-a/2],dir:[1,0]},moving:'TR',mode:'valley'}]},
     {id:'tuck',title:'ふたを差し込む',text:'上の角を手前に折り、下から折った三角の下へ差し込みます。ポチ袋の完成です。',tip:'先端は本体と下の三角の間に入れます。',ops:[
-      {type:'fold',line:{point:[0,-a/2],dir:[1,0]},moving:'TR',mode:'valley',stack:{mode:'between',upper:'bottom',lower:'body'},tagMoved:'lid'}]},
+      {type:'fold',line:{point:[0,-a/2],dir:[1,0]},moving:'TR',mode:'valley',stack:{mode:'between',upper:'bottom',lower:'body'},guideKind:'valley',tagMoved:'lid'}]},
   ],
 };
 export default pochi;

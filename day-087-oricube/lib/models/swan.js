@@ -18,7 +18,7 @@ export const swan={
       {type:'fold',line:{point:[0,.05],dir:[1,1]},moving:'BL',mode:'valley',stack:{mode:'between',upper:'halfL',lower:'halfR'},tagMoved:'neck'}]},
     {id:'head',title:'頭を中割り折り',text:'首の先端も同じ要領で紙の間へ折り込み、前を向く頭にします。',tip:'首の細い先端を、もう一度、中割り折りします。',durationMs:3800,ops:[
       {type:'fold',line:{point:[.45,.05],dir:[1,1]},moving:'BL',select:{tags:['neck']},mode:'valley',stack:{mode:'between',upper:'halfR',lower:'halfL'},tagMoved:'head'}]},
-    {id:'stand',title:'立たせる',text:'背骨を下にして立たせます。白鳥の完成です。',view:'side',ops:[
+    {id:'stand',title:'立たせる',text:'背骨を下にして立たせます。白鳥の完成です。',view:'profile',ops:[
       {type:'hinge',axis:{through:[[0,-.7],[0,.05]]},degrees:90}]},
   ],
 };

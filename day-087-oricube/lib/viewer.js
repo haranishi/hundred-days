@@ -2,6 +2,7 @@
 // 作品の中身は知らず、エンジンの frame() の出力と steps[i].guides だけを描く。
 
 import * as THREE from '../vendor/three.js';
+import { VIEW_ANGLES } from './views.js';
 
 const INK = '#2b2623';
 const GUIDE = '#d6452d';
@@ -13,15 +14,8 @@ const SHADOW_GAP = 0.03;
 const EXPLODE_MS = 250;
 const VIEW_MS = 480;
 
-// 視点のプリセット（極角 phi: 0=真上、方位角 theta: 0=手前から）
-const VIEWS = {
-  top: { phi: 0.0001, theta: 0 },
-  iso: { phi: 0.93, theta: 0.52 },
-  side: { phi: Math.PI / 2 - 0.1, theta: 0 },
-  // Flat models (heart, envelope, kimono) end as a flat shape: near top-down keeps the outline readable
-  // while a little tilt still shows the layers and the motion.
-  flat: { phi: 0.5, theta: 0 },
-};
+// 視点のプリセット（極角 phi: 0=真上、方位角 theta: 0=手前から）。角度は lib/views.js（Node の試験からも読める）
+const VIEWS = VIEW_ANGLES;
 
 export function webglAvailable() {
   try {
@@ -393,8 +387,6 @@ export function createViewer({ canvas, testGfx = false, reducedMotion = () => fa
     fit = { center: (currentCenter || info.center).clone(), dist, box: info.box };
     controls.minDistance = dist * 0.4;
     controls.maxDistance = dist * 2.6;
-    // 机と影は今の手順の最下点の下へ
-    desk.position.y = Math.min(0, info.box.min.y) - DESK_GAP;
     if (immediate) {
       controls.target.copy(fit.center);
       offset.copy(camera.position).sub(controls.target);
@@ -494,6 +486,10 @@ export function createViewer({ canvas, testGfx = false, reducedMotion = () => fa
       currentBox = now;
       if (fit) fit.center.copy(currentCenter);
       const size = now.getSize(new THREE.Vector3());
+      // The desk and the shadow follow the lowest point of the current pose. A flap that swings below the
+      // sheet mid-step (the crane's petal fold dips to -0.5) would otherwise leave the finished shape
+      // floating far above its shadow.
+      desk.position.y = Math.min(0, now.min.y) - DESK_GAP;
       shadow.position.set(currentCenter.x, desk.position.y + (DESK_GAP - SHADOW_GAP), currentCenter.z);
       shadow.scale.set(Math.max(0.25, size.x * 1.35), Math.max(0.25, size.z * 1.35), 1);
     }

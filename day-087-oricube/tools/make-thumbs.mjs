@@ -134,12 +134,13 @@ export function chooseView(model, frame) {
   const size = b.max.map((v, i) => v - b.min[i]);
   if (size[1] < 0.05 * Math.max(size[0], size[2])) return { phi: 0.0001, theta: 0 };
   const last = [...model.steps].reverse().find((s) => s.view)?.view;
-  const phi = last === 'side' ? 1.2 : 0.8;
+  const standing = ['side', 'profile', 'quarter'].includes(last);
+  const phi = standing ? 1.2 : 0.8;
   const points = triangles(frame).flatMap((t) => t.p);
-  // A model that ends with a side view (swan, crane) is shown in profile: the bearing with the
+  // A model that ends with a standing view (swan, crane) is shown in profile: the bearing with the
   // widest horizontal extent, so the neck, head and tail show instead of a wing-spread front.
   const score = (cam) => {
-    if (last !== 'side') return projectedArea(points, cam);
+    if (!standing) return projectedArea(points, cam);
     const xs = points.map((p) => dot(p, cam.right));
     return Math.max(...xs) - Math.min(...xs);
   };

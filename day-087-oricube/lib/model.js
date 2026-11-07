@@ -42,8 +42,9 @@ function guide(r,start) {
   const position=points.at(-1).slice(),direction=unit(sub(position,points.at(-2)));
   // A fold that names the layers it nests between is a reverse fold: its line is the pre-crease
   // (valley) but the motion is "push the tip in", so the viewer draws it with its own pattern.
+  // An op can say guideKind to name its line itself (the envelope's lid is tucked in with a plain valley fold).
   const reverse=r.type==='fold'&&r.op.stack&&typeof r.op.stack==='object';
-  return {kind:reverse?'reverse':r.type==='crease'?r.op.mode:r.type==='fold'?r.op.mode:r.type,line,arrow:{points,head:{position,direction}}};
+  return {kind:r.op.guideKind||(reverse?'reverse':r.type==='crease'?r.op.mode:r.type==='fold'?r.op.mode:r.type),line,arrow:{points,head:{position,direction}}};
 }
 function mechanismGuides(r,start) {
   // Every hinge samples the same path times; solve each guide pose only once.

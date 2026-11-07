@@ -576,18 +576,29 @@ test.describe('every model', () => {
 });
 
 // ---- 第2弾の画面評価（1周目）を受けた直し（UI担当が追加） ----
-const VIEW_PHI = { flat: 0.5, iso: 0.93, side: Math.PI / 2 - 0.1, top: 0.0001 };
+const VIEW_PHI = { flat: 0.5, iso: 0.93, side: Math.PI / 2 - 0.1, top: 0.0001, profile: 1.2, quarter: 1.2 };
 const phiNear = (page, name) => expect.poll(async () => Math.abs((await state(page)).viewer.phi - VIEW_PHI[name]), { timeout: 15_000 }).toBeLessThan(0.03);
 const settled = (page) => expect.poll(async () => (await state(page)).viewer.viewMoving, { timeout: 15_000 }).toBe(false);
 
 test.describe('the view each step recommends', () => {
   test.setTimeout(120_000);
 
-  test('the crane opened on its last step is seen from the side', async ({ page }) => {
+  test('the crane opened on its last step is seen from three quarters, neck and tail to the sides', async ({ page }) => {
     await open(page, 'm=crane&s=10&t=1');
     await rendered(page);
-    await phiNear(page, 'side');
+    await phiNear(page, 'quarter');
     expect((await state(page)).viewer.userMoved).toBe(false);
+  });
+
+  // The swan finishes as a sheet standing in one plane. Its last step first recommended "side", which looks at it
+  // edge-on: the evaluation saw a vertical line (about 1% of the width) when the completion card appeared.
+  test('the swan opened on its last step shows its profile, not an edge', async ({ page }) => {
+    await open(page, 'm=swan&s=6&t=1');
+    await rendered(page);
+    await phiNear(page, 'profile');
+    await settled(page);
+    const r = (await state(page)).viewer.paperRect;
+    expect(r.right - r.left).toBeGreaterThan(0.25);
   });
 
   test('stepping through the crane moves the camera flat, then iso, then flat', async ({ page }) => {

@@ -61,3 +61,11 @@ for(const [name,change] of [
   let m;try {m=buildModel(def);} catch(e) {assert.ok(e instanceof FoldError);return;}
   assert.throws(()=>criteria(m),assert.AssertionError);
 });
+
+// The step list says "差し込む" and its own text explains the tuck; a legend that said 中割り折り
+// (the swan's and the crane's technique) was reported by the experience evaluation.
+test('pochi: the lid tuck is drawn as a plain valley fold, so the legend does not say reverse fold',()=>{
+  const tuck=model.steps.at(-1);
+  assert.equal(tuck.id,'tuck');
+  assert.deepEqual([...new Set(tuck.guides.map(g=>g.kind))],['valley']);
+});

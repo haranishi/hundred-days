@@ -45,26 +45,26 @@
 タスクグラフ: 9・10・11 は 7 のあと並行（9 は別の作業ツリー）。12 は 9 の後。13 は 9 と 11 の後。14 は 10〜13 の後。15 は最後。
 担当: エンジンと作品データ＝Codex（ブラウザが使えないので、画面の確認は親）／作品選択UI＝Opus（ブラウザで確かめる）。
 
-- [ ] 9. 連動折り（mechanism）を試作し、実装する
+- [x] 9. 連動折り（mechanism）を試作し、実装する
   - 正方基本形のつぶし・花弁折り・袋を開く（かぶと・紙コップ）・つぶし折りが、剛体で表せるかを数値で確かめる。表せる分は `lib/mechanism.js` に実装し、`frame(i,t)` と案内（guides）につなぐ。表せない分は証拠つきで報告し、近似（`relaxed`）の要否を親へ返す。
   - _Depends: 7_
   - _Boundary: lib/mechanism.js, ops.js, model.js, tests/mechanism.test.mjs, engine.md, engine-notes.md_
   - _Requirements: 3.1,3.2,3.3,5.6_
-- [ ] 10. 作品の選択UIを作る
+- [x] 10. 作品の選択UIを作る
   - ヘッダーの「作品を選ぶ」・一覧（スマホは下から出るシート、PCは重なる枠）・完成形の絵の自動生成（tools/make-thumbs.mjs）・「次の作品へ」。作品数に依存しない作り。
   - _Depends: 7_
   - _Boundary: app.js, app.css, index.html, lib/viewer.js（必要な分のみ）, tools/, assets/thumb-*.svg_
   - _Requirements: 1.1,5.2,5.3,5.4,5.5,4.1_
-- [ ] 11. 平面の作品を足す（ハート・ポチ袋・着物）
+- [x] 11. 平面の作品を足す（ハート・ポチ袋・着物）
   - _Depends: 7_
   - _Boundary: lib/models/, tests/_
   - _Requirements: 5.1,5.7,3.4_
-- [ ] 12. 平面の作品を足す（ヨット・ちょうちょ・もみの木）。袋を開く作品（かぶと・舟・紙コップ）は見送り
-  - かぶとは開いた形が十字になり実物と違った（models-more.md の「見送り」）。
+- [x] 12. 平面の作品を足す（ヨット・もみの木・ネクタイ）。袋を開く作品（かぶと・舟・紙コップ）は見送り
+  - かぶとは開いた形が十字になり実物と違った（models-more.md の「見送り」）。ちょうちょは4案で基準に届かず、ネクタイに替えた。
   - _Depends: 7_
   - _Boundary: lib/models/, tests/_
   - _Requirements: 5.1,5.6,5.7_
-- [ ] 13. 鶴を足す
+- [x] 13. 鶴を足す
   - _Depends: 9, 11_
   - _Boundary: lib/models/crane.js, tests/_
   - _Requirements: 5.1,5.6,5.7_

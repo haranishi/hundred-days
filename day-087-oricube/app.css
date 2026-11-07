@@ -255,7 +255,9 @@ button { font: inherit; color: inherit; }
 .step-title { margin: 0 0 4px; font-family: var(--serif); font-size: 22px; line-height: 1.4; text-wrap: pretty; }
 .step-text, .step-tip { text-wrap: pretty; }
 /* Break Japanese between phrases where the browser can (ignored elsewhere; the nowrap spans still hold) */
-.panel, .done-card, .nogl { word-break: auto-phrase; }
+.panel, .done-card, .nogl, .foot { word-break: auto-phrase; }
+/* The footer notes are static text (not run through the word list), so ask the browser to avoid a lone last character */
+.foot-note, .foot .share__note { text-wrap: pretty; }
 .nowrap { white-space: nowrap; }
 .step-text { margin: 0; font-size: 16.5px; }
 .step-tip { margin: 8px 0 0; padding: 8px 12px; background: var(--paper); border-left: 3px solid var(--shu); border-radius: 0 6px 6px 0; font-size: 15px; color: #4a413b; }

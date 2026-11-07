@@ -1,6 +1,20 @@
 // Pure helpers for the screen (no DOM, no three.js), so they can be tested in Node.
 
-export const VIEW_PRESETS = ['flat', 'iso', 'top', 'side'];
+// Camera presets (three.js spherical angles: phi 0 = straight down, theta 0 = from the front).
+export const VIEW_ANGLES = {
+  top: { phi: 0.0001, theta: 0 },
+  iso: { phi: 0.93, theta: 0.52 },
+  side: { phi: Math.PI / 2 - 0.1, theta: 0 },
+  // Flat models (heart, envelope, kimono) end as a flat shape: near top-down keeps the outline readable
+  // while a little tilt still shows the layers and the motion.
+  flat: { phi: 0.5, theta: 0 },
+  // Standing models finish thin in one direction, so each needs the right bearing: a swan lies in the
+  // y-z plane (from theta 0 it is a line), a crane shows its neck and tail to the sides with the wings in a V.
+  // Both match the pictures in the list (tools/make-thumbs.mjs picks the same bearings).
+  profile: { phi: 1.2, theta: 1.3 },
+  quarter: { phi: 1.2, theta: 2.1 },
+};
+export const VIEW_PRESETS = Object.keys(VIEW_ANGLES);
 
 // The view a step recommends: the last `view` declared at or before step i. 'iso' when none is.
 export function effectiveView(steps, i) {

@@ -58,7 +58,7 @@ export const crane={
     {id:'wings-down',title:'翼を折り下げる',text:'前の翼は手前に、後ろの翼は向こうに折り下げます。左右の折り目の高さをそろえます。',tip:'首としっぽを一緒に折らないようにします。',durationMs:3600,ops:[
       {type:'fold',line:{point:world(0,0),dir:world(0,1)},moving:'BR',select:{tags:['wingFront']},mode:'valley',tagMoved:'flapFront'},
       {type:'fold',line:{point:world(0,0),dir:world(0,1)},moving:'TL',select:{tags:['wingRear']},mode:'mountain',tagMoved:'flapRear'}]},
-    {id:'finish',title:'翼を開いて完成',text:'胴を起こし、左右の翼を少し上げ、同じ高さに開きます。青磁色の鶴の完成です。',tip:'胴の上はとがったまま、翼を水平より少し上げて、V字に開きます。',view:'side',durationMs:5000,ops:[
+    {id:'finish',title:'翼を開いて完成',text:'胴を起こし、左右の翼を少し上げ、同じ高さに開きます。青磁色の鶴の完成です。',tip:'胴の上はとがったまま、翼を水平より少し上げて、V字に開きます。',view:'quarter',durationMs:5000,ops:[
       {type:'hinge',axis:wingAxis,degrees:-90},
       {type:'hinge',axis:wingAxis,select:{tags:['flapFront']},degrees:110},
       {type:'hinge',axis:wingAxis,select:{tags:['flapRear']},degrees:-110,together:true}]},
