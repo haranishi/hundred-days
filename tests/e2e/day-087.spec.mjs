@@ -538,3 +538,38 @@ test.describe('model picker on a phone', () => {
     }
   });
 });
+
+test.describe('every model', () => {
+  test('reaches its completion card at the last step without errors', async ({ page }) => {
+    const errors = await open(page);
+    const models = await page.evaluate(() => window.__oricube.models.map((m) => ({ id: m.id, name: m.name, steps: m.steps.length })));
+    expect(models.length).toBeGreaterThanOrEqual(9);
+    for (const m of models) {
+      await page.goto(`${base}?debug=1&gfx=test&paused=1&m=${m.id}&s=99&t=1`);
+      await expect(page.locator('#app')).toHaveAttribute('data-ready', 'true');
+      await expect(page.locator('#pick-name')).toHaveText(m.name);
+      await expect(page.locator('#step-no')).toHaveText(`手順 ${m.steps}`);
+      await expect(page.locator('#done')).toBeVisible();
+      await rendered(page);
+    }
+    expect(errors).toEqual([]);
+  });
+
+  test('a heavy model says it is being prepared, then opens', async ({ page }) => {
+    const errors = await open(page);
+    await page.evaluate(() => {
+      window.__loadingSeen = [];
+      const el = document.getElementById('loading');
+      new MutationObserver(() => { if (!el.hidden) window.__loadingSeen.push(el.textContent); })
+        .observe(el, { attributes: true, childList: true, characterData: true, subtree: true });
+    });
+    await page.locator('#pick-open').click();
+    await page.locator('.pick-card[data-id="crane"]').click();
+    await expect.poll(async () => (await state(page)).model, { timeout: 60_000 }).toBe('crane');
+    await expect(page.locator('#loading')).toBeHidden();
+    expect(await page.evaluate(() => window.__loadingSeen)).toContain('鶴を準備しています…');
+    await expect(page.locator('#pick-name')).toHaveText('鶴');
+    await expect(page.locator('#step-no')).toHaveText('手順 1');
+    expect(errors).toEqual([]);
+  });
+});
