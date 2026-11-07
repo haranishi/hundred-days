@@ -1,7 +1,7 @@
 {
   "feature_name": "day-087-oricube",
   "language": "ja",
-  "phase": "expansion-evaluation",
+  "phase": "expansion-release-prep",
   "approvals": {
     "requirements": true,
     "design": true,
@@ -30,21 +30,42 @@
   },
   "scope_decision": "第1弾は紙飛行機・白鳥・立方体の箱。箱は、壁の立ち上がりに角が連動する機構（三辺測量）をエンジンに足して前倒しで入れた。鶴は折りたたみの計算が別物なので第2弾。",
   "verification": {
-    "day_unit": 93,
-    "day_e2e": 25,
-    "repository_tests": {
-      "total": 5200,
-      "passed": 5199,
-      "failed": 0,
-      "skipped": 1
+    "first_release": {
+      "day_unit": 93,
+      "day_e2e": 25,
+      "repository_tests": {
+        "total": 5200,
+        "passed": 5199,
+        "failed": 0,
+        "skipped": 1
+      },
+      "publish_gate": {
+        "total": 338,
+        "passed": 337,
+        "skipped": 1
+      },
+      "experience_evaluation": "17/20 (pass)",
+      "visual_evaluation": "14/20 -> 16/20 (pass)",
+      "independent_code_review": "Codex read-only: 7 findings, 4 fixed, 3 recorded as known limits"
     },
-    "publish_gate": {
-      "total": 338,
-      "passed": 337,
-      "skipped": 1
-    },
-    "experience_evaluation": "17/20 (pass)",
-    "visual_evaluation": "14/20 -> 16/20 (pass)",
-    "independent_code_review": "Codex read-only: 7 findings, 4 fixed, 3 recorded as known limits"
+    "expansion": {
+      "day_unit": 294,
+      "day_e2e": 56,
+      "repository_tests": {
+        "total": 5401,
+        "passed": 5400,
+        "failed": 0,
+        "skipped": 1
+      },
+      "publish_gate": {
+        "total": 338,
+        "passed": 337,
+        "skipped": 1
+      },
+      "experience_evaluation": "15/20 -> 17/20 (pass)",
+      "visual_evaluation": "13/20 -> 17/20 (pass)",
+      "independent_code_review": "Codex read-only twice: engine side (missing test registrations found and fixed), screen side (4 findings, all fixed with browser tests that fail on the broken build)",
+      "note": "Fixes after the second evaluation round (swan view, shadow, guide lines clipped to the paper, pochi colours, 4 review findings) were checked by unit/browser tests and by eye; they were not re-scored by an independent evaluator."
+    }
   }
 }
