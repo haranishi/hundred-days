@@ -219,9 +219,9 @@ export function createViewer({ canvas, testGfx = false, reducedMotion = () => fa
   let pose = { i: 0, t: 0, guides: 'none' };
   let poseDirty = true;
   let explode = 1, explodeGoal = 1, explodeFrom = 1, explodeStart = 0;
-  let guideCache = new Map();
+  const guideCache = new Map();
   let shownGuideStep = -1;
-  let fitCache = new Map();
+  const fitCache = new Map();
   let fit = null; // { center, dist, box }
   let currentBox = null; // 今の姿勢の箱（試験用の占有率に使う）
   let currentCenter = null; // 今の姿勢の中心。視点はこれを緩やかに追う
@@ -267,6 +267,15 @@ export function createViewer({ canvas, testGfx = false, reducedMotion = () => fa
   let disposed = false;
   const spherical = new THREE.Spherical();
   const offset = new THREE.Vector3();
+
+  function clearGuideCache() {
+    // Only the geometries belong to a step; the meshes share materials across models.
+    for (const { lines, arrows } of guideCache.values()) {
+      lines.dispose();
+      arrows.dispose();
+    }
+    guideCache.clear();
+  }
 
   controls.addEventListener('start', () => { interacting = true; userMoved = true; viewAnim = null; stopSpin(); wake(); });
   controls.addEventListener('change', () => { needsRender = true; wake(); });
@@ -590,8 +599,8 @@ export function createViewer({ canvas, testGfx = false, reducedMotion = () => fa
       explode = explodeGoal = explodeFrom = 1;
       topologyKey = null;
       currentCenter = null;
-      guideCache = new Map();
-      fitCache = new Map();
+      clearGuideCache();
+      fitCache.clear(); // Bounds and typed arrays only; no GPU resources.
       shownGuideStep = -1;
       zoomFactor = 1;
       finished = false;
@@ -702,9 +711,10 @@ export function createViewer({ canvas, testGfx = false, reducedMotion = () => fa
     stats() {
       const off = camera.position.clone().sub(controls.target);
       const s = new THREE.Spherical().setFromVector3(off);
-      return { renders, running: !!raf, why: lastWhy, spinning: !!spin, finished, coverage: coverage(), paperRect: paperRect(), explode, userMoved, view: autoName, viewMoving: !!viewAnim, distance: s.radius, phi: s.phi, theta: s.theta, fitDistance: fit?.dist ?? null, zoomFactor };
+      return { renders, geometries: renderer.info.memory.geometries, running: !!raf, why: lastWhy, spinning: !!spin, finished, coverage: coverage(), paperRect: paperRect(), explode, userMoved, view: autoName, viewMoving: !!viewAnim, distance: s.radius, phi: s.phi, theta: s.theta, fitDistance: fit?.dist ?? null, zoomFactor };
     },
     dispose() {
+      clearGuideCache();
       disposed = true; ro.disconnect(); controls.dispose(); renderer.dispose();
       if (raf) cancelAnimationFrame(raf);
     },

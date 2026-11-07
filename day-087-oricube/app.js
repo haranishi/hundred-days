@@ -334,7 +334,7 @@ function announce(text) {
   els.live.textContent = text;
 }
 
-function sync() {
+function sync({ syncScrub = false } = {}) {
   if (!tl) return;
   const s = tl.state();
   const n = s.length;
@@ -381,7 +381,7 @@ function sync() {
   if (focused?.disabled) (els.play.offsetParent !== null ? els.play : focused === els.next ? els.prev : els.next).focus({ preventScroll: true });
 
   const pos = tl.position();
-  if (document.activeElement !== els.scrub || s.playing) els.scrub.value = String(pos);
+  if (syncScrub || document.activeElement !== els.scrub || s.playing) els.scrub.value = String(pos);
   const pct = Math.round(s.t * 100);
   els.scrub.setAttribute('aria-valuetext', s.finished ? '完成' : `手順${s.step + 1}／${n}、${pct}%`);
   els.scrub.style.setProperty('--fill', `${(pos / n) * 100}%`);
@@ -493,7 +493,7 @@ function bind() {
     if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
       e.preventDefault();
       if (e.key === 'ArrowLeft') tl.prev(); else tl.next();
-      sync();
+      sync({ syncScrub: true });
     }
   });
 
@@ -506,7 +506,7 @@ function bind() {
     else if (e.key === 'ArrowLeft') { e.preventDefault(); tl.prev(); sync(); }
     else if (e.key === ' ' || e.code === 'Space') {
       // ボタンにフォーカスがあるときは、そのボタンを押す（標準の動き）
-      if (tag === 'BUTTON' || tag === 'A') return;
+      if (tag === 'BUTTON' || tag === 'A' || tag === 'SUMMARY') return;
       e.preventDefault(); tl.toggle(); sync(); viewer?.wake();
     } else if (e.key === 'r' || e.key === 'R') {
       e.preventDefault(); resetView();
@@ -522,7 +522,12 @@ function bind() {
   wideQuery.addEventListener?.('change', placeStepList);
   placeDone();
   sideQuery.addEventListener?.('change', placeDone);
-  reducedQuery.addEventListener?.('change', () => { tl.setReduced(reduced()); sync(); viewer?.wake(); });
+  reducedQuery.addEventListener?.('change', () => {
+    if (reduced()) viewer?.stopSpin();
+    tl.setReduced(reduced());
+    sync();
+    viewer?.wake();
+  });
 }
 
 function showNoGl(reason) {

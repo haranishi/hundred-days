@@ -665,6 +665,92 @@ test.describe('the view each step recommends', () => {
   });
 });
 
+test.describe('viewer and keyboard regressions', () => {
+  test('guide geometries stay bounded when switching between the plane and swan', async ({ page }) => {
+    test.setTimeout(60_000);
+    await page.emulateMedia({ reducedMotion: 'no-preference' });
+    await open(page, 'm=plane');
+    await rendered(page);
+    const counts = [];
+    for (let k = 0; k < 8; k++) {
+      const id = k % 2 === 0 ? 'plane' : 'swan';
+      if (k > 0) {
+        await page.locator('#pick-open').click();
+        await page.locator(`.pick-card[data-id="${id}"]`).click();
+        await expect.poll(async () => (await state(page)).model).toBe(id);
+      }
+      // Pause on full guides and render both steps before sampling. The picker starts playback;
+      // sampling immediately after it closes could still count the previous model's geometry.
+      for (const step of [1, 0]) {
+        const before = await page.evaluate((i) => {
+          window.__oricube.setProgress(i, 0);
+          return window.__oricube.state().viewer.renders;
+        }, step);
+        await expect.poll(async () => (await state(page)).viewer.renders, { timeout: 10_000 }).toBeGreaterThan(before);
+        expect((await state(page)).guides).toBe('full');
+      }
+      counts.push((await state(page)).viewer.geometries);
+    }
+    expect(Math.min(...counts)).toBeGreaterThan(0);
+    const warm = Math.max(...counts.slice(0, 2));
+    expect(Math.max(...counts.slice(2)), JSON.stringify(counts)).toBeLessThanOrEqual(warm + 2);
+  });
+
+  test('arrow keys on the focused slider keep its value aligned with the step', async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: 'no-preference' });
+    await open(page, 'm=plane&s=2');
+    const scrub = page.locator('#scrub');
+    await expect(scrub).toHaveValue('1');
+    await scrub.focus();
+    await page.keyboard.press('ArrowRight');
+    await expect(page.locator('#step-no')).toHaveText('手順 3');
+    await expect(scrub).toBeFocused();
+    await expect(scrub).toHaveValue('2');
+    await page.keyboard.press('ArrowLeft');
+    await expect(page.locator('#step-no')).toHaveText('手順 2');
+    await expect(scrub).toHaveValue('1');
+    expect((await state(page)).playing).toBe(false);
+  });
+
+  test('enabling reduced motion stops a completion turn already in progress', async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: 'no-preference' });
+    await open(page, 'm=plane&s=9&t=1');
+    await rendered(page);
+    expect((await state(page)).viewer.spinning).toBe(true);
+    const start = (await state(page)).viewer.theta;
+    await expect.poll(async () => Math.abs((await state(page)).viewer.theta - start), { timeout: 5_000 }).toBeGreaterThan(0.02);
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await expect.poll(async () => (await state(page)).viewer.spinning, { timeout: 2_000 }).toBe(false);
+    expect((await state(page)).finished).toBe(true);
+    await expect.poll(async () => (await state(page)).viewer.running, { timeout: 15_000 }).toBe(false);
+    const stopped = (await state(page)).viewer;
+    await page.emulateMedia({ reducedMotion: 'no-preference' });
+    await page.waitForTimeout(300);
+    const after = (await state(page)).viewer;
+    expect(after.spinning).toBe(false);
+    expect(Math.abs(after.theta - stopped.theta)).toBeLessThan(1e-6);
+  });
+
+  test.describe('the step summary on a phone', () => {
+    test.use(phone);
+    test('Space and Enter toggle the step list without changing playback', async ({ page }) => {
+      await open(page, 'm=plane&s=2');
+      const details = page.locator('#steps');
+      const summary = details.locator('summary');
+      await expect(details).toHaveJSProperty('open', false);
+      const before = (await state(page)).playing;
+      await summary.focus();
+      await page.keyboard.press('Space');
+      await expect(details).toHaveJSProperty('open', true);
+      expect((await state(page)).playing).toBe(before);
+      await expect(summary).toBeFocused();
+      await page.keyboard.press('Enter');
+      await expect(details).toHaveJSProperty('open', false);
+      expect((await state(page)).playing).toBe(before);
+    });
+  });
+});
+
 test.describe('keys and focus', () => {
   test('after choosing from the list, focus is on play and Space plays', async ({ page }) => {
     await open(page);
