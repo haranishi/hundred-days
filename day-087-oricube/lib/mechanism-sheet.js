@@ -58,24 +58,40 @@ export function assertMechanismPath(s,motion) {
   }
 }
 function endpointRanks(s,motion,end) {
-  const near=sheetMechanismPose(s,motion,1-1e-4),edges=[],groups=motion.path.core.clusters.map((_,i)=>i);
+  const near=sheetMechanismPose(s,motion,1-1e-4),edges=[],groups=[];
+  // A locked fold may bind several existing layers into one rigid bundle.
+  // Keep those layers separate in the order graph, even though they share a pose.
+  const faces=s.triangles.map((t,i)=>{
+    const cluster=motion.faces[i];let id=groups.findIndex(g=>g.cluster===cluster&&g.rank===t.rank);
+    if(id<0) {id=groups.length;groups.push({cluster,rank:t.rank});}return id;
+  });
   for(let i=0;i<s.triangles.length;i++) for(let j=i+1;j<s.triangles.length;j++) {
     const a=s.triangles[i],b=s.triangles[j],ci=motion.faces[i],cj=motion.faces[j];
     const pa=a.v.map(v=>[end.p[v][0],end.p[v][2]]),pb=b.v.map(v=>[end.p[v][0],end.p[v][2]]),poly=clip(pa,pb);
     if(poly.length<3||Math.abs(signedArea(poly))<=AREA_EPS) continue;
-    if(ci===cj) fail('A rigid cluster contains overlapping layers','MECHANISM_LAYER_AMBIGUOUS');
     const uv=centroid(poly),wa=barycentric(uv,...pa),wb=barycentric(uv,...pb);
     const ha=wa.reduce((sum,w,k)=>sum+w*near.p[a.v[k]][1],0),hb=wb.reduce((sum,w,k)=>sum+w*near.p[b.v[k]][1],0);
-    if(Math.abs(ha-hb)<1e-10) fail('Endpoint layer order is ambiguous','MECHANISM_LAYER_AMBIGUOUS');
-    edges.push(ha<hb?[ci,cj]:[cj,ci]);
+    let height=ha-hb;
+    if(ci===cj) height=motion.layerGap>0?(near.offsets[i][1]-near.offsets[j][1])/motion.layerGap:
+      (a.rank-b.rank)*near.poses[ci].r[1][1];
+    if(faces[i]===faces[j]||Math.abs(height)<1e-10) fail('Endpoint layer order is ambiguous','MECHANISM_LAYER_AMBIGUOUS');
+    edges.push(height<0?[faces[i],faces[j]]:[faces[j],faces[i]]);
   }
+  const fixed=groups.flatMap((g,i)=>g.cluster===motion.path.core.pin?[i]:[]).sort((a,b)=>groups[a].rank-groups[b].rank);
+  for(let i=1;i<fixed.length;i++) edges.push([fixed[i-1],fixed[i]]);
   const order=[];
   while(order.length<groups.length) {
-    const next=groups.find(i=>!order.includes(i)&&!edges.some(([a,b])=>b===i&&!order.includes(a)));
-    if(next===undefined) fail('Endpoint layer order contains a cycle','MECHANISM_PENETRATION');
+    const next=groups.findIndex((_,i)=>!order.includes(i)&&!edges.some(([a,b])=>b===i&&!order.includes(a)));
+    if(next<0) fail('Endpoint layer order contains a cycle','MECHANISM_PENETRATION');
     order.push(next);
   }
-  return motion.faces.map(c=>order.indexOf(c));
+  const anchors=fixed.map(id=>({index:order.indexOf(id),rank:groups[id].rank}));
+  const ranks=order.map((_,i)=>{
+    const lower=anchors.filter(a=>a.index<=i).at(-1),upper=anchors.find(a=>a.index>=i);
+    if(lower&&upper) return lower===upper?lower.rank:lower.rank+(upper.rank-lower.rank)*(i-lower.index)/(upper.index-lower.index);
+    const anchor=lower??upper;return anchor.rank+i-anchor.index;
+  });
+  return faces.map(id=>ranks[order.indexOf(id)]);
 }
 export function mechanismGraph(s,op) {
   if(!Array.isArray(op.hinges)||!op.hinges.length||!op.pin) fail('Mechanism needs hinges and a pin selection');
@@ -122,10 +138,16 @@ export function mechanismGraph(s,op) {
   const merged=new Map();
   for(const joint of joints) {
     const {a,b,h}=joint,key=`${faces[a]}:${faces[b]}:${declarations.indexOf(h)}`;
-    if(!merged.has(key)) merged.set(key,{...joint,v:[]});
-    merged.get(key).v.push(...joint.v);
+    const edge=joint.v.map(v=>s.vertices[v].p),axis=unit(sub(edge[1],edge[0]));
+    if(!merged.has(key)) merged.set(key,[]);
+    const groups=merged.get(key);
+    // A material line can reverse at a locked 180-degree fold (e.g. a brim).
+    // Such pieces need separate angular constraints, even on the same axis.
+    let group=groups.find(g=>dot(g.axis,axis)>1-1e-10&&norm(cross(sub(edge[0],g.origin),axis))<VERTEX_EPS);
+    if(!group) {group={...joint,v:[],axis,origin:edge[0]};groups.push(group);}
+    group.v.push(...joint.v);
   }
-  const hinges=[...merged.values()].map(({a,b,v,h})=>{
+  const hinges=[...merged.values()].flat().map(({a,b,v,h})=>{
     if(faces[a]===faces[b]) fail('Declared hinge is locked inside a rigid cluster','MECHANISM_INFEASIBLE');
     const direction=sub(h.edge[1],h.edge[0]);
     v=[...new Set(v)].sort((a,b)=>dot(sub(s.vertices[a].uv,s.vertices[b].uv),direction));
@@ -144,9 +166,6 @@ export function prepareMechanismOp(s,op,layerGap) {
   motion.flat=end.p.every(p=>Math.abs(p[1])<VERTEX_EPS);
   if(motion.flat) {
     motion.ranks=endpointRanks(s,motion,end);
-    const fixed=s.triangles.findIndex((_,i)=>motion.faces[i]===motion.path.core.pin);
-    const shift=s.triangles[fixed].rank-motion.ranks[fixed];
-    motion.ranks=motion.ranks.map(rank=>rank+shift);
     assertLayers({...s,flat:true,vertices:s.vertices.map((v,i)=>({...v,p:end.p[i]})),
       triangles:s.triangles.map((t,i)=>({...t,rank:motion.ranks[i]}))});
   }

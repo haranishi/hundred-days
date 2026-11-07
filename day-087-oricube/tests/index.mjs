@@ -11,3 +11,6 @@ import './tray.test.mjs';
 import './mechanism-core.test.mjs';
 import './mechanism.test.mjs';
 import './mechanism-feasibility.test.mjs';
+import './mechanism-crane.test.mjs';
+import './mechanism-pocket.test.mjs';
+import './mechanism-investigation.test.mjs';

@@ -57,7 +57,7 @@ function linearSolve(matrix,rhs) {
   }
   return x;
 }
-function project(core,t,initial,maxIterations=60) {
+function project(core,t,initial,maxIterations=60,attractor=true) {
   const angles=initial.slice(),driver=core.driver,free=core.goals.flatMap((goal,i)=>i===driver||!goal?[]:[i]);
   core.goals.forEach((goal,i)=>{if(!goal) angles[i]=0;});
   if(driver!=='projection') angles[driver]=t*core.goals[driver];
@@ -72,7 +72,7 @@ function project(core,t,initial,maxIterations=60) {
     let accepted=false;
     for(let attempt=0;attempt<12;attempt++) {
       const step=linearSolve(matrix.map((row,i)=>row.map((v,j)=>v+(i===j?damping:0))),
-        rhs.map((v,k)=>v+(magnitude(r)>1e-8?damping:0)*(t*core.goals[free[k]]-angles[free[k]])));
+        rhs.map((v,k)=>v+(attractor&&magnitude(r)>1e-8?damping:0)*(t*core.goals[free[k]]-angles[free[k]])));
       if(!step) {damping*=10;continue;}
       const scale=Math.min(1,.35/Math.max(1e-30,...step.map(Math.abs))),next=angles.slice();
       free.forEach((i,k)=>{next[i]=Math.max(Math.min(0,core.goals[i]),Math.min(Math.max(0,core.goals[i]),next[i]+step[k]*scale));});
@@ -149,13 +149,18 @@ export function buildMechanism(input,{samples=256}={}) {
   // A signed seed chooses a side of the flat singularity without random noise.
   const seedT=1e-3;let previous=project(core,seedT,core.goals.map(v=>v*seedT));
   assertBranch(core,previous,seedT);
+  // Extrapolate the solved tangent. Pulling toward the endpoint injects motion
+  // into unconstrained modes and can leave the branch near flat singularities.
+  let older=core.goals.map(()=>0),olderT=0;
   for(let k=1;k<samples;k++) {
     const t=k/samples,lastT=k===1?seedT:(k-1)/samples;
-    const guess=previous.map((v,i)=>v+(core.goals[i]-v)*(t-lastT)/(1-lastT)),angles=project(core,t,guess);
+    const guess=previous.map((v,i)=>v+(v-older[i])*(t-lastT)/(lastT-olderT)),angles=project(core,t,guess);
     assertBranch(core,angles,t);
     if(angles.some((v,i)=>Math.abs(v-previous[i])>.3))
       fail('Rigid path jumps between branches','MECHANISM_BRANCH',{t});
-    table.push(angles);previous=angles;
+    table.push(angles);
+    if(t!==lastT) {older=previous;olderT=lastT;}
+    previous=angles;
   }
   if(previous.some((v,i)=>Math.abs(v-core.goals[i])>.3))
     fail('Rigid path does not reach the declared endpoint','MECHANISM_BRANCH',{t:1});
@@ -166,7 +171,7 @@ export function buildMechanism(input,{samples=256}={}) {
       const index=Math.min(samples-1,Math.floor(t*samples)),f=t*samples-index;
       if(f===0) return mechanismPose(core,table[index],{points});
       if(t===1) return mechanismPose(core,table[samples],{points});
-      const guess=table[index].map((v,i)=>v+(table[index+1][i]-v)*f),angles=project(core,t,guess,12);
+      const guess=table[index].map((v,i)=>v+(table[index+1][i]-v)*f),angles=project(core,t,guess,12,false);
       if(angles.some((a,i)=>Math.abs(a-guess[i])>.1)) fail('Frame projection changes branch','MECHANISM_BRANCH',{t});
       assertBranch(core,angles,t);return mechanismPose(core,angles,{points});
     }};
