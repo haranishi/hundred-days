@@ -12,7 +12,7 @@ const reduced = () => reducedQuery.matches;
 
 const els = {
   app: $('app'), pickOpen: $('pick-open'), pickName: $('pick-name'), picker: $('picker'),
-  pickerList: $('picker-list'), pickerClose: $('picker-close'), donePick: $('done-pick'), stage: $('stage'), canvas: $('view'), hint: $('hint'),
+  pickerList: $('picker-list'), pickerClose: $('picker-close'), donePick: $('done-pick'), stage: $('stage'), canvas: $('view'), hint: $('hint'), loading: $('loading'),
   tools: $('stage-tools'), explode: $('explode'), done: $('done'), doneTitle: $('done-title'),
   other: $('other'), otherLabel: $('other-label'), shareOpen: $('share-open'),
   nogl: $('nogl'), noglWhy: $('nogl-why'), noglList: $('nogl-list'),
@@ -248,18 +248,35 @@ function renderNoGlList() {
   }));
 }
 
-// A model is built the first time it is used (the crane takes a moment). Keep the current model
-// if the data of the chosen one cannot be built.
+// A model is built the first time it is used. A heavy one (the crane) says so first and lets the screen
+// paint before the build; a light one is built in place. If the data of the chosen model cannot be
+// built, the current model stays.
+let chooseToken = 0;
 function chooseModel(id, opts) {
   const next = models.find((m) => m.id === id);
-  if (next && next !== model) {
-    try { void next.steps; } catch (error) {
+  const token = ++chooseToken;
+  const finish = () => {
+    if (token !== chooseToken) return;
+    els.loading.hidden = true;
+    selectModel(id, opts);
+  };
+  const build = () => {
+    try { void next.steps; return true; } catch (error) {
       console.error(error);
+      els.loading.hidden = true;
+      els.hint.hidden = false;
       els.hint.textContent = `${next.name}の手順を組み立てられませんでした。`;
-      return;
+      return false;
     }
+  };
+  if (!next || next === model || next.ready || !next.heavy) {
+    if (next && next !== model && !build()) return;
+    selectModel(id, opts);
+    return;
   }
-  selectModel(id, opts);
+  els.loading.textContent = `${next.name}を準備しています…`;
+  els.loading.hidden = false;
+  requestAnimationFrame(() => requestAnimationFrame(() => setTimeout(() => { if (token === chooseToken && build()) finish(); }, 0)));
 }
 
 function selectModel(id, { autoplay = false, step = 0, t = null } = {}) {

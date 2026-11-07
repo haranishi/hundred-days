@@ -8,7 +8,9 @@ import { MODELS } from './models/index.js';
 function lazyModel(def) {
   let built = null;
   const build = () => (built ??= buildModel(def));
-  const meta = { id: def.id, name: def.name, reading: def.reading, level: def.level, minutes: def.minutes };
+  // heavy: building takes a noticeable moment (the screen says so first). ready: already built.
+  const meta = { id: def.id, name: def.name, reading: def.reading, level: def.level, minutes: def.minutes, heavy: !!def.heavy };
+  Object.defineProperty(meta, 'ready', { get: () => built !== null });
   return new Proxy(meta, {
     get: (target, prop) => (prop in target ? target[prop] : build()[prop]),
     has: (target, prop) => prop in target || prop in build(),

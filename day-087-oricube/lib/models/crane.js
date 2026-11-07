@@ -31,7 +31,7 @@ const raise=(tag,side)=>({type:'fold',line:{point:world(b,0),dir:world(1,side*2.
 const neck=[-21/29,20/29],headBase=[b+.4*neck[0],.4*neck[1]];
 const wingAxis={through:[world(0,-.3),world(0,.3)]};
 export const crane={
-  id:'crane',name:'鶴',reading:'つる',level:3,minutes:10,
+  id:'crane',name:'鶴',reading:'つる',level:3,minutes:10,heavy:true,
   paper:{width:1,height:1,front:'#faf9f3',back:'#3f9c92',frontName:'白い面',backName:'青磁色の面'},
   steps:[
     {id:'centers',title:'対角線と縦横に折り目',text:'白い面を上に置きます。対角線は向こうに、縦横の中心線は手前に折り、そのつど開きます。',tip:'角と辺をそろえてから、折り目をつけます。',ops:[
