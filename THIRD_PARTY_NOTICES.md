@@ -132,6 +132,7 @@ Day056の配信ビルドに含む第三者ライブラリ・移植実装・検�
 | 082 | 写真の質感「White Plaster 02」（白壁と町屋の二階のむら） | [Poly Haven](https://polyhaven.com/a/white_plaster_02)（Rob Tuytel） | [CC0 1.0](https://polyhaven.com/license) | **加工あり**。上と同じ派生（輝度の白黒 JPEG・1K、法線 512px）を配る |
 | 082 | 写真の質感「Clay Plaster」（土塀の鏝むら） | [Poly Haven](https://polyhaven.com/a/clay_plaster)（Amal Kumar） | [CC0 1.0](https://polyhaven.com/license) | **加工あり**。上と同じ派生（輝度の白黒 JPEG・1K、法線 512px）を配る |
 | 082 | 写真の質感「Rock Surface」（切石・地面の石畳・自然石・溝の底） | [Poly Haven](https://polyhaven.com/a/rock_surface)（Amal Kumar） | [CC0 1.0](https://polyhaven.com/license) | **加工あり**。上と同じ派生（輝度の白黒 JPEG・1K、法線 512px）を配る |
+| 087 | `day-087-oricube/vendor/three.js`（three.js 0.186.0・OrbitControlsを含むESMビルド） | [three.js](https://threejs.org/) | [MIT](day-087-oricube/vendor/LICENSE-three.txt) | Day044の同梱版（esbuildでまとめただけ）を未改変で複製。折り紙の形・案内線・影・アイコンは実行時の計算か自作で、外部の画像・音・書体は使っていない |
 
 ## Day64「漏洩の地図」の出典と描画依存
 
@@ -201,9 +202,16 @@ Pixel-Boy / AAAのNinja Adventure（CC0）、DotGothic16（OFL 1.1）、Phaser 4
 
 ## Day084 AirPresenter
 
-公開画像は自作サンプル画面です。配布ZIPはアプリのソースと合成試験だけを含み、実資料・フォント・変換ツールを含みません。
-Playwright/Chromium、LibreOffice、Poppler、qrencode、Fontconfigは利用者の環境で別途取得します。
-Macのインストール済みフォントは変換中に参照するだけで、再配布しません。
+公開画像・試験PDFは自作サンプルです。本人の実資料・変換画像・操作権限を含みません。
+ブラウザ版はPDF.js 6.5.438（Apache-2.0）とqrcode-generator 2.0.4（MIT、Kazuhiko Arase）を同梱します。
+PDF.jsのCMaps、標準フォント、WASM、ICCには個別のライセンスがあります。
+Adobe CMaps、Foxit、Liberation（GPL-2.0＋フォント例外）、OpenJPEG、QCMS、ICCの表記を含め、`vendor/pdfjs/`各ディレクトリのLICENSEと`vendor/qrcode-LICENSE`を保持しています。
+Playwright/Chromium・Wrangler・Miniflareは開発・検証用で、利用者のインストールは不要です。
+旧ローカル版ZIPはソースと合成試験のみを含みます。LibreOffice・Poppler・qrencode・Fontconfig・Macフォントは含みません。
+
+PowerPoint のブラウザ内変換は、未改変の公式 ZetaOffice 24.2.8.0.beta1（LibreOffice BuildId `efaf0670b4d055f838a2849becb10f08aa06a257`）、ZetaJS 1.2.0（MIT）、Qt 5 の WASM 版と Emscripten の実行時部品を使用します。
+エンジン全体を MIT や MPL だけとは扱いません。LibreOffice の全外部部品通知、Qt の GPL/LGPL と第三者許諾、musl/LLVM、Noto Sans CJK JP 通常・太字の OFL を、[変換エンジンの許諾・固定ソース案内](day-084-airpresenter/licenses/office/README.md) に同梱しています。
+各原文の取得 URL・SHA256 は `licenses/office/sources.json`、公開バイナリとフォントは `web/office-sources.json` に記録します。Qt の正確なビルドコミットは未確認で、再現ビルド済みとは表示しません。
 
 ## Day086: OpenPOI API
 

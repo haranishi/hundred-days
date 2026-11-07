@@ -101,6 +101,11 @@ const allApps = dirs.map((dir) => {
 
 const drafts = allApps.filter((a) => a.draft);
 const apps = allApps.filter((a) => !a.draft);
+// Only a build that includes this app needs its policy; isolated builds of other Days stay independent.
+const { APP_PATH: AIRPRESENTER_PATH, SECURITY_HEADERS: AIRPRESENTER_HEADERS,
+  CONTENT_SECURITY_POLICY: AIRPRESENTER_CSP, PERMISSIONS_POLICY: AIRPRESENTER_PERMISSIONS } =
+  apps.some((app) => app.dir === 'day-084-airpresenter') ? await import('../day-084-airpresenter/web/policy.mjs') : {};
+
 const publishCheckOnly = allApps.filter((a) => a.publishCheckOnly);
 const unmatchedChecks = unmatchedPublishCheckTargets(dirs);
 if (unmatchedChecks.length) {
@@ -274,7 +279,7 @@ const FRAME_BY_APP = {
   'day-030-world-window': 'frame-src https://www.youtube-nocookie.com https://webcams.windy.com https://www.windy.com'
 };
 
-const appCsp = (dir) => [
+const appCsp = (dir) => dir === 'day-084-airpresenter' ? AIRPRESENTER_CSP : [
   "default-src 'self'",
   // Day64 compiles its local Rust module in a same-origin Worker.
   // Permit Wasm compilation for this app without permitting JavaScript eval.
@@ -299,6 +304,7 @@ const appCsp = (dir) => [
    マイクの許可はブラウザがサイト（オリジン）単位で覚えることがあるので、ほかのDayは方針で閉じたままにする */
 const GLOBAL_PERMISSIONS = 'geolocation=(self), camera=(), microphone=(), payment=(), usb=()';
 const PERMISSIONS_BY_APP = {
+  'day-084-airpresenter': AIRPRESENTER_PERMISSIONS,
   // day-059 は話した声に合わせて口を動かす。「マイクを開始」を押したときだけ許可を求める。位置情報は使わないので閉じる
   'day-059-kuchi-sanmai': 'geolocation=(), camera=(), microphone=(self), payment=(), usb=()'
 };
@@ -324,11 +330,17 @@ const headerLines = [
 // 外部Dayの紹介ページ（intro）も、公開済みのDayと同じCSPで配る。インラインのscript・styleを持たない作りにしてある
 for (const app of apps.filter((a) => a.published || a.intro)) {
   headerLines.push(`/${app.dir}/*`, `  Content-Security-Policy: ${appCsp(app.dir)}`);
+  if (app.dir === 'day-084-airpresenter') headerLines.push('  ! Referrer-Policy', `  Referrer-Policy: ${AIRPRESENTER_HEADERS['Referrer-Policy']}`);
   if (PERMISSIONS_BY_APP[app.dir]) headerLines.push('  ! Permissions-Policy', `  Permissions-Policy: ${PERMISSIONS_BY_APP[app.dir]}`);
   headerLines.push('');
 }
 headerLines.push('/*/tools/*', '  X-Robots-Tag: noindex', '');
 writeFileSync(join(distDir, '_headers'), headerLines.join('\n'));
+// Dedicated Worker asset uploads use the same headers even after a root-only build.
+if (existsSync(join(distDir, 'day-084-airpresenter'))) {
+  const workerHeaders = [AIRPRESENTER_PATH + '/*', ...Object.entries(AIRPRESENTER_HEADERS).map(([name, value]) => '  ' + name + ': ' + value), ''].join('\n');
+  writeFileSync(join(distDir, 'day-084-airpresenter/_headers'), workerHeaders);
+}
 
 // ---------------------------------------------------------------- 集計（すべて meta.json の実値から）
 

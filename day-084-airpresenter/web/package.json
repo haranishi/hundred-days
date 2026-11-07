@@ -1,0 +1,24 @@
+{
+  "name": "day084-browser-tools",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test worker.test.mjs office-assets.test.mjs",
+    "test:browser": "node --test browser.test.mjs",
+    "test:e2e": "node e2e.mjs",
+    "build": "node build.mjs",
+    "dev": "wrangler dev --port 8784",
+    "deploy": "wrangler deploy",
+    "test:powerpoint": "node --test powerpoint.test.mjs",
+    "test:powerpoint-ui": "node powerpoint-ui.mjs"
+  },
+  "dependencies": {
+    "pdfjs-dist": "6.5.438",
+    "qrcode-generator": "2.0.4"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.62.1",
+    "wrangler": "4.157.0",
+    "miniflare": "5.20261103.0-beta"
+  }
+}

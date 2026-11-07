@@ -6,3 +6,8 @@ edc53e175c032b40fd7feb0c42e69c9ef63de3f2:tests/e2e/day-075.spec.mjs:generic-api-
 # Day80: reviewed public localStorage identifier, used only for save/load.
 # Exact introducing-commit finding; default secret rules remain enabled.
 b5f3b54e5a86a2d9fe670052a680bf5442f5248a:day-080-fifth-prince/source/src/persistence.ts:generic-api-key:6
+
+# Day85: reviewed public localStorage identifier, used only for save/load.
+# Exact introducing-commit findings; all default secret rules stay enabled.
+c7eb29a05463d70553ee8b3f98a68085cd8b9fed:day-085-warikan/lib/storage.js:generic-api-key:2
+c7eb29a05463d70553ee8b3f98a68085cd8b9fed:tests/e2e/day-085.spec.mjs:generic-api-key:6

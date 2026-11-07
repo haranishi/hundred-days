@@ -182,11 +182,63 @@ jobs:
             day-080-fifth-prince/source/test-results/
           retention-days: 7
 
+  day084:
+    name: Day084 browser and encrypted relay
+    needs: checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Set up Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            day-084-airpresenter/web/package-lock.json
+      - name: Install build and runtime test dependencies
+        run: |
+          npm ci --ignore-scripts
+          npm ci --ignore-scripts --prefix day-084-airpresenter/web
+      # Relay terminal-close tests also use real Chromium, so install before npm test.
+      - name: Install Chromium
+        timeout-minutes: 5
+        working-directory: day-084-airpresenter/web
+        run: npx playwright install chromium
+      - name: Exercise actual SQLite relay and encrypted browser peers
+        working-directory: day-084-airpresenter/web
+        run: |
+          npm test
+          npm run test:browser
+      - name: Build vendored browser assets and shared security headers
+        working-directory: day-084-airpresenter/web
+        run: npm run build
+      - name: Render PowerPoint locally and stop cancelled jobs
+        working-directory: day-084-airpresenter/web
+        run: npm run test:powerpoint
+      - name: Use the complete app from two browser contexts
+        working-directory: day-084-airpresenter/web
+        run: |
+          npm run test:e2e
+          npm run test:powerpoint-ui
+      - name: Save UI evidence on failure
+        if: failure()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
+        with:
+          name: day084-browser-failure
+          path: |
+            .cache/day084-browser-e2e/
+            .cache/day084-powerpoint/
+            .cache/day084-powerpoint-ui/
+          retention-days: 7
+
   # ブランチ保護の必須チェック名を維持し、失敗・キャンセル・skipを成功に見せない。
   test:
     name: Build and browser test
     if: ${{ always() }}
-    needs: [checks, browser, day080, api-abuse]
+    needs: [checks, browser, day080, day084, api-abuse]
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
@@ -195,12 +247,14 @@ jobs:
           CHECKS_RESULT: ${{ needs.checks.result }}
           BROWSER_RESULT: ${{ needs.browser.result }}
           GAME_RESULT: ${{ needs.day080.result }}
+          AIRPRESENTER_RESULT: ${{ needs.day084.result }}
           API_RESULT: ${{ needs.api-abuse.result }}
         run: |
           printf 'Quick checks: %s\nBrowser tests: %s\n' "$CHECKS_RESULT" "$BROWSER_RESULT"
           test "$CHECKS_RESULT" = success
           test "$BROWSER_RESULT" = success
           test "$GAME_RESULT" = success
+          test "$AIRPRESENTER_RESULT" = success
           test "$API_RESULT" = success
 
   deploy:

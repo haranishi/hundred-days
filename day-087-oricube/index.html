@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>OriCube — 折り紙の折り方を3Dで見る | 100日チャレンジ Day87</title>
+<meta name="description" content="紙飛行機・鶴・白鳥など10個の折り方を、紙が折れていく3Dの動きで見られます。止める・戻す・回す・重なりを広げるがスマホの指だけで。ブラウザで完結します。">
+<meta name="share:text" content="OriCube — 折り紙の折り方を3Dで見る。紙が折れる動きを、好きな角度から。">
+<meta name="theme-color" content="#f7f3ea">
+<link rel="icon" href="./favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="./shared/share.css">
+<link rel="stylesheet" href="./app.css">
+<script src="./shared/share.js" defer></script>
+<script type="module" src="./app.js"></script>
+</head>
+<body>
+<a class="skip" href="#controls">手順と操作へ移る</a>
+<div class="app" id="app" data-ready="false">
+  <header class="top">
+    <p class="brand">
+      <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M5 7h22v18H5Z" fill="#2e7bd0"/><path d="M5 7h22L5 25Z" fill="#fffdf8"/><path d="M5 25 27 7" stroke="#d6452d" stroke-width="2" stroke-dasharray="3.4 2.2"/><path d="M5 7h22L5 25Z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
+      <span class="brand-name">OriCube</span>
+      <span class="brand-sub">折り紙の折り方を3Dで見る</span>
+    </p>
+    <button type="button" class="pick-open" id="pick-open" aria-haspopup="dialog" aria-controls="picker">
+      <span class="pick-kicker">作品を選ぶ</span>
+      <span class="pick-current"><span id="pick-name">紙飛行機</span><span class="pick-caret" aria-hidden="true"></span></span>
+    </button>
+  </header>
+
+  <dialog class="picker" id="picker" role="dialog" aria-modal="true" aria-labelledby="picker-title">
+    <div class="picker-inner">
+      <div class="picker-head">
+        <h2 class="picker-title" id="picker-title">作品を選ぶ</h2>
+        <p class="picker-note">やさしい順</p>
+        <button type="button" class="picker-close" id="picker-close" aria-label="閉じる"><span class="ico ico-close" aria-hidden="true"></span></button>
+      </div>
+      <ul class="picker-list" id="picker-list"></ul>
+    </div>
+  </dialog>
+
+  <section class="stage" id="stage" aria-label="折っている紙の3D表示">
+    <canvas id="view" role="img" aria-label="折っている紙の3D表示。1本指で回し、2本指で拡大縮小できます。"></canvas>
+    <p class="hint" id="hint" aria-hidden="true">1本指で回す ・ 2本指で拡大</p>
+    <p class="loading" id="loading" role="status" hidden></p>
+    <div class="stage-tools" id="stage-tools">
+      <div class="seg views" role="group" aria-label="視点">
+        <button type="button" class="tool" data-view="top"><span class="ico ico-top" aria-hidden="true"></span>真上</button>
+        <button type="button" class="tool" data-view="iso"><span class="ico ico-iso" aria-hidden="true"></span>斜め</button>
+        <button type="button" class="tool" data-view="reset" aria-label="視点を元に戻す"><span class="ico ico-reset" aria-hidden="true"></span>戻す</button>
+      </div>
+      <button type="button" class="tool explode" id="explode" aria-pressed="false"><span class="ico ico-layers" aria-hidden="true"></span><span class="explode-label">重なりを広げる</span></button>
+    </div>
+    <div class="done" id="done" hidden>
+      <div class="done-card" role="dialog" aria-modal="false" aria-labelledby="done-title">
+        <div class="done-head">
+          <div>
+            <p class="done-kicker">できあがり</p>
+            <h2 id="done-title">完成</h2>
+          </div>
+          <button type="button" class="btn ghost" id="done-pick">作品を選ぶ</button>
+        </div>
+        <div class="done-actions">
+          <button type="button" class="btn primary" id="other"><span id="other-label">次の作品へ</span><span class="ico ico-go" aria-hidden="true"></span></button>
+          <button type="button" class="btn" id="share-open"><span class="ico ico-share" aria-hidden="true"></span>共有</button>
+        </div>
+      </div>
+    </div>
+    <div class="nogl" id="nogl" hidden>
+      <p class="nogl-why" id="nogl-why"></p>
+      <ol class="nogl-list" id="nogl-list"></ol>
+    </div>
+  </section>
+
+  <section class="panel" id="controls" aria-label="手順と操作" tabindex="-1">
+    <div class="transport">
+      <button type="button" class="btn nav" id="prev"><span class="ico ico-prev" aria-hidden="true"></span>前へ</button>
+      <button type="button" class="btn play" id="play" aria-label="再生"><span class="ico ico-play" aria-hidden="true"></span><span id="play-label">再生</span></button>
+      <button type="button" class="btn nav" id="next">次へ<span class="ico ico-next" aria-hidden="true"></span></button>
+    </div>
+    <div class="scrub">
+      <input type="range" id="scrub" min="0" max="1" step="any" value="0" aria-label="手順の位置">
+      <div class="ticks" id="ticks" aria-hidden="true"></div>
+    </div>
+
+    <div class="settings">
+      <div class="seg speed" role="group" aria-label="再生の速さ" id="speed">
+        <span class="seg-label" aria-hidden="true">速さ</span>
+        <button type="button" class="chip" data-speed="0.5" aria-pressed="false">0.5倍</button>
+        <button type="button" class="chip" data-speed="1" aria-pressed="true">1倍</button>
+        <button type="button" class="chip" data-speed="2" aria-pressed="false">2倍</button>
+      </div>
+      <button type="button" class="chip stop-each" id="step-stop" aria-pressed="false">手順ごとに止める</button>
+    </div>
+    <article class="step" aria-labelledby="step-title">
+      <p class="step-no"><span id="step-no">手順 1</span><span class="step-count" id="step-count">/ 1</span></p>
+      <h2 class="step-title" id="step-title">読み込み中</h2>
+      <p class="step-text" id="step-text"></p>
+      <ul class="legend" id="legend" aria-label="この手順の線の見方" hidden></ul>
+      <p class="step-tip" id="step-tip" hidden></p>
+    </article>
+
+    <p class="paper-info" id="paper-info"></p>
+    <details class="steps" id="steps">
+      <summary>手順の一覧</summary>
+      <ol class="step-list" id="step-list"></ol>
+    </details>
+    <p class="keys">キーボード：← → 手順 ／ スペース 再生 ／ R 視点を戻す</p>
+  </section>
+</div>
+<p class="sr-only" id="live" role="status" aria-live="polite"></p>
+<footer class="foot">
+  <p class="foot-note">OriCube は<span class="nowrap">紙の動きを</span><span class="nowrap">ブラウザの中だけで</span><span class="nowrap">計算しています。</span><span class="nowrap">外部への通信は</span><span class="nowrap">ありません。</span></p>
+  <div id="share"></div>
+  <a class="back" href="../">100日チャレンジへ ↗</a>
+</footer>
+</body>
+</html>

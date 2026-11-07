@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f5f3eb">
+  <title>最小ワリカン | 100日チャレンジ Day085</title>
+  <meta name="description" content="旅行も飲み会も、立て替えをまとめて最小回数で精算。誰が誰にいくら送るかを計算し、LINEに貼れるメモに。ログイン不要・ブラウザで完結。">
+  <meta name="share:text" content="最小ワリカン｜立て替えをまとめて、誰が誰にいくら送るかを最小回数で。">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="shared/share.css">
+  <link rel="stylesheet" href="app.css">
+  <script src="shared/share.js" defer></script>
+  <script src="app.js" type="module"></script>
+</head>
+<body>
+  <a class="skip" href="#member-name">入力へ進む</a>
+  <header class="site-header wrap">
+    <a class="brand" href="./" aria-label="最小ワリカン ホーム">
+      <svg viewBox="0 0 40 40" aria-hidden="true"><path d="M20 4a16 16 0 1 0 0 32V4Z" fill="currentColor"/><path d="M25 5a16 16 0 0 1 0 30" fill="none" stroke="currentColor" stroke-width="2"/><path d="M28 15h8m-8 10h8" stroke="currentColor" stroke-width="2"/></svg>
+      最小ワリカン<span class="brand-sub">THE SIMPLE SETTLEMENT</span>
+    </a>
+    <a class="day-link" href="../">100日チャレンジ <span>085 ↗</span></a>
+  </header>
+  <main class="wrap">
+    <section class="hero" aria-labelledby="page-title">
+      <div>
+        <p class="eyebrow"><span class="small-dot"></span> 旅行も、飲み会も、帰り道まで気持ちよく。</p>
+        <h1 id="page-title">立て替えは、<br>ここで<span class="circle-word">まるく。</span></h1>
+        <p class="intro">誰が、誰に、いくら送る？<br>ばらばらの支払いをまとめて、<strong>いちばん少ない送金回数</strong>に。</p>
+      </div>
+      <div class="hero-aside">
+        <div class="mini-art" aria-hidden="true"><span class="art-person person-one">A</span><span class="art-line">→</span><span class="art-person person-two">B</span><span class="art-stamp">すっきり<br>精算</span></div>
+        <p>ログイン不要 <span>／</span> 最大12人</p>
+        <button type="button" class="text-button" id="example">4人旅行の見本を試す <span aria-hidden="true">↗</span></button>
+      </div>
+    </section>
+    <div class="utility-bar"><p id="save-status" role="status">入力はこの端末に自動保存されます</p><button id="reset" class="text-button" type="button">最初から</button></div>
+    <p id="notice" class="notice" role="status" hidden></p>
+    <div class="workspace">
+      <div class="entry-column">
+        <section class="panel" aria-labelledby="members-title">
+          <div class="section-title"><h2 id="members-title"><span class="step">01</span> 一緒にいた人</h2><span class="count" id="member-count">0 / 12人</span></div>
+          <form id="member-form" novalidate>
+            <label class="sr-only" for="member-name">メンバーの名前</label>
+            <div class="add-member"><input id="member-name" name="name" maxlength="20" placeholder="名前を入力" autocomplete="off" required><button class="button secondary" type="submit">追加 <span aria-hidden="true">＋</span></button></div>
+            <p id="member-error" class="error" role="alert" hidden></p>
+          </form>
+          <ul id="members" class="members" aria-label="登録したメンバー"></ul>
+          <p class="hint" id="members-hint">まずは2人以上の名前を追加してください。</p>
+        </section>
+        <section class="panel payment-panel" aria-labelledby="payment-title">
+          <div class="section-title"><h2 id="payment-title"><span class="step">02</span> 誰が、いくら払った？</h2><span class="small-label">PAYMENTS</span></div>
+          <p id="payment-lock" class="hint">メンバーを追加すると、支払いを入力できます。</p>
+          <form id="expense-form" novalidate>
+            <fieldset id="expense-fields" disabled>
+              <legend class="sr-only">支払いの入力</legend>
+              <div class="payment-row"><div class="field"><label for="payer">支払った人</label><select id="payer" name="payer"></select></div><div class="field amount-field"><label for="amount">金額</label><div class="amount-input"><span aria-hidden="true">¥</span><input id="amount" name="amount" inputmode="numeric" maxlength="16" placeholder="0" autocomplete="off" required aria-describedby="amount-hint"></div></div></div>
+              <p class="sr-only" id="amount-hint">1〜1,000,000,000円の整数</p>
+              <div class="field"><label for="expense-label">支払いの内容</label><input id="expense-label" name="label" maxlength="40" placeholder="例：宿泊代、夜ごはん" required autocomplete="off"></div>
+              <fieldset class="participants-field"><legend>割り勘する人</legend><div class="participants-heading"><p class="hint">この支払いを負担する人だけ選択</p><button class="text-button" id="select-all" type="button">全員を選ぶ</button></div><div id="participants" class="participants"></div></fieldset>
+              <p id="expense-error" class="error" role="alert" hidden></p>
+              <div class="form-actions"><button class="button primary" id="save-expense" type="submit">支払いを追加 <span aria-hidden="true">＋</span></button><button class="button secondary" id="cancel-expense" type="button" hidden>入力を取り消す</button></div>
+              <p class="hint draft-note" id="draft-note" hidden>入力中です。追加・更新すると精算に反映されます。</p>
+            </fieldset>
+          </form>
+        </section>
+        <section class="history-section" aria-labelledby="history-title"><div class="section-title"><h2 id="history-title">立て替えの記録 <span id="expense-count">0件</span></h2><a class="text-button jump-result" href="#result">精算を見る ↓</a></div><p class="hint" id="history-empty">登録した支払いがここに並びます。</p><ol id="expenses" class="expenses"></ol></section>
+      </div>
+      <aside class="receipt" id="result" tabindex="-1" aria-labelledby="result-title">
+        <div class="receipt-top"><span>WARIKAN / SETTLEMENT</span><span aria-hidden="true">✳</span></div>
+        <h2 id="result-title">みんなの精算票</h2><p class="receipt-sub">支払いをまとめて、すっきり。</p>
+        <div class="receipt-total"><span>立て替え合計</span><strong id="total">¥0</strong></div>
+        <p class="result-pending" id="result-pending" hidden>入力中の支払いがあります。追加・更新、または取消の後に結果を共有できます。</p>
+        <div id="result-body" class="result-body"><div class="empty-result"><svg viewBox="0 0 96 96" aria-hidden="true"><path d="M24 13h48v70l-8-5-8 5-8-5-8 5-8-5-8 5V13Z" fill="#efeee8" stroke="currentColor" stroke-width="1.5"/><path d="M36 33h24M36 43h24M36 57h10" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="68" cy="65" r="15" fill="#d7ee8b" stroke="currentColor" stroke-width="1.5"/><path d="m61 65 5 5 9-10" fill="none" stroke="currentColor" stroke-width="2"/></svg><h3>精算票は、ここに。</h3><p>メンバーと支払いを追加すると<br>誰にいくら送るかが分かります。</p></div></div>
+        <div id="breakdown-host"></div>
+        <div class="receipt-actions"><button class="button primary" id="copy-result" type="button" disabled>精算文をコピー <span aria-hidden="true">↗</span></button><p class="action-hint">コピーして、グループLINEに貼るだけ。</p><button class="button secondary" id="copy-state" type="button" disabled>この精算のURLをコピー</button><p class="share-privacy">精算URLには名前・金額・支払い内容が含まれます。<br>リンクを知る人が閲覧できます。</p></div>
+        <section id="manual-copy" hidden><label for="copy-text">コピーできませんでした。下の内容を選択してコピーしてください。</label><textarea id="copy-text" readonly rows="8"></textarea></section>
+        <p class="rounding-note">割り切れない1円は、支払いごとにメンバーの登録順に配分します。送金そのものは行いません。</p>
+        <div class="receipt-bottom" aria-hidden="true"><span>THANK YOU, EVERYONE.</span><span>085</span></div>
+      </aside>
+    </div>
+    <section class="how-it-works" aria-labelledby="how-title"><h2 id="how-title">帰り道の、3ステップ。</h2><ol><li><span>01</span><h3>名前を並べる</h3><p>旅行や飲み会に参加した人を追加。</p></li><li><span>02</span><h3>立て替えをまとめる</h3><p>支払った人と、その支払いの対象者を選択。</p></li><li><span>03</span><h3>精算票をLINEへ</h3><p>最小回数の送金手順を、みんなに共有。</p></li></ol></section>
+  </main>
+  <footer class="wrap site-footer"><div class="footer-heading"><span>最小ワリカン</span><span>小さな計算で、気持ちよく。</span></div><div id="share"></div><p class="footer-note">計算と保存はこのブラウザ内で行います。精算内容を含むのは「この精算のURL」だけです。</p><a class="back-link" href="../">← 100日チャレンジの一覧へ</a></footer>
+  <dialog id="confirm-dialog" aria-labelledby="confirm-title" aria-describedby="confirm-body"><form method="dialog"><p class="eyebrow">PLEASE CONFIRM</p><h2 id="confirm-title"></h2><p id="confirm-body"></p><div class="dialog-actions"><button class="button secondary" value="cancel">やめる</button><button class="button primary" id="confirm-yes" value="yes">続ける</button></div></form></dialog>
+  <dialog id="rename-dialog" aria-labelledby="rename-title"><form id="rename-form" novalidate><h2 id="rename-title">名前を変更</h2><label for="rename-name">メンバーの名前</label><input id="rename-name" maxlength="20" autocomplete="off" required><p id="rename-error" class="error" role="alert" hidden></p><div class="dialog-actions"><button class="button secondary" id="rename-cancel" type="button">やめる</button><button class="button primary" type="submit">変更する</button></div></form></dialog>
+  <noscript><p class="noscript">計算にはJavaScriptが必要です。ブラウザの設定で有効にしてください。</p></noscript>
+</body>
+</html>
