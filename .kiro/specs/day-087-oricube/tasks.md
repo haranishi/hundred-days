@@ -41,4 +41,40 @@
   - _Depends: 6_
   - _Requirements: 4.5_
 
+## 第2弾（作品を約10個に・2026-11-07）
+タスクグラフ: 9・10・11 は 7 のあと並行（9 は別の作業ツリー）。12 は 9 の後。13 は 9 と 11 の後。14 は 10〜13 の後。15 は最後。
+担当: エンジンと作品データ＝Codex（ブラウザが使えないので、画面の確認は親）／作品選択UI＝Opus（ブラウザで確かめる）。
+
+- [ ] 9. 連動折り（mechanism）を試作し、実装する
+  - 正方基本形のつぶし・花弁折り・袋を開く（かぶと・紙コップ）・つぶし折りが、剛体で表せるかを数値で確かめる。表せる分は `lib/mechanism.js` に実装し、`frame(i,t)` と案内（guides）につなぐ。表せない分は証拠つきで報告し、近似（`relaxed`）の要否を親へ返す。
+  - _Depends: 7_
+  - _Boundary: lib/mechanism.js, ops.js, model.js, tests/mechanism.test.mjs, engine.md, engine-notes.md_
+  - _Requirements: 3.1,3.2,3.3,5.6_
+- [ ] 10. 作品の選択UIを作る
+  - ヘッダーの「作品を選ぶ」・一覧（スマホは下から出るシート、PCは重なる枠）・完成形の絵の自動生成（tools/make-thumbs.mjs）・「次の作品へ」。作品数に依存しない作り。
+  - _Depends: 7_
+  - _Boundary: app.js, app.css, index.html, lib/viewer.js（必要な分のみ）, tools/, assets/thumb-*.svg_
+  - _Requirements: 1.1,5.2,5.3,5.4,5.5,4.1_
+- [ ] 11. 平面の作品を足す（ハート・ポチ袋・着物）
+  - _Depends: 7_
+  - _Boundary: lib/models/, tests/_
+  - _Requirements: 5.1,5.7,3.4_
+- [ ] 12. 袋を開く作品を足す（かぶと・舟・紙コップ）
+  - _Depends: 9_
+  - _Boundary: lib/models/, tests/_
+  - _Requirements: 5.1,5.6,5.7_
+- [ ] 13. 鶴を足す
+  - _Depends: 9, 11_
+  - _Boundary: lib/models/crane.js, tests/_
+  - _Requirements: 5.1,5.6,5.7_
+- [ ] 14. 統合する
+  - 全作品を通すE2E（各作品を最後まで再生・スマホの指で一覧から選ぶ）、README・meta.json・OGP・作品数と手順数の記述、公開ゲート、全体check。
+  - _Depends: 10,11,12,13_
+  - _Boundary: tests/e2e/day-087.spec.mjs, meta.json, README.md, og.png, 根のREADME_
+  - _Requirements: 4.1〜4.5,5.1〜5.7_
+- [ ] 15. 評価・独立レビュー・PR
+  - UI採点（最大3周）・体験評価・独立コードレビュー（Codex読み取り専用）・権利と全文の照合。宣伝動画とX投稿文を作る。第1弾（PR #211）の状態に応じてPRを出す。マージとX投稿は本人。
+  - _Depends: 14_
+  - _Requirements: 4.5,5.1〜5.7_
+
 検証の証拠: `.agent-harness/runs/day087-oricube.md`。

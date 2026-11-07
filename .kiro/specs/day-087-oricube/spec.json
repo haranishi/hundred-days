@@ -1,14 +1,21 @@
 {
   "feature_name": "day-087-oricube",
   "language": "ja",
-  "phase": "pull-request-created",
+  "phase": "expansion-in-progress",
   "approvals": {
     "requirements": true,
     "design": true,
     "tasks": true
   },
   "approval_basis": "2026-11-06の本人の依頼「折り紙の折り方を3Dで見るWebアプリを、Day87として、Codexなども使って作る」。自律進行の原則(2026-10-19)に従い、要件・設計・タスクは確認を取らず確定した。",
-  "updated_at": "2026-11-06",
+  "updated_at": "2026-11-07",
+  "expansion_2026_11_07": {
+    "basis": "2026-11-07の本人の依頼「鶴など作品を約10個に。サブエージェントのCodexとスキルを使って」。自律進行の原則(2026-10-19)に従い、要件5章・設計・タスク9〜15を確定して進める。",
+    "branch": "feat/day087-oricube-more",
+    "first_release_pr": "PR #211（第1弾・3作品。触らない）",
+    "lineup": ["plane", "heart", "pochi", "cup", "kabuto", "boat", "kimono", "swan", "tray", "crane"],
+    "risk": "鶴の正方基本形のつぶし・花弁折りが、剛体で表せるかは未確認。試作（タスク9）で確かめ、表せなければ近似（relaxed）にするかを決める。"
+  },
   "scope_decision": "第1弾は紙飛行機・白鳥・立方体の箱。箱は、壁の立ち上がりに角が連動する機構（三辺測量）をエンジンに足して前倒しで入れた。鶴は折りたたみの計算が別物なので第2弾。",
   "verification": {
     "day_unit": 93,
