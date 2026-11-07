@@ -32,7 +32,7 @@ const neck=[-21/29,20/29],headBase=[b+.4*neck[0],.4*neck[1]];
 const wingAxis={through:[world(0,-.3),world(0,.3)]};
 export const crane={
   id:'crane',name:'鶴',reading:'つる',level:3,minutes:10,heavy:true,
-  paper:{width:1,height:1,front:'#faf9f3',back:'#3f9c92',frontName:'白い面',backName:'青磁色の面'},
+  paper:{width:1,height:1,front:'#faf9f3',back:'#3f9c92',frontName:'白い面',backName:'青磁色の面',layerGap:.0008},
   steps:[
     {id:'centers',title:'対角線と縦横に折り目',text:'白い面を上に置きます。対角線は向こうに、縦横の中心線は手前に折り、そのつど開きます。',tip:'角と辺をそろえてから、折り目をつけます。',ops:[
       {type:'crease',line:{through:['BL','TR']},moving:'BR',mode:'mountain',tagMoved:'front',tagStationary:'rear'},
@@ -58,10 +58,10 @@ export const crane={
     {id:'wings-down',title:'翼を折り下げる',text:'前の翼は手前に、後ろの翼は向こうに折り下げます。左右の折り目の高さをそろえます。',tip:'首としっぽを一緒に折らないようにします。',ops:[
       {type:'fold',line:{point:world(0,0),dir:world(0,1)},moving:'BR',select:{tags:['wingFront']},mode:'valley',tagMoved:'flapFront'},
       {type:'fold',line:{point:world(0,0),dir:world(0,1)},moving:'TL',select:{tags:['wingRear']},mode:'mountain',tagMoved:'flapRear'}]},
-    {id:'finish',title:'翼を開いて完成',text:'胴を起こし、左右の翼を同じ高さに開きます。青磁色の鶴の完成です。',tip:'胴の上はとがったまま、翼を水平に近づけます。',view:'side',ops:[
+    {id:'finish',title:'翼を開いて完成',text:'胴を起こし、左右の翼を少し上げ、同じ高さに開きます。青磁色の鶴の完成です。',tip:'胴の上はとがったまま、翼を水平より少し上げて、V字に開きます。',view:'side',ops:[
       {type:'hinge',axis:wingAxis,degrees:-90},
-      {type:'hinge',axis:wingAxis,select:{tags:['flapFront']},degrees:90},
-      {type:'hinge',axis:wingAxis,select:{tags:['flapRear']},degrees:-90,together:true}]},
+      {type:'hinge',axis:wingAxis,select:{tags:['flapFront']},degrees:110},
+      {type:'hinge',axis:wingAxis,select:{tags:['flapRear']},degrees:-110,together:true}]},
   ],
 };
 export default crane;

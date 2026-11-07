@@ -14,6 +14,16 @@ const vecNear=(a,b,eps=1e-8)=>assert.ok(distance(a,b)<=eps,`${a} != ${b}`);
 const normal=ps=>unit(cross(sub(ps[1],ps[0]),sub(ps[2],ps[0])));
 const q=[Math.SQRT1_2,0,-Math.SQRT1_2],r=[Math.SQRT1_2,0,Math.SQRT1_2];
 const point=(s,key)=>paperPoint(s,s.marks[key]);
+const wingRise=20*Math.PI/180;
+// Measure the folded-down wing after the body is upright, before either wing opens.
+const upright=info.raw.at(-1).groups[0].records[0].after;
+const wingTarget=key=>{
+  const foldedTip=point(upright,key),root=mul(r,dot(foldedTip,r));
+  near(dot(foldedTip,q),0);assert.ok(foldedTip[1]<root[1]);
+  const length=distance(foldedTip,root),side=key==='BR'?1:-1;
+  return {height:root[1]+length*Math.sin(wingRise),
+    transverse:dot(root,q)+side*length*Math.cos(wingRise),longitudinal:dot(root,r)};
+};
 const project=(s,t)=>t.v.map(v=>[s.vertices[v].p[0],s.vertices[v].p[2]]);
 const layersAt=(s,q,r)=>{
   const p=[(q+r)*Math.SQRT1_2,(r-q)*Math.SQRT1_2];
@@ -51,11 +61,13 @@ function finalCriteria(s) {
   assert.ok(tail[1]>bodyTop+.15,'tail rises above the body');
   for(const tag of ['flapFront','flapRear']) {
     const wing=s.triangles.filter(t=>t.tags.includes(tag));assert.ok(wing.length);
-    for(const t of wing)assert.ok(Math.abs(normal(t.v.map(v=>s.vertices[v].p))[1])>=.9);
+    for(const t of wing)near(Math.abs(normal(t.v.map(v=>s.vertices[v].p))[1]),Math.cos(wingRise));
   }
-  near(dot(point(s,'BR'),q),1-Math.SQRT1_2);
-  near(dot(point(s,'TL'),q),-(1-Math.SQRT1_2));
-  near(point(s,'BR')[1],0);near(point(s,'TL')[1],0);
+  for(const key of ['BR','TL']) {
+    const tip=point(s,key),target=wingTarget(key);
+    near(tip[1],target.height);near(dot(tip,q),target.transverse);
+    near(dot(tip,r),target.longitudinal);
+  }
 }
 
 test('crane: standalone metadata, contrasting named paper and ten authored steps',()=>{
@@ -153,19 +165,21 @@ test('crane: turning to narrow the rear preserves the existing front folds and m
   assert.equal(info.raw[5].groups.filter(g=>g.records.some(r=>r.type==='turn')).length,2);
   for(const k of ['BR','TL','TR','BL'])vecNear(point(s,k),point(info.raw[3].end,k));
 });
-test('crane: final mirror symmetry, raised neck and tail, forward head and horizontal wings',()=>finalCriteria(final));
+test('crane: final mirror symmetry, raised neck and tail, forward head and wings raised 20 degrees',()=>finalCriteria(final));
 test('crane: visible upper wing surfaces present the coloured back on both sides',()=>{
   const {p,offsets}=info.pose(9,1);
   const faces=info.fine.triangles.map((tri,j)=>tri.v.map(v=>p[v].map((x,k)=>x+offsets[j][k])));
   for(const tag of ['flapFront','flapRear']) {
     const wings=info.fine.triangles.filter(t=>t.tags.includes(tag));assert.ok(wings.length);
     for(const tri of wings) {
-      const center=tri.v.reduce((sum,v)=>sum.map((x,k)=>x+p[v][k]/3),[0,0,0]);
+      // Sample the rendered face, including its rotated layer offset.
+      const ps=faces[info.fine.triangles.indexOf(tri)];
+      const center=ps.reduce((sum,p)=>sum.map((x,k)=>x+p[k]/3),[0,0,0]);
       const hits=faces.flatMap(ps=>{
         const w=barycentric([center[0],center[2]],...ps.map(p=>[p[0],p[2]]));
         return w?.every(x=>x>=-1e-8)?[{ps,y:w.reduce((y,x,k)=>y+x*ps[k][1],0)}]:[];
       }).sort((a,b)=>b.y-a.y);
-      assert.ok(hits.length);assert.ok(normal(hits[0].ps)[1]<-.9,'visible back faces upward');
+      assert.ok(hits.length);near(normal(hits[0].ps)[1],-Math.cos(wingRise),1e-7);
     }
   }
 });
@@ -205,4 +219,11 @@ for(const [name,change]of [
   ['low tail',s=>{s.vertices.find(v=>distance(v.uv,[0,0])<1e-8).p[1]=-.1;}],
 ])test(`crane: numerical final criteria reject a ${name}`,()=>{
   const s=structuredClone(final);change(s);assert.throws(()=>finalCriteria(s),assert.AssertionError);
+});
+
+for(const degrees of [90,105,115])test(`crane: final criteria reject symmetric ${degrees-90}-degree wing rise`,()=>{
+  const def=structuredClone(crane),ops=def.steps.at(-1).ops;
+  ops[1].degrees=degrees;ops[2].degrees=-degrees;
+  const changed=inspectModel(buildModel(def)).raw.at(-1).end;
+  assert.throws(()=>finalCriteria(changed),assert.AssertionError);
 });
