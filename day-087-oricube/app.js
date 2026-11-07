@@ -193,7 +193,7 @@ function renderPicker() {
     st.setAttribute('aria-label', `難しさ${Math.max(1, Math.min(3, m.level || 1))}`);
     meta.append(st, document.createTextNode(` 約${m.minutes}分`));
     b.append(img, name, meta);
-    onPress(b, () => { selectModel(m.id, { autoplay: true }); closePicker(); });
+    onPress(b, () => { closePicker(); chooseModel(m.id, { autoplay: true }); });
     li.append(b);
     return li;
   }));
@@ -246,6 +246,20 @@ function renderNoGlList() {
     li.append(h, p);
     return li;
   }));
+}
+
+// A model is built the first time it is used (the crane takes a moment). Keep the current model
+// if the data of the chosen one cannot be built.
+function chooseModel(id, opts) {
+  const next = models.find((m) => m.id === id);
+  if (next && next !== model) {
+    try { void next.steps; } catch (error) {
+      console.error(error);
+      els.hint.textContent = `${next.name}の手順を組み立てられませんでした。`;
+      return;
+    }
+  }
+  selectModel(id, opts);
 }
 
 function selectModel(id, { autoplay = false, step = 0, t = null } = {}) {
@@ -381,7 +395,7 @@ function bind() {
   onPress(els.prev, () => { viewer?.stopSpin(); tl.prev(); sync(); });
   onPress(els.next, () => { viewer?.stopSpin(); tl.next(); sync(); });
   onPress(els.stepStop, () => setStepStop(!stepStop));
-  onPress(els.other, () => selectModel(nextModel().id, { autoplay: true }));
+  onPress(els.other, () => chooseModel(nextModel().id, { autoplay: true }));
   onPress(els.pickOpen, openPicker);
   onPress(els.donePick, openPicker);
   onPress(els.pickerClose, () => closePicker());
@@ -463,6 +477,8 @@ function showNoGl(reason) {
 async function main() {
   try {
     models = await loadModels();
+    // Only the model that opens first is built now; a data error in it shows here as before.
+    void (models.find((m) => m.id === params.get('m')) || models[0]).steps;
   } catch (error) {
     showNoGl(`作品のデータを組み立てられませんでした。${error?.message || ''}`);
     els.stepTitle.textContent = '読み込めませんでした';
