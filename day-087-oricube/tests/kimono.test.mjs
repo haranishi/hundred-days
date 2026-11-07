@@ -12,9 +12,12 @@ function criteria(m) {
   const s=inspectModel(m).raw.at(-1).end,poly=outline(s);
   assert.ok(s.flat);assert.ok(s.vertices.every(v=>Math.abs(v.p[1])<1e-9));
   assert.equal(poly.length,4);assert.ok(symmetryError(poly)<1e-6);
-  near(Math.max(...poly.map(p=>p[0]))-Math.min(...poly.map(p=>p[0])),.4);
-  near(Math.max(...poly.map(p=>p[1]))-Math.min(...poly.map(p=>p[1])),.9);
-  near(signedArea(poly),.36);
+  near(Math.max(...poly.map(p=>p[0]))-Math.min(...poly.map(p=>p[0])),.46);
+  near(Math.max(...poly.map(p=>p[1]))-Math.min(...poly.map(p=>p[1])),.8);
+  near(signedArea(poly),.368);
+  const width=Math.max(...poly.map(p=>p[0]))-Math.min(...poly.map(p=>p[0]));
+  const height=Math.max(...poly.map(p=>p[1]))-Math.min(...poly.map(p=>p[1]));
+  assert.ok(width/height>=.55,'body is wide enough');
   const collars=['collarL','collarR'].map(tag=>s.triangles.filter(t=>t.tags.includes(tag)));
   // Derive the two slanted collar boundaries from material triangles, then intersect them.
   const lines=collars.map(ts=>{
@@ -23,22 +26,27 @@ function criteria(m) {
     return p.map((a,i)=>[a,p[(i+1)%p.length]]).find(([a,b])=>Math.abs(a[0]-b[0])>1e-7&&Math.abs(a[1]-b[1])>1e-7);
   });
   const [[a,b],[c,d]]=lines,u=sub(b,a),v=sub(d,c),t=cross2(sub(c,a),v)/cross2(u,v);
-  const tip=a.map((x,i)=>x+t*u[i]);near(tip[0],0);near(tip[1],-.3);
+  const tip=a.map((x,i)=>x+t*u[i]);near(tip[0],0);near(tip[1],-.27);
+  const collarPoints=collars.flat().flatMap(t=>projection(s,t));
+  const collarHeight=Math.max(...collarPoints.map(p=>p[1]))-Math.min(...collarPoints.map(p=>p[1]));
+  near(collarHeight,.27);assert.ok(collarHeight/height<=.4,'collar stays in the upper 40%');
+  const depth=tip[1]-Math.min(...poly.map(p=>p[1]));
+  near(depth,.23);assert.ok(depth/height>=.2,'V opening has enough depth');
   let area=0;
   for(const left of collars[0]) for(const right of collars[1]) {
     const overlap=overlapArea(projection(s,left),projection(s,right));area+=overlap;
     if(overlap>AREA_EPS) assert.ok(left.rank<right.rank,'left collar below right');
   }
-  near(area,.01);
-  for(const [p,tag] of [[[0,-.31],null],[[-.15,-.3],'collarL'],[[.15,-.3],'collarR'],[[0,-.29],'collarR']]) {
+  near(area,.0016);
+  for(const [p,tag] of [[[0,-.28],null],[[-.15,-.3],'collarL'],[[.15,-.3],'collarR'],[[0,-.26],'collarR']]) {
     const face=topFace(s,p);assert.ok(face);
     if(tag) assert.ok(face.tags.includes(tag),`${tag} is visible`);
     else assert.ok(!face.tags.some(t=>t.startsWith('collar')),'V opening exposes the base');
-    assert.ok(signedArea(projection(s,face))<0,'ink front of collar faces upward');
+    assert.ok(signedArea(projection(s,face))<0,'ivory front of collar faces upward');
   }
-  assert.ok(signedArea(projection(s,topFace(s,[0,0])))>0,'apricot body faces upward');
-  const hem=topFace(s,[0,.35]);assert.ok(hem.tags.includes('hem'));
-  assert.ok(signedArea(projection(s,hem))>0,'apricot back of the base is exposed by the hem');
+  assert.ok(signedArea(projection(s,topFace(s,[0,0])))>0,'indigo body faces upward');
+  const hem=topFace(s,[0,.25]);assert.ok(hem.tags.includes('hem'));
+  assert.ok(signedArea(projection(s,hem))>0,'indigo back of the base is exposed by the hem');
 }
 test('kimono: flat symmetric union, visible centred V, right-front overlap and hem',()=>criteria(model));
 test('kimono: free-corner folds move only their own gate and preserve the opposite collar',()=>{
@@ -51,7 +59,16 @@ test('kimono: free-corner folds move only their own gate and preserve the opposi
 });
 test('kimono: registry, named contrasting colours and six steps without squash folds',()=>{
   assert.equal(modelDef('kimono'),kimono);assert.equal(kimono.steps.length,6);
-  assert.notEqual(kimono.paper.front,kimono.paper.back);
+  assert.equal(kimono.paper.front,'#f5efe2');assert.equal(kimono.paper.back,'#2d4a7e');
+  assert.equal(kimono.paper.frontName,'生成りの面');assert.equal(kimono.paper.backName,'藍色の面');
+  assert.equal(kimono.steps[0].view,'flat');
+  assert.ok(kimono.steps[0].text.includes('生成りの面'));
+  assert.ok(kimono.steps[3].text.includes('白い襟'));
+  // WCAG relative luminance also checks the vermilion guide on ivory paper.
+  const luminance=hex=>[1,3,5].map(i=>parseInt(hex.slice(i,i+2),16)/255)
+    .map(c=>c<=.04045?c/12.92:((c+.055)/1.055)**2.4)
+    .reduce((n,c,i)=>n+c*[.2126,.7152,.0722][i],0);
+  assert.ok((luminance(kimono.paper.front)+.05)/(luminance('#d6452d')+.05)>=3);
   for(const side of ['front','back']) {
     assert.ok(kimono.paper[`${side}Name`]);assert.notEqual(kimono.paper[side],'#d6452d');
     for(const d of MODELS.filter(d=>d!==kimono)) for(const key of ['front','back']) assert.notEqual(kimono.paper[side],d.paper[key]);

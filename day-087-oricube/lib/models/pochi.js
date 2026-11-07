@@ -3,9 +3,9 @@
 const a=Math.SQRT1_2;
 export const pochi={
   id:'pochi',name:'ポチ袋',reading:'ぽちぶくろ',level:1,minutes:3,
-  paper:{width:1,height:1,rotationDeg:45,front:'#f7df99',back:'#a77b12',frontName:'薄金色の面',backName:'からし色の面'},
+  paper:{width:1,height:1,rotationDeg:45,front:'#f2c14e',back:'#a77b12',frontName:'山吹色の面',backName:'からし色の面'},
   steps:[
-    {id:'center',title:'縦横に折り目をつける',text:'薄金色の面を上にして、角を上下に置きます。縦と横に手前に折り、開きます。',view:'flat',ops:[
+    {id:'center',title:'縦横に折り目をつける',text:'山吹色の面を上にして、角を上下に置きます。縦と横に手前に折り、開きます。',view:'flat',ops:[
       {type:'crease',line:{through:['BL','TR']},moving:'BR',mode:'valley'},
       {type:'crease',line:{through:['TL','BR']},moving:'BL',mode:'valley'}]},
     {id:'left',title:'左の角を中心へ',text:'左の角を手前に折り、中心の交点に合わせます。',ops:[

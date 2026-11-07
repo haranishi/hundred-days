@@ -43,7 +43,9 @@ test('pochi: four visible flaps present the back colour in the expected order',(
 test('pochi: registry, named contrasting colours and six short steps',()=>{
   assert.equal(modelDef('pochi'),pochi);assert.equal(pochi.steps.length,6);
   assert.equal(pochi.level,1);assert.equal(pochi.minutes,3);
-  assert.notEqual(pochi.paper.front,pochi.paper.back);
+  assert.equal(pochi.paper.front,'#f2c14e');assert.equal(pochi.paper.back,'#a77b12');
+  assert.equal(pochi.paper.frontName,'山吹色の面');
+  assert.ok(pochi.steps[0].text.includes('山吹色の面'));assert.equal(pochi.steps[0].view,'flat');
   for(const side of ['front','back']) {
     assert.ok(pochi.paper[`${side}Name`]);assert.notEqual(pochi.paper[side],'#d6452d');
     for(const d of MODELS.filter(d=>d!==pochi)) for(const key of ['front','back']) assert.notEqual(pochi.paper[side],d.paper[key]);
