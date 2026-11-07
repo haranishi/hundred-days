@@ -43,8 +43,18 @@ test('pochi: four visible flaps present the back colour in the expected order',(
 test('pochi: registry, named contrasting colours and six short steps',()=>{
   assert.equal(modelDef('pochi'),pochi);assert.equal(pochi.steps.length,6);
   assert.equal(pochi.level,1);assert.equal(pochi.minutes,3);
-  assert.equal(pochi.paper.front,'#f2c14e');assert.equal(pochi.paper.back,'#a77b12');
-  assert.equal(pochi.paper.frontName,'山吹色の面');
+  assert.equal(pochi.paper.front,'#f2c14e');assert.equal(pochi.paper.back,'#745399');
+  assert.equal(pochi.paper.frontName,'山吹色の面');assert.equal(pochi.paper.backName,'江戸紫の面');
+  // The two faces must read apart on screen: with a mustard back (ratio about 2.3) the visual evaluation
+  // could not tell front from back. WCAG relative luminance, same helper shape as kimono.test.mjs.
+  const lum=hex=>[1,3,5].map(i=>parseInt(hex.slice(i,i+2),16)/255).map(c=>c<=.03928?c/12.92:((c+.055)/1.055)**2.4)
+    .reduce((sum,c,i)=>sum+c*[.2126,.7152,.0722][i],0);
+  const [hi,lo]=[lum(pochi.paper.front),lum(pochi.paper.back)].sort((x,y)=>y-x);
+  assert.ok((hi+.05)/(lo+.05)>=3,'front and back faces are clearly told apart');
+  // The vermilion guide line must stay readable on both faces (same floor the newer models use).
+  for(const face of [pochi.paper.front,pochi.paper.back]) {
+    const [a,b]=[lum(face),lum('#d6452d')].sort((x,y)=>y-x);assert.ok((a+.05)/(b+.05)>=1.2,`guide on ${face}`);
+  }
   assert.ok(pochi.steps[0].text.includes('山吹色の面'));assert.equal(pochi.steps[0].view,'flat');
   for(const side of ['front','back']) {
     assert.ok(pochi.paper[`${side}Name`]);assert.notEqual(pochi.paper[side],'#d6452d');

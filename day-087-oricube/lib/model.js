@@ -31,6 +31,17 @@ function guide(r,start) {
   if(on.length<2) {
     const b=boundsOf(vertices);
     on=[add(origin,mul(axis,-b.radius)),add(origin,mul(axis,b.radius))];
+    // Clip the fallback axis to the paper in the starting pose. Keep the old
+    // extent for non-horizontal axes, whose x-z projection cannot describe it.
+    if(Math.abs(axis[1])<VERTEX_EPS&&Math.hypot(axis[0],axis[2])>VERTEX_EPS) {
+      const project=p=>[p[0],p[2]],a=project(on[0]),b=project(on[1]);
+      let low=Infinity,high=-Infinity;
+      for(const t of r.before.triangles) {
+        const interval=segmentTriangleInterval(a,b,t.v.map(i=>project(vertices[i])));
+        if(interval) {low=Math.min(low,interval[0]);high=Math.max(high,interval[1]);}
+      }
+      if(low<=high) on=[lerp(on[0],on[1],low),lerp(on[0],on[1],high)];
+    }
   }
   const along=on.map(p=>dot(sub(p,origin),axis));
   const line=[add(origin,mul(axis,Math.min(...along))),add(origin,mul(axis,Math.max(...along)))];

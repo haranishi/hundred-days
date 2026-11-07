@@ -3,7 +3,9 @@
 const a=Math.SQRT1_2;
 export const pochi={
   id:'pochi',name:'ポチ袋',reading:'ぽちぶくろ',level:1,minutes:3,
-  paper:{width:1,height:1,rotationDeg:45,front:'#f2c14e',back:'#a77b12',frontName:'山吹色の面',backName:'からし色の面'},
+  // The back was a mustard (#a77b12) that the visual evaluation could not tell from the yellow front.
+  // A blue-leaning violet (Edo purple) is the yellow's complement and keeps the vermilion guide readable.
+  paper:{width:1,height:1,rotationDeg:45,front:'#f2c14e',back:'#745399',frontName:'山吹色の面',backName:'江戸紫の面'},
   steps:[
     {id:'center',title:'縦横に折り目をつける',text:'山吹色の面を上にして、角を上下に置きます。縦と横に手前に折り、開きます。',view:'flat',ops:[
       {type:'crease',line:{through:['BL','TR']},moving:'BR',mode:'valley'},
