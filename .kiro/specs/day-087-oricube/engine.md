@@ -54,3 +54,15 @@
 - 案内: 動く折り目を谷・山の線で、主な動きを矢印で `guides` に出す（既存の `valley`/`mountain`）。
 - 失敗: 解が無い・分岐が曖昧・経路での貫通は、作品名と手順つきの `FoldError`（`MECHANISM_INFEASIBLE` など）で止める。
 - 近似（最後の手段）: 剛体で表せないと実測で分かった手順だけ、`relaxed:{maxStrain}` で辺の伸びを制限した緩和解を許す。engine-notes.md に手順と最大誤差を記録する。
+
+### 第2回の実装範囲とAPI
+- 独立部品 `mechanism.js`: `prepareMechanism({clusters:[{points:[[x,y,z],…]}],hinges:[{a,b,edge:[[x,y,z],[x,y,z]],degrees}],pin,driver?})`。points/edgeは共通の始点世界座標。coreのdegreesは始点からの右手系回転増分（±180°以内）。`mechanismPose(core,angles)` のanglesはラジアン。
+- `projectMechanism(core,t,seed?)` は局所射影。`buildMechanism(input,{samples=256})` は257点の角度表と `at(t)`（倍精度のposes/points/angles/closure/residual）を返す。外部依存・乱数・履歴なし。
+- 既定driverは `'projection'`。目標方向への射影量 `dot(angles,goals)/dot(goals,goals)=t` を拘束する。整数driverはその蝶番1本を線形に駆動する。非木辺は接合辺両端と相対回転を照合し、角度だけが未拘束になるのを防ぐ。
+- 公開opの `line` は今回は **有限の紙座標線分** `{through:[マーク名または[u,v],…]}`。先に `scribe split:true` で切る。`select` は共有辺の両面に適用。未宣言の辺は剛体クラスタへ統合する。`pin:{tags?,notTags?}` はちょうど1クラスタを選ぶ。
+- 公開opのdegreesは **符号付き終点二面角**。始点の面法線とrankから初期角を求め、coreへ回転増分を渡す。180°から90°へ開く場合も扱う。
+- 構築時に257点の逆行・異クラスタ間の三角形内部の交差・平面時の既存層検査を実行。辺共有の隣接面と同一クラスタは交差検査から除く。共面の接触と内部を横断する交差を区別する（層offsetは材料座標に入れない）。
+- 平面終点は `t=1−1e-4` の重なり領域で高さを比較し、順位の非循環な順序を求める。固定クラスタの元rankを基準にそろえ、境界でoffsetが飛ぶのを防ぐ。高さ同値・層の循環・クラスタ内の既存重なりは現実装では拒否する。
+- `frame` は表の線形補間を種に最大12回の射影。guidesは終点角の谷/山を保ち、手順t=0へ座標を戻す。`topologyKey`・配列再利用・boundsは既存APIを維持する。
+- `MECHANISM_INFEASIBLE` は宣言終点の不整合、`MECHANISM_NO_CONVERGENCE` は局所解法の未収束。後者は剛体経路が存在しない証明ではない。`MECHANISM_BRANCH` / `MECHANISM_PENETRATION` / `MECHANISM_LAYER_AMBIGUOUS` も作品・手順つきのFoldError。
+- AとC1を実装・検証。C2は指定した前面だけの折り目に条件付きの終点障害、C3(a)・C3(b)・C4の可否と統合は未完（engine-notes.md）。`relaxed` は拡張の余地のみ残し、現在は `MECHANISM_RELAXED` で拒否する。

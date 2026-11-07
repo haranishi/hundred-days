@@ -8,3 +8,6 @@ import './frame-extras.test.mjs';
 import './review-hardening.test.mjs';
 import './timeline.test.mjs';
 import './tray.test.mjs';
+import './mechanism-core.test.mjs';
+import './mechanism.test.mjs';
+import './mechanism-feasibility.test.mjs';

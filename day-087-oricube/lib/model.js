@@ -4,7 +4,8 @@ import {VERTEX_EPS,add,sub,mul,unit,cross,dot,rotate,axisDistance,lerp,boundsOf,
 import {createSheet,cloneSheet,paperPoint,locate} from './sheet.js';
 import {applyOp,assertSheet,resolveLine} from './ops.js';
 import {FoldError} from './error.js';
-import {drivePose} from './drive.js';
+import {drivePose,rotateFaceVector} from './drive.js';
+import {sheetMechanismPose} from './mechanism-sheet.js';
 export {FoldError} from './error.js';
 // Lower layers are drawn a little darker so stacked paper of one colour reads as separate
 // layers. The tint follows rank order only; it never feeds geometry. Subtle on purpose.
@@ -44,6 +45,26 @@ function guide(r,start) {
   const reverse=r.type==='fold'&&r.op.stack&&typeof r.op.stack==='object';
   return {kind:reverse?'reverse':r.type==='crease'?r.op.mode:r.type==='fold'?r.op.mode:r.type,line,arrow:{points,head:{position,direction}}};
 }
+function mechanismGuides(r,start) {
+  return r.mechanism.path.core.hinges.flatMap((h,i)=>{
+    if(!h.degrees) return [];
+    const candidates=[h.a,h.b].flatMap(cluster=>r.mechanism.clusterVertices[cluster]
+      .map(v=>({cluster,v,p:r.before.vertices[v].p,motion:distance(r.before.vertices[v].p,mechanismPointForGuide(r,cluster,r.before.vertices[v].p,.5))})));
+    const chosen=candidates.sort((a,b)=>b.motion-a.motion)[0];
+    if(!chosen||chosen.motion<VERTEX_EPS) return [];
+    const tri=r.before.triangles.find((_,i)=>r.mechanism.faces[i]===chosen.cluster);
+    const before=tri.v.map(v=>r.before.vertices[v].p),initial=tri.v.map(v=>paperPoint(start,r.before.vertices[v].uv));
+    const transport=p=>add(initial[0],rotateFaceVector(sub(p,before[0]),before,initial));
+    const points=Array.from({length:25},(_,k)=>transport(mechanismPointForGuide(r,chosen.cluster,chosen.p,k/48)));
+    const position=points.at(-1).slice(),delta=sub(position,points.at(-2));
+    if(distance(position,points[0])<VERTEX_EPS||Math.hypot(...delta)<VERTEX_EPS) return [];
+    return [{kind:(h.assignment??h.degrees)>=0?'valley':'mountain',line:h.uvEdge.map(uv=>paperPoint(start,uv)),arrow:{points,head:{position,direction:unit(delta)}}}];
+  });
+}
+function mechanismPointForGuide(r,cluster,p,t) {
+  const pose=r.mechanism.path.at(t).poses[cluster];
+  return p.reduce((sum,x,k)=>add(sum,mul(pose.r[k],x)),pose.o.slice());
+}
 function creaseMapping(fine,pairs) {
   const result=[];
   for(const pair of pairs) fine.triangles.forEach((tri,triangle)=>{
@@ -64,7 +85,7 @@ function sampleState(s,fine) {
 }
 function compileRecord(r,fine) {
   const base=sampleState(r.before,fine),end=sampleState(r.type==='crease'?r.folded:r.after,fine);
-  if(r.type==='drive') {
+  if(r.type==='drive'||r.type==='mechanism') {
     const mapping=fine.vertices.map(v=>{
       const {tri,w}=locate(r.before,v.uv);return {v:tri.v,w};
     });
@@ -90,10 +111,13 @@ function fillPose(step,t,p,offsets,ranks=[]) {
   group.base.ranks.forEach((v,i)=>{ranks[i]=v;});
   for(const r of group.records) {
     const f=r.type==='crease'?(q<=.5?q*2:2-q*2):q;
-    if(r.type==='drive') {
-      const pose=drivePose(r.before,r.drive,f);
+    if(r.type==='drive'||r.type==='mechanism') {
+      const pose=r.type==='drive'?drivePose(r.before,r.drive,f):sheetMechanismPose(r.before,r.mechanism,f);
       r.mapping.forEach(({v,w},i)=>{if(r.mv[i]) p[i]=v.reduce((sum,id,k)=>add(sum,mul(pose.p[id],w[k])),[0,0,0]);});
       r.faces.forEach((face,i)=>{if(r.mt[i]) offsets[i]=pose.offsets[face].slice();});
+      if(r.type==='mechanism'&&r.mechanism.ranks) r.faces.forEach((face,i)=>{
+        if(r.mt[i]) ranks[i]=r.base.ranks[i]+(r.mechanism.ranks[face]-r.base.ranks[i])*f;
+      });
       continue;
     }
     for(let i=0;i<p.length;i++) if(r.mv[i]) p[i]=rotate(r.base.p[i],r.origin,r.axis,r.angle*f);
@@ -184,7 +208,7 @@ export function buildModel(def) {
     })));
     const steps=raw.map((r,i)=>({index:i,id:r.data.id,title:r.data.title,text:r.data.text,tip:r.data.tip,view:r.data.view,
       durationMs:r.data.durationMs??2200*r.groups.length,guides:r.groups.flatMap(g=>g.records.flatMap(op=>
-        op.type==='drive'?op.drive.groups.map(group=>guide(group,r.start)):[guide(op,r.start)]).filter(Boolean))}));
+        op.type==='drive'?op.drive.groups.map(group=>guide(group,r.start)):op.type==='mechanism'?mechanismGuides(op,r.start):[guide(op,r.start)]).filter(Boolean))}));
     const model={id:def.id,name:def.name,level:def.level,minutes:def.minutes,paper,steps,
       frame(i,t,{explode=1}={}) {
         if(!Number.isInteger(i)||i<0||i>=compiled.length) throw new RangeError('Step out of range');
@@ -192,6 +216,7 @@ export function buildModel(def) {
         if(!Number.isFinite(explode)||explode<0) throw new RangeError('Explode must be nonnegative');
         const step=compiled[i],out=step.buffer;
         fillPose(step,t,p,offsets,ranks);
+        const min=[Infinity,Infinity,Infinity],max=[-Infinity,-Infinity,-Infinity];
         let lowRank=Infinity,highRank=-Infinity;
         for(const r of ranks) {if(r<lowRank)lowRank=r;if(r>highRank)highRank=r;}
         const rankSpan=highRank-lowRank;
@@ -199,6 +224,8 @@ export function buildModel(def) {
           const points=tri.v.map(i=>p[i]),normal=unit(cross(sub(points[1],points[0]),sub(points[2],points[0])));
           for(let k=0;k<3;k++) for(let c=0;c<3;c++) {
             out.positions[j*9+k*3+c]=points[k][c]+offsets[j][c]*explode;
+            const value=out.positions[j*9+k*3+c];
+            if(value<min[c])min[c]=value;if(value>max[c])max[c]=value;
             out.normals[j*9+k*3+c]=normal[c];
             out.shade[j*9+k*3+c]=rankSpan>1e-9?1-SHADE_DEPTH*(1-(ranks[j]-lowRank)/rankSpan):1;
           }
@@ -209,23 +236,24 @@ export function buildModel(def) {
         step.outlineMap.forEach(({triangle,endpoints},j)=>endpoints.forEach(({v,w},k)=>{
           for(let c=0;c<3;c++) out.outlineSegments[j*6+k*3+c]=v.reduce((sum,id,n)=>sum+p[id][c]*w[n],0)+offsets[triangle][c]*explode;
         }));
-        out.bounds=boundsOf(Array.from({length:out.positions.length/3},(_,j)=>Array.from(out.positions.subarray(j*3,j*3+3))));
+        out.bounds={min,max,center:lerp(min,max,.5),radius:distance(min,max)/2};
         return out;
       },
       finalFrame(opts) { return this.frame(steps.length-1,1,opts); },bounds:null};
     // A full circular envelope is conservative even between the sampled frames.
     // The display contract uses explode=1..24; larger factors remain caller-owned.
     const boundPoints=[];
-    const boundSamples=compiled.some(step=>step.groups.some(g=>g.records.some(r=>r.type==='drive')))
+    const boundSamples=compiled.some(step=>step.groups.some(g=>g.records.some(r=>r.type==='drive'||r.type==='mechanism')))
       ?[0,.125,.25,.375,.5,.625,.75,.875,1]:[0,.25,.5,.75,1];
     for(let i=0;i<steps.length;i++) for(const t of boundSamples) {
       const b=model.frame(i,t,{explode:24}).bounds;boundPoints.push(b.min,b.max);
     }
     for(const step of compiled) for(const g of step.groups) for(const r of g.records) {
-      if(r.type==='drive') {
+      if(r.type==='drive'||r.type==='mechanism') {
         // Every material point lies within its paper distance of a fixed anchor.
         // This envelope covers between samples as well as rotating offsets.
-        const anchor=[...r.drive.fixedVertices][0],uv=r.before.vertices[anchor].uv;
+        const anchor=r.type==='drive'?[...r.drive.fixedVertices][0]:r.before.triangles.find((_,i)=>r.mechanism.faces[i]===r.mechanism.path.core.pin).v[0];
+        const uv=r.before.vertices[anchor].uv;
         const radius=Math.max(...r.before.vertices.map(v=>distance(v.uv,uv)))+
           24*Math.max(0,...r.base.offsets.map(v=>Math.hypot(...v)));
         const center=r.before.vertices[anchor].p;
