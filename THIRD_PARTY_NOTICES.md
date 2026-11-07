@@ -132,6 +132,7 @@ Day056の配信ビルドに含む第三者ライブラリ・移植実装・検�
 | 082 | 写真の質感「White Plaster 02」（白壁と町屋の二階のむら） | [Poly Haven](https://polyhaven.com/a/white_plaster_02)（Rob Tuytel） | [CC0 1.0](https://polyhaven.com/license) | **加工あり**。上と同じ派生（輝度の白黒 JPEG・1K、法線 512px）を配る |
 | 082 | 写真の質感「Clay Plaster」（土塀の鏝むら） | [Poly Haven](https://polyhaven.com/a/clay_plaster)（Amal Kumar） | [CC0 1.0](https://polyhaven.com/license) | **加工あり**。上と同じ派生（輝度の白黒 JPEG・1K、法線 512px）を配る |
 | 082 | 写真の質感「Rock Surface」（切石・地面の石畳・自然石・溝の底） | [Poly Haven](https://polyhaven.com/a/rock_surface)（Amal Kumar） | [CC0 1.0](https://polyhaven.com/license) | **加工あり**。上と同じ派生（輝度の白黒 JPEG・1K、法線 512px）を配る |
+| 087 | `day-087-oricube/vendor/three.js`（three.js 0.186.0・OrbitControlsを含むESMビルド） | [three.js](https://threejs.org/) | [MIT](day-087-oricube/vendor/LICENSE-three.txt) | Day044の同梱版（esbuildでまとめただけ）を未改変で複製。折り紙の形・案内線・影・アイコンは実行時の計算か自作で、外部の画像・音・書体は使っていない |
 
 ## Day64「漏洩の地図」の出典と描画依存
 
