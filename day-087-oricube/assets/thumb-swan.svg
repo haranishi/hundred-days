@@ -17,5 +17,5 @@
 <path d="M25.5 71.7L36.7 42.7L8.4 56.8Z" fill="#d0cfcc" stroke="#d0cfcc" stroke-width=".5" stroke-linejoin="round"/>
 <path d="M8.5 56.9L58.7 61.8L65.7 67.9ZM8.5 56.9L65.7 67.9L25.6 71.8ZM8.5 56.9L36.8 42.8L58.7 61.8Z" fill="#ba5c6e" stroke="#ba5c6e" stroke-width=".5" stroke-linejoin="round"/>
 <path d="M25.5 33L8.3 56.8L20.1 28.3Z" fill="#c26073" stroke="#c26073" stroke-width=".5" stroke-linejoin="round"/>
-<path d="M25.4 32.9L25.4 47.4M7 34.7L18.5 33.6M25.5 71.7L56 68.7M56 68.7L56 67.5M56 66.4L56 65.2M56 62.9L56 59.5M56 52.9L56 49.6M56.1 33.2L93 65.2M92.7 64.8L55.8 32.8M55.9 59.3L55.9 62.8M55.9 65.1L55.9 67.4M55.9 49.4L55.9 52.7M25.5 47.4L25.5 32.9M18.5 33.6L7 34.7M55.9 68.5L25.4 71.5" fill="none" stroke="#2b2623" stroke-opacity=".72" stroke-width="1.1" stroke-linecap="round"/>
+<path d="M7 34.7L25.4 32.9M25.5 71.7L56 68.7M56.1 33.2L93 65.2M92.7 64.8L55.8 32.8M25.4 32.9L7 34.7M55.9 68.5L25.4 71.5" fill="none" stroke="#2b2623" stroke-opacity=".72" stroke-width="1.1" stroke-linecap="round"/>
 </svg>

@@ -25,3 +25,4 @@ import './yacht.test.mjs';
 import './tree.test.mjs';
 import './tie.test.mjs';
 import './registry-complete.test.mjs';
+import './mechanism-rotation.test.mjs';

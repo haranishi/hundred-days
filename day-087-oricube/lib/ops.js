@@ -4,7 +4,7 @@ import {VERTEX_EPS,LENGTH_EPS,DEGENERATE_AREA_EPS,AREA_EPS,overlapArea,add,sub,m
 import {cloneSheet,point,splitLine,selected,simplifyFlat} from './sheet.js';
 import {orderStack,assertLayers} from './stack.js';
 import {FoldError} from './error.js';
-import {prepareDrive,drivePose} from './drive.js';
+import {prepareDrive,drivePose,rotateFaceVector} from './drive.js';
 import {prepareMechanismOp,sheetMechanismPose} from './mechanism-sheet.js';
 const fail=(message,code)=>{throw new FoldError(message,{code});};
 export function resolveLine(s,line) {
@@ -90,6 +90,8 @@ function outsideClearance(s,moving,layerGap) {
 }
 export function applyOp(s,op,layerGap) {
   const type=op.type??op.op;
+  // Unit-gap layer positions retain fold sidedness even when layerGap is zero.
+  for(const t of s.triangles) t.layerOrder??=[0,t.rank,0];
   let origin,axis,angle=0,moving=new Set(),movingVertices=new Set(),line;
   if(type==='mechanism') {
     const before=cloneSheet(s),mechanism=prepareMechanismOp(before,op,layerGap);
@@ -98,7 +100,8 @@ export function applyOp(s,op,layerGap) {
       pose.p.forEach((p,i)=>{if(distance(p,before.vertices[i].p)>VERTEX_EPS) movingVertices.add(i);});
       if(f===1) {
         s.vertices.forEach((v,i)=>{v.p=pose.p[i];});
-        s.triangles.forEach((t,i)=>{t.offset=pose.offsets[i];if(mechanism.ranks)t.rank=mechanism.ranks[i];});
+        s.triangles.forEach((t,i)=>{t.offset=pose.offsets[i];if(mechanism.ranks)t.rank=mechanism.ranks[i];
+          t.layerOrder=mechanism.ranks?[0,t.rank,0]:t.layerOrder.reduce((sum,x,k)=>add(sum,mul(pose.poses[mechanism.faces[i]].r[k],x)),[0,0,0]);});
       }
     }
     moving=new Set(s.triangles.flatMap((_,i)=>mechanism.faces[i]===mechanism.path.core.pin?[]:[i]));
@@ -115,7 +118,11 @@ export function applyOp(s,op,layerGap) {
       assertGeometry({...before,vertices:before.vertices.map((v,i)=>({...v,p:pose.p[i]}))},materialArea);
       if(f===1) {
         s.vertices.forEach((v,i)=>{v.p=pose.p[i];});
-        s.triangles.forEach((t,i)=>{t.offset=pose.offsets[i];});
+        s.triangles.forEach((t,i)=>{
+          t.offset=pose.offsets[i];
+          t.layerOrder=rotateFaceVector(before.triangles[i].layerOrder,
+            t.v.map(v=>before.vertices[v].p),t.v.map(v=>pose.p[v]));
+        });
       }
     }
     s.flat=false;
@@ -197,9 +204,12 @@ export function applyOp(s,op,layerGap) {
   for(const i of movingVertices) s.vertices[i].p=rotate(s.vertices[i].p,origin,axis,angle);
   if(type==='fold'||type==='crease') {
     orderStack(s,moving,op.stack??'auto',op.mode);
-    s.triangles.forEach(t=>{t.offset=[0,t.rank*layerGap,0];});
+    s.triangles.forEach(t=>{t.offset=[0,t.rank*layerGap,0];t.layerOrder=[0,t.rank,0];});
   } else {
-    for(const i of moving) s.triangles[i].offset=rotate(s.triangles[i].offset,[0,0,0],axis,angle);
+    for(const i of moving) {
+      s.triangles[i].offset=rotate(s.triangles[i].offset,[0,0,0],axis,angle);
+      s.triangles[i].layerOrder=rotate(s.triangles[i].layerOrder,[0,0,0],axis,angle);
+    }
     if(type==='turn') s.triangles.forEach(t=>{t.rank=-t.rank;});
     if(type==='hinge') s.flat=false;
   }
@@ -209,7 +219,7 @@ export function applyOp(s,op,layerGap) {
   const folded=cloneSheet(s);
   if(type==='crease') {
     s.vertices.forEach((v,i)=>{v.p=before.vertices[i].p.slice();});
-    s.triangles.forEach((t,i)=>{t.rank=before.triangles[i].rank;t.offset=before.triangles[i].offset.slice();});
+    s.triangles.forEach((t,i)=>{t.rank=before.triangles[i].rank;t.offset=before.triangles[i].offset.slice();t.layerOrder=before.triangles[i].layerOrder.slice();});
   }
   s.triangles.forEach((t,i)=>{
     const tag=moving.has(i)?op.tagMoved:op.tagStationary;

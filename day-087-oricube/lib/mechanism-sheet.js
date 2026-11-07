@@ -164,7 +164,9 @@ export function mechanismGraph(s,op) {
     v=[...new Set(v)].sort((a,b)=>dot(sub(s.vertices[a].uv,s.vertices[b].uv),direction));
     const edge=[v[0],v.at(-1)].map(v=>s.vertices[v].p),axis=unit(sub(edge[1],edge[0])),na=normal(a),nb=normal(b);
     let start=Math.atan2(dot(axis,cross(na,nb)),dot(na,nb))*180/Math.PI;
-    if(Math.abs(Math.abs(start)-180)<1e-7) start=180*Math.sign((s.triangles[b].rank-s.triangles[a].rank)*na[1]);
+    // At the antipodal singularity, material layer order chooses +pi or -pi.
+    // Both vectors follow the face rotations; display thickness is irrelevant.
+    if(Math.abs(Math.abs(start)-180)<1e-7) start=180*Math.sign(dot(sub(s.triangles[b].layerOrder,s.triangles[a].layerOrder),na));
     return {a:faces[a],b:faces[b],edge,degrees:h.degrees-start,assignment:h.degrees,uvEdge:[v[0],v.at(-1)].map(v=>s.vertices[v].uv)};
   });
   return {input:{clusters,hinges,pin:pins[0]},faces};

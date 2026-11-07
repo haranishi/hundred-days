@@ -42,12 +42,15 @@ import { loadModels } from '../lib/engine-adapter.js';
 import { createViewer } from '../lib/viewer.js';
 const q = new URLSearchParams(location.search);
 const models = await loadModels();
-document.getElementById('chips').replaceChildren(...models.map((m) => Object.assign(document.createElement('span'), { className: 'chip', textContent: m.name })));
+// 作品が10個になったので、札は代表の4つと「ほか◯作品」にする（全部並べると3行になり、下に切れる）
+const shown = ['plane', 'crane', 'swan', 'heart'].map((id) => models.find((m) => m.id === id)?.name).filter(Boolean);
+document.getElementById('chips').replaceChildren(...[...shown, `ほか${models.length - shown.length}作品`].map((text) => Object.assign(document.createElement('span'), { className: 'chip', textContent: text })));
 const model = models.find((m) => m.id === (q.get('m') || 'plane')) || models[0];
 const step = Math.min(Math.max((Number(q.get('s')) || model.steps.length) - 1, 0), model.steps.length - 1);
 const t = q.has('t') ? Number(q.get('t')) : 1;
 const viewer = createViewer({ canvas: document.getElementById('view'), testGfx: false, reducedMotion: () => true, onTick: () => false });
 viewer.setModel(model, { view: q.get('view') || 'iso' });
+if (q.has('phi')) viewer.setView('tilt', { phi: Number(q.get('phi')), theta: Number(q.get('theta') || 0), immediate: true });
 viewer.setPose(step, t, []);
 viewer.wake();
 await new Promise((r) => setTimeout(r, 900));
