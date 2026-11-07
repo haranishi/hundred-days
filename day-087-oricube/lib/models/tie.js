@@ -17,7 +17,7 @@ export const tie={
       {type:'fold',line:{point:[0,a],dir:[k,-1]},moving:[.4,0],mode:'valley'}]},
     {id:'knot-down',title:'上側を折り下げる',text:'中心より少し上で、上側の紙をまとめて向こうに折ります。',tip:'下の剣先は動かしません。',ops:[
       {type:'fold',line:{point:[0,-.2],dir:[1,0]},moving:[0,-.55],mode:'mountain',tagMoved:'knot'}]},
-    {id:'knot-return',title:'結び目を折り返す',text:'今折った上側だけを、少しずらして手前に折り返します。結び目の上に生成りの面が出る、ネクタイの完成です。',tip:'前の折り線より少し下で折り返し、左右のくびれをそろえます。',ops:[
+    {id:'knot-return',title:'結び目を折り返す',text:'今折った上側だけを、少しずらして手前に折り返します。結び目の上に生成りの面が細く出る、ネクタイの完成です。',tip:'前の折り線より少し下で折り返し、左右のくびれをそろえます。',ops:[
       {type:'fold',line:{point:[0,-.125],dir:[1,0]},moving:[0,.15],select:{tags:['knot']},mode:'valley'}]},
   ],
 };
