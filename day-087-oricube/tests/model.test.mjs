@@ -128,7 +128,7 @@ export function swanCriteria(model) {
 test('plane final symmetry, horizontal wings, table contact, wingspan and length',()=>planeCriteria(models.find(m=>m.id==='plane')));
 test('swan final head height, forward beak, table contact and reverse-fold nesting',()=>swanCriteria(models.find(m=>m.id==='swan')));
 test('registry is unique, follows difficulty order, and resolves ids',()=>{
-  const order=['plane','heart','pochi','cup','kabuto','boat','kimono','swan','tray','crane'];
+  const order=['plane','heart','pochi','yacht','tree','tie','kimono','swan','tray','crane'];
   const ids=MODELS.map(d=>d.id);
   assert.equal(new Set(ids).size,ids.length);
   assert.deepEqual(ids,order.filter(id=>ids.includes(id)));

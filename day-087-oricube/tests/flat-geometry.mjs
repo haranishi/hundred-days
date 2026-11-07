@@ -61,3 +61,52 @@ export function topFace(s,p) {
   return s.triangles.filter(t=>inside(p,t.v.map(i=>[s.vertices[i].p[0],s.vertices[i].p[2]])))
     .sort((a,b)=>b.rank-a.rank)[0];
 }
+
+// Unregistered flat models need the same motion checks as registered models.
+export async function verifyFlatMotion(model) {
+  const {default:assert}=await import('node:assert/strict');
+  const {inspectModel}=await import('../lib/model.js');
+  const {assertSheet}=await import('../lib/ops.js');
+  const {cross,unit,dot,rotate}=await import('../lib/math.js');
+  const {fine,raw,compiled,pose}=inspectModel(model);
+  const normal=ps=>unit(cross(sub(ps[1],ps[0]),sub(ps[2],ps[0])));
+  for(let i=0;i<raw.length;i++) {
+    for(const s of [raw[i].start,raw[i].end]) assertSheet(s,model.paper);
+    for(const g of raw[i].groups) for(const r of g.records) {
+      for(const s of [r.before,r.after,r.folded].filter(Boolean)) assertSheet(s,model.paper);
+    }
+    const groups=compiled[i].groups;
+    for(let gi=0;gi<groups.length;gi++) for(const q of [0,.125,.25,.5,.75,.875,1]) {
+      const t=(gi+q)/groups.length,{p}=pose(i,t),frame=model.frame(i,t,{explode:0});
+      let area=0;
+      fine.triangles.forEach((tri,j)=>{
+        const uv=tri.v.map(v=>fine.vertices[v].uv),ps=tri.v.map(v=>p[v]);
+        const material=signedArea(uv),world=cross(sub(ps[1],ps[0]),sub(ps[2],ps[0]));
+        assert.ok(material>0);
+        assert.ok(Math.abs(Math.hypot(...world)/2-material)<1e-8);
+        area+=Math.hypot(...world)/2;
+        for(let k=0;k<3;k++) {
+          const n=(k+1)%3,expected=distance(uv[k],uv[n]);
+          assert.ok(Math.abs(distance(ps[k],ps[n])-expected)<1e-8);
+          assert.ok(Math.abs(distance(frame.positions.slice(j*9+k*3,j*9+k*3+3),
+            frame.positions.slice(j*9+n*3,j*9+n*3+3))-expected)<2e-7);
+        }
+        // At group boundaries use the active group selected by the public timeline.
+        const at=Math.min(Math.floor(t*groups.length),groups.length-1),g=groups[at];
+        const f=t===1?1:t*groups.length-at;
+        let expected=normal(tri.v.map(v=>g.base.p[v]));
+        for(const r of g.records) if(r.mt[j]) {
+          expected=rotate(normal(tri.v.map(v=>r.base.p[v])),[0,0,0],r.axis,
+            r.angle*(r.type==='crease'?(f<=.5?2*f:2-2*f):f));
+        }
+        assert.ok(dot(normal(ps),expected)>1-1e-7);
+        assert.ok(dot(frame.normals.slice(j*9,j*9+3),expected)>1-1e-7);
+      });
+      assert.ok(Math.abs(area-1)<1e-7);
+    }
+    if(i) {
+      const before=model.frame(i-1,1).positions.slice(),after=model.frame(i,0).positions;
+      assert.ok(after.every((v,j)=>Math.abs(v-before[j])<1e-7));
+    }
+  }
+}
