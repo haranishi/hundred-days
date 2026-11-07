@@ -1,7 +1,7 @@
 // Final UV refinement is reused at every step: later cuts cannot make earlier
 // frames pop or change the paper's shape. Scratch buffers are owned by each step.
-import {VERTEX_EPS,add,sub,mul,unit,cross,dot,rotate,axisDistance,lerp,boundsOf,distance,barycentric,segmentTriangleInterval} from './math.js';
-import {createSheet,cloneSheet,paperPoint,locate} from './sheet.js';
+import {VERTEX_EPS,add,sub,mul,unit,cross,dot,rotate,axisDistance,lerp,boundsOf,distance,barycentric,weighted,segmentTriangleInterval} from './math.js';
+import {createSheet,cloneSheet,paperPoint,makeLocator} from './sheet.js';
 import {applyOp,assertSheet,resolveLine} from './ops.js';
 import {FoldError} from './error.js';
 import {drivePose,rotateFaceVector} from './drive.js';
@@ -46,24 +46,27 @@ function guide(r,start) {
   return {kind:reverse?'reverse':r.type==='crease'?r.op.mode:r.type==='fold'?r.op.mode:r.type,line,arrow:{points,head:{position,direction}}};
 }
 function mechanismGuides(r,start) {
+  // Every hinge samples the same path times; solve each guide pose only once.
+  const poses=new Map();
+  const guidePoint=(cluster,p,t)=>{
+    if(!poses.has(t)) poses.set(t,r.mechanism.path.at(t,{points:false}).poses);
+    const pose=poses.get(t)[cluster];
+    return p.reduce((sum,x,k)=>add(sum,mul(pose.r[k],x)),pose.o.slice());
+  };
   return r.mechanism.path.core.hinges.flatMap((h,i)=>{
     if(!h.degrees) return [];
     const candidates=[h.a,h.b].flatMap(cluster=>r.mechanism.clusterVertices[cluster]
-      .map(v=>({cluster,v,p:r.before.vertices[v].p,motion:distance(r.before.vertices[v].p,mechanismPointForGuide(r,cluster,r.before.vertices[v].p,.5))})));
+      .map(v=>({cluster,v,p:r.before.vertices[v].p,motion:distance(r.before.vertices[v].p,guidePoint(cluster,r.before.vertices[v].p,.5))})));
     const chosen=candidates.sort((a,b)=>b.motion-a.motion)[0];
     if(!chosen||chosen.motion<VERTEX_EPS) return [];
     const tri=r.before.triangles.find((_,i)=>r.mechanism.faces[i]===chosen.cluster);
     const before=tri.v.map(v=>r.before.vertices[v].p),initial=tri.v.map(v=>paperPoint(start,r.before.vertices[v].uv));
     const transport=p=>add(initial[0],rotateFaceVector(sub(p,before[0]),before,initial));
-    const points=Array.from({length:25},(_,k)=>transport(mechanismPointForGuide(r,chosen.cluster,chosen.p,k/48)));
+    const points=Array.from({length:25},(_,k)=>transport(guidePoint(chosen.cluster,chosen.p,k/48)));
     const position=points.at(-1).slice(),delta=sub(position,points.at(-2));
     if(distance(position,points[0])<VERTEX_EPS||Math.hypot(...delta)<VERTEX_EPS) return [];
     return [{kind:(h.assignment??h.degrees)>=0?'valley':'mountain',line:h.uvEdge.map(uv=>paperPoint(start,uv)),arrow:{points,head:{position,direction:unit(delta)}}}];
   });
-}
-function mechanismPointForGuide(r,cluster,p,t) {
-  const pose=r.mechanism.path.at(t).poses[cluster];
-  return p.reduce((sum,x,k)=>add(sum,mul(pose.r[k],x)),pose.o.slice());
 }
 function creaseMapping(fine,pairs) {
   const result=[];
@@ -78,28 +81,28 @@ function creaseMapping(fine,pairs) {
   });
   return result;
 }
-function sampleState(s,fine) {
-  return {p:fine.vertices.map(v=>paperPoint(s,v.uv)),
-    offsets:fine.triangles.map(t=>locate(s,centroid(fine,t)).tri.offset.slice()),
-    ranks:fine.triangles.map(t=>locate(s,centroid(fine,t)).tri.rank)};
+function makeSampler(fine) {
+  const cache=new WeakMap(),centers=fine.triangles.map(t=>centroid(fine,t));
+  return s=>{
+    if(cache.has(s)) return cache.get(s);
+    const locate=makeLocator(s),indices=new Map(s.triangles.map((tri,i)=>[tri,i]));
+    const hits=fine.vertices.map(v=>locate(v.uv));
+    const mapping=hits.map(({tri,w})=>({v:tri.v,w})),vertexFaces=hits.map(({tri})=>indices.get(tri));
+    const faces=centers.map(uv=>indices.get(locate(uv).tri));
+    const state={p:mapping.map(({v,w})=>weighted(v.map(i=>s.vertices[i].p),w)),
+      offsets:faces.map(i=>s.triangles[i].offset.slice()),ranks:faces.map(i=>s.triangles[i].rank)};
+    const result={state,mapping,faces,vertexFaces};cache.set(s,result);return result;
+  };
 }
-function compileRecord(r,fine) {
-  const base=sampleState(r.before,fine),end=sampleState(r.type==='crease'?r.folded:r.after,fine);
+function compileRecord(r,sample) {
+  const {state:base,mapping,faces,vertexFaces}=sample(r.before),end=sample(r.type==='crease'?r.folded:r.after).state;
   if(r.type==='drive'||r.type==='mechanism') {
-    const mapping=fine.vertices.map(v=>{
-      const {tri,w}=locate(r.before,v.uv);return {v:tri.v,w};
-    });
-    const faces=fine.triangles.map(t=>r.before.triangles.indexOf(locate(r.before,centroid(fine,t)).tri));
     return {...r,base,end,mapping,faces,mv:mapping.map(({v,w})=>v.some((id,k)=>w[k]>VERTEX_EPS&&r.movingVertices.has(id))),
       mt:faces.map(i=>r.moving.has(i))};
   }
-  const mv=base.p.map(p=>r.origin && axisDistance(p,r.origin,r.axis)>VERTEX_EPS);
-  for(let i=0;i<mv.length;i++) if(mv[i]) {
-    const found=locate(r.before,fine.vertices[i].uv);
-    mv[i]=r.moving.has(r.before.triangles.indexOf(found.tri));
-  }
-  const mt=fine.triangles.map(t=>r.moving.has(r.before.triangles.indexOf(locate(r.before,centroid(fine,t)).tri)));
-  const clearance=r.clearance?fine.triangles.map(t=>r.clearance[r.before.triangles.indexOf(locate(r.before,centroid(fine,t)).tri)]):null;
+  const mv=base.p.map((p,i)=>r.origin&&axisDistance(p,r.origin,r.axis)>VERTEX_EPS&&r.moving.has(vertexFaces[i]));
+  const mt=faces.map(i=>r.moving.has(i));
+  const clearance=r.clearance?faces.map(i=>r.clearance[i]):null;
   return {...r,base,end,mv,mt,clearance};
 }
 function fillPose(step,t,p,offsets,ranks=[]) {
@@ -158,14 +161,14 @@ export function buildModel(def) {
       }
       raw.push({data,start,end:cloneSheet(s),groups});
     }
-    const fine=cloneSheet(s);
+    const fine=cloneSheet(s),sample=makeSampler(fine);
     // The paper's own edge is drawn as a thin line so folded-over layers of one colour
     // keep a visible border. It is fixed in paper space, so it follows every fold.
     const {width:pw,height:ph}=paper;
     const outlineMap=creaseMapping(fine,[[[0,0],[pw,0]],[[pw,0],[pw,ph]],[[pw,ph],[0,ph]],[[0,ph],[0,0]]]);
     const compiled=raw.map((step,i)=>{
       stepNumber=i+1;
-      const groups=step.groups.map(g=>({base:sampleState(g.start,fine),records:g.records.map(r=>compileRecord(r,fine))}));
+      const groups=step.groups.map(g=>({base:sample(g.start).state,records:g.records.map(r=>compileRecord(r,sample))}));
       for(const g of groups) for(let a=0;a<g.records.length;a++) for(let b=a+1;b<g.records.length;b++) {
         const first=g.records[a],second=g.records[b];
         if(first.mv.some((moving,i)=>moving&&second.mv[i])) {
@@ -186,7 +189,7 @@ export function buildModel(def) {
       fillPose(compiled[i],t,p,offsets,ranks);
       const state=t?raw[i].end:raw[i].start;
       const vertices=fine.vertices.map((v,j)=>({uv:v.uv,p:p[j]}));
-      for(let j=0;j<vertices.length;j++) if(distance(vertices[j].p,paperPoint(state,vertices[j].uv))>VERTEX_EPS)
+      for(let j=0;j<vertices.length;j++) if(distance(vertices[j].p,sample(state).state.p[j])>VERTEX_EPS)
         throw new FoldError('Compiled endpoint disagrees with paper state',{code:'ENDPOINT'});
       // Ranks were checked on the source flat mesh; here we check the refined
       // geometry that will actually reach the renderer, independently of offsets.
@@ -246,7 +249,20 @@ export function buildModel(def) {
     const boundSamples=compiled.some(step=>step.groups.some(g=>g.records.some(r=>r.type==='drive'||r.type==='mechanism')))
       ?[0,.125,.25,.375,.5,.625,.75,.875,1]:[0,.25,.5,.75,1];
     for(let i=0;i<steps.length;i++) for(const t of boundSamples) {
-      const b=model.frame(i,t,{explode:24}).bounds;boundPoints.push(b.min,b.max);
+      // Keep the last sample's diagnostic buffers as before. Intermediate
+      // bounds need only positions, with the renderer's Float32 rounding.
+      if(t===1) {
+        const b=model.frame(i,t,{explode:24}).bounds;boundPoints.push(b.min,b.max);continue;
+      }
+      fillPose(compiled[i],t,p,offsets,ranks);
+      const min=[Infinity,Infinity,Infinity],max=[-Infinity,-Infinity,-Infinity];
+      fine.triangles.forEach((tri,j)=>{
+        for(const v of tri.v) for(let c=0;c<3;c++) {
+          const value=Math.fround(p[v][c]+offsets[j][c]*24);
+          if(value<min[c]) min[c]=value;if(value>max[c]) max[c]=value;
+        }
+      });
+      boundPoints.push(min,max);
     }
     for(const step of compiled) for(const g of step.groups) for(const r of g.records) {
       if(r.type==='drive'||r.type==='mechanism') {

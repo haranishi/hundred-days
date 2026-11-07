@@ -6,10 +6,26 @@ export const LENGTH_EPS = 1e-7;
 export const RANK_EPS = 1e-10;
 export const DEGENERATE_AREA_EPS = 1e-16;
 export const BARYCENTRIC_DEN_EPS = 1e-18;
-export const add = (a,b) => a.map((v,i)=>v+b[i]);
-export const sub = (a,b) => a.map((v,i)=>v-b[i]);
-export const mul = (a,s) => a.map(v=>v*s);
-export const dot = (a,b) => a.reduce((s,v,i)=>s+v*b[i],0);
+export function add(a,b) {
+  const out=new Array(a.length);
+  for(let i=0;i<a.length;i++) out[i]=a[i]+b[i];
+  return out;
+}
+export function sub(a,b) {
+  const out=new Array(a.length);
+  for(let i=0;i<a.length;i++) out[i]=a[i]-b[i];
+  return out;
+}
+export function mul(a,s) {
+  const out=new Array(a.length);
+  for(let i=0;i<a.length;i++) out[i]=a[i]*s;
+  return out;
+}
+export function dot(a,b) {
+  let sum=0;
+  for(let i=0;i<a.length;i++) sum+=a[i]*b[i];
+  return sum;
+}
 export const cross = (a,b) => [a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]];
 export const norm = a => Math.hypot(...a);
 export const unit = a => mul(a,1/norm(a));
@@ -18,15 +34,21 @@ export const lerp = (a,b,t) => a.map((v,i)=>v+(b[i]-v)*t);
 export const cross2 = (a,b) => a[0]*b[1]-a[1]*b[0];
 export const signedArea = p => p.reduce((s,a,i)=>s+cross2(a,p[(i+1)%p.length]),0)/2;
 export function rotate(p,origin,axis,angle) {
-  const q=sub(p,origin), c=Math.cos(angle), s=Math.sin(angle);
-  return add(origin,add(add(mul(q,c),mul(cross(axis,q),s)),mul(axis,dot(axis,q)*(1-c))));
+  const x=p[0]-origin[0],y=p[1]-origin[1],z=p[2]-origin[2];
+  const ax=axis[0],ay=axis[1],az=axis[2],c=Math.cos(angle),s=Math.sin(angle);
+  const d=(x*ax+y*ay+z*az)*(1-c);
+  return [origin[0]+((x*c+(ay*z-az*y)*s)+ax*d),
+    origin[1]+((y*c+(az*x-ax*z)*s)+ay*d),
+    origin[2]+((z*c+(ax*y-ay*x)*s)+az*d)];
 }
 export const axisDistance = (p,o,a) => norm(cross(sub(p,o),a));
 export function barycentric(p,a,b,c) {
-  const den=cross2(sub(b,a),sub(c,a));
+  const bx=b[0]-a[0],by=b[1]-a[1],cx=c[0]-a[0],cy=c[1]-a[1];
+  const den=bx*cy-by*cx;
   if(Math.abs(den)<BARYCENTRIC_DEN_EPS) return null;
-  const v=cross2(sub(p,a),sub(c,a))/den;
-  const w=cross2(sub(b,a),sub(p,a))/den;
+  const px=p[0]-a[0],py=p[1]-a[1];
+  const v=(px*cy-py*cx)/den;
+  const w=(bx*py-by*px)/den;
   return [1-v-w,v,w];
 }
 export const inTriangle = w => w && w.every(v=>v>=-VERTEX_EPS && v<=1+VERTEX_EPS);

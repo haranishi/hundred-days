@@ -25,6 +25,34 @@ export function locate(s,uv) {
   }
   throw new Error('Point outside paper');
 }
+// Build only for snapshots whose UV mesh will not be mutated. Cell lists retain
+// source order, including edge ties and the barycentric weld tolerance.
+export function makeLocator(s) {
+  const size=Math.max(1,Math.min(32,Math.ceil(Math.sqrt(s.triangles.length))));
+  const points=s.vertices.map(v=>v.uv),min=[0,1].map(c=>Math.min(...points.map(p=>p[c])));
+  const span=[0,1].map(c=>Math.max(...points.map(p=>p[c]))-min[c]);
+  const cell=(v,c)=>Math.max(0,Math.min(size-1,Math.floor((v-min[c])/span[c]*size)||0));
+  const cells=Array.from({length:size*size},()=>[]);
+  for(const tri of s.triangles) {
+    const uv=tri.v.map(i=>s.vertices[i].uv);
+    const low=[],high=[];
+    for(let c=0;c<2;c++) {
+      const pad=VERTEX_EPS*(Math.abs(uv[1][c]-uv[0][c])+Math.abs(uv[2][c]-uv[0][c]))+
+        32*Number.EPSILON*Math.max(1,...uv.map(p=>Math.abs(p[c])));
+      low[c]=cell(Math.min(...uv.map(p=>p[c]))-pad,c);
+      high[c]=cell(Math.max(...uv.map(p=>p[c]))+pad,c);
+    }
+    const entry={tri,uv};
+    for(let y=low[1];y<=high[1];y++) for(let x=low[0];x<=high[0];x++) cells[y*size+x].push(entry);
+  }
+  return uv=>{
+    for(const {tri,uv:points} of cells[cell(uv[1],1)*size+cell(uv[0],0)]) {
+      const w=barycentric(uv,...points);
+      if(inTriangle(w)) return {tri,w};
+    }
+    throw new Error('Point outside paper');
+  };
+}
 export function paperPoint(s,uv) {
   const {tri,w}=locate(s,uv);
   return weighted(tri.v.map(i=>s.vertices[i].p),w);

@@ -18,3 +18,5 @@ import './mechanism-feasibility.test.mjs';
 import './mechanism-crane.test.mjs';
 import './mechanism-pocket.test.mjs';
 import './mechanism-investigation.test.mjs';
+import './locator.test.mjs';
+import './build-time.test.mjs';

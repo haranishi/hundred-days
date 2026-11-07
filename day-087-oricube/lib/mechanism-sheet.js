@@ -39,6 +39,12 @@ export function trianglesPenetrate(a,b) {
   return Math.min(x[1],y[1])-Math.max(x[0],y[0])>1e-9;
 }
 export function assertMechanismPath(s,motion) {
+  // Topological exclusions do not depend on the sampled pose.
+  const pairs=[];
+  for(let i=0;i<s.triangles.length;i++) for(let j=i+1;j<s.triangles.length;j++) {
+    if(motion.faces[i]===motion.faces[j]||s.triangles[i].v.filter(v=>s.triangles[j].v.includes(v)).length>=2) continue;
+    pairs.push([i,j]);
+  }
   let previous=null;
   for(let k=0;k<=motion.path.samples;k++) {
     const progress=k/motion.path.samples,pose=sheetMechanismPose(s,motion,progress);
@@ -50,9 +56,14 @@ export function assertMechanismPath(s,motion) {
     if(pose.p.every(p=>Math.abs(p[1])<VERTEX_EPS)) assertLayers({...s,flat:true,
       vertices:s.vertices.map((v,i)=>({...v,p:pose.p[i]})),triangles:s.triangles.map((t,i)=>({...t,
         rank:motion.ranks?t.rank+(motion.ranks[i]-t.rank)*progress:t.rank}))});
-    for(let i=0;i<s.triangles.length;i++) for(let j=i+1;j<s.triangles.length;j++) {
-      if(motion.faces[i]===motion.faces[j]||s.triangles[i].v.filter(v=>s.triangles[j].v.includes(v)).length>=2) continue;
-      if(trianglesPenetrate(s.triangles[i].v.map(v=>pose.p[v]),s.triangles[j].v.map(v=>pose.p[v])))
+    const triangles=s.triangles.map(tri=>tri.v.map(v=>pose.p[v]));
+    const boxes=triangles.map(points=>({min:[0,1,2].map(c=>Math.min(...points.map(p=>p[c]))),
+      max:[0,1,2].map(c=>Math.max(...points.map(p=>p[c])))}));
+    for(const [i,j] of pairs) {
+      // A proper interior crossing must overlap on every world axis. Padding
+      // keeps boundary roundoff in the existing narrow-phase predicate.
+      if([0,1,2].some(c=>boxes[i].max[c]<boxes[j].min[c]-VERTEX_EPS||boxes[j].max[c]<boxes[i].min[c]-VERTEX_EPS)) continue;
+      if(trianglesPenetrate(triangles[i],triangles[j]))
         fail('Mechanism path penetrates another face','MECHANISM_PENETRATION');
     }
   }
