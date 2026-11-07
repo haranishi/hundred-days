@@ -1,0 +1,31 @@
+Day086 ふたりの着地点 — データの出典
+
+OpenPOI API: https://openpoiapi.com/attribution.html
+API仕様: https://docs.openpoiapi.com/
+施設データはAPI応答を利用時に取得し、永続保存しません。
+licenses / attributions は施設と一緒にメモリで保持します。
+本アプリはデータから対象を選別し、直線距離と徒歩時間の目安を計算します。
+名称・住所・座標を表示し、実際の営業状況や評価を追加するものではありません。
+
+Overture Maps Foundation: https://overturemaps.org/
+Japan Food Facilities、各自治体の食品営業許可・届出データなどの詳細とライセンス:
+https://openpoiapi.com/attribution.html
+
+Foursquare OS Places (Overture Maps経由のデータを含む)
+Copyright 2024 Foursquare Labs, Inc. All rights reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+OpenPOI APIによる変更: 他ソースとの名寄せ（正規化・重複排除）と緯度経度の統合。
+Foursquare NOTICEの原典: https://opensource.foursquare.com/places-notice-txt/
+上記データセット同梱版の文面はOpenPOIの開発者向け資料で確認（2026-11-05）。
