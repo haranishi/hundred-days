@@ -22,8 +22,22 @@
       <span class="brand-name">OriCube</span>
       <span class="brand-sub">折り紙の折り方を3Dで見る</span>
     </p>
-    <div class="tabs" id="tabs" role="tablist" aria-label="作品を選ぶ"></div>
+    <button type="button" class="pick-open" id="pick-open" aria-haspopup="dialog" aria-controls="picker">
+      <span class="pick-kicker">作品を選ぶ</span>
+      <span class="pick-current"><span id="pick-name">紙飛行機</span><span class="pick-caret" aria-hidden="true"></span></span>
+    </button>
   </header>
+
+  <dialog class="picker" id="picker" role="dialog" aria-modal="true" aria-labelledby="picker-title">
+    <div class="picker-inner">
+      <div class="picker-head">
+        <h2 class="picker-title" id="picker-title">作品を選ぶ</h2>
+        <p class="picker-note">やさしい順</p>
+        <button type="button" class="picker-close" id="picker-close" aria-label="閉じる"><span class="ico ico-close" aria-hidden="true"></span></button>
+      </div>
+      <ul class="picker-list" id="picker-list"></ul>
+    </div>
+  </dialog>
 
   <section class="stage" id="stage" aria-label="折っている紙の3D表示">
     <canvas id="view" role="img" aria-label="折っている紙の3D表示。1本指で回し、2本指で拡大縮小できます。"></canvas>
@@ -38,10 +52,15 @@
     </div>
     <div class="done" id="done" hidden>
       <div class="done-card" role="dialog" aria-modal="false" aria-labelledby="done-title">
-        <p class="done-kicker">できあがり</p>
-        <h2 id="done-title">完成</h2>
+        <div class="done-head">
+          <div>
+            <p class="done-kicker">できあがり</p>
+            <h2 id="done-title">完成</h2>
+          </div>
+          <button type="button" class="btn ghost" id="done-pick">作品を選ぶ</button>
+        </div>
         <div class="done-actions">
-          <button type="button" class="btn primary" id="other"><span id="other-label">別の作品へ</span><span class="ico ico-go" aria-hidden="true"></span></button>
+          <button type="button" class="btn primary" id="other"><span id="other-label">次の作品へ</span><span class="ico ico-go" aria-hidden="true"></span></button>
           <button type="button" class="btn" id="share-open"><span class="ico ico-share" aria-hidden="true"></span>共有</button>
         </div>
       </div>

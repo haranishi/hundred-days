@@ -76,7 +76,7 @@ function checkFinal(m) {
   }
 }
 test('tray is registered last with the requested paper, name and timing',()=>{
-  assert.equal(MODELS.at(-1),tray);assert.equal(modelDef('tray'),tray);
+  assert.equal(MODELS.find(d=>d.id==='tray'),tray);assert.equal(modelDef('tray'),tray);
   assert.deepEqual([tray.name,tray.reading,tray.level,tray.minutes],['立方体の箱','りっぽうたいのはこ',2,5]);
   assert.deepEqual([model.paper.front,model.paper.back],['#2fa37a','#f6f1e3']);
   assert.equal(model.steps[3].durationMs,2800);assert.equal(info.compiled[3].groups.length,1);

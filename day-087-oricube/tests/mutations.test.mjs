@@ -14,7 +14,7 @@ const cases=[
   ['stand the swan upside down',1,d=>{d.steps[5].ops[0].degrees=-90;}],
 ];
 for(const [name,index,mutate] of cases) test(`mutation: ${name} is rejected by construction or numerical shape criteria`,()=>{
-  const d=structuredClone(MODELS[index]);mutate(d);
+  const d=structuredClone(MODELS.find(d=>d.id===['plane','swan'][index]));mutate(d);
   let m;
   try { m=buildModel(d); } catch(e) { assert.ok(e instanceof FoldError);assert.ok(e.step>0);return; }
   assert.throws(()=>[planeCriteria,swanCriteria][index](m),assert.AssertionError);

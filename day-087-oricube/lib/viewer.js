@@ -18,6 +18,9 @@ const VIEWS = {
   top: { phi: 0.0001, theta: 0 },
   iso: { phi: 0.93, theta: 0.52 },
   side: { phi: Math.PI / 2 - 0.1, theta: 0 },
+  // Flat models (heart, envelope, kimono) end as a flat shape: near top-down keeps the outline readable
+  // while a little tilt still shows the layers and the motion.
+  flat: { phi: 0.5, theta: 0 },
 };
 
 export function webglAvailable() {
@@ -229,6 +232,7 @@ export function createViewer({ canvas, testGfx = false, reducedMotion = () => fa
   let currentBox = null; // 今の姿勢の箱（試験用の占有率に使う）
   let currentCenter = null; // 今の姿勢の中心。視点はこれを緩やかに追う
   let zoomFactor = 1;
+  let homeView = 'iso'; // the model's own starting view; the reset button returns here
   let viewAnim = null;
   let interacting = false;
   let needsRender = true;
@@ -574,7 +578,8 @@ export function createViewer({ canvas, testGfx = false, reducedMotion = () => fa
       pose = { i: 0, t: 0, guides: 'none' };
       poseDirty = true;
       updateFit(false);
-      api.setView(view || 'iso', { immediate: true });
+      homeView = VIEWS[view] ? view : 'iso';
+      api.setView(homeView, { immediate: true });
       updateFit(true);
       wake();
     },
@@ -601,7 +606,7 @@ export function createViewer({ canvas, testGfx = false, reducedMotion = () => fa
     },
     setView(name, { immediate = false, phi, theta } = {}) {
       stopSpin();
-      const preset = name === 'tilt' ? { phi, theta } : VIEWS[name] || VIEWS.iso;
+      const preset = name === 'tilt' ? { phi, theta } : name === 'reset' ? VIEWS[homeView] : VIEWS[name] || VIEWS.iso;
       if (name === 'reset') zoomFactor = 1;
       offset.copy(camera.position).sub(controls.target);
       spherical.setFromVector3(offset);

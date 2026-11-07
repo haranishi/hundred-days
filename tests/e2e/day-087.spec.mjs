@@ -22,9 +22,11 @@ test('opens on step 1 of the paper plane with a drawn 3D view and no errors', as
   const errors = await open(page);
   await expect(page.locator('#app')).toHaveAttribute('data-webgl', 'true');
   const declared = await page.evaluate(() => window.__oricube.models.map((m) => m.name));
-  expect(declared).toEqual(['紙飛行機', '白鳥', '立方体の箱']);
-  await expect(page.locator('.tab')).toHaveCount(3);
-  await expect(page.locator('.tab[aria-selected="true"]')).toContainText('紙飛行機');
+  expect(declared[0]).toBe('紙飛行機');
+  expect(declared).toEqual(expect.arrayContaining(['紙飛行機', '白鳥', '立方体の箱']));
+  await expect(page.locator('.pick-card')).toHaveCount(declared.length);
+  await expect(page.locator('.tab')).toHaveCount(0);
+  await expect(page.locator('#pick-name')).toHaveText('紙飛行機');
   await expect(page.locator('#step-no')).toHaveText('手順 1');
   await expect(page.locator('#step-title')).not.toHaveText('読み込み中');
   await expect(page.locator('#view')).toBeVisible();
@@ -55,18 +57,23 @@ test('the last steps play to the completion card and offer another model', async
   await expect(page.locator('#done')).toBeVisible({ timeout: 45_000 });
   await expect(page.locator('#done-title')).toHaveText('紙飛行機の完成');
   await expect(page.locator('#step-no')).toHaveText('手順 9');
+  const next = await page.evaluate(() => window.__oricube.models[1].name);
+  await expect(page.locator('#other')).toHaveText(`${next}へ`);
   await page.locator('#other').click();
-  await expect(page.locator('.tab[aria-selected="true"]')).not.toContainText('紙飛行機');
+  await expect(page.locator('#pick-name')).toHaveText(next);
+  await expect(page.locator('#step-no')).toHaveText('手順 1');
 });
 
 test('each model opens on its own first step', async ({ page }) => {
   await open(page);
-  const names = await page.locator('.tab .tab-name').allInnerTexts();
+  const names = await page.locator('.pick-card .pick-card-name').allTextContents();
   expect(names).toEqual(await page.evaluate(() => window.__oricube.models.map((m) => m.name)));
-  expect(names).toEqual(['紙飛行機', '白鳥', '立方体の箱']);
   for (const name of names) {
-    await page.locator('.tab', { hasText: name }).click();
-    await expect(page.locator('.tab[aria-selected="true"]')).toContainText(name);
+    await page.locator('#pick-open').click();
+    await page.locator('.pick-card', { hasText: name }).click();
+    await expect(page.locator('#picker')).toBeHidden();
+    await expect(page.locator('#pick-name')).toHaveText(name);
+    await expect(page.locator('.pick-card[aria-current="true"] .pick-card-name')).toHaveText(name);
     await expect(page.locator('#step-no')).toHaveText('手順 1');
     await expect(page.locator('#step-text')).not.toBeEmpty();
   }
@@ -371,5 +378,163 @@ test.describe('phone framing', () => {
     const fill = Math.max(c.w, c.h);
     expect(fill).toBeGreaterThanOrEqual(0.6);
     expect(fill).toBeLessThanOrEqual(0.72);
+  });
+});
+
+// ---- 作品の一覧（第2弾。UI担当が追加） ----
+test.describe('model picker', () => {
+  test('opens as a modal dialog on the current model, keeps playing, and Esc returns focus', async ({ page }) => {
+    await open(page, 'm=swan&s=2&t=0');
+    await page.locator('#play').click();
+    const opener = page.locator('#pick-open');
+    await opener.click();
+    const dialog = page.getByRole('dialog', { name: '作品を選ぶ' });
+    await expect(dialog).toBeVisible();
+    await expect(dialog).toHaveAttribute('aria-modal', 'true');
+    await expect(page.locator('.pick-card[aria-current="true"]')).toHaveAttribute('data-id', 'swan');
+    await expect(page.locator('.pick-card[aria-current="true"]')).toBeFocused();
+    // The model behind keeps moving while the list is open
+    const t0 = (await state(page)).t;
+    await expect.poll(async () => (await state(page)).t, { timeout: 5_000 }).toBeGreaterThan(t0);
+    expect((await state(page)).playing).toBe(true);
+    // Arrow keys belong to the list, not to the steps behind it
+    await page.keyboard.press('ArrowRight');
+    expect((await state(page)).step).toBe(1);
+    // Tab stays inside the dialog
+    for (let i = 0; i < 8; i++) {
+      await page.keyboard.press('Tab');
+      expect(await page.evaluate(() => document.getElementById('picker').contains(document.activeElement))).toBe(true);
+    }
+    await page.keyboard.press('Escape');
+    await expect(dialog).toBeHidden();
+    await expect(opener).toBeFocused();
+    expect((await state(page)).model).toBe('swan');
+  });
+
+  test('the close button and a tap outside both close it', async ({ page }) => {
+    await open(page);
+    await page.locator('#pick-open').click();
+    await page.getByRole('button', { name: '閉じる' }).click();
+    await expect(page.locator('#picker')).toBeHidden();
+    await expect(page.locator('#pick-open')).toBeFocused();
+    await page.locator('#pick-open').click();
+    await expect(page.locator('#picker')).toBeVisible();
+    await page.mouse.click(4, 400);
+    await expect(page.locator('#picker')).toBeHidden();
+  });
+
+  test('choosing a model starts it from the first step and plays', async ({ page }) => {
+    await open(page, 'm=plane&s=6&t=0.5');
+    await page.locator('#pick-open').click();
+    await page.locator('.pick-card[data-id="tray"]').click();
+    await expect(page.locator('#picker')).toBeHidden();
+    const s = await state(page);
+    expect([s.model, s.step, s.playing]).toEqual(['tray', 0, true]);
+    await expect(page.locator('#pick-name')).toHaveText('立方体の箱');
+    await expect(page.locator('#pick-open')).toBeFocused();
+  });
+
+  test('with reduced motion a chosen model shows the end of its first step without playing', async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await open(page);
+    await page.locator('#pick-open').click();
+    await page.locator('.pick-card[data-id="swan"]').click();
+    const s = await state(page);
+    expect([s.model, s.step, s.t, s.playing]).toEqual(['swan', 0, 1, false]);
+  });
+
+  test('every card shows a picture, a name, the difficulty and the time, in list order', async ({ page }) => {
+    await open(page);
+    const models = await page.evaluate(() => window.__oricube.models.map((m) => ({ id: m.id, name: m.name, level: m.level, minutes: m.minutes })));
+    await page.locator('#pick-open').click();
+    const cards = page.locator('.pick-card');
+    await expect(cards).toHaveCount(models.length);
+    for (const [i, m] of models.entries()) {
+      const card = cards.nth(i);
+      await expect(card).toHaveAttribute('data-id', m.id);
+      await expect(card.locator('.pick-card-name')).toHaveText(m.name);
+      await expect(card.locator('.pick-stars')).toHaveText('★'.repeat(m.level));
+      await expect(card).toContainText(`約${m.minutes}分`);
+      await expect.poll(() => card.locator('img').evaluate((img) => img.complete && img.naturalWidth > 0)).toBe(true);
+    }
+  });
+
+  test('the completion card goes to the next model in the list and wraps to the first', async ({ page }) => {
+    await open(page);
+    const ids = await page.evaluate(() => window.__oricube.models.map((m) => m.id));
+    const last = ids.at(-1);
+    await page.goto(`${base}?debug=1&gfx=test&m=${last}&s=99&t=1`);
+    await expect(page.locator('#app')).toHaveAttribute('data-ready', 'true');
+    await expect(page.locator('#done')).toBeVisible();
+    await expect(page.locator('#other')).toHaveText(`${await page.evaluate(() => window.__oricube.models[0].name)}へ`);
+    await page.locator('#done-pick').click();
+    await expect(page.locator('#picker')).toBeVisible();
+    await page.keyboard.press('Escape');
+    await expect(page.locator('#done-pick')).toBeFocused();
+    await page.locator('#other').click();
+    expect((await state(page)).model).toBe(ids[0]);
+  });
+});
+
+test.describe('model picker on a phone', () => {
+  test.use(phone);
+
+  test('a finger tap chooses a model from the bottom sheet', async ({ page, context }) => {
+    await open(page, 'm=plane&s=4&t=0');
+    await page.locator('#pick-open').tap();
+    const sheet = page.locator('#picker');
+    await expect(sheet).toBeVisible();
+    // Measure after the slide-in has settled
+    await expect.poll(() => sheet.evaluate((el) => el.getAnimations().length)).toBe(0);
+    const box = await sheet.boundingBox();
+    // A sheet from the bottom, about three quarters of the screen
+    expect(box.y + box.height).toBeGreaterThan(843);
+    expect(box.height / 844).toBeGreaterThan(0.6);
+    expect(box.height / 844).toBeLessThan(0.85);
+    const card = await page.locator('.pick-card[data-id="swan"]').boundingBox();
+    const cdp = await context.newCDPSession(page);
+    const p = { x: card.x + card.width / 2, y: card.y + card.height / 2, id: 1 };
+    await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [p] });
+    await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+    await expect(sheet).toBeHidden();
+    const s = await state(page);
+    expect([s.model, s.step]).toEqual(['swan', 0]);
+  });
+
+  test('ten cards fit 390px without sideways scroll and every control is at least 44px', async ({ page }) => {
+    await open(page);
+    // Stand-in for the full set: copy the cards up to ten (test only)
+    await page.evaluate(() => {
+      const list = document.getElementById('picker-list');
+      const items = [...list.children];
+      for (let k = 0; list.children.length < 10; k++) list.append(items[k % items.length].cloneNode(true));
+    });
+    for (const size of [{ width: 390, height: 844 }, { width: 360, height: 740 }, { width: 844, height: 390 }]) {
+      await page.setViewportSize(size);
+      await page.locator('#pick-open').tap();
+      await expect(page.locator('#picker')).toBeVisible();
+      const m = await page.evaluate(() => {
+        const dialog = document.getElementById('picker');
+        const list = document.getElementById('picker-list');
+        const controls = [...dialog.querySelectorAll('button')].map((el) => el.getBoundingClientRect());
+        const lr = list.getBoundingClientRect();
+        return {
+          overflow: document.documentElement.scrollWidth - window.innerWidth,
+          listOverflowX: list.scrollWidth - list.clientWidth,
+          dialogRight: dialog.getBoundingClientRect().right - window.innerWidth,
+          small: controls.filter((r) => r.width < 44 || r.height < 44).length,
+          seen: [...list.querySelectorAll('.pick-card')].filter((c) => c.getBoundingClientRect().top < lr.bottom - 40).length,
+        };
+      });
+      const tag = `${size.width}x${size.height}`;
+      expect(m.overflow, tag).toBeLessThanOrEqual(0);
+      expect(m.listOverflowX, tag).toBeLessThanOrEqual(0);
+      expect(m.dialogRight, tag).toBeLessThanOrEqual(0.5);
+      expect(m.small, tag).toBe(0);
+      // Most of the ten are in view without scrolling
+      expect(m.seen, tag).toBeGreaterThanOrEqual(9);
+      await page.keyboard.press('Escape');
+      await expect(page.locator('#picker')).toBeHidden();
+    }
   });
 });

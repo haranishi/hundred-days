@@ -8,3 +8,7 @@ import './frame-extras.test.mjs';
 import './review-hardening.test.mjs';
 import './timeline.test.mjs';
 import './tray.test.mjs';
+import './heart.test.mjs';
+import './pochi.test.mjs';
+import './kimono.test.mjs';
+import './thumbs.test.mjs';

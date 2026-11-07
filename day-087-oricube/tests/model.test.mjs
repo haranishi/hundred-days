@@ -7,7 +7,7 @@ import {assertSheet} from '../lib/ops.js';
 import {paperPoint} from '../lib/sheet.js';
 import {projection} from '../lib/stack.js';
 // The linked, non-rigid drive has its own independent analytic checks in tray.test.
-const models=MODELS.slice(0,2).map(buildModel);
+const models=MODELS.filter(d=>!d.steps.some(s=>s.ops.some(o=>o.type==='drive'))).map(buildModel);
 const samples=[0,.25,.5,.75,1];
 const triangleNormal=points=>unit(cross(sub(points[1],points[0]),sub(points[2],points[0])));
 for(const model of models) {
@@ -123,12 +123,17 @@ export function swanCriteria(model) {
     for(const i of r.moving) assert.ok(r.after.triangles[i].rank>lower&&r.after.triangles[i].rank<upper,'inside bounding layers');
   }
 }
-test('plane final symmetry, horizontal wings, table contact, wingspan and length',()=>planeCriteria(models[0]));
-test('swan final head height, forward beak, table contact and reverse-fold nesting',()=>swanCriteria(models[1]));
-test('registry retains plane and swan, appends tray, and unknown ids are undefined',()=>{
-  assert.deepEqual(MODELS.map(d=>d.id),['plane','swan','tray']);assert.equal(modelDef('unknown'),undefined);
+test('plane final symmetry, horizontal wings, table contact, wingspan and length',()=>planeCriteria(models.find(m=>m.id==='plane')));
+test('swan final head height, forward beak, table contact and reverse-fold nesting',()=>swanCriteria(models.find(m=>m.id==='swan')));
+test('registry is unique, follows difficulty order, and resolves ids',()=>{
+  const order=['plane','heart','pochi','cup','kabuto','boat','kimono','swan','tray','crane'];
+  const ids=MODELS.map(d=>d.id);
+  assert.equal(new Set(ids).size,ids.length);
+  assert.deepEqual(ids,order.filter(id=>ids.includes(id)));
+  for(const def of MODELS) assert.equal(modelDef(def.id),def);
+  assert.equal(modelDef('unknown'),undefined);
 });
 test('FoldError reports one-based step, op and stable code',()=>{
-  const d=structuredClone(MODELS[0]);d.steps[2].ops[1].line={through:['T','T']};
+  const d=structuredClone(modelDef('plane'));d.steps[2].ops[1].line={through:['T','T']};
   assert.throws(()=>buildModel(d),e=>e instanceof FoldError && e.step===3&&e.op===2&&e.code==='INVALID_LINE');
 });

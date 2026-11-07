@@ -11,7 +11,8 @@ const reducedQuery = matchMedia('(prefers-reduced-motion: reduce)');
 const reduced = () => reducedQuery.matches;
 
 const els = {
-  app: $('app'), tabs: $('tabs'), stage: $('stage'), canvas: $('view'), hint: $('hint'),
+  app: $('app'), pickOpen: $('pick-open'), pickName: $('pick-name'), picker: $('picker'),
+  pickerList: $('picker-list'), pickerClose: $('picker-close'), donePick: $('done-pick'), stage: $('stage'), canvas: $('view'), hint: $('hint'),
   tools: $('stage-tools'), explode: $('explode'), done: $('done'), doneTitle: $('done-title'),
   other: $('other'), otherLabel: $('other-label'), shareOpen: $('share-open'),
   nogl: $('nogl'), noglWhy: $('nogl-why'), noglList: $('nogl-list'),
@@ -167,27 +168,62 @@ function paperShape(p) {
   return '長方形';
 }
 
-function renderTabs() {
-  els.tabs.replaceChildren(...models.map((m) => {
+// The model picker: one card per model, in the list order (easiest first).
+function renderPicker() {
+  els.pickerList.replaceChildren(...models.map((m) => {
+    const li = document.createElement('li');
     const b = document.createElement('button');
     b.type = 'button';
-    b.className = 'tab';
-    b.setAttribute('role', 'tab');
-    b.id = `tab-${m.id}`;
+    b.className = 'pick-card';
     b.dataset.id = m.id;
-    b.setAttribute('aria-controls', 'controls');
+    const img = document.createElement('img');
+    img.src = `./assets/thumb-${m.id}.svg`;
+    img.alt = '';
+    img.width = 96;
+    img.height = 96;
+    img.decoding = 'async';
     const name = document.createElement('span');
-    name.className = 'tab-name';
+    name.className = 'pick-card-name';
     name.textContent = m.name;
     const meta = document.createElement('span');
-    meta.className = 'tab-meta';
-    meta.textContent = `${stars(m.level)} 約${m.minutes}分`;
-    meta.setAttribute('aria-label', `難しさ${m.level || 1}、約${m.minutes}分`);
-    b.append(name, meta);
-    onPress(b, () => selectModel(m.id, { autoplay: true }));
-    return b;
+    meta.className = 'pick-card-meta';
+    const st = document.createElement('span');
+    st.className = 'pick-stars';
+    st.textContent = stars(m.level);
+    st.setAttribute('aria-label', `難しさ${Math.max(1, Math.min(3, m.level || 1))}`);
+    meta.append(st, document.createTextNode(` 約${m.minutes}分`));
+    b.append(img, name, meta);
+    onPress(b, () => { selectModel(m.id, { autoplay: true }); closePicker(); });
+    li.append(b);
+    return li;
   }));
 }
+
+function markCurrentModel() {
+  els.pickName.textContent = model.name;
+  els.pickOpen.setAttribute('aria-label', `作品を選ぶ（今は${model.name}）`);
+  for (const b of els.pickerList.querySelectorAll('.pick-card')) {
+    if (b.dataset.id === model.id) b.setAttribute('aria-current', 'true'); else b.removeAttribute('aria-current');
+  }
+}
+
+let opener = null;
+function openPicker(e) {
+  if (els.picker.open) return;
+  opener = e?.currentTarget instanceof HTMLElement ? e.currentTarget : els.pickOpen;
+  els.picker.showModal();
+  // Start on the current model, so Enter keeps it and Tab moves on from there.
+  const current = els.pickerList.querySelector('.pick-card[aria-current="true"]');
+  current?.scrollIntoView({ block: 'nearest' });
+  (current || els.pickerClose).focus({ preventScroll: true });
+}
+
+// Focus goes back to the button that opened it (see the 'close' listener).
+function closePicker() {
+  if (els.picker.open) els.picker.close();
+}
+
+const nextModel = () => models[(models.findIndex((m) => m.id === model.id) + 1) % models.length];
 
 function renderTicks() {
   const n = model.steps.length;
@@ -215,11 +251,7 @@ function renderNoGlList() {
 function selectModel(id, { autoplay = false, step = 0, t = null } = {}) {
   const next = models.find((m) => m.id === id) || models[0];
   model = next;
-  for (const b of els.tabs.querySelectorAll('.tab')) {
-    const on = b.dataset.id === model.id;
-    b.setAttribute('aria-selected', on ? 'true' : 'false');
-    b.tabIndex = on ? 0 : -1;
-  }
+  markCurrentModel();
   tl = createTimeline({ durations: model.steps.map((s) => s.durationMs), reduced: reduced(), stepStop });
   tl.setSpeed(speed);
   if (t !== null) tl.setProgress(step, t);
@@ -241,8 +273,7 @@ function selectModel(id, { autoplay = false, step = 0, t = null } = {}) {
     return s;
   };
   els.paperInfo.append(label, sw(p.front, p.frontName, '表'), sw(p.back, p.backName, '裏'));
-  const others = models.filter((m) => m.id !== model.id);
-  els.otherLabel.textContent = others.length ? `${others[0].name}へ` : '最初から';
+  els.otherLabel.textContent = models.length > 1 ? `${nextModel().name}へ` : '最初から';
   if (viewer) viewer.setModel(model, { view: params.get('view') || model.steps[0]?.view || 'iso' });
   else renderNoGlList();
   // 3Dが無いときは動きを再生できないので、自動再生しない
@@ -350,10 +381,26 @@ function bind() {
   onPress(els.prev, () => { viewer?.stopSpin(); tl.prev(); sync(); });
   onPress(els.next, () => { viewer?.stopSpin(); tl.next(); sync(); });
   onPress(els.stepStop, () => setStepStop(!stepStop));
-  onPress(els.other, () => {
-    const others = models.filter((m) => m.id !== model.id);
-    selectModel((others[0] || model).id, { autoplay: true });
+  onPress(els.other, () => selectModel(nextModel().id, { autoplay: true }));
+  onPress(els.pickOpen, openPicker);
+  onPress(els.donePick, openPicker);
+  onPress(els.pickerClose, () => closePicker());
+  // Esc closes the native modal; send focus back to the header button either way.
+  els.picker.addEventListener('close', () => {
+    const back = opener && opener.offsetParent !== null ? opener : els.pickOpen;
+    back.focus({ preventScroll: true });
   });
+  // Keep Tab inside the list: a native modal would otherwise let it leave to the browser's own controls.
+  els.picker.addEventListener('keydown', (e) => {
+    if (e.key !== 'Tab') return;
+    const items = [...els.picker.querySelectorAll('button')].filter((b) => !b.disabled && b.offsetParent !== null);
+    if (!items.length) return;
+    const first = items[0], last = items.at(-1);
+    if (e.shiftKey && (document.activeElement === first || !els.picker.contains(document.activeElement))) { e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+  });
+  // A tap on the dimmed area outside the panel lands on the <dialog> itself.
+  els.picker.addEventListener('click', (e) => { if (e.target === els.picker) closePicker(); });
   onPress(els.shareOpen, () => {
     const share = document.getElementById('share');
     share?.scrollIntoView({ behavior: reduced() ? 'auto' : 'smooth', block: 'center' });
@@ -374,20 +421,8 @@ function bind() {
     }
   });
 
-  els.tabs.addEventListener('keydown', (e) => {
-    if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
-    const tabs = [...els.tabs.querySelectorAll('.tab')];
-    const i = tabs.indexOf(document.activeElement);
-    if (i < 0) return;
-    e.preventDefault();
-    e.stopPropagation();
-    const j = (i + (e.key === 'ArrowRight' ? 1 : -1) + tabs.length) % tabs.length;
-    tabs[j].focus();
-    selectModel(tabs[j].dataset.id, { autoplay: true });
-  });
-
   document.addEventListener('keydown', (e) => {
-    if (e.defaultPrevented || e.altKey || e.ctrlKey || e.metaKey) return;
+    if (e.defaultPrevented || e.altKey || e.ctrlKey || e.metaKey || els.picker.open) return;
     const tag = e.target?.tagName;
     const typing = tag === 'INPUT' && e.target.type !== 'range';
     if (typing || tag === 'TEXTAREA' || tag === 'SELECT') return;
@@ -434,7 +469,7 @@ async function main() {
     throw error;
   }
   els.app.dataset.engine = models.source || 'engine';
-  renderTabs();
+  renderPicker();
 
   if (webglAvailable()) {
     try {
