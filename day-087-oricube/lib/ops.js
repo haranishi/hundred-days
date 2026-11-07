@@ -5,6 +5,7 @@ import {cloneSheet,point,splitLine,selected,simplifyFlat} from './sheet.js';
 import {orderStack,assertLayers} from './stack.js';
 import {FoldError} from './error.js';
 import {prepareDrive,drivePose} from './drive.js';
+import {prepareMechanismOp,sheetMechanismPose} from './mechanism-sheet.js';
 const fail=(message,code)=>{throw new FoldError(message,{code});};
 export function resolveLine(s,line) {
   let o,d;
@@ -90,6 +91,20 @@ function outsideClearance(s,moving,layerGap) {
 export function applyOp(s,op,layerGap) {
   const type=op.type??op.op;
   let origin,axis,angle=0,moving=new Set(),movingVertices=new Set(),line;
+  if(type==='mechanism') {
+    const before=cloneSheet(s),mechanism=prepareMechanismOp(before,op,layerGap);
+    for(const f of [.25,.5,.75,1]) {
+      const pose=sheetMechanismPose(before,mechanism,f);
+      pose.p.forEach((p,i)=>{if(distance(p,before.vertices[i].p)>VERTEX_EPS) movingVertices.add(i);});
+      if(f===1) {
+        s.vertices.forEach((v,i)=>{v.p=pose.p[i];});
+        s.triangles.forEach((t,i)=>{t.offset=pose.offsets[i];if(mechanism.ranks)t.rank=mechanism.ranks[i];});
+      }
+    }
+    moving=new Set(s.triangles.flatMap((_,i)=>mechanism.faces[i]===mechanism.path.core.pin?[]:[i]));
+    s.flat=mechanism.flat;
+    return {type,op,before,after:cloneSheet(s),mechanism,moving,movingVertices,angle:0};
+  }
   if(type==='drive') {
     const before=cloneSheet(s),drive=prepareDrive(before,op);
     const materialArea=before.triangles.reduce((a,t)=>a+signedArea(t.v.map(v=>before.vertices[v].uv)),0);

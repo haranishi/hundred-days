@@ -54,3 +54,24 @@
 - 案内: 動く折り目を谷・山の線で、主な動きを矢印で `guides` に出す（既存の `valley`/`mountain`）。
 - 失敗: 解が無い・分岐が曖昧・経路での貫通は、作品名と手順つきの `FoldError`（`MECHANISM_INFEASIBLE` など）で止める。
 - 近似（最後の手段）: 剛体で表せないと実測で分かった手順だけ、`relaxed:{maxStrain}` で辺の伸びを制限した緩和解を許す。engine-notes.md に手順と最大誤差を記録する。
+
+### 第2回の実装範囲とAPI
+- 独立部品 `mechanism.js`: `prepareMechanism({clusters:[{points:[[x,y,z],…]}],hinges:[{a,b,edge:[[x,y,z],[x,y,z]],degrees}],pin,driver?})`。points/edgeは共通の始点世界座標。coreのdegreesは始点からの右手系回転増分（±180°以内）。`mechanismPose(core,angles)` のanglesはラジアン。
+- `projectMechanism(core,t,seed?)` は局所射影。`buildMechanism(input,{samples=256})` は257点の角度表と `at(t)`（倍精度のposes/points/angles/closure/residual）を返す。外部依存・乱数・履歴なし。
+- 既定driverは `'projection'`。目標方向への射影量 `dot(angles,goals)/dot(goals,goals)=t` を拘束する。整数driverはその蝶番1本を線形に駆動する。非木辺は接合辺両端と相対回転を照合し、角度だけが未拘束になるのを防ぐ。
+- 公開opの `line` は今回は **有限の紙座標線分** `{through:[マーク名または[u,v],…]}`。先に `scribe split:true` で切る。`select` は共有辺の両面に適用。未宣言の辺は剛体クラスタへ統合する。`pin:{tags?,notTags?}` はちょうど1クラスタを選ぶ。
+- 公開opのdegreesは **符号付き終点二面角**。始点の面法線とrankから初期角を求め、coreへ回転増分を渡す。180°から90°へ開く場合も扱う。
+- 構築時に257点の逆行・異クラスタ間の三角形内部の交差・平面時の既存層検査を実行。辺共有の隣接面と同一クラスタは交差検査から除く。共面の接触と内部を横断する交差を区別する（層offsetは材料座標に入れない）。
+- 平面終点は `t=1−1e-4` の重なり領域で高さを比較し、順位の非循環な順序を求める。固定クラスタの元rankを基準にそろえ、境界でoffsetが飛ぶのを防ぐ。高さ同値・層の循環・クラスタ内の既存重なりは現実装では拒否する。
+- `frame` は表の線形補間を種に最大12回の射影。補正中は終点へ誘導せず、補間した分岐を保つ。guidesは終点角の谷/山を保ち、手順t=0へ座標を戻す。`topologyKey`・配列再利用・boundsは既存APIを維持する。
+- `MECHANISM_INFEASIBLE` は宣言終点の不整合、`MECHANISM_NO_CONVERGENCE` は局所解法の未収束。後者は剛体経路が存在しない証明ではない。`MECHANISM_BRANCH` / `MECHANISM_PENETRATION` / `MECHANISM_LAYER_AMBIGUOUS` も作品・手順つきのFoldError。
+- A・C1は既存仕様を維持。第3回でC2とC3(b)を作品と同形の固定データへ統合。C3(a)・C4は未採用（engine-notes.md）。`relaxed` は現在も `MECHANISM_RELAXED` で拒否する。
+
+### 第3回の追加契約
+- 連続表の予測は直前2姿勢の割線を使う。種と表の時刻が一致した場合は直前の割線を保持し、ゼロ除算を防ぐ。多自由度の経路を毎回終点方向へ引くと、特異点付近で別の自由度が混ざって未収束になるため。
+- 終点の層順は「クラスタ＋始点rank」を節点にする。未宣言の180°折りで束ねた既存層を、同じ剛体クラスタの中でも区別する。異クラスタ間は終点直前の材料高さ、同一クラスタ内は回転した元の層順で比較する。
+- 固定クラスタの各rankをすべて保持し、その間には分数rankで新しい層を入れる。表示gap=0でも層順を保つ。高さが同じ異クラスタを元rankだけで順位づけず、曖昧として拒否する。
+- 紙座標の直線が既存の折り返しで世界座標の向きを反転する場合、蝶番を分けて各区間の角度を検査する。作者も折り返しの交点で線分を分け、胴とつばの谷山を逆に指定する。同じ角度で束ねた不整合な宣言は拒否する。
+- C2の固定データは `tests/mechanism-crane-fixtures.mjs`。全4象限の凧線と横線を先置きし、既存C1→両面花弁と進む。1辺1の紙で鳥の基本形は長さ1・幅√2−1、対応する翼2枚・脚2本の先がそれぞれ一致する。
+- C3(b)は `tests/mechanism-pocket-fixtures.mjs`。胴の中央2区間+90°、つばの中央2区間−90°、旧半折りの左右2区間+90°。正方形の口は面積0.5・深さ0.5。任意のtで閉じ≤1e-9、frame・guide・rank・topologyKeyは既存APIで扱う。
+- 調査データは `tests/mechanism-investigation.json`、再構築は同名の `.mjs`。紙コップの4案と舟の4案を保存し、終点だけの閉じを経路の成功と混同しない。論文§5.2の原則を採用したが、図の番号・位置との対応は未照合。

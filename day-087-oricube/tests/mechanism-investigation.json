@@ -1,0 +1,2608 @@
+{
+  "craneCandidates": [
+    {
+      "candidate": 1,
+      "assignment": [
+        -180,
+        0,
+        180,
+        0,
+        180,
+        0,
+        180,
+        0
+      ],
+      "error": "MECHANISM_NO_CONVERGENCE",
+      "step": 2,
+      "t": 0.50390625,
+      "residual": 3.938841461950141e-14
+    },
+    {
+      "candidate": 2,
+      "assignment": [
+        180,
+        0,
+        -180,
+        0,
+        180,
+        0,
+        180,
+        0
+      ],
+      "error": "MECHANISM_NO_CONVERGENCE",
+      "step": 2,
+      "t": 0.50390625,
+      "residual": 3.892135727836219e-14
+    },
+    {
+      "candidate": 3,
+      "assignment": [
+        180,
+        0,
+        180,
+        0,
+        -180,
+        0,
+        180,
+        0
+      ],
+      "error": "MECHANISM_BRANCH",
+      "step": 2,
+      "t": 0.50390625
+    },
+    {
+      "candidate": 4,
+      "assignment": [
+        -180,
+        0,
+        -180,
+        0,
+        -180,
+        0,
+        180,
+        0
+      ],
+      "error": "MECHANISM_BRANCH",
+      "step": 2,
+      "t": 0.50390625
+    },
+    {
+      "candidate": 5,
+      "assignment": [
+        180,
+        -180,
+        180,
+        0,
+        180,
+        -180,
+        180,
+        0
+      ],
+      "ok": true
+    },
+    {
+      "candidate": 6,
+      "assignment": [
+        180,
+        0,
+        180,
+        0,
+        180,
+        0,
+        -180,
+        0
+      ],
+      "error": "MECHANISM_BRANCH",
+      "step": 2,
+      "t": 0.50390625
+    },
+    {
+      "candidate": 7,
+      "assignment": [
+        -180,
+        0,
+        -180,
+        0,
+        180,
+        0,
+        -180,
+        0
+      ],
+      "error": "MECHANISM_BRANCH",
+      "step": 2,
+      "t": 0.50390625
+    },
+    {
+      "candidate": 8,
+      "assignment": [
+        -180,
+        0,
+        180,
+        0,
+        -180,
+        0,
+        -180,
+        0
+      ],
+      "error": "MECHANISM_NO_CONVERGENCE",
+      "step": 2,
+      "t": 0.50390625,
+      "residual": 3.892135727836219e-14
+    },
+    {
+      "candidate": 9,
+      "assignment": [
+        180,
+        0,
+        -180,
+        0,
+        -180,
+        0,
+        -180,
+        0
+      ],
+      "error": "MECHANISM_NO_CONVERGENCE",
+      "step": 2,
+      "t": 0.50390625,
+      "residual": 3.938841461950141e-14
+    },
+    {
+      "candidate": 10,
+      "assignment": [
+        -180,
+        180,
+        -180,
+        0,
+        -180,
+        180,
+        -180,
+        0
+      ],
+      "ok": true
+    },
+    {
+      "candidate": 11,
+      "assignment": [
+        -180,
+        0,
+        -180,
+        180,
+        -180,
+        0,
+        -180,
+        180
+      ],
+      "ok": true
+    },
+    {
+      "candidate": 12,
+      "assignment": [
+        180,
+        0,
+        180,
+        -180,
+        180,
+        0,
+        180,
+        -180
+      ],
+      "ok": true
+    }
+  ],
+  "cup": {
+    "method": "Bounded LM prototype: 300 iterations, centered differences 1e-5, initial damping 1e-10, no endpoint attractor. All mesh edges are auxiliary hinges; absolute crease angles stay in [-pi,pi]. Driver is the angle between front/back material normals. Four deterministic signed seeds have magnitude .01,.01,.3,.3.",
+    "front": [
+      0.7,
+      0.6
+    ],
+    "back": [
+      0.4,
+      0.3
+    ],
+    "designs": [
+      {
+        "design": 0,
+        "clusters": 28,
+        "hinges": 36,
+        "loops": 9,
+        "attempts": [
+          {
+            "attempt": 0,
+            "error": "MECHANISM_NO_CONVERGENCE",
+            "residual": 0.7096523655639966
+          },
+          {
+            "attempt": 1,
+            "error": "MECHANISM_NO_CONVERGENCE",
+            "residual": 0.880494595985594
+          },
+          {
+            "attempt": 2,
+            "error": "MECHANISM_NO_CONVERGENCE",
+            "residual": 0.09899366082955777
+          },
+          {
+            "attempt": 3,
+            "error": "MECHANISM_NO_CONVERGENCE",
+            "residual": 0.0016272462157820855
+          }
+        ],
+        "definition": {
+          "id": "cup-flat-fixture",
+          "paper": {
+            "width": 1,
+            "height": 1,
+            "rotationDeg": 45
+          },
+          "steps": [
+            {
+              "ops": [
+                {
+                  "type": "fold",
+                  "line": {
+                    "through": [
+                      "TL",
+                      "BR"
+                    ]
+                  },
+                  "moving": "BL",
+                  "mode": "valley",
+                  "tagMoved": "back",
+                  "tagStationary": "front"
+                }
+              ]
+            },
+            {
+              "ops": [
+                {
+                  "type": "fold",
+                  "line": {
+                    "perpBisector": [
+                      "TL",
+                      [
+                        0.29289321881345254,
+                        -0.41421356237309503
+                      ]
+                    ]
+                  },
+                  "moving": "TL",
+                  "mode": "valley",
+                  "tagMoved": "left-flap"
+                }
+              ]
+            },
+            {
+              "ops": [
+                {
+                  "type": "fold",
+                  "line": {
+                    "perpBisector": [
+                      "BR",
+                      [
+                        -0.29289321881345254,
+                        -0.41421356237309503
+                      ]
+                    ]
+                  },
+                  "moving": "BR",
+                  "mode": "valley",
+                  "tagMoved": "right-flap"
+                }
+              ]
+            },
+            {
+              "ops": [
+                {
+                  "type": "tag",
+                  "rect": [
+                    0.25,
+                    0.15,
+                    0.5,
+                    0.4
+                  ],
+                  "add": [
+                    "body"
+                  ]
+                },
+                {
+                  "type": "fold",
+                  "line": {
+                    "point": [
+                      0,
+                      -0.41421356237309503
+                    ],
+                    "dir": [
+                      1,
+                      0
+                    ]
+                  },
+                  "moving": "TR",
+                  "mode": "mountain",
+                  "select": {
+                    "tags": [
+                      "front"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "ops": [
+                {
+                  "type": "fold",
+                  "line": {
+                    "point": [
+                      0,
+                      -0.41421356237309503
+                    ],
+                    "dir": [
+                      1,
+                      0
+                    ]
+                  },
+                  "moving": "BL",
+                  "mode": "valley",
+                  "select": {
+                    "tags": [
+                      "back"
+                    ]
+                  },
+                  "stack": {
+                    "mode": "between",
+                    "upper": "left-flap",
+                    "lower": "body"
+                  }
+                }
+              ]
+            },
+            {
+              "ops": [
+                {
+                  "type": "scribe",
+                  "split": true,
+                  "segments": [
+                    [
+                      [
+                        0,
+                        -0.41421356237309503
+                      ],
+                      [
+                        0,
+                        0
+                      ]
+                    ]
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "constraintRank": 18,
+        "rankConfiguration": "flat singular start"
+      },
+      {
+        "design": 1,
+        "clusters": 68,
+        "hinges": 94,
+        "loops": 27,
+        "attempts": [
+          {
+            "attempt": 0,
+            "error": "MECHANISM_NO_CONVERGENCE",
+            "residual": 0.06884460847629724
+          },
+          {
+            "attempt": 1,
+            "error": "MECHANISM_NO_CONVERGENCE",
+            "residual": 0.02163682592098881
+          },
+          {
+            "attempt": 2,
+            "error": "MECHANISM_NO_CONVERGENCE",
+            "residual": 0.16154926045254453
+          },
+          {
+            "attempt": 3,
+            "error": "MECHANISM_NO_CONVERGENCE",
+            "residual": 0.08246025451082356
+          }
+        ],
+        "definition": {
+          "id": "cup-flat-fixture",
+          "paper": {
+            "width": 1,
+            "height": 1,
+            "rotationDeg": 45
+          },
+          "steps": [
+            {
+              "ops": [
+                {
+                  "type": "fold",
+                  "line": {
+                    "through": [
+                      "TL",
+                      "BR"
+                    ]
+                  },
+                  "moving": "BL",
+                  "mode": "valley",
+                  "tagMoved": "back",
+                  "tagStationary": "front"
+                }
+              ]
+            },
+            {
+              "ops": [
+                {
+                  "type": "fold",
+                  "line": {
+                    "perpBisector": [
+                      "TL",
+                      [
+                        0.29289321881345254,
+                        -0.41421356237309503
+                      ]
+                    ]
+                  },
+                  "moving": "TL",
+                  "mode": "valley",
+                  "tagMoved": "left-flap"
+                }
+              ]
+            },
+            {
+              "ops": [
+                {
+                  "type": "fold",
+                  "line": {
+                    "perpBisector": [
+                      "BR",
+                      [
+                        -0.29289321881345254,
+                        -0.41421356237309503
+                      ]
+                    ]
+                  },
+                  "moving": "BR",
+                  "mode": "valley",
+                  "tagMoved": "right-flap"
+                }
+              ]
+            },
+            {
+              "ops": [
+                {
+                  "type": "tag",
+                  "rect": [
+                    0.25,
+                    0.15,
+                    0.5,
+                    0.4
+                  ],
+                  "add": [
+                    "body"
+                  ]
+                },
+                {
+                  "type": "fold",
+                  "line": {
+                    "point": [
+                      0,
+                      -0.41421356237309503
+                    ],
+                    "dir": [
+                      1,
+                      0
+                    ]
+                  },
+                  "moving": "TR",
+                  "mode": "mountain",
+                  "select": {
+                    "tags": [
+                      "front"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "ops": [
+                {
+                  "type": "fold",
+                  "line": {
+                    "point": [
+                      0,
+                      -0.41421356237309503
+                    ],
+                    "dir": [
+                      1,
+                      0
+                    ]
+                  },
+                  "moving": "BL",
+                  "mode": "valley",
+                  "select": {
+                    "tags": [
+                      "back"
+                    ]
+                  },
+                  "stack": {
+                    "mode": "between",
+                    "upper": "left-flap",
+                    "lower": "body"
+                  }
+                }
+              ]
+            },
+            {
+              "ops": [
+                {
+                  "type": "scribe",
+                  "split": true,
+                  "segments": [
+                    [
+                      [
+                        0,
+                        -0.41421356237309503
+                      ],
+                      [
+                        0,
+                        0
+                      ]
+                    ],
+                    [
+                      [
+                        -0.05,
+                        -0.13807118745769834
+                      ],
+                      [
+                        0.05,
+                        -0.13807118745769834
+                      ]
+                    ]
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "constraintRank": 54,
+        "rankConfiguration": "flat singular start"
+      },
+      {
+        "design": 2,
+        "clusters": 60,
+        "hinges": 78,
+        "loops": 19,
+        "attempts": [
+          {
+            "attempt": 0,
+            "error": "MECHANISM_NO_CONVERGENCE",
+            "residual": 0.5433132127203293
+          },
+          {
+            "attempt": 1,
+            "error": "MECHANISM_NO_CONVERGENCE",
+            "residual": 0.5421527877589205
+          },
+          {
+            "attempt": 2,
+            "error": "MECHANISM_NO_CONVERGENCE",
+            "residual": 0.80195051661948
+          },
+          {
+            "attempt": 3,
+            "error": "MECHANISM_NO_CONVERGENCE",
+            "residual": 0.34535026870673224
+          }
+        ],
+        "definition": {
+          "id": "cup-flat-fixture",
+          "paper": {
+            "width": 1,
+            "height": 1,
+            "rotationDeg": 45
+          },
+          "steps": [
+            {
+              "ops": [
+                {
+                  "type": "fold",
+                  "line": {
+                    "through": [
+                      "TL",
+                      "BR"
+                    ]
+                  },
+                  "moving": "BL",
+                  "mode": "valley",
+                  "tagMoved": "back",
+                  "tagStationary": "front"
+                }
+              ]
+            },
+            {
+              "ops": [
+                {
+                  "type": "fold",
+                  "line": {
+                    "perpBisector": [
+                      "TL",
+                      [
+                        0.29289321881345254,
+                        -0.41421356237309503
+                      ]
+                    ]
+                  },
+                  "moving": "TL",
+                  "mode": "valley",
+                  "tagMoved": "left-flap"
+                }
+              ]
+            },
+            {
+              "ops": [
+                {
+                  "type": "fold",
+                  "line": {
+                    "perpBisector": [
+                      "BR",
+                      [
+                        -0.29289321881345254,
+                        -0.41421356237309503
+                      ]
+                    ]
+                  },
+                  "moving": "BR",
+                  "mode": "valley",
+                  "tagMoved": "right-flap"
+                }
+              ]
+            },
+            {
+              "ops": [
+                {
+                  "type": "tag",
+                  "rect": [
+                    0.25,
+                    0.15,
+                    0.5,
+                    0.4
+                  ],
+                  "add": [
+                    "body"
+                  ]
+                },
+                {
+                  "type": "fold",
+                  "line": {
+                    "point": [
+                      0,
+                      -0.41421356237309503
+                    ],
+                    "dir": [
+                      1,
+                      0
+                    ]
+                  },
+                  "moving": "TR",
+                  "mode": "mountain",
+                  "select": {
+                    "tags": [
+                      "front"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "ops": [
+                {
+                  "type": "fold",
+                  "line": {
+                    "point": [
+                      0,
+                      -0.41421356237309503
+                    ],
+                    "dir": [
+                      1,
+                      0
+                    ]
+                  },
+                  "moving": "BL",
+                  "mode": "valley",
+                  "select": {
+                    "tags": [
+                      "back"
+                    ]
+                  },
+                  "stack": {
+                    "mode": "between",
+                    "upper": "left-flap",
+                    "lower": "body"
+                  }
+                }
+              ]
+            },
+            {
+              "ops": [
+                {
+                  "type": "scribe",
+                  "split": true,
+                  "segments": [
+                    [
+                      [
+                        0,
+                        -0.41421356237309503
+                      ],
+                      [
+                        0,
+                        0
+                      ]
+                    ],
+                    [
+                      [
+                        0,
+                        0
+                      ],
+                      [
+                        -0.1,
+                        -0.41421356237309503
+                      ]
+                    ],
+                    [
+                      [
+                        0,
+                        0
+                      ],
+                      [
+                        0.1,
+                        -0.41421356237309503
+                      ]
+                    ]
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "constraintRank": 38,
+        "rankConfiguration": "flat singular start"
+      },
+      {
+        "design": 3,
+        "clusters": 20,
+        "hinges": 24,
+        "loops": 5,
+        "attempts": [
+          {
+            "attempt": 0,
+            "residual": 2.220446049250313e-16,
+            "closed": true,
+            "angles": [
+              1.4186959154433083,
+              -1.5427265343170715,
+              8.637046788453222e-06,
+              -0.04859279685807686,
+              -0.0041233127193314794,
+              0.03468362681287536,
+              0.06684118601967283,
+              -0.01833945853798123,
+              -0.09527378350681322,
+              0.037383972842116406,
+              1.26382146050215,
+              -0.054790724118580277,
+              0.014220271366032829,
+              -1.5091161066235637,
+              -0.06684010597998087,
+              1.2811125727156059,
+              -5.467150346804233e-09,
+              -0.207059813612943,
+              0.1466752359547078,
+              -0.20705981908009327,
+              0.11406560700285365,
+              -1.4078857779369223,
+              0.006145187419469725,
+              0.14667522822298937
+            ]
+          },
+          {
+            "attempt": 1,
+            "residual": 2.220446049250313e-16,
+            "closed": true,
+            "angles": [
+              1.2088456500184837,
+              -1.3672659833895928,
+              7.211796232725791e-08,
+              -0.343318180807324,
+              -0.12514892046859663,
+              2.0080130304576067e-06,
+              0.4675374602588897,
+              -0.12574427960481413,
+              -0.6726380692758445,
+              0.26934501085085366,
+              0.5313296869444419,
+              -0.0008439730278707339,
+              0.0005953703467367343,
+              -0.5547822082015116,
+              -0.7349161861148209,
+              0.012752273537534789,
+              -8.240582238332578e-10,
+              8.24058071407945e-10,
+              -0.4843808545045024,
+              -1.1299178860532943e-16,
+              0.6716385869312346,
+              -1.3138995915232994,
+              0.614118090561735,
+              0.4843808533391083
+            ]
+          },
+          {
+            "attempt": 2,
+            "error": "MECHANISM_NO_CONVERGENCE",
+            "residual": 0.0014779782629685267
+          },
+          {
+            "attempt": 3,
+            "error": "MECHANISM_NO_CONVERGENCE",
+            "residual": 0.002105413259811839
+          }
+        ],
+        "definition": {
+          "id": "cup-flat-fixture",
+          "paper": {
+            "width": 1,
+            "height": 1,
+            "rotationDeg": 45
+          },
+          "steps": [
+            {
+              "ops": [
+                {
+                  "type": "fold",
+                  "line": {
+                    "through": [
+                      "TL",
+                      "BR"
+                    ]
+                  },
+                  "moving": "BL",
+                  "mode": "valley",
+                  "tagMoved": "back",
+                  "tagStationary": "front"
+                }
+              ]
+            },
+            {
+              "ops": [
+                {
+                  "type": "fold",
+                  "line": {
+                    "perpBisector": [
+                      "TL",
+                      [
+                        0.29289321881345254,
+                        -0.41421356237309503
+                      ]
+                    ]
+                  },
+                  "moving": "TL",
+                  "mode": "valley",
+                  "tagMoved": "left-flap"
+                }
+              ]
+            },
+            {
+              "ops": [
+                {
+                  "type": "fold",
+                  "line": {
+                    "perpBisector": [
+                      "BR",
+                      [
+                        -0.29289321881345254,
+                        -0.41421356237309503
+                      ]
+                    ]
+                  },
+                  "moving": "BR",
+                  "mode": "valley",
+                  "tagMoved": "right-flap"
+                }
+              ]
+            },
+            {
+              "ops": [
+                {
+                  "type": "scribe",
+                  "split": true,
+                  "segments": [
+                    [
+                      [
+                        0,
+                        -0.41421356237309503
+                      ],
+                      [
+                        0,
+                        0
+                      ]
+                    ]
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "constraintRank": 15,
+        "rankConfiguration": "closed 90-degree endpoint",
+        "pathFailures": [
+          {
+            "attempt": 0,
+            "residual": 7.098226650326767e-08
+          },
+          {
+            "attempt": 1,
+            "residual": 6.095573126318555e-07
+          }
+        ]
+      }
+    ]
+  },
+  "boat": [
+    {
+      "n": 12,
+      "definition": {
+        "id": "boat-squash-probe-12",
+        "paper": {
+          "width": 1,
+          "height": 1.4142135623730951
+        },
+        "marks": {
+          "roofL": [
+            0,
+            0.20710678118654757
+          ],
+          "roofR": [
+            1,
+            0.20710678118654757
+          ],
+          "backL": [
+            0,
+            1.2071067811865475
+          ],
+          "backR": [
+            1,
+            1.2071067811865475
+          ]
+        },
+        "steps": [
+          {
+            "ops": [
+              {
+                "type": "fold",
+                "line": {
+                  "through": [
+                    "L",
+                    "R"
+                  ]
+                },
+                "moving": "TL",
+                "mode": "valley",
+                "tagMoved": "back",
+                "tagStationary": "front"
+              }
+            ]
+          },
+          {
+            "ops": [
+              {
+                "type": "fold",
+                "line": {
+                  "through": [
+                    "C",
+                    "roofL"
+                  ]
+                },
+                "moving": "L",
+                "mode": "valley"
+              }
+            ]
+          },
+          {
+            "ops": [
+              {
+                "type": "fold",
+                "line": {
+                  "through": [
+                    "C",
+                    "roofR"
+                  ]
+                },
+                "moving": "R",
+                "mode": "valley"
+              }
+            ]
+          },
+          {
+            "ops": [
+              {
+                "type": "fold",
+                "line": {
+                  "through": [
+                    "roofL",
+                    "roofR"
+                  ]
+                },
+                "moving": "BL",
+                "mode": "valley",
+                "select": {
+                  "tags": [
+                    "back"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "ops": [
+              {
+                "type": "fold",
+                "line": {
+                  "through": [
+                    "roofL",
+                    "roofR"
+                  ]
+                },
+                "moving": "BL",
+                "mode": "mountain",
+                "select": {
+                  "tags": [
+                    "front"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "ops": [
+              {
+                "type": "scribe",
+                "split": true,
+                "segments": [
+                  [
+                    "C",
+                    "B"
+                  ]
+                ]
+              },
+              {
+                "type": "tag",
+                "rect": [
+                  0.65,
+                  0.36,
+                  0.68,
+                  0.39
+                ],
+                "add": [
+                  "pin"
+                ]
+              }
+            ]
+          },
+          {
+            "ops": [
+              {
+                "type": "mechanism",
+                "pin": {
+                  "tags": [
+                    "pin"
+                  ]
+                },
+                "hinges": [
+                  {
+                    "line": {
+                      "through": [
+                        [
+                          0.5,
+                          0
+                        ],
+                        [
+                          0.5,
+                          0.20710678118654757
+                        ]
+                      ]
+                    },
+                    "degrees": -180
+                  },
+                  {
+                    "line": {
+                      "through": [
+                        [
+                          0,
+                          0.20710678118654757
+                        ],
+                        [
+                          0.5,
+                          0.20710678118654757
+                        ]
+                      ]
+                    },
+                    "degrees": -180
+                  },
+                  {
+                    "line": {
+                      "through": [
+                        [
+                          1,
+                          0.20710678118654757
+                        ],
+                        [
+                          0.5,
+                          0.20710678118654757
+                        ]
+                      ]
+                    },
+                    "degrees": -180
+                  },
+                  {
+                    "line": {
+                      "through": [
+                        [
+                          0.5,
+                          0.7071067811865476
+                        ],
+                        [
+                          0.5,
+                          0.20710678118654757
+                        ]
+                      ]
+                    },
+                    "degrees": 180
+                  },
+                  {
+                    "line": {
+                      "through": [
+                        [
+                          0.5,
+                          0.7071067811865476
+                        ],
+                        [
+                          0,
+                          0.20710678118654757
+                        ]
+                      ]
+                    },
+                    "degrees": 0
+                  },
+                  {
+                    "line": {
+                      "through": [
+                        [
+                          0.5,
+                          0.7071067811865476
+                        ],
+                        [
+                          1,
+                          0.20710678118654757
+                        ]
+                      ]
+                    },
+                    "degrees": 0
+                  },
+                  {
+                    "line": {
+                      "through": [
+                        [
+                          1,
+                          0.7071067811865476
+                        ],
+                        [
+                          0.5,
+                          0.7071067811865476
+                        ]
+                      ]
+                    },
+                    "degrees": 180
+                  },
+                  {
+                    "line": {
+                      "through": [
+                        [
+                          1,
+                          1.2071067811865475
+                        ],
+                        [
+                          0.5,
+                          1.2071067811865475
+                        ]
+                      ]
+                    },
+                    "degrees": -180
+                  },
+                  {
+                    "line": {
+                      "through": [
+                        [
+                          0.5,
+                          1.4142135623730951
+                        ],
+                        [
+                          0.5,
+                          1.2071067811865475
+                        ]
+                      ]
+                    },
+                    "degrees": -180
+                  },
+                  {
+                    "line": {
+                      "through": [
+                        [
+                          0.5,
+                          0.7071067811865476
+                        ],
+                        [
+                          0.5,
+                          1.2071067811865475
+                        ]
+                      ]
+                    },
+                    "degrees": 180
+                  },
+                  {
+                    "line": {
+                      "through": [
+                        [
+                          0.5,
+                          0.7071067811865476
+                        ],
+                        [
+                          1,
+                          1.2071067811865475
+                        ]
+                      ]
+                    },
+                    "degrees": -180
+                  },
+                  {
+                    "line": {
+                      "through": [
+                        [
+                          0.5,
+                          0.7071067811865476
+                        ],
+                        [
+                          0,
+                          0.7071067811865476
+                        ]
+                      ]
+                    },
+                    "degrees": 180
+                  },
+                  {
+                    "line": {
+                      "through": [
+                        [
+                          0,
+                          1.2071067811865475
+                        ],
+                        [
+                          0.5,
+                          1.2071067811865475
+                        ]
+                      ]
+                    },
+                    "degrees": -180
+                  },
+                  {
+                    "line": {
+                      "through": [
+                        [
+                          0.5,
+                          0.7071067811865476
+                        ],
+                        [
+                          0,
+                          1.2071067811865475
+                        ]
+                      ]
+                    },
+                    "degrees": -180
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "trials": [
+        {
+          "n": 12,
+          "a": -180,
+          "b": -180,
+          "error": "MECHANISM_NO_CONVERGENCE",
+          "t": 0.001,
+          "residual": 0.005257587902727019
+        },
+        {
+          "n": 12,
+          "a": -180,
+          "b": 180,
+          "error": "MECHANISM_BRANCH",
+          "t": 0.66796875
+        },
+        {
+          "n": 12,
+          "a": 180,
+          "b": -180,
+          "error": "MECHANISM_BRANCH",
+          "t": 0.66796875
+        },
+        {
+          "n": 12,
+          "a": 180,
+          "b": 180,
+          "residual": 1.1318970333149723e-15,
+          "poly": [
+            [
+              0,
+              0
+            ],
+            [
+              0.4999999999999999,
+              -1.1102230246251565e-16
+            ],
+            [
+              0.4999999999999998,
+              0.4999999999999998
+            ],
+            [
+              0,
+              0.5
+            ]
+          ],
+          "lens": [
+            0.4999999999999999,
+            0.4999999999999999,
+            0.4999999999999998,
+            0.5
+          ],
+          "angles": [
+            -3.141592653589793,
+            0,
+            0,
+            3.141592653589793,
+            -3.141592653589793,
+            -3.141592653589793,
+            0,
+            0,
+            -3.141592653589793,
+            3.141592653589793,
+            0,
+            0,
+            0,
+            0
+          ],
+          "ok": true
+        }
+      ],
+      "rejection": {
+        "endpointOutline": "square, side 0.5",
+        "interiorCrossing": {
+          "progress": 0.00390625,
+          "faces": [
+            0,
+            12
+          ]
+        },
+        "modelError": "MECHANISM_LAYER_AMBIGUOUS"
+      }
+    },
+    {
+      "n": 15,
+      "definition": {
+        "id": "boat-squash-probe-15",
+        "paper": {
+          "width": 1,
+          "height": 1.4142135623730951
+        },
+        "marks": {
+          "roofL": [
+            0,
+            0.20710678118654757
+          ],
+          "roofR": [
+            1,
+            0.20710678118654757
+          ],
+          "backL": [
+            0,
+            1.2071067811865475
+          ],
+          "backR": [
+            1,
+            1.2071067811865475
+          ]
+        },
+        "steps": [
+          {
+            "ops": [
+              {
+                "type": "fold",
+                "line": {
+                  "through": [
+                    "L",
+                    "R"
+                  ]
+                },
+                "moving": "TL",
+                "mode": "valley",
+                "tagMoved": "back",
+                "tagStationary": "front"
+              }
+            ]
+          },
+          {
+            "ops": [
+              {
+                "type": "fold",
+                "line": {
+                  "through": [
+                    "C",
+                    "roofL"
+                  ]
+                },
+                "moving": "L",
+                "mode": "valley"
+              }
+            ]
+          },
+          {
+            "ops": [
+              {
+                "type": "fold",
+                "line": {
+                  "through": [
+                    "C",
+                    "roofR"
+                  ]
+                },
+                "moving": "R",
+                "mode": "valley"
+              }
+            ]
+          },
+          {
+            "ops": [
+              {
+                "type": "fold",
+                "line": {
+                  "through": [
+                    "roofL",
+                    "roofR"
+                  ]
+                },
+                "moving": "BL",
+                "mode": "valley",
+                "select": {
+                  "tags": [
+                    "back"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "ops": [
+              {
+                "type": "fold",
+                "line": {
+                  "through": [
+                    "roofL",
+                    "roofR"
+                  ]
+                },
+                "moving": "BL",
+                "mode": "mountain",
+                "select": {
+                  "tags": [
+                    "front"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "ops": [
+              {
+                "type": "scribe",
+                "split": true,
+                "segments": [
+                  [
+                    "C",
+                    "B"
+                  ]
+                ]
+              },
+              {
+                "type": "tag",
+                "rect": [
+                  0.65,
+                  0.36,
+                  0.68,
+                  0.39
+                ],
+                "add": [
+                  "pin"
+                ]
+              }
+            ]
+          },
+          {
+            "ops": [
+              {
+                "type": "mechanism",
+                "pin": {
+                  "tags": [
+                    "pin"
+                  ]
+                },
+                "hinges": [
+                  {
+                    "line": {
+                      "through": [
+                        [
+                          0.5,
+                          0
+                        ],
+                        [
+                          0.5,
+                          0.20710678118654757
+                        ]
+                      ]
+                    },
+                    "degrees": -180
+                  },
+                  {
+                    "line": {
+                      "through": [
+                        [
+                          0,
+                          0.20710678118654757
+                        ],
+                        [
+                          0.5,
+                          0.20710678118654757
+                        ]
+                      ]
+                    },
+                    "degrees": 0
+                  },
+                  {
+                    "line": {
+                      "through": [
+                        [
+                          1,
+                          0.20710678118654757
+                        ],
+                        [
+                          0.5,
+                          0.20710678118654757
+                        ]
+                      ]
+                    },
+                    "degrees": 0
+                  },
+                  {
+                    "line": {
+                      "through": [
+                        [
+                          0.5,
+                          0.7071067811865476
+                        ],
+                        [
+                          0.5,
+                          0.20710678118654757
+                        ]
+                      ]
+                    },
+                    "degrees": 180
+                  },
+                  {
+                    "line": {
+                      "through": [
+                        [
+                          0.5,
+                          0.7071067811865476
+                        ],
+                        [
+                          0,
+                          0.20710678118654757
+                        ]
+                      ]
+                    },
+                    "degrees": 0
+                  },
+                  {
+                    "line": {
+                      "through": [
+                        [
+                          0.5,
+                          0.7071067811865476
+                        ],
+                        [
+                          1,
+                          0.20710678118654757
+                        ]
+                      ]
+                    },
+                    "degrees": 0
+                  },
+                  {
+                    "line": {
+                      "through": [
+                        [
+                          1,
+                          0.7071067811865476
+                        ],
+                        [
+                          0.5,
+                          0.7071067811865476
+                        ]
+                      ]
+                    },
+                    "degrees": 180
+                  },
+                  {
+                    "line": {
+                      "through": [
+                        [
+                          1,
+                          1.2071067811865475
+                        ],
+                        [
+                          0.5,
+                          1.2071067811865475
+                        ]
+                      ]
+                    },
+                    "degrees": -180
+                  },
+                  {
+                    "line": {
+                      "through": [
+                        [
+                          0.5,
+                          1.4142135623730951
+                        ],
+                        [
+                          0.5,
+                          1.2071067811865475
+                        ]
+                      ]
+                    },
+                    "degrees": -180
+                  },
+                  {
+                    "line": {
+                      "through": [
+                        [
+                          0.5,
+                          0.7071067811865476
+                        ],
+                        [
+                          0.5,
+                          1.2071067811865475
+                        ]
+                      ]
+                    },
+                    "degrees": 180
+                  },
+                  {
+                    "line": {
+                      "through": [
+                        [
+                          0.5,
+                          0.7071067811865476
+                        ],
+                        [
+                          1,
+                          1.2071067811865475
+                        ]
+                      ]
+                    },
+                    "degrees": -180
+                  },
+                  {
+                    "line": {
+                      "through": [
+                        [
+                          0.5,
+                          0.7071067811865476
+                        ],
+                        [
+                          0,
+                          0.7071067811865476
+                        ]
+                      ]
+                    },
+                    "degrees": 180
+                  },
+                  {
+                    "line": {
+                      "through": [
+                        [
+                          0,
+                          1.2071067811865475
+                        ],
+                        [
+                          0.5,
+                          1.2071067811865475
+                        ]
+                      ]
+                    },
+                    "degrees": -180
+                  },
+                  {
+                    "line": {
+                      "through": [
+                        [
+                          0.5,
+                          0.7071067811865476
+                        ],
+                        [
+                          0,
+                          1.2071067811865475
+                        ]
+                      ]
+                    },
+                    "degrees": -180
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "trials": [
+        {
+          "n": 15,
+          "a": -180,
+          "b": -180,
+          "error": "MECHANISM_NO_CONVERGENCE",
+          "t": 0.001,
+          "residual": 1.1368714300997944e-06
+        },
+        {
+          "n": 15,
+          "a": -180,
+          "b": 180,
+          "error": "MECHANISM_BRANCH",
+          "t": 0.0625
+        },
+        {
+          "n": 15,
+          "a": 180,
+          "b": -180,
+          "error": "MECHANISM_NO_CONVERGENCE",
+          "t": 0.50390625,
+          "residual": 3.730349362740526e-14
+        },
+        {
+          "n": 15,
+          "a": 180,
+          "b": 180,
+          "error": "MECHANISM_BRANCH",
+          "t": 0.75390625
+        }
+      ],
+      "endpointOutline": "The body is square but the full outline is not a rhombus."
+    },
+    {
+      "n": 876,
+      "definition": {
+        "id": "boat-squash-probe-876",
+        "paper": {
+          "width": 1,
+          "height": 1.4142135623730951
+        },
+        "marks": {
+          "roofL": [
+            0,
+            0.20710678118654757
+          ],
+          "roofR": [
+            1,
+            0.20710678118654757
+          ],
+          "backL": [
+            0,
+            1.2071067811865475
+          ],
+          "backR": [
+            1,
+            1.2071067811865475
+          ]
+        },
+        "steps": [
+          {
+            "ops": [
+              {
+                "type": "fold",
+                "line": {
+                  "through": [
+                    "L",
+                    "R"
+                  ]
+                },
+                "moving": "TL",
+                "mode": "valley",
+                "tagMoved": "back",
+                "tagStationary": "front"
+              }
+            ]
+          },
+          {
+            "ops": [
+              {
+                "type": "fold",
+                "line": {
+                  "through": [
+                    "C",
+                    "roofL"
+                  ]
+                },
+                "moving": "L",
+                "mode": "valley"
+              }
+            ]
+          },
+          {
+            "ops": [
+              {
+                "type": "fold",
+                "line": {
+                  "through": [
+                    "C",
+                    "roofR"
+                  ]
+                },
+                "moving": "R",
+                "mode": "valley"
+              }
+            ]
+          },
+          {
+            "ops": [
+              {
+                "type": "fold",
+                "line": {
+                  "through": [
+                    "roofL",
+                    "roofR"
+                  ]
+                },
+                "moving": "BL",
+                "mode": "valley",
+                "select": {
+                  "tags": [
+                    "back"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "ops": [
+              {
+                "type": "fold",
+                "line": {
+                  "through": [
+                    "roofL",
+                    "roofR"
+                  ]
+                },
+                "moving": "BL",
+                "mode": "mountain",
+                "select": {
+                  "tags": [
+                    "front"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "ops": [
+              {
+                "type": "scribe",
+                "split": true,
+                "segments": [
+                  [
+                    "C",
+                    "B"
+                  ]
+                ]
+              },
+              {
+                "type": "tag",
+                "rect": [
+                  0.65,
+                  0.36,
+                  0.68,
+                  0.39
+                ],
+                "add": [
+                  "pin"
+                ]
+              }
+            ]
+          },
+          {
+            "ops": [
+              {
+                "type": "mechanism",
+                "pin": {
+                  "tags": [
+                    "pin"
+                  ]
+                },
+                "hinges": [
+                  {
+                    "line": {
+                      "through": [
+                        [
+                          0.5,
+                          0
+                        ],
+                        [
+                          0.5,
+                          0.20710678118654757
+                        ]
+                      ]
+                    },
+                    "degrees": -180
+                  },
+                  {
+                    "line": {
+                      "through": [
+                        [
+                          0,
+                          0.20710678118654757
+                        ],
+                        [
+                          0.5,
+                          0.20710678118654757
+                        ]
+                      ]
+                    },
+                    "degrees": -180
+                  },
+                  {
+                    "line": {
+                      "through": [
+                        [
+                          1,
+                          0.20710678118654757
+                        ],
+                        [
+                          0.5,
+                          0.20710678118654757
+                        ]
+                      ]
+                    },
+                    "degrees": -180
+                  },
+                  {
+                    "line": {
+                      "through": [
+                        [
+                          0.5,
+                          0.7071067811865476
+                        ],
+                        [
+                          0.5,
+                          0.20710678118654757
+                        ]
+                      ]
+                    },
+                    "degrees": 180
+                  },
+                  {
+                    "line": {
+                      "through": [
+                        [
+                          0.5,
+                          0.7071067811865476
+                        ],
+                        [
+                          0,
+                          0.20710678118654757
+                        ]
+                      ]
+                    },
+                    "degrees": 0
+                  },
+                  {
+                    "line": {
+                      "through": [
+                        [
+                          0.5,
+                          0.7071067811865476
+                        ],
+                        [
+                          1,
+                          0.20710678118654757
+                        ]
+                      ]
+                    },
+                    "degrees": 0
+                  },
+                  {
+                    "line": {
+                      "through": [
+                        [
+                          1,
+                          0.7071067811865476
+                        ],
+                        [
+                          0.5,
+                          0.7071067811865476
+                        ]
+                      ]
+                    },
+                    "degrees": 180
+                  },
+                  {
+                    "line": {
+                      "through": [
+                        [
+                          1,
+                          1.2071067811865475
+                        ],
+                        [
+                          0.5,
+                          1.2071067811865475
+                        ]
+                      ]
+                    },
+                    "degrees": 0
+                  },
+                  {
+                    "line": {
+                      "through": [
+                        [
+                          0.5,
+                          1.4142135623730951
+                        ],
+                        [
+                          0.5,
+                          1.2071067811865475
+                        ]
+                      ]
+                    },
+                    "degrees": -180
+                  },
+                  {
+                    "line": {
+                      "through": [
+                        [
+                          0.5,
+                          0.7071067811865476
+                        ],
+                        [
+                          0.5,
+                          1.2071067811865475
+                        ]
+                      ]
+                    },
+                    "degrees": 180
+                  },
+                  {
+                    "line": {
+                      "through": [
+                        [
+                          0.5,
+                          0.7071067811865476
+                        ],
+                        [
+                          1,
+                          1.2071067811865475
+                        ]
+                      ]
+                    },
+                    "degrees": 0
+                  },
+                  {
+                    "line": {
+                      "through": [
+                        [
+                          0.5,
+                          0.7071067811865476
+                        ],
+                        [
+                          0,
+                          0.7071067811865476
+                        ]
+                      ]
+                    },
+                    "degrees": 180
+                  },
+                  {
+                    "line": {
+                      "through": [
+                        [
+                          0,
+                          1.2071067811865475
+                        ],
+                        [
+                          0.5,
+                          1.2071067811865475
+                        ]
+                      ]
+                    },
+                    "degrees": 0
+                  },
+                  {
+                    "line": {
+                      "through": [
+                        [
+                          0.5,
+                          0.7071067811865476
+                        ],
+                        [
+                          0,
+                          1.2071067811865475
+                        ]
+                      ]
+                    },
+                    "degrees": 0
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "trials": [
+        {
+          "n": 876,
+          "a": -180,
+          "b": -180,
+          "error": "MECHANISM_NO_CONVERGENCE",
+          "t": 0.001,
+          "residual": 6.517475615645276e-07
+        },
+        {
+          "n": 876,
+          "a": -180,
+          "b": 180,
+          "error": "MECHANISM_NO_CONVERGENCE",
+          "t": 0.001,
+          "residual": 1.5710124481832515e-06
+        },
+        {
+          "n": 876,
+          "a": 180,
+          "b": -180,
+          "error": "MECHANISM_NO_CONVERGENCE",
+          "t": 0.001,
+          "residual": 1.571081330736525e-06
+        },
+        {
+          "n": 876,
+          "a": 180,
+          "b": 180,
+          "error": "MECHANISM_NO_CONVERGENCE",
+          "t": 0.001,
+          "residual": 2.107786689318213e-06
+        }
+      ],
+      "endpointOutline": "The body is square but the full outline is not a rhombus."
+    },
+    {
+      "n": 879,
+      "definition": {
+        "id": "boat-squash-probe-879",
+        "paper": {
+          "width": 1,
+          "height": 1.4142135623730951
+        },
+        "marks": {
+          "roofL": [
+            0,
+            0.20710678118654757
+          ],
+          "roofR": [
+            1,
+            0.20710678118654757
+          ],
+          "backL": [
+            0,
+            1.2071067811865475
+          ],
+          "backR": [
+            1,
+            1.2071067811865475
+          ]
+        },
+        "steps": [
+          {
+            "ops": [
+              {
+                "type": "fold",
+                "line": {
+                  "through": [
+                    "L",
+                    "R"
+                  ]
+                },
+                "moving": "TL",
+                "mode": "valley",
+                "tagMoved": "back",
+                "tagStationary": "front"
+              }
+            ]
+          },
+          {
+            "ops": [
+              {
+                "type": "fold",
+                "line": {
+                  "through": [
+                    "C",
+                    "roofL"
+                  ]
+                },
+                "moving": "L",
+                "mode": "valley"
+              }
+            ]
+          },
+          {
+            "ops": [
+              {
+                "type": "fold",
+                "line": {
+                  "through": [
+                    "C",
+                    "roofR"
+                  ]
+                },
+                "moving": "R",
+                "mode": "valley"
+              }
+            ]
+          },
+          {
+            "ops": [
+              {
+                "type": "fold",
+                "line": {
+                  "through": [
+                    "roofL",
+                    "roofR"
+                  ]
+                },
+                "moving": "BL",
+                "mode": "valley",
+                "select": {
+                  "tags": [
+                    "back"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "ops": [
+              {
+                "type": "fold",
+                "line": {
+                  "through": [
+                    "roofL",
+                    "roofR"
+                  ]
+                },
+                "moving": "BL",
+                "mode": "mountain",
+                "select": {
+                  "tags": [
+                    "front"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "ops": [
+              {
+                "type": "scribe",
+                "split": true,
+                "segments": [
+                  [
+                    "C",
+                    "B"
+                  ]
+                ]
+              },
+              {
+                "type": "tag",
+                "rect": [
+                  0.65,
+                  0.36,
+                  0.68,
+                  0.39
+                ],
+                "add": [
+                  "pin"
+                ]
+              }
+            ]
+          },
+          {
+            "ops": [
+              {
+                "type": "mechanism",
+                "pin": {
+                  "tags": [
+                    "pin"
+                  ]
+                },
+                "hinges": [
+                  {
+                    "line": {
+                      "through": [
+                        [
+                          0.5,
+                          0
+                        ],
+                        [
+                          0.5,
+                          0.20710678118654757
+                        ]
+                      ]
+                    },
+                    "degrees": -180
+                  },
+                  {
+                    "line": {
+                      "through": [
+                        [
+                          0,
+                          0.20710678118654757
+                        ],
+                        [
+                          0.5,
+                          0.20710678118654757
+                        ]
+                      ]
+                    },
+                    "degrees": 0
+                  },
+                  {
+                    "line": {
+                      "through": [
+                        [
+                          1,
+                          0.20710678118654757
+                        ],
+                        [
+                          0.5,
+                          0.20710678118654757
+                        ]
+                      ]
+                    },
+                    "degrees": 0
+                  },
+                  {
+                    "line": {
+                      "through": [
+                        [
+                          0.5,
+                          0.7071067811865476
+                        ],
+                        [
+                          0.5,
+                          0.20710678118654757
+                        ]
+                      ]
+                    },
+                    "degrees": 180
+                  },
+                  {
+                    "line": {
+                      "through": [
+                        [
+                          0.5,
+                          0.7071067811865476
+                        ],
+                        [
+                          0,
+                          0.20710678118654757
+                        ]
+                      ]
+                    },
+                    "degrees": 0
+                  },
+                  {
+                    "line": {
+                      "through": [
+                        [
+                          0.5,
+                          0.7071067811865476
+                        ],
+                        [
+                          1,
+                          0.20710678118654757
+                        ]
+                      ]
+                    },
+                    "degrees": 0
+                  },
+                  {
+                    "line": {
+                      "through": [
+                        [
+                          1,
+                          0.7071067811865476
+                        ],
+                        [
+                          0.5,
+                          0.7071067811865476
+                        ]
+                      ]
+                    },
+                    "degrees": 180
+                  },
+                  {
+                    "line": {
+                      "through": [
+                        [
+                          1,
+                          1.2071067811865475
+                        ],
+                        [
+                          0.5,
+                          1.2071067811865475
+                        ]
+                      ]
+                    },
+                    "degrees": 0
+                  },
+                  {
+                    "line": {
+                      "through": [
+                        [
+                          0.5,
+                          1.4142135623730951
+                        ],
+                        [
+                          0.5,
+                          1.2071067811865475
+                        ]
+                      ]
+                    },
+                    "degrees": -180
+                  },
+                  {
+                    "line": {
+                      "through": [
+                        [
+                          0.5,
+                          0.7071067811865476
+                        ],
+                        [
+                          0.5,
+                          1.2071067811865475
+                        ]
+                      ]
+                    },
+                    "degrees": 180
+                  },
+                  {
+                    "line": {
+                      "through": [
+                        [
+                          0.5,
+                          0.7071067811865476
+                        ],
+                        [
+                          1,
+                          1.2071067811865475
+                        ]
+                      ]
+                    },
+                    "degrees": 0
+                  },
+                  {
+                    "line": {
+                      "through": [
+                        [
+                          0.5,
+                          0.7071067811865476
+                        ],
+                        [
+                          0,
+                          0.7071067811865476
+                        ]
+                      ]
+                    },
+                    "degrees": 180
+                  },
+                  {
+                    "line": {
+                      "through": [
+                        [
+                          0,
+                          1.2071067811865475
+                        ],
+                        [
+                          0.5,
+                          1.2071067811865475
+                        ]
+                      ]
+                    },
+                    "degrees": 0
+                  },
+                  {
+                    "line": {
+                      "through": [
+                        [
+                          0.5,
+                          0.7071067811865476
+                        ],
+                        [
+                          0,
+                          1.2071067811865475
+                        ]
+                      ]
+                    },
+                    "degrees": 0
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "trials": [
+        {
+          "n": 879,
+          "a": -180,
+          "b": -180,
+          "error": "MECHANISM_NO_CONVERGENCE",
+          "t": 0.001,
+          "residual": 6.940902540021784e-07
+        },
+        {
+          "n": 879,
+          "a": -180,
+          "b": 180,
+          "error": "MECHANISM_NO_CONVERGENCE",
+          "t": 0.33984375,
+          "residual": 3.831129366141301e-14
+        },
+        {
+          "n": 879,
+          "a": 180,
+          "b": -180,
+          "error": "MECHANISM_NO_CONVERGENCE",
+          "t": 0.001,
+          "residual": 3.8359142682273225e-08
+        },
+        {
+          "n": 879,
+          "a": 180,
+          "b": 180,
+          "error": "MECHANISM_NO_CONVERGENCE",
+          "t": 0.001,
+          "residual": 1.9013490474927799e-06
+        }
+      ],
+      "endpointOutline": "The body is square but the full outline is not a rhombus."
+    }
+  ],
+  "note": "Saved failed local solves are not proofs of rigid infeasibility. Mesh-triangulation edges in cup probes are experimental auxiliary creases, not a certified traditional crease pattern."
+}
