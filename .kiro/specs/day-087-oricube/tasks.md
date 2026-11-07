@@ -59,8 +59,9 @@
   - _Depends: 7_
   - _Boundary: lib/models/, tests/_
   - _Requirements: 5.1,5.7,3.4_
-- [ ] 12. 袋を開く作品を足す（かぶと・舟・紙コップ）
-  - _Depends: 9_
+- [ ] 12. 平面の作品を足す（ヨット・ちょうちょ・もみの木）。袋を開く作品（かぶと・舟・紙コップ）は見送り
+  - かぶとは開いた形が十字になり実物と違った（models-more.md の「見送り」）。
+  - _Depends: 7_
   - _Boundary: lib/models/, tests/_
   - _Requirements: 5.1,5.6,5.7_
 - [ ] 13. 鶴を足す

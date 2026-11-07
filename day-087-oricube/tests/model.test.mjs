@@ -7,7 +7,9 @@ import {assertSheet} from '../lib/ops.js';
 import {paperPoint} from '../lib/sheet.js';
 import {projection} from '../lib/stack.js';
 // The linked, non-rigid drive has its own independent analytic checks in tray.test.
-const models=MODELS.filter(d=>!d.steps.some(s=>s.ops.some(o=>o.type==='drive'))).map(buildModel);
+// Models with a mechanism step (several hinges moving together) are checked by mechanism*.test and
+// their own tests (kabuto, crane): the single-axis rotation model used below does not describe them.
+const models=MODELS.filter(d=>!d.steps.some(s=>s.ops.some(o=>o.type==='drive'||o.type==='mechanism'))).map(buildModel);
 const samples=[0,.25,.5,.75,1];
 const triangleNormal=points=>unit(cross(sub(points[1],points[0]),sub(points[2],points[0])));
 for(const model of models) {

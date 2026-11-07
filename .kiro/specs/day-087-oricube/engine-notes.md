@@ -90,3 +90,4 @@
 - 折り方: [伝承の帽子](https://webspace.science.uu.nl/~bodla101/d.origami/traditional/hat.html)、[帽子から舟への説明](https://webspace.science.uu.nl/~bodla101/d.origami/traditional/boat.html)、[Japan Society/Japan Foundationのコップ](https://www.japansociety.org.uk/rsn/lessons/resources/RSN-Resources-OrigamiCup.pdf)。図・文章の転載なし。
 - 検証: 新規22件を入口indexから読み込み、既存120件を含め142件を実行。辺・面積・向き・閉じ・内部交差・層・任意t・決定性・guide・rank/offset境界・topologyKeyを確認する。最終結果は全件合格・失敗0。分割数1000/1001/2000で種と表の時刻が一致する場合も回帰試験で確認した。
 - 残件: 紙コップの差し込み後の開口経路、舟のつば端の補助折り筋と層順・後半の折り。論文図との対応、UI描画・本番ビルドは未検証。近似の採否を決める根拠はまだ不足している。
+- 🔴 親の目視（2026-11-07）: かぶと（C3b）の終点は、全検査を通ったが**十字**（前後の2枚が直角に交わる）で、帽子の閉じた口にならない。口の検査が凸包だけだった。袋を開く系は、「高さ中央の水平断面が1本の閉じた折れ線」の検査を足し、側面のまち（コーナー折りの三角）の折り目も動かす設計で再挑戦する。作品は見送り。

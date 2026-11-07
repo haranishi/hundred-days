@@ -136,10 +136,17 @@ export function chooseView(model, frame) {
   const last = [...model.steps].reverse().find((s) => s.view)?.view;
   const phi = last === 'side' ? 1.2 : 0.8;
   const points = triangles(frame).flatMap((t) => t.p);
+  // A model that ends with a side view (swan, crane) is shown in profile: the bearing with the
+  // widest horizontal extent, so the neck, head and tail show instead of a wing-spread front.
+  const score = (cam) => {
+    if (last !== 'side') return projectedArea(points, cam);
+    const xs = points.map((p) => dot(p, cam.right));
+    return Math.max(...xs) - Math.min(...xs);
+  };
   let best = null;
   for (let k = 0; k < 8; k++) {
     const theta = 0.52 + (k * Math.PI) / 4;
-    const area = projectedArea(points, camera(phi, theta));
+    const area = score(camera(phi, theta));
     if (!best || area > best.area * 1.02) best = { phi, theta, area };
   }
   return { phi: best.phi, theta: best.theta };
@@ -175,8 +182,33 @@ export function thumbSvg(model) {
     };
   });
   const order = paintOrder(tri2d);
+  // Heavily layered models (the crane) have many triangles that are completely hidden behind nearer
+  // ones. Walk front to back on a fine sample grid and keep only triangles that show at least one sample.
+  const GRID = SIZE * 4, claimed = new Uint8Array(GRID * GRID), shown = new Set();
+  for (let k = order.length - 1; k >= 0; k--) {
+    const j = order[k], [a, b, c] = tri2d[j].xy;
+    const minX = Math.max(0, Math.floor(Math.min(a[0], b[0], c[0]) * 4)), maxX = Math.min(GRID - 1, Math.ceil(Math.max(a[0], b[0], c[0]) * 4));
+    const minY = Math.max(0, Math.floor(Math.min(a[1], b[1], c[1]) * 4)), maxY = Math.min(GRID - 1, Math.ceil(Math.max(a[1], b[1], c[1]) * 4));
+    const den = (b[1] - c[1]) * (a[0] - c[0]) + (c[0] - b[0]) * (a[1] - c[1]);
+    let visible = Math.abs(den) < 1e-9; // a degenerate sliver is kept: it can only be a thin outline
+    for (let y = minY; y <= maxY && !visible; y++) for (let x = minX; x <= maxX; x++) {
+      const px = (x + 0.5) / 4, py = (y + 0.5) / 4;
+      const u = ((b[1] - c[1]) * (px - c[0]) + (c[0] - b[0]) * (py - c[1])) / den;
+      const v = ((c[1] - a[1]) * (px - c[0]) + (a[0] - c[0]) * (py - c[1])) / den;
+      if (u < 0 || v < 0 || u + v > 1 || claimed[y * GRID + x]) continue;
+      visible = true;
+    }
+    if (!visible) continue;
+    shown.add(j);
+    for (let y = minY; y <= maxY; y++) for (let x = minX; x <= maxX; x++) {
+      const px = (x + 0.5) / 4, py = (y + 0.5) / 4;
+      const u = ((b[1] - c[1]) * (px - c[0]) + (c[0] - b[0]) * (py - c[1])) / den;
+      const v = ((c[1] - a[1]) * (px - c[0]) + (a[0] - c[0]) * (py - c[1])) / den;
+      if (u >= 0 && v >= 0 && u + v <= 1) claimed[y * GRID + x] = 1;
+    }
+  }
   // Paper edges go on top, except where a nearer triangle clearly covers the edge's middle.
-  const items = order.map((j) => ({ kind: 'tri', fill: tri2d[j].fill, d: tris[j].p.map(to2d) }));
+  const items = order.filter((j) => shown.has(j)).map((j) => ({ kind: 'tri', fill: tri2d[j].fill, d: tris[j].p.map(to2d) }));
   for (const s of segs) {
     const mid3 = s[0].map((v, i) => (v + s[1][i]) / 2);
     const mid = [(dot(mid3, cam.right) - x0) * scale + ox, (-dot(mid3, cam.up) - y0) * scale + oy];
