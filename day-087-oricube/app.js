@@ -255,6 +255,7 @@ let chooseToken = 0;
 function chooseModel(id, opts) {
   const next = models.find((m) => m.id === id);
   const token = ++chooseToken;
+  els.loading.hidden = true; // a choice made a moment ago may have left its notice up
   const finish = () => {
     if (token !== chooseToken) return;
     els.loading.hidden = true;
@@ -263,9 +264,10 @@ function chooseModel(id, opts) {
   const build = () => {
     try { void next.steps; return true; } catch (error) {
       console.error(error);
-      els.loading.hidden = true;
-      els.hint.hidden = false;
-      els.hint.textContent = `${next.name}の手順を組み立てられませんでした。`;
+      // The notice is a status region, so a screen reader announces the failure too.
+      els.loading.textContent = `${next.name}の手順を組み立てられませんでした。`;
+      els.loading.hidden = false;
+      setTimeout(() => { if (token === chooseToken) els.loading.hidden = true; }, 5000);
       return false;
     }
   };

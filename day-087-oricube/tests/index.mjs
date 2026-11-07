@@ -20,3 +20,8 @@ import './mechanism-pocket.test.mjs';
 import './mechanism-investigation.test.mjs';
 import './locator.test.mjs';
 import './build-time.test.mjs';
+import './crane.test.mjs';
+import './yacht.test.mjs';
+import './tree.test.mjs';
+import './tie.test.mjs';
+import './registry-complete.test.mjs';

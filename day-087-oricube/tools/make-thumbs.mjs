@@ -209,12 +209,23 @@ export function thumbSvg(model) {
   }
   // Paper edges go on top, except where a nearer triangle clearly covers the edge's middle.
   const items = order.filter((j) => shown.has(j)).map((j) => ({ kind: 'tri', fill: tri2d[j].fill, d: tris[j].p.map(to2d) }));
+  // An edge is drawn only where nothing nearer covers it: sample along it and keep the visible runs.
+  const SAMPLES = 8;
   for (const s of segs) {
-    const mid3 = s[0].map((v, i) => (v + s[1][i]) / 2);
-    const mid = [(dot(mid3, cam.right) - x0) * scale + ox, (-dot(mid3, cam.up) - y0) * scale + oy];
-    const z = dot(mid3, cam.dir);
-    const hidden = tri2d.some((t) => insideBy(t.xy, mid, 0.8) && depthAt(t, mid) > z + 1e-4);
-    if (!hidden) items.push({ kind: 'edge', d: s.map(to2d) });
+    const at = (k) => s[0].map((v, i) => v + ((s[1][i] - v) * k) / SAMPLES);
+    const visible = Array.from({ length: SAMPLES }, (_, k) => {
+      const mid3 = at(k + 0.5);
+      const mid = [(dot(mid3, cam.right) - x0) * scale + ox, (-dot(mid3, cam.up) - y0) * scale + oy];
+      const z = dot(mid3, cam.dir);
+      return !tri2d.some((t) => insideBy(t.xy, mid, 0.8) && depthAt(t, mid) > z + 1e-4);
+    });
+    for (let k = 0; k < SAMPLES; k++) {
+      if (!visible[k]) continue;
+      let end = k;
+      while (end + 1 < SAMPLES && visible[end + 1]) end++;
+      items.push({ kind: 'edge', d: [at(k), at(end + 1)].map(to2d) });
+      k = end;
+    }
   }
 
   // Neighbouring items of one kind and colour share a path; the paint order is kept.

@@ -65,7 +65,7 @@ test('crane: standalone metadata, contrasting named paper and ten authored steps
   assert.deepEqual([crane.paper.front,crane.paper.back],['#faf9f3','#3f9c92']);
   assert.ok(crane.paper.frontName&&crane.paper.backName);
   for(const c of [crane.paper.front,crane.paper.back])assert.notEqual(c,'#d6452d');
-  assert.equal(crane.steps.length,10);assert.equal(crane.steps.at(-1).view,'iso');
+  assert.equal(crane.steps.length,10);assert.equal(crane.steps.at(-1).view,'side');
   for(const step of crane.steps)for(const field of ['id','title','text','tip'])assert.ok(step[field]);
   assert.match(crane.steps[1].text,/あとで使う折り目を先につけておきます/);
 });

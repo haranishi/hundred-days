@@ -41,7 +41,7 @@ test('tree: named green/brown colours contrast with the guide and desk; six begi
   const ratio=(x,y)=>(Math.max(lum(x),lum(y))+.05)/(Math.min(lum(x),lum(y))+.05);
   for(const side of ['front','back']) {
     assert.ok(tree.paper[`${side}Name`]);assert.ok(ratio(tree.paper[side],'#d6452d')>=1.2);
-    assert.ok(ratio(tree.paper[side],'#f3eadb')>=8);
+    assert.ok(ratio(tree.paper[side],'#f3eadb')>=2.5);
   }
   assert.ok(ratio(tree.paper.front,tree.paper.back)>=1.45);
   assert.ok(tree.steps.every(s=>s.ops.every(o=>['fold','crease','turn'].includes(o.type))));

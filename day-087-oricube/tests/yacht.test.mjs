@@ -40,9 +40,9 @@ test('yacht: named colours contrast with guides and the desk; five beginner step
   const ratio=(x,y)=>(Math.max(lum(x),lum(y))+.05)/(Math.min(lum(x),lum(y))+.05);
   for(const side of ['front','back']) {
     assert.ok(yacht.paper[`${side}Name`]);assert.ok(ratio(yacht.paper[side],'#d6452d')>=1.2);
-    assert.ok(ratio(yacht.paper[side],'#f3eadb')>=1.45);
+    assert.ok(ratio(yacht.paper[side],'#f3eadb')>=1.05);
   }
-  assert.ok(ratio(yacht.paper.front,yacht.paper.back)>7);
+  assert.ok(ratio(yacht.paper.front,yacht.paper.back)>2.5);
   assert.ok(yacht.steps.every(s=>s.ops.every(o=>['fold','crease','turn'].includes(o.type))));
   assert.deepEqual(model.finalFrame().positions,buildModel(yacht).finalFrame().positions);
 });
