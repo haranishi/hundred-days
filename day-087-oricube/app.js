@@ -1,7 +1,8 @@
 // 画面とイベント。作品は engine-adapter から、再生は timeline、描画は viewer に任せる。
 import { loadModels } from './lib/engine-adapter.js';
 import { createTimeline, SPEEDS } from './lib/timeline.js';
-import { createViewer, webglAvailable } from './lib/viewer.js';
+import { createViewer, webglAvailable, VIEW_NAMES as VIEWS } from './lib/viewer.js';
+import { effectiveView, wrapSegments } from './lib/views.js';
 
 const $ = (id) => document.getElementById(id);
 const params = new URLSearchParams(location.search);
@@ -23,6 +24,9 @@ const els = {
   legend: $('legend'), stepStop: $('step-stop'), steps: $('steps'), stepList: $('step-list'),
 };
 const wideQuery = matchMedia('(min-width: 720px) and (orientation: landscape), (min-width: 1024px)');
+// A phone on its side with the two-column layout: the 3D is short, so the completion card goes to the
+// right column (above the step text) instead of covering the paper.
+const sideQuery = matchMedia('(min-width: 720px) and (orientation: landscape) and (max-height: 480px)');
 
 // 線の種類ごとの凡例。turn・hinge は線の意味を説明しなくても動きで分かるので出さない
 const LEGEND = {
@@ -46,43 +50,16 @@ let shownFinished = null;
 let stepStop = false;
 let hintBand = null;
 
-// 日本語は語の途中でも折り返せてしまう（「手／前に」「紙飛行／機」）。折り紙の用語と、短い名詞・副詞句は途中で切らない。
-// 長い語を先に並べる（正規表現は左から最長一致ではなく、並びの順に試すため）。
-const NOWRAP_WORDS = [
-  '立方体の箱', '紙飛行機', '中割り折り', 'ふたのない', '細くとがった', '桜色の面', '白い面', '青い面', '緑の面', '生成りの面',
-  '中心線', '折り筋', '折り目', '谷折り', '山折り', '折り込み', '折り返し', '立ち上げ', '裏返し', '裏返す', '向こうに', '手前に',
-  '手前の', '向こう', '手前', '二つに', '二つ', '仕組み', '背骨', '先端', '左右の', '角のひれ', '紙の間', '胴の紙',
-];
-const WORD_SPLIT = new RegExp(`(${NOWRAP_WORDS.map((w) => w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|')})`);
-const WORD_SET = new Set(NOWRAP_WORDS);
-
-// 文末の数文字（「す。」「せん。」など）だけが次の行に落ちないよう、各文の末尾をまとめて折り返さない。
-// 文全体の最後は長めに（tail）、途中の文は4文字。DOMで組み、innerHTML は使わない
+// 日本語は語の途中でも折り返せてしまう（「ネ／クタイ」）。語と文末の数文字を、折り返さない span にまとめる（lib/views.js）。
+// DOMで組み、innerHTML は使わない
 function setWrapped(el, text, tail = 6) {
-  const str = String(text || '');
-  const sentences = str.match(/[^。！？]+[。！？]?|[。！？]/g) || [];
-  const nodes = [];
-  const pushPlain = (plain) => {
-    for (const part of plain.split(WORD_SPLIT)) {
-      if (!part) continue;
-      if (WORD_SET.has(part)) {
-        const word = document.createElement('span');
-        word.className = 'nowrap';
-        word.textContent = part;
-        nodes.push(word);
-      } else nodes.push(document.createTextNode(part));
-    }
-  };
-  sentences.forEach((sentence, i) => {
-    const k = i === sentences.length - 1 ? tail : 4;
-    if (sentence.length <= k + 2) { pushPlain(sentence); return; }
-    const keep = document.createElement('span');
-    keep.className = 'nowrap';
-    keep.textContent = sentence.slice(-k);
-    pushPlain(sentence.slice(0, -k));
-    nodes.push(keep);
-  });
-  el.replaceChildren(...nodes);
+  el.replaceChildren(...wrapSegments(text, tail).map((p) => {
+    if (!p.nowrap) return document.createTextNode(p.text);
+    const span = document.createElement('span');
+    span.className = 'nowrap';
+    span.textContent = p.text;
+    return span;
+  }));
 }
 
 function renderLegend(step) {
@@ -133,6 +110,14 @@ function markCurrentStep(i) {
   els.noglList.querySelectorAll('li').forEach((li, k) => {
     if (k === i) li.setAttribute('aria-current', 'step'); else li.removeAttribute('aria-current');
   });
+}
+
+function placeDone() {
+  const panel = $('controls');
+  if (sideQuery.matches) { if (els.done.parentElement !== panel) panel.prepend(els.done); }
+  else if (els.done.parentElement !== els.stage) els.stage.insertBefore(els.done, els.nogl);
+  els.app.dataset.donePlace = sideQuery.matches ? 'panel' : 'stage';
+  updateInsets();
 }
 
 // 広い画面では右欄に開いたまま、スマホでは閉じた折りたたみにする
@@ -192,8 +177,17 @@ function renderPicker() {
     st.textContent = stars(m.level);
     st.setAttribute('aria-label', `難しさ${Math.max(1, Math.min(3, m.level || 1))}`);
     meta.append(st, document.createTextNode(` 約${m.minutes}分`));
-    b.append(img, name, meta);
-    onPress(b, () => { closePicker(); chooseModel(m.id, { autoplay: true }); });
+    // Shown on the current card only (CSS), so the choice is not told by the red frame alone
+    const badge = document.createElement('span');
+    badge.className = 'pick-badge';
+    badge.textContent = '選択中';
+    b.append(badge, img, name, meta);
+    onPress(b, () => {
+      // After a choice, focus goes to play: Space then plays instead of opening the list again
+      afterClose = els.play.offsetParent !== null ? els.play : els.next;
+      closePicker();
+      chooseModel(m.id, { autoplay: true });
+    });
     li.append(b);
     return li;
   }));
@@ -208,9 +202,13 @@ function markCurrentModel() {
 }
 
 let opener = null;
+let afterClose = null; // where focus goes when the list closes after a choice (otherwise back to the opener)
 function openPicker(e) {
   if (els.picker.open) return;
   opener = e?.currentTarget instanceof HTMLElement ? e.currentTarget : els.pickOpen;
+  afterClose = null;
+  // On a short landscape screen the list starts below the header, so the button that opened it stays whole
+  els.picker.style.setProperty('--picker-top', `${Math.round(document.querySelector('.top').getBoundingClientRect().bottom)}px`);
   els.picker.showModal();
   // Start on the current model, so Enter keeps it and Tab moves on from there.
   const current = els.pickerList.querySelector('.pick-card[aria-current="true"]');
@@ -218,7 +216,7 @@ function openPicker(e) {
   (current || els.pickerClose).focus({ preventScroll: true });
 }
 
-// Focus goes back to the button that opened it (see the 'close' listener).
+// Focus goes back to the button that opened it, or to play after a choice (see the 'close' listener).
 function closePicker() {
   if (els.picker.open) els.picker.close();
 }
@@ -281,9 +279,20 @@ function chooseModel(id, opts) {
   requestAnimationFrame(() => requestAnimationFrame(() => setTimeout(() => { if (token === chooseToken && build()) finish(); }, 0)));
 }
 
-function selectModel(id, { autoplay = false, step = 0, t = null } = {}) {
+// Switching models (not the first open) puts the model in the address bar and drops the position and
+// the spread: s, t, paused and explode belong to the previous model. debug, gfx and view stay.
+function rememberModel(id) {
+  const q = new URLSearchParams(location.search);
+  for (const k of ['s', 't', 'paused', 'explode']) q.delete(k);
+  q.set('m', id);
+  try { history.replaceState(history.state, '', `${location.pathname}?${q}${location.hash}`); } catch { /* file: or sandboxed */ }
+}
+
+// view: a view chosen in the link (view=). It holds for every step until the person resets the view.
+function selectModel(id, { autoplay = false, step = 0, t = null, view = null, initial = false } = {}) {
   const next = models.find((m) => m.id === id) || models[0];
   model = next;
+  if (!initial) rememberModel(model.id);
   markCurrentModel();
   tl = createTimeline({ durations: model.steps.map((s) => s.durationMs), reduced: reduced(), stepStop });
   tl.setSpeed(speed);
@@ -305,9 +314,16 @@ function selectModel(id, { autoplay = false, step = 0, t = null } = {}) {
     s.append(dot, document.createTextNode(`${side} ${name || ''}`));
     return s;
   };
-  els.paperInfo.append(label, sw(p.front, p.frontName, '表'), sw(p.back, p.backName, '裏'));
+  // Line 1: the paper; line 2: the two sides (so a swatch never breaks away from its name)
+  const sides = document.createElement('span');
+  sides.className = 'swatches';
+  sides.append(sw(p.front, p.frontName, '表'), sw(p.back, p.backName, '裏'));
+  els.paperInfo.append(label, sides);
   els.otherLabel.textContent = models.length > 1 ? `${nextModel().name}へ` : '最初から';
-  if (viewer) viewer.setModel(model, { view: params.get('view') || model.steps[0]?.view || 'iso' });
+  // The spread is per model: a new model starts closed
+  if (exploded) setExplode(false);
+  const startStep = tl.state().step;
+  if (viewer) viewer.setModel(model, { view: VIEWS.includes(view) ? view : effectiveView(model.steps, startStep), moved: VIEWS.includes(view) });
   else renderNoGlList();
   // 3Dが無いときは動きを再生できないので、自動再生しない
   if (autoplay && !reduced() && viewer) tl.play();
@@ -334,6 +350,9 @@ function sync() {
     setWrapped(els.stepTip, st.tip ? `つまずきやすい点：${st.tip}` : '');
     renderLegend(st);
     markCurrentStep(s.step);
+    // Each step may recommend a view (the crane ends from the side). The viewer only follows it
+    // until the person moves the camera.
+    viewer?.followView(effectiveView(model.steps, s.step));
     announce(`手順${s.step + 1}／${n}。${st.title}。${st.text}${st.tip ? ` ${st.tip}` : ''}`);
   }
 
@@ -344,6 +363,7 @@ function sync() {
     if (s.finished) {
       els.doneTitle.textContent = `${model.name}の完成`;
       announce(`${model.name}が完成しました。`);
+      if (!els.stage.contains(els.done)) els.done.scrollIntoView({ block: 'nearest' });
     }
     viewer?.setFinished(s.finished);
     updateInsets();
@@ -354,8 +374,11 @@ function sync() {
   els.play.classList.toggle('is-playing', s.playing);
   // 完成後の「もう一度」は主ボタンにしない（主は完成の札の「次の作品へ」だけ）
   els.play.classList.toggle('is-done', s.finished && !s.playing);
+  const focused = [els.next, els.prev].find((b) => b === document.activeElement);
   els.prev.disabled = s.step === 0 && (s.t === 0 || s.reduced) && !s.finished;
   els.next.disabled = s.finished;
+  // A disabled button drops the focus to the page; keep it on the controls instead
+  if (focused?.disabled) (els.play.offsetParent !== null ? els.play : focused === els.next ? els.prev : els.next).focus({ preventScroll: true });
 
   const pos = tl.position();
   if (document.activeElement !== els.scrub || s.playing) els.scrub.value = String(pos);
@@ -398,9 +421,14 @@ function updateInsets() {
   if (!els.hint.hidden && getComputedStyle(els.hint).display !== 'none') hintBand = Math.max(0, els.hint.getBoundingClientRect().bottom - stage.top) + 4;
   const cssHidden = els.hint.hidden ? false : getComputedStyle(els.hint).display === 'none';
   const top = cssHidden || hintBand === null ? 8 : hintBand;
-  const lowest = els.done.hidden ? els.tools : els.done.querySelector('.done-card');
+  const lowest = els.done.hidden || !els.stage.contains(els.done) ? els.tools : els.done.querySelector('.done-card');
   const bottom = Math.max(0, stage.bottom - lowest.getBoundingClientRect().top) + 4;
   viewer.setInsets({ top, bottom });
+}
+
+// Back to the view the current step recommends; from here on the steps move the camera again.
+function resetView() {
+  viewer?.resetView(effectiveView(model.steps, tl.state().step));
 }
 
 function setStepStop(on) {
@@ -418,10 +446,25 @@ function bind() {
   onPress(els.pickOpen, openPicker);
   onPress(els.donePick, openPicker);
   onPress(els.pickerClose, () => closePicker());
-  // Esc closes the native modal; send focus back to the header button either way.
+  // ×, a tap outside and Esc send focus back to the button that opened the list; a choice sends it to play.
   els.picker.addEventListener('close', () => {
-    const back = opener && opener.offsetParent !== null ? opener : els.pickOpen;
+    const back = afterClose && afterClose.offsetParent !== null ? afterClose
+      : opener && opener.offsetParent !== null ? opener : els.pickOpen;
+    afterClose = null;
     back.focus({ preventScroll: true });
+  });
+  // Arrow keys move between the cards: ← → one card, ↑ ↓ one row (the column count is read from the layout).
+  els.picker.addEventListener('keydown', (e) => {
+    const cards = [...els.pickerList.querySelectorAll('.pick-card')];
+    const at = cards.indexOf(document.activeElement);
+    if (at < 0 || !['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End'].includes(e.key)) return;
+    const top0 = cards[0].getBoundingClientRect().top;
+    const cols = Math.max(1, cards.filter((c) => Math.abs(c.getBoundingClientRect().top - top0) < 2).length);
+    const to = { ArrowLeft: at - 1, ArrowRight: at + 1, ArrowUp: at - cols, ArrowDown: at + cols, Home: 0, End: cards.length - 1 }[e.key];
+    e.preventDefault();
+    if (to < 0 || to >= cards.length) return;
+    cards[to].focus();
+    cards[to].scrollIntoView({ block: 'nearest' });
   });
   // Keep Tab inside the list: a native modal would otherwise let it leave to the browser's own controls.
   els.picker.addEventListener('keydown', (e) => {
@@ -440,7 +483,7 @@ function bind() {
     share?.querySelector('button, a')?.focus({ preventScroll: true });
   });
   onPress(els.explode, () => setExplode(!exploded));
-  for (const b of els.tools.querySelectorAll('[data-view]')) onPress(b, () => viewer?.setView(b.dataset.view));
+  for (const b of els.tools.querySelectorAll('[data-view]')) onPress(b, () => (b.dataset.view === 'reset' ? resetView() : viewer?.pickView(b.dataset.view)));
   for (const b of els.speed.querySelectorAll('[data-speed]')) onPress(b, () => setSpeed(Number(b.dataset.speed)));
 
   els.scrub.addEventListener('pointerdown', () => viewer?.stopSpin());
@@ -466,7 +509,7 @@ function bind() {
       if (tag === 'BUTTON' || tag === 'A') return;
       e.preventDefault(); tl.toggle(); sync(); viewer?.wake();
     } else if (e.key === 'r' || e.key === 'R') {
-      e.preventDefault(); viewer?.setView('reset');
+      e.preventDefault(); resetView();
     }
   });
 
@@ -477,6 +520,8 @@ function bind() {
   new ResizeObserver(updateInsets).observe(els.stage);
   placeStepList();
   wideQuery.addEventListener?.('change', placeStepList);
+  placeDone();
+  sideQuery.addEventListener?.('change', placeDone);
   reducedQuery.addEventListener?.('change', () => { tl.setReduced(reduced()); sync(); viewer?.wake(); });
 }
 
@@ -526,7 +571,7 @@ async function main() {
   const hasPosition = Number.isFinite(sParam) || (tParam !== null && Number.isFinite(tParam));
   const autoplay = !hasPosition && params.get('paused') !== '1';
   bind();
-  selectModel(target.id, { autoplay, step, t: tParam !== null && Number.isFinite(tParam) ? tParam : null });
+  selectModel(target.id, { autoplay, step, t: tParam !== null && Number.isFinite(tParam) ? tParam : null, view: params.get('view'), initial: true });
   if (params.get('explode') === '1') setExplode(true);
   if (!SPEEDS.includes(speed)) setSpeed(1);
   els.app.dataset.ready = 'true';

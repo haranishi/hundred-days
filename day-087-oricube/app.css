@@ -51,7 +51,14 @@ button { font: inherit; color: inherit; }
 .brand { display: flex; align-items: center; gap: 8px; margin: 0; min-width: 0; }
 .brand svg { width: 28px; height: 28px; flex: none; }
 .brand-name { font-family: var(--serif); font-weight: 700; font-size: 20px; letter-spacing: 0.02em; }
-.brand-sub { display: none; color: var(--sub); font-size: 13px; white-space: nowrap; }
+.brand-sub { color: var(--sub); font-size: 13px; white-space: nowrap; }
+/* Phones: the one-line description sits small under the name (the header keeps the button's height) */
+@media (max-width: 639px) {
+  .brand { display: grid; grid-template-columns: 28px auto; column-gap: 8px; align-items: center; }
+  .brand svg { grid-row: 1 / span 2; }
+  .brand-name { line-height: 1.15; }
+  .brand-sub { grid-column: 2; font-size: 11px; line-height: 1.35; letter-spacing: 0.02em; }
+}
 
 /* 作品を選ぶボタン: 小さな見出し＋今の作品名 */
 .pick-open {
@@ -104,6 +111,14 @@ button { font: inherit; color: inherit; }
 .pick-card-meta { font-size: 12.5px; color: var(--sub); white-space: nowrap; }
 .pick-stars { color: var(--shu); letter-spacing: 0.04em; }
 .pick-card[aria-current="true"] { border: 2px solid var(--shu); padding: 5px 3px; box-shadow: 0 0 0 3px rgba(214, 69, 45, 0.12); }
+.pick-card { position: relative; }
+/* The current card also says so in words, not only by the red frame */
+.pick-badge {
+  display: none; position: absolute; top: 4px; left: 4px; z-index: 1;
+  padding: 0 6px; border-radius: 999px; background: var(--shu); color: #fff;
+  font-size: 11px; font-weight: 700; line-height: 1.6; letter-spacing: 0.04em;
+}
+.pick-card[aria-current="true"] .pick-badge { display: block; }
 
 /* ---- 3D ---- */
 .stage { position: relative; height: 55svh; min-height: 280px; background: var(--stage); overflow: hidden; }
@@ -170,6 +185,8 @@ button { font: inherit; color: inherit; }
 .done-card h2 { margin: 0 0 10px; font-family: var(--serif); font-size: 22px; line-height: 1.35; }
 .done-actions { display: flex; gap: 8px; }
 .done-actions .btn { flex: 1 1 auto; min-height: 46px; }
+.panel > .done { position: static; display: block; order: -2; margin: 0 0 12px; pointer-events: auto; }
+.panel > .done .done-card { width: 100%; box-shadow: none; }
 @container (max-width: 380px) {
   .done-actions { gap: 6px; }
   .done-actions .btn { padding: 0 8px; font-size: 15px; gap: 4px; }
@@ -237,6 +254,8 @@ button { font: inherit; color: inherit; }
 .step-count { color: var(--sub); font-weight: 500; margin-left: 4px; }
 .step-title { margin: 0 0 4px; font-family: var(--serif); font-size: 22px; line-height: 1.4; text-wrap: pretty; }
 .step-text, .step-tip { text-wrap: pretty; }
+/* Break Japanese between phrases where the browser can (ignored elsewhere; the nowrap spans still hold) */
+.panel, .done-card, .nogl { word-break: auto-phrase; }
 .nowrap { white-space: nowrap; }
 .step-text { margin: 0; font-size: 16.5px; }
 .step-tip { margin: 8px 0 0; padding: 8px 12px; background: var(--paper); border-left: 3px solid var(--shu); border-radius: 0 6px 6px 0; font-size: 15px; color: #4a413b; }
@@ -246,7 +265,14 @@ button { font: inherit; color: inherit; }
 .legend svg { width: 40px; height: 8px; }
 .legend b { color: var(--ink); }
 
-.settings { margin-top: 14px; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; }
+/* Speed and stop-at-each-step sit right under the transport, where the person folding looks */
+.settings { margin: 0 0 6px; display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; }
+.settings .chip { min-width: 46px; padding: 0 9px; }
+/* 360px phones: keep speed and stop on one row (the speed chips explain themselves without the label) */
+@container (max-width: 352px) {
+  .settings .seg-label { display: none; }
+  .settings .chip { font-size: 14px; }
+}
 .chip.stop-each { min-width: 0; }
 
 /* 手順の一覧: スマホは閉じた折りたたみ、広い画面は右欄に開いたまま */
@@ -277,9 +303,11 @@ button { font: inherit; color: inherit; }
 }
 .chip[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); font-weight: 700; }
 
-.paper-info { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 14px; margin: 12px 0 0; font-size: 14px; color: var(--sub); }
-.swatch { display: inline-flex; align-items: center; gap: 6px; }
-.swatch i { width: 14px; height: 14px; border-radius: 3px; border: 1px solid var(--line-strong); display: inline-block; }
+.paper-info { display: flex; flex-direction: column; gap: 2px; margin: 12px 0 0; font-size: 14px; color: var(--sub); }
+/* Line 1 the paper, line 2 the two sides. A swatch is a round dot so it does not read as a check box */
+.swatches { display: flex; flex-wrap: wrap; align-items: center; gap: 2px 16px; }
+.swatch { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+.swatch i { width: 14px; height: 14px; border-radius: 50%; border: 1px solid var(--line-strong); display: inline-block; flex: none; }
 .keys { display: none; margin: 10px 0 0; font-size: 13px; color: var(--sub); }
 
 .foot {
@@ -298,9 +326,6 @@ button { font: inherit; color: inherit; }
   .pick-open { padding: 3px 10px 4px; }
   .btn.nav { min-width: 72px; padding: 0 10px; }
   .tool { padding: 0 8px; }
-}
-@media (min-width: 640px) {
-  .brand-sub { display: inline; }
 }
 @media (hover: hover) and (pointer: fine) {
   .keys { display: block; }
@@ -347,16 +372,29 @@ button { font: inherit; color: inherit; }
 /* PC: 作品ボタンの下、右に寄せる。3Dの紙は左に見えたまま動き続ける */
 @media (min-width: 1024px) and (min-height: 600px) {
   .picker { inset: 68px 16px auto auto; margin: 0; width: min(calc(100vw - 32px), 640px); max-height: calc(100svh - 84px); }
-  .picker::backdrop { background: rgba(43, 38, 35, 0.12); }
+  .picker::backdrop { background: rgba(43, 38, 34, 0.16); }
 }
 /* 背の低い横向き（スマホ横）: 5列にして10個を2段で見渡す */
 @media (max-height: 480px) and (orientation: landscape) {
-  .picker { max-height: calc(100svh - 16px); width: min(calc(100vw - 24px), 820px); }
+  .picker {
+    inset: var(--picker-top, 56px) 0 auto 0; margin: 0 auto; width: min(calc(100vw - 24px), 820px);
+    max-height: calc(100svh - var(--picker-top, 56px) - 6px); border-radius: 0 0 16px 16px;
+  }
   .picker-head { padding-top: 2px; padding-bottom: 2px; }
   .picker-list { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; padding: 8px 12px 10px; }
   .pick-card { padding: 5px 4px; }
   .pick-card[aria-current="true"] { padding: 4px 3px; }
   .pick-card img { max-width: 64px; }
+}
+/* A narrow phone on its side (one column): the completion is a one-line band low in the 3D, so the paper
+   keeps the space above it */
+@media (max-height: 480px) and (orientation: landscape) and (max-width: 719px) {
+  .stage > .done .done-card { display: flex; align-items: center; gap: 8px; width: min(100%, 600px); padding: 6px 8px 6px 14px; }
+  .stage > .done .done-head { flex: 1 1 auto; align-items: center; min-width: 0; }
+  .stage > .done .done-kicker { display: none; }
+  .stage > .done .done-card h2 { margin: 0; font-size: 17px; white-space: nowrap; }
+  .stage > .done .done-actions { flex: none; gap: 6px; }
+  .stage > .done .done-actions .btn { min-height: 44px; padding: 0 12px; }
 }
 @keyframes pop-in { from { transform: translateY(12px) scale(0.98); opacity: 0; } to { transform: none; opacity: 1; } }
 

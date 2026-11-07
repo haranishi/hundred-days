@@ -26,3 +26,4 @@ import './tree.test.mjs';
 import './tie.test.mjs';
 import './registry-complete.test.mjs';
 import './mechanism-rotation.test.mjs';
+import './views.test.mjs';

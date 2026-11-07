@@ -431,7 +431,8 @@ test.describe('model picker', () => {
     const s = await state(page);
     expect([s.model, s.step, s.playing]).toEqual(['tray', 0, true]);
     await expect(page.locator('#pick-name')).toHaveText('立方体の箱');
-    await expect(page.locator('#pick-open')).toBeFocused();
+    // Focus goes to play, so Space plays instead of opening the list again
+    await expect(page.locator('#play')).toBeFocused();
   });
 
   test('with reduced motion a chosen model shows the end of its first step without playing', async ({ page }) => {
@@ -571,5 +572,241 @@ test.describe('every model', () => {
     await expect(page.locator('#pick-name')).toHaveText('鶴');
     await expect(page.locator('#step-no')).toHaveText('手順 1');
     expect(errors).toEqual([]);
+  });
+});
+
+// ---- 第2弾の画面評価（1周目）を受けた直し（UI担当が追加） ----
+const VIEW_PHI = { flat: 0.5, iso: 0.93, side: Math.PI / 2 - 0.1, top: 0.0001 };
+const phiNear = (page, name) => expect.poll(async () => Math.abs((await state(page)).viewer.phi - VIEW_PHI[name]), { timeout: 15_000 }).toBeLessThan(0.03);
+const settled = (page) => expect.poll(async () => (await state(page)).viewer.viewMoving, { timeout: 15_000 }).toBe(false);
+
+test.describe('the view each step recommends', () => {
+  test.setTimeout(120_000);
+
+  test('the crane opened on its last step is seen from the side', async ({ page }) => {
+    await open(page, 'm=crane&s=10&t=1');
+    await rendered(page);
+    await phiNear(page, 'side');
+    expect((await state(page)).viewer.userMoved).toBe(false);
+  });
+
+  test('stepping through the crane moves the camera flat, then iso, then flat', async ({ page }) => {
+    await open(page, 'm=crane&s=1');
+    await rendered(page);
+    await phiNear(page, 'flat');
+    const next = page.locator('#next');
+    await next.click(); await next.click();
+    await expect(page.locator('#step-no')).toHaveText('手順 3');
+    await phiNear(page, 'iso');
+    await next.click(); await next.click();
+    await expect(page.locator('#step-no')).toHaveText('手順 5');
+    await phiNear(page, 'flat');
+  });
+
+  test('after the person drags the view, steps no longer move it', async ({ page }) => {
+    await open(page, 'm=crane&s=1');
+    await rendered(page);
+    await settled(page);
+    const box = await page.locator('#view').boundingBox();
+    await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+    await page.mouse.down();
+    for (let i = 1; i <= 6; i++) await page.mouse.move(box.x + box.width / 2 + i * 12, box.y + box.height / 2 + i * 8);
+    await page.mouse.up();
+    await expect.poll(async () => (await state(page)).viewer.running, { timeout: 15_000 }).toBe(false);
+    const before = (await state(page)).viewer;
+    expect(before.userMoved).toBe(true);
+    await page.locator('#next').click(); await page.locator('#next').click();
+    await expect(page.locator('#step-no')).toHaveText('手順 3');
+    await page.waitForTimeout(800);
+    const after = (await state(page)).viewer;
+    // Only the fitting may nudge it a little; it is not sent to the step's view (iso)
+    expect(Math.abs(after.phi - before.phi)).toBeLessThan(0.02);
+    expect(Math.abs(after.theta - before.theta)).toBeLessThan(0.02);
+    expect(Math.abs(after.phi - VIEW_PHI.iso)).toBeGreaterThan(0.05);
+  });
+
+  test('a view= link holds for every step', async ({ page }) => {
+    await open(page, 'm=crane&s=1&view=top');
+    await rendered(page);
+    await phiNear(page, 'top');
+    for (let i = 0; i < 4; i++) await page.locator('#next').click();
+    await expect(page.locator('#step-no')).toHaveText('手順 5');
+    await page.waitForTimeout(800);
+    expect((await state(page)).viewer.phi).toBeLessThan(0.03);
+  });
+
+  test('the top button holds, and reset returns to the current step’s view and resumes following', async ({ page }) => {
+    await open(page, 'm=crane&s=3');
+    await rendered(page);
+    await phiNear(page, 'iso');
+    await page.getByRole('button', { name: '真上' }).click();
+    await phiNear(page, 'top');
+    await page.locator('#next').click(); await page.locator('#next').click();
+    await expect(page.locator('#step-no')).toHaveText('手順 5');
+    await page.waitForTimeout(800);
+    expect((await state(page)).viewer.phi).toBeLessThan(0.03);
+    await page.getByRole('button', { name: '視点を元に戻す' }).click();
+    await phiNear(page, 'flat'); // step 5 recommends flat, not the first step's view
+    expect((await state(page)).viewer.userMoved).toBe(false);
+    await page.locator('#prev').click(); await page.locator('#prev').click();
+    await expect(page.locator('#step-no')).toHaveText('手順 3');
+    await phiNear(page, 'iso');
+  });
+});
+
+test.describe('keys and focus', () => {
+  test('after choosing from the list, focus is on play and Space plays', async ({ page }) => {
+    await open(page);
+    await page.locator('#pick-open').click();
+    await page.locator('.pick-card[data-id="heart"]').focus();
+    await page.keyboard.press('Enter');
+    await expect(page.locator('#picker')).toBeHidden();
+    await expect(page.locator('#play')).toBeFocused();
+    const before = (await state(page)).playing;
+    await page.keyboard.press(' ');
+    await expect.poll(async () => (await state(page)).playing).toBe(!before);
+    await expect(page.locator('#picker')).toBeHidden();
+  });
+
+  test('Space on a focused button presses only that button, once', async ({ page }) => {
+    await open(page, 'm=swan&s=2&t=0');
+    await page.locator('#next').click();
+    await expect(page.locator('#step-no')).toHaveText('手順 3');
+    await expect(page.locator('#next')).toBeFocused();
+    await page.keyboard.press(' ');
+    await expect(page.locator('#step-no')).toHaveText('手順 4');
+    await page.keyboard.press('Enter');
+    await expect(page.locator('#step-no')).toHaveText('手順 5');
+    await page.waitForTimeout(300);
+    const s = await state(page);
+    expect([s.step, s.playing]).toEqual([4, false]);
+  });
+
+  test('when next reaches the end and turns off, focus moves to play instead of the page', async ({ page }) => {
+    await open(page, 'm=swan&s=6&t=0');
+    await page.locator('#next').click();
+    await expect(page.locator('#done')).toBeVisible();
+    await expect(page.locator('#play')).toBeFocused();
+  });
+
+  test('arrow keys, Home and End move between the cards', async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 800 });
+    await open(page, 'm=swan');
+    await page.locator('#pick-open').click();
+    const ids = await page.evaluate(() => window.__oricube.models.map((m) => m.id));
+    const cols = await page.evaluate(() => {
+      const cards = [...document.querySelectorAll('.pick-card')];
+      const top = cards[0].getBoundingClientRect().top;
+      return cards.filter((c) => Math.abs(c.getBoundingClientRect().top - top) < 2).length;
+    });
+    expect(cols).toBeGreaterThan(1);
+    const focusedId = () => page.evaluate(() => document.activeElement?.dataset?.id);
+    const at = ids.indexOf('swan');
+    expect(await focusedId()).toBe('swan');
+    await page.keyboard.press('ArrowRight');
+    expect(await focusedId()).toBe(ids[at + 1]);
+    await page.keyboard.press('ArrowLeft');
+    await page.keyboard.press('ArrowUp');
+    expect(await focusedId()).toBe(ids[at - cols]);
+    await page.keyboard.press('ArrowDown');
+    expect(await focusedId()).toBe('swan');
+    await page.keyboard.press('Home');
+    expect(await focusedId()).toBe(ids[0]);
+    await page.keyboard.press('ArrowLeft');
+    expect(await focusedId()).toBe(ids[0]);
+    await page.keyboard.press('End');
+    expect(await focusedId()).toBe(ids.at(-1));
+    expect((await state(page)).model).toBe('swan');
+    await page.keyboard.press('Escape');
+    await expect(page.locator('#pick-open')).toBeFocused();
+  });
+});
+
+test.describe('switching models', () => {
+  test('the spread is turned off for the new model', async ({ page }) => {
+    await open(page, 'm=plane&s=5&t=0');
+    await page.locator('#explode').click();
+    await expect(page.locator('#explode')).toHaveAttribute('aria-pressed', 'true');
+    await page.locator('#pick-open').click();
+    await page.locator('.pick-card[data-id="heart"]').click();
+    await expect(page.locator('#explode')).toHaveAttribute('aria-pressed', 'false');
+    await expect(page.locator('#explode')).toHaveText('重なりを広げる');
+    const s = await state(page);
+    expect([s.model, s.exploded]).toEqual(['heart', false]);
+    expect(s.viewer.explode).toBeLessThan(1.01);
+  });
+
+  test('the address shows the new model and drops the old position', async ({ page }) => {
+    await open(page, 'm=plane&s=6&t=0.5&explode=1&view=top');
+    await page.locator('#pick-open').click();
+    await page.locator('.pick-card[data-id="tray"]').click();
+    await expect.poll(() => page.evaluate(() => new URLSearchParams(location.search).get('m'))).toBe('tray');
+    const q = await page.evaluate(() => Object.fromEntries(new URLSearchParams(location.search)));
+    expect(q).toEqual({ debug: '1', gfx: 'test', view: 'top', m: 'tray' });
+    // A new model follows its own views again
+    expect((await state(page)).viewer.userMoved).toBe(false);
+  });
+});
+
+test.describe('the completion card on a phone on its side', () => {
+  test.use(phone);
+  for (const size of [{ width: 844, height: 390 }, { width: 667, height: 375 }]) {
+    test(`does not cover the paper at ${size.width}x${size.height}`, async ({ page }) => {
+      await page.emulateMedia({ reducedMotion: 'reduce' });
+      await page.setViewportSize(size);
+      await open(page, 'm=plane&s=9&t=1');
+      await rendered(page);
+      await expect(page.locator('#done')).toBeVisible();
+      await expect.poll(async () => (await state(page)).viewer.running, { timeout: 15_000 }).toBe(false);
+      const r = await page.evaluate(() => {
+        const c = window.__oricube.state().viewer.paperRect;
+        const canvas = document.getElementById('view').getBoundingClientRect();
+        const card = document.querySelector('.done-card').getBoundingClientRect();
+        const paper = { top: canvas.top + c.top * canvas.height, bottom: canvas.top + c.bottom * canvas.height, left: canvas.left + c.left * canvas.width, right: canvas.left + c.right * canvas.width };
+        const overlap = paper.left < card.right && card.left < paper.right && paper.top < card.bottom && card.top < paper.bottom;
+        return { overlap, paper, card: { top: card.top, bottom: card.bottom, left: card.left, right: card.right }, place: document.getElementById('app').dataset.donePlace, small: [...document.querySelectorAll('.done-card button')].filter((b) => { const x = b.getBoundingClientRect(); return x.width < 44 || x.height < 44; }).length };
+      });
+      expect(r.overlap, JSON.stringify(r)).toBe(false);
+      expect(r.small).toBe(0);
+    });
+  }
+});
+
+test.describe('details on a phone', () => {
+  test.use(phone);
+  test('the header says what the app is, without growing, and stop-at-each-step is on the first screen', async ({ page }) => {
+    for (const width of [360, 390, 430]) {
+      await page.setViewportSize({ width, height: 844 });
+      await open(page, 'm=swan&s=2');
+      const r = await page.evaluate(() => {
+        const box = (sel) => document.querySelector(sel).getBoundingClientRect();
+        return { header: box('.top').height, sub: box('.brand-sub'), pick: box('#pick-open'), stop: box('#step-stop'), inner: innerHeight };
+      });
+      expect(r.sub.height, `${width}`).toBeGreaterThan(0);
+      expect(r.sub.right, `${width}`).toBeLessThan(r.pick.left);
+      expect(r.header, `${width}`).toBeLessThanOrEqual(65 + 14);
+      expect(r.pick.height, `${width}`).toBeGreaterThanOrEqual(44);
+      expect(r.stop.bottom, `${width}`).toBeLessThanOrEqual(r.inner);
+    }
+    await expect(page.locator('.brand-sub')).toHaveText('折り紙の折り方を3Dで見る');
+  });
+
+  test('the current card says 選択中 in words, and only that card', async ({ page }) => {
+    await open(page, 'm=tie');
+    await page.locator('#pick-open').tap();
+    await expect(page.locator('.pick-badge:visible')).toHaveCount(1);
+    await expect(page.locator('.pick-card[data-id="tie"] .pick-badge')).toBeVisible();
+    await expect(page.locator('.pick-card[data-id="tie"] .pick-badge')).toHaveText('選択中');
+  });
+
+  test('the paper swatches are round and sit on their own line under the paper', async ({ page }) => {
+    await open(page, 'm=crane&s=2');
+    const r = await page.evaluate(() => {
+      const label = document.querySelector('#paper-info > span').getBoundingClientRect();
+      const dots = [...document.querySelectorAll('.swatch i')].map((i) => ({ top: i.getBoundingClientRect().top, radius: getComputedStyle(i).borderRadius, w: i.getBoundingClientRect().width }));
+      return { labelBottom: label.bottom, dots };
+    });
+    expect(r.dots).toHaveLength(2);
+    for (const d of r.dots) { expect(d.top).toBeGreaterThanOrEqual(r.labelBottom - 1); expect(d.radius).toBe('50%'); expect(d.w).toBe(14); }
   });
 });

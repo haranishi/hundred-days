@@ -232,7 +232,10 @@ export function createViewer({ canvas, testGfx = false, reducedMotion = () => fa
   let currentBox = null; // 今の姿勢の箱（試験用の占有率に使う）
   let currentCenter = null; // 今の姿勢の中心。視点はこれを緩やかに追う
   let zoomFactor = 1;
-  let homeView = 'iso'; // the model's own starting view; the reset button returns here
+  let homeView = 'iso'; // the view the reset button returns to: the current step's recommended view
+  // Until the person turns, zooms or picks a view, the camera follows the view each step recommends.
+  let userMoved = false;
+  let autoName = 'iso'; // the recommended view the camera was last sent to
   let viewAnim = null;
   let interacting = false;
   let needsRender = true;
@@ -244,11 +247,17 @@ export function createViewer({ canvas, testGfx = false, reducedMotion = () => fa
   // 完成のとき: 寄せは最後の姿勢だけで取り、ゆっくりちょうど1周回して始めの向きへ戻す
   let finished = false;
   let insets = { top: 0, bottom: 0 }; // 3Dの上下に重なっている帯（ヒント・視点ボタン・完成の札）の高さ(px)
-  let spin = null; // { start, theta, phi }
+  let spin = null; // { start, theta, phi }; start is null while a view change is still running
   const SPIN_MS = 6500;
   function stopSpin() { spin = null; }
   function stepSpin(now) {
     if (!spin) return false;
+    // The lap starts from the view the camera settles on, so it waits for a running view change.
+    if (spin.start === null) {
+      if (viewAnim) return true;
+      const d = currentDir();
+      spin = { start: now, theta: d.theta, phi: d.phi };
+    }
     const p = Math.min(1, (now - spin.start) / SPIN_MS);
     offset.copy(camera.position).sub(controls.target);
     spherical.setFromVector3(offset);
@@ -265,7 +274,7 @@ export function createViewer({ canvas, testGfx = false, reducedMotion = () => fa
   const spherical = new THREE.Spherical();
   const offset = new THREE.Vector3();
 
-  controls.addEventListener('start', () => { interacting = true; viewAnim = null; stopSpin(); wake(); });
+  controls.addEventListener('start', () => { interacting = true; userMoved = true; viewAnim = null; stopSpin(); wake(); });
   controls.addEventListener('change', () => { needsRender = true; wake(); });
   controls.addEventListener('end', () => {
     interacting = false;
@@ -351,7 +360,23 @@ export function createViewer({ canvas, testGfx = false, reducedMotion = () => fa
       v.set(k & 1 ? currentBox.max.x : currentBox.min.x, k & 2 ? currentBox.max.y : currentBox.min.y, k & 4 ? currentBox.max.z : currentBox.min.z).project(camera);
       x0 = Math.min(x0, v.x); x1 = Math.max(x1, v.x); y0 = Math.min(y0, v.y); y1 = Math.max(y1, v.y);
     }
-    return { w: (x1 - x0) / 2, h: (y1 - y0) / 2, top: (1 - y1) / 2, bottom: (1 - y0) / 2 };
+    return { w: (x1 - x0) / 2, h: (y1 - y0) / 2, top: (1 - y1) / 2, bottom: (1 - y0) / 2, left: (x0 + 1) / 2, right: (x1 + 1) / 2 };
+  }
+
+  // Where the paper itself is drawn, as fractions of the canvas (its vertices, not the box). For tests.
+  function paperRect() {
+    const pos = paperGeo.getAttribute('position');
+    if (!pos) return null;
+    camera.updateMatrixWorld();
+    const count = Math.min(pos.count, paperGeo.drawRange.count === Infinity ? pos.count : paperGeo.drawRange.count);
+    let x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity;
+    const v = new THREE.Vector3();
+    for (let k = 0; k < count; k++) {
+      v.fromBufferAttribute(pos, k).project(camera);
+      x0 = Math.min(x0, v.x); x1 = Math.max(x1, v.x); y0 = Math.min(y0, v.y); y1 = Math.max(y1, v.y);
+    }
+    if (!(x1 >= x0)) return null;
+    return { left: (x0 + 1) / 2, right: (x1 + 1) / 2, top: (1 - y1) / 2, bottom: (1 - y0) / 2 };
   }
 
   function currentDir() {
@@ -563,8 +588,10 @@ export function createViewer({ canvas, testGfx = false, reducedMotion = () => fa
   document.addEventListener('visibilitychange', () => { if (!document.hidden) { last = 0; wake(); } });
 
   const api = {
-    setModel(next, { view } = {}) {
+    // view: the view to open on. moved: true when the person chose it (a view= link), so steps do not move it.
+    setModel(next, { view, moved = false } = {}) {
       model = next;
+      explode = explodeGoal = explodeFrom = 1;
       topologyKey = null;
       currentCenter = null;
       guideCache = new Map();
@@ -579,6 +606,8 @@ export function createViewer({ canvas, testGfx = false, reducedMotion = () => fa
       poseDirty = true;
       updateFit(false);
       homeView = VIEWS[view] ? view : 'iso';
+      autoName = homeView;
+      userMoved = !!moved;
       api.setView(homeView, { immediate: true });
       updateFit(true);
       wake();
@@ -603,6 +632,28 @@ export function createViewer({ canvas, testGfx = false, reducedMotion = () => fa
         if (spherical.phi < 0.5) api.setView('tilt', { phi: 0.9, theta: spherical.theta });
       }
       wake();
+    },
+    // Sent by the app when the step changes. Moves (smoothly) to the step's view, unless the person has
+    // moved the camera since the model or the reset, or the camera is already there.
+    followView(name) {
+      if (!VIEWS[name]) return false;
+      homeView = name;
+      if (userMoved || name === autoName) return false;
+      autoName = name;
+      api.setView(name);
+      return true;
+    },
+    // The view buttons (top / iso): the person chose a view, so steps stop moving it.
+    pickView(name) {
+      userMoved = true;
+      api.setView(name);
+    },
+    // The reset button: back to the given recommended view, and steps move the camera again.
+    resetView(name) {
+      if (VIEWS[name]) homeView = name;
+      autoName = homeView;
+      userMoved = false;
+      api.setView('reset');
     },
     setView(name, { immediate = false, phi, theta } = {}) {
       stopSpin();
@@ -633,7 +684,7 @@ export function createViewer({ canvas, testGfx = false, reducedMotion = () => fa
       on = !!on;
       if (on === finished) return;
       finished = on;
-      if (on && !reducedMotion()) { const d = currentDir(); spin = { start: performance.now(), theta: d.theta, phi: d.phi }; }
+      if (on && !reducedMotion()) spin = { start: null, theta: 0, phi: 0 };
       else stopSpin();
       updateFit(false);
       needsRender = true;
@@ -655,7 +706,7 @@ export function createViewer({ canvas, testGfx = false, reducedMotion = () => fa
     stats() {
       const off = camera.position.clone().sub(controls.target);
       const s = new THREE.Spherical().setFromVector3(off);
-      return { renders, running: !!raf, why: lastWhy, spinning: !!spin, finished, coverage: coverage(), explode, distance: s.radius, phi: s.phi, theta: s.theta, fitDistance: fit?.dist ?? null, zoomFactor };
+      return { renders, running: !!raf, why: lastWhy, spinning: !!spin, finished, coverage: coverage(), paperRect: paperRect(), explode, userMoved, view: autoName, viewMoving: !!viewAnim, distance: s.radius, phi: s.phi, theta: s.theta, fitDistance: fit?.dist ?? null, zoomFactor };
     },
     dispose() {
       disposed = true; ro.disconnect(); controls.dispose(); renderer.dispose();
