@@ -9,4 +9,5 @@ workers_dev = false   # 公開の *.workers.dev の住所は作らない
 routes = [
   { pattern = "rairakku.com/day*", zone_name = "rairakku.com" },
   { pattern = "rairakku.com/100days/day-083-car360*", zone_name = "rairakku.com" },
+  { pattern = "rairakku.com/100days/day-088-bouquet-studio*", zone_name = "rairakku.com" },
 ]

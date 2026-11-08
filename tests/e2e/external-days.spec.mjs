@@ -34,6 +34,13 @@ const EXTERNAL_DAYS = [
     dir: 'day-083-car360',
     url: 'https://day83.rairakku.com/',
     demo: false // 紹介動画はまだ無い。カードはスクリーンショットだけで、デモ再生ボタンは出さない
+  },
+  {
+    day: '088',
+    title: 'Bouquet Studio',
+    dir: 'day-088-bouquet-studio',
+    url: 'https://day88.rairakku.com/',
+    demo: false // 紹介動画はまだ無い。カードはスクリーンショットだけで、デモ再生ボタンは出さない
   }
 ];
 
