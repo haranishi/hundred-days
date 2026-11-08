@@ -212,3 +212,7 @@ Playwright/Chromium・Wrangler・Miniflareは開発・検証用で、利用者�
 PowerPoint のブラウザ内変換は、未改変の公式 ZetaOffice 24.2.8.0.beta1（LibreOffice BuildId `efaf0670b4d055f838a2849becb10f08aa06a257`）、ZetaJS 1.2.0（MIT）、Qt 5 の WASM 版と Emscripten の実行時部品を使用します。
 エンジン全体を MIT や MPL だけとは扱いません。LibreOffice の全外部部品通知、Qt の GPL/LGPL と第三者許諾、musl/LLVM、Noto Sans CJK JP 通常・太字の OFL を、[変換エンジンの許諾・固定ソース案内](day-084-airpresenter/licenses/office/README.md) に同梱しています。
 各原文の取得 URL・SHA256 は `licenses/office/sources.json`、公開バイナリとフォントは `web/office-sources.json` に記録します。Qt の正確なビルドコミットは未確認で、再現ビルド済みとは表示しません。
+
+## Day086: OpenPOI API
+
+施設検索は [OpenPOI API](https://openpoiapi.com/attribution.html) を使用。元データの帰属・ライセンスとFoursquare通知は [Day086のNOTICE](day-086-chakuchiten/NOTICE.txt) を参照。画面のイラストは独自制作。

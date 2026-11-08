@@ -1,0 +1,419 @@
+import { test, expect } from '@playwright/test';
+import { readFileSync, mkdirSync } from 'node:fs';
+import { FOOD_GROUPS } from '../../day-086-chakuchiten/lib/food.js';
+import { createMountedServer } from '../../scripts/serve-mounted.mjs';
+
+const DIR = 'day-086-chakuchiten';
+const PATH = `/${DIR}/`;
+const center = { latitude: 35.68, longitude: 139.76 };
+const position = { lat: center.latitude, lng: center.longitude };
+const makePlace = (name, offset, category = 'cafe') => ({ name, lat: position.lat + offset, lng: position.lng, category, address: '試験市 テスト町1-1', licenses: ['CC0-1.0'], attributions: ['自作の試験データ'] });
+const places = [
+  makePlace('試験カフェ ひと息', .0002), makePlace('試験喫茶 まどべ', .0006), makePlace('試験コーヒースタンド', .001),
+  makePlace('試験食堂', .0003, 'restaurant'), makePlace('試験定食', .0007, 'restaurant'),
+  makePlace('試験カクテル酒場', .0003, 'bar_izakaya'), makePlace('試験カクテルバー', .0008, 'bar_izakaya'),
+  makePlace('試験公園', .0003, 'tourism'), makePlace('試験庭園', .0007, 'public_facility'),
+  makePlace('試験ラーメン', .0004, 'restaurant'), makePlace('試験寿司', .0004, 'restaurant'),
+  makePlace('薬局は候補外', 0, 'medical'), makePlace('遠方のカフェは候補外', 1),
+];
+const suggestions = [{ name: '試験駅', address: '試験市 テスト町', category: 'station', ...position }];
+const headers = readFileSync('dist/_headers', 'utf8');
+const csp = (headers.split(`\n/${DIR}/*\n`)[1] || '').split('\n').find((line) => line.includes('Content-Security-Policy:'))?.trim().replace('Content-Security-Policy: ', '');
+const runs = new WeakMap();
+
+test.use({ geolocation: center, permissions: ['geolocation'] });
+test.beforeEach(async ({ page }) => {
+  expect(csp).toContain('https://api.openpoiapi.com');
+  const seen = { errors: [], violations: [], search: [] }; runs.set(page, seen);
+  page.on('pageerror', (error) => seen.errors.push(error.message));
+  await page.addInitScript(() => {
+    window.__day086Violations = [];
+    document.addEventListener('securitypolicyviolation', (event) => window.__day086Violations.push(event.violatedDirective));
+  });
+  await page.route(`**${PATH}`, async (route) => {
+    const response = await route.fetch();
+    await route.fulfill({ response, headers: { ...response.headers(), 'content-security-policy': csp } });
+  });
+  await page.route('https://api.openpoiapi.com/**', async (route) => {
+    const url = new URL(route.request().url());
+    if (url.pathname === '/v1/search') seen.search.push(url);
+    await route.fulfill({ json: url.pathname === '/v1/suggest' ? { suggestions } : { results: places } });
+  });
+});
+test.afterEach(async ({ page }) => {
+  if (page.isClosed()) return;
+  const seen = runs.get(page);
+  expect(seen.errors, 'JavaScript exceptions').toEqual([]);
+  expect(await page.evaluate(() => window.__day086Violations), 'CSP violations').toEqual([]);
+  expect(await page.locator('body').innerText()).not.toMatch(/\bundefined\b|\bNaN\b|\[object Object\]/);
+});
+async function open(page, path = PATH) {
+  await page.goto(path);
+  await expect(page.locator('html')).toHaveAttribute('data-ready', 'true');
+}
+const pick = async (page, text) => page.getByText(text, { exact: true }).click();
+const defaultFood = { 'ガッツリ満腹': ['meal', 'rice', 'teishoku'], '軽め・お茶したい': ['cafe', 'drinks', 'coffee'], 'ちょっと一杯': ['drink', 'alcohol', 'cocktail'] };
+async function foodSteps(page, moodLabel, genre, dish) {
+  const defaults = defaultFood[moodLabel];
+  if (!defaults) return;
+  const group = FOOD_GROUPS[defaults[0]].find(item => item.id === (genre || defaults[1]));
+  await pick(page, group.label); await page.locator('#question-next').click();
+  await pick(page, group.dishes.find(item => item.id === (dish || defaults[2])).label);
+  await page.locator('#question-next').click();
+}
+async function throughQuestions(page, { companion = 'パートナー', mood = '軽め・お茶したい', genre, dish,
+  space = '静かにゆっくり', walk = 'すぐそこがいい', submit = true } = {}) {
+  await pick(page, companion); await page.locator('#companion-next').click();
+  await pick(page, mood); await page.locator('#question-next').click();
+  await foodSteps(page, mood, genre, dish);
+  await pick(page, space); await page.locator('#question-next').click();
+  await pick(page, walk);
+  if (submit) await page.locator('#question-next').click();
+}
+async function selectManual(page) {
+  await page.locator('#place-query').fill('試験駅');
+  await page.locator('#place-submit').click();
+  await page.getByRole('button', { name: /^試験駅/ }).click();
+  await expect(page.locator('#location-dialog')).not.toBeVisible();
+}
+
+test('開始時は通信せず、同行者を選ぶまで進めない', async ({ page }) => {
+  const outside = []; page.on('request', (request) => { if (request.url().startsWith('https://')) outside.push(request.url()); });
+  await open(page);
+  await expect(page.locator('#companion-next')).toBeDisabled();
+  await expect(page.getByRole('radio')).toHaveCount(4);
+  expect(outside).toEqual([]);
+  await pick(page, '友達'); await expect(page.locator('#companion-next')).toBeEnabled();
+});
+for (const [mood, title] of [['ガッツリ満腹', '試験食堂'], ['軽め・お茶したい', '試験カフェ ひと息'], ['ちょっと一杯', '試験カクテル酒場'], ['外でリフレッシュ', '試験公園']]) {
+  for (const space of ['静かにゆっくり', '賑やかでもOK']) {
+    for (const walk of ['すぐそこがいい', '少し散歩してもいい']) {
+      test(`${mood} / ${space} / ${walk} → 現在地の結果と道案内`, async ({ page }) => {
+        await open(page); await throughQuestions(page, { mood, space, walk });
+        await expect(page.locator('#result-name')).toHaveText(title);
+        await expect(page.locator('#result-time')).toContainText('徒歩 約1分');
+        const calls = runs.get(page).search;
+        expect(calls).toHaveLength(1);
+        expect(calls[0].searchParams.get('center')).toBe('139.76,35.68');
+        expect(calls[0].searchParams.get('radius')).toBe(walk === 'すぐそこがいい' ? '180' : '600');
+        const url = new URL(await page.locator('#maps-link').getAttribute('href'));
+        expect(url.origin).toBe('https://www.google.com'); expect(url.searchParams.get('travelmode')).toBe('walking');
+        expect(url.searchParams.has('origin')).toBe(false);
+        await page.locator('.data-note summary').click();
+        await expect(page.locator('.data-note')).toContainText('静かさや営業状況は取得できない');
+      });
+    }
+  }
+}
+test('候補は1軒ずつ表示し、最後で止まり、APIを呼び直さない', async ({ page }) => {
+  await open(page); await throughQuestions(page);
+  await expect(page.locator('#candidate-counter')).toHaveText('候補 1 / 3');
+  await page.locator('#next-place').click(); await expect(page.locator('#result-name')).toHaveText('試験喫茶 まどべ');
+  await page.locator('#next-place').click(); await expect(page.locator('#result-name')).toHaveText('試験コーヒースタンド');
+  await expect(page.locator('#next-place')).toBeDisabled(); await expect(page.locator('#last-candidate')).toBeVisible();
+  expect(runs.get(page).search).toHaveLength(1);
+});
+test('前の問へ戻っても回答を保持し、結果から気分を直せる', async ({ page }) => {
+  await open(page); await pick(page, 'ひとり'); await page.locator('#companion-next').click();
+  await expect(page.locator('#question-next')).toBeDisabled();
+  await pick(page, '軽め・お茶したい'); await page.locator('#question-next').click();
+  await page.locator('#question-back').click(); await expect(page.locator('input[value="cafe"]')).toBeChecked();
+  await page.locator('#question-next').click(); await foodSteps(page, '軽め・お茶したい'); await pick(page, '静かにゆっくり'); await page.locator('#question-next').click();
+  await pick(page, 'すぐそこがいい'); await page.locator('#question-next').click();
+  await expect(page.locator('#result-screen')).toBeVisible();
+  await page.locator('#review-answers').click(); await expect(page.locator('input[value="cafe"]')).toBeChecked();
+  await pick(page, 'ガッツリ満腹'); await page.locator('#question-next').click();
+  await foodSteps(page, 'ガッツリ満腹');
+  await expect(page.locator('input[value="quiet"]')).toBeChecked(); await page.locator('#question-next').click();
+  await expect(page.locator('input[value="near"]')).toBeChecked(); await page.locator('#question-next').click();
+  await expect(page.locator('#result-name')).toHaveText('試験食堂');
+});
+test('位置情報の拒否から場所指定へ進み、回答を入力し直さず結果を出せる', async ({ page, context }) => {
+  await context.clearPermissions();
+  await page.addInitScript(() => Object.defineProperty(navigator, 'geolocation', { value: {
+    getCurrentPosition: (_ok, fail) => setTimeout(() => fail({ code: 1 }), 0),
+  } }));
+  await open(page); await throughQuestions(page, { companion: '家族' });
+  await expect(page.locator('#error-title')).toHaveText('位置情報が許可されていません');
+  await page.locator('#error-manual').click(); await selectManual(page);
+  await expect(page.locator('#result-name')).toHaveText('試験カフェ ひと息');
+  await expect(page.locator('#location-label')).toHaveText('試験駅');
+});
+test('最初に場所を指定すると、位置情報を要求せずその場所で探せる', async ({ page }) => {
+  await page.addInitScript(() => { window.__gpsCalls = 0; Object.defineProperty(navigator, 'geolocation', { value: {
+    getCurrentPosition: () => { window.__gpsCalls++; },
+  } }); });
+  await open(page); await page.locator('#location-trigger').click(); await selectManual(page);
+  await throughQuestions(page); await expect(page.locator('#result-screen')).toBeVisible();
+  expect(await page.evaluate(() => window.__gpsCalls)).toBe(0);
+});
+test('0件では自動で範囲を広げ、希望の徒歩圏外だと伝える', async ({ page }) => {
+  await page.route('**/v1/search?**', (route) => route.fulfill({ json: {
+    results: new URL(route.request().url()).searchParams.get('radius') === '180' ? [] : [makePlace('散歩先の試験カフェ', .004)],
+  } }));
+  await open(page); await throughQuestions(page);
+  await expect(page.locator('#result-name')).toHaveText('散歩先の試験カフェ');
+  await expect(page.locator('#expanded-note')).toContainText('希望の徒歩圏では見つからなかった');
+  await expect(page.locator('#result-time')).not.toContainText('約3分');
+  await expect(page.locator('#answer-summary')).toContainText('すぐそこがいい');
+});
+test('API失敗と0件を区別し、再試行で復帰する', async ({ page }) => {
+  let count = 0;
+  await page.route('**/v1/search?**', (route) => ++count === 1 ? route.fulfill({ status: 503, json: { error: 'test' } }) : route.fulfill({ json: { results: places } }));
+  await open(page); await throughQuestions(page);
+  await expect(page.locator('#error-title')).toHaveText('検索先につながりませんでした');
+  await page.locator('#retry').click(); await expect(page.locator('#result-name')).toHaveText('試験カフェ ひと息');
+});
+test('APIの時間切れを表示し、待ち続けない', async ({ page }) => {
+  await open(page); await page.locator('#location-trigger').click(); await selectManual(page);
+  await throughQuestions(page, { submit: false });
+  await page.route('**/v1/search?**', () => {});
+  await page.clock.install(); await page.locator('#question-next').click();
+  await expect(page.locator('#loading-screen')).toBeVisible(); await page.clock.fastForward(10001);
+  await expect(page.locator('#error-title')).toHaveText('少し時間がかかっています');
+});
+test('検索を取り消して戻ると、遅い応答で結果に飛ばされない', async ({ page }) => {
+  let release;
+  const delayed = new Promise((resolve) => { release = resolve; });
+  await page.route('**/v1/search?**', async (route) => { await delayed; await route.fulfill({ json: { results: places } }).catch(() => {}); });
+  await open(page); await throughQuestions(page); await expect(page.locator('#loading-screen')).toBeVisible();
+  await page.locator('#cancel-search').click(); await expect(page.locator('#question-title')).toHaveText('どれくらい動ける？');
+  release(); await page.waitForTimeout(100);
+  await expect(page.locator('#question-screen')).toBeVisible(); await expect(page.locator('input[value="near"]')).toBeChecked();
+});
+test('位置取得の待機も取り消せ、遅い位置情報を無視する', async ({ page }) => {
+  await page.addInitScript(() => Object.defineProperty(navigator, 'geolocation', { value: {
+    getCurrentPosition: (ok) => { window.__lateGps = ok; },
+  } }));
+  await open(page); await throughQuestions(page); await expect(page.locator('#loading-title')).toHaveText('いまいる場所を確認しています');
+  await page.locator('#cancel-search').click();
+  await page.evaluate(() => window.__lateGps({ coords: { latitude: 35.68, longitude: 139.76, accuracy: 10 } }));
+  await expect(page.locator('#question-screen')).toBeVisible(); expect(runs.get(page).search).toHaveLength(0);
+});
+test('GPS精度が粗い場合は結果に場所指定の案内を出す', async ({ page }) => {
+  await page.addInitScript(() => Object.defineProperty(navigator, 'geolocation', { value: {
+    getCurrentPosition: (ok) => ok({ coords: { latitude: 35.68, longitude: 139.76, accuracy: 1200 } }),
+  } }));
+  await open(page); await throughQuestions(page);
+  await expect(page.locator('#accuracy-note')).toContainText('約1200m');
+});
+test('場所検索の0件、失敗、取消、Escapeから再入力できる', async ({ page }) => {
+  let count = 0;
+  await page.route('**/v1/suggest?**', (route) => {
+    count++;
+    return count === 1 ? route.fulfill({ json: { suggestions: [] } })
+      : count === 2 ? route.fulfill({ status: 500, json: {} }) : route.fulfill({ json: { suggestions } });
+  });
+  await open(page); await page.locator('#location-trigger').click();
+  await page.locator('#place-query').fill('試験駅'); await page.locator('#place-submit').click();
+  await expect(page.locator('#place-status')).toContainText('場所が見つかりませんでした');
+  await page.locator('#place-submit').click(); await expect(page.locator('#place-status')).toContainText('検索先につながりませんでした');
+  await page.keyboard.press('Escape'); await expect(page.locator('#location-dialog')).not.toBeVisible();
+  await expect(page.locator('#location-trigger')).toBeFocused();
+  await page.locator('#location-trigger').click(); await selectManual(page);
+});
+test('外部の施設名をHTMLとして解釈しない', async ({ page }) => {
+  const name = '<img src=x onerror=alert(1)> 試験カフェ';
+  await page.route('**/v1/search?**', (route) => route.fulfill({ json: { results: [makePlace(name, .0002)] } }));
+  await open(page); await throughQuestions(page);
+  await expect(page.locator('#result-name')).toHaveText(name); await expect(page.locator('#result-name img')).toHaveCount(0);
+});
+test('キーボードで同行者と質問を選び、見えるフォーカスで進める', async ({ page }) => {
+  await open(page); await page.locator('input[name="companion"]').first().focus();
+  await page.keyboard.press('ArrowRight'); await expect(page.locator('input[value="friends"]')).toBeChecked();
+  await page.keyboard.press('Tab'); await expect(page.locator('#companion-next')).toBeFocused();
+  await page.keyboard.press('Enter'); await expect(page.locator('#question-title')).toBeFocused();
+  await page.keyboard.press('Tab'); await page.keyboard.press('ArrowDown');
+  await expect(page.locator('#question-next')).toBeEnabled();
+});
+test('位置・回答を保存せず、共有はアプリURLだけにする', async ({ page, context }) => {
+  await context.grantPermissions(['clipboard-read', 'clipboard-write']);
+  await open(page); await throughQuestions(page); await expect(page.locator('#result-screen')).toBeVisible();
+  expect(await page.evaluate(() => ({ local: localStorage.length, session: sessionStorage.length }))).toEqual({ local: 0, session: 0 });
+  await page.getByRole('button', { name: 'リンクをコピー', exact: true }).click();
+  expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(`https://rairakku.com/100days${PATH}`);
+});
+for (const width of [390, 768, 1440]) {
+  test(`${width}pxで質問と結果がはみ出さず、44pxの操作領域と動きの軽減がある`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 900 }); await page.emulateMedia({ reducedMotion: 'reduce' });
+    await open(page); await throughQuestions(page);
+    await expect(page.locator('#result-screen')).toBeVisible();
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+    for (const selector of ['#maps-link', '#next-place', '#review-answers', '#location-trigger']) {
+      expect((await page.locator(selector).boundingBox()).height).toBeGreaterThanOrEqual(44);
+    }
+    expect(await page.locator('.screen:visible').evaluate((node) => getComputedStyle(node).animationName)).toBe('none');
+    mkdirSync('.cache/day086', { recursive: true });
+    await page.screenshot({ path: `.cache/day086/result-${width}.png`, fullPage: true });
+  });
+}
+test('100days配下でも場所指定→3問→結果→道案内まで動く', async ({ page }) => {
+  const server = createMountedServer({ prefix: '/100days' });
+  await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve));
+  const base = `http://127.0.0.1:${server.address().port}`;
+  try {
+    await open(page, `${base}/100days${PATH}`);
+    await page.locator('#location-trigger').click(); await selectManual(page);
+    await throughQuestions(page); await expect(page.locator('#result-name')).toHaveText('試験カフェ ひと息');
+    await expect(page.locator('#maps-link')).toHaveAttribute('href', /travelmode=walking/);
+  } finally { await new Promise((resolve) => server.close(resolve)); }
+});
+
+test('BFCacheから戻ったとき、取消済みの位置取得画面を質問へ戻す', async ({ page }) => {
+  await page.addInitScript(() => Object.defineProperty(navigator, 'geolocation', { value: { getCurrentPosition: () => {} } }));
+  await open(page); await throughQuestions(page); await expect(page.locator('#loading-screen')).toBeVisible();
+  await page.evaluate(() => {
+    dispatchEvent(new PageTransitionEvent('pagehide', { persisted: true }));
+    dispatchEvent(new PageTransitionEvent('pageshow', { persisted: true }));
+  });
+  await expect(page.locator('#question-title')).toHaveText('どれくらい動ける？');
+  await expect(page.locator('input[value="near"]')).toBeChecked();
+  await expect(page.locator('#question-next')).toBeEnabled();
+});
+test('BFCacheから場所取得dialogへ戻ったとき、取得をやり直せる', async ({ page }) => {
+  await page.route('**/v1/suggest?**', () => {});
+  await open(page); await page.locator('#location-trigger').click();
+  await page.locator('#place-query').fill('試験駅'); await page.locator('#place-submit').click();
+  await expect(page.locator('#place-submit')).toBeDisabled();
+  await page.evaluate(() => {
+    dispatchEvent(new PageTransitionEvent('pagehide', { persisted: true }));
+    dispatchEvent(new PageTransitionEvent('pageshow', { persisted: true }));
+  });
+  await expect(page.locator('#place-submit')).toBeEnabled();
+  await expect(page.locator('#place-status')).toContainText('もう一度指定できます');
+});
+
+for (const [moodId, groups] of Object.entries(FOOD_GROUPS)) for (const group of groups) for (const dish of group.dishes) {
+  const mood = ({ meal: 'ガッツリ満腹', cafe: '軽め・お茶したい', drink: 'ちょっと一杯' })[moodId];
+  test(`${group.label}→${dish.label}の分岐を店探しに使う`, async ({ page }) => {
+    let query;
+    await page.route('**/v1/search?**', route => {
+      query = new URL(route.request().url()).searchParams.get('q');
+      return route.fulfill({ json: { results: [makePlace(`試験 ${dish.label}の店`, .0003, 'restaurant')] } });
+    });
+    await open(page); await throughQuestions(page, { mood, genre: group.id, dish: dish.id });
+    await expect(page.locator('#result-name')).toHaveText(`試験 ${dish.label}の店`);
+    await expect(page.locator('#result-reason')).toContainText(dish.label);
+    await expect(page.locator('#result-intro')).toHaveText('あなたにおすすめのお店');
+    await expect(page.locator('#answer-summary')).toContainText(dish.label);
+    expect(query).toBe(dish.query);
+  });
+}
+test('麺類から魚料理へ変えるとラーメンを消し、寿司を選び直せる', async ({ page }) => {
+  await open(page); await throughQuestions(page, { mood: 'ガッツリ満腹', genre: 'noodles', dish: 'ramen', submit: false });
+  await expect(page.locator('#stage-label')).toHaveText('STEP 5 / 5');
+  await page.locator('#question-back').click(); await page.locator('#question-back').click();
+  await expect(page.locator('input[value="ramen"]')).toBeChecked();
+  await page.locator('#question-back').click(); await pick(page, '魚料理'); await page.locator('#question-next').click();
+  await expect(page.locator('#question-title')).toHaveText('魚なら、どんな一皿？');
+  await expect(page.locator('#question-next')).toBeDisabled();
+  await expect(page.locator('input[value="ramen"]')).toHaveCount(0);
+  await pick(page, '寿司'); await page.locator('#question-next').click(); await page.locator('#question-next').click();
+  await page.locator('#question-next').click(); await expect(page.locator('#result-name')).toHaveText('試験寿司');
+  expect(runs.get(page).search[0].searchParams.get('q')).toBe('寿司');
+});
+test('食事から外出へ変えると料理を聞かず、3問の流れに切り替わる', async ({ page }) => {
+  await open(page); await pick(page, 'パートナー'); await page.locator('#companion-next').click();
+  await pick(page, 'ガッツリ満腹'); await page.locator('#question-next').click();
+  await pick(page, '麺類'); await page.locator('#question-next').click(); await pick(page, 'ラーメン');
+  await page.locator('#question-back').click(); await page.locator('#question-back').click();
+  await pick(page, '外でリフレッシュ'); await page.locator('#question-next').click();
+  await expect(page.locator('#question-title')).toHaveText('どんな空間がいい？');
+  await expect(page.locator('#stage-label')).toHaveText('STEP 2 / 3');
+  await expect(page.locator('#question-progress li')).toHaveCount(3);
+  await pick(page, '静かにゆっくり'); await page.locator('#question-next').click();
+  await pick(page, 'すぐそこがいい'); await page.locator('#question-next').click();
+  await expect(page.locator('#result-name')).toHaveText('試験公園');
+  await expect(page.locator('#answer-summary')).not.toContainText('ラーメン');
+});
+test('全範囲と同ジャンルでも0件なら、料理を保持して地図検索や選び直しへ進める', async ({ page }) => {
+  const queries = [];
+  await page.route('**/v1/search?**', route => {
+    queries.push(new URL(route.request().url()));
+    return route.fulfill({ json: { results: [makePlace('近くの寿司店', .0001, 'restaurant')] } });
+  });
+  await open(page); await throughQuestions(page, { mood: 'ガッツリ満腹', genre: 'noodles', dish: 'ramen' });
+  await expect(page.locator('#empty-title')).toContainText('ラーメン');
+  const search = page.locator('#empty-screen [data-maps-search]');
+  await expect(search).toContainText('ラーメン');
+  expect(new URL(await search.getAttribute('href')).searchParams.get('query')).toBe('ラーメン near 35.68,139.76');
+  await expect(page.locator('#empty-copy')).toContainText('半径5km');
+  expect(queries.map(url => url.searchParams.get('q'))).toEqual(['ラーメン', 'ラーメン', 'ラーメン', 'ラーメン うどん そば パスタ']);
+  expect(queries.map(url => url.searchParams.get('radius'))).toEqual(['180', '1500', '5000', '5000']);
+  await page.locator('#empty-edit').click();
+  await expect(page.locator('input[value="meal"]')).toBeChecked();
+  await page.locator('#question-next').click(); await page.locator('#question-next').click();
+  await expect(page.locator('input[value="ramen"]')).toBeChecked();
+});
+
+test('近くが0件でも、範囲を広げて具体的な店名と地図の案内まで出す', async ({ page }) => {
+  await page.route('**/v1/search?**', route => {
+    const radius = Number(new URL(route.request().url()).searchParams.get('radius'));
+    return route.fulfill({ json: { results: radius >= 1500 ? [makePlace('試験焼き魚食堂', .008, 'restaurant')] : [] } });
+  });
+  await open(page);
+  await throughQuestions(page, { mood: 'ガッツリ満腹', genre: 'fish', dish: 'grilled_fish', walk: '少し散歩してもいい' });
+  await expect(page.locator('#result-name')).toBeVisible();
+  await expect(page.locator('#result-name')).toHaveText('試験焼き魚食堂');
+  await expect(page.locator('#maps-link')).toBeVisible();
+  await expect(page.locator('#maps-link')).toHaveAttribute('href', /destination=.*travelmode=walking/);
+});
+
+test('料理の店がなくても同ジャンルの店名と地図を、別案と伝えて出す', async ({ page }) => {
+  await page.route('**/v1/search?**', route => {
+    const q = new URL(route.request().url()).searchParams.get('q');
+    return route.fulfill({ json: { results: q === '焼き魚' ? [] : [makePlace('試験寿司の店', .0003, 'restaurant')] } });
+  });
+  await open(page); await throughQuestions(page, { mood: 'ガッツリ満腹', genre: 'fish', dish: 'grilled_fish' });
+  await expect(page.locator('#result-name')).toHaveText('試験寿司の店');
+  await expect(page.locator('#result-reason')).toContainText('近い「魚料理」');
+  await expect(page.locator('#result-food-note')).toContainText('別案');
+  await expect(page.locator('#answer-summary')).toContainText('焼き魚');
+  await expect(page.locator('#maps-link')).toHaveAttribute('href', /destination=35.6803%2C139.76/);
+});
+test('390×667でも店名と地図ボタンが最初の画面に収まる', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 667 });
+  await open(page); await throughQuestions(page);
+  await expect(page.locator('#result-name')).toBeInViewport({ ratio: 1 });
+  await expect(page.locator('#maps-link')).toBeInViewport({ ratio: 1 });
+  const opened = page.waitForEvent('popup');
+  await page.route('https://www.google.com/maps/**', route => route.fulfill({ body: '試験用の地図到着先' }));
+  await page.locator('#maps-link').click();
+  const popup = await opened;
+  expect(new URL(popup.url()).searchParams.get('destination')).toBe('35.6802,139.76');
+  await popup.close();
+});
+test('範囲を広げた検索も取り消せ、遅い結果が画面を変えない', async ({ page }) => {
+  let release;
+  const delayed = new Promise(resolve => { release = resolve; });
+  await page.route('**/v1/search?**', async route => {
+    if (new URL(route.request().url()).searchParams.get('radius') === '180') return route.fulfill({ json: { results: [] } });
+    await delayed;
+    await route.fulfill({ json: { results: [makePlace('遅い焼き魚の店', .008, 'restaurant')] } }).catch(() => {});
+  });
+  await open(page); await throughQuestions(page, { mood: 'ガッツリ満腹', genre: 'fish', dish: 'grilled_fish' });
+  await expect(page.locator('#loading-copy')).toContainText('1.5km');
+  await page.locator('#cancel-search').click(); release();
+  await expect(page.locator('#question-screen')).toBeVisible();
+  await expect(page.locator('input[value="near"]')).toBeChecked();
+  await expect(page.locator('#result-screen')).not.toBeVisible();
+});
+
+test('検索前に範囲拡大・別案と座標の送信先を表示する', async ({ page }) => {
+  await open(page); await throughQuestions(page, { submit: false });
+  await expect(page.locator('#search-consent .search-policy')).toContainText('半径5km');
+  await expect(page.locator('#search-consent .search-policy')).toContainText('近いジャンル');
+  await expect(page.locator('#search-consent .privacy-note')).toContainText('現在地の座標をOpenPOI APIへ');
+  expect(runs.get(page).search).toHaveLength(0);
+});
+
+test('低いスマホ画面でも長い店名・住所・範囲拡大の説明と地図を表示できる', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 667 });
+  const destination = { ...makePlace('試験コーヒー 渋谷スクランブルスクエアショップ＆レストラン店', .008),
+    address: '東京都渋谷区渋谷二丁目24番12号 渋谷スクランブルスクエアショップ＆レストラン 12階' };
+  await page.route('**/v1/search?**', route => route.fulfill({ json: { results: [destination] } }));
+  await open(page); await throughQuestions(page);
+  await expect(page.locator('#result-name')).toHaveText(destination.name);
+  await expect(page.locator('#expanded-note')).toBeVisible();
+  await expect(page.locator('#maps-link')).toBeInViewport({ ratio: 1 });
+});
