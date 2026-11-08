@@ -60,6 +60,58 @@ test('fetch：GET・HEAD は302で転送し、他の方法・表に無いもの�
   } finally { globalThis.fetch = original; }
 });
 
+test('Day088：外部Dayの番号だけ、day<番号>.rairakku.com へ転送する（パスと問い合わせを引き継ぐ）', () => {
+  assert.equal(target('/day88'), 'https://day88.rairakku.com/');
+  assert.equal(target('/day88/'), 'https://day88.rairakku.com/');
+  assert.equal(target('/day88/drive/?a=1&b=2'), 'https://day88.rairakku.com/drive/?a=1&b=2');
+  assert.equal(target('/day81/x.js'), 'https://day81.rairakku.com/x.js');
+  assert.equal(target('/day088/'), 'https://day88.rairakku.com/', 'ゼロ埋めの番号も同じDayへ');
+});
+
+test('Day088：紹介ページを持たない外部Dayは、100日の正の住所（/100days/<フォルダ名>/）からもアプリへ転送する', () => {
+  assert.equal(target('/100days/day-088-bouquet-studio'), 'https://day88.rairakku.com/');
+  assert.equal(target('/100days/day-088-bouquet-studio/'), 'https://day88.rairakku.com/');
+  assert.equal(target('/100days/day-088-bouquet-studio?x=1'), 'https://day88.rairakku.com/?x=1');
+  assert.equal(target('/100days/day-088-bouquet-studio/?x=1'), 'https://day88.rairakku.com/?x=1', '問い合わせは引き継ぐ');
+});
+
+test('Day088：100日の正の住所の下の素材（カードの画像など）は転送しない（転送すると一覧のカードの画像が壊れる）', () => {
+  for (const path of ['/100days/day-088-bouquet-studio/screenshot.webp', '/100days/day-088-bouquet-studio/meta.json', '/100days/day-088-bouquet-studio/drive/', '/100days/day-088-bouquet-studio//']) {
+    assert.equal(target(path), null, path);
+  }
+});
+
+test('Day088：紹介ページを持つ外部Day（Day81）・ほかのDay・似た名前は、100日の正の住所を転送しない', () => {
+  for (const path of ['/100days/day-081-pagecrate/', '/100days/day-082-kageuchi/', '/100days/', '/100days', '/100days/day-088-bouquet-studiox/', '/100days/day-088/', '/100days/Day-088-bouquet-studio/', '/x/100days/day-088-bouquet-studio/']) {
+    assert.equal(target(path), null, path);
+  }
+});
+
+test('Day088：表に無い番号・似た名前・別の深さは転送しない（元のサイトへ素通し）', () => {
+  for (const path of ['/', '/day', '/day0', '/day8/', '/day82/', '/day84/', '/day880/', '/day88abc', '/days88/', '/Day88/', '/xday88/']) {
+    assert.equal(target(path), null, path);
+  }
+});
+
+test('Day088：fetch：GET・HEAD は302で転送し、他の方法・表に無いものは元のサイトへ渡す', async () => {
+  const passed = [];
+  const original = globalThis.fetch;
+  globalThis.fetch = async request => { passed.push(`${request.method} ${new URL(request.url).pathname}`); return new Response('origin'); };
+  try {
+    for (const method of ['GET', 'HEAD']) {
+      for (const [from, to] of [['/day88/?x=1', 'https://day88.rairakku.com/?x=1'], ['/100days/day-088-bouquet-studio/?x=1', 'https://day88.rairakku.com/?x=1']]) {
+        const response = await worker.fetch(new Request(`https://rairakku.com${from}`, { method }));
+        assert.equal(response.status, 302);
+        assert.equal(response.headers.get('location'), to);
+      }
+    }
+    assert.equal(await (await worker.fetch(new Request('https://rairakku.com/day88/', { method: 'POST', body: 'x' }))).text(), 'origin');
+    assert.equal(await (await worker.fetch(new Request('https://rairakku.com/day84/'))).text(), 'origin');
+    assert.equal(await (await worker.fetch(new Request('https://rairakku.com/100days/day-088-bouquet-studio/screenshot.webp'))).text(), 'origin', 'カードの画像は元のサイトへ');
+    assert.deepEqual(passed, ['POST /day88/', 'GET /day84/', 'GET /100days/day-088-bouquet-studio/screenshot.webp']);
+  } finally { globalThis.fetch = original; }
+});
+
 // 実際の外部Day：meta.json が status: external で、公開先が day<番号>.rairakku.com のもの。
 function externalDays() {
   const found = new Map();
