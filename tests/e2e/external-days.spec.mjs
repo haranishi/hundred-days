@@ -40,12 +40,6 @@ const EXTERNAL_DAYS = [
     title: 'Bouquet Studio',
     dir: 'day-088-bouquet-studio',
     url: 'https://day88.rairakku.com/'
-  },
-  {
-    day: '089',
-    title: 'FROSTLINE',
-    dir: 'day-089-frostline',
-    url: 'https://day89.rairakku.com/'
   }
 ];
 

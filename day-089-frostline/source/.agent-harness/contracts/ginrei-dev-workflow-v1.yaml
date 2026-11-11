@@ -1,0 +1,31 @@
+# 開発の工程の契約（複数の工程を回すための取り決め）
+meta: {name: "ginrei-dev-workflow", version: "1.0.0", status: active, owner: "作者"}
+goal: >
+  ブラウザで開くと、架空の雪山をスノーボードで滑れる。切るターン・横滑り・ジャンプと着地が、
+  姿勢・雪煙・音・跡で同時に分かる。完了は、実ブラウザの検査が通り、体験の採点が合格し、作者が5分遊んで合格を出した状態。
+non_goals:
+  - 既存作品の山・画面・名称・音の再現
+  - 公開・push・本番への反映（作者が決めてから別の区切りで扱う）
+  - スキー・対戦・課金
+roles:
+  - {stage: research,  runner: "Codex（読み取りとWeb検索）", deliverable: "docs/research/ の根拠つき報告（R1〜R4は完了）"}
+  - {stage: design,    runner: "設計役（メインの会話）", deliverable: ".kiro/steering と .kiro/specs の要件・設計・タスク"}
+  - {stage: implement, runner: "Codex（画面なしで検算できる部分）／設計役か別のモデル（描画と演出）",
+     deliverable: "コード・試験・変更ファイルの一覧・未解決の一覧",
+     denied: ["git push", "公開", "対象フォルダの外への書き込み", "仕様に無い依存パッケージの追加"]}
+  - {stage: verify,    runner: "決定的な試験 → 実装者と別の担い手の読み取りレビュー → 実ブラウザの検査",
+     deliverable: ".agent-harness/runs/ の検証記録と指摘の一覧（採否は設計役が根拠を確かめて決める）"}
+  - {stage: human_gate, runner: "作者", approves: ["5分プレイの合否", "公開・push", "名称の決定", "有料の素材生成"]}
+loop_control:
+  retry: "検証で不合格なら実装へ差し戻す。上限3周。同じ失敗が2周続いたら止めて作者へ返す"
+  budgets: {max_cycles: 3}
+terminal_states: [SUCCESS, NO_WORK, NEEDS_HUMAN, BUDGET_EXCEEDED, FAILED, UNCERTAIN]
+invariants:
+  - "完了の判定は、試験の結果・実ファイル・実ブラウザの挙動で行う。実装者の「できました」だけで完了にしない"
+  - "設計と実装、実装とレビューを、同じ担い手の同じ作業の中で兼ねない"
+  - "工程のあいだは自己完結の文書で受け渡す（依頼書は .agent-harness/briefs/ に残す）"
+  - "描画・シェーダーを触ったら、実ブラウザのコンソール（警告を含む）を見てから次へ進む"
+  - "押すタイミングが関わる画面の試験は、等速の数回の合格で安定とみなさない。操作の間隔を振り、CPUを遅くしても流す"
+  - "ブラウザを使う試験は、同時に2本まで。終わったら試験用のブラウザを閉じる"
+  - "commit は選んだファイルだけ。手元の git にだけ残す"
+receipt: "各周の結果（何をして・何で確かめ・何が残っているか）を .agent-harness/runs/ に残す"

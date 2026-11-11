@@ -1,0 +1,27 @@
+{
+  "name": "ginrei",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "description": "FROSTLINE（コード名 ginrei）— ブラウザで滑るオリジナルの雪山フリーライド（スノーボード・スキー）",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1 --port 5183 --strictPort",
+    "build": "vite build",
+    "preview": "vite preview --host 127.0.0.1 --port 5184 --strictPort",
+    "test": "NODE_OPTIONS=--max-old-space-size=1536 vitest run",
+    "propgen": "node tools/propgen/generate.mjs",
+    "ridergen": "node tools/ridergen/generate.mjs",
+    "worldgen": "node tools/worldgen/generate.mjs",
+    "worldgen:quick": "node tools/worldgen/generate.mjs --quick",
+    "check:boot": "node tools/shots/boot-check.mjs",
+    "shots": "node tools/shots/capture.mjs"
+  },
+  "dependencies": {
+    "three": "^0.187.0"
+  },
+  "devDependencies": {
+    "playwright": "^1.64.1",
+    "vite": "^8.3.5",
+    "vitest": "^5.1.0"
+  }
+}

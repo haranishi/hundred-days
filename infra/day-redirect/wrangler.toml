@@ -10,5 +10,4 @@ routes = [
   { pattern = "rairakku.com/day*", zone_name = "rairakku.com" },
   { pattern = "rairakku.com/100days/day-083-car360*", zone_name = "rairakku.com" },
   { pattern = "rairakku.com/100days/day-088-bouquet-studio*", zone_name = "rairakku.com" },
-  { pattern = "rairakku.com/100days/day-089-frostline*", zone_name = "rairakku.com" },
 ]

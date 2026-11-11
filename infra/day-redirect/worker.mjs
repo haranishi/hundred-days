@@ -12,7 +12,6 @@ export const EXTERNAL_DAYS = [
   { number: 81 },                             // 紹介ページあり：rairakku.com/100days/day-081-pagecrate/ はサイトの本物のページなので、転送しない
   { number: 83, folder: 'day-083-car360' },   // 紹介ページなし
   { number: 88, folder: 'day-088-bouquet-studio' }, // 紹介ページなし
-  { number: 89, folder: 'day-089-frostline' },      // 紹介ページなし
 ];
 
 const target = (day, rest, url) => `https://day${day.number}.rairakku.com${rest ?? '/'}${url.search}`;
