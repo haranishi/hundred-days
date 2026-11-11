@@ -76,7 +76,7 @@ describe('要件3 進み具合', () => {
   });
 });
 describe('要件4/5/6 地図と戻り先と互換性', () => {
-  it('地図は印のデータと鍵の残り、駅、仕掛けを持つ',()=>{const p=setup(); expect(p.map()).toMatchObject({image:'/world/map.png',stations:expect.any(Array),features:expect.any(Array)}); expect(p.map().drops.find(d=>d.id==='d13')).toMatchObject({locked:true,remaining:3000}); expect(p.begin('d13',rider())).toBe(false);});
+  it('地図は印のデータと鍵の残り、駅、仕掛けを持つ',()=>{const p=setup(); expect(p.map()).toMatchObject({image:'world/map.png',stations:expect.any(Array),features:expect.any(Array)}); expect(p.map().drops.find(d=>d.id==='d13')).toMatchObject({locked:true,remaining:3000}); expect(p.begin('d13',rider())).toBe(false);});
   it('仕掛けを通った30秒だけapproachへ戻る',()=>{const p=setup(); p.update(rider({pos:{x:50,y:490,z:50}}),[],.1); expect(p.retryPoint()).toMatchObject({x:50,z:90,speed:12}); p.update(rider({pos:{x:100,y:400,z:100}}),[],30.1); expect(p.retryPoint().id).toBe('d0');});
   it('古い山・古い出来事でも動き、状態と山を書き換えない',()=>{const world={drops:[{id:'d0',name:'練習',x:0,z:0}]}; const p=setup(world),s=rider({speed:0}); const before=structuredClone(s),w=structuredClone(world); p.update(s,[{type:'land',quality:'clean'}],3); expect(s).toEqual(before); expect(world).toEqual(w); expect(p.snapshot().canFinish).toBe(true); expect(p.finish()).toBeTruthy();});
 });
