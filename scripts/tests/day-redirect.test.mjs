@@ -112,6 +112,22 @@ test('Day088：fetch：GET・HEAD は302で転送し、他の方法・表に無�
   } finally { globalThis.fetch = original; }
 });
 
+test('Day089：外部Dayの番号だけ、day<番号>.rairakku.com へ転送する（パスと問い合わせを引き継ぐ）', () => {
+  assert.equal(target('/day89'), 'https://day89.rairakku.com/');
+  assert.equal(target('/day89/'), 'https://day89.rairakku.com/');
+  assert.equal(target('/day89/about/?a=1&b=2'), 'https://day89.rairakku.com/about/?a=1&b=2');
+  assert.equal(target('/day089/'), 'https://day89.rairakku.com/', 'ゼロ埋めの番号も同じDayへ');
+});
+
+test('Day089：紹介ページを持たない外部Dayは、100日の正の住所（/100days/<フォルダ名>/）からもアプリへ転送する。下の素材は転送しない', () => {
+  assert.equal(target('/100days/day-089-frostline'), 'https://day89.rairakku.com/');
+  assert.equal(target('/100days/day-089-frostline/'), 'https://day89.rairakku.com/');
+  assert.equal(target('/100days/day-089-frostline/?x=1'), 'https://day89.rairakku.com/?x=1', '問い合わせは引き継ぐ');
+  for (const path of ['/100days/day-089-frostline/screenshot.webp', '/100days/day-089-frostline/demo.mp4', '/100days/day-089-frostline/meta.json', '/100days/day-089-frostlinex/', '/day890/', '/day89abc']) {
+    assert.equal(target(path), null, path);
+  }
+});
+
 // 実際の外部Day：meta.json が status: external で、公開先が day<番号>.rairakku.com のもの。
 function externalDays() {
   const found = new Map();
