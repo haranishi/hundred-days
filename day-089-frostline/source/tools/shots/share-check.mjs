@@ -22,6 +22,7 @@ try {
     const problems = [];
     page.on('console', m => { if (m.type() === 'error') problems.push(m.text().slice(0, 240)); });
     page.on('pageerror', e => problems.push(`例外: ${e.message}`));
+    page.on('response', r => { if (r.status() >= 400) problems.push(`${r.status()} ${r.url()}`); });
     // 手元の確認用サーバーには、本番と同じ CSP を付けて読む。本番（Cloudflare）は、本物の設定がそのまま付くので、手を加えない
     const local = ['127.0.0.1', 'localhost'].includes(new URL(values.url).hostname);
     if (local) await context.route('**/*', async route => {
@@ -85,7 +86,7 @@ try {
     // 「このゲームについて」と 404
     const about = await context.newPage(); const aboutProblems = [];
     about.on('console', m => { if (m.type() === 'error') aboutProblems.push(m.text().slice(0, 200)); });
-    await about.goto(new URL('/about/', values.url).href, { waitUntil: 'load' });
+    await about.goto(new URL('about/', values.url).href, { waitUntil: 'load' }); // 相対（/100days/… の下でも、その下の about/）
     const aboutOk = (await about.title()).includes('このゲームについて') && await about.evaluate(() => document.documentElement.scrollWidth <= innerWidth);
     await about.screenshot({ path: join(values.out, `about-${label}.png`), fullPage: true });
     check(`${label} このゲームについて（横にはみ出さない・誤り 0）`, aboutOk && aboutProblems.length === 0, aboutProblems.join(' / '));

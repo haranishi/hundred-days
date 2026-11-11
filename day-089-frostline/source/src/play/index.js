@@ -13,7 +13,7 @@ export function createPlay({world={},storage}={}) {
   function announce(text){notice=text;noticeFor=R.noticeSeconds;}
   function map(){
     const p=progress.get(),meta=world.map??world.meta?.map;
-    return copy({image:meta?.file?`/world/${meta.file}`:null,size:world.size??world.meta?.size??6144,stations,features,total:p.totals.descent,
+    return copy({image:meta?.file?`world/${meta.file}`:null,size:world.size??world.meta?.size??6144,stations,features,total:p.totals.descent,
       drops:drops.filter(visible).map(d=>({...d,locked:!unlocked(d),remaining:Math.max(0,(thresholds.get(d.id)??0)-p.totals.descent),threshold:thresholds.get(d.id)??0,
         station:stations.find(s=>s.id===d.finish)?.name??'駅の情報はありません',best:p.drops[d.id]?.best??0,
         runs:p.drops[d.id]?.runs??0,goals:goalsFor(d.kind).map((g,i)=>({...g,earned:p.drops[d.id]?.stars[i]??false}))}))});

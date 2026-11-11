@@ -1,6 +1,6 @@
 # Day 089「FROSTLINE」
 
-ブラウザで開くだけで滑れる、オリジナルの雪山ゲーム。架空の盆地（一辺4km・標高差1,500m）を、スノーボードかスキーで自由に滑ります。
+ブラウザで開くだけで滑れる、オリジナルの雪山ゲーム。架空の盆地（一辺4km・標高差約1,600m）を、スノーボードかスキーで自由に滑ります。
 エッジを立てれば雪を切って曲がり、板を横へ向ければ雪を削って止まります。ジャンプ台では、回転・宙返り・板をつかむ技が出せます。
 
 - [アプリを開く](https://rairakku.com/100days/day-089-frostline/)
@@ -20,6 +20,7 @@
 - 外部への通信はありません。設定と進み具合は、端末のブラウザ（localStorage）にだけ保存します。Cookie・アクセス解析は使っていません。
 - 元のコードは [source/](source/README.md) にあります。動かし方は `cd source && npm ci && npm run worldgen && npm run dev`。このフォルダへの組み立ては `node tools/build-day089.mjs`。
 - 設計の理由と落とし穴は [source/.kiro/steering/](source/.kiro/steering/) と [source/.kiro/specs/](source/.kiro/specs/)、着手前の調査は [source/docs/research/](source/docs/research/) にあります。
+- 宣伝動画（縦型30秒・BGM 2案）の道具は [tools/promo/](tools/promo/README.md) です。画面はすべて実際のゲームを1コマずつ撮ったもので、BGM は計算だけで合成しています。字幕の書体は Zen Kaku Gothic New（SIL Open Font License 1.1。書体のファイルはリポジトリに入れていません）。
 
 ## 権利と法律の確認（2026-11-11）
 
