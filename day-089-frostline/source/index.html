@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#172735">
+  <title>FROSTLINE｜ブラウザで滑る雪山（スノーボード・スキー）</title>
+  <meta name="description" content="ブラウザで開くだけで滑れる、オリジナルの雪山ゲーム。架空の山を、スノーボードかスキーで自由に滑る。ジャンプ台で技も出せる。スマホは指で操作できる。無料・登録なし。">
+  <meta name="share:text" content="ブラウザで滑れる雪山「FROSTLINE」。スノーボードとスキーで、架空の山を自由に滑る🏂">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="shared/share.css">
+  <script defer src="shared/share.js"></script>
+  <link rel="stylesheet" href="/src/styles/shell.css">
+</head>
+<body>
+  <main id="game" aria-label="FROSTLINE 雪山フリーライド">
+    <div class="boot" data-boot>
+      <p class="boot__title" lang="en">FROSTLINE</p>
+      <p class="boot__status" role="status">雪山のデータ（約 36 MB）を読み込んでいます</p>
+      <button type="button" class="boot__share" data-share-open aria-label="このアプリを共有する">共有</button>
+    </div>
+  </main>
+  <dialog class="share-dialog" data-share-dialog aria-labelledby="share-heading">
+    <h2 id="share-heading">このゲームを共有</h2>
+    <footer id="share"></footer>
+    <button type="button" class="share-dialog__close" data-share-close>閉じる</button>
+  </dialog>
+  <noscript>このゲームは、JavaScript を有効にすると遊べます。</noscript>
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>

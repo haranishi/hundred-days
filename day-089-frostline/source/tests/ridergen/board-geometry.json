@@ -1,0 +1,85 @@
+{
+  "vertices": 16327,
+  "triangles": 32394,
+  "bytes": 782144,
+  "attributes": {
+    "position": {
+      "type": "Float32Array",
+      "offset": 0,
+      "count": 48981,
+      "itemSize": 3,
+      "normalized": false
+    },
+    "normal": {
+      "type": "Int16Array",
+      "offset": 195924,
+      "count": 48981,
+      "itemSize": 3,
+      "normalized": true
+    },
+    "skinIndex": {
+      "type": "Uint8Array",
+      "offset": 293888,
+      "count": 65308,
+      "itemSize": 4,
+      "normalized": false
+    },
+    "skinWeight": {
+      "type": "Uint16Array",
+      "offset": 359196,
+      "count": 65308,
+      "itemSize": 4,
+      "normalized": true
+    },
+    "part": {
+      "type": "Uint8Array",
+      "offset": 489812,
+      "count": 16327,
+      "itemSize": 1,
+      "normalized": false
+    },
+    "wrinkle": {
+      "type": "Uint8Array",
+      "offset": 506140,
+      "count": 16327,
+      "itemSize": 1,
+      "normalized": true
+    },
+    "flutter": {
+      "type": "Uint8Array",
+      "offset": 522468,
+      "count": 16327,
+      "itemSize": 1,
+      "normalized": true
+    },
+    "ao": {
+      "type": "Uint8Array",
+      "offset": 538796,
+      "count": 16327,
+      "itemSize": 1,
+      "normalized": true
+    },
+    "seam": {
+      "type": "Uint8Array",
+      "offset": 555124,
+      "count": 16327,
+      "itemSize": 1,
+      "normalized": true
+    },
+    "tone": {
+      "type": "Uint8Array",
+      "offset": 571452,
+      "count": 16327,
+      "itemSize": 1,
+      "normalized": true
+    },
+    "index": {
+      "type": "Uint16Array",
+      "offset": 587780,
+      "count": 97182,
+      "itemSize": 1,
+      "normalized": false
+    }
+  },
+  "sha256": "406b7bf60d7bda3874b5639f050a2a5e118e9181773529139ee5a8c9fbcb71dc"
+}

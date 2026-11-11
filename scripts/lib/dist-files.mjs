@@ -14,6 +14,8 @@ export const EXCLUDED_DIRS = ['tools/cache', 'tests', 'node_modules'];
 /* ソースから組み立てたビルド結果を同じフォルダに置いているDayは、ソースと生成ツールを配信しない。
    見るのはDayのフォルダ直下の名前だけ（リポジトリを置いた場所の名前に source が含まれていても外さない） */
 export const SOURCE_DIRS_BY_APP = {
+  // Day89 は source/ から作った index.html・assets/・world/（山のデータ）・models/ などだけを配信する（元のコード・道具・試験・設計の文書は配らない）
+  'day-089-frostline': ['source'],
   // Day87 の tools/ は、共有画像と作品の絵を作り直す道具と、宣伝動画の道具。アプリの実行には要らず、配信しない。
   'day-087-oricube': ['tools'],
   // Day84はブラウザ用アセットを配信し、旧NodeソースとWorker/検証ツールは配信しない。

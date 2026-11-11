@@ -1,0 +1,288 @@
+:root {
+  color-scheme: dark;
+  --text: #fff;
+  --accent: #ff9a3d;
+  --panel: rgb(8 17 26 / 88%);
+  --line: rgb(255 255 255 / 35%);
+  --radius: 12px;
+  --space: 16px;
+  --safe-top: max(var(--space), env(safe-area-inset-top, 0px));
+  --safe-right: max(var(--space), env(safe-area-inset-right, 0px));
+  --safe-bottom: max(var(--space), env(safe-area-inset-bottom, 0px));
+  --safe-left: max(var(--space), env(safe-area-inset-left, 0px));
+  font-family: system-ui, sans-serif;
+  color: var(--text);
+  background: #172735;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; overscroll-behavior: none; }
+[hidden] { display: none !important; }
+button, select, input { font: inherit; color: inherit; accent-color: var(--accent); }
+button, select { min-width: 44px; min-height: 44px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--panel); padding: 10px 16px; }
+button { cursor: pointer; touch-action: manipulation; }
+/* 指で押す画面では、押した後も hover が残る（橙の枠が付いたままになる）。マウスのある画面だけに付ける */
+@media (hover: hover) { button:hover { border-color: var(--accent); } }
+button:disabled { opacity: .55; cursor: not-allowed; }
+.title-bottom button:disabled { cursor: wait; }
+/* 鍵のかかったボタン：暗くするのではなく、点線の枠の「押せない形」にする（橙を暗くすると濁って見えた） */
+button.locked:disabled { opacity: 1; background: transparent; border-style: dashed; color: rgb(255 255 255 / 85%); font-weight: 400; }
+button:focus-visible, select:focus-visible, input:focus-visible, [tabindex]:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+button.primary { background: var(--accent); border-color: var(--accent); color: #16120d; font-weight: 700; }
+p { margin: 0; line-height: 1.6; }
+h1, h2 { margin: 0; }
+#game, .canvas-host, .ui-layer { position: absolute; inset: 0; width: 100%; height: 100%; height: 100dvh; }
+.canvas-host { touch-action: none; }
+.canvas-host canvas { display: block; width: 100%; height: 100%; }
+.ui-layer { pointer-events: none; }
+.ui-layer button, .ui-layer input, .ui-layer select, .modal-backdrop, [data-control="steer"] { pointer-events: auto; }
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); }
+.title-screen { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: space-between; align-items: center; padding: var(--safe-top) var(--safe-right) var(--safe-bottom) var(--safe-left); gap: var(--space); overflow-y: auto; }
+.title-mark { text-align: center; padding-top: clamp(8px, 4vh, 48px); text-shadow: 0 2px 12px #000; }
+.title-mark h1 { font-size: clamp(44px, 8vw, 92px); font-weight: 600; letter-spacing: .2em; margin-right: -.2em; }
+.roman { letter-spacing: .35em; font-size: 16px; margin: 4px 0 8px; }
+.title-bottom { width: min(100%, 520px); text-align: center; padding: var(--space); display: grid; gap: 12px; margin-top: 40px; }
+.title-bottom .primary { min-height: 56px; font-size: 20px; }
+/* 滑る道具の選択（スノーボード／スキー）：横並びの 2 つのボタン。選んでいるほうは、強調色の枠と字と、薄い地（塗りつぶしは「滑りはじめる」だけ） */
+.gear-choice { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.title-bottom .gear-choice button { min-height: 44px; font-size: 16px; font-weight: 700; cursor: pointer; }
+.gear-choice button[aria-checked="true"] { border: 2px solid var(--accent); color: var(--accent); background: rgba(255, 154, 61, 0.14); }
+.gear-choice button[aria-checked="true"]::before { content: "✓ "; }
+.gear-choice button[aria-checked="false"] { opacity: 0.82; }
+.guide { font-size: 14px; }
+/* 速さの欄：書体はほかと同じ（小さな数字だけ等幅だった）。桁がそろうよう、数字の幅だけそろえる */
+.readouts { position: absolute; bottom: var(--safe-bottom); left: var(--safe-left); padding: 8px 14px; font-variant-numeric: tabular-nums; font-size: 15px; }
+.readout-speed { line-height: 1.15; }
+.readout-sub { line-height: 1.5; }
+.speed { font-size: 34px; font-weight: 600; }
+/* 案内の帯（文と、押すもの）：幅は文の長さに合わせる（短い文に 600px の帯が出て、景色を塞いだ） */
+.hud-center { position: absolute; bottom: var(--safe-bottom); left: 50%; transform: translateX(-50%); width: max-content; max-width: min(600px, calc(100% - 320px)); padding: 10px 16px; text-align: center; font-size: 15px; }
+.hud-actions { display: flex; justify-content: center; gap: 8px; }
+.hud-center.has-actions .hud-actions { margin-top: 8px; }
+.label-short { display: none; }
+.camera, .pause { position: absolute; top: var(--safe-top); }
+.camera { left: var(--safe-left); }
+.pause { right: var(--safe-right); }
+.controls [data-control] { touch-action: none; user-select: none; -webkit-user-select: none; }
+.touch-only { display: none; }
+.has-touch .touch-only { display: flex; align-items: center; justify-content: center; }
+.stick { position: absolute; width: 132px; height: 132px; left: var(--safe-left); bottom: var(--safe-bottom); border-radius: 50%; }
+.stick::after { content: ''; position: absolute; inset: 38%; border: 1px solid var(--line); border-radius: 50%; }
+.jump { position: absolute; width: 88px; height: 88px; right: var(--safe-right); bottom: var(--safe-bottom); border-radius: 50%; padding: 4px; }
+.brake { position: absolute; width: 72px; height: 56px; right: var(--safe-right); bottom: calc(var(--safe-bottom) + 104px); }
+.touch-mode .readouts { bottom: calc(var(--safe-bottom) + 148px); }
+/* 指で遊ぶ画面：案内の文は、上のボタンのすぐ下へ。押すものは、下の中央（舵とジャンプのあいだ）へ。
+   1 つの板にして下へ置くと、滑走者に重なった。板の枠を外し（display: contents）、文とボタンを別々に置く */
+.touch-mode .hud-center { display: contents; }
+.touch-mode .message { position: absolute; top: calc(var(--safe-top) + 56px); left: 50%; transform: translateX(-50%); width: max-content; max-width: calc(100% - var(--safe-left) - var(--safe-right)); padding: 8px 14px; text-align: center; font-size: 15px; background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); }
+/* 舵（左・幅 132）とジャンプ（右・幅 88）のあいだに置く。左右の幅が違うので、画面の中央ではなく、すき間の中央へ */
+.touch-mode .hud-actions { position: absolute; left: calc(var(--safe-left) + 140px); right: calc(var(--safe-right) + 96px); bottom: calc(var(--safe-bottom) + 38px); }
+.touch-mode .hud-actions button { min-height: 48px; padding: 10px 12px; white-space: nowrap; font-weight: 600; }
+.touch-mode .label-long { display: none; }
+.touch-mode .label-short { display: inline; }
+.modal-backdrop { position: absolute; inset: 0; display: grid; place-items: center; padding: var(--safe-top) var(--safe-right) var(--safe-bottom) var(--safe-left); background: rgb(4 10 16 / 40%); }
+.modal { width: min(100%, 420px); max-height: 100%; overflow-y: auto; padding: var(--space); }
+.modal h2 { font-size: 24px; margin-bottom: var(--space); }
+[data-pause-menu], [data-settings], [data-fields] { display: grid; gap: 12px; }
+[data-fields] label { min-height: 44px; display: flex; gap: var(--space); justify-content: space-between; align-items: center; }
+[data-fields] select { max-width: 60%; }
+[data-fields] input[type="range"] { min-width: 44px; min-height: 44px; width: 55%; }
+[data-fields] input[type="checkbox"] { width: 44px; height: 44px; margin: 0; }
+@media (max-width: 767px) {
+  :root { --space: 12px; --radius: 10px; }
+  .hud-center { bottom: calc(var(--safe-bottom) + 100px); max-width: calc(100% - var(--safe-left) - var(--safe-right)); }
+  .title-mark h1 { font-size: 56px; }
+  .title-bottom { padding: 12px; gap: 8px; }
+}
+@media (orientation: landscape) and (max-height: 540px) {
+  :root { --space: 8px; }
+  .title-mark { padding-top: 0; }
+  .title-mark h1 { font-size: 40px; }
+  .title-bottom { margin-top: 16px; padding: 8px; gap: 4px; }
+  .title-bottom .primary { min-height: 44px; font-size: 18px; }
+  .title-bottom .guide { font-size: 13px; }
+  .title-mark .roman { margin: 0; font-size: 12px; }
+  .stick { width: 108px; height: 108px; }
+  .touch-mode .readouts { bottom: calc(var(--safe-bottom) + 120px); padding: 4px 10px; font-size: 13px; }
+  .speed { font-size: 24px; }
+  .touch-mode .message { max-width: calc(100% - 300px); font-size: 13px; padding: 6px 12px; }
+  .touch-mode .hud-actions { left: calc(var(--safe-left) + 116px); bottom: var(--safe-bottom); }
+}
+/* 題字の画面を作る前に失敗したとき（山のデータが読めないなど）の案内。main.js が出す */
+.boot-failure {
+  position: fixed; inset: 0; display: grid; place-content: center; gap: 8px;
+  padding: var(--safe-top) var(--safe-right) var(--safe-bottom) var(--safe-left);
+  text-align: center; background: #172735;
+}
+.boot-failure p { margin: 0; max-width: 34em; line-height: 1.7; }
+.boot-failure__title { font-size: 18px; font-weight: 700; }
+.boot-failure__detail { font-size: 13px; opacity: .8; overflow-wrap: anywhere; }
+@media (prefers-reduced-motion: no-preference) {
+  button { transition: opacity .15s ease; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+}
+/* I12: 記録と地図も既存の板・書体・橙だけで組み立てる。 */
+.map-toggle { position: absolute; top: var(--safe-top); left: 50%; transform: translateX(-50%); }
+.summary-panel { width: min(100%, 700px); }
+.summary-body { display: grid; gap: 12px; }
+.summary-stats { display: grid; grid-template-columns: repeat(5, minmax(0,1fr)); gap: 8px; margin: 0; }
+.summary-stats dt { font-size: 14px; opacity: .9; }
+/* 数字は大きく、単位は小さく（5 つの数字の見え方をそろえる） */
+.summary-stats dd { margin: 2px 0 0; font-size: 22px; font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.summary-stats dd small { font-size: 13px; font-weight: 400; margin-right: 2px; }
+.summary-actions { display: grid; gap: 8px; }
+.summary-best, .summary-opened { font-size: 15px; overflow-wrap: anywhere; }
+.goal-list { list-style: none; padding: 0; margin: 0; font-size: 15px; line-height: 1.7; }
+/* 課題の状態は、色だけでなく、印（★と☆）と文字（達成済み・今回達成・まだ）でも示す */
+.goal-list li small { margin-left: 6px; font-size: max(13px, .93em); }
+.goal-list li:not(.earned):not(.fresh) { color: rgb(255 255 255 / 70%); }
+.goal-list .earned { color: #fff; }
+.goal-list .fresh { color: var(--accent); }
+/* 記録の画面：今回取れた課題は、枠と太字で強める（課題の列そのものを先頭に置く） */
+.summary-body .goal-list { display: grid; gap: 4px; }
+.summary-body .goal-list .fresh { padding: 6px 12px; border: 1px solid var(--accent); border-radius: var(--radius); font-weight: 700; }
+.fresh, [aria-pressed="true"] { color: var(--accent); }
+.map-panel { width: min(100%, 1040px); }
+/* 地図：正方形の絵の上に、出発地点の印（押せる）と、駅・仕掛けの小さな記号（押せない）を置く */
+/* 広い画面：左に絵と凡例、右に詳細・名前の一覧・戻る（名前の一覧を下の帯にすると、右の欄の下が空いて、帯の端で札が切れた） */
+.map-body { display: grid; grid-template-columns: auto minmax(260px, 1fr); grid-template-areas: "left details" "left names" "left close"; grid-template-rows: auto auto 1fr; gap: 8px 16px; align-items: start; }
+.map-left { grid-area: left; display: grid; gap: 8px; align-content: start; min-width: 0; }
+.map-visual { position: relative; width: min(58vh, 560px); aspect-ratio: 1; border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; pointer-events: auto; background: #dfe7ee; }
+.map-surface { position: absolute; inset: 0; }
+.map-surface img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.map-surface > p { padding: 12px; color: #1a2a38; }
+.map-lines { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.map-leader { stroke: #0b1620; stroke-width: .35; opacity: .75; }
+.map-anchor { fill: #0b1620; }
+.map-route { stroke: var(--accent); stroke-width: .6; stroke-dasharray: 1.6 1.4; }
+.map-mark { position: absolute; transform: translate(-50%,-50%); font-size: 12px; line-height: 1; color: #0b1620; text-shadow: 0 0 2px #fff, 0 0 2px #fff; pointer-events: none; }
+.map-mark-station { font-size: 15px; font-weight: 700; }
+.map-mark-station.is-finish { color: #b4480c; font-size: 18px; }
+.map-you { position: absolute; width: 12px; height: 12px; transform: translate(-50%,-50%) rotate(45deg); background: var(--accent); border: 2px solid #0b1620; pointer-events: none; }
+.map-pin { position: absolute; transform: translate(-50%,-50%); width: 44px; height: 44px; min-width: 44px; min-height: 44px; padding: 0; border: 0; background: transparent; display: grid; place-items: center; z-index: 2; }
+.map-badge { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; align-content: center; background: #0f1b26; border: 2px solid #f4f7fa; color: #fff; line-height: 1; box-shadow: 0 1px 4px rgba(0,0,0,.45); }
+.map-badge b { font-size: 15px; font-weight: 700; }
+.map-badge i { font-size: 7px; font-style: normal; letter-spacing: .5px; margin-top: 1px; }
+/* 鍵の地点：番号は残し、札の形（角ばった点線の枠）と小さな「鍵」の字で示す */
+.map-pin.is-locked .map-badge { border-style: dashed; border-radius: 9px; background: #37424e; color: #e9edf1; }
+.map-pin.is-locked .map-badge b { font-size: 13px; }
+.map-pin.is-locked .map-badge i { font-size: 10px; letter-spacing: 0; margin-top: 0; }
+.map-pin[aria-pressed="true"] .map-badge { border-color: var(--accent); background: var(--accent); color: #1a1205; transform: scale(1.12); }
+.map-pin:focus-visible .map-badge { outline: 3px solid #fff; outline-offset: 2px; }
+.map-legend { margin: 0; font-size: 14px; line-height: 1.5; max-width: min(58vh, 560px); display: flex; flex-wrap: wrap; gap: 2px 14px; }
+.map-legend-item { display: inline-flex; align-items: center; gap: 4px; white-space: nowrap; }
+.map-legend-item i { font-style: normal; }
+.map-legend-locked { width: 13px; height: 13px; border: 1.5px dashed #e9edf1; border-radius: 3px; background: #37424e; }
+.map-details { grid-area: details; display: grid; align-content: start; gap: 8px; min-width: 0; overflow-wrap: anywhere; }
+.map-details h3 { margin: 0; font-size: 20px; }
+.map-details p { margin: 0; line-height: 1.6; }
+.map-level, .map-facts { font-size: 14px; }
+.map-facts { display: flex; flex-wrap: wrap; gap: 0 1.2em; }
+.map-facts span { white-space: nowrap; }
+/* 鍵の条件の文は、橙にしない（橙は、押すもの・選んでいるもの・取れたものだけに使う） */
+.map-locked { color: rgb(255 255 255 / 82%); font-size: 14px; }
+.map-details button { width: 100%; margin-top: 4px; }
+.map-names-wrap { grid-area: names; position: relative; min-width: 0; align-self: start; }
+.map-names { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 6px; padding: 2px; pointer-events: auto; }
+.map-names button { display: flex; align-items: center; gap: 6px; min-width: 0; padding: 4px 8px; font-size: 13px; line-height: 1.25; text-align: left; }
+.map-names button b { flex: 0 0 auto; min-width: 1.3em; text-align: center; font-variant-numeric: tabular-nums; }
+/* 名前は、語の途中で折らない（折ってよい所は、名前の中の wbr） */
+.map-names button span { min-width: 0; word-break: keep-all; overflow-wrap: normal; }
+.map-names button i { flex: 0 0 auto; margin-left: auto; padding: 1px 5px; border-radius: 4px; background: rgb(255 255 255 / 16%); font-style: normal; font-size: 12px; line-height: 1.2; }
+.map-names button.is-locked { border-style: dashed; color: rgb(255 255 255 / 78%); }
+.map-names button[aria-pressed="true"] { border-color: var(--accent); color: var(--accent); background: rgb(255 154 61 / 16%); }
+.map-close { grid-area: close; align-self: start; }
+[data-clear-confirm] { padding: 8px 0; }
+@media (max-width: 600px) {
+  .summary-stats { grid-template-columns: repeat(3,minmax(0,1fr)); }
+  .summary-stats dd { font-size: 19px; }
+  .summary-panel { padding: 16px; }
+}
+/* 地図：幅 900px までは縦に積む（絵と詳細を横に並べると、幅 768 で詳細のボタンが画面の外へ出た） */
+@media (max-width: 900px) and (min-height: 481px) {
+  .map-panel { padding: 12px; }
+  .map-panel h2 { font-size: 20px; margin-bottom: 8px; }
+  .map-body { grid-template-columns: minmax(0,1fr); grid-template-areas: "left" "names" "details" "close"; grid-template-rows: none; gap: 6px; }
+  .map-left { gap: 4px; justify-items: center; }
+  .map-visual { width: min(100%, 44vh); }
+  .map-legend { font-size: 13px; max-width: none; justify-content: center; gap: 0 12px; }
+  .map-details { gap: 4px; font-size: 14px; }
+  .map-details h3 { font-size: 17px; }
+  .map-details .goal-list { font-size: 13px; line-height: 1.5; }
+}
+@media (max-height: 480px) and (min-width: 601px) {
+  .summary-panel { width: min(100%, 790px); padding: 12px; }
+  .summary-body { grid-template-columns: 1fr 280px; gap: 6px 16px; }
+  .summary-stats, .summary-best, .summary-opened, .summary-body .goal-list { grid-column: 1; }
+  .summary-body .goal-list .fresh { padding: 3px 10px; }
+  .summary-actions { grid-column: 2; grid-row: 1 / span 4; align-content: center; }
+  .summary-stats { grid-template-columns: repeat(3,minmax(0,1fr)); }
+  .summary-stats dd { font-size: 17px; margin: 0; }
+  .summary-best, .summary-opened, .summary-body .goal-list { font-size: 13px; line-height: 1.5; }
+  .map-panel { padding: 10px 12px; }
+  .map-panel h2 { font-size: 16px; margin-bottom: 4px; }
+  .map-body { grid-template-columns: auto minmax(240px, 1fr); grid-template-areas: "left details" "left names" "left close"; grid-template-rows: auto auto auto; gap: 4px 12px; }
+  .map-visual { width: min(58vh, 300px); }
+  .map-legend { font-size: 13px; max-width: min(58vh, 300px); gap: 0 10px; line-height: 1.35; }
+  .map-details { gap: 2px; font-size: 13px; }
+  .map-details .goal-list { font-size: 13px; line-height: 1.4; }
+  .map-details h3 { font-size: 15px; }
+  .map-details p { line-height: 1.35; }
+}
+/* 景色を見る：下の帯だけ。景色を塞がない */
+.vista { position: absolute; inset: 0; pointer-events: none; }
+.vista-bar { position: absolute; left: 50%; bottom: calc(var(--safe-bottom) + 12px); transform: translateX(-50%); display: flex; gap: 8px; align-items: center; padding: 8px; pointer-events: auto; max-width: calc(100% - 24px); }
+.vista-bar p { margin: 0 8px; min-width: 9em; text-align: center; font-size: 15px; }
+.vista-bar button { min-width: 64px; }
+/* 「次へ」と「戻る」のあいだの区切り（隣り合っていて、押し間違えやすかった） */
+.vista-gap { align-self: stretch; width: 1px; margin: 4px 6px; background: var(--line); }
+@media (max-width: 600px) { .vista-bar p { min-width: 6em; font-size: 13px; margin: 0 2px; } .vista-bar button { min-width: 52px; padding-left: 8px; padding-right: 8px; } }
+
+/* I12b：小さな印は地図面の位置を示す。操作は地図面と独立した44pxの送り。 */
+.map-navigator { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.map-navigator h3 { flex: 1; min-width: 0; }
+.map-navigator button { flex: 0 0 44px; width: 44px; height: 44px; padding: 0; margin: 0; font-size: 26px; }
+.is-compact .map-pin { width: 24px; height: 24px; min-width: 0; min-height: 0; cursor: pointer; }
+.is-compact .map-badge { width: 24px; height: 24px; border-width: 1px; }
+.is-compact .map-badge b, .is-compact .map-pin.is-locked .map-badge b { font-size: 13px; }
+.is-compact .map-badge i { display: none; }
+.is-compact .map-pin.is-locked .map-badge { border-radius: 4px; }
+.is-compact .map-pin[data-selected="true"] { width: 36px; height: 36px; z-index: 3; }
+.is-compact .map-pin[data-selected="true"] .map-badge { width: 36px; height: 36px; background: var(--accent); border-color: #1a1205; color: #1a1205; }
+.title-bottom { gap: 6px; padding: 10px 12px; }
+.title-links { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+@media (orientation: landscape) and (max-height: 540px) {
+  /* 中央の滑走者を空け、メニューは右下へ。開始ボタンも高さ390内に置く。 */
+  .title-screen { flex-direction: row; align-items: flex-end; }
+  .title-mark { align-self: flex-start; }
+  .title-bottom { width: min(40%, 340px); margin-top: 0; gap: 4px; padding: 8px; }
+  .title-bottom p { font-size: 13px; line-height: 1.35; }
+}
+@media (max-height: 480px) and (min-width: 601px) {
+  .map-body.is-compact { grid-template-areas: "left details" "left legend" "left close"; }
+  .map-body.is-compact .map-left { display: contents; }
+  .map-body.is-compact .map-visual { grid-area: left; }
+  .map-body.is-compact .map-legend { grid-area: legend; display: grid; grid-template-columns: 1fr 1fr; max-width: none; gap: 0 8px; font-size: 13px; }
+  .map-body.is-compact .map-legend-item { white-space: normal; }
+}
+/* リンクをボタンと同じ形で出す（共有の「X に投稿する」「LINE で送る」・題字の「このゲームについて」） */
+a.button { display: flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 16px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--panel); color: inherit; text-decoration: none; touch-action: manipulation; }
+a.button:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+@media (hover: hover) { a.button:hover { border-color: var(--accent); } }
+.ui-layer a { pointer-events: auto; }
+/* 題字：英字 9 文字。漢字 2 文字の頃の大きさと字間のままだと、幅 390 の画面からはみ出した */
+.title-mark h1 { font-size: clamp(48px, 7vw, 96px); letter-spacing: .12em; margin-right: -.12em; }
+@media (max-width: 767px) { .title-mark h1 { font-size: min(44px, 11.5vw); } }
+@media (orientation: landscape) and (max-height: 540px) { .title-mark h1 { font-size: 36px; } }
+/* 読み込み中の表示（index.html）。山のデータを読み終えて、題字の画面ができたら消える */
+.boot { position: absolute; inset: 0; display: grid; place-content: center; justify-items: center; gap: 12px; padding: var(--safe-top) var(--safe-right) var(--safe-bottom) var(--safe-left); text-align: center; background: radial-gradient(ellipse at 50% 30%, #2b4a63, #172735 70%); }
+.boot__title { font-size: min(44px, 11.5vw); font-weight: 600; letter-spacing: .12em; margin-right: -.12em; }
+.boot__status { font-size: 15px; opacity: .9; }
+.boot__share { position: absolute; top: var(--safe-top); right: var(--safe-right); }
+/* 共有の窓（中身は 100 日チャレンジの共通部品 shared/share.js が入れる。色は、置かれた所の文字色に従う） */
+.share-dialog { width: min(100% - 32px, 460px); max-height: calc(100% - 32px); overflow-y: auto; padding: var(--space); border: 1px solid var(--line); border-radius: var(--radius); background: #101d29; color: var(--text); }
+.share-dialog::backdrop { background: rgb(4 10 16 / 55%); }
+.share-dialog h2 { font-size: 22px; }
+.share-dialog .share { margin-top: 12px; min-width: 0; }
+.share-dialog__close { width: 100%; margin-top: 16px; }

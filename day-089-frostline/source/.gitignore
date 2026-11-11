@@ -1,0 +1,16 @@
+node_modules/
+dist/
+.DS_Store
+*.log
+# 調査・検証の生ログ（要約は docs/ と .agent-harness/runs/*.md に残す）
+.agent-harness/runs/**/*.stream.*.log
+.agent-harness/runs/**/*.png
+.agent-harness/runs/**/*.webm
+# 参照写真は手元だけに置く（出典は docs/ に記録）
+refs/
+# 生成した山のデータ（npm run worldgen で作り直す）
+public/world/
+# 開発中に固定して使う、山のデータの控え（?world=名前）
+public/world-*/
+# 開発中の手早い撮影の出力（確かめたら捨てる）
+.agent-harness/runs/play-dev/

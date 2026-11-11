@@ -1,0 +1,14 @@
+{
+  "feature_name": "valley-map",
+  "created_at": "2026-11-10T23:45:00+09:00",
+  "updated_at": "2026-11-10T23:45:00+09:00",
+  "language": "ja",
+  "phase": "tasks-generated",
+  "approvals": {
+    "requirements": { "generated": true, "approved": true },
+    "design": { "generated": true, "approved": true },
+    "tasks": { "generated": true, "approved": true }
+  },
+  "ready_for_implementation": true,
+  "approval_basis": "本人の依頼（2026-11-10 夜。参考画像 9 枚と配置の指示を添えて「こちらを参考にマップの作り込みをお願いしたい」）に基づき確定"
+}
