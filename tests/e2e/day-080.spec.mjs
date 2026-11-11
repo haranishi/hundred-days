@@ -26,7 +26,7 @@ test('Day80のサブパスで素材と音を読み、正式メタ情報と開発
  expect(await page.evaluate(()=>typeof window.__FIFTH_PRINCE__)).toBe('undefined');await page.locator('#new-game').click();await expect.poll(()=>media.length).toBeGreaterThan(0);expect(media.every(p=>p.startsWith(path))).toBe(true);expect(failures).toEqual([]);expect(errors).toEqual([]);expect(external).toEqual([]);
 });
 // 終幕まで進む2つの試験は、CI（記録つき・GPUなし）で1操作に1〜2.7秒かかり、進むほど重くなる。
-// 2026-11-11に2回、62〜63秒で60秒の上限を超えた（手元は記録つきで28〜38秒）。止まったのではないので、上限だけを約3倍にする。
+// 2026-11-11に2回、62〜63秒で60秒の上限を超えた（手元は記録つきで17〜46秒）。止まったのではないので、上限だけを約3倍にする。
 const ENDING_TIMEOUT=180000;
 test('Day80の本番版でも終章途中の再開から帰還・配膳・終幕へ進む',async({page})=>{
  test.setTimeout(ENDING_TIMEOUT);await boot(page,route.ended);await expect(page.locator('.dialogue-top')).toContainText('終章 1/4');await page.locator('[data-next]').click();await page.reload();await expect(page.locator('#loading')).toBeHidden();await page.locator('#continue').click();await expect(page.locator('.dialogue-top')).toContainText('終章 1/4');await ending(page);
