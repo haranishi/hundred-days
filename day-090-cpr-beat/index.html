@@ -5,24 +5,48 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#f5f4ee">
   <title>CPRビート — 心肺蘇生テンポマスター | 100日チャレンジ Day090</title>
-  <meta name="description" content="胸骨圧迫の100〜120回／分を、30秒のタップで事前練習。合成クリックと任意の振動、対応スマホの軽い上下動でも。成人向けの教育用テンポツールです。深さや救命技術は測定しません。">
-  <meta name="share:text" content="CPRビート — 心肺蘇生テンポマスター｜100〜120回／分のリズムを、30秒で事前練習。教育用のテンポツールです。">
+  <meta name="description" content="100〜120回／分のリズムを、止めるまで連続再生。音量・音色を選べるブラウザのメトロノームと、30秒のタップ練習。成人の胸骨圧迫テンポの目安です。119番・AED・通信指令員の指示を優先してください。">
+  <meta name="share:text" content="CPRビート — 心肺蘇生テンポマスター｜100〜120回／分の連続リズムと、30秒のタップ練習。">
   <meta property="og:image" content="https://hundred-days.pages.dev/day-090-cpr-beat/og.png">
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="shared/share.css">
   <link rel="stylesheet" href="app.css">
+  <link rel="stylesheet" href="continuous.css">
   <script src="shared/share.js" defer></script>
   <script src="app.js" type="module"></script>
 </head>
 <body>
   <a class="skip" href="#start">練習へ進む</a>
-  <div class="learning-banner"><div class="wrap"><span class="banner-dot" aria-hidden="true"></span><strong>事前学習用</strong><span>緊急時はアプリより、119番・AED・通信指令員の指示を優先。</span></div></div>
+  <div class="learning-banner"><div class="wrap"><span class="banner-dot" aria-hidden="true"></span><strong>119番・AEDを優先</strong><span>通報やAED、通信指令員の音声指示を妨げないでください。</span></div></div>
   <header class="wrap site-header">
     <a class="brand" href="./" aria-label="CPRビート ホーム"><svg viewBox="0 0 40 40" aria-hidden="true"><rect width="40" height="40" rx="13" fill="currentColor"/><path d="M7 21h7l3-8 5 15 3-7h8" fill="none" stroke="#f5f4ee" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span>CPR<span class="brand-light">ビート</span><small>心肺蘇生テンポマスター</small></span></a>
     <a class="day-link" href="../">100 DAYS <span>090 ↗</span></a>
   </header>
   <main class="wrap">
-    <section class="hero" aria-labelledby="page-title"><div><p class="eyebrow"><span class="dot" aria-hidden="true"></span> PRACTICE THE RHYTHM</p><h1 id="page-title">そのリズムを、<br><span>手に覚えよう。</span></h1><p class="intro">胸骨圧迫のテンポを、まずは30秒のタップで。<br>音に合わせて、覚えたら自分のリズムで。</p></div><div class="tempo-note"><span class="tempo-caption">成人の胸骨圧迫の目安</span><div><strong>100<span>–</span>120</strong><span class="unit">回／分</span></div><svg viewBox="0 0 240 42" aria-hidden="true"><path d="M0 24h40l9-9 10 16 13-29 15 38 13-16h37l9-9 10 16 13-29 15 38 13-16h43" fill="none" stroke="currentColor" stroke-width="2"/></svg><p>約0.5〜0.6秒に、1回。</p></div></section>
+    <section class="hero playback-hero" aria-labelledby="page-title">
+      <div><p class="eyebrow"><span class="dot" aria-hidden="true"></span> LISTEN TO THE RHYTHM</p><h1 id="page-title">リズムを、<br><span>そのまま聴く。</span></h1><p class="intro">100〜120回／分を、止めるまで連続再生。<br>タップしなくても、一定のリズムが流れます。</p></div>
+      <a id="practice-link" class="practice-link" href="#practice-panel">30秒のタップ練習へ <span aria-hidden="true">↓</span></a>
+    </section>
+    <section id="continuous" class="continuous" data-state="idle" aria-labelledby="continuous-title">
+      <div class="continuous-heading"><h2 id="continuous-title"><span class="dot" aria-hidden="true"></span> リズムを聴く</h2><span>時間制限なし・タップ不要</span></div>
+      <div class="continuous-grid">
+        <div class="sound-display">
+          <div class="sound-pulse" id="sound-pulse" role="img" aria-label="1分間に110回のリズム"><span class="sound-ring" aria-hidden="true"></span><span class="sound-number" id="rhythm-bpm" aria-hidden="true">110</span><span class="sound-unit" aria-hidden="true">回／分</span></div>
+          <div class="sound-information"><p class="rhythm-state" id="rhythm-state">停止中</p><p class="playback-elapsed">経過 <span id="rhythm-elapsed">00:00</span></p><p class="adult-tempo">成人の胸骨圧迫のテンポの目安<br>100〜120回／分</p></div>
+        </div>
+        <div class="primary-controls">
+          <div class="continuous-tempo-heading"><span>リズムの速さ</span><span>回／分</span></div>
+          <div class="continuous-tempos" role="group" aria-label="連続再生のテンポ"><button type="button" data-rhythm-bpm="100" aria-label="100回／分" aria-pressed="false">100</button><button type="button" data-rhythm-bpm="110" aria-label="110回／分" aria-pressed="true">110<small>標準</small></button><button type="button" data-rhythm-bpm="120" aria-label="120回／分" aria-pressed="false">120</button></div>
+          <button id="rhythm-toggle" class="rhythm-toggle" type="button" aria-pressed="false">▶ リズムを流す</button>
+          <p id="rhythm-message" class="rhythm-message" role="status">ボタンを押すと、すぐに音が流れます。</p>
+          <div class="rhythm-controls-row"><div class="rhythm-field"><label for="rhythm-tone">音色</label><select id="rhythm-tone"><option value="clear">はっきりした音</option><option value="soft">やわらかい音</option></select></div><div class="rhythm-field"><label for="rhythm-volume">アプリの音量 <output id="rhythm-volume-value" for="rhythm-volume">65%</output></label><input id="rhythm-volume" type="range" min="10" max="100" step="5" value="65"></div></div>
+          <label class="keep-awake"><input id="keep-awake" type="checkbox" checked><span>再生中、画面をつけたままにする</span></label>
+          <p id="awake-status" class="awake-status" role="status">対応端末では画面の点灯を維持します。</p>
+        </div>
+      </div>
+      <div class="continuity-note"><p><strong>音を止めるときは、再生中のボタンをもう一度。</strong>パソコンではEscでも止められます。AEDの音声や周囲の声を聞ける音量で使ってください。</p><p>通話・画面ロック・別アプリへの切り替えで音が止まる場合があります。音が続くことを保証する機器ではありません。画面を開いたまま使用し、中断時はボタンで音を再開してください。</p></div>
+    </section>
+    <details class="practice-panel" id="practice-panel"><summary><span><small>PRACTICE / 30 SECONDS</small><strong>リズムを、手で覚える。</strong></span><span class="practice-summary-arrow" aria-hidden="true">＋</span></summary><p class="practice-intro">事前学習用の30秒タップ練習。入力のテンポを測ります。<br>人の胸で練習せず、画面を指先で軽くタップしてください。</p>
     <section class="trainer" id="trainer" aria-labelledby="practice-title">
       <div class="trainer-top"><h2 id="practice-title"><span class="dot" aria-hidden="true"></span> リズムの練習</h2><span class="training-label">成人向け・テンポのみ</span></div>
       <div class="trainer-grid">
@@ -54,8 +78,9 @@
       </div>
     </section>
     <section id="result" class="result" aria-labelledby="result-title" tabindex="-1" hidden><div class="result-heading"><div><p class="eyebrow">YOUR RHYTHM / 30 SECONDS</p><h2 id="result-title">今回のリズム</h2></div><span class="result-badge">テンポの練習記録</span></div><p id="result-message" class="result-message"></p><div class="result-stats"><div><span>平均テンポ</span><p><strong id="result-bpm">—</strong><small>回／分</small></p></div><div><span>測定区間の範囲内率</span><p><strong id="result-percent">—</strong><small>%</small></p></div><div><span>入力数</span><p><strong id="result-taps">0</strong><small>回</small></p></div><div><span>最長の入力間隔</span><p><strong id="result-gap">—</strong><small>秒</small></p></div></div><p id="result-detail" class="hint"></p><div class="rhythm-chart" id="rhythm-chart" aria-label="各入力間隔のテンポ。目安の範囲は100〜120回／分。" role="img"></div><div class="chart-legend"><span><i class="legend-in"></i>100〜120</span><span><i class="legend-out"></i>範囲外</span><span>左から、タップした順</span></div><p class="result-limit">範囲内率は入力間隔の目安です。圧迫の深さ・位置・力や、救命技術の習得は判定できません。</p><button id="retry" class="retry-button" type="button">もう一度、30秒 ↗</button></section>
+    </details>
     <section class="learn" aria-labelledby="learn-title"><div class="learn-heading"><p class="eyebrow">BEYOND THE RHYTHM</p><h2 id="learn-title">リズムの、その先は講習で。</h2><p>このアプリで練習できるのは、成人の胸骨圧迫のテンポだけです。</p></div><div class="learn-cards"><article><span class="card-number">01 / RHYTHM</span><h3>100〜120回／分</h3><p>強く、速く、絶え間なく。ここでは、その速さの感覚を練習します。</p></article><article><span class="card-number">02 / DEPTH</span><h3>成人は約5cm</h3><p>胸を押した後は、元の高さに戻します。深さや押し方は、訓練用の人形と講習で。</p></article><article><span class="card-number">03 / LEARN</span><h3>実際の手技を学ぶ</h3><p>手の位置、人工呼吸、AEDの使い方も大切。子どもの手技は成人と異なります。</p><a href="https://www.jrc.or.jp/study/safety/" target="_blank" rel="noopener noreferrer">日本赤十字社の救急法講習 ↗</a></article></div></section>
-    <details class="sources"><summary>このアプリについて・参考資料</summary><div><p>成人向けの事前学習用テンポツールです。医療機器・緊急時の救命支援ツールではなく、公式機関による監修・認定も受けていません。タップや動きの回数は、実際の胸骨圧迫の回数や質を示しません。</p><p>動きの検出は端末の加速度を使う参考測定です。端末を握って軽く上下させ、強く振ったり、人の胸へ押し当てたりしないでください。音・振動・動きの対応と精度は端末やブラウザによって異なります。</p><ul><li><a href="https://www.fdma.go.jp/relocation/kyukyukikaku/oukyu/02jokyu/05shinpai/02_05_04.html" target="_blank" rel="noopener noreferrer">消防庁｜応急手当WEB講習・胸骨圧迫 ↗</a></li><li><a href="https://www.jrc.or.jp/study/safety/airway/" target="_blank" rel="noopener noreferrer">日本赤十字社｜心肺蘇生 ↗</a></li></ul><p class="hint">数値・内容の確認日：2026年11月12日。参考資料の図・音源は転載していません。</p><p class="hint">練習記録やセンサー値は端末の外へ送らず、保存しません。共有ボタンはアプリの紹介リンクを渡します。</p></div></details>
+    <details class="sources"><summary>このアプリについて・参考資料</summary><div><p>成人の胸骨圧迫のテンポの目安を再生し、事前練習するツールです。医療機器ではなく、公式機関の監修・認定も受けていません。救命の結果や、緊急時に音が継続することは保証しません。タップや動きの回数は、実際の胸骨圧迫の回数や質を示しません。</p><p>動きの検出は端末の加速度を使う参考測定です。端末を握って軽く上下させ、強く振ったり、人の胸へ押し当てたりしないでください。音・振動・動きの対応と精度は端末やブラウザによって異なります。</p><ul><li><a href="https://www.fdma.go.jp/relocation/kyukyukikaku/oukyu/02jokyu/05shinpai/02_05_04.html" target="_blank" rel="noopener noreferrer">消防庁｜応急手当WEB講習・胸骨圧迫 ↗</a></li><li><a href="https://www.jrc.or.jp/study/safety/airway/" target="_blank" rel="noopener noreferrer">日本赤十字社｜心肺蘇生 ↗</a></li></ul><p class="hint">数値・内容の確認日：2026年11月12日。参考資料の図・音源は転載していません。</p><p class="hint">練習記録やセンサー値は端末の外へ送らず、保存しません。共有ボタンはアプリの紹介リンクを渡します。</p></div></details>
   </main>
   <footer class="wrap site-footer"><div class="footer-line"><span>CPRビート</span><span>小さな練習を、もしもの備えに。</span></div><div id="share"></div><a class="back-link" href="../">← 100日チャレンジの一覧へ</a></footer>
   <noscript><p class="noscript">練習にはJavaScriptが必要です。緊急時は119番へ通報し、通信指令員の指示に従ってください。</p></noscript>

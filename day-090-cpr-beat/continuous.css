@@ -1,0 +1,123 @@
+/* Continuous playback is the first task; practice remains independently available. */
+.playback-hero { padding: 32px 0 28px; gap: 24px; }
+.playback-hero h1 { font-size: 42px; line-height: 1.4; margin-bottom: 13px; }
+.playback-hero .intro { font-size: 13px; }
+.practice-link { display: inline-flex; align-items: center; gap: 20px; min-height: 48px; font-size: 12px; color: var(--green); }
+.continuous { background: #fbfcf8; border: 1px solid var(--line); border-radius: 20px; overflow: hidden; }
+.continuous-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 18px 27px; border-bottom: 1px solid var(--line); }
+.continuous-heading h2 { display: flex; align-items: center; gap: 10px; font-size: 15px; margin: 0; }
+.continuous-heading > span { font-size: 11px; color: var(--muted); }
+.continuous-grid { display: grid; grid-template-columns: .95fr 1fr; }
+.sound-display { background: var(--dark); color: #f3f6ef; padding: 34px 25px 27px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.sound-pulse { --pulse: 0; width: 216px; height: 216px; border-radius: 50%; display: flex; justify-content: center; align-items: center; flex-direction: column; border: 1px solid #609787; background: #214a48; position: relative; isolation: isolate; }
+.sound-ring { position: absolute; border: 1px solid #78b59b; inset: -16px; border-radius: 50%; opacity: calc(.12 + var(--pulse) * .25); transform: scale(calc(1 + var(--pulse) * .045)); }
+.sound-ring::after { content: ''; position: absolute; inset: -15px; border: 1px solid #78b59b; border-radius: 50%; opacity: .45; }
+.sound-number { font: 72px/1.05 Arial, sans-serif; letter-spacing: -3px; font-variant-numeric: tabular-nums; color: #c6ead6; }
+.sound-unit { font-size: 13px; margin-top: 9px; color: #c6dcd1; }
+.sound-information { text-align: center; margin-top: 28px; }
+.rhythm-state { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; color: #bddbcd; margin: 0; }
+.rhythm-state::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: #78968c; }
+.continuous[data-state='playing'] .rhythm-state::before { background: #bde7d0; }
+.continuous[data-state='interrupted'] .rhythm-state { color: #ffd3a4; }
+.playback-elapsed { font-size: 12px; color: #bbd2c6; margin: 12px 0; }
+.playback-elapsed span { font-family: Arial, sans-serif; margin-left: 7px; font-variant-numeric: tabular-nums; }
+.adult-tempo { font-size: 11px; line-height: 1.8; color: #b8cfc3; margin: 15px 0 0; }
+.primary-controls { padding: 27px 31px 24px; }
+.continuous-tempo-heading { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); margin-bottom: 10px; }
+.continuous-tempos { display: grid; grid-template-columns: repeat(3, 1fr); gap: 9px; margin-bottom: 19px; }
+.continuous-tempos button { position: relative; min-height: 54px; background: transparent; border: 1px solid #a8bcae; color: var(--ink); border-radius: 8px; font: 24px Arial, sans-serif; }
+.continuous-tempos button[aria-pressed='true'] { background: #e7f1e6; color: var(--green); border-color: var(--green); box-shadow: inset 0 0 0 1px var(--green); }
+.continuous-tempos small { display: block; font: 10px/1.1 'Hiragino Kaku Gothic ProN', sans-serif; margin-top: 2px; }
+.rhythm-toggle { width: 100%; min-height: 62px; border: 0; border-radius: 9px; background: var(--green); color: #f9fcf4; font-family: inherit; line-height: 1.5; font-size: 16px; font-weight: 600; padding: 15px; }
+.rhythm-toggle:hover { background: #11584f; }
+.continuous[data-state='playing'] .rhythm-toggle { background: #244f4c; }
+.continuous[data-state='interrupted'] .rhythm-toggle { background: #76502b; }
+.rhythm-message { min-height: 40px; font-size: 12px; line-height: 1.8; margin: 12px 0 17px; color: var(--muted); }
+.continuous[data-state='error'] .rhythm-message, .continuous[data-state='interrupted'] .rhythm-message { color: #80532d; }
+.rhythm-controls-row { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+.rhythm-field { min-width: 0; }
+.rhythm-field label { display: flex; justify-content: space-between; gap: 8px; font-size: 12px; margin-bottom: 8px; }
+.rhythm-field output { font-family: Arial, sans-serif; color: var(--green); }
+.rhythm-field select { appearance: none; -webkit-appearance: none; width: 100%; height: 44px; min-height: 44px; border: 1px solid #acbfb0; border-radius: 7px; font: inherit; font-size: 12px; color: var(--ink); background: #fffef9; padding: 8px; }
+.rhythm-field input[type='range'] { appearance: none; width: 100%; height: 44px; margin: 0; background: transparent; cursor: pointer; }
+.rhythm-field input[type='range']::-webkit-slider-runnable-track { background: #b8ccbb; height: 4px; border-radius: 4px; }
+.rhythm-field input[type='range']::-webkit-slider-thumb { appearance: none; width: 22px; height: 22px; border-radius: 50%; background: var(--green); margin-top: -9px; }
+.rhythm-field input[type='range']::-moz-range-track { background: #b8ccbb; height: 4px; border-radius: 4px; }
+.rhythm-field input[type='range']::-moz-range-thumb { width: 22px; height: 22px; border: 0; border-radius: 50%; background: var(--green); }
+.keep-awake { display: flex; align-items: center; gap: 8px; font-size: 12px; min-height: 44px; margin-top: 12px; cursor: pointer; }
+.keep-awake input { accent-color: var(--green); width: 17px; height: 17px; margin: 0; }
+.awake-status { margin: 0; color: var(--muted); font-size: 11px; line-height: 1.8; min-height: 20px; }
+.continuity-note { border-top: 1px solid var(--line); padding: 17px 27px; background: #f0f3eb; }
+.continuity-note p { color: #4d6258; font-size: 12px; line-height: 1.9; margin: 0; }
+.continuity-note p + p { margin-top: 7px; }
+.continuity-note strong { font-weight: 600; }
+.practice-panel { margin-top: 27px; border-top: 1px solid var(--line); scroll-margin-top: 18px; }
+.practice-panel > summary { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 95px; padding: 23px 1px; cursor: pointer; list-style: none; }
+.practice-panel > summary::-webkit-details-marker { display: none; }
+.practice-panel > summary small { display: block; font: 10px Arial, sans-serif; letter-spacing: 1.8px; color: var(--green); margin-bottom: 9px; }
+.practice-panel > summary strong { display: block; font: 600 23px/1.5 var(--serif); }
+.practice-summary-arrow { font-size: 25px; font-weight: 300; color: var(--green); }
+.practice-panel[open] .practice-summary-arrow { transform: rotate(45deg); }
+.practice-intro { margin: 0 0 20px; color: var(--muted); font-size: 12px; line-height: 1.9; }
+.safety-note, .instrument-note, .result-limit, .sources, .sources .hint { font-size: 12px; line-height: 1.9; }
+.keyboard-hint, .capability-note, .start-note { font-size: 11px; }
+@media(max-width:800px) {
+  .primary-controls { padding: 25px 23px; }
+  .sound-pulse { width: 180px; height: 180px; }
+  .sound-number { font-size: 63px; }
+  .rhythm-controls-row { grid-template-columns: 1fr; gap: 9px; }
+  .rhythm-message { min-height: 60px; }
+}
+@media(max-width:620px) {
+  .playback-hero { padding: 24px 0 22px; gap: 12px; }
+  .playback-hero h1 { font-size: 31px; line-height: 1.35; margin-bottom: 11px; }
+  .playback-hero .eyebrow { font-size: 8px; margin-bottom: 12px; }
+  .playback-hero .intro { font-size: 12px; line-height: 1.8; }
+  .practice-link { font-size: 11px; min-height: 44px; padding: 0; }
+  .continuous { border-radius: 14px; }
+  .continuous-heading { padding: 15px 18px; }
+  .continuous-heading h2 { font-size: 13px; }
+  .continuous-heading > span { font-size: 10px; }
+  .continuous-grid { display: flex; flex-direction: column; }
+  .sound-display { display: grid; grid-template-columns: 122px 1fr; padding: 22px 27px; gap: 20px; align-items: center; }
+  .sound-pulse { width: 106px; height: 106px; }
+  .sound-ring { inset: -8px; }
+  .sound-ring::after { inset: -8px; }
+  .sound-number { font-size: 44px; letter-spacing: -2px; }
+  .sound-unit { font-size: 10px; margin-top: 4px; }
+  .sound-information { margin: 0; text-align: left; }
+  .rhythm-state { font-size: 13px; }
+  .playback-elapsed { font-size: 11px; margin: 8px 0; }
+  .adult-tempo { font-size: 10px; margin-top: 9px; }
+  .primary-controls { padding: 20px 21px 21px; }
+  .continuous-tempo-heading { font-size: 11px; margin-bottom: 9px; }
+  .continuous-tempos { margin-bottom: 13px; gap: 8px; }
+  .continuous-tempos button { min-height: 48px; font-size: 21px; }
+  .continuous-tempos small { font-size: 9px; }
+  .rhythm-toggle { min-height: 58px; font-size: 15px; }
+  .rhythm-message { min-height: 40px; font-size: 12px; margin: 10px 0 16px; }
+  .rhythm-controls-row { grid-template-columns: 1fr 1fr; gap: 18px; }
+  .rhythm-field label { font-size: 11px; margin-bottom: 4px; }
+  .rhythm-field select { font-size: 11px; }
+  .keep-awake { font-size: 11px; margin-top: 8px; }
+  .awake-status { font-size: 11px; }
+  .continuity-note { padding: 16px 20px; }
+  .continuity-note p { font-size: 12px; }
+  .practice-panel { margin-top: 22px; }
+  .practice-panel > summary { min-height: 87px; padding: 20px 0; }
+  .practice-panel > summary strong { font-size: 21px; }
+  .practice-intro { font-size: 12px; }
+  .safety-note, .instrument-note, .result-limit, .sources, .sources .hint { font-size: 12px; }
+  .keyboard-hint, .capability-note, .start-note { font-size: 11px; }
+}
+@media(max-width:360px) {
+  .continuous-heading { padding-inline: 14px; }
+  .continuous-heading > span { font-size: 9px; }
+  .sound-display { grid-template-columns: 108px 1fr; padding-inline: 21px; gap: 16px; }
+  .primary-controls { padding-inline: 17px; }
+  .rhythm-controls-row { gap: 12px; }
+  .rhythm-field label { font-size: 10px; }
+}
+@media(prefers-reduced-motion:reduce) {
+  .sound-ring { transform: none; opacity: .25; }
+}

@@ -24,3 +24,11 @@
 音は利用者操作後、振動は対応端末のみ、動きは安全な接続と端末・ブラウザの許可が必要。
 深さ・力・胸への圧迫を測れるとは表示しない。
 物理端末の振動・センサー精度・音声遅延はデスクトップの自動試験では保証しない。
+
+## 連続再生の追加確認
+- AudioBufferSourceNode.loop：生成音を音声エンジンで反復できる。
+  https://developer.mozilla.org/en-US/docs/Web/API/AudioBufferSourceNode/loop
+- Screen Wake Lock：HTTPS・表示中の文書などが前提で、OSによる解除もある。
+  https://developer.mozilla.org/en-US/docs/Web/API/Screen_Wake_Lock_API
+- AudioContextのstate：通話・OS等のinterrupted/suspendedを区別し、再開操作を用意する。
+  https://developer.mozilla.org/en-US/docs/Web/API/BaseAudioContext/state

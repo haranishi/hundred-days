@@ -1,5 +1,6 @@
 import { DURATION, Session, MotionDetector } from './lib/rhythm.js';
 import { Metronome } from './lib/metronome.js';
+import { initContinuousPlayback } from './lib/continuous.js';
 
 const $ = (id) => document.getElementById(id);
 const selected = (name) => document.querySelector(`input[name="${name}"]:checked`).value;
@@ -19,6 +20,24 @@ const metro = new Metronome(() => {
     catch { $('vibration').checked = false; }
   }
 }, () => notice('音を開始できませんでした。画面のリズムで練習できます。端末の音量やブラウザの設定も確認してください。'));
+
+const continuous = initContinuousPlayback({
+  metronome: metro,
+  beforeStart() {
+    if (['preparing', 'countdown', 'running'].includes(phase)) abort('連続リズムの再生に切り替えたため、練習を中止しました。');
+    else { generation++; stopOutput(); stopMotion(); if (selected('input') === 'motion') useTap('タップ入力に戻しました。動きを使う場合は選び直してください。'); }
+  },
+});
+$('practice-link').addEventListener('click', event => {
+  event.preventDefault(); $('practice-panel').open = true;
+  $('start').scrollIntoView({ behavior: 'instant', block: 'center' }); $('start').focus({ preventScroll: true });
+});
+$('practice-panel').addEventListener('toggle', () => {
+  if (!$('practice-panel').open) {
+    if (['preparing', 'countdown', 'running'].includes(phase)) abort('練習の画面を閉じたため、練習を中止しました。');
+    else { generation++; stopOutput(); stopMotion(); if (selected('input') === 'motion') useTap('センサーを停止しました。'); }
+  }
+});
 
 function resetFeedback() {
   $('feedback').removeAttribute('data-kind'); feedbackKind = '';
@@ -131,6 +150,7 @@ function tick(now) {
 async function start() {
   if (phase === 'preparing' || phase === 'running' || phase === 'countdown' || pendingMotion) return;
   if (selected('input') === 'motion' && !motionReady) { tapFallback('動きを使う場合は、もう一度「スマホの動き」を選んでください。'); return; }
+  continuous.stop('30秒の練習に切り替えたため、連続再生を止めました。');
   const token = ++generation; phase = 'preparing'; stopOutput(); notice(''); lockSettings(true);
   const guided = selected('mode') === 'guided';
   metro.audioReady = await metro.prepare(guided && $('sound').checked);
@@ -183,6 +203,7 @@ document.querySelectorAll('input[name="input"]').forEach((input) => input.addEve
 }));
 $('preview').addEventListener('click', async () => {
   if (previewing) { stopOutput(); generation += 1; return; }
+  continuous.stop('練習のお手本の試聴に切り替えました。');
   const token = ++generation; stopOutput(); previewing = true; $('preview').textContent = '□ 音を止める';
   const audio = await metro.prepare(true);
   if (token !== generation || !previewing || document.hidden) return;

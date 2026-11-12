@@ -12,6 +12,7 @@ test.beforeEach(async ({ page, baseURL }) => {
 test.afterEach(async ({ page }) => { expect(errors.get(page)).toEqual([]); expect(external.get(page)).toEqual([]); });
 async function load(page) {
   await page.goto(path);
+  await page.locator('#practice-panel > summary').click();
   await expect(page.locator('#start')).toBeEnabled();
 }
 async function clock(page) {
@@ -31,7 +32,7 @@ async function steady(page, interval = 550, count = 50) {
 
 test('first view explains learning scope; no sound before interaction, and no health claim', async ({ page }) => {
   await load(page);
-  await expect(page.getByRole('heading',{level:1})).toContainText('手に覚えよう');
+  await expect(page.getByRole('heading',{level:1})).toContainText('そのまま聴く');
   await expect(page.locator('.learning-banner')).toContainText('119番');
   await expect(page.locator('#tap-pad')).toBeDisabled();
   await expect(page.locator('.instrument-note')).toContainText('深さ・力は測れません');
