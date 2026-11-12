@@ -751,6 +751,8 @@ test('PCで表示の高さが低いと入力欄は追従せず、最後の欄ま
   await expect(page.locator('#hours-per-payday')).toBeInViewport();
   await expect(page.locator('#input-rules > summary')).toBeInViewport();
   await page.setViewportSize({ width: 1440, height: 900 });
+  // resize is delivered asynchronously; assert the updated UI before taking its geometry.
+  await expect(page.locator('.input-panel')).toHaveCSS('position', 'sticky');
   const tall = await page.locator('.input-panel').evaluate((panel) => ({ position: getComputedStyle(panel).position, height: panel.getBoundingClientRect().height, top: parseFloat(getComputedStyle(panel).top), viewport: window.innerHeight }));
   expect(tall.position).toBe('sticky');
   expect(tall.height + tall.top).toBeLessThanOrEqual(tall.viewport);
