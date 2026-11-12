@@ -1,0 +1,34 @@
+# 内容とブラウザ機能の確認
+
+確認日：2026-11-12。
+
+## 救命の一次資料
+- 消防庁「応急手当WEB講習・胸骨圧迫」：成人の約5cm、100〜120回／分の説明。
+  https://www.fdma.go.jp/relocation/kyukyukikaku/oukyu/02jokyu/05shinpai/02_05_04.html
+- 日本赤十字社「一次救命処置（BLS）入門編」：100〜120回／分、約5cm、119番・AED。
+  https://www.jrc.or.jp/chapter/yamaguchi/pdf/20210407-5a789801c7909726580a669a05c0fd49ce12a149.pdf
+- 日本赤十字社「心肺蘇生」：手技と一次救命処置の公式講習への入口。
+  https://www.jrc.or.jp/study/safety/airway/
+- 日本赤十字社「AED」：AEDの音声案内に従う。
+  https://www.jrc.or.jp/study/safety/aed/
+- JRC蘇生ガイドライン2025の書籍があるため、2020を最新版とは呼ばない。
+  https://www.igaku-shoin.co.jp/book/detail/117228
+
+## 表現への反映
+深さ・完全な圧迫解除は公式講習で学ぶ内容として参考表示する。
+テンポの範囲内率を救命技術の合格率に言い換えない。
+日本赤十字社や消防庁による推奨・監修・認定を示唆しない。
+楽曲のBPMを検証していないため、原曲・歌詞・曲名に依存する記憶法は使わない。
+
+## ブラウザの限界
+音は利用者操作後、振動は対応端末のみ、動きは安全な接続と端末・ブラウザの許可が必要。
+深さ・力・胸への圧迫を測れるとは表示しない。
+物理端末の振動・センサー精度・音声遅延はデスクトップの自動試験では保証しない。
+
+## 連続再生の追加確認
+- AudioBufferSourceNode.loop：生成音を音声エンジンで反復できる。
+  https://developer.mozilla.org/en-US/docs/Web/API/AudioBufferSourceNode/loop
+- Screen Wake Lock：HTTPS・表示中の文書などが前提で、OSによる解除もある。
+  https://developer.mozilla.org/en-US/docs/Web/API/Screen_Wake_Lock_API
+- AudioContextのstate：通話・OS等のinterrupted/suspendedを区別し、再開操作を用意する。
+  https://developer.mozilla.org/en-US/docs/Web/API/BaseAudioContext/state
