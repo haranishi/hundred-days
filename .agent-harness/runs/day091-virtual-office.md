@@ -25,9 +25,17 @@
 - 撮影の途中で、座った人と飲み物の最中の人の名札が地図の外へ消える不具合が見つかった。アプリ側を直して本番に出してから撮り直した。
 - 一覧用の `demo.mp4` は字幕なし・540×960・16秒・約340KB。
 
+## CI の偶発の失敗と対策（2本目のPR）
+
+- 2本目のPRの CI で、Day081 のデモ動画を取る試験が1回だけ「socket hang up」で落ちた。同じ分割の523本は成功し、配信サーバーも動き続けていた。要求を送ってから0.01秒で切られていた。
+- 原因は、試験用の配信サーバー（`scripts/serve-dist.mjs`）と Playwright の `page.request` の競合。`page.request` は空いた接続をワーカー全体で使い回し、自分では期限を切らない（Node の接続プールは、自分のタイムアウトが無いと、サーバーが知らせる「閉じるまでの秒数」を使わない）。サーバーは空いた接続を約6秒で閉じる。前の試験の要求から約6.1秒後に送ったため、閉じる瞬間と重なった。
+- 再現: 空き接続を200本作り、約6秒後に少しずつずらして送った。3回中2回で2〜3本が ECONNRESET になった（600本中5本）。
+- 対策: 配信サーバーが応答のたびに接続を閉じる（`Connection: close`）。直した後は同じ再現で600本すべて成功し、使い回された接続は0本。単体試験を1本足し、直す前の状態に戻すと落ちることも確かめた。関連する画面試験390本と単体試験5540本が成功した（どちらも予定どおりの省略が1本ずつ）。
+
 ## 100日側の変更
 
 - `day-091-virtual-office/`（meta.json・README.md・screenshot.webp）
 - `README.md` の一覧（`npm run index:sync`）
 - `infra/day-redirect/`（`EXTERNAL_DAYS` と `wrangler.toml` の経路）、`scripts/tests/day-redirect.test.mjs`（Day091 のオフィスのリンクの転送）
-- `tests/e2e/external-days.spec.mjs`（外部Dayのカードの検査に Day091 を追加。紹介動画はまだ無いので `demo: false`）
+- `tests/e2e/external-days.spec.mjs`（外部Dayのカードの検査に Day091 を追加。2本目のPRで紹介動画を足し、デモ再生の検査も有効にした）
+- `scripts/serve-dist.mjs`（応答のたびに接続を閉じる）と、その単体試験（`scripts/tests/publish-check.test.mjs`）
