@@ -75,6 +75,15 @@ test('Day088：紹介ページを持たない外部Dayは、100日の正の住�
   assert.equal(target('/100days/day-088-bouquet-studio/?x=1'), 'https://day88.rairakku.com/?x=1', '問い合わせは引き継ぐ');
 });
 
+test('Day091：オフィスのリンク（/o/<ID>）も、パスごと day91.rairakku.com へ転送する', () => {
+  assert.equal(target('/day91'), 'https://day91.rairakku.com/');
+  assert.equal(target('/day91/'), 'https://day91.rairakku.com/');
+  assert.equal(target('/day091/o/23456789bcdfghjk'), 'https://day91.rairakku.com/o/23456789bcdfghjk');
+  assert.equal(target('/day91/o/23456789bcdfghjk/meeting'), 'https://day91.rairakku.com/o/23456789bcdfghjk/meeting');
+  assert.equal(target('/100days/day-091-virtual-office/'), 'https://day91.rairakku.com/');
+  assert.equal(target('/100days/day-091-virtual-office/screenshot.webp'), null, 'カードの画像は転送しない');
+});
+
 test('Day088：100日の正の住所の下の素材（カードの画像など）は転送しない（転送すると一覧のカードの画像が壊れる）', () => {
   for (const path of ['/100days/day-088-bouquet-studio/screenshot.webp', '/100days/day-088-bouquet-studio/meta.json', '/100days/day-088-bouquet-studio/drive/', '/100days/day-088-bouquet-studio//']) {
     assert.equal(target(path), null, path);
