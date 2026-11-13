@@ -40,6 +40,13 @@ const EXTERNAL_DAYS = [
     title: 'Bouquet Studio',
     dir: 'day-088-bouquet-studio',
     url: 'https://day88.rairakku.com/'
+  },
+  {
+    day: '091',
+    title: 'バーチャルオフィス',
+    dir: 'day-091-virtual-office',
+    url: 'https://day91.rairakku.com/',
+    demo: false // 紹介動画は次のPRで足す。それまでカードはスクリーンショットだけ
   }
 ];
 
