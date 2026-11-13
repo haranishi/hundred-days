@@ -112,10 +112,14 @@ export class BodyRig {
     const skull = part(sphere, M.skin, M.outline);
     skull.scale.set(...BODY.headRadius);
     skull.position.set(BODY.headCenter[0] - pivot[0], BODY.headCenter[1] - pivot[1], BODY.headCenter[2] - pivot[2]);
-    const hair = part(new SphereGeometry(1, 28, 14, 0, Math.PI * 2, 0, Math.PI * 0.56), M.hair, M.outline);
-    hair.scale.set(BODY.headRadius[0] * 1.06, BODY.headRadius[1] * 1.04, BODY.headRadius[2] * 1.07);
-    hair.position.set(0, BODY.headCenter[1] - pivot[1] + 0.06, BODY.headCenter[2] - pivot[2] - 0.08);
-    hair.rotation.x = -0.42;
+    // 髪は、頭と同じ中心・同じ向きの殻を、どこでも頭より5%外に置く。生え際の傾きは、殻の形（切り口）の側で付ける。
+    // 以前は殻ごと後ろへずらして傾けていたので、額のあたりで髪の面が頭の中へ潜り、生え際が肌色のまだら（面の取り合い）に見えた。
+    // 切り口は頭のてっぺんから95度、後ろへ42度傾ける：前は眉の上に額を残し（てっぺんから53度）、横は耳の上、後ろは首の上（137度）で切れる
+    const hairGeometry = new SphereGeometry(1, 48, 24, 0, Math.PI * 2, 0, (95 / 180) * Math.PI);
+    hairGeometry.rotateX((-42 / 180) * Math.PI);
+    const hair = part(hairGeometry, M.hair, M.outline);
+    hair.scale.set(BODY.headRadius[0] * 1.05, BODY.headRadius[1] * 1.05, BODY.headRadius[2] * 1.05);
+    hair.position.copy(skull.position);
     const ear = (sx: number) => {
       const e = part(sphere, M.skin, M.outline);
       e.scale.set(0.12, 0.24, 0.14);
