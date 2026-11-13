@@ -1,0 +1,15 @@
+/* 丸ゴシック（Zen Maru Gothic・SIL OFL 1.1・src/ui/fonts/OFL.txt）。このアプリで使う文字だけに絞った版（npm run fonts で作り直す） */
+@font-face {
+  font-family: 'Zen Maru Gothic';
+  src: url('./fonts/zen-maru-gothic-500.woff2') format('woff2');
+  font-weight: 400 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Zen Maru Gothic';
+  src: url('./fonts/zen-maru-gothic-700.woff2') format('woff2');
+  font-weight: 600 900;
+  font-style: normal;
+  font-display: swap;
+}

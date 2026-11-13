@@ -135,6 +135,10 @@ Day056の配信ビルドに含む第三者ライブラリ・移植実装・検�
 | 087 | `day-087-oricube/vendor/three.js`（three.js 0.186.0・OrbitControlsを含むESMビルド） | [three.js](https://threejs.org/) | [MIT](day-087-oricube/vendor/LICENSE-three.txt) | Day044の同梱版（esbuildでまとめただけ）を未改変で複製。折り紙の形・案内線・影・アイコンは実行時の計算か自作で、外部の画像・音・書体は使っていない |
 | 089 | three.js 0.187（本体と addons の CSMShadowNode・SkyMesh・BloomNode・FXAANode・MotionBlur・TRAANode・BufferGeometryUtils。`day-089-frostline/assets/` のビルドに同梱） | [three.js](https://threejs.org/) | [MIT](day-089-frostline/licenses/three.txt) | 改変なし。Vite でビルドし、使う部分だけを同梱 |
 | 089 | three.js に含まれる MaterialX の雑音の関数（`mx_noise_float`・`mx_fractal_noise_float`・`mx_worley_noise_vec2`。地形と雲の模様に使用） | [MaterialX](https://github.com/AcademySoftwareFoundation/MaterialX)（Academy Software Foundation。three.js が TSL へ移したもの） | [Apache License 2.0](day-089-frostline/licenses/materialx.txt) | 改変なし（three.js の TSL の関数として呼ぶだけ） |
+| 092 | three.js 0.186.1（本体。`day-092-shuwa/assets/` のビルドに同梱。3Dの手と上半身の描画） | [three.js](https://threejs.org/) | [MIT](day-092-shuwa/THIRD_PARTY_NOTICES.txt) | 改変なし。Vite でビルドし、使う部分だけを同梱 |
+| 092 | Preact 10.29.8・@preact/signals 2.11.4・Workbox（workbox-window 7.4.1 とサービスワーカー） | [Preact](https://preactjs.com/)・[Workbox](https://developer.chrome.com/docs/workbox) | [MIT](day-092-shuwa/THIRD_PARTY_NOTICES.txt) | 改変なし |
+| 092 | MediaPipe Tasks Vision 1.2.0 の wasm（`day-092-shuwa/mediapipe/wasm/`）と手の検出モデル `hand_landmarker.task`（float16・版1） | [MediaPipe](https://ai.google.dev/edge/mediapipe)（Google） | [Apache License 2.0](day-092-shuwa/THIRD_PARTY_NOTICES.txt) | 改変なし。SIMD 版の wasm だけを同梱。利用状況の数値を Google へ送る機能は、アプリの側で送信を止めている |
+| 092 | 書体 Zen Maru Gothic（Medium・Bold） | [Zen Maru Gothic](https://github.com/googlefonts/zen-marugothic)（Yoshimichi Ohira） | [SIL Open Font License 1.1](day-092-shuwa/THIRD_PARTY_NOTICES.txt) | **加工あり**。アプリで使う文字だけに絞った woff2 を同梱（書体の名前は変えていない） |
 
 ## Day64「漏洩の地図」の出典と描画依存
 

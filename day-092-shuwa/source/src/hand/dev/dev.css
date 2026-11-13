@@ -1,0 +1,43 @@
+.dev { padding: 16px; max-width: 1280px; margin: 0 auto; }
+.dev h1 { font-size: 22px; margin: 0 0 4px; }
+.dev__lead { margin: 0 0 16px; color: var(--c-ink-soft); }
+.dev-live { display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 16px; margin-bottom: 24px; background: var(--c-surface); border-radius: var(--radius); }
+.dev-live__opts { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: center; }
+.dev-live__opts select, .dev-live__opts button { min-height: 36px; font: inherit; }
+.dev__grid { display: grid; gap: 16px; }
+.dev-card { background: var(--c-surface); border-radius: var(--radius); padding: 12px 16px; }
+.dev-card__head { display: flex; gap: 16px; align-items: flex-start; }
+.dev-card__head h2 { font-size: 40px; margin: 0; min-width: 56px; }
+.dev-card__head dl { display: grid; grid-template-columns: auto 1fr; gap: 2px 10px; margin: 4px 0; font-size: 13px; }
+.dev-card__head dt { color: var(--c-ink-soft); }
+.dev-card__head dd { margin: 0; }
+.dev-card__thumbs { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 8px; }
+.dev-thumb { margin: 0; text-align: center; font-size: 12px; color: var(--c-ink-soft); }
+.dev-thumb img, .dev-thumb__wait { display: block; background: var(--c-bg); border-radius: 12px; }
+.dev-card__meta { font-size: 12px; color: var(--c-ink-soft); margin: 8px 0 0; }
+.dev-card__warn { color: var(--c-wrong); }
+/* 中身の一覧（?set=kana・content.tsx） */
+.dev--content { max-width: none; }
+.dev-row { margin: 0 0 20px; padding: 12px; background: var(--c-bg); border-radius: var(--radius); }
+.dev-row__title { font-size: 18px; margin: 0 0 8px; }
+.dev-row__cards { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-start; }
+.dev-card--content { padding: 10px 12px; }
+.dev-card--content .dev-card__head h2 { font-size: 34px; min-width: 44px; }
+.dev-card__id { margin: 2px 0; font-size: 12px; color: var(--c-ink-soft); display: flex; gap: 6px; align-items: center; }
+.dev-card__note { margin: 2px 0; font-size: 12px; max-width: 320px; line-height: 1.4; }
+.dev-badge { padding: 0 6px; border-radius: 999px; background: var(--c-bg); font-size: 11px; }
+.dev-badge--high { background: #dff3e4; }
+.dev-badge--medium { background: #fff1c9; }
+.dev-badge--low { background: #ffd9d6; }
+/* 札に置いた小さな画像（?set=cards・cards.tsx）。画面の図鑑の札（library.css の .catalog-item）と Thumbnail（learning.css）に合わせる */
+.dev--cards { max-width: none; }
+.dev-tgroup { margin: 0 0 20px; }
+.dev-tgroup h2 { font-size: 18px; margin: 0 0 8px; }
+.dev-tgroup__cards { display: flex; flex-wrap: wrap; gap: 14px; }
+.dev-tcard { display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 18px 8px; min-width: 150px; border-radius: 20px; box-shadow: 0 3px 14px rgb(31 37 68 / 5%); }
+.dev-tcard > strong { font-size: 22px; }
+.dev-tcard__thumb { display: inline-flex; align-items: center; justify-content: center; aspect-ratio: 1; overflow: hidden; border-radius: 12px; }
+.dev-tcard__thumb > img { display: block; width: 100%; height: 100%; object-fit: contain; }
+/* 大きな表示を並べる（?set=views・views.tsx） */
+.dev-views { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+.dev-view { margin: 0; background: var(--c-surface); border-radius: 12px; padding: 8px; font-size: 12px; text-align: center; }

@@ -1,0 +1,10 @@
+meta: {name: "tekotoba-webui", version: "1.0.0", status: active}
+goal: "スクショだけを見る別セッションの評価者が、10項目×0〜2点で16点以上・0点なしを付ける"
+evaluator: {runner: "Opus・毎回新しいセッション", sees: "3幅（390・768・1280）の画面画像のみ。コードは見ない"}
+rubric: ["3秒理解", "視覚階層", "配色", "余白と整列", "タイポグラフィ", "モバイル", "CTA・導線", "一貫性", "アクセシビリティ", "体感速度"]
+gate_before_scoring: ["npm run typecheck", "npm test", "npm run build", "npm run e2e"]
+loop_control: {max_cycles: 3, stop_if_same_finding_twice: true}
+accepted_design_decisions:
+  - "色は独自（主 #4C5FD5・強調 #FF8A3D）。Duolingo の緑に寄せない"
+  - "ライフ制は無い（まちがいは最後にもう一度出す）"
+  - "手は自作の3D。写真や動画は使わない"

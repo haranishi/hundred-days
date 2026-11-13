@@ -1,0 +1,37 @@
+{
+  "name": "tekotoba",
+  "version": "0.1.0",
+  "private": true,
+  "description": "ログインなしでブラウザだけで学べる、日本の手話（指文字・数字・あいさつ）の入門アプリ",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1 --port 4321",
+    "build": "node scripts/notices.mjs && vite build",
+    "preview": "vite preview --host 127.0.0.1 --port 4322",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "test": "vitest run",
+    "content:check": "vitest run tests/content",
+    "e2e": "playwright test",
+    "notices": "node scripts/notices.mjs",
+    "publish:check": "node scripts/publish-check.mjs",
+    "fonts": "node scripts/subset-font.mjs"
+  },
+  "dependencies": {
+    "@mediapipe/tasks-vision": "1.2.0",
+    "@preact/signals": "2.11.4",
+    "budoux": "0.10.2",
+    "preact": "10.29.8",
+    "three": "0.186.1"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "4.14.0",
+    "@playwright/test": "1.64.1",
+    "@preact/preset-vite": "2.10.6",
+    "@types/three": "0.186.0",
+    "happy-dom": "21.0.4",
+    "typescript": "7.0.2",
+    "vite": "8.3.5",
+    "vite-plugin-pwa": "2.0.0",
+    "vitest": "5.0.5"
+  }
+}
