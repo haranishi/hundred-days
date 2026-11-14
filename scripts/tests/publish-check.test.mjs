@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { spawn, spawnSync } from 'node:child_process';
 import { EventEmitter } from 'node:events';
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
-import { createServer } from 'node:http';
+import { Agent, createServer, get } from 'node:http';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { test } from 'node:test';
@@ -299,6 +299,28 @@ test('レビュー1：serve-dist は PLAYWRIGHT_PORT=0 なら、実際に開い�
   const port = Number(/^Serving dist at http:\/\/127\.0\.0\.1:(\d+)$/.exec(first)?.[1]);
   assert.ok(port > 0, first);
   assert.equal(await probeOnce(`http://127.0.0.1:${port}/`), true);
+  assert.equal(await stopProcess(server, GRACE), 'terminated');
+});
+
+test('serve-dist は応答のたびに接続を閉じ、使い回せる空き接続を残さない（page.request の socket hang up 対策）', REAL_PROCESS, async (t) => {
+  const { server, line } = serveDistWithLine(t, 0);
+  const port = Number(/:(\d+)$/.exec(await line)?.[1]);
+  // Playwright の page.request と同じく、空いた接続を使い回す設定で取る
+  const agent = new Agent({ keepAlive: true });
+  t.after(() => agent.destroy());
+  for (const [path, status] of [['/', 200], ['/no-such-file', 404], ['/%', 400]]) {
+    const response = await new Promise((resolve, reject) => {
+      get(`http://127.0.0.1:${port}${path}`, { agent }, (res) => {
+        res.resume();
+        res.on('end', () => resolve(res));
+      }).on('error', reject);
+    });
+    assert.equal(response.statusCode, status, path);
+    assert.equal(response.headers.connection, 'close', path);
+  }
+  await new Promise((resolve) => setImmediate(resolve));
+  // 空き接続がプールに戻っていなければ、サーバーが閉じる瞬間に使い回して落ちることもない
+  assert.equal(Object.values(agent.freeSockets).flat().length, 0);
   assert.equal(await stopProcess(server, GRACE), 'terminated');
 });
 

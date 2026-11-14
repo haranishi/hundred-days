@@ -20,6 +20,10 @@ const types = {
 };
 
 const server = createServer((request, response) => {
+  // 応答のたびに接続を閉じる。Playwright の page.request は空いた接続をワーカー全体で使い回し、自分では期限を切らない。
+  // 一方このサーバーは空いた接続を約6秒（keepAliveTimeout 5秒＋猶予1秒）で閉じるので、その瞬間に送った要求が
+  // 「socket hang up」で落ちた（2026-11-13 の CI、external-days の Day081）。使い回す接続が無ければ、この競合は起きない
+  response.setHeader('Connection', 'close');
   try {
     const pathname = decodeURIComponent(new URL(request.url, `http://${host}`).pathname);
     const relativePath = pathname.endsWith('/') ? `${pathname}index.html` : pathname;
