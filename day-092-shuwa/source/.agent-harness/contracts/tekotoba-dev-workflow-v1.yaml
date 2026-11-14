@@ -1,0 +1,20 @@
+meta: {name: "tekotoba-dev-workflow", version: "1.0.0", status: active, owner: "本人"}
+goal: "ログインなしでブラウザだけで使える、日本の手話（指文字・数字・あいさつ）の入門アプリを、100日チャレンジ Day92 として公開ゲートを通した状態で PR にする"
+non_goals: ["ログイン・同期", "ランキング・広告・課金・通知", "手話の翻訳・文法の授業", "ろう者の監修済みと名乗ること"]
+roles:
+  - {stage: research,  runner: "Codex(個人用・read-only＋web検索)", deliverable: ".agent-harness/research/ の根拠付きノート"}
+  - {stage: design,    runner: "メインループ", deliverable: ".kiro/specs/*/requirements.md・design.md・tasks.md・ux-5layers.md"}
+  - {stage: implement, runner: "Codex(個人用・workspace-write)／Opus(ブラウザで目視が要る3Dの手と中身のデータ)", deliverable: "コード＋試験＋変更一覧",
+     denied: ["git commit/push", "本番反映", "対象リポ外への書き込み"]}
+  - {stage: verify,    runner: "決定的試験(typecheck・vitest・build・Playwright・axe)→別セッションのOpus(画面のみ・プレイのみ)", deliverable: "採点表・指摘一覧"}
+  - {stage: human_gate, runner: "本人", approves: ["100日リポジトリへのマージ", "X投稿", "名前の確定", "スコープ変更"]}
+loop_control:
+  retry: "verify不合格はimplementへ差し戻し（上限3周）。同一の指摘が2周続いたらNEEDS_HUMAN"
+  budgets: {max_cycles: 3}
+terminal_states: [SUCCESS, NO_WORK, NEEDS_HUMAN, BUDGET_EXCEEDED, FAILED, UNCERTAIN]
+invariants:
+  - "完了判定は試験・実ファイル・実挙動の証拠で行う"
+  - "手話の形と動きは調査の出典に基づく。確信度の低いものはレッスンに入れない"
+  - "工程間の受け渡しは .agent-harness/briefs/ の自己完結の依頼書で行う"
+  - "押すタイミングが関わる画面試験は、間隔を振る試験とCPUを遅くした実行を含める"
+receipt: ".agent-harness/runs/<工程>/ に notes.md・final.md・採点表を残す"

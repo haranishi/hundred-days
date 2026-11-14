@@ -282,8 +282,9 @@ const FRAME_BY_APP = {
 const appCsp = (dir) => dir === 'day-084-airpresenter' ? AIRPRESENTER_CSP : [
   "default-src 'self'",
   // Day64 compiles its local Rust module in a same-origin Worker.
+  // Day92 は手の形の読み取り（MediaPipe の wasm）を、カメラの問題で使うときだけ読み込む。
   // Permit Wasm compilation for this app without permitting JavaScript eval.
-  `script-src 'self'${['day-064-breach-atlas', 'day-076-henkan-desk'].includes(dir) ? " 'wasm-unsafe-eval'" : ''}`,
+  `script-src 'self'${['day-064-breach-atlas', 'day-076-henkan-desk', 'day-092-shuwa'].includes(dir) ? " 'wasm-unsafe-eval'" : ''}`,
   "style-src 'self' 'unsafe-inline'",
   `img-src 'self' data: blob:${IMG_BY_APP[dir] || ''}`,
   `media-src 'self'${MEDIA_BY_APP[dir] || ''}`,
@@ -306,7 +307,9 @@ const GLOBAL_PERMISSIONS = 'geolocation=(self), camera=(), microphone=(), paymen
 const PERMISSIONS_BY_APP = {
   'day-084-airpresenter': AIRPRESENTER_PERMISSIONS,
   // day-059 は話した声に合わせて口を動かす。「マイクを開始」を押したときだけ許可を求める。位置情報は使わないので閉じる
-  'day-059-kuchi-sanmai': 'geolocation=(), camera=(), microphone=(self), payment=(), usb=()'
+  'day-059-kuchi-sanmai': 'geolocation=(), camera=(), microphone=(self), payment=(), usb=()',
+  // day-092 は「やってみよう」の問題で「カメラで確かめる」を押したときだけカメラを使う（映像は端末内で処理し、送らない）
+  'day-092-shuwa': 'geolocation=(), camera=(self), microphone=(), payment=(), usb=()'
 };
 
 /* 一覧ページ（/）にCSPを入れていないのは、インラインscriptが2本とGA4があり、

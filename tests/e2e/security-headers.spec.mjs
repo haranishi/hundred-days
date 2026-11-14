@@ -53,6 +53,8 @@ test('全ページに枠内表示の禁止と端末機能の制限が付く', ()
    付け直しが本当に効くかは wrangler pages dev で実測した（Day 059 の作業記録）。 */
 const MIC_DAYS = ['day-059-kuchi-sanmai'];
 const SENSOR_DAYS = ['day-084-airpresenter'];
+// カメラを開けてよいDay。Day92 は「やってみよう」で「カメラで確かめる」を押した時だけ使う（映像は端末内で処理し、送らない）
+const CAMERA_DAYS = ['day-092-shuwa'];
 
 test('マイクは全体で閉じたまま、開けるのはマイクを使うDayのパスだけ', () => {
   for (const dir of MIC_DAYS) {
@@ -70,7 +72,15 @@ test('マイクは全体で閉じたまま、開けるのはマイクを使うDa
   for (const [path, lines] of rules) {
     if (path === '/*' || MIC_DAYS.some((dir) => path === `/${dir}/*`)) continue;
     expect(lines.join('\n'), `${path} がマイクを開けている`).not.toContain('microphone=(self)');
-    if (SENSOR_DAYS.some(dir => path === `/${dir}/*`)) {
+    if (CAMERA_DAYS.some(dir => path === `/${dir}/*`)) {
+      const policy = lines.filter(line => line.startsWith('Permissions-Policy:'));
+      expect(policy, `${path} の Permissions-Policy`).toHaveLength(1);
+      expect(policy[0]).toContain('camera=(self)');
+      for (const feature of ['microphone', 'geolocation', 'payment', 'usb']) expect(policy[0]).toContain(`${feature}=()`);
+      const detach = lines.indexOf('! Permissions-Policy');
+      expect(detach).toBeGreaterThanOrEqual(0);
+      expect(detach).toBeLessThan(lines.indexOf(policy[0]));
+    } else if (SENSOR_DAYS.some(dir => path === `/${dir}/*`)) {
       const policy = lines.filter(line => line.startsWith('Permissions-Policy:'));
       expect(policy, `${path} の Permissions-Policy`).toHaveLength(1);
       for (const feature of ['camera', 'microphone', 'geolocation', 'payment', 'usb']) expect(policy[0]).toContain(`${feature}=()`);

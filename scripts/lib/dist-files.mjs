@@ -14,6 +14,9 @@ export const EXCLUDED_DIRS = ['tools/cache', 'tests', 'node_modules'];
 /* ソースから組み立てたビルド結果を同じフォルダに置いているDayは、ソースと生成ツールを配信しない。
    見るのはDayのフォルダ直下の名前だけ（リポジトリを置いた場所の名前に source が含まれていても外さない） */
 export const SOURCE_DIRS_BY_APP = {
+  // Day92 は source/ から作った本体だけを配信する（元のコード・試験・仕様・作業の記録は配らない）。
+  // tools/ は宣伝動画の道具で、配信には要らない
+  'day-092-shuwa': ['source', 'tools'],
   // Day89 は source/ から作った index.html・assets/・world/（山のデータ）・models/ などだけを配信する（元のコード・道具・試験・設計の文書は配らない）。
   // tools/ は宣伝動画の道具で、配信には要らない
   'day-089-frostline': ['source', 'tools'],
