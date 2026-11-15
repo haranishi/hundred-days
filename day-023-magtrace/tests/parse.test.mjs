@@ -2,8 +2,9 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import {
-  aggregateYears, parseOpenSearchCount, parseOpenSearchRecords, parseSruCount, parseSruRecords,
+  aggregateYears, decodeHtml, parseOpenSearchCount, parseOpenSearchRecords, parseSruCount, parseSruRecords,
 } from "../../functions/api/day-023/trend.js";
+import { safeHttpUrl } from "../lib/format.js";
 
 const fixture = (name) => readFileSync(new URL(`./fixtures/${name}`, import.meta.url), "utf8");
 
@@ -39,4 +40,28 @@ test("OpenSearchの代表記事3件と掲載誌を整形する", () => {
   assert.equal(records[0].magazine, "Research Bureau論究");
   assert.equal(records[0].url, "https://ndlsearch.ndl.go.jp/books/R000000004-I033254806");
   assert.equal(records[1].magazine, "日経コンストラクション");
+});
+
+test("decodeHtml: 範囲外やサロゲートの数値参照をそのまま残す", () => {
+  assert.equal(decodeHtml("&#0; &#x0; &#9999999; &#x110000; &#xD800; &#55296; &#x3042;"), "&#0; &#x0; &#9999999; &#x110000; &#xD800; &#55296; あ");
+});
+
+test("parseOpenSearchRecords: http/https 以外の link を空にする", () => {
+  const xml = `<rss><channel>
+    <item><title>悪意あるリンク</title><link>javascript:alert(1)</link></item>
+    <item><title>dataリンク</title><link>data:text/html,&lt;script&gt;</link></item>
+    <item><title>vbリンク</title><link>vbscript:msgbox(1)</link></item>
+    <item><title>正常リンク</title><link>https://ndlsearch.ndl.go.jp/books/R1</link></item>
+  </channel></rss>`;
+  const records = parseOpenSearchRecords(xml, 2024);
+  assert.deepEqual(records.map((r) => r.url), ["", "", "", "https://ndlsearch.ndl.go.jp/books/R1"]);
+});
+
+test("safeHttpUrl: http/https のみ許可し不正スキームを拒む", () => {
+  assert.equal(safeHttpUrl("https://ndlsearch.ndl.go.jp/books/R1"), "https://ndlsearch.ndl.go.jp/books/R1");
+  assert.equal(safeHttpUrl("http://example.com/a"), "http://example.com/a");
+  assert.equal(safeHttpUrl("javascript:alert(1)"), "");
+  assert.equal(safeHttpUrl("data:text/html,x"), "");
+  assert.equal(safeHttpUrl(""), "");
+  assert.equal(safeHttpUrl(null), "");
 });

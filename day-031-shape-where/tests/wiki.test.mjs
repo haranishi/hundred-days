@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 
-import { articleUrl, createWikiReader, fileUrlFromThumbnail, isThumbnailHost, pickFields, shouldTryNext, summaryUrl, titleCandidates, trimExtract } from '../lib/wiki.js';
+import { articleUrl, createWikiReader, fileUrlFromThumbnail, isThumbnailHost, pickFields, safeHttpUrl, shouldTryNext, summaryUrl, titleCandidates, trimExtract } from '../lib/wiki.js';
 
 const summary = (over = {}) => ({
   type: 'standard',
@@ -186,4 +186,16 @@ test('pickFields は写真のファイルページも一緒に返す', () => {
     thumbnail: { source: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/a/ab/Foo.jpg/320px-Foo.jpg' },
   }));
   assert.equal(info.thumbnailPage, 'https://commons.wikimedia.org/wiki/File:Foo.jpg');
+});
+
+test('safeHttpUrl と pickFields: http/https 以外の記事URLを拒む', () => {
+  assert.equal(safeHttpUrl('https://ja.wikipedia.org/wiki/%E7%BE%8E%E9%83%B7%E7%94%BA'), 'https://ja.wikipedia.org/wiki/%E7%BE%8E%E9%83%B7%E7%94%BA');
+  assert.equal(safeHttpUrl('http://example.com/page'), 'http://example.com/page');
+  for (const bad of ['javascript:alert(1)', 'data:text/html,<script>', 'vbscript:msgbox(1)', '//evil.example/x', '', null]) {
+    assert.equal(safeHttpUrl(bad), '', String(bad));
+    const info = pickFields(summary({ content_urls: { desktop: { page: bad } } }));
+    assert.equal(info.url, '', String(bad));
+  }
+  const ok = pickFields(summary());
+  assert.equal(ok.url, 'https://ja.wikipedia.org/wiki/%E7%BE%8E%E9%83%B7%E7%94%BA');
 });

@@ -1,3 +1,5 @@
+import { safeHttpUrl } from "../../../day-023-magtrace/lib/format.js";
+
 const FROM_YEAR = 1997;
 const UNTIL_YEAR = 2026;
 const PARTIAL_YEAR = 2026;
@@ -20,10 +22,16 @@ export function normalizeQuery(value) {
   return normalized.length >= 1 && normalized.length <= 30 ? normalized : null;
 }
 
+const decodeCodePoint = (whole, code) => (
+  Number.isInteger(code) && code > 0 && code <= 0x10ffff && (code < 0xd800 || code > 0xdfff)
+    ? String.fromCodePoint(code)
+    : whole
+);
+
 export function decodeHtml(value = "") {
   return String(value)
-    .replace(/&#x([0-9a-f]+);/gi, (_, hex) => String.fromCodePoint(Number.parseInt(hex, 16)))
-    .replace(/&#([0-9]+);/g, (_, number) => String.fromCodePoint(Number(number)))
+    .replace(/&#x([0-9a-f]+);/gi, (whole, hex) => decodeCodePoint(whole, Number.parseInt(hex, 16)))
+    .replace(/&#([0-9]+);/g, (whole, number) => decodeCodePoint(whole, Number(number)))
     .replace(/&quot;/g, '"')
     .replace(/&apos;/g, "'")
     .replace(/&lt;/g, "<")
@@ -87,7 +95,7 @@ export function parseOpenSearchRecords(xml, year) {
     title: firstTag(item, "dc:title") || firstTag(item, "title"),
     magazine: cleanMagazine(firstTag(item, "dc:description"), { openSearch: true }),
     creators: [...new Set(allTags(item, "dc:creator"))],
-    url: firstTag(item, "link"),
+    url: safeHttpUrl(firstTag(item, "link")),
   }));
 }
 

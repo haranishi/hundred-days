@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
   isGovernmentPosition, ministryOf, aggregateByYear, aggregateByMinistry,
-  cleanSpeech, excerpt, buildCitation, yearOf,
+  cleanSpeech, excerpt, buildCitation, safeSpeechUrl, yearOf,
 } from '../lib/gov.js';
 
 // 実データ（国会会議録API 2020-2026）で観測した役職をそのまま使う。
@@ -111,4 +111,15 @@ test('引用は抜粋・発言者・出典URLの3行になる', () => {
 test('日付から年を取り出す', () => {
   assert.equal(yearOf({ date: '2026-07-27' }), 2026);
   assert.equal(yearOf({}), null);
+});
+
+test('safeSpeechUrl: http/https のみ許可し不正スキームを拒む', () => {
+  assert.equal(
+    safeSpeechUrl('https://kokkai.ndl.go.jp/txt/122105261X01720260727/5'),
+    'https://kokkai.ndl.go.jp/txt/122105261X01720260727/5'
+  );
+  assert.equal(safeSpeechUrl('http://kokkai.ndl.go.jp/txt/1'), 'http://kokkai.ndl.go.jp/txt/1');
+  for (const bad of ['javascript:alert(1)', 'data:text/html,<b>', 'vbscript:foo', 'file:///etc/passwd', '', null]) {
+    assert.equal(safeSpeechUrl(bad), '', String(bad));
+  }
 });

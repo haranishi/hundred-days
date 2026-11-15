@@ -97,6 +97,18 @@ export function aggregateByMinistry(records) {
     .sort((a, b) => b.count - a.count || a.ministry.localeCompare(b.ministry, 'ja'));
 }
 
+export function safeSpeechUrl(value) {
+  if (typeof value !== 'string') return '';
+  const trimmed = value.trim();
+  if (!trimmed) return '';
+  try {
+    const parsed = new URL(trimmed);
+    return parsed.protocol === 'http:' || parsed.protocol === 'https:' ? parsed.href : '';
+  } catch {
+    return '';
+  }
+}
+
 /** 会議録の発言は「○国務大臣（氏名君）」で始まる。読みやすさのため落とす。 */
 export function cleanSpeech(text) {
   if (!text) return '';

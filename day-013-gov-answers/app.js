@@ -1,6 +1,6 @@
 import {
   isGovernmentSpeech, aggregateByYear, aggregateByMinistry,
-  ministryOf, excerpt, buildCitation,
+  ministryOf, excerpt, buildCitation, safeSpeechUrl,
 } from './lib/gov.js';
 
 const API = 'https://kokkai.ndl.go.jp/api/speech';
@@ -111,9 +111,13 @@ function renderList() {
 
     const acts = document.createElement('div');
     acts.className = 'acts';
-    const link = document.createElement('a');
-    link.href = r.speechURL; link.target = '_blank'; link.rel = 'noopener';
-    link.textContent = '原文を読む';
+    const safeUrl = safeSpeechUrl(r.speechURL);
+    if (safeUrl) {
+      const link = document.createElement('a');
+      link.href = safeUrl; link.target = '_blank'; link.rel = 'noopener noreferrer';
+      link.textContent = '原文を読む';
+      acts.append(link);
+    }
     const copy = document.createElement('button');
     copy.type = 'button'; copy.className = 'secondary'; copy.textContent = '引用をコピー';
     copy.addEventListener('click', async () => {
@@ -121,7 +125,7 @@ function renderList() {
       copy.textContent = 'コピーしました';
       setTimeout(() => { copy.textContent = '引用をコピー'; }, 1600);
     });
-    acts.append(link, copy);
+    acts.append(copy);
 
     card.append(meta, who, body, acts);
     cards.append(card);

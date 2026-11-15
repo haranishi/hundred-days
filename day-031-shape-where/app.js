@@ -8,7 +8,7 @@ import { QUESTION_COUNT, buildRound, formatScore, planPrefCodes, score } from '.
 import { mulberry32, parseSeed, randomSeed } from './lib/rng.js';
 import { REGIONS, regionHint } from './lib/regions.js';
 import { bestOf, bestSlot, isPrefCode, load, saveBest, saveLastPref } from './lib/store.js';
-import { articleUrl, createWikiReader } from './lib/wiki.js';
+import { articleUrl, createWikiReader, safeHttpUrl } from './lib/wiki.js';
 import { intentHref, intentText, modeLabel, postText, shareUrl, townUnit } from './lib/share-text.js';
 import { placedPath, ringsToPath } from './lib/svg.js';
 
@@ -400,6 +400,7 @@ function resetWiki() {
   // 前の問の写真のライセンスリンクが次の問に残らないようにする
   ui.wikiPhotoLink.removeAttribute('href');
   ui.wikiPhotoLink.removeAttribute('aria-label');
+  ui.wikiLink.removeAttribute('href');
   setWiki('loading', WIKI_LOADING);
 }
 
@@ -411,7 +412,14 @@ async function loadWiki(question, ticket) {
     setWiki('none', WIKI_NONE);
     return;
   }
-  ui.wikiLink.href = info.url || articleUrl(info.title);
+  const safeWikiHref = safeHttpUrl(info.url) || (info.title ? safeHttpUrl(articleUrl(info.title)) : '');
+  if (safeWikiHref) {
+    ui.wikiLink.href = safeWikiHref;
+    ui.wikiLink.target = '_blank';
+    ui.wikiLink.rel = 'noopener noreferrer';
+  } else {
+    ui.wikiLink.removeAttribute('href');
+  }
   if (info.thumbnail) {
     ui.wikiThumb.src = info.thumbnail;
     ui.wikiThumb.alt = info.title;
@@ -419,8 +427,10 @@ async function loadWiki(question, ticket) {
     ui.revealWiki.dataset.thumb = 'true';
     /* 写真のライセンスは1枚ごとに違うので、押せば作者とライセンスに辿り着けるようにする。
        配信URLからファイルページを組み立てられなかったときは、href を付けずに写真だけ出す */
-    if (info.thumbnailPage) {
-      ui.wikiPhotoLink.href = info.thumbnailPage;
+    const safePhotoHref = safeHttpUrl(info.thumbnailPage);
+    if (safePhotoHref) {
+      ui.wikiPhotoLink.href = safePhotoHref;
+      ui.wikiPhotoLink.rel = 'noopener noreferrer';
       ui.wikiPhotoLink.setAttribute('aria-label', `${info.title}の写真の作者とライセンス`);
     }
   }

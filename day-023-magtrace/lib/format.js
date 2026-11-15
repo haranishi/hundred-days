@@ -22,3 +22,15 @@ export function isCached(fetchedAt, currentTime = Date.now()) {
   const fetched = new Date(fetchedAt).getTime();
   return Number.isFinite(fetched) && currentTime - fetched >= 60_000;
 }
+
+export function safeHttpUrl(value) {
+  if (typeof value !== "string") return "";
+  const trimmed = value.trim();
+  if (!trimmed) return "";
+  try {
+    const parsed = new URL(trimmed);
+    return parsed.protocol === "http:" || parsed.protocol === "https:" ? parsed.href : "";
+  } catch {
+    return "";
+  }
+}
