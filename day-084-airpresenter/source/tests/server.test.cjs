@@ -96,11 +96,22 @@ test('authentication, host-only control, session isolation and static allowlist'
       assert.equal((await fetch(a.base + resource)).status, 404);
     }
     assert.equal((await fetch(a.base + '/api/session', { method: 'POST', headers: { Origin: 'https://example.invalid' } })).status, 403);
-    const invalidHost = await new Promise((resolve, reject) => {
-      const req = require('node:http').request(a.base + '/api/session', { method: 'POST', headers: { Host: 'evil.invalid' } }, res => { res.resume(); res.on('end', () => resolve(res.statusCode)); });
+    const rawStatus = (requestPath, headers = {}) => new Promise((resolve, reject) => {
+      const target = new URL(a.base);
+      const req = require('node:http').request({
+        hostname: target.hostname, port: target.port, method: 'POST', path: requestPath, headers
+      }, res => { res.resume(); res.on('end', () => resolve(res.statusCode)); });
       req.on('error', reject); req.end();
     });
-    assert.equal(invalidHost, 403);
+    assert.equal(await rawStatus('/api/session', { Host: 'evil.invalid' }), 403);
+    assert.equal(await rawStatus(`${a.base}/api/session`, { Host: 'evil.invalid', Origin: 'http://evil.invalid' }), 403);
+    assert.equal(await rawStatus(`${a.base}/api/session`, { Host: `localhost:${new URL(a.base).port}`, Origin: `http://localhost:${new URL(a.base).port}` }), 403);
+    assert.equal(await rawStatus(`//evil.invalid/api/session`, { Host: new URL(a.base).host, Origin: a.base }), 403);
+    assert.equal(await rawStatus('/api/session', { Host: `user@${new URL(a.base).host}`, Origin: a.base }), 400);
+    assert.equal(await rawStatus('/api/session', { Host: `${new URL(a.base).host}/bad`, Origin: a.base }), 400);
+    assert.equal(await rawStatus('/api/session', { Host: `127.0.0.1:0${new URL(a.base).port}`, Origin: a.base }), 400);
+    assert.equal(await rawStatus('/api/session', { Host: new URL(a.base).host, Origin: '' }), 403);
+    assert.equal(await rawStatus('/api/session', { Host: `LOCALHOST:${new URL(a.base).port}`, Origin: `http://localhost:${new URL(a.base).port}` }), 200);
     assert.equal((await fetch(b.base + '/api/info', { headers: { ...a.headers(), Origin: b.base } })).status, 401);
     assert.equal((await a.request('/api/upload?filename=test.pdf', { role: 'remote', body: createPdf() })).status, 403);
     assert.equal((await a.request('/api/command', { role: 'remote', json: { type: 'NEXT' } })).status, 409);

@@ -58,7 +58,7 @@ export function extractMeta(html = '', baseUrl = '') {
   for (const [tag] of String(html).matchAll(/<link\b[^>]*>/gi)) {
     const attrs = attrsOf(tag);
     if ((attrs.rel || '').toLowerCase() === 'canonical' && attrs.href) {
-      canonical = absolute(attrs.href, baseUrl);
+      canonical = validateTarget(absolute(attrs.href, baseUrl))?.href ?? null;
       break;
     }
   }
@@ -70,10 +70,13 @@ export function extractMeta(html = '', baseUrl = '') {
     }
     return null;
   };
+  const rawImage = absolute(pick('og:image', 'og:image:url', 'og:image:secure_url', 'twitter:image', 'twitter:image:src'), canonical || baseUrl);
+  const validatedImage = validateTarget(rawImage);
+  const image = validatedImage?.protocol === 'https:' ? validatedImage.href : null;
   return {
     title: pick('og:title', 'twitter:title') || clean(decodeEntities(titleTag?.[1] ?? '')),
     lead: pick('og:description', 'twitter:description', 'description'),
-    image: absolute(pick('og:image', 'og:image:url', 'og:image:secure_url', 'twitter:image', 'twitter:image:src'), canonical || baseUrl),
+    image,
     site: pick('og:site_name', 'application-name'),
     publishedAt: pick('article:published_time', 'article:modified_time', 'date', 'pubdate'),
     canonical

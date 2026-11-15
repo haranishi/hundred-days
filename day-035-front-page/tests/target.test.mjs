@@ -24,10 +24,27 @@ test('validateTarget: http/https 以外は拒む', () => {
 test('validateTarget: 内部を指す形は拒む', () => {
   for (const value of [
     'http://localhost/', 'http://127.0.0.1/', 'http://[::1]/', 'http://2130706433/',
-    'http://0x7f.0.0.1/', 'http://printer.local/', 'http://nas.internal/', 'http://192.168.0.1/'
+    'http://0x7f.0.0.1/', 'http://printer.local/', 'http://nas.internal/', 'http://192.168.0.1/',
+    'http://router.arpa/', 'http://app.corp/', 'http://staging.example/', 'http://dev.test/',
+    'http://bad.invalid/', 'http://wiki.intranet/', 'http://db.private/',
+    'https://hundred-days.pages.dev/', 'https://preview.hundred-days.pages.dev/',
+    'https://rairakku.com/', 'https://sub.rairakku.com/'
   ]) {
     assert.equal(validateTarget(value), null, value);
   }
+});
+
+test('validateTarget: 非標準の明示ポート番号は拒む', () => {
+  for (const value of [
+    'https://example.com:8443/',
+    'https://example.com:6379/',
+    'http://example.com:8080/path',
+    'https://example.com:80/',
+    'http://example.com:443/',
+  ]) {
+    assert.equal(validateTarget(value), null, value);
+  }
+  assert.equal(validateTarget('https://example.com:443/')?.href, 'https://example.com/');
 });
 
 test('validateTarget: 認証情報つきURLは拒む', () => {

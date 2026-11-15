@@ -162,15 +162,25 @@ async function createApp(options = {}) {
   }
 
   function validateRequest(req) {
-    let url;
-    try { url = new URL(req.url, `http://${req.headers.host}`); }
+    const rawHost = req.headers.host;
+    if (typeof rawHost !== 'string' || !rawHost) throw new HttpError(400, 'URLが不正です。');
+    let hostUrl;
+    try { hostUrl = new URL(`http://${rawHost}`); }
     catch { throw new HttpError(400, 'URLが不正です。'); }
+    if (hostUrl.username || hostUrl.password || hostUrl.pathname !== '/' || hostUrl.search || hostUrl.hash || hostUrl.host !== rawHost.toLowerCase()) {
+      throw new HttpError(400, 'URLが不正です。');
+    }
     const allowed = new Set(['localhost', '127.0.0.1', '[::1]', lanIp]);
-    if (!allowed.has(url.hostname) || Number(url.port || 80) !== server.address()?.port) {
+    if (!allowed.has(hostUrl.hostname) || Number(hostUrl.port || 80) !== server.address()?.port) {
       throw new HttpError(403, 'このホスト名では接続できません。');
     }
-    const expectedOrigin = `http://${req.headers.host}`;
-    if (req.headers.origin && req.headers.origin !== expectedOrigin) {
+    let url;
+    try { url = new URL(req.url, hostUrl.origin); }
+    catch { throw new HttpError(400, 'URLが不正です。'); }
+    if (url.origin !== hostUrl.origin || url.username || url.password) {
+      throw new HttpError(403, 'このホスト名では接続できません。');
+    }
+    if (req.headers.origin !== undefined && req.headers.origin !== hostUrl.origin) {
       throw new HttpError(403, '別サイトからの操作は許可されていません。');
     }
     if (req.headers['sec-fetch-site'] === 'cross-site') throw new HttpError(403, '別サイトからの操作は許可されていません。');

@@ -42,6 +42,29 @@ test('extractMeta: javascript: の画像は拾わない', () => {
   assert.equal(meta.image, null);
 });
 
+test('extractMeta: http: や内部宛て・自ホスト宛ての画像と canonical は弾く', () => {
+  const meta = extractMeta(
+    '<link rel="canonical" href="http://169.254.169.254/latest"><meta property="og:image" content="http://example.com/a.png">',
+    'https://example.com/'
+  );
+  assert.equal(meta.canonical, null);
+  assert.equal(meta.image, null);
+
+  const privateImg = extractMeta(
+    '<link rel="canonical" href="https://hundred-days.pages.dev/leak"><meta property="og:image" content="https://192.168.1.1/cam.png">',
+    'https://example.com/'
+  );
+  assert.equal(privateImg.canonical, null);
+  assert.equal(privateImg.image, null);
+
+  const goodRel = extractMeta(
+    '<link rel="canonical" href="/news/1"><meta property="og:image" content="/assets/ok.jpg">',
+    'https://example.com/'
+  );
+  assert.equal(goodRel.canonical, 'https://example.com/news/1');
+  assert.equal(goodRel.image, 'https://example.com/assets/ok.jpg');
+});
+
 test('extractMeta: twitter: の値にも落ちる', () => {
   const meta = extractMeta('<meta name="twitter:title" content="Xの題"><meta name="twitter:image" content="https://example.com/x.png">', 'https://example.com/');
   assert.equal(meta.title, 'Xの題');
