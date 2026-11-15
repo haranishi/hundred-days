@@ -1,0 +1,27 @@
+{
+  "feature_name": "security-audit-2026-11",
+  "language": "ja",
+  "phase": "verified",
+  "created_at": "2026-11-15",
+  "verified_at": "2026-11-15",
+  "approvals": {
+    "requirements": {
+      "generated": true,
+      "approved": true
+    },
+    "design": {
+      "generated": true,
+      "approved": true
+    },
+    "tasks": {
+      "generated": true,
+      "approved": true
+    }
+  },
+  "approval_basis": "haranishi/hundred-days のDependabot対応および全体のセキュリティチェックと修正を、cc-sdd・security-and-hardening・security-loop ハーネスで進める本人依頼に基づく。",
+  "delivery": {
+    "repository": "haranishi/hundred-days",
+    "base": "main",
+    "branch": "fix/security-audit-2026-11-15"
+  }
+}
