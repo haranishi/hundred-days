@@ -12,7 +12,10 @@ export function createXmlCheck(name: string, info: PackageInfo): sax.SAXParser {
   let xmlDepth=0,instructionDepth=0, orphanInstructions='',formulaDepth=0,formulaText='';
   const checkFormula=(text:string)=>{
     if(/\b(?:WEBSERVICE|RTD|DDE|IMAGE|STOCKHISTORY|PY|CUBEVALUE|CUBEMEMBER)\s*\(|\[[^\]]+\][^!]*!|\|[^!]+!/i.test(text))unsafe();
-    if(/\bHYPERLINK\s*\(/i.test(text)){const match=text.match(/\bHYPERLINK\s*\(\s*"((?:""|[^"])*)"/i);if(!match||!/^(?:https?:\/\/|mailto:)/i.test(match[1]!.replace(/""/g,'"')))unsafe();}
+    for(const match of text.matchAll(/\bHYPERLINK\s*\(/gi)){
+      const arg=text.slice((match.index??0)+match[0].length).match(/^\s*"((?:""|[^"])*)"\s*([,)])/);
+      if(!arg||!/^(?:https?:\/\/|mailto:)/i.test((arg[1]??'').replace(/""/g,'"')))unsafe();
+    }
   };
   const fields:{text:string;collecting:boolean}[]=[];
   const checkInstruction=(text:string)=>{if(/\b(?:DDEAUTO|DDE|INCLUDETEXT|INCLUDEPICTURE)\b/i.test(text))unsafe();};

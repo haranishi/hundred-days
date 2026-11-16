@@ -1,0 +1,769 @@
+{
+  "schema_version": 1,
+  "run_id": "20261115-hundred-days",
+  "mode": "fix",
+  "run_status": "completed",
+  "rounds": 1,
+  "scope_paths": [
+    "day-092-shuwa/source",
+    "day-076-henkan-desk/source",
+    "day-084-airpresenter",
+    "day-035-front-page",
+    "functions/api",
+    "day-023-magtrace",
+    "day-031-shape-where",
+    "day-030-world-window",
+    "day-013-gov-answers",
+    "scripts/lib/dist-files.mjs"
+  ],
+  "blockers": [],
+  "stop_reason": null,
+  "source": {
+    "before": {
+      "ref": "a34bfbce954855978ea2b2a61c7fd6330dfb9569",
+      "manifest": "scratch:manifest.before.sha256",
+      "tree_sha256": "a3ef4e5d33ff594253767b5b5977ed4489b98f59c0a0515998916d381d7db505"
+    },
+    "after": {
+      "ref": "fix/security-audit-2026-11-15",
+      "manifest": "scratch:manifest.after.sha256",
+      "tree_sha256": "9e372e0cdb62ca9c4004eb32563e976c67890a74577bbac428f9b5f7e6d51086"
+    }
+  },
+  "coverage": [
+    {
+      "area": "day-092-shuwa/source dependencies and lockfile (#60 fixed, #58 upstream-unpatched dev-only)",
+      "status": "validated",
+      "evidence": [
+        "npm --prefix day-092-shuwa/source audit --json (0 critical/high/moderate; 4 low = dev-only deepmerge@4.3.1)",
+        "npm --prefix day-092-shuwa/source test (39/39 files, 751/751 tests)",
+        "dist/day-092-shuwa SHA-256 parity 28/28 vs baseline"
+      ],
+      "tree_sha256": "9e372e0cdb62ca9c4004eb32563e976c67890a74577bbac428f9b5f7e6d51086"
+    },
+    {
+      "area": "day-076-henkan-desk spreadsheet formula inspection",
+      "status": "validated",
+      "evidence": [
+        "/tmp/sec-loop-probes/probe-day076-hyperlink.mjs (boundary_enforced)",
+        "/tmp/sec-loop-probes/variant-day076-hyperlink.mjs (boundary_enforced)",
+        "npm --prefix day-076-henkan-desk/source test (15 files 175 tests passed; 2 Docker/LibreOffice runtime files skipped)"
+      ],
+      "tree_sha256": "9e372e0cdb62ca9c4004eb32563e976c67890a74577bbac428f9b5f7e6d51086"
+    },
+    {
+      "area": "day-084-airpresenter local server Host/Origin and archive parity",
+      "status": "validated",
+      "evidence": [
+        "/tmp/sec-loop-probes/probe-day084-server-request.mjs (boundary_enforced)",
+        "/tmp/sec-loop-probes/variant-day084-server-request.mjs (boundary_enforced)",
+        "node --test day-084-airpresenter/source/tests/server.test.cjs day-084-airpresenter/tests/distribution.test.mjs (14/14 passed)"
+      ],
+      "tree_sha256": "9e372e0cdb62ca9c4004eb32563e976c67890a74577bbac428f9b5f7e6d51086"
+    },
+    {
+      "area": "functions/api/* & client URL sinks (Day 013, 023, 030, 031, 035) and Pages dist packaging",
+      "status": "validated",
+      "evidence": [
+        "/tmp/sec-loop-probes/probe-guarded-controls.mjs (all guarded controls intact)",
+        "npm run precheck (0 NG findings)",
+        "npm run check:syntax (2129 files, 0 errors)",
+        "npm run build (92 days built cleanly)",
+        "npm run audit:deps (18 projects, 0 failures)",
+        "npm run test:unit (5550 passed, 0 failed, 1 skipped)"
+      ],
+      "tree_sha256": "9e372e0cdb62ca9c4004eb32563e976c67890a74577bbac428f9b5f7e6d51086"
+    },
+    {
+      "area": "functions/api/_middleware.js live Cloudflare Pages runtime rate-limit/HMAC harness (wrangler missing locally)",
+      "status": "out_of_scope",
+      "reason": "Offline verification host lacks local wrangler binary (npm run test:api-abuse exited ENOENT on spawn wrangler); static middleware behavior verified via probe-guarded-controls.mjs and CI workflow executes wrangler in GitHub Actions."
+    }
+  ],
+  "findings": [
+    {
+      "id": "day-092-lockfile-advisories",
+      "status": "fixed",
+      "severity": "medium",
+      "root_cause": "day-092-shuwa/source/package-lock.json resolved deprecated glob@11.1.0 pulling minimatch@10.2.6 (Dependabot #60 / ReDoS via globparts amplification).",
+      "boundary": "Build toolchain dependency lockfile and npm audit integrity in day-092-shuwa/source",
+      "locations": [
+        "day-092-shuwa/source/package.json",
+        "day-092-shuwa/source/package-lock.json"
+      ],
+      "regression_test": "day-092-shuwa/source/tests/unit/smoke.test.ts",
+      "evidence": {
+        "attacker_id": "513d81a7-6fae-4e64-97e3-619e83b3b995",
+        "defender_id": "e815f5b5-4722-4f35-83a6-080f8dfb385c",
+        "verifier_id": "60721547-6121-43cf-9883-2e509efb1d34",
+        "before": {
+          "command": "node /tmp/sec-loop-probes/atk2-day092-lockfile-advisories.mjs",
+          "artifact": "/tmp/sec-loop-probes/atk2-day092-lockfile-advisories.mjs",
+          "sandbox_id": "attacker:513d81a7-6fae-4e64-97e3-619e83b3b995",
+          "outcome": "boundary_violated",
+          "probe_sha256": "e55ead5a7eae9efb44bc520bb908ed1f86aab886ec0ddde58dc3dfae14f98b08",
+          "tree_sha256": "a3ef4e5d33ff594253767b5b5977ed4489b98f59c0a0515998916d381d7db505"
+        },
+        "after": {
+          "command": "node /tmp/sec-loop-probes/atk2-day092-lockfile-advisories.mjs",
+          "artifact": "/tmp/sec-loop-probes/atk2-day092-lockfile-advisories.mjs",
+          "sandbox_id": "verifier:60721547-6121-43cf-9883-2e509efb1d34",
+          "outcome": "boundary_enforced",
+          "probe_sha256": "e55ead5a7eae9efb44bc520bb908ed1f86aab886ec0ddde58dc3dfae14f98b08",
+          "tree_sha256": "9e372e0cdb62ca9c4004eb32563e976c67890a74577bbac428f9b5f7e6d51086"
+        },
+        "positive_controls": [
+          {
+            "command": "node /tmp/sec-loop-probes/atk2-day092-lockfile-advisories.mjs",
+            "artifact": "/tmp/sec-loop-probes/atk2-day092-lockfile-advisories.mjs",
+            "sandbox_id": "verifier:60721547-6121-43cf-9883-2e509efb1d34",
+            "outcome": "allowed",
+            "probe_sha256": "e55ead5a7eae9efb44bc520bb908ed1f86aab886ec0ddde58dc3dfae14f98b08",
+            "tree_sha256": "9e372e0cdb62ca9c4004eb32563e976c67890a74577bbac428f9b5f7e6d51086"
+          }
+        ],
+        "variant_checks": [
+          {
+            "command": "node /tmp/sec-loop-probes/variant-day092-lockfile-advisories.mjs",
+            "artifact": "/tmp/sec-loop-probes/variant-day092-lockfile-advisories.mjs",
+            "sandbox_id": "verifier:60721547-6121-43cf-9883-2e509efb1d34",
+            "outcome": "boundary_enforced",
+            "probe_sha256": "9f18d20fda2d57d4a563ba7ca81bb62df52d8f91f51881f3a0670d832ec62687",
+            "tree_sha256": "9e372e0cdb62ca9c4004eb32563e976c67890a74577bbac428f9b5f7e6d51086"
+          }
+        ],
+        "project_checks": [
+          {
+            "command": "npm --prefix day-092-shuwa/source test && npm run audit:deps",
+            "artifact": "scripts/audit-dependencies.mjs",
+            "sandbox_id": "coordinator:85404587-854d-4d83-91e7-1697a2aaa982",
+            "outcome": "passed",
+            "probe_sha256": "dd62cdc668653e29d9c7145aafa339102215711c8343adacc83798677c917d7e",
+            "tree_sha256": "9e372e0cdb62ca9c4004eb32563e976c67890a74577bbac428f9b5f7e6d51086"
+          }
+        ]
+      }
+    },
+    {
+      "id": "day-076-formula-hyperlink-bypass",
+      "status": "fixed",
+      "severity": "high",
+      "root_cause": "checkFormula only checked the first HYPERLINK() call using text.match(...) instead of iterating all HYPERLINK() occurrences and requiring direct literal first arguments ending in ',' or ')'.",
+      "boundary": "Day 76 uploaded Office XML formula validation prior to headless LibreOffice conversion",
+      "locations": [
+        "day-076-henkan-desk/source/server/documents/content.ts",
+        "day-076-henkan-desk/source/tests/documents/office.test.ts"
+      ],
+      "regression_test": "day-076-henkan-desk/source/tests/documents/office.test.ts",
+      "evidence": {
+        "attacker_id": "10858699-57be-4853-b898-39978a9e7cbf",
+        "defender_id": "e815f5b5-4722-4f35-83a6-080f8dfb385c",
+        "verifier_id": "60721547-6121-43cf-9883-2e509efb1d34",
+        "before": {
+          "command": "node --experimental-transform-types /tmp/sec-loop-probes/probe-day076-hyperlink.mjs",
+          "artifact": "/tmp/sec-loop-probes/probe-day076-hyperlink.mjs",
+          "sandbox_id": "attacker:10858699-57be-4853-b898-39978a9e7cbf",
+          "outcome": "boundary_violated",
+          "probe_sha256": "51619b9c9b938cc030892fcc6080eeaf40544548b9f35be1cc7523e40541c751",
+          "tree_sha256": "a3ef4e5d33ff594253767b5b5977ed4489b98f59c0a0515998916d381d7db505"
+        },
+        "after": {
+          "command": "(cd day-076-henkan-desk/source && node --experimental-transform-types /tmp/sec-loop-probes/probe-day076-hyperlink.mjs)",
+          "artifact": "/tmp/sec-loop-probes/probe-day076-hyperlink.mjs",
+          "sandbox_id": "verifier:60721547-6121-43cf-9883-2e509efb1d34",
+          "outcome": "boundary_enforced",
+          "probe_sha256": "51619b9c9b938cc030892fcc6080eeaf40544548b9f35be1cc7523e40541c751",
+          "tree_sha256": "9e372e0cdb62ca9c4004eb32563e976c67890a74577bbac428f9b5f7e6d51086"
+        },
+        "positive_controls": [
+          {
+            "command": "(cd day-076-henkan-desk/source && node --experimental-transform-types /tmp/sec-loop-probes/probe-day076-hyperlink.mjs)",
+            "artifact": "/tmp/sec-loop-probes/probe-day076-hyperlink.mjs",
+            "sandbox_id": "verifier:60721547-6121-43cf-9883-2e509efb1d34",
+            "outcome": "allowed",
+            "probe_sha256": "51619b9c9b938cc030892fcc6080eeaf40544548b9f35be1cc7523e40541c751",
+            "tree_sha256": "9e372e0cdb62ca9c4004eb32563e976c67890a74577bbac428f9b5f7e6d51086"
+          }
+        ],
+        "variant_checks": [
+          {
+            "command": "(cd day-076-henkan-desk/source && node --experimental-transform-types /tmp/sec-loop-probes/variant-day076-hyperlink.mjs)",
+            "artifact": "/tmp/sec-loop-probes/variant-day076-hyperlink.mjs",
+            "sandbox_id": "verifier:60721547-6121-43cf-9883-2e509efb1d34",
+            "outcome": "boundary_enforced",
+            "probe_sha256": "eeaa642cb3221b244382612b691f65fdccfec472e07b695a06d3f221e8adcdb5",
+            "tree_sha256": "9e372e0cdb62ca9c4004eb32563e976c67890a74577bbac428f9b5f7e6d51086"
+          }
+        ],
+        "project_checks": [
+          {
+            "command": "npm --prefix day-076-henkan-desk/source run typecheck && npm --prefix day-076-henkan-desk/source test",
+            "artifact": "day-076-henkan-desk/source/tests/documents/office.test.ts",
+            "sandbox_id": "verifier:60721547-6121-43cf-9883-2e509efb1d34",
+            "outcome": "passed",
+            "probe_sha256": "9bd89486818015f44c6ac92a1f11f221aa9bdfec3dad3b1b3588cbc5e73c8ce3",
+            "tree_sha256": "9e372e0cdb62ca9c4004eb32563e976c67890a74577bbac428f9b5f7e6d51086"
+          }
+        ]
+      }
+    },
+    {
+      "id": "day-084-host-origin-request-bypass",
+      "status": "fixed",
+      "severity": "high",
+      "root_cause": "validateRequest parsed new URL(req.url, `http://${req.headers.host}`) before validating Host directly, permitting absolute-form req.url to override a spoofed Host header and derive expectedOrigin from req.headers.host.",
+      "boundary": "Day 84 AirPresenter local loopback HTTP Host and Origin CSRF/DNS-rebinding boundary",
+      "locations": [
+        "day-084-airpresenter/source/server.js",
+        "day-084-airpresenter/source/tests/server.test.cjs",
+        "day-084-airpresenter/airpresenter-local.zip"
+      ],
+      "regression_test": "day-084-airpresenter/source/tests/server.test.cjs",
+      "evidence": {
+        "attacker_id": "10858699-57be-4853-b898-39978a9e7cbf",
+        "defender_id": "e815f5b5-4722-4f35-83a6-080f8dfb385c",
+        "verifier_id": "60721547-6121-43cf-9883-2e509efb1d34",
+        "before": {
+          "command": "node /tmp/sec-loop-probes/probe-day084-server-request.mjs",
+          "artifact": "/tmp/sec-loop-probes/probe-day084-server-request.mjs",
+          "sandbox_id": "attacker:10858699-57be-4853-b898-39978a9e7cbf",
+          "outcome": "boundary_violated",
+          "probe_sha256": "52e9d81dde451bbf0afd42a78f9bdf14f6f5a3e8a457035263056d251529715e",
+          "tree_sha256": "a3ef4e5d33ff594253767b5b5977ed4489b98f59c0a0515998916d381d7db505"
+        },
+        "after": {
+          "command": "node /tmp/sec-loop-probes/probe-day084-server-request.mjs",
+          "artifact": "/tmp/sec-loop-probes/probe-day084-server-request.mjs",
+          "sandbox_id": "verifier:60721547-6121-43cf-9883-2e509efb1d34",
+          "outcome": "boundary_enforced",
+          "probe_sha256": "52e9d81dde451bbf0afd42a78f9bdf14f6f5a3e8a457035263056d251529715e",
+          "tree_sha256": "9e372e0cdb62ca9c4004eb32563e976c67890a74577bbac428f9b5f7e6d51086"
+        },
+        "positive_controls": [
+          {
+            "command": "node /tmp/sec-loop-probes/probe-day084-server-request.mjs",
+            "artifact": "/tmp/sec-loop-probes/probe-day084-server-request.mjs",
+            "sandbox_id": "verifier:60721547-6121-43cf-9883-2e509efb1d34",
+            "outcome": "allowed",
+            "probe_sha256": "52e9d81dde451bbf0afd42a78f9bdf14f6f5a3e8a457035263056d251529715e",
+            "tree_sha256": "9e372e0cdb62ca9c4004eb32563e976c67890a74577bbac428f9b5f7e6d51086"
+          }
+        ],
+        "variant_checks": [
+          {
+            "command": "node /tmp/sec-loop-probes/variant-day084-inmemory.mjs",
+            "artifact": "/tmp/sec-loop-probes/variant-day084-inmemory.mjs",
+            "sandbox_id": "verifier:60721547-6121-43cf-9883-2e509efb1d34",
+            "outcome": "boundary_enforced",
+            "probe_sha256": "ecd4760974d205eccd46a5a00cb208e14e0863316547104a95ba64eefc96adcc",
+            "tree_sha256": "9e372e0cdb62ca9c4004eb32563e976c67890a74577bbac428f9b5f7e6d51086"
+          },
+          {
+            "command": "node /tmp/sec-loop-probes/variant-day084-server-request.mjs",
+            "artifact": "/tmp/sec-loop-probes/variant-day084-server-request.mjs",
+            "sandbox_id": "coordinator:85404587-854d-4d83-91e7-1697a2aaa982",
+            "outcome": "boundary_enforced",
+            "probe_sha256": "73e549985a2fee973974dd7037514d9c3b3d8275351d17e30297ed3a6ad53df6",
+            "tree_sha256": "9e372e0cdb62ca9c4004eb32563e976c67890a74577bbac428f9b5f7e6d51086"
+          }
+        ],
+        "project_checks": [
+          {
+            "command": "node --test day-084-airpresenter/source/tests/server.test.cjs day-084-airpresenter/tests/distribution.test.mjs",
+            "artifact": "day-084-airpresenter/source/tests/server.test.cjs",
+            "sandbox_id": "coordinator:85404587-854d-4d83-91e7-1697a2aaa982",
+            "outcome": "passed",
+            "probe_sha256": "4586e098f605b108e1b3a190a343e9738450d3d2c90d4299451e1c6975fbc88c",
+            "tree_sha256": "9e372e0cdb62ca9c4004eb32563e976c67890a74577bbac428f9b5f7e6d51086"
+          }
+        ]
+      }
+    },
+    {
+      "id": "day-035-ssrf-reserved-meta-bypass",
+      "status": "fixed",
+      "severity": "medium",
+      "root_cause": "validateTarget accepted arbitrary explicit ports, reserved suffixes (.arpa/.corp/.example/.test/.invalid/.intranet/.private), and self-hosts; extractMeta left canonical and image URLs unvalidated.",
+      "boundary": "Day 35 URL fetch SSRF allowlist and extracted metadata canonical/image URL validation",
+      "locations": [
+        "day-035-front-page/lib/target.js",
+        "functions/api/day-035/page.js",
+        "day-035-front-page/tests/target.test.mjs",
+        "day-035-front-page/tests/page-relay.test.mjs"
+      ],
+      "regression_test": "day-035-front-page/tests/target.test.mjs",
+      "evidence": {
+        "attacker_id": "10858699-57be-4853-b898-39978a9e7cbf",
+        "defender_id": "e815f5b5-4722-4f35-83a6-080f8dfb385c",
+        "verifier_id": "60721547-6121-43cf-9883-2e509efb1d34",
+        "before": {
+          "command": "node /tmp/sec-loop-probes/probe-day035-target-meta.mjs",
+          "artifact": "/tmp/sec-loop-probes/probe-day035-target-meta.mjs",
+          "sandbox_id": "attacker:10858699-57be-4853-b898-39978a9e7cbf",
+          "outcome": "boundary_violated",
+          "probe_sha256": "907dc643f8dd709dce6676fc18ed92ab2e2f82d1b6afd88c8e44866bb77c65bc",
+          "tree_sha256": "a3ef4e5d33ff594253767b5b5977ed4489b98f59c0a0515998916d381d7db505"
+        },
+        "after": {
+          "command": "node /tmp/sec-loop-probes/probe-day035-target-meta.mjs",
+          "artifact": "/tmp/sec-loop-probes/probe-day035-target-meta.mjs",
+          "sandbox_id": "verifier:60721547-6121-43cf-9883-2e509efb1d34",
+          "outcome": "boundary_enforced",
+          "probe_sha256": "907dc643f8dd709dce6676fc18ed92ab2e2f82d1b6afd88c8e44866bb77c65bc",
+          "tree_sha256": "9e372e0cdb62ca9c4004eb32563e976c67890a74577bbac428f9b5f7e6d51086"
+        },
+        "positive_controls": [
+          {
+            "command": "node /tmp/sec-loop-probes/probe-day035-target-meta.mjs",
+            "artifact": "/tmp/sec-loop-probes/probe-day035-target-meta.mjs",
+            "sandbox_id": "verifier:60721547-6121-43cf-9883-2e509efb1d34",
+            "outcome": "allowed",
+            "probe_sha256": "907dc643f8dd709dce6676fc18ed92ab2e2f82d1b6afd88c8e44866bb77c65bc",
+            "tree_sha256": "9e372e0cdb62ca9c4004eb32563e976c67890a74577bbac428f9b5f7e6d51086"
+          }
+        ],
+        "variant_checks": [
+          {
+            "command": "node /tmp/sec-loop-probes/variant-day035-target-meta.mjs",
+            "artifact": "/tmp/sec-loop-probes/variant-day035-target-meta.mjs",
+            "sandbox_id": "verifier:60721547-6121-43cf-9883-2e509efb1d34",
+            "outcome": "boundary_enforced",
+            "probe_sha256": "951dc746b632066ee502fe4cd323ab94984e126c44bd21a77bdaec21a0c4b649",
+            "tree_sha256": "9e372e0cdb62ca9c4004eb32563e976c67890a74577bbac428f9b5f7e6d51086"
+          }
+        ],
+        "project_checks": [
+          {
+            "command": "node --test day-035-front-page/tests/*.test.mjs",
+            "artifact": "day-035-front-page/tests/target.test.mjs",
+            "sandbox_id": "verifier:60721547-6121-43cf-9883-2e509efb1d34",
+            "outcome": "passed",
+            "probe_sha256": "68a4d5f13aa615dea4099c43cf5b2da99c931c00e74cf467e51bb93be73a6fee",
+            "tree_sha256": "9e372e0cdb62ca9c4004eb32563e976c67890a74577bbac428f9b5f7e6d51086"
+          }
+        ]
+      }
+    },
+    {
+      "id": "day-023-decodehtml-codepoint-range",
+      "status": "fixed",
+      "severity": "medium",
+      "root_cause": "decodeHtml passed arbitrary parsed decimal/hex numeric HTML entities directly to String.fromCodePoint(), throwing RangeError on out-of-range or surrogate code points.",
+      "boundary": "Day 23 upstream HTML entity decoding boundary in functions/api/day-023/trend.js",
+      "locations": [
+        "functions/api/day-023/trend.js",
+        "day-023-magtrace/tests/parse.test.mjs"
+      ],
+      "regression_test": "day-023-magtrace/tests/parse.test.mjs",
+      "evidence": {
+        "attacker_id": "10858699-57be-4853-b898-39978a9e7cbf",
+        "defender_id": "e815f5b5-4722-4f35-83a6-080f8dfb385c",
+        "verifier_id": "60721547-6121-43cf-9883-2e509efb1d34",
+        "before": {
+          "command": "node /tmp/sec-loop-probes/probe-day023-decodehtml.mjs",
+          "artifact": "/tmp/sec-loop-probes/probe-day023-decodehtml.mjs",
+          "sandbox_id": "attacker:10858699-57be-4853-b898-39978a9e7cbf",
+          "outcome": "boundary_violated",
+          "probe_sha256": "a1f1b681b95c2a074cce7d148e6da0a8f70cefc899c2a699c6779108906e44a6",
+          "tree_sha256": "a3ef4e5d33ff594253767b5b5977ed4489b98f59c0a0515998916d381d7db505"
+        },
+        "after": {
+          "command": "node /tmp/sec-loop-probes/probe-day023-decodehtml.mjs",
+          "artifact": "/tmp/sec-loop-probes/probe-day023-decodehtml.mjs",
+          "sandbox_id": "verifier:60721547-6121-43cf-9883-2e509efb1d34",
+          "outcome": "boundary_enforced",
+          "probe_sha256": "a1f1b681b95c2a074cce7d148e6da0a8f70cefc899c2a699c6779108906e44a6",
+          "tree_sha256": "9e372e0cdb62ca9c4004eb32563e976c67890a74577bbac428f9b5f7e6d51086"
+        },
+        "positive_controls": [
+          {
+            "command": "node /tmp/sec-loop-probes/probe-day023-decodehtml.mjs",
+            "artifact": "/tmp/sec-loop-probes/probe-day023-decodehtml.mjs",
+            "sandbox_id": "verifier:60721547-6121-43cf-9883-2e509efb1d34",
+            "outcome": "allowed",
+            "probe_sha256": "a1f1b681b95c2a074cce7d148e6da0a8f70cefc899c2a699c6779108906e44a6",
+            "tree_sha256": "9e372e0cdb62ca9c4004eb32563e976c67890a74577bbac428f9b5f7e6d51086"
+          }
+        ],
+        "variant_checks": [
+          {
+            "command": "node /tmp/sec-loop-probes/variant-day023-decodehtml-opensearch.mjs",
+            "artifact": "/tmp/sec-loop-probes/variant-day023-decodehtml-opensearch.mjs",
+            "sandbox_id": "verifier:60721547-6121-43cf-9883-2e509efb1d34",
+            "outcome": "boundary_enforced",
+            "probe_sha256": "5d011a38f6fe3f059b6eb1c844a729035aff1326cf2cad363841a41fa7723a15",
+            "tree_sha256": "9e372e0cdb62ca9c4004eb32563e976c67890a74577bbac428f9b5f7e6d51086"
+          }
+        ],
+        "project_checks": [
+          {
+            "command": "node --test day-023-magtrace/tests/*.test.mjs",
+            "artifact": "day-023-magtrace/tests/parse.test.mjs",
+            "sandbox_id": "verifier:60721547-6121-43cf-9883-2e509efb1d34",
+            "outcome": "passed",
+            "probe_sha256": "a151ad39e650165f58fe18e2bfdde1d4ec21b394bf27fc25d6b351e6a804720f",
+            "tree_sha256": "9e372e0cdb62ca9c4004eb32563e976c67890a74577bbac428f9b5f7e6d51086"
+          }
+        ]
+      }
+    },
+    {
+      "id": "day-023-opensearch-url-scheme",
+      "status": "fixed",
+      "severity": "medium",
+      "root_cause": "parseOpenSearchRecords and day-023-magtrace/app.js copied arbitrary URI schemes (including javascript:) from upstream XML <link> tags into record links.",
+      "boundary": "Day 23 OpenSearch parser and client link sink scheme boundary",
+      "locations": [
+        "day-023-magtrace/lib/format.js",
+        "functions/api/day-023/trend.js",
+        "day-023-magtrace/app.js",
+        "day-023-magtrace/tests/parse.test.mjs"
+      ],
+      "regression_test": "day-023-magtrace/tests/parse.test.mjs",
+      "evidence": {
+        "attacker_id": "513d81a7-6fae-4e64-97e3-619e83b3b995",
+        "defender_id": "e815f5b5-4722-4f35-83a6-080f8dfb385c",
+        "verifier_id": "60721547-6121-43cf-9883-2e509efb1d34",
+        "before": {
+          "command": "node /tmp/sec-loop-probes/atk2-day023-opensearch-url.mjs",
+          "artifact": "/tmp/sec-loop-probes/atk2-day023-opensearch-url.mjs",
+          "sandbox_id": "attacker:513d81a7-6fae-4e64-97e3-619e83b3b995",
+          "outcome": "boundary_violated",
+          "probe_sha256": "63230d4d5d5b6c339e0bbb39e1b160e507d02454241bf1c71b7333a43626caa9",
+          "tree_sha256": "a3ef4e5d33ff594253767b5b5977ed4489b98f59c0a0515998916d381d7db505"
+        },
+        "after": {
+          "command": "node /tmp/sec-loop-probes/atk2-day023-opensearch-url.mjs",
+          "artifact": "/tmp/sec-loop-probes/atk2-day023-opensearch-url.mjs",
+          "sandbox_id": "verifier:60721547-6121-43cf-9883-2e509efb1d34",
+          "outcome": "boundary_enforced",
+          "probe_sha256": "63230d4d5d5b6c339e0bbb39e1b160e507d02454241bf1c71b7333a43626caa9",
+          "tree_sha256": "9e372e0cdb62ca9c4004eb32563e976c67890a74577bbac428f9b5f7e6d51086"
+        },
+        "positive_controls": [
+          {
+            "command": "node /tmp/sec-loop-probes/atk2-day023-opensearch-url.mjs",
+            "artifact": "/tmp/sec-loop-probes/atk2-day023-opensearch-url.mjs",
+            "sandbox_id": "verifier:60721547-6121-43cf-9883-2e509efb1d34",
+            "outcome": "allowed",
+            "probe_sha256": "63230d4d5d5b6c339e0bbb39e1b160e507d02454241bf1c71b7333a43626caa9",
+            "tree_sha256": "9e372e0cdb62ca9c4004eb32563e976c67890a74577bbac428f9b5f7e6d51086"
+          }
+        ],
+        "variant_checks": [
+          {
+            "command": "node /tmp/sec-loop-probes/variant-day023-decodehtml-opensearch.mjs",
+            "artifact": "/tmp/sec-loop-probes/variant-day023-decodehtml-opensearch.mjs",
+            "sandbox_id": "verifier:60721547-6121-43cf-9883-2e509efb1d34",
+            "outcome": "boundary_enforced",
+            "probe_sha256": "5d011a38f6fe3f059b6eb1c844a729035aff1326cf2cad363841a41fa7723a15",
+            "tree_sha256": "9e372e0cdb62ca9c4004eb32563e976c67890a74577bbac428f9b5f7e6d51086"
+          }
+        ],
+        "project_checks": [
+          {
+            "command": "node --test day-023-magtrace/tests/*.test.mjs",
+            "artifact": "day-023-magtrace/tests/parse.test.mjs",
+            "sandbox_id": "verifier:60721547-6121-43cf-9883-2e509efb1d34",
+            "outcome": "passed",
+            "probe_sha256": "a151ad39e650165f58fe18e2bfdde1d4ec21b394bf27fc25d6b351e6a804720f",
+            "tree_sha256": "9e372e0cdb62ca9c4004eb32563e976c67890a74577bbac428f9b5f7e6d51086"
+          }
+        ]
+      }
+    },
+    {
+      "id": "day-031-wiki-url-scheme",
+      "status": "fixed",
+      "severity": "medium",
+      "root_cause": "pickFields in day-031-shape-where/lib/wiki.js and loadWiki in app.js forwarded arbitrary schemes from summary.content_urls.desktop.page to ui.wikiLink.href.",
+      "boundary": "Day 31 Wikipedia summary parser and client href sink boundary",
+      "locations": [
+        "day-031-shape-where/lib/wiki.js",
+        "day-031-shape-where/app.js",
+        "day-031-shape-where/tests/wiki.test.mjs"
+      ],
+      "regression_test": "day-031-shape-where/tests/wiki.test.mjs",
+      "evidence": {
+        "attacker_id": "513d81a7-6fae-4e64-97e3-619e83b3b995",
+        "defender_id": "e815f5b5-4722-4f35-83a6-080f8dfb385c",
+        "verifier_id": "60721547-6121-43cf-9883-2e509efb1d34",
+        "before": {
+          "command": "node /tmp/sec-loop-probes/atk2-wiki-url-scheme.mjs",
+          "artifact": "/tmp/sec-loop-probes/atk2-wiki-url-scheme.mjs",
+          "sandbox_id": "attacker:513d81a7-6fae-4e64-97e3-619e83b3b995",
+          "outcome": "boundary_violated",
+          "probe_sha256": "80837f25828e91fc6bde36477f24682ad5b0b78f5a1f1a33a904f2b778e7a2f1",
+          "tree_sha256": "a3ef4e5d33ff594253767b5b5977ed4489b98f59c0a0515998916d381d7db505"
+        },
+        "after": {
+          "command": "node /tmp/sec-loop-probes/atk2-wiki-url-scheme.mjs",
+          "artifact": "/tmp/sec-loop-probes/atk2-wiki-url-scheme.mjs",
+          "sandbox_id": "verifier:60721547-6121-43cf-9883-2e509efb1d34",
+          "outcome": "boundary_enforced",
+          "probe_sha256": "80837f25828e91fc6bde36477f24682ad5b0b78f5a1f1a33a904f2b778e7a2f1",
+          "tree_sha256": "9e372e0cdb62ca9c4004eb32563e976c67890a74577bbac428f9b5f7e6d51086"
+        },
+        "positive_controls": [
+          {
+            "command": "node /tmp/sec-loop-probes/atk2-wiki-url-scheme.mjs",
+            "artifact": "/tmp/sec-loop-probes/atk2-wiki-url-scheme.mjs",
+            "sandbox_id": "verifier:60721547-6121-43cf-9883-2e509efb1d34",
+            "outcome": "allowed",
+            "probe_sha256": "80837f25828e91fc6bde36477f24682ad5b0b78f5a1f1a33a904f2b778e7a2f1",
+            "tree_sha256": "9e372e0cdb62ca9c4004eb32563e976c67890a74577bbac428f9b5f7e6d51086"
+          }
+        ],
+        "variant_checks": [
+          {
+            "command": "node /tmp/sec-loop-probes/variant-day031-wiki-scheme.mjs",
+            "artifact": "/tmp/sec-loop-probes/variant-day031-wiki-scheme.mjs",
+            "sandbox_id": "verifier:60721547-6121-43cf-9883-2e509efb1d34",
+            "outcome": "boundary_enforced",
+            "probe_sha256": "d60104f2ff2c62040efd494d9bfe47a6f151f351e04283d383ad5ad7cfae09c2",
+            "tree_sha256": "9e372e0cdb62ca9c4004eb32563e976c67890a74577bbac428f9b5f7e6d51086"
+          }
+        ],
+        "project_checks": [
+          {
+            "command": "node --test day-031-shape-where/tests/*.test.mjs",
+            "artifact": "day-031-shape-where/tests/wiki.test.mjs",
+            "sandbox_id": "verifier:60721547-6121-43cf-9883-2e509efb1d34",
+            "outcome": "passed",
+            "probe_sha256": "351789897b202d1293bad0cd3eb889ec3d582342bc010ede875684de1de60aed",
+            "tree_sha256": "9e372e0cdb62ca9c4004eb32563e976c67890a74577bbac428f9b5f7e6d51086"
+          }
+        ]
+      }
+    },
+    {
+      "id": "day-030-windy-url-scheme",
+      "status": "fixed",
+      "severity": "medium",
+      "root_cause": "trimDetail in functions/api/day-030/windy.js and day-030-world-window/lib/ui.js accepted non-HTTPS/javascript: schemes into image.src, iframe.src, and external href sinks.",
+      "boundary": "Day 30 Windy proxy normalizer and viewer UI https-only URL scheme boundary",
+      "locations": [
+        "functions/api/day-030/windy.js",
+        "day-030-world-window/lib/links.js",
+        "day-030-world-window/lib/ui.js",
+        "day-030-world-window/tests/links-zones.test.mjs",
+        "day-030-world-window/tests/proxy-windy.test.mjs"
+      ],
+      "regression_test": "day-030-world-window/tests/proxy-windy.test.mjs",
+      "evidence": {
+        "attacker_id": "513d81a7-6fae-4e64-97e3-619e83b3b995",
+        "defender_id": "e815f5b5-4722-4f35-83a6-080f8dfb385c",
+        "verifier_id": "60721547-6121-43cf-9883-2e509efb1d34",
+        "before": {
+          "command": "node /tmp/sec-loop-probes/atk2-day030-windy-url.mjs",
+          "artifact": "/tmp/sec-loop-probes/atk2-day030-windy-url.mjs",
+          "sandbox_id": "attacker:513d81a7-6fae-4e64-97e3-619e83b3b995",
+          "outcome": "boundary_violated",
+          "probe_sha256": "0f882f5d31ec5ea19a140ac1a44ea6982a86b5aba5978e9b6c800d74cca709f5",
+          "tree_sha256": "a3ef4e5d33ff594253767b5b5977ed4489b98f59c0a0515998916d381d7db505"
+        },
+        "after": {
+          "command": "node /tmp/sec-loop-probes/atk2-day030-windy-url.mjs",
+          "artifact": "/tmp/sec-loop-probes/atk2-day030-windy-url.mjs",
+          "sandbox_id": "verifier:60721547-6121-43cf-9883-2e509efb1d34",
+          "outcome": "boundary_enforced",
+          "probe_sha256": "0f882f5d31ec5ea19a140ac1a44ea6982a86b5aba5978e9b6c800d74cca709f5",
+          "tree_sha256": "9e372e0cdb62ca9c4004eb32563e976c67890a74577bbac428f9b5f7e6d51086"
+        },
+        "positive_controls": [
+          {
+            "command": "node /tmp/sec-loop-probes/atk2-day030-windy-url.mjs",
+            "artifact": "/tmp/sec-loop-probes/atk2-day030-windy-url.mjs",
+            "sandbox_id": "verifier:60721547-6121-43cf-9883-2e509efb1d34",
+            "outcome": "allowed",
+            "probe_sha256": "0f882f5d31ec5ea19a140ac1a44ea6982a86b5aba5978e9b6c800d74cca709f5",
+            "tree_sha256": "9e372e0cdb62ca9c4004eb32563e976c67890a74577bbac428f9b5f7e6d51086"
+          }
+        ],
+        "variant_checks": [
+          {
+            "command": "node /tmp/sec-loop-probes/variant-day030-windy-scheme.mjs",
+            "artifact": "/tmp/sec-loop-probes/variant-day030-windy-scheme.mjs",
+            "sandbox_id": "verifier:60721547-6121-43cf-9883-2e509efb1d34",
+            "outcome": "boundary_enforced",
+            "probe_sha256": "04610daae95d73e175d8a844b2d393ee913c6efc53d1b2c642652bf6b3de4d58",
+            "tree_sha256": "9e372e0cdb62ca9c4004eb32563e976c67890a74577bbac428f9b5f7e6d51086"
+          }
+        ],
+        "project_checks": [
+          {
+            "command": "node --test day-030-world-window/tests/*.test.mjs",
+            "artifact": "day-030-world-window/tests/proxy-windy.test.mjs",
+            "sandbox_id": "verifier:60721547-6121-43cf-9883-2e509efb1d34",
+            "outcome": "passed",
+            "probe_sha256": "bf1030381ac30af62f14ca17be81f83bf7f72b1770c78e651d97467b7c00951c",
+            "tree_sha256": "9e372e0cdb62ca9c4004eb32563e976c67890a74577bbac428f9b5f7e6d51086"
+          }
+        ]
+      }
+    },
+    {
+      "id": "day-013-gov-href-scheme",
+      "status": "fixed",
+      "severity": "medium",
+      "root_cause": "day-013-gov-answers/app.js assigned unvalidated speechURL strings directly to <a href> and omitted rel=noreferrer.",
+      "boundary": "Day 13 Diet speech link client href scheme and noopener noreferrer boundary",
+      "locations": [
+        "day-013-gov-answers/lib/gov.js",
+        "day-013-gov-answers/app.js",
+        "day-013-gov-answers/tests/gov.test.mjs"
+      ],
+      "regression_test": "day-013-gov-answers/tests/gov.test.mjs",
+      "evidence": {
+        "attacker_id": "513d81a7-6fae-4e64-97e3-619e83b3b995",
+        "defender_id": "e815f5b5-4722-4f35-83a6-080f8dfb385c",
+        "verifier_id": "60721547-6121-43cf-9883-2e509efb1d34",
+        "before": {
+          "command": "node /tmp/sec-loop-probes/atk2-day013-gov-href.mjs",
+          "artifact": "/tmp/sec-loop-probes/atk2-day013-gov-href.mjs",
+          "sandbox_id": "attacker:513d81a7-6fae-4e64-97e3-619e83b3b995",
+          "outcome": "boundary_violated",
+          "probe_sha256": "1f398ce4d62c4cede97020a3c30a36b6af54bf6ffc9beaf8a3f441ee285960e4",
+          "tree_sha256": "a3ef4e5d33ff594253767b5b5977ed4489b98f59c0a0515998916d381d7db505"
+        },
+        "after": {
+          "command": "node /tmp/sec-loop-probes/atk2-day013-gov-href.mjs",
+          "artifact": "/tmp/sec-loop-probes/atk2-day013-gov-href.mjs",
+          "sandbox_id": "verifier:60721547-6121-43cf-9883-2e509efb1d34",
+          "outcome": "boundary_enforced",
+          "probe_sha256": "1f398ce4d62c4cede97020a3c30a36b6af54bf6ffc9beaf8a3f441ee285960e4",
+          "tree_sha256": "9e372e0cdb62ca9c4004eb32563e976c67890a74577bbac428f9b5f7e6d51086"
+        },
+        "positive_controls": [
+          {
+            "command": "node /tmp/sec-loop-probes/atk2-day013-gov-href.mjs",
+            "artifact": "/tmp/sec-loop-probes/atk2-day013-gov-href.mjs",
+            "sandbox_id": "verifier:60721547-6121-43cf-9883-2e509efb1d34",
+            "outcome": "allowed",
+            "probe_sha256": "1f398ce4d62c4cede97020a3c30a36b6af54bf6ffc9beaf8a3f441ee285960e4",
+            "tree_sha256": "9e372e0cdb62ca9c4004eb32563e976c67890a74577bbac428f9b5f7e6d51086"
+          }
+        ],
+        "variant_checks": [
+          {
+            "command": "node /tmp/sec-loop-probes/variant-day013-gov-scheme.mjs",
+            "artifact": "/tmp/sec-loop-probes/variant-day013-gov-scheme.mjs",
+            "sandbox_id": "verifier:60721547-6121-43cf-9883-2e509efb1d34",
+            "outcome": "boundary_enforced",
+            "probe_sha256": "3191486c46a0b23612580fd0808eb2da8be2c2e7e3909c476d1d83b0268b5236",
+            "tree_sha256": "9e372e0cdb62ca9c4004eb32563e976c67890a74577bbac428f9b5f7e6d51086"
+          }
+        ],
+        "project_checks": [
+          {
+            "command": "node --test day-013-gov-answers/tests/*.test.mjs",
+            "artifact": "day-013-gov-answers/tests/gov.test.mjs",
+            "sandbox_id": "verifier:60721547-6121-43cf-9883-2e509efb1d34",
+            "outcome": "passed",
+            "probe_sha256": "7206264be931df4d30f2330c57ec7e1da2cb3f23178f5ab862bacad511d4517c",
+            "tree_sha256": "9e372e0cdb62ca9c4004eb32563e976c67890a74577bbac428f9b5f7e6d51086"
+          }
+        ]
+      }
+    },
+    {
+      "id": "dist-packaging-leaks",
+      "status": "fixed",
+      "severity": "medium",
+      "root_cause": "isServedPath did not uniformly exclude dotfiles, package manifests/lockfiles, static _headers, and top-level tools/scripts folders across all Days before cpSync into dist/.",
+      "boundary": "Cloudflare Pages static dist/ packaging filter in scripts/lib/dist-files.mjs",
+      "locations": [
+        "scripts/lib/dist-files.mjs",
+        "scripts/tests/dist-files.test.mjs"
+      ],
+      "regression_test": "scripts/tests/dist-files.test.mjs",
+      "evidence": {
+        "attacker_id": "513d81a7-6fae-4e64-97e3-619e83b3b995",
+        "defender_id": "e815f5b5-4722-4f35-83a6-080f8dfb385c",
+        "verifier_id": "60721547-6121-43cf-9883-2e509efb1d34",
+        "before": {
+          "command": "node /tmp/sec-loop-probes/atk2-dist-leak.mjs",
+          "artifact": "/tmp/sec-loop-probes/atk2-dist-leak.mjs",
+          "sandbox_id": "attacker:513d81a7-6fae-4e64-97e3-619e83b3b995",
+          "outcome": "boundary_violated",
+          "probe_sha256": "65d7603e5a204d5102c7ed2e23eac9d48e55e33709e7988821a1078a835a2ffa",
+          "tree_sha256": "a3ef4e5d33ff594253767b5b5977ed4489b98f59c0a0515998916d381d7db505"
+        },
+        "after": {
+          "command": "node /tmp/sec-loop-probes/atk2-dist-leak.mjs",
+          "artifact": "/tmp/sec-loop-probes/atk2-dist-leak.mjs",
+          "sandbox_id": "verifier:60721547-6121-43cf-9883-2e509efb1d34",
+          "outcome": "boundary_enforced",
+          "probe_sha256": "65d7603e5a204d5102c7ed2e23eac9d48e55e33709e7988821a1078a835a2ffa",
+          "tree_sha256": "9e372e0cdb62ca9c4004eb32563e976c67890a74577bbac428f9b5f7e6d51086"
+        },
+        "positive_controls": [
+          {
+            "command": "node /tmp/sec-loop-probes/atk2-dist-leak.mjs",
+            "artifact": "/tmp/sec-loop-probes/atk2-dist-leak.mjs",
+            "sandbox_id": "verifier:60721547-6121-43cf-9883-2e509efb1d34",
+            "outcome": "allowed",
+            "probe_sha256": "65d7603e5a204d5102c7ed2e23eac9d48e55e33709e7988821a1078a835a2ffa",
+            "tree_sha256": "9e372e0cdb62ca9c4004eb32563e976c67890a74577bbac428f9b5f7e6d51086"
+          }
+        ],
+        "variant_checks": [
+          {
+            "command": "node /tmp/sec-loop-probes/variant-dist-leak.mjs",
+            "artifact": "/tmp/sec-loop-probes/variant-dist-leak.mjs",
+            "sandbox_id": "verifier:60721547-6121-43cf-9883-2e509efb1d34",
+            "outcome": "boundary_enforced",
+            "probe_sha256": "7cf99949cd64481046b0d828d84a49696b07769356e86880b3e84d2610493734",
+            "tree_sha256": "9e372e0cdb62ca9c4004eb32563e976c67890a74577bbac428f9b5f7e6d51086"
+          }
+        ],
+        "project_checks": [
+          {
+            "command": "npm run check:syntax && node --test scripts/tests/dist-files.test.mjs",
+            "artifact": "scripts/tests/dist-files.test.mjs",
+            "sandbox_id": "verifier:60721547-6121-43cf-9883-2e509efb1d34",
+            "outcome": "passed",
+            "probe_sha256": "7f7a427474a73f9ed7c6fafc589b1ed7b65f1927ce06b9d586c271b181e1384e",
+            "tree_sha256": "9e372e0cdb62ca9c4004eb32563e976c67890a74577bbac428f9b5f7e6d51086"
+          }
+        ]
+      }
+    },
+    {
+      "id": "day-084-pages-headers-and-zip",
+      "status": "rejected",
+      "severity": null,
+      "root_cause": "Hypothesized missing COEP/office CSP in Pages dist/day-084-airpresenter/_headers and unintended archive exposure.",
+      "boundary": "Day 84 Pages redirect headers vs dedicated Worker policy",
+      "locations": [
+        "scripts/build.mjs",
+        "day-084-airpresenter/web/policy.mjs",
+        "day-084-airpresenter/airpresenter-local.zip"
+      ],
+      "reason": "Rejected during triage: dist/day-084-airpresenter/_headers intentionally locks Pages redirect frame-ancestors 'none' while COEP and OFFICE_CONTENT_SECURITY_POLICY are enforced by dedicated Worker policy (day-084-airpresenter/web/policy.mjs); airpresenter-local.zip is an intentional public distribution archive verified by distribution.test.mjs and day084-browser-build.test.mjs."
+    },
+    {
+      "id": "day-055-kyaraben-headers-inheritance",
+      "status": "rejected",
+      "severity": null,
+      "root_cause": "Hypothesized missing Permissions-Policy directives in day-055-kyaraben/_headers override.",
+      "boundary": "Cloudflare Pages _headers inheritance for Day 55 microphone access",
+      "locations": [
+        "day-055-kyaraben/_headers",
+        "tests/e2e/security-headers.spec.mjs"
+      ],
+      "reason": "Rejected during triage: verified in tests/e2e/security-headers.spec.mjs:59-103 that global frame-ancestors 'none' and camera/geolocation restrictions apply at runtime while day-055 overrides microphone=(self) intentionally."
+    },
+    {
+      "id": "day-092-deepmerge-alert-58",
+      "status": "rejected",
+      "severity": null,
+      "root_cause": "GitHub Dependabot alert #58 (deepmerge@4.3.1 GHSA-gcqx-w48m-w2h4, Low) reported in day-092-shuwa/source/package-lock.json.",
+      "boundary": "Day 92 Vite PWA dev/build dependency vs browser runtime bundle",
+      "locations": [
+        "day-092-shuwa/source/package-lock.json"
+      ],
+      "reason": "Rejected for runtime reachability and upstream patch availability: deepmerge@4.3.1 has upstream first_patched_version: null and is pulled only as a dev dependency (@rollup/plugin-node-resolve -> workbox-build -> vite-plugin-pwa) with 0 bytes shipped in dist/day-092-shuwa/. Documented in .kiro/specs/security-audit-2026-11/verification.md and followup-2026-11-15.md for explicit maintainer alert dismissal review."
+    }
+  ]
+}

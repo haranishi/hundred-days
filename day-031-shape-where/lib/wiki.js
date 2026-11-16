@@ -15,6 +15,18 @@ export const summaryUrl = (title) => `${WIKI_ORIGIN}/api/rest_v1/page/summary/${
 /** 記事そのもののURL。応答に content_urls が無かったときの控え */
 export const articleUrl = (title) => `${WIKI_ORIGIN}/wiki/${encodeURIComponent(title)}`;
 
+export function safeHttpUrl(value) {
+  if (typeof value !== 'string') return '';
+  const trimmed = value.trim();
+  if (!trimmed) return '';
+  try {
+    const parsed = new URL(trimmed);
+    return parsed.protocol === 'http:' || parsed.protocol === 'https:' ? parsed.href : '';
+  } catch {
+    return '';
+  }
+}
+
 /** 先頭から max 文字に切り、切ったら「…」を足す。絵文字が割れないよう符号位置で数える */
 export function trimExtract(text, max = EXTRACT_LIMIT) {
   const clean = String(text ?? '').replace(/\s+/g, ' ').trim();
@@ -83,7 +95,7 @@ export function pickFields(summary) {
     extract,
     thumbnail: isThumbnailHost(thumb) ? thumb : '',
     thumbnailPage: fileUrlFromThumbnail(thumb),
-    url: String(summary?.content_urls?.desktop?.page || '').trim()
+    url: safeHttpUrl(summary?.content_urls?.desktop?.page)
   };
 }
 

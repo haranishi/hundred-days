@@ -48,14 +48,26 @@ export const SOURCE_DIRS_BY_APP = {
   'day-075-amegumo-sokoban': ['tools']
 };
 
+const EXCLUDED_FILES = ['package.json', 'package-lock.json', '_headers'];
+const EXCLUDED_TOP_DIRS = ['tools', 'scripts'];
+
 /** Dayのフォルダからの相対パス（/ 区切り。'' はフォルダそのもの）が、dist/ に配信されるか */
 export function isServedPath(dir, relativePath) {
-  const path = `/${relativePath}`;
+  const rel = String(relativePath);
+  const segments = rel.split('/').filter(Boolean);
+  // ドットで始まる隠しファイル・隠しディレクトリ（.DS_Store / .env 等）は配信しない
+  if (segments.some((seg) => seg.startsWith('.'))) return false;
+  // package.json / package-lock.json / _headers はどの深さでも配信しない（build.mjs が必要な _headers のみ別途出力する）
+  const base = segments.at(-1);
+  if (base && EXCLUDED_FILES.includes(base)) return false;
+
+  const path = `/${rel}`;
   // そのフォルダ自身（末尾一致）と、その中身（区切り文字が続く）だけを外す。
   // `tests` が `testsuite` のような別名に当たらないようにしている
   if (EXCLUDED_DIRS.some((name) => path.endsWith(`/${name}`) || path.includes(`/${name}/`))) return false;
   // day-044 だけは、tools で始まる名前を深さを問わず外す（build.mjs にあった特例をそのまま移した）
   if (dir === 'day-044-train-here' && path.includes('/tools')) return false;
-  const [top] = String(relativePath).split('/');
+  const [top] = rel.split('/');
+  if (EXCLUDED_TOP_DIRS.includes(top)) return false;
   return !(SOURCE_DIRS_BY_APP[dir] ?? []).includes(top);
 }

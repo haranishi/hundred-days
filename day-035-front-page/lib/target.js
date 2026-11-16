@@ -6,7 +6,8 @@ export const MAX_URL_LENGTH = 2048;
 
 /* 名前で内部を指すもの。Workers の fetch は外向きなので私設アドレスには届かないが、
    届かない先に投げる前に断ったほうが、返す言葉を選べる。 */
-const RESERVED_NAME = /(^|\.)(localhost|local|internal|localdomain|home|lan|onion)$/i;
+const RESERVED_NAME = /(^|\.)(localhost|local|internal|localdomain|home|lan|onion|arpa|corp|example|test|invalid|intranet|private)$/i;
+const SELF_HOST = /(^|\.)(hundred-days\.pages\.dev|rairakku\.com)$/i;
 
 /* 数値だけのホスト（127.0.0.1・2130706433・0x7f.0.0.1・[::1]）を見分ける。
    ラベルが全部10進か16進なら名前ではない、という判定。
@@ -29,9 +30,9 @@ export function validateTarget(value) {
     return null;
   }
   if (url.protocol !== 'http:' && url.protocol !== 'https:') return null;
-  if (url.username || url.password) return null;
+  if (url.username || url.password || url.port) return null;
   const host = url.hostname.toLowerCase().replace(/\.$/, '');
-  if (!host.includes('.') || isNumericHost(host) || RESERVED_NAME.test(host)) return null;
+  if (!host.includes('.') || isNumericHost(host) || RESERVED_NAME.test(host) || SELF_HOST.test(host)) return null;
   if (!/^[a-z]{2,}$/.test(host.split('.').at(-1))) return null;
   url.hash = '';
   return url;

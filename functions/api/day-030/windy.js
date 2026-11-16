@@ -13,6 +13,18 @@ const numberOrNull = (value) => {
 
 const valueOrNull = (value) => value ?? null;
 
+export function safeHttpsUrl(value) {
+  if (typeof value !== "string") return null;
+  const trimmed = value.trim();
+  if (!trimmed) return null;
+  try {
+    const parsed = new URL(trimmed);
+    return parsed.protocol === "https:" ? parsed.href : null;
+  } catch {
+    return null;
+  }
+}
+
 const trimCategories = (categories) => {
   if (!Array.isArray(categories)) return null;
   return categories.map((category) => valueOrNull(category?.id));
@@ -91,15 +103,15 @@ export function trimDetail(webcam = {}) {
     country: valueOrNull(webcam?.location?.country),
     lat: numberOrNull(webcam?.location?.latitude),
     lon: numberOrNull(webcam?.location?.longitude),
-    image: valueOrNull(webcam?.images?.current?.preview),
-    imageDaylight: valueOrNull(webcam?.images?.daylight?.preview),
+    image: safeHttpsUrl(webcam?.images?.current?.preview),
+    imageDaylight: safeHttpsUrl(webcam?.images?.daylight?.preview),
     player: {
-      day: valueOrNull(webcam?.player?.day),
-      month: valueOrNull(webcam?.player?.month),
-      year: valueOrNull(webcam?.player?.year),
-      lifetime: valueOrNull(webcam?.player?.lifetime),
+      day: safeHttpsUrl(webcam?.player?.day),
+      month: safeHttpsUrl(webcam?.player?.month),
+      year: safeHttpsUrl(webcam?.player?.year),
+      lifetime: safeHttpsUrl(webcam?.player?.lifetime),
     },
-    detailUrl: valueOrNull(webcam?.urls?.detail),
+    detailUrl: safeHttpsUrl(webcam?.urls?.detail),
     categories: trimCategories(webcam?.categories),
   };
 }

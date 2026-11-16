@@ -7,3 +7,15 @@ export function osmUrl(id) {
   if (!match) return null;
   return `https://www.openstreetmap.org/${match[1] === 'n' ? 'node' : 'way'}/${match[2]}`;
 }
+
+export function safeHttpsUrl(value) {
+  if (typeof value !== 'string') return null;
+  const trimmed = value.trim();
+  if (!trimmed) return null;
+  try {
+    const parsed = new URL(trimmed);
+    return parsed.protocol === 'https:' ? parsed.href : null;
+  } catch {
+    return null;
+  }
+}

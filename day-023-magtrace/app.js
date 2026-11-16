@@ -1,6 +1,6 @@
 import { renderChart } from "./lib/chart.js";
 import { canUseStorage, clearHistory, readHistory, saveHistory } from "./lib/history.js";
-import { formatFetchedAt, formatToday, isCached, yearOverYear } from "./lib/format.js";
+import { formatFetchedAt, formatToday, isCached, safeHttpUrl, yearOverYear } from "./lib/format.js";
 
 const EXAMPLES = ["推し活", "タピオカ", "サウナ", "腸活", "生成AI"];
 const TODAY_WORDS = ["防災", "少子化", "地方創生", "腸活", "睡眠", "ミニマリスト", "生成AI", "副業", "リスキリング", "推し活", "サウナ", "昭和レトロ"];
@@ -188,10 +188,16 @@ function renderRecords(records) {
       copy.append(element("h4", "", record.title || "題名不明"));
       if (record.creators?.length) copy.append(element("p", "record__meta", record.creators.join("／")));
       const magazine = element("span", "record__magazine", record.magazine || "掲載誌不明");
-      const link = element("a", "button button--quiet record__link", "出典（NDLサーチ）↗");
-      link.href = record.url;
-      link.target = "_blank";
-      link.rel = "noopener noreferrer";
+      const safeUrl = safeHttpUrl(record.url);
+      let link;
+      if (safeUrl) {
+        link = element("a", "button button--quiet record__link", "出典（NDLサーチ）↗");
+        link.href = safeUrl;
+        link.target = "_blank";
+        link.rel = "noopener noreferrer";
+      } else {
+        link = element("span", "button button--quiet record__link", "出典URLなし");
+      }
       article.append(yearLabel, copy, magazine, link);
       list.append(article);
     });

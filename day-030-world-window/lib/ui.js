@@ -1,7 +1,7 @@
 import { displayName, normalizeText } from './data.js';
 import { compassLabel } from './direction.js';
 import { continentLabel, operatorLabel } from './labels.js';
-import { googleMapsUrl, osmUrl } from './links.js';
+import { googleMapsUrl, osmUrl, safeHttpsUrl } from './links.js';
 import { formatLocalTime } from './localtime.js';
 import { dayPhase, sunElevation } from './sun.js';
 import { bustCache, viewerFor } from './viewer.js';
@@ -24,15 +24,19 @@ const make = (tag, className, text) => {
 };
 const badge = (kind) => { const [text,cls]=KIND[kind] || KIND.page; return make('span',`badge ${cls}`,text); };
 const externalLink = (label, href, className='') => {
-  const link=make('a',className,label); link.href=href; link.target='_blank'; link.rel='noopener noreferrer'; return link;
+  const safeHref = safeHttpsUrl(href);
+  if (!safeHref) return make('span', className, label);
+  const link=make('a',className,label); link.href=safeHref; link.target='_blank'; link.rel='noopener noreferrer'; return link;
 };
 const appendIf = (parent,node) => { if(node) parent.append(node); };
 
 function providerUrl(camera) {
-  if (camera.website) return camera.website;
-  if (camera.kind === 'yt' && camera.url?.startsWith('v:')) return `https://${YOUTUBE_PAGE_HOST}/watch?v=${encodeURIComponent(camera.url.slice(2))}`;
-  if (camera.kind === 'yt' && camera.url?.startsWith('c:')) return `https://${YOUTUBE_PAGE_HOST}/channel/${encodeURIComponent(camera.url.slice(2))}/live`;
-  return camera.url;
+  let candidate = camera.website || camera.url;
+  if (!camera.website) {
+    if (camera.kind === 'yt' && camera.url?.startsWith('v:')) candidate = `https://${YOUTUBE_PAGE_HOST}/watch?v=${encodeURIComponent(camera.url.slice(2))}`;
+    else if (camera.kind === 'yt' && camera.url?.startsWith('c:')) candidate = `https://${YOUTUBE_PAGE_HOST}/channel/${encodeURIComponent(camera.url.slice(2))}/live`;
+  }
+  return safeHttpsUrl(candidate);
 }
 
 /* いま読み込んでいる先のホスト名。出典としてそのまま読めることを条件にしている提供元があるので、
@@ -239,30 +243,32 @@ export function createUI(handlers) {
     const wrap=make('div','viewer');
     wrap.append(make('p','privacy-note','見ているのは提供元が公開している映像です。個人の特定には使わないでください。'));
     const frame=make('div','viewer-frame'); const view=viewerFor(camera,{canPlayHls:document.createElement('video').canPlayType('application/vnd.apple.mpegurl')!=='',autoplay});
+    const safeSrc = safeHttpsUrl(view.src);
     const fallbackBox=(text)=>{const box=make('div','viewer-fallback');box.append(make('p','',text));const url=providerUrl(camera);if(url)box.append(externalLink('提供元で見る',url,'large-link'));return box;};
-    if(view.mode==='youtube' && view.src){
-      const iframe=make('iframe');iframe.src=view.src;iframe.title=`${label(camera)}のライブ映像`;
+    if(view.mode==='youtube' && safeSrc){
+      const iframe=make('iframe');iframe.src=safeSrc;iframe.title=`${label(camera)}のライブ映像`;
       /* allow に fullscreen を入れてあるので allowfullscreen 属性は付けない（同じ許可の二重指定になる）。 */
       iframe.allow='autoplay; encrypted-media; picture-in-picture; fullscreen';iframe.referrerPolicy='strict-origin-when-cross-origin';
       frame.append(iframe);wrap.append(frame,make('p','viewer-note','配信が終わっている場合があります。'));
       /* スマホはパネルの幅がプレーヤーの推奨（480px）に届かない。シートを広げて見てもらう逃げ道を置く。 */
       const bigger=make('button','sheet-expand','大きく見る');bigger.type='button';bigger.addEventListener('click',()=>setExpanded(true));wrap.append(bigger);
     }
-    else if(view.mode==='image'){
+    else if(view.mode==='image' && safeSrc){
       const fetched=make('span','fetched');
       const fail=()=>{frame.classList.add('is-fallback');frame.replaceChildren(fallbackBox('画像を読み込めませんでした。提供元で見てください。'));};
       /* 失敗のたびに <img> を外すと「更新」の行き先が消えて、押しても何も起きなかった。
          毎回作り直して差し替えるので、失敗した後の再試行も本当に効く。 */
       const refresh=()=>{
-        const now=new Date();const image=make('img');image.alt=label(camera);
-        image.addEventListener('error',fail);image.src=bustCache(view.src,now.getTime());
+        const now=new Date();const nextSrc=safeHttpsUrl(bustCache(safeSrc,now.getTime()));if(!nextSrc){fail();return;}
+        const image=make('img');image.alt=label(camera);
+        image.addEventListener('error',fail);image.src=nextSrc;
         frame.classList.remove('is-fallback');frame.replaceChildren(linkToProvider(camera,image));
         fetched.textContent=`取得 ${now.toLocaleTimeString('ja-JP',{hour12:false})}`;
       };
       const tools=make('div','viewer-tools');const button=make('button','', '更新');button.type='button';button.addEventListener('click',refresh);
-      tools.append(button,fetched);wrap.append(frame);appendIf(wrap,providerCredit(camera,view.src));wrap.append(tools);refresh();
+      tools.append(button,fetched);wrap.append(frame);appendIf(wrap,providerCredit(camera,safeSrc));wrap.append(tools);refresh();
       viewerTimer=setInterval(()=>{if(!refs.close.hidden && document.visibilityState==='visible')refresh();},60_000);
-    } else if(view.mode==='hls') {
+    } else if(view.mode==='hls' && safeSrc) {
       const video=make('video');video.controls=true;video.autoplay=true;video.playsInline=true;video.muted=true;
       /* canPlayType の申告はあてにならない。Chromium は HLS を再生できないのに 'maybe' を返す
          （Chrome 151・Playwright同梱ともに実測）。しかも error すら来ずに黒い箱のまま止まるので、
@@ -271,10 +277,10 @@ export function createUI(handlers) {
       video.addEventListener('error',guide);
       video.addEventListener('loadedmetadata',()=>{clearTimeout(hlsTimer);hlsTimer=null;});
       hlsTimer=setTimeout(guide,HLS_WAIT_MS);
-      video.src=view.src;frame.append(video);wrap.append(frame);appendIf(wrap,providerCredit(camera,view.src));
+      video.src=safeSrc;frame.append(video);wrap.append(frame);appendIf(wrap,providerCredit(camera,safeSrc));
     }
     else if(camera.kind==='hls'){frame.classList.add('is-fallback');frame.replaceChildren(fallbackBox(HLS_UNSUPPORTED));wrap.append(frame);}
-    else { const message=make('div','viewer-fallback');message.append(make('p','', 'このカメラは提供元のページで見られます。'),externalLink('提供元で見る',providerUrl(camera),'large-link'));wrap.append(message); }
+    else { const message=make('div','viewer-fallback');message.append(make('p','', 'このカメラは提供元のページで見られます。'));const url=providerUrl(camera);if(url)message.append(externalLink('提供元で見る',url,'large-link'));wrap.append(message); }
     return wrap;
   }
 
@@ -298,10 +304,10 @@ export function createUI(handlers) {
   function renderWindyLoading(camera,trigger){cleanupViewer();rememberTrigger(trigger);refs.close.hidden=false;refs.panelCount.textContent='';setDetailMode(true);heading(camera,true);refs.body.replaceChildren(badge('windy'),make('div','skeleton'));}
   function renderWindy(camera,detail) {
     cleanupViewer();const item={...camera,...detail,kind:'windy',name:detail.title||camera.name};heading(item);const content=document.createDocumentFragment();content.append(badge('windy'),make('p','privacy-note','見ているのは提供元が公開している映像です。個人の特定には使わないでください。'));
-    const viewer=make('div','viewer');if(detail.image){const frame=make('div','viewer-frame');const image=make('img');image.src=detail.image;image.alt=label(item);frame.append(image);viewer.append(frame);}
-    if(detail.player?.day){const frame=make('div','viewer-frame');const iframe=make('iframe');iframe.src=detail.player.day;iframe.title=`${label(item)}のタイムラプス`;iframe.allow='fullscreen';iframe.referrerPolicy='strict-origin-when-cross-origin';frame.append(iframe);viewer.append(frame);}
+    const viewer=make('div','viewer');const imageSrc=safeHttpsUrl(detail.image);if(imageSrc){const frame=make('div','viewer-frame');const image=make('img');image.src=imageSrc;image.alt=label(item);frame.append(image);viewer.append(frame);}
+    const playerSrc=safeHttpsUrl(detail.player?.day);if(playerSrc){const frame=make('div','viewer-frame');const iframe=make('iframe');iframe.src=playerSrc;iframe.title=`${label(item)}のタイムラプス`;iframe.allow='fullscreen';iframe.referrerPolicy='strict-origin-when-cross-origin';frame.append(iframe);viewer.append(frame);}
     const credit=make('p','windy-credit');credit.append('Webcams provided by ',externalLink('windy.com',`https://${WINDY_HOST}/webcams`),' - ',externalLink('add new webcam',`https://${WINDY_HOST}/webcams/add`));viewer.append(credit);content.append(viewer);
-    const links=make('div','external-links');if(detail.detailUrl)links.append(externalLink('Windyで見る',detail.detailUrl));content.append(links);refs.body.replaceChildren(content);
+    const links=make('div','external-links');const detailHref=safeHttpsUrl(detail.detailUrl);if(detailHref)links.append(externalLink('Windyで見る',detailHref));content.append(links);refs.body.replaceChildren(content);
   }
   function closeDetail(){cleanupViewer();refs.close.hidden=true;setExpanded(false);setDetailMode(false);focusBack();}
 

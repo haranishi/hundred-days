@@ -3,10 +3,12 @@ import assert from 'node:assert/strict';
 import {
   onRequestGet,
   parseBbox,
+  safeHttpsUrl,
   snapBbox,
   trimDetail,
   trimList,
 } from '../../functions/api/day-030/windy.js';
+import { createUI } from '../lib/ui.js';
 
 const ctx = (query, apiKey) => ({
   request: new Request(`https://x/api/day-030/windy${query}`),
@@ -164,4 +166,136 @@ test('Cache API が無いNode環境でも一覧を取得できる', async () => 
   assert.deepEqual(await response.json(), {
     webcams: [], total: 0, attribution: 'Webcams provided by windy.com',
   });
+});
+
+test('trimDetail と safeHttpsUrl: https 以外の画像・プレーヤー・詳細URLを null にする', () => {
+  assert.equal(safeHttpsUrl('https://images-webcams.windy.com/a.jpg'), 'https://images-webcams.windy.com/a.jpg');
+  for (const bad of ['http://images-webcams.windy.com/a.jpg', 'javascript:alert(1)', 'data:text/html,x', '', null]) {
+    assert.equal(safeHttpsUrl(bad), null, String(bad));
+  }
+  const detail = trimDetail({
+    webcamId: 123,
+    title: 'Test Cam',
+    images: {
+      current: { preview: 'javascript:alert(1)' },
+      daylight: { preview: 'http://example.com/day.jpg' },
+    },
+    player: {
+      day: 'https://webcams.windy.com/player/day',
+      month: 'javascript:alert(2)',
+      year: 'http://webcams.windy.com/player/year',
+      lifetime: 'data:text/html,<b>x</b>',
+    },
+    urls: { detail: 'javascript:alert(3)' },
+  });
+  assert.equal(detail.image, null);
+  assert.equal(detail.imageDaylight, null);
+  assert.equal(detail.player.day, 'https://webcams.windy.com/player/day');
+  assert.equal(detail.player.month, null);
+  assert.equal(detail.player.year, null);
+  assert.equal(detail.player.lifetime, null);
+  assert.equal(detail.detailUrl, null);
+});
+
+test('ui.js: renderWindy と renderDetail は https 以外の src/href をDOMに書かない', (t) => {
+  const makeNode = (tagName = 'div') => {
+    const attrs = {};
+    const node = {
+      tagName: tagName.toUpperCase(),
+      className: '',
+      textContent: '',
+      children: [],
+      dataset: {},
+      style: { setProperty() {} },
+      classList: {
+        _set: new Set(),
+        toggle(k, v) { if (v === undefined ? !this._set.has(k) : v) this._set.add(k); else this._set.delete(k); },
+        contains(k) { return this._set.has(k); },
+        add(k) { this._set.add(k); },
+        remove(k) { this._set.delete(k); },
+      },
+      append(...items) { this.children.push(...items.map((x) => (typeof x === 'string' ? { tagName: '#TEXT', textContent: x, children: [] } : x))); },
+      replaceChildren(...items) { this.children = []; this.append(...items); },
+      setAttribute(k, v) { attrs[k] = String(v); },
+      getAttribute(k) { return attrs[k] ?? null; },
+      removeAttribute(k) { delete attrs[k]; },
+      addEventListener() {},
+      getBoundingClientRect() { return { bottom: 0 }; },
+      focus() {},
+      canPlayType() { return ''; },
+    };
+    return node;
+  };
+  const walk = (root, out = []) => {
+    out.push(root);
+    for (const child of root.children || []) walk(child, out);
+    return out;
+  };
+
+  const origDoc = globalThis.document;
+  const origAdd = globalThis.addEventListener;
+  const origHtmlEl = globalThis.HTMLElement;
+  const nodes = new Map();
+  const bodyRoot = makeNode('div');
+  nodes.set('#panel-body', bodyRoot);
+  globalThis.HTMLElement = class {};
+  globalThis.document = {
+    documentElement: makeNode('html'),
+    body: makeNode('body'),
+    visibilityState: 'hidden',
+    querySelector(sel) {
+      if (!nodes.has(sel)) nodes.set(sel, makeNode());
+      return nodes.get(sel);
+    },
+    querySelectorAll() { return []; },
+    createElement(tag) { return makeNode(tag); },
+    createElementNS(_ns, tag) { return makeNode(tag); },
+    createDocumentFragment() { return makeNode('#FRAGMENT'); },
+    addEventListener() {},
+  };
+  globalThis.addEventListener = () => {};
+  t.after(() => {
+    globalThis.document = origDoc;
+    globalThis.addEventListener = origAdd;
+    if (origHtmlEl === undefined) delete globalThis.HTMLElement;
+    else globalThis.HTMLElement = origHtmlEl;
+  });
+
+  const ui = createUI({ toggleKind() {}, toggleWindy() {}, search() {}, random() {}, locate() {}, close() {}, theme() {} });
+  try {
+    ui.renderWindy(
+      { id: 'w1', lat: 35, lon: 139, country: 'JP', kind: 'windy', name: 'Unsafe Cam' },
+      {
+        title: 'Unsafe Cam',
+        image: 'javascript:alert(1)',
+        player: { day: 'http://evil.example/embed' },
+        detailUrl: 'javascript:alert(2)',
+      }
+    );
+    let all = walk(bodyRoot);
+    assert.equal(all.filter((n) => n.tagName === 'IMG').length, 0);
+    assert.equal(all.filter((n) => n.tagName === 'IFRAME').length, 0);
+    assert.ok(all.filter((n) => n.tagName === 'A').every((a) => typeof a.href === 'string' && a.href.startsWith('https://')));
+
+    ui.renderDetail(
+      { id: 'n1', lat: 35, lon: 139, country: 'JP', kind: 'img', url: 'http://insecure.example/cam.jpg', website: 'javascript:alert(1)', name: 'Insecure Cam' },
+      { JP: { ja: '日本', continent: 'AS' } },
+      null
+    );
+    all = walk(bodyRoot);
+    assert.equal(all.filter((n) => n.tagName === 'IMG').length, 0);
+    assert.ok(all.filter((n) => n.tagName === 'A').every((a) => typeof a.href === 'string' && a.href.startsWith('https://')));
+
+    ui.renderDetail(
+      { id: 'n2', lat: 35, lon: 139, country: 'JP', kind: 'img', url: 'https://cam.example.com/live.jpg', website: 'https://cam.example.com/', name: 'Safe Cam' },
+      { JP: { ja: '日本', continent: 'AS' } },
+      null
+    );
+    all = walk(bodyRoot);
+    const imgs = all.filter((n) => n.tagName === 'IMG');
+    assert.equal(imgs.length, 1);
+    assert.match(imgs[0].src, /^https:\/\/cam\.example\.com\/live\.jpg\?_=/);
+  } finally {
+    ui.closeDetail();
+  }
 });
