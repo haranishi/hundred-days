@@ -13,6 +13,7 @@ export const EXTERNAL_DAYS = [
   { number: 83, folder: 'day-083-car360' },   // 紹介ページなし
   { number: 88, folder: 'day-088-bouquet-studio' }, // 紹介ページなし
   { number: 91, folder: 'day-091-virtual-office' }, // 紹介ページなし
+  { number: 93, folder: 'day-093-find' },   // 紹介ページなし
 ];
 
 const target = (day, rest, url) => `https://day${day.number}.rairakku.com${rest ?? '/'}${url.search}`;
