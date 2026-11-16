@@ -51,8 +51,7 @@ const EXTERNAL_DAYS = [
     day: '093',
     title: 'find',
     dir: 'day-093-find',
-    url: 'https://day93.rairakku.com/',
-    demo: false
+    url: 'https://day93.rairakku.com/'
   }
 ];
 
