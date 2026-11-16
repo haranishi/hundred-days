@@ -154,3 +154,12 @@ test('wrangler.toml の経路は、rairakku.com/day* と、表の folder ごと�
   const expected = ['rairakku.com/day*', ...EXTERNAL_DAYS.filter(row => row.folder).map(row => `rairakku.com/100days/${row.folder}*`)].sort();
   assert.deepEqual(patterns, expected);
 });
+
+test('Day093：/day93/ と正の住所を day93.rairakku.com へ転送し、カードの画像は素通しする', () => {
+  assert.equal(target('/day93'), 'https://day93.rairakku.com/');
+  assert.equal(target('/day93/'), 'https://day93.rairakku.com/');
+  assert.equal(target('/day093/'), 'https://day93.rairakku.com/');
+  assert.equal(target('/100days/day-093-find'), 'https://day93.rairakku.com/');
+  assert.equal(target('/100days/day-093-find/'), 'https://day93.rairakku.com/');
+  assert.equal(target('/100days/day-093-find/screenshot.webp'), null, 'カードの画像は転送しない');
+});
