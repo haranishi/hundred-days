@@ -170,3 +170,66 @@ test('コピーボタンは公開URLをそのまま渡す', async ({ page, conte
   const copied = await page.evaluate(() => navigator.clipboard.readText());
   expect(copied).toBe(`${meta.mount === false ? 'https://hundred-days.pages.dev' : 'https://rairakku.com/100days'}/${dir}/`);
 });
+
+/* 共有の窓（ダイアログ）の中で、コピーや共有が失敗したとき。Day092 の共有ダイアログで起きた不具合を、実物の窓で再現する。
+   窓の外の要素は操作できないので、代替のコピー用の入力欄を窓の外に置くと、コピーに失敗しているのに「コピーしました」と出ていた。 */
+const FALLBACK_DIR = 'day-092-shuwa';
+const fallbackApp = published.find(({ dir }) => dir === FALLBACK_DIR);
+const fallbackUrl = fallbackApp && `${fallbackApp.meta.mount === false ? 'https://hundred-days.pages.dev' : 'https://rairakku.com/100days'}/${FALLBACK_DIR}/`;
+
+test.describe('共有の窓の中で、コピーや共有が失敗したとき', () => {
+  test.skip(!fallbackApp, `${FALLBACK_DIR} が公開済みでないので、確かめる窓が無い`);
+
+  test('通常のコピーが拒否されても、代替の手段で公開URLをコピーし、元の内容を残さない', async ({ page, context, browserName }) => {
+    test.skip(browserName !== 'chromium', 'クリップボードの許可はChromiumでだけ与えられる');
+    await context.grantPermissions(['clipboard-read', 'clipboard-write']);
+    await openShare(page, FALLBACK_DIR);
+    await page.evaluate(() => navigator.clipboard.writeText('BEFORE'));
+    await page.evaluate(() => { navigator.clipboard.writeText = () => Promise.reject(new DOMException('denied', 'NotAllowedError')); });
+
+    await page.getByRole('button', { name: 'リンクをコピー' }).click();
+
+    await expect(page.locator('.share__said')).toHaveText('コピーしました');
+    expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(fallbackUrl);
+  });
+
+  test('どちらのコピーも失敗したら、選べるURL欄を出して、利用者に伝える', async ({ page }) => {
+    await openShare(page, FALLBACK_DIR);
+    await page.evaluate(() => {
+      navigator.clipboard.writeText = () => Promise.reject(new DOMException('denied', 'NotAllowedError'));
+      document.execCommand = () => false;
+    });
+
+    await page.getByRole('button', { name: 'リンクをコピー' }).click();
+
+    await expect(page.locator('.share__said')).toContainText('コピーできませんでした');
+    const manual = page.getByLabel('手動でコピーするリンク');
+    await expect(manual).toBeVisible();
+    await expect(manual).toHaveValue(fallbackUrl);
+    await expect(manual).toBeFocused();
+  });
+
+  test('端末の共有が失敗したら伝え、利用者が閉じただけなら黙り、次に成功したら古い失敗を消す', async ({ page }) => {
+    await page.addInitScript(() => {
+      let count = 0;
+      Object.defineProperty(navigator, 'share', {
+        configurable: true,
+        value: async () => {
+          count += 1;
+          if (count === 1) throw new DOMException('denied', 'NotAllowedError');
+          if (count === 2) throw new DOMException('closed', 'AbortError');
+        },
+      });
+    });
+    await openShare(page, FALLBACK_DIR);
+    const said = page.locator('.share__said');
+    const share = page.getByRole('button', { name: '共有…' });
+
+    await share.click();
+    await expect(said).toContainText('共有できませんでした');
+    await share.click();   // 利用者が共有シートを閉じただけ。前の失敗の表示は消え、新しい表示は出ない
+    await expect(said).toHaveText('');
+    await share.click();   // 成功
+    await expect(said).toHaveText('');
+  });
+});

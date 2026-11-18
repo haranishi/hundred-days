@@ -95,6 +95,10 @@ function mountShare(host) {
   if (navigator.share) {
     const native = button('共有…', 'share__button--primary');
     native.addEventListener('click', async () => {
+      // 前の操作の表示（コピーの完了・共有の失敗）を消してから始める。再試行がうまくいっても、古い失敗が残らないようにする
+      clearTimeout(resetTimer);
+      said.textContent = '';
+      delete copyButton.dataset.done;
       try {
         await navigator.share({ title: text, text, url });
       } catch (error) {
