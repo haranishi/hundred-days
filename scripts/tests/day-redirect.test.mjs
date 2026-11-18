@@ -163,3 +163,13 @@ test('Day093：/day93/ と正の住所を day93.rairakku.com へ転送し、カ�
   assert.equal(target('/100days/day-093-find/'), 'https://day93.rairakku.com/');
   assert.equal(target('/100days/day-093-find/screenshot.webp'), null, 'カードの画像は転送しない');
 });
+
+test('Day094：/day94/ と正の住所を day94.rairakku.com へ転送し、カードの画像は素通しする', () => {
+  assert.equal(target('/day94'), 'https://day94.rairakku.com/');
+  assert.equal(target('/day94/'), 'https://day94.rairakku.com/');
+  assert.equal(target('/day094/'), 'https://day94.rairakku.com/');
+  assert.equal(target('/day94/?room=ABCD'), 'https://day94.rairakku.com/?room=ABCD', '友だちの部屋の招待リンクの問い合わせを引き継ぐ');
+  assert.equal(target('/100days/day-094-super-yaritai'), 'https://day94.rairakku.com/');
+  assert.equal(target('/100days/day-094-super-yaritai/'), 'https://day94.rairakku.com/');
+  assert.equal(target('/100days/day-094-super-yaritai/screenshot.webp'), null, 'カードの画像は転送しない');
+});

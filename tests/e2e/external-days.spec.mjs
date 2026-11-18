@@ -52,6 +52,13 @@ const EXTERNAL_DAYS = [
     title: 'find',
     dir: 'day-093-find',
     url: 'https://day93.rairakku.com/'
+  },
+  {
+    day: '094',
+    title: 'スーパーやりたい放題',
+    dir: 'day-094-super-yaritai',
+    url: 'https://day94.rairakku.com/',
+    demo: false // 紹介動画はまだ無い。カードはスクリーンショットだけで、デモ再生ボタンは出さない
   }
 ];
 
