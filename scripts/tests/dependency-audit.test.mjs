@@ -5,7 +5,7 @@ import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { test } from 'node:test';
 import { fixture } from './helpers.mjs';
-import { AUDIT_EXCEPTIONS, auditResult, exceptionNotes } from '../lib/dependency-audit.mjs';
+import { AUDIT_EXCEPTIONS, AUDIT_TIMEOUT_MS, auditResult, exceptionNotes } from '../lib/dependency-audit.mjs';
 
 const script = fileURLToPath(new URL('../audit-dependencies.mjs', import.meta.url));
 const report = (severity = '') => ({ auditReportVersion: 2,
@@ -164,6 +164,9 @@ test('例外の状態を、有効なら残り日数、切れていれば無効�
   assert.match(exceptionNotes([exception], '2026-11-18')[0], new RegExp(`${GHSA}.*残り30日`));
   assert.match(exceptionNotes([exception], '2026-12-19')[0], /期限切れ.*無効/);
   assert.deepEqual(exceptionNotes([], '2026-11-18'), []);
+});
+test('npm auditの時間制限は、修正版の無い勧告を持つ大きなlockの照会（空のcacheで約46〜61秒）の約3倍以上ある', () => {
+  assert.ok(AUDIT_TIMEOUT_MS >= 180000, `${AUDIT_TIMEOUT_MS}ms では、CIで偶発的に「npm auditを実行できない」で落ちる`);
 });
 // 実際の一覧に対する通し（期限が切れたら、監査が失敗に戻るのが正しいので、この試験は飛ばす）
 const live = AUDIT_EXCEPTIONS.find(item => item.id === GHSA);

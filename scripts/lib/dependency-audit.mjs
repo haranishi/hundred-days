@@ -24,6 +24,11 @@ export function discoverProjects(root, files) {
   });
 }
 
+// npm audit 1回あたりの時間制限。勧告に当たると、npm は修正の候補を調べるために部品情報を大量に取りに行くとみられる。
+// 空のcacheでは、Day79（798部品・high 16件）が手元で約46秒（大半がCPU時間）、CIで約58〜61秒かかった（2026-11-18）。
+// 60秒では、CIの混み具合で偶発的に落ちたので、余裕を持たせる。ジョブ全体の制限は15分。
+export const AUDIT_TIMEOUT_MS = 240000;
+
 // 修正版がまだ公開されていない勧告を、期限つきで合格にする例外の一覧。
 // - 対象は high だけ。critical は除けない。勧告は、npm audit の url が https://github.com/advisories/<ID> と完全一致するものだけ。
 //   期限（UTC）を過ぎると無効になり、監査は失敗に戻る。
