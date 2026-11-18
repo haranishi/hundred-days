@@ -24,7 +24,6 @@ import { compileSign } from '../core/timeline';
 import { NUMBERS } from '../../content/numbers';
 import { WORDS, WORD_SHAPES } from '../../content/words';
 import type { SignItem } from '../../content/types';
-import r2 from '../../../.agent-harness/research/r2_numbers_words.json';
 
 const params = new URLSearchParams(location.search);
 const SIZE = Number(params.get('size') ?? 200);
@@ -57,7 +56,11 @@ interface R2Word {
   word: string;
   steps: R2Step[];
 }
-const R2 = r2 as unknown as { numbers: R2Number[]; words: R2Word[] };
+// 公開用の source/ には調査の原文を含めない。手元にあるときだけ比較欄に載せる。
+const research = import.meta.glob<{ numbers: R2Number[]; words: R2Word[] }>(
+  '../../../.agent-harness/research/r2_numbers_words.json', { eager: true, import: 'default' },
+);
+const R2 = Object.values(research)[0] ?? { numbers: [], words: [] };
 
 function researchLines(item: SignItem): Array<[string, string]> {
   if (item.kind === 'number') {

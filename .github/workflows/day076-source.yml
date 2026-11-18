@@ -29,4 +29,9 @@ jobs:
       - run: npm run release:static
       - name: Verify committed public release
         working-directory: .
-        run: git diff --exit-code -- day-076-henkan-desk/index.html day-076-henkan-desk/assets day-076-henkan-desk/pdf-assets day-076-henkan-desk/licenses day-076-henkan-desk/shared day-076-henkan-desk/legal.html day-076-henkan-desk/legal.css day-076-henkan-desk/ogp.png day-076-henkan-desk/favicon.svg
+        run: |
+          changed=$(git status --porcelain --untracked-files=all -- day-076-henkan-desk/index.html day-076-henkan-desk/assets day-076-henkan-desk/pdf-assets day-076-henkan-desk/licenses day-076-henkan-desk/shared day-076-henkan-desk/legal.html day-076-henkan-desk/legal.css day-076-henkan-desk/ogp.png day-076-henkan-desk/favicon.svg)
+          if [ -n "$changed" ]; then
+            printf '%s\n' "$changed"
+            exit 1
+          fi

@@ -138,6 +138,7 @@ Day056の配信ビルドに含む第三者ライブラリ・移植実装・検�
 | 092 | three.js 0.186.1（本体。`day-092-shuwa/assets/` のビルドに同梱。3Dの手と上半身の描画） | [three.js](https://threejs.org/) | [MIT](day-092-shuwa/THIRD_PARTY_NOTICES.txt) | 改変なし。Vite でビルドし、使う部分だけを同梱 |
 | 092 | Preact 10.29.8・@preact/signals 2.11.4・Workbox（workbox-window 7.4.1 とサービスワーカー） | [Preact](https://preactjs.com/)・[Workbox](https://developer.chrome.com/docs/workbox) | [MIT](day-092-shuwa/THIRD_PARTY_NOTICES.txt) | 改変なし |
 | 092 | MediaPipe Tasks Vision 1.2.0 の wasm（`day-092-shuwa/mediapipe/wasm/`）と手の検出モデル `hand_landmarker.task`（float16・版1） | [MediaPipe](https://ai.google.dev/edge/mediapipe)（Google） | [Apache License 2.0](day-092-shuwa/THIRD_PARTY_NOTICES.txt) | 改変なし。SIMD 版の wasm だけを同梱。利用状況の数値を Google へ送る機能は、アプリの側で送信を止めている |
+| 092 | BudouX 0.10.2（日本語の文節分けと日本語モデル。画面表示のビルドに同梱） | [BudouX](https://github.com/google/budoux)（Google LLC） | [Apache License 2.0](day-092-shuwa/THIRD_PARTY_NOTICES.txt) | Parser と日本語モデルを使用 |
 | 092 | 書体 Zen Maru Gothic（Medium・Bold） | [Zen Maru Gothic](https://github.com/googlefonts/zen-marugothic)（Yoshimichi Ohira） | [SIL Open Font License 1.1](day-092-shuwa/THIRD_PARTY_NOTICES.txt) | **加工あり**。アプリで使う文字だけに絞った woff2 を同梱（書体の名前は変えていない） |
 
 ## Day64「漏洩の地図」の出典と描画依存
