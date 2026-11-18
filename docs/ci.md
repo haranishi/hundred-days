@@ -89,6 +89,7 @@ npx playwright show-trace path/to/test-results/test-name/trace.zip
 ## 依存の継続監査
 `npm run audit:deps`は新しいDayも自動発見し、開発依存を含めて監査する。共通CIの必須チェックに接続し、別workflowでも毎日照会する。
 依存コードやinstall scriptは実行しない。勧告照会の通信失敗は成功扱いにせず、復旧後に再実行する。
+修正版がどこにも無い勧告だけは、期限つきの例外（`scripts/lib/dependency-audit.mjs`の`AUDIT_EXCEPTIONS`）で除ける。期限を過ぎると失敗に戻り、ログには例外の残り日数が出る。足す条件と外す手順は [依存更新の手引き](../.kiro/steering/dependency-updates.md) の落とし穴に書いた。
 背景と再現は [.kiro/specs/dependency-audit-ci](../.kiro/specs/dependency-audit-ci/requirements.md) を参照。
 
 Day80のソース39件・固定lockからの公開物再生成・全40ブラウザも共通の必須集約に含める。sourceの検査が失敗するとデプロイへ進まない。
