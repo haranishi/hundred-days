@@ -27,4 +27,9 @@ jobs:
       - run: npm test -- --maxWorkers=2
       - run: npm run build
       - name: Check committed release is reproducible
-        run: git diff --exit-code -- ../game
+        run: |
+          changed=$(git status --porcelain --untracked-files=all -- ../game)
+          if [ -n "$changed" ]; then
+            printf '%s\n' "$changed"
+            exit 1
+          fi

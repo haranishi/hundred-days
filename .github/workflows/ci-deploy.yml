@@ -166,7 +166,12 @@ jobs:
       - run: npm run release:static
       - name: Require the committed release to match source
         working-directory: .
-        run: git diff --exit-code -- day-080-fifth-prince/index.html day-080-fifth-prince/assets day-080-fifth-prince/fonts day-080-fifth-prince/favicon.svg day-080-fifth-prince/og-cover.png day-080-fifth-prince/shared
+        run: |
+          changed=$(git status --porcelain --untracked-files=all -- day-080-fifth-prince/index.html day-080-fifth-prince/assets day-080-fifth-prince/fonts day-080-fifth-prince/favicon.svg day-080-fifth-prince/og-cover.png day-080-fifth-prince/shared)
+          if [ -n "$changed" ]; then
+            printf '%s\n' "$changed"
+            exit 1
+          fi
       - name: Install gameplay browser
         timeout-minutes: 5
         run: npx playwright install chromium
