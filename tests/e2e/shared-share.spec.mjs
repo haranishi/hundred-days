@@ -232,4 +232,50 @@ test.describe('共有の窓の中で、コピーや共有が失敗したとき',
     await share.click();   // 成功
     await expect(said).toHaveText('');
   });
+
+  test('共有が終わる前にコピーが成功したら、あとで失敗した古い共有の表示で、コピーの完了を上書きしない', async ({ page, context, browserName }) => {
+    test.skip(browserName !== 'chromium', 'クリップボードの許可はChromiumでだけ与えられる');
+    await context.grantPermissions(['clipboard-read', 'clipboard-write']);
+    await page.addInitScript(() => {
+      // 共有を、こちらが好きなときに失敗させられる形にする（それまでは終わらない）
+      Object.defineProperty(navigator, 'share', {
+        configurable: true,
+        value: () => new Promise((_resolve, reject) => { window.__failShare = () => reject(new DOMException('denied', 'NotAllowedError')); }),
+      });
+    });
+    await openShare(page, FALLBACK_DIR);
+    const said = page.locator('.share__said');
+    const copy = page.getByRole('button', { name: 'リンクをコピー' });
+
+    await page.getByRole('button', { name: '共有…' }).click();   // 共有は、終わらないまま
+    await copy.click();                                          // そのあいだに、コピーが成功する
+    await expect(said).toHaveText('コピーしました');
+    await page.evaluate(() => window.__failShare());             // 古い共有が、あとから失敗する
+    await page.evaluate(() => new Promise((resolve) => setTimeout(resolve, 0)));   // 失敗の処理が終わるのを待つ
+
+    await expect(said).toHaveText('コピーしました');
+    await expect(copy).toHaveAttribute('data-done', 'true');
+  });
+
+  test('コピーに失敗したあとで共有を押すと、手動コピー欄と前回の表示は消える', async ({ page }) => {
+    await page.addInitScript(() => {
+      Object.defineProperty(navigator, 'share', { configurable: true, value: async () => {} });
+    });
+    await openShare(page, FALLBACK_DIR);
+    await page.evaluate(() => {
+      navigator.clipboard.writeText = () => Promise.reject(new DOMException('denied', 'NotAllowedError'));
+      document.execCommand = () => false;
+    });
+    const manual = page.getByLabel('手動でコピーするリンク');
+    const said = page.locator('.share__said');
+
+    await page.getByRole('button', { name: 'リンクをコピー' }).click();
+    await expect(manual).toBeVisible();
+    await expect(said).toContainText('コピーできませんでした');
+
+    await page.getByRole('button', { name: '共有…' }).click();
+
+    await expect(manual).toBeHidden();
+    await expect(said).toHaveText('');
+  });
 });

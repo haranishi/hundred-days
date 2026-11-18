@@ -95,13 +95,17 @@ function mountShare(host) {
   if (navigator.share) {
     const native = button('共有…', 'share__button--primary');
     native.addEventListener('click', async () => {
-      // 前の操作の表示（コピーの完了・共有の失敗）を消してから始める。再試行がうまくいっても、古い失敗が残らないようにする
+      // 前の操作の表示（コピーの完了・共有の失敗・手動コピー欄）を消してから始める。再試行がうまくいっても、古い表示が残らないようにする
+      const mine = ++operation;
       clearTimeout(resetTimer);
       said.textContent = '';
       delete copyButton.dataset.done;
+      manual.hidden = true;
       try {
         await navigator.share({ title: text, text, url });
       } catch (error) {
+        // 待っているあいだに別の操作（コピー）が始まっていたら、この古い失敗で、新しい表示を上書きしない
+        if (mine !== operation) return;
         if (error?.name !== 'AbortError') {
           clearTimeout(resetTimer);
           said.textContent = '共有できませんでした。「リンクをコピー」をお試しください。';
@@ -124,8 +128,13 @@ function mountShare(host) {
   manual.hidden = true;
   manual.setAttribute('aria-label', '手動でコピーするリンク');
   let resetTimer;
+  // 最後に始めた操作（共有・コピー）の番号。遅れて終わった古い操作が、新しい操作の表示を書き換えないために使う
+  let operation = 0;
   copyButton.addEventListener('click', async () => {
+    const mine = ++operation;
     const ok = await copy(url, copyButton);
+    // 待っているあいだに別の操作（共有・もう一度のコピー）が始まっていたら、新しい操作の表示を優先する
+    if (mine !== operation) return;
     clearTimeout(resetTimer);
     manual.hidden = ok;
     if (!ok) {
