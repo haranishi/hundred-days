@@ -4,6 +4,7 @@
  * 2) dist に THIRD_PARTY_NOTICES.txt がある
  * 3) 100日へ写す元のコード（tools/day092-files.mjs の一覧）に、ローカルの絶対パス・メールアドレスが無い（個人の言葉の検査は100日の npm run precheck が行う）
  */
+import { createHash } from 'node:crypto';
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import { join, relative } from 'node:path';
 
@@ -28,6 +29,11 @@ else {
     // src="/..." href="/..." url(/...) のようなルート直下の参照（// で始まる外部は除く）
     const hit = text.match(/(?:src|href)=["']\/(?!\/)[^"']*["']|url\(\s*["']?\/(?!\/)[^)"']*/);
     if (hit) problems.push(`${rel}: ルート直下の参照 ${hit[0].slice(0, 80)}`);
+  }
+  const model = join(dist, 'mediapipe/hand_landmarker.task');
+  const expected = readFileSync(join(root, 'scripts/model.sha256'), 'utf8').trim().split(/\s+/)[0];
+  if (!existsSync(model) || createHash('sha256').update(readFileSync(model)).digest('hex') !== expected) {
+    problems.push('手の検出モデルが無いか、内容が違います。node scripts/fetch-model.mjs の後、ビルドし直してください');
   }
   if (!existsSync(join(dist, 'THIRD_PARTY_NOTICES.txt'))) problems.push('dist/THIRD_PARTY_NOTICES.txt がありません（npm run notices）');
 }
