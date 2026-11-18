@@ -4,7 +4,8 @@ import { fileURLToPath } from 'node:url';
 import { effectiveStatus } from '../../scripts/lib/day-status.mjs';
 
 /* Chrome拡張など、アプリ本体をこのサイトの外で公開しているDay（status: external ＋ externalUrl）の検査。
-   コードはこのリポジトリに置かず、一覧のカードが紹介ページへ正しくリンクすることだけを約束する。
+   本体の配信は外部。ここでは、一覧のカードが公開先へ正しくリンクすることと、動画があるDayは再生できることを約束する
+   （ソースを同梱するDay（Day094 など）も、配信されるのはカードのスクショと動画だけで、source/ は配信されない）。
 
    externalUrl へのネットワーク到達性はここでは見ない。外部サイトの停止でこのリポジトリの
    CIが落ちる依存を作らないため。リンク先が200を返すかは公開前チェック（手動）で確認する。 */
@@ -57,8 +58,7 @@ const EXTERNAL_DAYS = [
     day: '094',
     title: 'スーパーやりたい放題',
     dir: 'day-094-super-yaritai',
-    url: 'https://day94.rairakku.com/',
-    demo: false // 紹介動画はまだ無い。カードはスクリーンショットだけで、デモ再生ボタンは出さない
+    url: 'https://day94.rairakku.com/'
   }
 ];
 
