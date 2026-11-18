@@ -1,0 +1,2886 @@
+/* タイトル〜結果の画面（docs/02 ⑤：明るい「おもちゃの店」）。
+   色は docs/02 の6色だけ（地・文字・赤・青・黄・緑）。床のミントは店の床の市松と同じ薄い色。
+   外部フォントは読まず、端末の日本語フォント。見出しは値札POPのような太い字。
+   ゲーム中の表示（HUD）とは混ざらないよう、すべて .sy- で始めて #screens の中だけに効かせる。 */
+
+.sy-root {
+  --cream: #fff8ec;
+  --ink: #2b2b3a;
+  --red: #e8423f;
+  /* 小さな白い字を載せる赤・白地の小さな赤い字（#E8423F は白と 3.97:1 で AA に届かない。こちらは 5.3:1） */
+  --red-dark: #c2302d;
+  /* 灰色の字（クリームや白の地で 4.5:1 以上） */
+  --mute: #6b6455;
+  --blue: #2f7de1;
+  --yellow: #ffc93c;
+  --green: #3baa5c;
+  --sub: #5b5b6e;
+  --line: #e9dfcb;
+  --mint: #ddf2e6;
+  --paper: #ffffff;
+  --sat: env(safe-area-inset-top, 0px);
+  --sar: env(safe-area-inset-right, 0px);
+  --sab: env(safe-area-inset-bottom, 0px);
+  --sal: env(safe-area-inset-left, 0px);
+  --awning: 42px;
+  --font: 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'BIZ UDPGothic', 'Yu Gothic UI', 'Yu Gothic', 'YuGothic', 'Meiryo',
+    'Noto Sans JP', 'Noto Sans CJK JP', system-ui, sans-serif;
+  font-family: var(--font);
+  color: var(--ink);
+}
+
+.sy-root *,
+.sy-root *::before,
+.sy-root *::after {
+  box-sizing: border-box;
+}
+
+.sy-root h1,
+.sy-root h2,
+.sy-root h3,
+.sy-root p,
+.sy-root ul,
+.sy-root ol,
+.sy-root dl,
+.sy-root dd,
+.sy-root figure,
+.sy-root fieldset {
+  margin: 0;
+}
+
+.sy-root ul,
+.sy-root ol {
+  padding: 0;
+  list-style: none;
+}
+
+.sy-root fieldset {
+  border: 0;
+  padding: 0;
+  min-width: 0;
+}
+
+.sy-root legend {
+  padding: 0;
+}
+
+.sy-root h1:focus,
+.sy-root h2:focus {
+  outline: none;
+}
+
+.sy-root :focus-visible {
+  outline: 4px solid var(--blue);
+  outline-offset: 3px;
+}
+
+.sy-sr {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.sy-nowrap {
+  display: inline-block;
+}
+
+.sy-defs {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+}
+
+/* 文節で折る文（dom.ts の phraseBreaks・phraseify）：文節の中では折らず（nowrap）、文節の間（<wbr>）でだけ折る。
+   12字より長い文節は nowrap にせず keep-all のまま（それでも入らない幅では、どこでも折る） */
+.sy-ph {
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+
+.sy-phr {
+  white-space: nowrap;
+}
+
+/* 説明の文は、最後の行に1〜2文字だけ落ちないように折る（対応しているブラウザだけ） */
+.sy-note,
+.sy-lead,
+.sy-hint,
+.sy-status-text,
+.sy-match-text,
+.sy-howto-lead-sub,
+.sy-howto-sec p,
+.sy-list > li,
+.sy-results-me {
+  text-wrap: pretty;
+}
+
+/* 途中で折らないかたまり（名前の後ろの括弧など）。それでも入らない幅では、どこでも折る */
+.sy-keep {
+  display: inline-block;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+
+/* ───────── 層 ───────── */
+
+.sy-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  font-family: var(--font);
+  color: var(--ink);
+  line-height: 1.6;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* メニューの地：クリームに小さな点（値札の紙のような手ざわり）。
+   後ろの3Dの店（ゲームの芯が描く）がかすかに見えるよう、少しだけ透かす。3Dが無いときはクリームのまま */
+.sy-layer--menu {
+  background-color: rgba(255, 248, 236, 0.9);
+  background-image: radial-gradient(rgba(43, 43, 58, 0.07) 1.2px, transparent 1.6px);
+  background-size: 18px 18px;
+}
+
+/* 結果は字が多いので、地は透かさない */
+.sy-layer--results {
+  background-color: var(--cream);
+}
+
+/* 接続中・エラー：試合の上でも、何も無い所でも読めるよう、ほぼ不透明のクリーム */
+.sy-layer--status {
+  background: rgba(255, 248, 236, 0.95);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: calc(var(--sat) + 16px) calc(var(--sar) + 16px) calc(var(--sab) + 16px) calc(var(--sal) + 16px);
+}
+
+/* ネット対戦の一時停止：試合は続くので、幕を薄くしてぼかさない */
+.sy-layer--overlay.is-live {
+  background: rgba(43, 43, 58, 0.3);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
+/* 一時停止：後ろの店が少し見える */
+.sy-layer--overlay {
+  background: rgba(43, 43, 58, 0.55);
+  -webkit-backdrop-filter: blur(3px);
+  backdrop-filter: blur(3px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: calc(var(--sat) + 16px) calc(var(--sar) + 16px) calc(var(--sab) + 16px) calc(var(--sal) + 16px);
+}
+
+/* ───────── 店の日よけ ───────── */
+
+.sy-awning {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--awning);
+  pointer-events: none;
+  filter: drop-shadow(0 3px 0 rgba(43, 43, 58, 0.12));
+}
+
+.sy-awning-cloth {
+  height: calc(var(--awning) - 12px + var(--sat));
+  background: repeating-linear-gradient(90deg, var(--red) 0 28px, #fff 28px 56px);
+  border-bottom: 2px solid rgba(43, 43, 58, 0.15);
+}
+
+.sy-awning-edge {
+  height: 12px;
+  background:
+    radial-gradient(circle at 14px 0, var(--red) 13px, transparent 13.5px) 0 0 / 56px 12px repeat-x,
+    radial-gradient(circle at 42px 0, #fff 13px, transparent 13.5px) 0 0 / 56px 12px repeat-x;
+}
+
+/* ───────── ページの枠 ───────── */
+
+.sy-page {
+  position: relative;
+  width: 100%;
+  max-width: 680px;
+  min-height: 100%;
+  margin: 0 auto;
+  padding: calc(var(--sat) + var(--awning) + 10px) calc(var(--sar) + 16px) calc(var(--sab) + 28px) calc(var(--sal) + 16px);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.sy-page--wide {
+  max-width: 1080px;
+}
+
+.sy-bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 52px;
+}
+
+.sy-body {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+
+.sy-h1 {
+  font-size: 25px;
+  line-height: 1.3;
+  font-weight: 900;
+  letter-spacing: 0.02em;
+  min-width: 0;
+}
+
+.sy-h2 {
+  font-size: 18px;
+  line-height: 1.4;
+  font-weight: 900;
+}
+
+.sy-h3 {
+  font-size: 15px;
+  line-height: 1.4;
+  font-weight: 800;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+}
+
+.sy-lead {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.sy-note {
+  font-size: 14px;
+  color: var(--sub);
+  font-weight: 600;
+}
+
+.sy-card {
+  background: var(--paper);
+  border: 2.5px solid var(--ink);
+  border-radius: 18px;
+  box-shadow: 0 4px 0 var(--ink);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}
+
+.sy-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sy-list > li {
+  position: relative;
+  padding-left: 20px;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.sy-list > li::before {
+  content: '';
+  position: absolute;
+  left: 4px;
+  top: 0.62em;
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  background: var(--red);
+  transform: rotate(45deg);
+}
+
+/* ───────── ボタン ───────── */
+
+.sy-btn {
+  appearance: none;
+  -webkit-appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 52px;
+  min-width: 52px;
+  margin: 0 0 4px;
+  padding: 10px 18px;
+  border: 3px solid var(--ink);
+  border-radius: 14px;
+  background: #fff;
+  color: var(--ink);
+  font: inherit;
+  font-size: 17px;
+  font-weight: 800;
+  line-height: 1.3;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  box-shadow: 0 4px 0 var(--ink);
+  transition:
+    transform 0.08s ease-out,
+    box-shadow 0.08s ease-out;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.sy-btn:active:not([aria-disabled='true']) {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 var(--ink);
+}
+
+.sy-btn[aria-disabled='true'] {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* 白い字は大きく太く（赤と青の地でも読める大きさ） */
+.sy-btn--red,
+.sy-btn--danger {
+  background: var(--red);
+  color: #fff;
+  font-size: 19px;
+}
+
+.sy-btn--blue {
+  background: var(--blue);
+  color: #fff;
+  font-size: 19px;
+}
+
+.sy-btn--green {
+  background: var(--green);
+  color: var(--ink);
+}
+
+.sy-btn--big {
+  min-height: 60px;
+  padding: 12px 22px;
+  font-size: 20px;
+}
+
+.sy-btn--ghost {
+  border-color: transparent;
+  background: transparent;
+  box-shadow: none;
+  margin: 0;
+}
+
+.sy-btn--ghost:active:not([aria-disabled='true']) {
+  transform: none;
+  box-shadow: none;
+  background: rgba(43, 43, 58, 0.08);
+}
+
+.sy-back {
+  min-height: 48px;
+  padding: 6px 12px 6px 4px;
+  gap: 2px;
+  font-size: 16px;
+  flex: none;
+  border-radius: 12px;
+}
+
+@media (hover: hover) {
+  .sy-btn:hover:not([aria-disabled='true']) {
+    filter: brightness(1.04);
+  }
+
+  .sy-btn--ghost:hover:not([aria-disabled='true']) {
+    background: rgba(43, 43, 58, 0.06);
+  }
+}
+
+.sy-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px 12px;
+}
+
+.sy-actions > .sy-btn {
+  flex: 1 1 180px;
+}
+
+.sy-actions--stack {
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.sy-actions--stack > .sy-btn {
+  flex: none;
+}
+
+/* ───────── タイトル ───────── */
+
+/* タイトル：後ろの3Dの店（ゲームの芯が描く）を透かして見せる（第2波）。
+   上は薄く・下（入口のボタン）ほど濃いクリームをかけ、ボタンは板に載せて読みやすさを保つ。
+   3Dがまだ出ていないときは、下の地のクリームがそのまま見える */
+.sy-layer--title {
+  background-color: transparent;
+  /* .sy-layer--menu の点の模様の大きさ（18px）を引き継ぐと、この幕が18pxごとの縞になって3Dに横縞が出る（round3 の C8 で core が直した） */
+  background-size: 100% 100%;
+  background-image: linear-gradient(
+    180deg,
+    rgba(255, 248, 236, 0.45) 0%,
+    rgba(255, 248, 236, 0.04) 24%,
+    rgba(255, 248, 236, 0.06) 68%,
+    rgba(255, 248, 236, 0.5) 100%
+  );
+}
+
+.sy-title {
+  position: relative;
+  width: 100%;
+  max-width: 520px;
+  min-height: 100%;
+  margin: 0 auto;
+  padding: calc(var(--sat) + var(--awning) + 18px) calc(var(--sar) + 16px) calc(var(--sab) + 20px) calc(var(--sal) + 16px);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  /* 縦長では題字を上・入口を下に寄せ、あいだの余りを「店が見える窓」にする */
+  align-content: space-between;
+  justify-items: center;
+  gap: 22px;
+}
+
+/* 題字の大きさは、この欄の幅から決める（コンテナの単位 cqi）。欄より大きくして値札からはみ出さない */
+.sy-title-hero {
+  container-type: inline-size;
+  justify-self: stretch;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+}
+
+.sy-store-sign {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 4px 14px 5px;
+  border-radius: 8px;
+  background: var(--ink);
+  color: var(--cream);
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+}
+
+.sy-store-sign-small {
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  opacity: 0.85;
+}
+
+/* 題字：黄色い値札に、赤い太字を白でふちどる。少し傾けて手書きのPOPらしく */
+.sy-logo {
+  position: relative;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+  max-width: 100%;
+  padding: 10px 20px 14px 42px;
+  background: var(--yellow);
+  border: 4px solid var(--ink);
+  border-radius: 22px 22px 22px 22px;
+  box-shadow: 6px 7px 0 var(--ink);
+  transform: rotate(-3deg);
+  font-weight: 900;
+  line-height: 1.05;
+}
+
+/* 値札の穴とひも */
+.sy-logo::before {
+  content: '';
+  position: absolute;
+  left: 13px;
+  top: 50%;
+  width: 14px;
+  height: 14px;
+  margin-top: -7px;
+  border-radius: 50%;
+  background: var(--cream);
+  border: 3px solid var(--ink);
+}
+
+/* 穴から外へ出るひも（右の端を穴の中心に合わせ、左上へ伸ばす） */
+.sy-logo::after {
+  content: '';
+  position: absolute;
+  left: -22px;
+  top: calc(50% - 1.5px);
+  width: 42px;
+  height: 3px;
+  background: var(--ink);
+  transform: rotate(32deg);
+  transform-origin: right center;
+  border-radius: 2px;
+}
+
+.sy-logo-top {
+  font-size: clamp(19px, 5.6vw, 34px);
+  color: var(--ink);
+  letter-spacing: 0.18em;
+  padding-left: 0.1em;
+}
+
+.sy-logo-main {
+  font-size: clamp(40px, 11.6vw, 92px);
+  color: var(--red);
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  text-shadow:
+    3px 0 0 #fff,
+    -3px 0 0 #fff,
+    0 3px 0 #fff,
+    0 -3px 0 #fff,
+    2.2px 2.2px 0 #fff,
+    -2.2px 2.2px 0 #fff,
+    2.2px -2.2px 0 #fff,
+    -2.2px -2.2px 0 #fff,
+    0 6px 0 var(--ink),
+    3px 6px 0 var(--ink),
+    -3px 6px 0 var(--ink);
+}
+
+/* 欄の幅から字の大きさを決める（コンテナの単位が使えるブラウザだけ。古い iOS は上の vw のまま）。
+   6文字＋値札の余白（約80px）が欄に収まる大きさ。圧縮で消えないよう @supports に分けて書く */
+@supports (font-size: 1cqi) {
+  .sy-logo-top {
+    font-size: clamp(18px, 6.4cqi, 36px);
+  }
+
+  .sy-logo-main {
+    font-size: clamp(34px, calc((100cqi - 84px) / 6.15), 100px);
+  }
+}
+
+/* 一言は白い札に載せる（後ろの店の模様に負けないように） */
+.sy-tagline {
+  max-width: 24em;
+  padding: 4px 12px;
+  border: 2.5px solid var(--ink);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: 0 3px 0 var(--ink);
+  font-size: 17px;
+  font-weight: 900;
+  line-height: 1.7;
+  text-align: center;
+}
+
+.sy-tagline-part {
+  display: inline-block;
+  padding: 0 3px;
+  background: linear-gradient(transparent 60%, rgba(255, 201, 60, 0.75) 60%);
+}
+
+/* 入口のボタンは、クリームの板（店のカウンターのつもり）に載せる */
+.sy-title-menu {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 12px;
+  width: 100%;
+  max-width: 460px;
+  min-width: 0;
+  padding: 14px 14px 10px;
+  border-radius: 24px;
+  background: rgba(255, 248, 236, 0.93);
+  box-shadow:
+    0 0 0 3px rgba(43, 43, 58, 0.9),
+    0 12px 28px rgba(43, 43, 58, 0.28);
+}
+
+.sy-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.sy-menu-item {
+  justify-content: flex-start;
+  gap: 12px;
+  min-height: 70px;
+  width: 100%;
+  padding: 9px 14px 9px 10px;
+  text-align: left;
+  border-radius: 18px;
+}
+
+.sy-menu-tile {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 13px;
+  border: 2.5px solid var(--ink);
+  background: var(--paper);
+  color: var(--ink);
+}
+
+.sy-menu-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1;
+}
+
+.sy-menu-main {
+  font-size: 20px;
+  font-weight: 900;
+  line-height: 1.3;
+}
+
+.sy-menu-sub {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--sub);
+  line-height: 1.4;
+}
+
+.sy-menu-arrow {
+  flex: none;
+  font-size: 30px;
+  font-weight: 900;
+  line-height: 1;
+  margin-top: -3px;
+}
+
+.sy-menu-item--red {
+  background: var(--red);
+  color: #fff;
+  min-height: 78px;
+}
+
+.sy-menu-item--red .sy-menu-main {
+  font-size: 23px;
+}
+
+.sy-menu-item--red .sy-menu-tile {
+  color: var(--red);
+}
+
+.sy-menu-item--blue .sy-menu-tile {
+  background: var(--blue);
+  color: #fff;
+}
+
+.sy-menu-item--green .sy-menu-tile {
+  background: var(--green);
+  color: var(--ink);
+}
+
+.sy-menu-item--plain {
+  min-height: 60px;
+}
+
+.sy-menu-item--plain .sy-menu-tile {
+  background: var(--yellow);
+  width: 40px;
+  height: 40px;
+  margin: 0 4px;
+}
+
+.sy-menu-item--plain .sy-menu-main {
+  font-size: 18px;
+}
+
+/* タイトルの一言。あそびかたの「店の注意書き」（.sy-notice）とは別物＝名前を分ける */
+.sy-disclaimer {
+  margin: 0;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.5;
+  color: var(--sub);
+}
+
+.sy-credit {
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  column-gap: 4px;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--sub);
+}
+
+/* タップの的は48px以上（docs/02）。字は小さいまま、押せる範囲だけを広げる */
+.sy-credit-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 48px;
+  min-height: 48px;
+  padding: 0 10px;
+  color: var(--sub);
+  text-decoration: underline;
+}
+
+.sy-mute {
+  position: absolute;
+  top: calc(var(--sat) + 4px);
+  right: calc(var(--sar) + 8px);
+  min-height: 48px;
+  padding: 6px 14px 6px 10px;
+  gap: 6px;
+  font-size: 15px;
+  background: #fff;
+  border: 3px solid var(--ink);
+  box-shadow: 0 3px 0 var(--ink);
+  border-radius: 999px;
+  z-index: 2;
+}
+
+.sy-mute[aria-pressed='true'] {
+  background: var(--line);
+}
+
+.sy-mute-icon {
+  display: inline-flex;
+}
+
+/* ───────── あそびかた ───────── */
+
+.sy-howto-lead {
+  position: relative;
+  padding: 16px 18px;
+  border-radius: 18px;
+  background: var(--yellow);
+  border: 3px solid var(--ink);
+  box-shadow: 0 4px 0 var(--ink);
+}
+
+.sy-howto-lead-big {
+  font-size: 23px;
+  font-weight: 900;
+  line-height: 1.35;
+}
+
+.sy-howto-lead-sub {
+  margin-top: 6px;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.sy-jumps {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.sy-jump {
+  min-height: 48px;
+  padding: 6px 10px;
+  font-size: 15px;
+  border-width: 2.5px;
+  box-shadow: 0 3px 0 var(--ink);
+}
+
+.sy-howto-deeds,
+.sy-howto-sec {
+  scroll-margin-top: 12px;
+}
+
+.sy-howto-deeds {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.sy-deeds {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 10px;
+}
+
+.sy-deed {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px 12px 12px;
+  background: var(--paper);
+  border: 2.5px solid var(--ink);
+  border-radius: 16px;
+  box-shadow: 0 3px 0 var(--ink);
+  min-width: 0;
+}
+
+/* 店の注意書き（白い札・赤い帯） */
+.sy-notice {
+  display: flex;
+  align-items: stretch;
+  border: 2px solid var(--red);
+  border-radius: 8px;
+  overflow: hidden;
+  background: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.45;
+}
+
+.sy-notice-head {
+  flex: none;
+  display: grid;
+  place-items: center;
+  padding: 4px 8px;
+  background: var(--red-dark);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+}
+
+.sy-notice-text {
+  padding: 5px 10px;
+  min-width: 0;
+}
+
+.sy-deed-flip {
+  font-size: 13px;
+  font-weight: 900;
+  color: var(--red-dark);
+  padding-left: 4px;
+}
+
+.sy-deed-name {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 17px;
+  font-weight: 900;
+  line-height: 1.35;
+}
+
+.sy-deed-no {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--ink);
+  color: #fff;
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+}
+
+.sy-deed-facts {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 1px 10px;
+  font-size: 13.5px;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+.sy-deed-facts dt {
+  color: var(--sub);
+  font-weight: 800;
+}
+
+.sy-press {
+  display: inline-block;
+  margin-left: 2px;
+  padding: 0 8px;
+  border-radius: 999px;
+  border: 2px solid var(--ink);
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1.5;
+  vertical-align: 1px;
+  white-space: nowrap;
+}
+
+.sy-press--hold {
+  background: var(--yellow);
+}
+
+.sy-press--mash {
+  background: var(--mint);
+}
+
+.sy-howto-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 14px;
+}
+
+.sy-howto-sec p {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.sy-steps {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.sy-step {
+  padding: 2px 10px;
+  border-radius: 10px;
+  background: var(--ink);
+  color: #fff;
+  font-weight: 900;
+  font-variant-numeric: tabular-nums;
+}
+
+.sy-step:last-child {
+  background: var(--red-dark);
+}
+
+.sy-step-arrow {
+  font-weight: 900;
+  color: var(--sub);
+}
+
+.sy-controls-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 16px;
+}
+
+.sy-control {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+/* キーは左で折り返し、説明は右に5〜8文字ぶんの幅を取る（狭い画面で説明が縦一列にならない） */
+.sy-keymap {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(5.5em, 8em);
+  align-items: center;
+  gap: 8px 12px;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.sy-keymap dt {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 0;
+  min-width: 0;
+}
+
+.sy-keys {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.sy-kbd {
+  display: inline-grid;
+  place-items: center;
+  min-width: 30px;
+  height: 30px;
+  padding: 0 7px;
+  border: 2px solid var(--ink);
+  border-bottom-width: 4px;
+  border-radius: 7px;
+  background: #fff;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.sy-or {
+  margin: 0 6px;
+  font-size: 13px;
+  color: var(--sub);
+}
+
+/* ───────── キャラ選び ───────── */
+
+.sy-chars {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.sy-chars-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.sy-char {
+  position: relative;
+  display: block;
+  cursor: pointer;
+  min-width: 0;
+}
+
+/* 本物のラジオボタンは見た目の箱に重ねて透明にする（押しは本物に届く・矢印キーで選べる） */
+.sy-char-input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+  z-index: 1;
+}
+
+.sy-char-box {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  min-height: 104px;
+  padding: 8px 4px 8px;
+  border: 3px solid var(--line);
+  border-radius: 16px;
+  background: #fff;
+  transition:
+    border-color 0.12s,
+    transform 0.12s;
+}
+
+.sy-char-input:checked + .sy-char-box {
+  border-color: var(--red);
+  background: #fff4f1;
+  box-shadow: 0 3px 0 var(--red);
+}
+
+.sy-char-input:focus-visible + .sy-char-box {
+  outline: 4px solid var(--blue);
+  outline-offset: 2px;
+}
+
+/* 選んでいる印（色だけに頼らない） */
+.sy-char-check {
+  position: absolute;
+  top: -8px;
+  right: -6px;
+  display: none;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--red-dark);
+  color: #fff;
+  font-size: 15px;
+  font-weight: 900;
+  border: 2.5px solid #fff;
+}
+
+.sy-char-input:checked + .sy-char-box .sy-char-check {
+  display: grid;
+}
+
+.sy-char-name {
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.sy-face {
+  display: block;
+  flex: none;
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 42%, #fff 0 30%, var(--mint) 72%);
+  object-fit: contain;
+}
+
+.sy-face--none {
+  display: grid;
+  place-items: center;
+  color: #b9b0a0;
+}
+
+/* ───────── ひとりで ───────── */
+
+.sy-levels {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.sy-levels-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.sy-level {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas:
+    'name go'
+    'desc go';
+  align-items: center;
+  justify-content: stretch;
+  gap: 0 12px;
+  width: 100%;
+  min-height: 72px;
+  padding: 10px 14px 10px 16px;
+  text-align: left;
+  border-radius: 16px;
+  border-left-width: 14px;
+}
+
+.sy-level--green {
+  border-left-color: var(--green);
+}
+
+.sy-level--blue {
+  border-left-color: var(--blue);
+}
+
+.sy-level--red {
+  border-left-color: var(--red);
+}
+
+.sy-level-name {
+  grid-area: name;
+  font-size: 21px;
+  font-weight: 900;
+}
+
+.sy-level-desc {
+  grid-area: desc;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--sub);
+  line-height: 1.45;
+}
+
+.sy-level-go {
+  grid-area: go;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 12px;
+  border-radius: 12px;
+  background: var(--ink);
+  color: #fff;
+  font-size: 15px;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+/* ───────── 友だちと ───────── */
+
+.sy-invited {
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: var(--yellow);
+  border: 2.5px solid var(--ink);
+  font-weight: 800;
+}
+
+.sy-friends-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 16px;
+}
+
+.sy-rooms {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+
+.sy-field {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas:
+    'label label'
+    'input count';
+  align-items: center;
+  gap: 6px 10px;
+}
+
+.sy-field .sy-label {
+  grid-area: label;
+}
+
+.sy-field .sy-input {
+  grid-area: input;
+}
+
+.sy-count {
+  grid-area: count;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--sub);
+  font-variant-numeric: tabular-nums;
+}
+
+.sy-label {
+  display: block;
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.sy-input {
+  width: 100%;
+  min-width: 0;
+  min-height: 52px;
+  padding: 10px 14px;
+  border: 3px solid var(--ink);
+  border-radius: 12px;
+  background: #fff;
+  color: var(--ink);
+  font: inherit;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.sy-input::placeholder {
+  color: var(--mute);
+  font-weight: 600;
+}
+
+.sy-code-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  gap: 10px;
+}
+
+.sy-code-input {
+  flex: 1 1 170px;
+  width: 170px;
+  font-size: 30px;
+  font-weight: 900;
+  letter-spacing: 0.4em;
+  text-align: center;
+  text-transform: uppercase;
+  padding: 6px 4px 6px calc(4px + 0.4em);
+  font-variant-numeric: tabular-nums;
+}
+
+/* あいことばの欄の例は薄く（打つ文字と見分けるため。中身ではなく見本） */
+.sy-code-input::placeholder {
+  color: #b7ae9b;
+  font-weight: 900;
+}
+
+.sy-code-input[aria-invalid='true'] {
+  border-color: var(--red);
+  background: #fff4f1;
+}
+
+.sy-code-row .sy-btn {
+  flex: 1 1 120px;
+  margin: 0 0 4px;
+}
+
+.sy-hint {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--sub);
+  min-height: 1.6em;
+}
+
+.sy-hint.is-error {
+  color: var(--red-dark);
+}
+
+.sy-room-card .sy-btn {
+  align-self: stretch;
+}
+
+.sy-room-card.is-invited {
+  border-color: var(--green);
+  box-shadow: 0 4px 0 var(--green);
+}
+
+/* ───────── だれかと ───────── */
+
+.sy-match {
+  align-items: center;
+  text-align: center;
+  padding: 24px 18px 20px;
+  max-width: 520px;
+  width: 100%;
+  margin: 8px auto 0;
+}
+
+.sy-ring {
+  position: relative;
+  width: 132px;
+  height: 132px;
+}
+
+.sy-ring svg {
+  display: block;
+  transform: rotate(-90deg);
+}
+
+.sy-ring-bg {
+  fill: none;
+  stroke: var(--line);
+  stroke-width: 12;
+}
+
+.sy-ring-arc {
+  fill: none;
+  stroke: var(--green);
+  stroke-width: 12;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.9s linear;
+}
+
+.sy-ring-center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  padding-top: 38px;
+  gap: 2px;
+}
+
+.sy-ring-num {
+  font-size: 44px;
+  font-weight: 900;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.sy-ring-unit {
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.sy-match[data-state='timeout'] .sy-ring,
+.sy-match[data-state='error'] .sy-ring {
+  display: none;
+}
+
+.sy-match-text {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--sub);
+}
+
+.sy-match .sy-actions {
+  width: 100%;
+}
+
+/* ───────── 待合室 ───────── */
+
+.sy-lobby-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 16px;
+}
+
+.sy-lobby-side {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+
+.sy-code-tiles {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+/* あいことばは、値札の数字のように1文字ずつ大きく */
+.sy-code-tile {
+  display: grid;
+  place-items: center;
+  width: clamp(58px, 17vw, 76px);
+  height: clamp(72px, 21vw, 92px);
+  border: 3px solid var(--ink);
+  border-radius: 14px;
+  background: var(--yellow);
+  box-shadow: 0 4px 0 var(--ink);
+  font-size: clamp(40px, 12vw, 56px);
+  font-weight: 900;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.sy-lobby-code {
+  align-items: stretch;
+}
+
+.sy-lobby-code > .sy-h2,
+.sy-lobby-code > .sy-note {
+  text-align: center;
+}
+
+.sy-count-badge {
+  margin-left: 10px;
+  padding: 1px 10px;
+  border-radius: 999px;
+  background: var(--ink);
+  color: #fff;
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+  vertical-align: 2px;
+}
+
+.sy-members {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sy-member {
+  display: grid;
+  grid-template-columns: auto auto minmax(0, 1fr);
+  grid-template-areas: 'slot face name' 'slot face tags';
+  align-items: center;
+  gap: 0 10px;
+  min-height: 64px;
+  padding: 6px 10px;
+  border: 2.5px solid var(--ink);
+  border-left: 10px solid var(--pc, var(--ink));
+  border-radius: 14px;
+  background: #fff;
+}
+
+.sy-member .sy-slot {
+  grid-area: slot;
+}
+
+.sy-member .sy-face {
+  grid-area: face;
+}
+
+.sy-member-name {
+  grid-area: name;
+  font-size: 17px;
+  font-weight: 900;
+  overflow-wrap: anywhere;
+  line-height: 1.3;
+}
+
+.sy-member-tags {
+  grid-area: tags;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.sy-member-tags:empty {
+  display: none;
+}
+
+/* 切れている人：字は読める濃さのまま、顔だけを薄くし、枠を点線にする */
+.sy-member.is-away {
+  background: #f6f2ea;
+  border-style: dashed;
+  border-left-style: solid;
+}
+
+.sy-member.is-away .sy-face {
+  opacity: 0.45;
+  filter: grayscale(1);
+}
+
+.sy-member.is-you {
+  background: #fffbf0;
+}
+
+.sy-member.is-empty {
+  display: flex;
+  justify-content: center;
+  border: 2.5px dashed #c9bfaa;
+  background: transparent;
+  color: var(--mute);
+  min-height: 52px;
+}
+
+.sy-member-empty {
+  font-weight: 800;
+  font-size: 15px;
+}
+
+.sy-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 0 8px;
+  border-radius: 999px;
+  background: var(--line);
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1.6;
+  white-space: nowrap;
+}
+
+.sy-tag--you {
+  background: var(--ink);
+  color: #fff;
+}
+
+.sy-tag--host {
+  background: var(--yellow);
+}
+
+.sy-tag--away {
+  background: #fde0dc;
+}
+
+/* 試合の長さ（横並びの切り替え） */
+.sy-seg {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sy-seg-items {
+  display: flex;
+  gap: 8px;
+}
+
+.sy-seg-item {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+}
+
+.sy-seg-input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+  z-index: 1;
+}
+
+.sy-seg-box {
+  display: grid;
+  place-items: center;
+  min-height: 52px;
+  border: 3px solid var(--ink);
+  border-radius: 12px;
+  background: #fff;
+  font-size: 17px;
+  font-weight: 900;
+}
+
+.sy-seg-input:checked + .sy-seg-box {
+  background: var(--ink);
+  color: #fff;
+}
+
+.sy-seg-input:focus-visible + .sy-seg-box {
+  outline: 4px solid var(--blue);
+  outline-offset: 2px;
+}
+
+.sy-wait {
+  font-size: 16px;
+  font-weight: 800;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: var(--cream);
+  border: 2px dashed var(--ink);
+}
+
+/* ───────── 1P〜4P の札 ───────── */
+
+.sy-slot {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  flex: none;
+  font-weight: 900;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.sy-slot--sm {
+  font-size: 13px;
+}
+
+.sy-slot--lg {
+  font-size: 15px;
+}
+
+.sy-shape {
+  display: block;
+  flex: none;
+}
+
+/* ───────── 接続中・エラー・一時停止 ───────── */
+
+.sy-status {
+  width: 100%;
+  max-width: 440px;
+  align-items: center;
+  text-align: center;
+  padding: 24px 20px 20px;
+  gap: 14px;
+}
+
+.sy-status-title {
+  font-size: 21px;
+}
+
+.sy-status-text {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--sub);
+  overflow-wrap: anywhere;
+}
+
+.sy-status .sy-actions {
+  width: 100%;
+}
+
+.sy-status-icon {
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: #fde0dc;
+  color: var(--red);
+}
+
+.sy-status-icon--pause {
+  background: var(--yellow);
+  color: var(--ink);
+}
+
+.sy-pause-title {
+  font-size: 26px;
+}
+
+.sy-spinner {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  border: 6px solid var(--line);
+  border-top-color: var(--red);
+  border-right-color: var(--yellow);
+  animation: sy-spin 0.9s linear infinite;
+}
+
+@keyframes sy-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ───────── トースト ───────── */
+
+.sy-toasts {
+  position: fixed;
+  left: 50%;
+  bottom: calc(var(--sab) + 24px);
+  z-index: 110;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  width: min(92vw, 420px);
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+/* 試合中は下に操作のボタンがあるので、上（残り時間の下）に出す */
+.sy-root.is-game .sy-toasts {
+  top: calc(var(--sat) + 84px);
+  bottom: auto;
+}
+
+.sy-toast {
+  max-width: 100%;
+  padding: 10px 18px;
+  border-radius: 999px;
+  background: var(--ink);
+  color: #fff;
+  font-family: var(--font);
+  font-size: 15px;
+  font-weight: 800;
+  line-height: 1.45;
+  text-align: center;
+  box-shadow: 0 4px 14px rgba(43, 43, 58, 0.25);
+  animation: sy-toast-in 0.18s ease-out;
+  transition:
+    opacity 0.4s,
+    transform 0.4s;
+}
+
+.sy-toast.is-leaving {
+  opacity: 0;
+  transform: translateY(6px);
+}
+
+@keyframes sy-toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+/* ───────── シェア ───────── */
+
+.sy-share {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+}
+
+.sy-share-heading {
+  font-size: 16px;
+  font-weight: 900;
+}
+
+/* いつも2列。端末の共有があれば2×2、無ければ X・LINE を並べ、コピーは下の1行を使う */
+.sy-share-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.sy-share-row:not(.has-native) .sy-share-copy {
+  grid-column: 1 / -1;
+}
+
+.sy-share-btn {
+  min-height: 52px;
+  min-width: 0;
+  padding: 8px 10px;
+  font-size: 15px;
+  white-space: nowrap;
+  gap: 6px;
+  border-width: 2.5px;
+  box-shadow: 0 3px 0 var(--ink);
+}
+
+.sy-share-icon {
+  flex: none;
+}
+
+.sy-share-native {
+  background: var(--yellow);
+}
+
+.sy-share-x {
+  background: var(--ink);
+  color: #fff;
+}
+
+.sy-share-line {
+  background: var(--green);
+  color: var(--ink);
+}
+
+/* 緑の字は白地で 3:1 に届かないので、知らせは濃い字にする */
+.sy-share-said {
+  min-height: 1.4em;
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--ink);
+}
+
+.sy-share-said:empty {
+  min-height: 0;
+}
+
+.sy-share-fallback {
+  width: 100%;
+  border: 2px solid var(--ink);
+  border-radius: 10px;
+  padding: 8px;
+  font: inherit;
+  font-size: 14px;
+}
+
+/* 『リンクをコピー』のようなボタンの名前は途中で折らない */
+.sy-share-note {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--sub);
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+
+/* ───────── 結果 ───────── */
+
+.sy-page--results {
+  max-width: 1080px;
+  padding-bottom: 0;
+  gap: 14px;
+}
+
+.sy-results-head {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  text-align: center;
+  padding-top: 4px;
+}
+
+.sy-kicker {
+  display: inline-block;
+  padding: 2px 12px;
+  border-radius: 999px;
+  background: var(--ink);
+  color: var(--cream);
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+
+.sy-results-headline {
+  font-size: clamp(32px, 9vw, 52px);
+  font-weight: 900;
+  line-height: 1.2;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+  text-wrap: balance;
+}
+
+.sy-results-headline.is-long {
+  font-size: clamp(24px, 6.4vw, 42px);
+}
+
+[data-tone='win'] .sy-results-headline {
+  color: var(--red);
+  text-shadow:
+    2px 0 0 #fff,
+    -2px 0 0 #fff,
+    0 2px 0 #fff,
+    0 -2px 0 #fff,
+    0 4px 0 var(--ink);
+}
+
+.sy-results-me {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 4px 8px;
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.sy-results-aborted {
+  max-width: 32em;
+}
+
+.sy-results-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 16px;
+}
+
+/* 1列のときは列の箱を外し、勝者→順位→内訳→シェア→「もう一回」の帯（下に貼りつく）の順に見せる */
+.sy-results-col {
+  display: contents;
+}
+
+.sy-results-col > .sy-hero {
+  order: 1;
+}
+
+.sy-results-col > .sy-ranking {
+  order: 2;
+}
+
+.sy-results-col > .sy-detail {
+  order: 3;
+}
+
+.sy-results-col > .sy-share {
+  order: 4;
+}
+
+.sy-results-col > .sy-results-bar {
+  order: 9;
+}
+
+.sy-hero {
+  position: relative;
+  align-items: center;
+  text-align: center;
+  background: var(--yellow);
+  padding: 26px 16px 18px;
+  margin-top: 14px;
+}
+
+.sy-hero-crown {
+  position: absolute;
+  top: -22px;
+  left: 50%;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  margin-left: -22px;
+  border-radius: 50%;
+  background: #fff;
+  border: 3px solid var(--ink);
+  color: var(--ink);
+}
+
+.sy-hero-crown .sy-icon {
+  fill: var(--yellow);
+}
+
+.sy-hero-people {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 16px 24px;
+  width: 100%;
+}
+
+.sy-hero-person {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.sy-hero-face .sy-face {
+  border: 4px solid var(--ink);
+  background: #fff;
+}
+
+.sy-hero-name {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 4px 8px;
+  font-size: 20px;
+  font-weight: 900;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+}
+
+.sy-hero-score {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 2px 6px;
+}
+
+.sy-hero-score-label {
+  font-size: 15px;
+  font-weight: 900;
+}
+
+.sy-hero-score-num {
+  font-size: clamp(44px, 13vw, 64px);
+  font-weight: 900;
+  line-height: 1;
+  color: var(--red);
+  font-variant-numeric: tabular-nums;
+  text-shadow:
+    2px 0 0 #fff,
+    -2px 0 0 #fff,
+    0 2px 0 #fff,
+    0 -2px 0 #fff,
+    0 4px 0 var(--ink);
+}
+
+.sy-hero.is-multi .sy-hero-score-num {
+  font-size: clamp(32px, 9vw, 44px);
+}
+
+.sy-hero-score-unit {
+  font-size: 18px;
+  font-weight: 900;
+}
+
+.sy-hero-title {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: baseline;
+  gap: 2px 6px;
+  font-size: 18px;
+}
+
+.sy-hero-title-label {
+  font-size: 13px;
+  font-weight: 800;
+  padding: 0 8px;
+  border-radius: 999px;
+  background: var(--ink);
+  color: var(--yellow);
+}
+
+.sy-hero-title strong {
+  font-weight: 900;
+}
+
+.sy-badge-complete {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: var(--red-dark);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 900;
+  white-space: nowrap;
+  border: 2px solid var(--ink);
+}
+
+.sy-rank-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* 2段：上＝印・名前・点、下＝称号（称号は点の下まで使う） */
+.sy-rank-row {
+  display: grid;
+  grid-template-columns: auto auto minmax(0, 1fr) auto;
+  grid-template-areas:
+    'no face name score'
+    'no face title title';
+  align-items: center;
+  column-gap: 8px;
+  row-gap: 1px;
+  min-height: 60px;
+  padding: 6px 10px 6px 8px;
+  border: 2.5px solid var(--line);
+  border-left: 8px solid var(--pc, var(--ink));
+  border-radius: 14px;
+  background: #fff;
+}
+
+.sy-rank-row > .sy-rank-no {
+  grid-area: no;
+}
+
+.sy-rank-row > .sy-face {
+  grid-area: face;
+}
+
+.sy-rank-row > .sy-rank-name {
+  grid-area: name;
+  align-self: end;
+}
+
+.sy-rank-row > .sy-rank-score {
+  grid-area: score;
+  align-self: end;
+}
+
+.sy-rank-row > .sy-rank-title {
+  grid-area: title;
+  align-self: start;
+}
+
+.sy-slot-mark {
+  display: inline-flex;
+  flex: none;
+}
+
+.sy-rank-row.is-winner {
+  border-color: var(--ink);
+  border-left-color: var(--pc, var(--ink));
+  background: #fffbea;
+}
+
+.sy-rank-row.is-you {
+  box-shadow: inset 0 0 0 2px var(--ink);
+}
+
+.sy-rank-no {
+  font-size: 22px;
+  font-weight: 900;
+  line-height: 1;
+  min-width: 1.6em;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+.sy-rank-no small {
+  font-size: 12px;
+}
+
+/* 印と名前は同じ行に置き、長い名前は名前の箱の中で折り返す */
+.sy-rank-name {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  font-size: 16px;
+  font-weight: 900;
+  line-height: 1.3;
+}
+
+/* 名前は語の途中で切らない（「ハカセ（CPU・ふつう）」は括弧の前で折る）。入りきらないときだけどこでも折る */
+.sy-rank-name-text,
+.sy-hero-name,
+.sy-results-headline,
+.sy-member-name,
+.sy-stamp-name,
+.sy-secret-name,
+.sy-deed-title,
+.sy-bd th {
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+
+.sy-rank-name-text {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+/* 名前の後ろの括弧（「（CPU・ふつう）」）は添え書きなので少し小さく。狭い行でも1行に収める */
+.sy-rank-name-text .sy-keep {
+  font-size: 0.8em;
+}
+
+.sy-rank-title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px 6px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--sub);
+}
+
+.sy-rank-score {
+  font-size: 21px;
+  font-weight: 900;
+  line-height: 1.2;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.sy-rank-score small {
+  font-size: 12px;
+  margin-left: 1px;
+}
+
+.sy-bd {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.sy-bd th,
+.sy-bd td {
+  padding: 7px 4px;
+  border-bottom: 1.5px dashed var(--line);
+  text-align: left;
+  vertical-align: baseline;
+}
+
+.sy-bd th {
+  font-weight: 700;
+}
+
+.sy-bd-count {
+  color: var(--sub);
+  font-weight: 700;
+  white-space: nowrap;
+  text-align: right !important;
+  font-variant-numeric: tabular-nums;
+}
+
+.sy-bd-points {
+  font-weight: 900;
+  white-space: nowrap;
+  text-align: right !important;
+  font-variant-numeric: tabular-nums;
+}
+
+.sy-bd-bonus th,
+.sy-bd-bonus td {
+  color: var(--red-dark);
+  border-bottom: 0;
+}
+
+/* 達成したやっちゃダメのハンコ（round3：約36px → 64〜76px。傾けて、かすれを付け、札の右端からはみ出して押す） */
+.sy-stamps {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px 8px;
+}
+
+.sy-stamp {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-height: 64px;
+  padding: 8px 52px 8px 10px;
+  border: 2px solid var(--line);
+  border-radius: 12px;
+  background: #fff;
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1.35;
+  color: var(--mute);
+}
+
+.sy-stamp.is-done {
+  border-color: var(--ink);
+  color: var(--ink);
+}
+
+.sy-stamp-name {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.sy-stamp-mark {
+  position: absolute;
+  right: -10px;
+  top: 50%;
+  width: 66px;
+  height: 66px;
+  margin-top: -33px;
+  color: var(--red-dark);
+  pointer-events: none;
+  /* 朱肉が紙に染みたように、下の白と重ねる */
+  mix-blend-mode: multiply;
+  z-index: 1;
+}
+
+.sy-hanko {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  transform: rotate(var(--tilt, -12deg));
+  animation: sy-stamp 0.42s cubic-bezier(0.25, 1.7, 0.55, 1) both;
+  animation-delay: calc(0.4s + var(--i, 0) * 0.09s);
+}
+
+.sy-stamp-todo {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  margin-top: -0.75em;
+  font-size: 12px;
+  color: var(--mute);
+}
+
+/* 押す勢い：大きく傾いて上から落ち、少し沈んで止まる */
+@keyframes sy-stamp {
+  0% {
+    opacity: 0;
+    transform: scale(2.4) rotate(calc(var(--tilt, -12deg) - 24deg));
+  }
+  70% {
+    opacity: 1;
+    transform: scale(0.92) rotate(var(--tilt, -12deg));
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(var(--tilt, -12deg));
+  }
+}
+
+.sy-secrets {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.sy-secret {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 48px;
+  padding: 6px 10px;
+  border: 2px dashed #c9bfaa;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--mute);
+  overflow-wrap: anywhere;
+}
+
+.sy-secret .sy-icon {
+  flex: none;
+  color: #d8d0c0;
+}
+
+.sy-secret.is-done {
+  border: 2px solid var(--ink);
+  background: #fffbea;
+  color: var(--ink);
+}
+
+.sy-secret.is-done .sy-icon {
+  color: var(--yellow);
+  stroke: var(--ink);
+}
+
+.sy-stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.sy-stat {
+  padding: 8px 12px;
+  border-radius: 12px;
+  background: var(--cream);
+  border: 2px solid var(--line);
+}
+
+.sy-stat dt {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--sub);
+}
+
+.sy-stat dd {
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.sy-stat dd b {
+  font-size: 26px;
+  font-weight: 900;
+  font-variant-numeric: tabular-nums;
+  margin-right: 2px;
+}
+
+.sy-meter {
+  display: block;
+  height: 8px;
+  margin-top: 4px;
+  border-radius: 999px;
+  background: var(--line);
+  overflow: hidden;
+}
+
+.sy-meter > span {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: var(--red);
+}
+
+/* 下に貼りつける操作の列（結果の「もう一回」、待合室の「はじめる」）。スクロールしなくても押せる */
+.sy-page--bar {
+  padding-bottom: 0;
+}
+
+.sy-page--bar > .sy-body {
+  flex: 1;
+}
+
+.sy-bottom-bar {
+  position: sticky;
+  bottom: 0;
+  z-index: 3;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 8px 12px;
+  /* 中身が短いときも画面の下にそろえる（上の余白を auto に） */
+  margin: auto calc(-1 * (var(--sar) + 16px)) 0 calc(-1 * (var(--sal) + 16px));
+  padding: 12px calc(var(--sar) + 16px) calc(var(--sab) + 12px) calc(var(--sal) + 16px);
+  /* 不透明にして、後ろのボタンや字が透けないようにする。上辺の影で、中身がこの下へ続くことを見せる */
+  background: var(--cream);
+  border-top: 3px solid var(--ink);
+  box-shadow: 0 -10px 18px rgba(43, 43, 58, 0.16);
+}
+
+.sy-bottom-bar > .sy-btn {
+  flex: 1 1 160px;
+  max-width: 320px;
+}
+
+.sy-bottom-bar > .sy-btn--red {
+  flex-grow: 2;
+}
+
+.sy-lobby-bar > .sy-btn--red {
+  max-width: 440px;
+}
+
+.sy-bar-hint {
+  flex: 1 1 100%;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--sub);
+}
+
+.sy-wait--bar {
+  flex: 1 1 100%;
+  text-align: center;
+  font-size: 15px;
+  padding: 8px 12px;
+}
+
+/* ───────── 広い画面 ───────── */
+
+@media (min-width: 560px) {
+  .sy-deeds {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .sy-jumps {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 700px) {
+  .sy-h1 {
+    font-size: 30px;
+  }
+
+  .sy-stamp {
+    min-height: 72px;
+    padding-right: 60px;
+  }
+
+  .sy-stamp-mark {
+    width: 76px;
+    height: 76px;
+    margin-top: -38px;
+  }
+
+  .sy-howto-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .sy-controls-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .sy-chars-grid {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+
+  .sy-stamps {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+}
+
+@media (min-width: 700px) {
+  .sy-friends-grid {
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+    align-items: start;
+  }
+
+  .sy-friends-grid .sy-chars-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .sy-lobby-grid {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: start;
+  }
+}
+
+/* 結果の2段組み：広い画面と、横持ち（高さが足りないので横に並べる）。
+   左＝勝者・「もう一回」・シェア、右＝順位・内訳。「もう一回」の帯は貼りつけず勝者のすぐ下に置くので、
+   シェアのボタンや順位の上に重ならない（round2 の見た目の指摘） */
+@media (min-width: 900px), (min-width: 700px) and (orientation: landscape) {
+  .sy-results-grid {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: start;
+  }
+
+  .sy-results-col {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    min-width: 0;
+  }
+
+  /* 1列のときの並べ替えは使わない（勝者→「もう一回」→シェアの順。横持ちでも「もう一回」が最初の画面に入る） */
+  .sy-results-col > .sy-hero,
+  .sy-results-col > .sy-results-bar,
+  .sy-results-col > .sy-share,
+  .sy-results-col > .sy-ranking,
+  .sy-results-col > .sy-detail {
+    order: 0;
+  }
+
+  /* 右の列の頭を、王冠ぶん下がった勝者の札とそろえる */
+  .sy-results-col--side {
+    padding-top: 14px;
+  }
+
+  .sy-page--results.sy-page--bar {
+    padding-bottom: calc(var(--sab) + 24px);
+  }
+
+  .sy-results-bar {
+    position: static;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: none;
+    box-shadow: none;
+  }
+
+  .sy-results-bar > .sy-btn {
+    max-width: none;
+  }
+
+  .sy-results-col--main > .sy-share {
+    padding: 0 4px;
+  }
+}
+
+/* 背の高い画面（768縦・1440など）の、ひとりで・友だちと・だれかと・待合室。
+   見出しと中身はひとかたまりのまま（間を空けない）、かたまりを縦の4割の位置に置く。下の半分が空かず、
+   見出しと中身の間も空かない（round2・round3 の見た目の指摘）。中身が長ければ、上下の空きは0まで縮む */
+@media (min-width: 700px) and (min-height: 700px) {
+  .sy-page--center::before,
+  .sy-page--center::after {
+    content: '';
+    flex: 2 1 0;
+  }
+
+  .sy-page--center::after {
+    flex-grow: 3;
+  }
+
+  /* 待合室の「はじめる」は中身のすぐ下に置く（背の高い画面では全部が1画面に入るので、下に貼りつけない） */
+  .sy-page--center.sy-page--bar {
+    padding-bottom: calc(var(--sab) + 24px);
+  }
+
+  .sy-page--center .sy-lobby-bar {
+    position: static;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: none;
+    box-shadow: none;
+  }
+}
+
+/* タイトルの2段組み：広い画面と、横持ちのスマホ（高さが足りない） */
+@media (min-width: 960px), (orientation: landscape) and (max-height: 560px) {
+  .sy-title {
+    max-width: 1080px;
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+    align-content: center;
+    align-items: center;
+    column-gap: 40px;
+  }
+}
+
+@media (orientation: landscape) and (max-height: 560px) {
+  .sy-root {
+    --awning: 26px;
+  }
+
+  .sy-awning-edge {
+    height: 8px;
+    background:
+      radial-gradient(circle at 14px 0, var(--red) 13px, transparent 13.5px) 0 0 / 56px 8px repeat-x,
+      radial-gradient(circle at 42px 0, #fff 13px, transparent 13.5px) 0 0 / 56px 8px repeat-x;
+  }
+
+  .sy-awning-cloth {
+    height: calc(var(--awning) - 8px + var(--sat));
+  }
+
+  .sy-title {
+    padding-top: calc(var(--sat) + var(--awning) + 12px);
+    padding-bottom: calc(var(--sab) + 12px);
+    gap: 12px;
+  }
+
+  .sy-title-hero {
+    gap: 10px;
+  }
+
+  .sy-tagline {
+    font-size: 15px;
+  }
+
+  /* 右上の消音のボタンをよけて、板を少し下げる */
+  .sy-title-menu {
+    margin-top: 18px;
+    padding: 10px 10px 6px;
+    gap: 6px;
+  }
+
+  /* 一言とライセンスの行を足しても、390px の高さに収める。押せる範囲は48pxのまま、行の高さだけを詰める（上下に重ねる） */
+  .sy-credit {
+    height: 20px;
+  }
+
+  .sy-credit-link {
+    margin: -14px 0;
+  }
+
+  .sy-menu {
+    gap: 8px;
+  }
+
+  .sy-menu-item,
+  .sy-menu-item--red {
+    min-height: 56px;
+    padding-top: 4px;
+    padding-bottom: 4px;
+  }
+
+  .sy-menu-item--red .sy-menu-main {
+    font-size: 20px;
+  }
+
+  .sy-menu-main {
+    font-size: 18px;
+  }
+
+  .sy-menu-sub {
+    font-size: 13px;
+  }
+
+  .sy-menu-tile {
+    width: 40px;
+    height: 40px;
+  }
+
+  .sy-page {
+    padding-top: calc(var(--sat) + var(--awning) + 4px);
+    gap: 10px;
+  }
+
+  .sy-bar {
+    min-height: 48px;
+  }
+
+  .sy-h1 {
+    font-size: 22px;
+  }
+
+  .sy-chars-grid {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+
+  .sy-char-box {
+    min-height: 82px;
+    padding-top: 4px;
+    padding-bottom: 4px;
+  }
+
+  .sy-char-box .sy-face {
+    width: 52px;
+    height: 52px;
+  }
+
+  /* 横持ちは高さが足りないので、前置きの1行を省いて、強さの3つを横に並べる */
+  .sy-page .sy-lead {
+    display: none;
+  }
+
+  .sy-levels-list {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  .sy-level {
+    flex: 1 1 200px;
+    min-height: 64px;
+    grid-template-areas:
+      'name go'
+      'desc desc';
+    align-content: center;
+  }
+
+  .sy-layer[data-screen='solo'] .sy-page {
+    max-width: 1080px;
+  }
+
+  .sy-match {
+    padding: 12px 16px;
+    gap: 8px;
+  }
+
+  .sy-ring,
+  .sy-ring svg {
+    width: 92px;
+    height: 92px;
+  }
+
+  .sy-ring-center {
+    padding-top: 24px;
+  }
+
+  .sy-ring-num {
+    font-size: 32px;
+  }
+
+  .sy-hero {
+    padding-top: 22px;
+  }
+
+  .sy-results-head {
+    gap: 2px;
+  }
+
+  .sy-results-headline {
+    font-size: 30px;
+  }
+
+  .sy-results-headline.is-long {
+    font-size: 24px;
+  }
+
+  .sy-bottom-bar {
+    padding-top: 6px;
+    padding-bottom: calc(var(--sab) + 6px);
+  }
+
+  /* 白い字を赤に載せるので、大きい字（19px 以上の太字）のままにする */
+  .sy-bottom-bar .sy-btn--big {
+    min-height: 52px;
+    font-size: 19px;
+  }
+
+  .sy-bar-hint {
+    flex-basis: auto;
+  }
+
+  .sy-hero-face .sy-face {
+    width: 72px;
+    height: 72px;
+  }
+
+  /* 横持ちの勝者：顔を左、名前・点・称号を右に並べて、低い画面に収める */
+  .sy-hero {
+    padding: 18px 14px 12px;
+    margin-top: 12px;
+  }
+
+  .sy-hero-person {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    column-gap: 14px;
+    row-gap: 2px;
+    align-items: center;
+    justify-items: start;
+    text-align: left;
+  }
+
+  .sy-hero-person > .sy-hero-face {
+    grid-row: 1 / span 4;
+  }
+
+  .sy-hero-name,
+  .sy-hero-score,
+  .sy-hero-title {
+    justify-content: flex-start;
+  }
+
+  .sy-hero-score {
+    flex-wrap: nowrap;
+  }
+
+  .sy-hero-score-num {
+    font-size: 40px;
+  }
+
+  .sy-hero.is-multi .sy-hero-score-num {
+    font-size: 30px;
+  }
+
+  .sy-hero:not(.is-multi) .sy-hero-crown {
+    left: 52px;
+  }
+}
+
+/* スマホの縦：順位の行は顔を省いて名前の幅を取る（勝者の顔は上の大きな欄に出ている。印が色・形・番号を見せる） */
+@media (max-width: 479px) {
+  .sy-rank-row {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    grid-template-areas:
+      'no name score'
+      'no title title';
+  }
+
+  .sy-rank-row > .sy-face {
+    display: none;
+  }
+}
+
+/* とても狭い画面（320px など） */
+@media (max-width: 359px) {
+  .sy-logo {
+    padding: 8px 14px 12px 34px;
+  }
+
+  .sy-logo::before {
+    left: 9px;
+  }
+
+  .sy-chars-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+}
+
+/* 動きを減らす設定：揺れ・回転・跳ねを止める */
+@media (prefers-reduced-motion: reduce) {
+  .sy-root *,
+  .sy-root *::before,
+  .sy-root *::after {
+    animation-duration: 0.001s !important;
+    animation-delay: 0s !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001s !important;
+  }
+
+  .sy-spinner {
+    border-color: var(--red) var(--yellow) var(--line) var(--line);
+  }
+
+  .sy-btn:active:not([aria-disabled='true']) {
+    transform: none;
+  }
+}

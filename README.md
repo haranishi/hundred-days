@@ -139,7 +139,7 @@ Day 051「ハコニワ」も外部公開アプリです。本体は独立リポ�
 | 091 | バーチャルオフィス | [制作記録のみ](day-091-virtual-office/) | [紹介ページ](https://day91.rairakku.com/) |
 | 092 | てことば — 3Dの手で覚える手話と指文字 | [day-092-shuwa/](day-092-shuwa/) | [アプリを開く](https://rairakku.com/100days/day-092-shuwa/) |
 | 093 | find | [制作記録のみ](day-093-find/) | [紹介ページ](https://day93.rairakku.com/) |
-| 094 | スーパーやりたい放題 | [制作記録のみ](day-094-super-yaritai/) | [紹介ページ](https://day94.rairakku.com/) |
+| 094 | スーパーやりたい放題 | [day-094-super-yaritai/](day-094-super-yaritai/) | [紹介ページ](https://day94.rairakku.com/) |
 <!-- day-index:end -->
 
 ## 1日アプリのルール
@@ -195,5 +195,7 @@ canonical・OGPの基準は `SITE.canonicalBase`（既定 `https://rairakku.com/
 独自のソースコードは原則 [MIT](LICENSE) です。Day64のPyMuPDFを使うオフラインPDF抽出ツールとそのテストは [AGPL-3.0-or-later](day-064-breach-atlas/source/tools/LICENSE-AGPL-3.0.txt)（対象は同DayのREADME参照）。**第三者データ・資料・ライブラリは、配置場所にかかわらずMITの対象外**で、
 ODbL 1.0 や CC BY-SA 3.0（継承あり）など、それぞれ別の条件が付きます。
 使っているデータの出どころ・ライセンス・加工した内容は [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) にまとめてあります。
+
+コードがこのリポジトリにあるDayは、フォルダ直下にも同じ内容の `LICENSE`（MIT）を置いています。フォルダだけ取り出しても条件が分かります（本番サイトには配信しません）。アプリ本体のコードがここに無い外部Day（`meta.json` が `status: external` で、`source/` が無いもの）には置いていません。このMITは、その製品本体には及ばないためです。置き忘れは `scripts/tests/day-license.test.mjs` が見つけます。
 
 Day64「漏洩の地図」は[公開アプリ](https://hundred-days.pages.dev/day-064-breach-atlas/)として登録しています。[ローカル起動・収録範囲](day-064-breach-atlas/README.md)：日本の公表・報道4,652件と米国政府の届出記録13,349件、計18,001記録。国内は201件から約23.1倍へ拡充し、自治体の公式一括公表から2,130記録を追加。Obsidianのデザインメモを参考に、企業検索・一覧・詳細を見分けやすい明るいUIへ改善。年代・原因・規模の探索とRust/WebAssemblyによる検索・集計を実装しています。地球儀を残し、検索・一覧・備えの学習に入口を整理。原因別の確認の問いとIPAなどの公的資料から、個人の確認や組織の学習に役立てる構成へ改善しています。

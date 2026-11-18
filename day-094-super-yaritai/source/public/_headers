@@ -1,0 +1,11 @@
+# 静的配信（Cloudflare Pages と Workers の assets）が付ける見出し。Worker の応答（/api/*）にも src/worker が同じものを付ける。
+# connect-src に Worker の https・wss を足したのは、画面を Pages（別の住所）から配るため。
+# - script-src の 'wasm-unsafe-eval'：物理エンジン Rapier（WebAssembly）を動かすため。eval は許さない
+# - style-src の 'unsafe-inline'：画面が要素に直接付ける色（style 属性）のため
+/*
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self' https://super-yaritai.haranishi.workers.dev wss://super-yaritai.haranishi.workers.dev; media-src 'self' data: blob:; worker-src 'self' blob:; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=()
+  Cross-Origin-Opener-Policy: same-origin
