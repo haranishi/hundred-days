@@ -48,17 +48,19 @@ function link(label, href, className = '') {
   return node;
 }
 
-async function copy(text) {
+async function copy(text, trigger, isCurrent = () => true) {
   try {
     await navigator.clipboard.writeText(text);
     return true;
   } catch {
+    // 待っているあいだに別の操作が始まっていたら、古いコピーは、代替の手段（選択・フォーカスの移動）に進まない
+    if (!isCurrent()) return false;
     // クリップボードAPIが使えない環境（古いSafari・http接続など）向けの逃げ道
     const area = document.createElement('textarea');
     area.value = text;
     area.setAttribute('readonly', '');
     area.style.cssText = 'position:fixed;top:-1000px;opacity:0';
-    document.body.append(area);
+    trigger.parentElement.append(area);
     area.select();
     let ok = false;
     try {
@@ -67,6 +69,7 @@ async function copy(text) {
       ok = false;
     }
     area.remove();
+    trigger.focus({ preventScroll: true });
     return ok;
   }
 }
@@ -94,10 +97,21 @@ function mountShare(host) {
   if (navigator.share) {
     const native = button('共有…', 'share__button--primary');
     native.addEventListener('click', async () => {
+      // 前の操作の表示（コピーの完了・共有の失敗・手動コピー欄）を消してから始める。再試行がうまくいっても、古い表示が残らないようにする
+      const mine = ++operation;
+      clearTimeout(resetTimer);
+      said.textContent = '';
+      delete copyButton.dataset.done;
+      manual.hidden = true;
       try {
         await navigator.share({ title: text, text, url });
-      } catch {
-        // 利用者が閉じただけ。何も出さない
+      } catch (error) {
+        // 待っているあいだに別の操作（コピー）が始まっていたら、この古い失敗で、新しい表示を上書きしない
+        if (mine !== operation) return;
+        if (error?.name !== 'AbortError') {
+          clearTimeout(resetTimer);
+          said.textContent = '共有できませんでした。「リンクをコピー」をお試しください。';
+        }
       }
     });
     row.append(native);
@@ -110,17 +124,34 @@ function mountShare(host) {
   said.className = 'share__said';
   said.setAttribute('role', 'status');
   said.setAttribute('aria-live', 'polite');
+  const manual = document.createElement('input');
+  manual.readOnly = true;
+  manual.value = url;
+  manual.hidden = true;
+  manual.setAttribute('aria-label', '手動でコピーするリンク');
+  let resetTimer;
+  // 最後に始めた操作（共有・コピー）の番号。遅れて終わった古い操作が、新しい操作の表示を書き換えないために使う
+  let operation = 0;
   copyButton.addEventListener('click', async () => {
-    const ok = await copy(url);
+    const mine = ++operation;
+    const ok = await copy(url, copyButton, () => mine === operation);
+    // 待っているあいだに別の操作（共有・もう一度のコピー）が始まっていたら、新しい操作の表示を優先する
+    if (mine !== operation) return;
+    clearTimeout(resetTimer);
+    manual.hidden = ok;
+    if (!ok) {
+      manual.focus();
+      manual.select();
+    }
     said.textContent = ok ? 'コピーしました' : 'コピーできませんでした。URLを選んでコピーしてください';
     copyButton.dataset.done = String(ok);
-    setTimeout(() => {
+    if (ok) resetTimer = setTimeout(() => {
       said.textContent = '';
       delete copyButton.dataset.done;
     }, 4000);
   });
   row.append(copyButton);
-  box.append(row, said);
+  box.append(row, said, manual);
 
   const note = document.createElement('p');
   note.className = 'share__note';
