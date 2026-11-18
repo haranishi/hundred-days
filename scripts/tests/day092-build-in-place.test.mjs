@@ -36,6 +36,7 @@ test('その場（<Day>/source から <Day> へ）の作り直しは、自分の
     const day = join(base, 'day-092-test');
     mkdirSync(day, { recursive: true });
     writeFileSync(join(day, 'meta.json'), '{"day":92}\n');
+    writeFileSync(join(day, 'LICENSE'), 'MIT License\n');
     makeSourceTree(join(day, 'source'));
 
     const r = build(join(day, 'source'), '..');
@@ -45,6 +46,7 @@ test('その場（<Day>/source から <Day> へ）の作り直しは、自分の
     assert.ok(existsSync(join(day, 'source/tools/build-day092.mjs')), 'source/ の道具が残っている');
     assert.ok(existsSync(join(day, 'index.html')), 'dist が Day のフォルダへ写っている');
     assert.equal(readFileSync(join(day, 'meta.json'), 'utf8'), '{"day":92}\n', '100日側で管理する物が残っている');
+    assert.equal(readFileSync(join(day, 'LICENSE'), 'utf8'), 'MIT License\n', '100日側で置く LICENSE が残っている');
   });
 });
 
@@ -55,6 +57,7 @@ test('別の場所から作る通常の作り直しは、前回写した物を�
     const day = join(base, 'hundred-days', 'day-092-test');
     mkdirSync(join(day, 'source'), { recursive: true });
     writeFileSync(join(day, 'meta.json'), '{"day":92}\n');
+    writeFileSync(join(day, 'LICENSE'), 'MIT License\n');
     writeFileSync(join(day, 'stale.js'), 'old\n');
     writeFileSync(join(day, 'source/stale.txt'), 'old\n');
 
@@ -66,6 +69,7 @@ test('別の場所から作る通常の作り直しは、前回写した物を�
     assert.ok(existsSync(join(day, 'source/src/main.ts')), 'source/ は元のコードから写し直される');
     assert.ok(existsSync(join(day, 'index.html')));
     assert.equal(readFileSync(join(day, 'meta.json'), 'utf8'), '{"day":92}\n');
+    assert.equal(readFileSync(join(day, 'LICENSE'), 'utf8'), 'MIT License\n', '100日側で置く LICENSE が残っている');
   });
 });
 
