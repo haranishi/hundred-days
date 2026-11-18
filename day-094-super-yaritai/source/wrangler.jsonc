@@ -1,0 +1,26 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "super-yaritai",
+  "main": "src/worker/index.ts",
+  "compatibility_date": "2026-10-01",
+  "assets": {
+    "directory": "./dist/client",
+    "binding": "ASSETS",
+    "not_found_handling": "404-page",
+    "run_worker_first": ["/api/*"]
+  },
+  "durable_objects": {
+    "bindings": [
+      { "name": "ROOMS", "class_name": "RoomDO" },
+      { "name": "LOBBY", "class_name": "LobbyDO" },
+      // 1日の使用量を数える（ブレーカー。docs/05「使用量と無料枠」）
+      { "name": "USAGE", "class_name": "UsageDO" }
+    ]
+  },
+  "ratelimits": [
+    { "name": "ROOM_CREATE_LIMIT", "namespace_id": "26100601", "simple": { "limit": 5, "period": 60 } },
+    { "name": "MATCH_LIMIT", "namespace_id": "26100602", "simple": { "limit": 6, "period": 60 } },
+    { "name": "ROOM_CONNECT_LIMIT", "namespace_id": "26100603", "simple": { "limit": 30, "period": 60 } }
+  ],
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["RoomDO", "LobbyDO", "UsageDO"] }]
+}
