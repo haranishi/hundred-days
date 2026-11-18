@@ -1,0 +1,36 @@
+{
+  "name": "super-yaritai",
+  "private": true,
+  "version": "0.1.0",
+  "description": "スーパーやりたい放題：スーパーで「やっちゃダメ」なことを2分間やりまくり、荒らし度を競うブラウザの3Dゲーム。ひとりでも、ネット対戦でも",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --port 5331 --strictPort",
+    "build": "npm run typecheck && vite build",
+    "preview": "vite preview --port 5332 --strictPort",
+    "typecheck": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p tsconfig.worker.json",
+    "test": "vitest run",
+    "e2e": "playwright test",
+    "e2e:online": "E2E_ONLINE=1 playwright test",
+    "e2e:split": "node tools/split-e2e.mjs",
+    "shots": "node tools/shots.mjs",
+    "cf:dev": "wrangler dev --port 8798",
+    "cf:deploy": "wrangler deploy",
+    "pages:deploy": "npm run build && wrangler pages deploy dist/client --project-name super-yaritai-day94 --branch main --commit-dirty=true"
+  },
+  "dependencies": {
+    "@dimforge/rapier3d-compat": "0.21.0",
+    "three": "0.186.1"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "5.20261023.1",
+    "@playwright/test": "1.63.0",
+    "@types/node": "24.x",
+    "@types/three": "0.186.0",
+    "pngjs": "7.0.0",
+    "typescript": "~6.0.3",
+    "vite": "8.3.5",
+    "vitest": "5.0.3",
+    "wrangler": "4.153.0"
+  }
+}

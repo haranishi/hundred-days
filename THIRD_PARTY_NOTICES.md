@@ -6,7 +6,7 @@
 
 Day056の配信ビルドに含む第三者ライブラリ・移植実装・検索画像には、`day-056-dragon-rush/game/licenses/` の個別の許諾が適用されます。
 
-ただし `day-*/data/` と `day-*/tests/fixtures/` 配下の第三者データと、`day-053-kotoba-tsuji/fonts/` と `static/assets/fonts/` の書体（SIL Open Font License 1.1）、`day-054-what-vanished/assets/` の3Dモデルと質感画像（Poly Haven・CC0 1.0）、`day-082-kageuchi/assets/` と `day-082-kageuchi/source/src/art/textures/` の写真の質感（Poly Haven・CC0 1.0）は MIT の対象外で、それぞれ別のライセンスが適用されます。内訳は、このファイルの下表にあります。とくに次の2つは、再配布するときに条件が付きます。
+ただし `day-*/data/` と `day-*/tests/fixtures/` 配下の第三者データと、`day-053-kotoba-tsuji/fonts/` と `static/assets/fonts/` の書体（SIL Open Font License 1.1）、`day-054-what-vanished/assets/` の3Dモデルと質感画像（Poly Haven・CC0 1.0）、`day-082-kageuchi/assets/` と `day-082-kageuchi/source/src/art/textures/` の写真の質感（Poly Haven・CC0 1.0）、`day-094-super-yaritai/source/public/models/` の3Dモデルと `day-094-super-yaritai/source/public/ui/chars/` の顔の画像（Kenney・CC0 1.0）は MIT の対象外で、それぞれ別のライセンスが適用されます。内訳は、このファイルの下表にあります。とくに次の2つは、再配布するときに条件が付きます。
 
 - `day-036-stroke-by-stroke/data/` は CC BY-SA 3.0（継承あり）
 - `day-008-vending-radar/data/`、`day-029-nearby-wifi/data/`、`day-030-world-window/data/` は ODbL 1.0（OpenStreetMap 由来）
@@ -222,3 +222,10 @@ PowerPoint のブラウザ内変換は、未改変の公式 ZetaOffice 24.2.8.0.
 ## Day086: OpenPOI API
 
 施設検索は [OpenPOI API](https://openpoiapi.com/attribution.html) を使用。元データの帰属・ライセンスとFoursquare通知は [Day086のNOTICE](day-086-chakuchiten/NOTICE.txt) を参照。画面のイラストは独自制作。
+
+## Day094 スーパーやりたい放題
+
+ゲームのソースは `day-094-super-yaritai/source/` にあり、このリポジトリの MIT（[LICENSE](LICENSE)）です。
+3Dモデルと、そこから作った顔の画像は Kenney の Mini Market・Mini Characters・Food Kit 2.0（いずれも CC0 1.0）です。出どころは `source/public/models/LICENSES.md` と `source/public/ui/LICENSES.md`。
+配信するゲームの画面に含む three.js（MIT）と Rapier（`@dimforge/rapier3d-compat`・Apache-2.0）の許諾の全文は `source/public/licenses.txt`（ゲームの [licenses.txt](https://day94.rairakku.com/licenses.txt) と同じ）にあります。
+効果音と宣伝動画のBGMは、コードで合成した自作です。宣伝動画の字幕の書体（Zen Kaku Gothic New・SIL Open Font License 1.1）は、リポジトリに入れていません。

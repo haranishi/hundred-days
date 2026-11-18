@@ -25,7 +25,8 @@ const rows = readdirSync(root, { withFileTypes: true })
     if (meta.day !== day || seen.has(day)) throw new Error(`Day番号の不一致または重複: ${dir}`);
     seen.add(day);
     if (!existsSync(join(root, dir, 'README.md'))) throw new Error(`READMEがありません: ${dir}`);
-    const hasCode = existsSync(join(root, dir, 'index.html'));
+    // 本体がDayのフォルダ直下にある（index.html）か、ソース一式を source/ に同梱している（package.json）Dayは、コードへのリンクを出す
+    const hasCode = existsSync(join(root, dir, 'index.html')) || existsSync(join(root, dir, 'source', 'package.json'));
     const url = meta.status === 'draft' ? '' : (meta.externalUrl || meta.publicUrl || '');
     if (url && !/^https:\/\//.test(url)) throw new Error(`公開URLを確認してください: ${dir}`);
     const code = hasCode ? `[${dir}/](${dir}/)` : `[制作記録のみ](${dir}/)`;
