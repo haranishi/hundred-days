@@ -48,7 +48,7 @@ function link(label, href, className = '') {
   return node;
 }
 
-async function copy(text) {
+async function copy(text, trigger) {
   try {
     await navigator.clipboard.writeText(text);
     return true;
@@ -58,7 +58,7 @@ async function copy(text) {
     area.value = text;
     area.setAttribute('readonly', '');
     area.style.cssText = 'position:fixed;top:-1000px;opacity:0';
-    document.body.append(area);
+    trigger.parentElement.append(area);
     area.select();
     let ok = false;
     try {
@@ -67,6 +67,7 @@ async function copy(text) {
       ok = false;
     }
     area.remove();
+    trigger.focus({ preventScroll: true });
     return ok;
   }
 }
@@ -96,8 +97,11 @@ function mountShare(host) {
     native.addEventListener('click', async () => {
       try {
         await navigator.share({ title: text, text, url });
-      } catch {
-        // 利用者が閉じただけ。何も出さない
+      } catch (error) {
+        if (error?.name !== 'AbortError') {
+          clearTimeout(resetTimer);
+          said.textContent = '共有できませんでした。「リンクをコピー」をお試しください。';
+        }
       }
     });
     row.append(native);
@@ -110,17 +114,29 @@ function mountShare(host) {
   said.className = 'share__said';
   said.setAttribute('role', 'status');
   said.setAttribute('aria-live', 'polite');
+  const manual = document.createElement('input');
+  manual.readOnly = true;
+  manual.value = url;
+  manual.hidden = true;
+  manual.setAttribute('aria-label', '手動でコピーするリンク');
+  let resetTimer;
   copyButton.addEventListener('click', async () => {
-    const ok = await copy(url);
+    const ok = await copy(url, copyButton);
+    clearTimeout(resetTimer);
+    manual.hidden = ok;
+    if (!ok) {
+      manual.focus();
+      manual.select();
+    }
     said.textContent = ok ? 'コピーしました' : 'コピーできませんでした。URLを選んでコピーしてください';
     copyButton.dataset.done = String(ok);
-    setTimeout(() => {
+    if (ok) resetTimer = setTimeout(() => {
       said.textContent = '';
       delete copyButton.dataset.done;
     }, 4000);
   });
   row.append(copyButton);
-  box.append(row, said);
+  box.append(row, said, manual);
 
   const note = document.createElement('p');
   note.className = 'share__note';
