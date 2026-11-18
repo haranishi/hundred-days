@@ -139,6 +139,7 @@ Day 051「ハコニワ」も外部公開アプリです。本体は独立リポ�
 | 091 | バーチャルオフィス | [制作記録のみ](day-091-virtual-office/) | [紹介ページ](https://day91.rairakku.com/) |
 | 092 | てことば — 3Dの手で覚える手話と指文字 | [day-092-shuwa/](day-092-shuwa/) | [アプリを開く](https://rairakku.com/100days/day-092-shuwa/) |
 | 093 | find | [制作記録のみ](day-093-find/) | [紹介ページ](https://day93.rairakku.com/) |
+| 094 | スーパーやりたい放題 | [制作記録のみ](day-094-super-yaritai/) | [紹介ページ](https://day94.rairakku.com/) |
 <!-- day-index:end -->
 
 ## 1日アプリのルール
