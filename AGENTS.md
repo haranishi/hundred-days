@@ -19,6 +19,7 @@ PR前の自動検査とマージ条件は [CI手順](docs/ci.md) を参照する
 - 本人が下書きを指定しない限り、公開ゲートを通した`status: "published"`の状態でPRを出す。マージとX投稿は本人が行う。
 - 下書きのまま出すときは、最終報告の冒頭で「このPRをマージしても本番には出ない」と伝える。
 - 公開時に新しい契約違反が見つかったら、同じPRで`scripts/lib/publish-contract.mjs`に契約として足す。理由と事故は [公開の契約](.kiro/steering/publish-contract.md) に残す。
+- コードがこのリポジトリにあるDay（`status` が `external` 以外。外部Dayでも `source/` にコードを置くなら同じ）は、フォルダ直下に、リポジトリ直下のMITと同じ `LICENSE` を置く（`cp LICENSE day-NNN-xxx/LICENSE`）。置き忘れは `scripts/tests/day-license.test.mjs` が落とす。本番には配信しない（`scripts/lib/dist-files.mjs`）。
 
 - 公開物の中のサイト内参照は文書相対にする。ルート直下の絶対パスを書かない（`/api/day-NNN/` だけ例外）。`npm run build` が検査する。
 - `meta.json` の `publicUrl`（Xの返信リンクと、README の一覧のリンクになる）は、公開済みで一覧にマウントされるすべてのDayで `https://rairakku.com/100days/<フォルダ名>/` にする（2026-10-30にDay080から試験運用し、2026-11-01に本人が全Dayへ広げた）。例外は meta.json で見分ける：`mount: false` のDay（Day064・076。作り直すまで）は `https://hundred-days.pages.dev/<フォルダ名>/` のまま、外部で公開するDay（`status: external`）は外部の公開先、下書き（`draft`）は対象外。新しいDayでも守られているかは `scripts/tests/public-url-contract.test.mjs` が見張る。止めるときは、この行を消して、各Dayの `publicUrl` を元に戻す。住所の全体像は [公開の住所と配信の構成](.kiro/steering/public-urls.md)。詳細は [返信リンクの試験運用](.kiro/specs/reply-link-trial/requirements.md)。
