@@ -144,3 +144,96 @@ test('大文字小文字を区別しないファイルシステムで、同じ�
     assert.ok(existsSync(join(day, 'index.html')), 'dist が Day のフォルダへ写っている');
   });
 });
+
+test('dist/ の名前の衝突は、綴りの違い（license など）も同じ物として止める（macOS は大文字小文字を区別しない）', () => {
+  withTempDir((base) => {
+    const day = join(base, 'day-092-test');
+    mkdirSync(day, { recursive: true });
+    writeFileSync(join(day, 'LICENSE'), 'MIT License\n');
+    writeFileSync(join(day, 'old.js'), 'old\n');
+    const src = join(day, 'source');
+    makeSourceTree(src);
+    writeFileSync(join(src, 'dist/license'), 'ほかの内容\n');
+
+    const r = build(src, '..');
+
+    assert.notEqual(r.status, 0);
+    assert.match(r.stderr, /license/);
+    assert.equal(readFileSync(join(day, 'LICENSE'), 'utf8'), 'MIT License\n', 'LICENSE は上書きされない');
+    assert.ok(existsSync(join(day, 'old.js')), '何も消さずに止まる');
+  });
+});
+
+test('dist がシンボリックリンクのときは、前回の公開物を消す前に止まる', () => {
+  withTempDir((base) => {
+    const day = join(base, 'day-092-test');
+    mkdirSync(day, { recursive: true });
+    writeFileSync(join(day, 'old.js'), 'old\n');
+    const src = join(day, 'source');
+    makeSourceTree(src);
+    const realDist = join(base, 'dist-real');
+    mkdirSync(realDist);
+    writeFileSync(join(realDist, 'index.html'), '<!doctype html><title>built</title>\n');
+    rmSync(join(src, 'dist'), { recursive: true, force: true });
+    symlinkSync(realDist, join(src, 'dist'));
+
+    const r = build(src, '..');
+
+    assert.notEqual(r.status, 0);
+    assert.match(r.stderr, /シンボリックリンク/);
+    assert.ok(existsSync(join(day, 'old.js')), '前回の公開物を消す前に止まる');
+    assert.ok(existsSync(join(src, 'src/main.ts')), '元のコードは消えない');
+  });
+});
+
+test('「リンク/..」は、文字列で畳まず、OS がリンクをたどった先で解釈する', () => {
+  withTempDir((base) => {
+    const wrong = join(base, 'day-092-test'); // 文字列で「link/..」を畳むと、こちらになる
+    const right = join(base, 'sub', 'day-092-test'); // リンクをたどった先の親にある、こちらが本来の出力先
+    mkdirSync(wrong, { recursive: true });
+    mkdirSync(right, { recursive: true });
+    mkdirSync(join(base, 'sub', 'child'), { recursive: true });
+    symlinkSync(join(base, 'sub', 'child'), join(base, 'link'));
+    const src = join(base, 'workspace');
+    makeSourceTree(src);
+
+    // join() は「link/..」を畳んでしまうので、文字列のまま渡す
+    const r = build(src, `${base}/link/../day-092-test`);
+
+    assert.equal(r.status, 0, r.stderr);
+    assert.ok(existsSync(join(right, 'index.html')), 'リンクをたどった先の Day に写る');
+    assert.ok(!existsSync(join(wrong, 'index.html')), '文字列で畳んだ先の Day には写らない');
+  });
+});
+
+test('Day の source がシンボリックリンクのときは、「その場の作り直し」とみなさず、重なりとして拒む（元のコードを含む親を消さない）', () => {
+  withTempDir((base) => {
+    const day = join(base, 'day-092-test');
+    const real = join(day, 'nested', 'workspace');
+    makeSourceTree(real);
+    symlinkSync(real, join(day, 'source'));
+    writeFileSync(join(day, 'keep.txt'), 'keep\n');
+
+    const r = build(real, day);
+
+    assert.notEqual(r.status, 0);
+    assert.match(r.stderr, /重なっています/);
+    assert.ok(existsSync(join(real, 'src/main.ts')), '元のコードを含む nested/ は消えない');
+    assert.ok(existsSync(join(day, 'keep.txt')), '出力先の物も消えない');
+  });
+});
+
+test('元のコードのフォルダの実名が source でない（SOURCE など）ときは、「その場の作り直し」とみなさず、何も消さずに止まる', () => {
+  withTempDir((base) => {
+    const day = join(base, 'day-092-test');
+    const upper = join(day, 'SOURCE');
+    makeSourceTree(upper);
+    writeFileSync(join(day, 'keep.txt'), 'keep\n');
+
+    const r = build(upper, day);
+
+    assert.notEqual(r.status, 0);
+    assert.ok(existsSync(join(upper, 'src/main.ts')), '元のコードは消えない');
+    assert.ok(existsSync(join(day, 'keep.txt')), '出力先の物も消えない');
+  });
+});

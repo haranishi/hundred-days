@@ -4,21 +4,22 @@
  * 2) 元のコード（tools/day092-files.mjs の一覧）を <Day>/source/ へ写す
  * Day のフォルダにある meta.json・README.md・LICENSE・screenshot.*・og.png・demo.mp4・tools/ は残す（100日側で管理する物）
  */
-import { cpSync, existsSync, mkdirSync, readdirSync, realpathSync, rmSync, statSync } from 'node:fs';
-import { basename, dirname, join, resolve, sep } from 'node:path';
+import { cpSync, existsSync, lstatSync, mkdirSync, readdirSync, realpathSync, rmSync, statSync } from 'node:fs';
+import { basename, dirname, join, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { SOURCE_FILES } from './day092-files.mjs';
 
-/* 場所の比べ方。入力の綴りでなく、OS が持つ本当の綴りと、中身（デバイスと inode）で比べる。
+/* 場所の比べ方。入力の綴りでなく、OS が持つ本当の綴りに直してから比べる。
    既定の realpathSync は大文字小文字を入力のまま返すので、macOS で同じフォルダを別の綴りで渡されると、
    「別の場所」と判定して、自分の source/ を消していた。realpathSync.native は、OS が持つ綴りに直して返す。 */
 const real = (path) => realpathSync.native(path);
 
-/* まだ無い出力先は、いちばん近い既存の親だけを正規化し、残りをそのままつなぐ。
+/* まだ無い出力先は、いちばん近い既存の親だけを OS に解決させ、残りをそのままつなぐ。
+   「リンク/..」のような指定は、文字列で畳まず、OS がリンクをたどった先で解釈させる（resolve() で先に畳まない）。
    元のコードを指すシンボリックリンクの下の未作成フォルダも、重なりの判定に載る。 */
 function realAllowMissing(path) {
   const rest = [];
-  let current = resolve(path);
+  let current = path;
   while (!existsSync(current)) {
     const parent = dirname(current);
     if (parent === current) break;
@@ -28,6 +29,8 @@ function realAllowMissing(path) {
   return join(real(current), ...rest);
 }
 
+/* 同じフォルダか（デバイスと inode）。使うのは「拒否を増やす」側（重なりの判定）だけ。
+   「その場の作り直し」の判定には使わない。広げると、source がリンクのときなどに、元のコードを含む親まで消す */
 function sameDir(a, b) {
   try {
     const x = statSync(a);
@@ -44,7 +47,7 @@ if (!target || !/^day-092-[\w-]+$/.test(basename(target))) {
   console.error('使い方: node tools/build-day092.mjs <…/hundred-days/day-092-…>');
   process.exit(1);
 }
-const inPlace = sameDir(join(target, 'source'), root);
+const inPlace = join(target, 'source') === root;
 if (!inPlace && (sameDir(root, target) || root.startsWith(target + sep) || target.startsWith(root + sep))) {
   throw new Error('出力先と元のコードが重なっています');
 }
@@ -53,11 +56,17 @@ if (!existsSync(join(dist, 'index.html'))) {
   console.error('dist がありません。先に npm run build を流してください');
   process.exit(1);
 }
+// dist がリンクだと、前回の公開物を消したあとで、コピーが失敗する
+if (!lstatSync(dist).isDirectory()) {
+  console.error('dist がシンボリックリンクです。実際のフォルダにしてから、もう一度流してください');
+  process.exit(1);
+}
 // LICENSE は、リポジトリ直下のMITの写し（scripts/tests/day-license.test.mjs が見張る）。消すと、次の100日のCIが落ちる
 const KEEP = new Set(['meta.json', 'README.md', 'LICENSE', 'screenshot.png', 'screenshot.webp', 'og.png', 'demo.mp4', 'tools']);
 /* 残す物は、消さないだけでは守れない。dist/ に同じ名前があると、あとの cpSync が上書きする（LICENSE・meta.json・source/ など）。
-   何かを消す前に止める */
-const clash = readdirSync(dist).filter((name) => KEEP.has(name) || name === 'source');
+   macOS は大文字小文字を区別しないので、綴りの違い（license など）も同じ物として、何かを消す前に止める */
+const reserved = new Set([...KEEP, 'source'].map((name) => name.toLowerCase()));
+const clash = readdirSync(dist).filter((name) => reserved.has(name.toLowerCase()));
 if (clash.length) {
   console.error(`dist/ に、Day のフォルダで残す名前（${clash.join('・')}）があります。コピーで上書きされるので、先に dist/ から外してください`);
   process.exit(1);
