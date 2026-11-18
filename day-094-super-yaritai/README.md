@@ -16,8 +16,12 @@
 
 登録やログインは要りません。名前は8字まで、ランキングや成績の保存はありません。効果音とBGMはブラウザの中で合成していて、外部の音源やフォントは読み込みません。3Dの素材は Kenney（CC0）です。
 
+## コードと宣伝動画
+
+ゲームのソースは [`source/`](source/) に置いています（リポジトリ直下の MIT ライセンス）。動かし方・試験・自分の環境への配信手順は [`source/README.md`](source/README.md)、設計書は [`source/docs/`](source/docs/) にあります。3Dの素材（Kenney・CC0）、three.js（MIT）、Rapier（Apache-2.0）の許諾は [`source/public/licenses.txt`](source/public/licenses.txt) と、リポジトリ直下の [THIRD_PARTY_NOTICES.md](../THIRD_PARTY_NOTICES.md) にあります。
+
+宣伝動画（縦型30秒・BGM 2案）の撮影・組み立て・BGM合成の道具は [`source/tools/promo/`](source/tools/promo/README.md) です。映像は、実際のゲームを1コマずつ撮ったものです（撮影用の視点・演出・字幕・BGMを加えています）。一覧のカードの動画（`demo.mp4`）は、その映像から切り出した16秒です。
+
 ## このDayの記録
 
-このDayの成果物はWebアプリです。コードは公開していません。ここにあるのは、一覧に載せるための記録（meta.json・スクリーンショット）です。
-
-構成は Day091 と同じ外部Dayです。画面は専用の Pages に置き、ネット対戦の部屋と相手探しは別のアカウントの Worker（Durable Objects）が受け持ちます。許可した住所の画面からの接続だけを受けます。
+構成は Day091 と同じ外部Dayです。画面は専用の Pages に置き、ネット対戦の部屋と相手探しは別の Worker（Durable Objects）が受け持ちます。許可した住所の画面からの接続だけを受けます。

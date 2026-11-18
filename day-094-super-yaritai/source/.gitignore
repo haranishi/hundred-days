@@ -1,0 +1,17 @@
+node_modules/
+dist/
+.wrangler/
+test-results/
+test-results*/
+playwright-report/
+shots/
+out/
+frames/
+work-notes/
+.DS_Store
+*.log
+.dev.vars
+.env*
+# 元の素材パック（FBX・OBJ・プレビュー込み）は重いので入れない。使う GLB は public/models/ に写してある
+art-sources/third-party/*/
+!art-sources/third-party/README.md
