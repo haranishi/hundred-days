@@ -1,7 +1,7 @@
 // 管理対象の全npmプロジェクトを、install scriptを実行せずlockだけで監査する。
 import { execFileSync, spawnSync } from 'node:child_process';
 import { join } from 'node:path';
-import { auditResult, discoverProjects } from './lib/dependency-audit.mjs';
+import { AUDIT_TIMEOUT_MS, auditResult, discoverProjects, exceptionNotes } from './lib/dependency-audit.mjs';
 
 let failures = 0;
 try {
@@ -16,16 +16,18 @@ try {
       });
       if (validation.error || validation.signal || validation.status !== 0) throw Error('lockの依存グラフを検証できない（npm ciのdry-runが失敗）');
       const result = spawnSync('npm', ['audit', '--package-lock-only', '--ignore-scripts', '--include=dev', '--include=optional', '--include=peer', '--json', '--fetch-retries=0', '--fetch-timeout=45000'], {
-        cwd: join(root, directory), encoding: 'utf8', timeout: 60000, maxBuffer: 16 * 1024 * 1024,
+        cwd: join(root, directory), encoding: 'utf8', timeout: AUDIT_TIMEOUT_MS, maxBuffer: 16 * 1024 * 1024,
       });
       const counts = auditResult(result);
-      console.log(`${counts.passed ? 'OK' : 'FAIL'} ${JSON.stringify(directory)}: high=${counts.high} critical=${counts.critical} moderate=${counts.moderate} low=${counts.low}`);
+      const excepted = counts.excepted ? ` 例外${counts.excepted}件` : '';
+      console.log(`${counts.passed ? 'OK' : 'FAIL'} ${JSON.stringify(directory)}: high=${counts.high} critical=${counts.critical} moderate=${counts.moderate} low=${counts.low}${excepted}`);
       if (!counts.passed) failures++;
     } catch (error) {
       console.error(`FAIL ${JSON.stringify(directory)}: ${error.message}`);
       failures++;
     }
   }
+  for (const note of exceptionNotes()) console.log(note);
   console.log(`依存監査: ${projects.length}プロジェクト、失敗${failures}件`);
 } catch (error) {
   console.error(`依存監査を完了できない: ${error.message}`);
