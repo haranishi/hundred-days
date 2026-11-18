@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { spawnSync } from 'node:child_process';
@@ -83,7 +83,64 @@ test('出力先と元のコードが重なる（その場の形ではない）�
     const r = build(src, day);
 
     assert.notEqual(r.status, 0);
+    assert.match(r.stderr, /重なっています/, '別の理由で止まったのではなく、重なりを理由に止まる');
     assert.ok(existsSync(join(src, 'src/main.ts')), '元のコードは消えない');
     assert.ok(existsSync(join(day, 'keep.txt')), '出力先の物も消えない');
+  });
+});
+
+test('元のコードを指すシンボリックリンクの下の、まだ無い出力先も、重なりとして拒む', () => {
+  withTempDir((base) => {
+    const src = join(base, 'workspace');
+    makeSourceTree(src);
+    const link = join(base, 'link');
+    symlinkSync(src, link);
+
+    const r = build(src, join(link, 'day-092-new'));
+
+    assert.notEqual(r.status, 0);
+    assert.match(r.stderr, /重なっています/);
+    assert.ok(!existsSync(join(src, 'day-092-new')), '元のコードの中に、出力先を作らない');
+    assert.ok(existsSync(join(src, 'src/main.ts')), '元のコードは消えない');
+  });
+});
+
+test('dist/ に、Day のフォルダで残す名前（LICENSE など）があるときは、何も消さず・上書きせずに止まる', () => {
+  withTempDir((base) => {
+    const day = join(base, 'day-092-test');
+    mkdirSync(day, { recursive: true });
+    writeFileSync(join(day, 'LICENSE'), 'MIT License\n');
+    writeFileSync(join(day, 'old.js'), 'old\n');
+    const src = join(day, 'source');
+    makeSourceTree(src);
+    writeFileSync(join(src, 'dist/LICENSE'), 'ほかの内容\n');
+
+    const r = build(src, '..');
+
+    assert.notEqual(r.status, 0);
+    assert.match(r.stderr, /LICENSE/, '衝突した名前を伝える');
+    assert.equal(readFileSync(join(day, 'LICENSE'), 'utf8'), 'MIT License\n', 'LICENSE は上書きされない');
+    assert.ok(existsSync(join(day, 'old.js')), '何も消さずに止まる');
+    assert.ok(existsSync(join(src, 'src/main.ts')), '元のコードも消えない');
+  });
+});
+
+test('大文字小文字を区別しないファイルシステムで、同じフォルダを別の綴りで渡されても、自分の source/ を消さない', (t) => {
+  withTempDir((base) => {
+    const day = join(base, 'day-092-test');
+    mkdirSync(day, { recursive: true });
+    // 区別するファイルシステム（Linux の CI）では、別の綴りは別のフォルダになるので、この試験の対象外。macOS では実行される
+    if (!existsSync(join(base, 'day-092-TEST'))) {
+      t.skip('大文字小文字を区別するファイルシステムでは確かめられない');
+      return;
+    }
+    writeFileSync(join(day, 'meta.json'), '{"day":92}\n');
+    makeSourceTree(join(day, 'source'));
+
+    const r = build(join(day, 'source'), join(base, 'day-092-TEST'));
+
+    assert.equal(r.status, 0, r.stderr);
+    assert.ok(existsSync(join(day, 'source/src/main.ts')), '別の綴りで渡されても、source/ の元のコードが残っている');
+    assert.ok(existsSync(join(day, 'index.html')), 'dist が Day のフォルダへ写っている');
   });
 });
