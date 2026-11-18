@@ -1,8 +1,8 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
+import { cpSync, existsSync, linkSync, mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { join } from 'node:path';
+import { join, sep } from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 
@@ -237,16 +237,30 @@ test('先頭の「..」だけの指定（ふだんの使い方）は、断らな
   });
 });
 
-test('dist/ に、出力先で同じ物を指す別の綴り（licenſe は macOS で LICENSE と同じ）があるときも、上書きせずに止まる', (t) => {
+test('dist/ に、綴りの違う同じ名前（licenſe は LICENSE と同じ物とみなす）があるときは、上書きせずに止まる', () => {
   withTempDir((base) => {
     const day = join(base, 'day-092-test');
     mkdirSync(day, { recursive: true });
     writeFileSync(join(day, 'LICENSE'), 'MIT License\n');
-    // 長い s（U+017F）を同じ文字として扱うファイルシステム（macOS の APFS など）でだけ、確かめられる
-    if (!existsSync(join(day, 'LICENſE'))) {
-      t.skip('この綴りを同じ物として扱わないファイルシステムでは確かめられない');
-      return;
-    }
+    writeFileSync(join(day, 'old.js'), 'old\n');
+    const src = join(day, 'source');
+    makeSourceTree(src);
+    writeFileSync(join(src, 'dist/licenſe'), 'ほかの内容\n'); // 長い s（U+017F）。macOS の APFS では LICENSE と同じ物になる
+
+    const r = build(src, '..');
+
+    assert.notEqual(r.status, 0);
+    assert.match(r.stderr, /licenſe/, '衝突した名前を伝える');
+    assert.equal(readFileSync(join(day, 'LICENSE'), 'utf8'), 'MIT License\n', 'LICENSE は上書きされない');
+    assert.ok(existsSync(join(day, 'old.js')), '何も消さずに止まる');
+  });
+});
+
+test('出力先の LICENSE がリンク切れでも、dist/ の同じ名前（licenſe）の衝突は、名前だけで止める', () => {
+  withTempDir((base) => {
+    const day = join(base, 'day-092-test');
+    mkdirSync(day, { recursive: true });
+    symlinkSync(join(base, 'no-such-file'), join(day, 'LICENSE')); // リンク切れ。stat では見えない
     writeFileSync(join(day, 'old.js'), 'old\n');
     const src = join(day, 'source');
     makeSourceTree(src);
@@ -255,8 +269,57 @@ test('dist/ に、出力先で同じ物を指す別の綴り（licenſe は macO
     const r = build(src, '..');
 
     assert.notEqual(r.status, 0);
-    assert.equal(readFileSync(join(day, 'LICENSE'), 'utf8'), 'MIT License\n', 'LICENSE は上書きされない');
+    assert.match(r.stderr, /licenſe/);
     assert.ok(existsSync(join(day, 'old.js')), '何も消さずに止まる');
+  });
+});
+
+test('削除する古い公開物が、残す LICENSE と同じ中身（ハードリンク）でも、正常な作り直しは止めず、LICENSE を残す', () => {
+  withTempDir((base) => {
+    const day = join(base, 'day-092-test');
+    mkdirSync(day, { recursive: true });
+    writeFileSync(join(day, 'LICENSE'), 'MIT License\n');
+    linkSync(join(day, 'LICENSE'), join(day, 'index.html')); // 古い index.html が、LICENSE のハードリンク
+    const src = join(base, 'workspace');
+    makeSourceTree(src);
+
+    const r = build(src, day);
+
+    assert.equal(r.status, 0, r.stderr);
+    assert.equal(readFileSync(join(day, 'LICENSE'), 'utf8'), 'MIT License\n', 'LICENSE は残る');
+    assert.match(readFileSync(join(day, 'index.html'), 'utf8'), /built/, 'index.html は新しい物に替わる');
+  });
+});
+
+test('出力先の LICENSE の実名の綴りが違っても（license）、作り直しで消さない', () => {
+  withTempDir((base) => {
+    const day = join(base, 'day-092-test');
+    mkdirSync(day, { recursive: true });
+    writeFileSync(join(day, 'license'), 'MIT License\n'); // macOS では LICENSE として読める実名
+    const src = join(base, 'workspace');
+    makeSourceTree(src);
+
+    const r = build(src, day);
+
+    assert.equal(r.status, 0, r.stderr);
+    assert.equal(readFileSync(join(day, 'license'), 'utf8'), 'MIT License\n', 'LICENSE として残る');
+  });
+});
+
+test('名前に「\\..」を含むフォルダ（POSIX では正当な名前）を通る指定は、途中の「..」とみなして断らない', (t) => {
+  if (sep === '\\') {
+    t.skip('Windows では「\\」が区切りなので、対象外');
+    return;
+  }
+  withTempDir((base) => {
+    mkdirSync(join(base, 'dir\\..'));
+    const src = join(base, 'workspace');
+    makeSourceTree(src);
+
+    const r = build(src, `${base}/dir\\../day-092-test`);
+
+    assert.equal(r.status, 0, r.stderr);
+    assert.ok(existsSync(join(base, 'dir\\..', 'day-092-test', 'index.html')));
   });
 });
 
@@ -287,6 +350,7 @@ test('元のコードのフォルダの実名が source でない（SOURCE な�
     const r = build(upper, day);
 
     assert.notEqual(r.status, 0);
+    assert.match(r.stderr, /重なっています/, '別の理由で止まったのではなく、重なりを理由に止まる');
     assert.ok(existsSync(join(upper, 'src/main.ts')), '元のコードは消えない');
     assert.ok(existsSync(join(day, 'keep.txt')), '出力先の物も消えない');
   });
