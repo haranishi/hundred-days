@@ -14,10 +14,12 @@
 ## 動かす
 
 ```sh
-npm install
-npm run worldgen   # 山のデータを作る（1 分ほど）。データは大きいので Git に入れていない
+npm ci
+mkdir -p public/world && cp -R ../world/. public/world/  # このリポジトリの公開版と同じ山を使う
 npm run dev        # http://127.0.0.1:5183/
 ```
+
+山の生成処理を変更した場合は、保存済みの山をコピーする代わりに `npm run worldgen` を実行し、新しい地形の検査を通してください。
 
 操作は、左右キーで曲がる・下で制動・空白キーを押して離すとジャンプ・上で低い姿勢（平らな所では蹴って進む）。
 ジャンプ台では、空白キーを押したまま縁を越えても踏み切る。空中で空白キーを押している間は、左右で回転・上下で宙返り（押している間、板をつかむ）。
@@ -42,7 +44,8 @@ C キーで視点の切り替え、M キーで山の地図、E キーで直前�
 100 日チャレンジ（`haranishi/hundred-days`）の `day-089-frostline/` に、組み立てた本体を置く。このフォルダは、その `source/` に写してある。
 
 ```sh
-npm ci && npm run worldgen                  # 山のデータを作る（1 分ほど。Git には入れていない）
+npm ci
+mkdir -p public/world && cp -R ../world/. public/world/  # 既存の公開版を組み直す場合
 node tools/build-day089.mjs ..              # 相対の住所（./）で組み立て、1 つ上の Day のフォルダへ置く
 node tools/shots/share-check.mjs --url http://127.0.0.1:5185/   # 共有の窓・題字の収まり・誤り 0（手元の配信で）
 ```
