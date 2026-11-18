@@ -377,10 +377,11 @@ test('390×667でも店名と地図ボタンが最初の画面に収まる', asy
   await expect(page.locator('#result-name')).toBeInViewport({ ratio: 1 });
   await expect(page.locator('#maps-link')).toBeInViewport({ ratio: 1 });
   const opened = page.waitForEvent('popup');
-  await page.route('https://www.google.com/maps/**', route => route.fulfill({ body: '試験用の地図到着先' }));
+  await page.context().route('https://www.google.com/maps/**', route => route.fulfill({ contentType: 'text/plain; charset=utf-8', body: '試験用の地図到着先' }));
   await page.locator('#maps-link').click();
   const popup = await opened;
-  expect(new URL(popup.url()).searchParams.get('destination')).toBe('35.6802,139.76');
+  await expect(popup).toHaveURL(url => url.searchParams.get('destination') === '35.6802,139.76');
+  await expect(popup.locator('body')).toHaveText('試験用の地図到着先');
   await popup.close();
 });
 test('範囲を広げた検索も取り消せ、遅い結果が画面を変えない', async ({ page }) => {
