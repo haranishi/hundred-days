@@ -24,7 +24,69 @@ export function discoverProjects(root, files) {
   });
 }
 
-export function auditResult(result) {
+// npm audit 1回あたりの時間制限。勧告に当たると、npm は修正の候補を調べるために部品情報を大量に取りに行くとみられる。
+// 空のcacheでは、Day79（798部品・high 16件）が手元で約46秒（大半がCPU時間）、CIで約58〜61秒かかった（2026-11-18）。
+// 60秒では、CIの混み具合で偶発的に落ちたので、余裕を持たせる。ジョブ全体の制限は15分。
+export const AUDIT_TIMEOUT_MS = 240000;
+
+// 修正版がまだ公開されていない勧告を、期限つきで合格にする例外の一覧。
+// - 対象は high だけ。critical は除けない。勧告は、npm audit の url が https://github.com/advisories/<ID> と完全一致するものだけ。
+//   期限（UTC）を過ぎると無効になり、監査は失敗に戻る。
+// - 部品が合格になるのは、high/critical の原因がすべて「有効な例外の勧告」か「合格になった別の部品」で、例外の勧告までたどり着けるときだけ。
+//   別の勧告が1つでも混ざれば失敗のまま。
+// - 修正版が出たら overrides などで直し、ここから消す。背景と手順は .kiro/specs/dependency-audit-ci/followup-2026-11-18.md。
+export const AUDIT_EXCEPTIONS = [
+  {
+    id: 'GHSA-fc5q-39xc-vjpf',
+    expires: '2026-12-18',
+    reason: 'picomatch の ReDoS（4.0.7 以下の全版・修正版なし）。vite・vitest など開発用の道具が経由し、全ロックで dev のみ。配信物に入らない',
+  },
+];
+
+const minor = ['info', 'low', 'moderate'];
+const utcToday = () => new Date().toISOString().slice(0, 10);
+
+// 例外で合格にできる high の部品名を返す。落とす条件は2つを、変化がなくなるまで繰り返す。
+// ①悪い原因（例外でない勧告・合格にならない部品・不正な形）が1つでも混ざる部品。循環の中でも同じ。
+// ②有効な例外の勧告にたどり着かない部品。互いだけを参照する根拠のない循環を通さないため。
+export function excusedPackages(vulnerabilities, { exceptions = AUDIT_EXCEPTIONS, today = utcToday() } = {}) {
+  const urls = new Set(exceptions.filter(item => item.expires >= today).map(item => `https://github.com/advisories/${item.id}`));
+  const isException = item => item?.severity === 'high' && urls.has(item.url);
+  const causesOf = name => (Array.isArray(vulnerabilities[name].via) ? vulnerabilities[name].via : [null]).filter(item =>
+    typeof item === 'string' ? !minor.includes(vulnerabilities[item]?.severity) : !minor.includes(item?.severity));
+  const excused = new Set(Object.keys(vulnerabilities).filter(name => vulnerabilities[name].severity === 'high'));
+  for (let changed = true; changed;) {
+    changed = false;
+    for (const name of excused) {
+      if (!causesOf(name).every(item => typeof item === 'string' ? excused.has(item) : isException(item))) {
+        excused.delete(name); changed = true;
+      }
+    }
+    const grounded = new Set();
+    for (let more = true; more;) {
+      more = false;
+      for (const name of excused) {
+        if (!grounded.has(name) && causesOf(name).some(item => typeof item === 'string' ? grounded.has(item) : isException(item))) {
+          grounded.add(name); more = true;
+        }
+      }
+    }
+    for (const name of excused) if (!grounded.has(name)) { excused.delete(name); changed = true; }
+  }
+  return excused;
+}
+
+// 例外の状態を、CIのログに出す1行ずつの文にする（期限が近い・切れたことに気づくため）。
+export function exceptionNotes(exceptions = AUDIT_EXCEPTIONS, today = utcToday()) {
+  return exceptions.map(item => {
+    const left = Math.round((Date.parse(item.expires) - Date.parse(today)) / 86400000);
+    return item.expires >= today
+      ? `例外 ${item.id}: ${item.expires}（UTC）まで有効・残り${left}日。${item.reason}`
+      : `期限切れの例外 ${item.id}（${item.expires}）: 無効。修正版を取り込むか、期限と理由を見直す`;
+  });
+}
+
+export function auditResult(result, options) {
   if (result.error || result.signal || ![0, 1].includes(result.status)) throw Error('npm auditを実行できない（通信・プロセス・時間制限を確認）');
   let data;
   try { data = JSON.parse(result.stdout); } catch { throw Error('npm auditのJSON応答が不正'); }
@@ -39,5 +101,6 @@ export function auditResult(result) {
     actual[value.severity]++;
   }
   if (levels.some(k => actual[k] !== counts[k]) || result.status === 1 && counts.total === 0) throw Error('npm auditの終了結果と報告が不一致');
-  return { ...counts, passed: counts.high === 0 && counts.critical === 0 };
+  const excepted = excusedPackages(data.vulnerabilities, options).size;
+  return { ...counts, excepted, passed: counts.high === excepted && counts.critical === 0 };
 }
