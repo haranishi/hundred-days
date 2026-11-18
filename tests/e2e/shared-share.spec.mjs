@@ -278,4 +278,24 @@ test.describe('共有の窓の中で、コピーや共有が失敗したとき',
     await expect(manual).toBeHidden();
     await expect(said).toHaveText('');
   });
+
+  test('古いコピーが、あとから代替の手段に進んで、新しい操作のフォーカスを奪わない', async ({ page }) => {
+    await page.addInitScript(() => {
+      Object.defineProperty(navigator, 'share', { configurable: true, value: async () => {} });
+    });
+    await openShare(page, FALLBACK_DIR);
+    await page.evaluate(() => {
+      // コピーを、こちらが好きなときに拒否できる形にする（それまでは終わらない）
+      navigator.clipboard.writeText = () => new Promise((_resolve, reject) => { window.__denyCopy = () => reject(new DOMException('denied', 'NotAllowedError')); });
+    });
+    const share = page.getByRole('button', { name: '共有…' });
+
+    await page.getByRole('button', { name: 'リンクをコピー' }).click();   // コピーは、終わらないまま
+    await share.click();                                                  // そのあいだに、共有を始める（フォーカスは共有ボタン）
+    await expect(share).toBeFocused();
+    await page.evaluate(() => window.__denyCopy());                       // 古いコピーが、あとから拒否される
+    await page.evaluate(() => new Promise((resolve) => setTimeout(resolve, 0)));   // 拒否の処理が終わるのを待つ
+
+    await expect(share).toBeFocused();   // 古いコピーが、コピーのボタンへフォーカスを戻していない
+  });
 });

@@ -48,11 +48,13 @@ function link(label, href, className = '') {
   return node;
 }
 
-async function copy(text, trigger) {
+async function copy(text, trigger, isCurrent = () => true) {
   try {
     await navigator.clipboard.writeText(text);
     return true;
   } catch {
+    // 待っているあいだに別の操作が始まっていたら、古いコピーは、代替の手段（選択・フォーカスの移動）に進まない
+    if (!isCurrent()) return false;
     // クリップボードAPIが使えない環境（古いSafari・http接続など）向けの逃げ道
     const area = document.createElement('textarea');
     area.value = text;
@@ -132,7 +134,7 @@ function mountShare(host) {
   let operation = 0;
   copyButton.addEventListener('click', async () => {
     const mine = ++operation;
-    const ok = await copy(url, copyButton);
+    const ok = await copy(url, copyButton, () => mine === operation);
     // 待っているあいだに別の操作（共有・もう一度のコピー）が始まっていたら、新しい操作の表示を優先する
     if (mine !== operation) return;
     clearTimeout(resetTimer);
