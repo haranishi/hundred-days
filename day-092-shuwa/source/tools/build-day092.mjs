@@ -29,14 +29,14 @@ function realAllowMissing(path) {
   return join(real(current), ...rest);
 }
 
-/* 「リンク/..」のように、文字列で畳んだ先と、OS がリンクをたどった先が食い違う指定は、どちらの Day を更新するのか曖昧。
-   何かを消す前に、断る（片方に決めて進まない） */
-function ambiguous(path) {
-  try {
-    return real(path) !== real(resolve(path));
-  } catch {
-    return false; // どちらかが無い指定は、ここでは判定しない
-  }
+/* 出力先の指定に、途中の「..」（名前のあとの ..）があるか。
+   「リンク/..」や「存在しない要素/..」は、文字列で畳んだ先と、OS がたどる先が食い違い得て、どの Day を更新するのか曖昧になる
+   （最後の名前がまだ無い指定は、OS に解決させても見抜けない）。判定の細部に頼らず、断る。
+   先頭の「..」（<Day>/source から「..」を渡す、ふだんの使い方）は、作業場所が実際の場所なので曖昧にならず、通す */
+function hasInteriorDotDot(path) {
+  const parts = path.split(/[\\/]+/).filter((part) => part && part !== '.');
+  const firstName = parts.findIndex((part) => part !== '..');
+  return firstName >= 0 && parts.slice(firstName).includes('..');
 }
 
 /* 同じ物か（デバイスと inode）。使うのは「拒否を増やす」側（重なり・名前の衝突）だけ。
@@ -52,8 +52,8 @@ function sameEntry(a, b) {
 }
 
 const root = real(fileURLToPath(new URL('..', import.meta.url)));
-if (process.argv[2] && ambiguous(process.argv[2])) {
-  console.error('出力先の指定が曖昧です（シンボリックリンクの直後に .. があり、文字列で畳んだ先と、OS がたどる先が違います）。.. を含まない形で渡してください');
+if (process.argv[2] && hasInteriorDotDot(process.argv[2])) {
+  console.error('出力先の指定に、途中の .. があり、どの Day か曖昧になり得ます。.. は先頭にだけ使うか、.. を含まない形で渡してください');
   process.exit(1);
 }
 const target = process.argv[2] ? realAllowMissing(process.argv[2]) : undefined;

@@ -186,7 +186,7 @@ test('dist がシンボリックリンクのときは、前回の公開物を消
   });
 });
 
-test('「リンク/..」のように、文字列で畳んだ先と OS がたどる先が違う指定は、どちらの Day か曖昧なので、何も写さずに断る', () => {
+test('出力先の指定に、途中の「..」があるときは、どの組み合わせでも、何も写さず・何も消さずに断る', () => {
   withTempDir((base) => {
     const lexical = join(base, 'day-092-test'); // 文字列で「link/..」を畳むと、こちらになる
     const followed = join(base, 'sub', 'day-092-test'); // OS がリンクをたどると、こちらになる
@@ -194,53 +194,46 @@ test('「リンク/..」のように、文字列で畳んだ先と OS がたど�
     mkdirSync(followed, { recursive: true });
     mkdirSync(join(base, 'sub', 'child'), { recursive: true });
     symlinkSync(join(base, 'sub', 'child'), join(base, 'link'));
+    const day = join(base, 'day-092-real'); // 元のコードを中に持つ Day
+    const real = join(day, 'nested', 'workspace');
+    makeSourceTree(real);
+    mkdirSync(join(base, 'aliases'));
+    symlinkSync(day, join(base, 'aliases', 'day-092-alias'));
+    writeFileSync(join(day, 'keep.txt'), 'keep\n');
     const src = join(base, 'workspace');
     makeSourceTree(src);
 
     // join() は「link/..」を畳んでしまうので、文字列のまま渡す
-    const r = build(src, `${base}/link/../day-092-test`);
-
-    assert.notEqual(r.status, 0);
-    assert.match(r.stderr, /曖昧/);
+    const cases = [
+      [src, `${base}/link/../day-092-test`, 'リンクの直後の ..（実在の出力先）'],
+      [src, `${base}/link/../day-092-new`, 'リンクの直後の ..（最後の名前がまだ無い）'],
+      [real, `${base}/aliases/missing/../day-092-alias`, '存在しない要素のあとの ..（リンクの先に、元のコードを含む Day）'],
+      [src, `${base}/missing/../day-092-TEST`, '存在しない要素のあとの ..（別の綴り）'],
+    ];
+    for (const [cwd, target, label] of cases) {
+      const r = build(cwd, target);
+      assert.notEqual(r.status, 0, label);
+      assert.match(r.stderr, /途中の \.\./, label);
+    }
     assert.ok(!existsSync(join(lexical, 'index.html')), '文字列で畳んだ先の Day には写らない');
     assert.ok(!existsSync(join(followed, 'index.html')), 'OS がたどった先の Day にも写らない');
-  });
-});
-
-test('存在しない要素のあとの「..」を含む指定でも、別名（リンク）を解決して、重なりとして拒む', () => {
-  withTempDir((base) => {
-    const day = join(base, 'day-092-test');
-    const real = join(day, 'nested', 'workspace');
-    makeSourceTree(real);
-    const aliases = join(base, 'aliases');
-    mkdirSync(aliases);
-    symlinkSync(day, join(aliases, 'day-092-test'));
-    writeFileSync(join(day, 'keep.txt'), 'keep\n');
-
-    // 「missing/..」は打ち消し合い、実体は aliases/day-092-test（Day へのリンク）。Day の中に元のコードがある
-    const r = build(real, `${aliases}/missing/../day-092-test`);
-
-    assert.notEqual(r.status, 0);
-    assert.match(r.stderr, /重なっています/);
+    assert.ok(!existsSync(join(base, 'day-092-new')) && !existsSync(join(base, 'sub', 'day-092-new')), '新しい Day も作らない');
     assert.ok(existsSync(join(real, 'src/main.ts')), '元のコードを含む nested/ は消えない');
     assert.ok(existsSync(join(day, 'keep.txt')), '出力先の物も消えない');
   });
 });
 
-test('存在しない要素と「..」と別の綴りを組み合わせても、自分の source/ を消さない（大文字小文字を区別しない FS だけ）', (t) => {
+test('先頭の「..」だけの指定（ふだんの使い方）は、断らない', () => {
   withTempDir((base) => {
     const day = join(base, 'day-092-test');
     mkdirSync(day, { recursive: true });
-    if (!existsSync(join(base, 'day-092-TEST'))) {
-      t.skip('大文字小文字を区別するファイルシステムでは確かめられない');
-      return;
-    }
     makeSourceTree(join(day, 'source'));
 
-    const r = build(join(day, 'source'), `${base}/missing/../day-092-TEST`);
+    const r = build(join(day, 'source'), '../');
 
     assert.equal(r.status, 0, r.stderr);
-    assert.ok(existsSync(join(day, 'source/src/main.ts')), 'source/ の元のコードが残っている');
+    assert.ok(existsSync(join(day, 'source/src/main.ts')));
+    assert.ok(existsSync(join(day, 'index.html')));
   });
 });
 
