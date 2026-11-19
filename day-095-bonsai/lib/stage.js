@@ -258,11 +258,13 @@ export function createStage(THREE, scene, renderer, { gfx = 'high', seed = 1, cr
       dummy.position.set(x, y, z);
       dummy.rotation.set(life * 2, flake.spin + clock.t * 0.4, flake.spin);
       const s = usePetal ? 0.7 : 1;
-      dummy.scale.set(s, s, s);
+      // 落ち葉は少し細長く（四角い板に見えない）。花びらは丸いまま
+      dummy.scale.set(s, usePetal ? s : s * 0.6, s);
       dummy.updateMatrix();
       seasonMesh.setMatrixAt(n, dummy.matrix);
-      if (usePetal) tint.setRGB(0.98, 0.9, 0.92);
-      else tint.setRGB(leafColor[0], leafColor[1], leafColor[2]);
+      // look.color は sRGB。作業色空間（線形）へ変換しないと、白っぽい鮭色に色あせる（葉のカードと同じ扱いにそろえる）
+      if (usePetal) tint.setRGB(0.98, 0.9, 0.92, THREE.SRGBColorSpace);
+      else tint.setRGB(leafColor[0], leafColor[1], leafColor[2], THREE.SRGBColorSpace);
       seasonMesh.instanceColor.setXYZ(n, tint.r, tint.g, tint.b);
       n += 1;
       if (n >= 48) break;

@@ -129,9 +129,11 @@ test('樹冠の殻は選んだパッドだけを覆い、芽摘みは1個、冬�
   const shells = find('highlight-pads');
   assert.equal(shells.visible, true);
   assert.equal(shells.count, 2);
-  assert.equal(shells.material.color.getHex(), 0xe0482f);
+  // 殻は、赤い葉・緑の葉のどちらの上でも見えるよう、淡い色を足し合わせる（朱だと赤い葉に埋もれる）
+  assert.equal(shells.material.color.getHex(), 0xfff0c0);
   assert.equal(shells.material.transparent, true);
-  assert.equal(shells.material.opacity, 0.35);
+  assert.equal(shells.material.blending, THREE.AdditiveBlending);
+  assert.equal(shells.material.opacity, 0.6);
   assert.equal(shells.material.depthWrite, false);
   assert.equal(shells.material.depthTest, true);
   assert.equal(shells.castShadow, false);
@@ -147,7 +149,7 @@ test('樹冠の殻は選んだパッドだけを覆い、芽摘みは1個、冬�
     const up = new THREE.Vector3(0, 1, 0).applyQuaternion(rotation);
     assert.ok(center.distanceTo(new THREE.Vector3().fromArray(pads.center, p * 3)) < 1e-6);
     assert.ok(up.distanceTo(new THREE.Vector3().fromArray(pads.normal, p * 3)) < 1e-6);
-    const radius = pads.radius[p] * 1.05;
+    const radius = pads.radius[p] * 1.18;
     near(scale.x, radius, '殻の幅');
     near(scale.y, radius * PAD_FLAT, '殻の厚み');
     near(scale.z, radius, '殻の奥行き');
@@ -156,7 +158,7 @@ test('樹冠の殻は選んだパッドだけを覆い、芽摘みは1個、冬�
   view.setHighlight({ nodes, tone: 'pinch' });
   draw();
   assert.equal(shells.count, 1);
-  assert.equal(shells.material.color.getHex(), 0xe8b030);
+  assert.equal(shells.material.color.getHex(), 0xffe070);
   const pinched = new THREE.Matrix4();
   shells.getMatrixAt(0, pinched);
   assert.ok(matrices.some((matrix) => matrix.equals(pinched)), '選んでいない先端が色づく');

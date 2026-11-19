@@ -167,7 +167,7 @@ function photo() {
   ui.showPhoto(async () => {
     current.setHighlight(null);
     try {
-      return await current.capturePhoto({ width: 1080, height: 1350, caption: { title: '盆栽日和', subtitle: `${name} ・ ${date}` } });
+      return await current.capturePhoto({ width: 1080, height: 1350, caption: { title: '盆栽日和', subtitle: `${name}・${date}` } });
     } finally {
       // 撮影を待っている間に始まった枝の候補を、以前の選択で消さない。
       if (current === view && generation === inputGeneration) actions.showSelection();

@@ -168,19 +168,19 @@ function previousSave() {
 test('日付の札は保存から復元した樹種を表示し、時間送りと苗の切り替えでも更新する', async (t) => {
   const page = await boot(t, { raw: previousSave() });
   const date = page.byId('date-label');
-  assert.equal(date.textContent, '梅 ・ 冬・12月5週');
+  assert.equal(date.textContent, '梅・冬・12月5週');
   page.app.advance(7);
-  assert.equal(date.textContent, '梅 ・ 冬・1月1週');
+  assert.equal(date.textContent, '梅・冬・1月1週');
 
   page.click('menu-open');
   page.byId('new-species').value = 'pine';
   send(page.byId('new-tree'), 'submit');
-  assert.equal(date.textContent, '黒松 ・ 秋・10月1週');
+  assert.equal(date.textContent, '黒松・秋・10月1週');
 
   page.click('menu-open');
   page.click('reset-open');
   page.click('reset-confirm');
-  assert.equal(date.textContent, '紅葉 ・ 秋・10月1週');
+  assert.equal(date.textContent, '紅葉・秋・10月1週');
 });
 
 test('視点ボタンは案内やダイアログが開くと隠れ、舞台に戻ると表示する', async (t) => {

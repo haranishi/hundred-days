@@ -73,7 +73,7 @@ export function connectUI(handlers) {
       branches: String(state.branches), gfx: state.gfx,
     });
     const speciesName = SPECIES_NAMES[state.species];
-    date.textContent = `${speciesName} ・ ${state.date}`;
+    date.textContent = `${speciesName}・${state.date}`;
     canvas.setAttribute('aria-label', `${speciesName}の盆栽。${state.seasonLabel}。枝は${state.branches}本`);
     for (const button of tools) {
       const id = button.dataset.tool;

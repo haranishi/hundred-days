@@ -17,6 +17,12 @@ import { captureFrame } from './capture.js';
 const FOV = 30;
 const HIGHLIGHT_COLOR = { cut: 0xe0482f, bend: 0x2f6fa3, pinch: 0xe8b030, select: 0xfff2c0 };
 const highlightColor = (tone) => HIGHLIGHT_COLOR[tone] ?? HIGHLIGHT_COLOR.select;
+// 葉の塊にかぶせる殻は、紅葉の赤の上でも松の緑の上でも見えるよう、足し合わせて明るくなる淡い色にする
+// （朱の殻は、赤い葉に埋もれて見えなかった＝採点役2人が指摘した）。管の色は、これまでどおり tone の色。
+const SHELL_COLOR = { cut: 0xfff0c0, bend: 0xcfe8ff, pinch: 0xffe070, select: 0xffffff };
+const shellColor = (tone) => SHELL_COLOR[tone] ?? SHELL_COLOR.select;
+const SHELL_OPACITY = 0.6;
+const SHELL_SCALE = 1.18; // 葉の外へ少しはみ出して、塊の輪郭ごと光らせる
 
 const lerp = (a, b, t) => a + (b - a) * t;
 const smooth = (t) => t * t * (3 - 2 * t);
@@ -299,7 +305,8 @@ export function createView3D(THREE, canvas, {
       if (!highlightPads) {
         // 殻を1回の描画で重ねる。透明な面で、その奥の枝や葉を消さない。
         const mat = new THREE.MeshBasicMaterial({
-          transparent: true, opacity: 0.35, depthWrite: false, toneMapped: false,
+          transparent: true, opacity: SHELL_OPACITY, depthWrite: false, toneMapped: false,
+          blending: THREE.AdditiveBlending,
         });
         highlightPads = new THREE.InstancedMesh(new THREE.SphereGeometry(1, 16, 8), mat, MAX_PADS);
         highlightPads.count = 0;
@@ -311,7 +318,7 @@ export function createView3D(THREE, canvas, {
       }
       const i = p * 3;
       const j = node * 3;
-      const radius = pads.radius[p] * 1.05;
+      const radius = pads.radius[p] * SHELL_SCALE;
       padPose.position.set(pads.center[i] + shift[j], pads.center[i + 1] + shift[j + 1], pads.center[i + 2] + shift[j + 2]);
       padNormal.fromArray(pads.normal, i).normalize();
       padPose.quaternion.setFromUnitVectors(up, padNormal);
@@ -322,7 +329,7 @@ export function createView3D(THREE, canvas, {
       if (highlight.tone === 'pinch') break;
     }
     if (highlightPads?.count) {
-      highlightPads.material.color.setHex(highlightColor(highlight.tone));
+      highlightPads.material.color.setHex(shellColor(highlight.tone));
       highlightPads.instanceMatrix.needsUpdate = true;
       highlightPads.visible = true;
     }
@@ -455,7 +462,9 @@ export function createView3D(THREE, canvas, {
     if (highlightMesh?.visible && motion) {
       // フレーム間隔が伸びても、実時間で同じ0.9秒の明滅にする。
       pulseStart ??= now;
-      highlightMat.emissiveIntensity = 0.825 + 0.175 * Math.sin((now - pulseStart) * Math.PI * 2 / 900);
+      const wave = Math.sin((now - pulseStart) * Math.PI * 2 / 900);
+      highlightMat.emissiveIntensity = 0.825 + 0.175 * wave;
+      if (highlightPads?.visible) highlightPads.material.opacity = SHELL_OPACITY * (0.8 + 0.2 * wave);
       moving = true;
     }
     for (let i = drops.length - 1; i >= 0; i -= 1) {
