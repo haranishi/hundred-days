@@ -18,9 +18,12 @@ test('光の表: 朝昼夕の方位と強さ、夜は月と提灯', () => {
   assert.equal(LIGHT_PRESETS.evening.intensity, 2.4);
   assert.equal(LIGHT_PRESETS.morning.sky, LIGHT_PRESETS.noon.sky);
   assert.equal(LIGHT_PRESETS.morning.ground, LIGHT_PRESETS.noon.ground);
-  assert.equal(LIGHT_PRESETS.night.color, '#8da4d6');
-  assert.equal(LIGHT_PRESETS.night.intensity, 0.6);
-  assert.equal(LIGHT_PRESETS.night.sky, '#2a3350');
+  assert.equal(LIGHT_PRESETS.night.color, '#9db4e6');
+  assert.equal(LIGHT_PRESETS.night.intensity, 1.5);
+  assert.equal(LIGHT_PRESETS.night.sky, '#44527f');
+  // 夜でも枝ぶりが読める明るさ。かつ、昼よりは暗い（暗すぎて沈む／昼と変わらない、の両方を落とす）
+  assert.ok(LIGHT_PRESETS.night.hemi >= 0.9 && LIGHT_PRESETS.night.exposure >= 1.2);
+  assert.ok(LIGHT_PRESETS.night.intensity < LIGHT_PRESETS.evening.intensity);
   assert.ok(LIGHT_PRESETS.night.lantern > 0);
   assert.equal(LIGHT_PRESETS.noon.bgTop, '#f3eee3');
 });

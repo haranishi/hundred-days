@@ -12,7 +12,8 @@ test('日付の表示と次の季節は同じ暦を使い、季節の境界で�
   assert.equal(calendarState(7).label, '秋・10月2週');
   assert.equal(daysToAdvance('week', 27), 7);
   assert.equal(daysToAdvance('month', 27), 30);
-  for (const [day, delta, label] of [[0, 61, '冬・12月1週'], [60, 1, '冬・12月1週'], [61, 90, '春・3月1週'], [335, 91, '冬・12月1週']]) {
+  // 「次の季節」は、次の季節の始まりの45日後（中ごろ）へ進める。始まりの日は見た目が変わらず、押しても何も起きないように見えた
+  for (const [day, delta, label] of [[0, 106, '冬・1月3週'], [60, 46, '冬・1月3週'], [61, 135, '春・4月3週'], [335, 136, '冬・1月3週']]) {
     assert.equal(daysToAdvance('season', day), delta);
     assert.equal(calendarState(day + delta).label, label);
   }

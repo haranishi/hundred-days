@@ -61,16 +61,29 @@ export function createActions({ initialTree, history, getView, canvasRect, notif
     return branchList(tree.snapshot());
   }
 
+  let selectionShown = false;
+
   function showSelection() {
     const view = getView();
     if (!view) return;
     const branch = selectedChain === null ? null : availableBranches().find(({ chain }) => chain === selectedChain);
     if (!branch) {
       selectedChain = null;
+      selectionShown = false;
       view.setHighlight(null);
       return;
     }
+    selectionShown = true;
     view.setHighlight({ nodes: branchSegment(tree.snapshot(), branch.first), tone: 'select' });
+  }
+
+  /** 鍵盤（[ ]）や補助パネルで選んだ枝の白い光を消す。指やマウスの操作に移ったあとも光り続けていた（体験の採点の指摘）。
+      指で押している間の候補表示（切る・曲げる）は、ここでは触らない。 */
+  function clearSelection() {
+    if (!selectionShown) return;
+    selectedChain = null;
+    selectionShown = false;
+    getView()?.setHighlight(null);
   }
 
   function pick(point, tool) {
@@ -324,7 +337,7 @@ export function createActions({ initialTree, history, getView, canvasRect, notif
   return {
     get tree() { return tree; },
     get branches() { return availableBranches().filter(({ order }) => order === 1).length; },
-    repaint, replace, advance, restore, selectBranch, showSelection, keyboardArrow, applySelected, cancelKeyboardBend,
+    repaint, replace, advance, restore, selectBranch, showSelection, clearSelection, keyboardArrow, applySelected, cancelKeyboardBend,
     pick, highlight, cut, pinch, beginBend, moveBend, finishBend, splash, water,
   };
 }

@@ -8,10 +8,15 @@ export function calendarState(day) {
   return dateOf(day);
 }
 
+/** 「次の季節」で、季節の始まりから進める日数。 */
+export const SEASON_MIDDLE = 45;
+
 export function daysToAdvance(step, day) {
   if (step === 'week') return 7;
   if (step === 'month') return 30;
-  if (step === 'season') return nextSeasonDay(day) - day;
+  // 次の季節の「始まり」ではなく、その中ごろ（始まりの45日後）へ進める。始まりの日は、芽吹き前の裸の枝・まだ緑の葉のまま
+  // 見た目が変わらず、ボタンを押しても何も起きないように見えた（体験の採点の指摘）。
+  if (step === 'season') return nextSeasonDay(day) - day + SEASON_MIDDLE;
   return 0;
 }
 

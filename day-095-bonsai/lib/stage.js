@@ -7,7 +7,8 @@ export const LIGHT_PRESETS = Object.freeze({
   morning: Object.freeze({ az: -35, alt: 28, color: '#fff1dc', intensity: 2.6, sky: '#dfe8f5', ground: '#8c7a63', hemi: 0.9, exposure: 0.95, bgTop: '#efe9dd', bgBottom: '#d8cdb8', lantern: 0 }),
   noon: Object.freeze({ az: -20, alt: 52, color: '#fffaf0', intensity: 3.2, sky: '#dfe8f5', ground: '#8c7a63', hemi: 0.8, exposure: 1, bgTop: '#f3eee3', bgBottom: '#e5dccb', lantern: 0 }),
   evening: Object.freeze({ az: 60, alt: 14, color: '#ffb877', intensity: 2.4, sky: '#ffd9b8', ground: '#6e5640', hemi: 0.6, exposure: 1.05, bgTop: '#f1d7b5', bgBottom: '#c99a72', lantern: 0 }),
-  night: Object.freeze({ az: 150, alt: 62, color: '#8da4d6', intensity: 0.6, sky: '#2a3350', ground: '#12141c', hemi: 0.5, exposure: 1.1, bgTop: '#1d2233', bgBottom: '#0e111b', lantern: 1.7 }),
+  // 夜：月明かりで枝ぶりが読める明るさにする（暗すぎて幹が背景に沈むという体験の採点の指摘）。提灯は鉢まわりの暖色の差し色
+  night: Object.freeze({ az: 150, alt: 62, color: '#9db4e6', intensity: 1.5, sky: '#44527f', ground: '#232738', hemi: 1.0, exposure: 1.3, bgTop: '#2a3350', bgBottom: '#161a2a', lantern: 1.7 }),
 });
 
 const LIGHT_SECONDS = 0.6;

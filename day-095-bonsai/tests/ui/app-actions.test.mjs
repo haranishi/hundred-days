@@ -206,12 +206,12 @@ test('次の季節へ進むと暦・骨格・季節色を更新し、動きの�
     const { actions, history, calls } = harness({ animate });
     calls.length = 0;
     const day = actions.tree.day;
-    assert.equal(actions.advance(daysToAdvance('season', day)).day, 61);
-    assert.equal(actions.tree.date().label, '冬・12月1週');
+    assert.equal(actions.advance(daysToAdvance('season', day)).day, 106);
+    assert.equal(actions.tree.date().label, '冬・1月3週');
     assert.equal(history.canUndo, true);
     for (const name of ['skeleton', 'look']) assert.equal(calls.find(([key]) => key === name)[2].animate, animate);
     assert.equal(calls.find(([key]) => key === 'look')[1].coverage, 0);
-    assert.deepEqual(calls.at(-1), ['notice', '冬・12月1週になりました。', { undo: true }]);
+    assert.deepEqual(calls.at(-1), ['notice', '冬・1月3週になりました。', { undo: true }]);
   }
 });
 

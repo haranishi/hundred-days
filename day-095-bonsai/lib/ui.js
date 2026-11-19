@@ -7,6 +7,7 @@ const TOOL_GUIDES = {
   cut: '枝をおさえると切る範囲が色づき、離すと切ります。',
   bend: '枝をおさえたまま動かすと、先が曲がります。',
   pinch: '枝先をおさえて指を離すと、芽を摘みます。',
+  water: '鉢や木をおさえると、水をやります。',
 };
 const nameTool = (id) => TOOL_NAMES[id];
 
@@ -201,10 +202,13 @@ export function connectUI(handlers) {
     });
   }
 
-  for (const button of tools) button.addEventListener('click', () => handlers.tool(button.dataset.tool));
-  for (const button of time) button.addEventListener('click', () => handlers.advance(button.dataset.advance));
-  click('undo', handlers.undo);
-  click('redo', handlers.redo);
+  // ボタンを押したあとフォーカスがボタンに残ると、数字・[ ]・Z・矢印のキー操作が効かなくなる。
+  // マウス・指でのクリック（event.detail > 0）のときだけ、キャンバスへ戻す（キーボードで Enter を押した場合は動かさない）
+  const refocus = (event) => { if (event.detail > 0 && !canvas.hidden) canvas.focus({ preventScroll: true }); };
+  for (const button of tools) button.addEventListener('click', (event) => { handlers.tool(button.dataset.tool); refocus(event); });
+  for (const button of time) button.addEventListener('click', (event) => { handlers.advance(button.dataset.advance); refocus(event); });
+  byId('undo').addEventListener('click', (event) => { handlers.undo(); refocus(event); });
+  byId('redo').addEventListener('click', (event) => { handlers.redo(); refocus(event); });
   click('notice-undo', handlers.undo);
   click('camera-reset', handlers.cameraReset);
   click('tips-close', handlers.dismissTips);

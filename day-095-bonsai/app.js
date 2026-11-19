@@ -26,6 +26,8 @@ let light = options.light ?? saved?.light ?? DEFAULTS.light;
 let muted = saved?.muted ?? false;
 let tipsSeen = saved?.tipsSeen ?? false;
 let rememberOpeningTips = !options.directsTree && !options.pot && !options.light;
+// 「保存を消して最初から」の直後は、結果の通知を読めるよう、初回の案内カードを出さない（同じ位置で重なって読めなかった）
+let skipTipsOnce = false;
 let tool = options.tool === 'water' && typeof initialTree.water !== 'function' ? 'look' : options.tool;
 let view = null;
 let controls = null;
@@ -78,6 +80,9 @@ function input(source) {
   inputGeneration += 1;
   stopFast();
   if (source !== 'key') actions.cancelKeyboardBend();
+  // 指やマウスで盆栽に触れたら、鍵盤（[ ]）や補助パネルで選んだ枝の白い光は消す。消さないと、幹が光ったまま戻らない。
+  // ボタンや鍵盤での道具・時間の操作では消さない（枝を選んでから道具を選ぶ順でも、道具を選んでから枝を選ぶ順でも使えるように）
+  if (source === 'pointer') actions.clearSelection();
   dismissTips();
   scheduleOrbit();
 }
@@ -234,6 +239,7 @@ function workOnNewTree(seedling, initial) {
     rememberOpeningTips = false;
     light = DEFAULTS.light;
     muted = tipsSeen = false;
+    skipTipsOnce = true;
     audio.setMuted(false);
   } else {
     save({ replace: true });
@@ -302,7 +308,8 @@ function mountView(camera) {
       ready = true;
       ui.status('ready');
       ui.sync(state());
-      const showTips = options.tips && !tipsSeen;
+      const showTips = options.tips && !tipsSeen && !skipTipsOnce;
+      skipTipsOnce = false;
       ui.showTips(showTips);
       if (showTips && rememberOpeningTips) {
         tipsSeen = true;

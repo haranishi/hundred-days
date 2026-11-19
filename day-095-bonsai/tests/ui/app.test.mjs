@@ -183,6 +183,16 @@ test('日付の札は保存から復元した樹種を表示し、時間送り�
   assert.equal(date.textContent, '紅葉・秋・10月1週');
 });
 
+test('保存を消して最初から：通知と初回の案内カードが同じ位置で重ならない（案内は出さず、通知を読める）', async (t) => {
+  const page = await boot(t);
+  page.click('tips-close');
+  page.click('menu-open');
+  page.click('reset-open');
+  page.click('reset-confirm'); // click は描画の枠（rAF）まで進める
+  assert.equal(page.byId('notice').hidden, false, '通知が出る');
+  assert.equal(page.byId('tips').hidden, true, '案内カードは出さない（通知と重なる）');
+});
+
 test('視点ボタンは案内やダイアログが開くと隠れ、舞台に戻ると表示する', async (t) => {
   const page = await boot(t, { capturePhoto: async () => new Blob(['photo'], { type: 'image/png' }) });
   const button = page.byId('camera-reset');
@@ -300,6 +310,22 @@ test('写真の完了は、撮影中の新しい操作がない時だけ選択�
   await Promise.resolve();
   assert.equal(page.highlights.at(-1)?.tone, 'cut');
   page.pointer('pointercancel', 'view', 1);
+});
+
+test('鍵盤で選んだ枝の白い光は、指やマウスで盆栽に触れると消え、道具やボタンの操作では消えない', async (t) => {
+  const page = await boot(t);
+  send(page.byId('view'), 'keydown', { key: ']' });
+  assert.equal(page.highlights.at(-1)?.tone, 'select');
+  // 道具を選んでも、枝を選んでから道具を選ぶ順で使えるよう、選択は残る
+  page.click('tool-cut');
+  assert.equal(page.highlights.at(-1)?.tone, 'select');
+  page.click('undo');
+  assert.equal(page.highlights.at(-1)?.tone, 'select');
+  // 盆栽に触れた時点で消える。離したあとも、白い光が戻らない
+  page.pointer('pointerdown', 'view', 1);
+  page.pointer('pointerup', 'view', 1);
+  assert.notEqual(page.highlights.at(-1)?.tone, 'select');
+  assert.equal(page.highlights.at(-1), null);
 });
 
 test('道具の使い方を札と読み上げに出し、同じ道具の札は出し直さない', async (t) => {
