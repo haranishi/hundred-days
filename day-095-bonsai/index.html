@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>盆栽日和 — 3Dの盆栽を、切って曲げて育てる</title>
+  <meta name="description" content="枝を切る、針金で曲げる、芽を摘む。季節とともに姿を変える3Dの盆栽を仕立てて、写真に残せます。">
+  <meta name="share:text" content="盆栽日和 — 3Dの盆栽を、切って曲げて育てる。季節とともに変わる姿を、写真に。">
+  <meta name="theme-color" content="#f3eee3">
+  <link rel="icon" href="./favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./shared/share.css">
+  <link rel="stylesheet" href="./app.css">
+  <script src="./shared/share.js" defer></script>
+  <script type="module" src="./app.js"></script>
+</head>
+<body data-ready="false">
+<a class="skip" href="#tools">道具へ移る</a>
+<main id="app" data-ready="false" data-species="maple" data-tool="look" data-season="autumn" data-day="0" data-branches="0" data-gfx="high">
+  <header class="top">
+    <div class="top-inner">
+      <h1>盆栽日和</h1>
+      <div class="top-actions">
+        <button type="button" id="menu-open" class="top-action" aria-haspopup="dialog" aria-controls="menu">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>メニュー
+        </button>
+        <button type="button" id="photo-open" class="top-action" aria-haspopup="dialog" aria-controls="photo" disabled>
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h4l2-3h4l2 3h4a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1Z"/><circle cx="12" cy="13" r="3"/></svg>写真
+        </button>
+        <button type="button" id="share-open" class="top-action" aria-label="このアプリを共有する" aria-haspopup="dialog" aria-controls="share-dialog">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15V3m-4 4 4-4 4 4M7 10H5v10h14V10h-2"/></svg>共有
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <div class="workbench">
+    <section class="tools" id="tools" tabindex="-1" aria-label="手入れの道具">
+      <div class="tools-inner" role="group" aria-label="道具を選ぶ">
+        <button type="button" class="tool" data-tool="look" aria-pressed="true" disabled>
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12c2.4-4 5.6-6 10-6s7.6 2 10 6c-2.4 4-5.6 6-10 6s-7.6-2-10-6Z"/><circle cx="12" cy="12" r="2.5"/></svg>見る
+        </button>
+        <button type="button" class="tool" data-tool="cut" aria-pressed="false" disabled>
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="6" cy="17" r="3"/><circle cx="18" cy="17" r="3"/><path d="M8 15 18 4M16 15 6 4"/></svg>切る
+        </button>
+        <button type="button" class="tool" data-tool="bend" aria-pressed="false" disabled>
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 20c7 0 11-5 11-12V4m-4 4 4-4 4 4M5 15l5 4"/></svg>曲げる
+        </button>
+        <button type="button" class="tool" data-tool="pinch" aria-pressed="false" disabled>
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21v-9M12 16C6 16 3 12 3 7c5 0 9 3 9 9Zm0-4c0-5 3.5-8 9-8 0 5-3.5 8-9 8Z"/></svg>芽摘み
+        </button>
+        <button type="button" class="tool" data-tool="water" aria-pressed="false" disabled>
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3c-2 3.6-6.5 7.4-6.5 11.1a6.5 6.5 0 0 0 13 0C18.5 10.4 14 6.6 12 3ZM9 15a3.3 3.3 0 0 0 3 3"/></svg>水
+        </button>
+      </div>
+    </section>
+
+    <section class="stage" id="stage" aria-label="盆栽の舞台">
+      <canvas id="view" role="img" tabindex="0" aria-label="紅葉の盆栽。秋。枝は0本" aria-describedby="canvas-keys"></canvas>
+      <p class="sr-only" id="canvas-keys">矢印キーで視点を回し、プラスとマイナスで拡大縮小します。角括弧で枝を選び、Enterで道具を使います。詳しい操作はメニューにあります。</p>
+      <p class="stage-status" id="loading">盆栽を用意しています</p>
+      <aside class="tips" id="tips" aria-label="はじめての手入れ" hidden>
+        <ul>
+          <li>指で回す</li>
+          <li>道具を選んで枝にさわる</li>
+          <li>時を進めて季節を見る</li>
+        </ul>
+        <button type="button" id="tips-close" class="icon-button" aria-label="案内を閉じる">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg>
+        </button>
+      </aside>
+      <div class="notice" id="notice" hidden>
+        <span id="notice-text"></span>
+        <button type="button" class="button notice-undo" id="notice-undo" aria-label="この操作を元に戻す" hidden>元に戻す</button>
+      </div>
+      <button type="button" id="camera-reset" class="icon-button camera-reset" aria-label="視点を元に戻す" title="視点を元に戻す" hidden>
+        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4H4v5M15 4h5v5M4 15v5h5M20 15v5h-5"/><circle cx="12" cy="12" r="1.5" fill="currentColor" stroke="none"/></svg>視点
+      </button>
+      <section class="assist" id="assist" aria-labelledby="assist-title" hidden>
+        <div class="assist-head">
+          <h2 id="assist-title">枝と視点の操作</h2>
+          <button type="button" class="icon-button" id="assist-close" aria-label="枝と視点の操作を閉じる">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg>
+          </button>
+        </div>
+        <div class="assist-actions" role="group" aria-label="枝に道具を使う">
+          <button type="button" class="button" data-assist-key="[">前の枝</button>
+          <button type="button" class="button" data-assist-key="]">次の枝</button>
+          <button type="button" class="button" data-assist-key="Enter">道具を使う</button>
+          <button type="button" class="button" data-assist-key="Escape">曲げを取り消す</button>
+        </div>
+        <div class="assist-actions" role="group" aria-label="方向と拡大縮小">
+          <button type="button" class="button" data-assist-key="ArrowLeft" aria-label="左へ">←</button>
+          <button type="button" class="button" data-assist-key="ArrowRight" aria-label="右へ">→</button>
+          <button type="button" class="button" data-assist-key="ArrowUp" aria-label="上へ">↑</button>
+          <button type="button" class="button" data-assist-key="ArrowDown" aria-label="下へ">↓</button>
+          <button type="button" class="button" data-assist-key="+" aria-label="拡大する">＋</button>
+          <button type="button" class="button" data-assist-key="-" aria-label="縮小する">−</button>
+        </div>
+      </section>
+      <article class="fallback" id="fallback" hidden>
+        <h2>盆栽の手入れ</h2>
+        <p id="fallback-why"></p>
+        <button type="button" class="button" id="retry-view">もう一度</button>
+        <div class="lore" id="fallback-lore"></div>
+      </article>
+      <noscript><p class="stage-status">3D表示にはJavaScriptが必要です。</p></noscript>
+    </section>
+
+    <section class="calendar" aria-label="時間と履歴">
+      <div class="calendar-inner">
+        <div class="calendar-heading">
+          <p class="date" id="date-label">紅葉 ・ 秋・10月1週</p>
+          <div class="history" role="group" aria-label="手入れの履歴">
+            <button type="button" class="button" id="undo" disabled>
+              <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6 4 11l5 5m-5-5h10a5 5 0 0 1 5 5v2"/></svg>元に戻す
+            </button>
+            <button type="button" class="button" id="redo" disabled>
+              <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m15 6 5 5-5 5m5-5H10a5 5 0 0 0-5 5v2"/></svg>やり直す
+            </button>
+          </div>
+        </div>
+        <div class="time-actions" role="group" aria-label="時間を進める">
+          <button type="button" class="button" data-advance="week" disabled>1週間</button>
+          <button type="button" class="button" data-advance="month" disabled>1か月</button>
+          <button type="button" class="button" data-advance="season" disabled>次の季節</button>
+          <button type="button" class="button fast-stop" id="fast-stop" hidden>早送りを止める</button>
+        </div>
+      </div>
+    </section>
+  </div>
+</main>
+
+<p class="sr-only" id="live" role="status" aria-live="polite" aria-atomic="true"></p>
+
+<dialog class="sheet menu" id="menu" aria-labelledby="menu-title">
+  <div class="sheet-head">
+    <h2 id="menu-title">メニュー</h2>
+    <button type="button" class="icon-button" data-close aria-label="閉じる" autofocus>
+      <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg>
+    </button>
+  </div>
+  <div class="sheet-body">
+    <form id="new-tree" class="menu-group" aria-labelledby="new-tree-title">
+      <h3 id="new-tree-title">新しい苗</h3>
+      <div class="seedling-options">
+        <label>樹種<select id="new-species">
+          <option value="maple">紅葉</option>
+          <option value="pine">黒松</option>
+          <option value="plum">梅</option>
+        </select></label>
+        <label>樹形<select id="new-style">
+          <option value="moyogi">模様木</option>
+          <option value="chokkan">直幹</option>
+          <option value="shakan">斜幹</option>
+        </select></label>
+        <label>鉢<select id="new-pot">
+          <option value="oval-brown">楕円・茶</option>
+          <option value="round-blue">丸・藍</option>
+          <option value="rect-grey">長方・灰</option>
+        </select></label>
+      </div>
+      <button type="submit" class="button confirm">新しい苗を始める</button>
+    </form>
+
+    <section class="menu-group" aria-labelledby="settings-title">
+      <h3 id="settings-title">設定</h3>
+      <div class="settings-options">
+        <label>光<select id="light">
+          <option value="morning">朝</option>
+          <option value="noon" selected>昼</option>
+          <option value="evening">夕</option>
+          <option value="night">夜</option>
+        </select></label>
+        <label class="check"><input type="checkbox" id="sound" checked>音を鳴らす</label>
+      </div>
+      <button type="button" class="button" id="fast-start" disabled>早送りを始める</button>
+    </section>
+    <details class="menu-group disclosure">
+      <summary>このアプリについて</summary>
+      <p>盆栽はこのブラウザの中で育ちます。作りかけの盆栽、鉢・光・音の設定、案内の表示状況はこの端末に保存されます。盆栽の手入れと保存は、このブラウザの中だけで行います。共有を選んだときだけ、アプリのリンクや写真を共有先に渡します。</p>
+      <div class="lore" id="about-lore"></div>
+    </details>
+    <details class="menu-group disclosure">
+      <summary>キー操作</summary>
+      <button type="button" class="button assist-open" id="assist-open" aria-controls="assist" disabled>枝と視点をボタンで操作</button>
+      <dl class="key-list">
+        <dt><kbd>Tab</kbd></dt><dd>道具・盆栽・時間の操作へ移る</dd>
+        <dt><kbd>1</kbd>〜<kbd>5</kbd></dt><dd>見る・切る・曲げる・芽摘み・水</dd>
+        <dt><kbd>[</kbd> <kbd>]</kbd></dt><dd>前後の枝を選ぶ</dd>
+        <dt><kbd>Enter</kbd></dt><dd>選んだ枝に道具を使う・曲げを確定</dd>
+        <dt><kbd>↑</kbd> <kbd>↓</kbd> <kbd>←</kbd> <kbd>→</kbd></dt><dd>回す・選んだ枝を曲げる</dd>
+        <dt><kbd>+</kbd> <kbd>−</kbd> <kbd>R</kbd></dt><dd>寄る・引く・視点を戻す</dd>
+        <dt><kbd>Space</kbd></dt><dd>1週間を進める</dd>
+        <dt><kbd>Z</kbd> / <kbd>Shift</kbd>+<kbd>Z</kbd></dt><dd>元に戻す・やり直す</dd>
+        <dt><kbd>Esc</kbd></dt><dd>曲げを取り消す・メニューを閉じる</dd>
+      </dl>
+    </details>
+    <button type="button" class="button reset-open" id="reset-open" aria-haspopup="dialog" aria-controls="reset-dialog">保存を消して最初から</button>
+  </div>
+</dialog>
+
+<dialog class="sheet" id="share-dialog" aria-labelledby="share-title">
+  <div class="sheet-head">
+    <h2 id="share-title">盆栽日和を共有</h2>
+    <button type="button" class="icon-button" data-close aria-label="閉じる" autofocus>
+      <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg>
+    </button>
+  </div>
+  <div class="sheet-body" id="share-panel"><div id="share"></div></div>
+</dialog>
+
+<dialog class="sheet photo" id="photo" aria-labelledby="photo-title">
+  <div class="sheet-head">
+    <h2 id="photo-title">盆栽の写真</h2>
+    <button type="button" class="icon-button" data-close aria-label="閉じる" autofocus>
+      <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg>
+    </button>
+  </div>
+  <div class="sheet-body photo-body">
+    <p id="photo-status" role="status" hidden></p>
+    <img id="photo-image" width="1080" height="1350" alt="" hidden>
+    <div class="photo-actions" id="photo-actions" hidden>
+      <a class="button confirm" id="photo-save" download="bonsai.png">写真を保存</a>
+      <button type="button" class="button" id="photo-share" hidden>写真を共有</button>
+    </div>
+  </div>
+</dialog>
+
+<dialog class="sheet" id="reset-dialog" aria-labelledby="reset-title" aria-describedby="reset-description">
+  <div class="sheet-head"><h2 id="reset-title">保存を消して最初から</h2></div>
+  <div class="sheet-body">
+    <p id="reset-description">作りかけの盆栽と設定を消して、初めの紅葉に戻します。</p>
+    <div class="reset-actions">
+      <button type="button" class="button" data-close autofocus>取り消す</button>
+      <button type="button" class="button confirm" id="reset-confirm">保存を消す</button>
+    </div>
+  </div>
+</dialog>
+</body>
+</html>

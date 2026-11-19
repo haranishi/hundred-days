@@ -1,0 +1,41 @@
+{
+  "day": 95,
+  "season": 3,
+  "title": "盆栽日和 — 3Dの盆栽を、切って曲げて育てる",
+  "description": "登録なし・無料で遊べる、3Dの盆栽アプリ。枝を切る、針金で曲げる、芽を摘む。時間を進めると、モミジは紅葉して葉を落とし、黒松は緑の針葉を保ち、梅は花を咲かせる。できた盆栽は写真にして残せる。スマホは指で、PCはマウスやキーボードで操作できる。",
+  "tags": [
+    "盆栽",
+    "3D",
+    "季節",
+    "ブラウザ完結",
+    "スマホ対応"
+  ],
+  "status": "draft",
+  "publicUrl": "https://rairakku.com/100days/day-095-bonsai/",
+  "screenshot": "screenshot.webp",
+  "startedAt": "2026-11-19",
+  "finishedAt": null,
+  "actualMinutes": null,
+  "sourceOfIdea": "本人が「盆栽をするアプリ。3Dで盆栽を作れるWebアプリを、100日チャレンジのDay95として」と依頼した。",
+  "aiHandled": [],
+  "humanHandled": [
+    "企画（3Dで盆栽を仕立てるアプリ）と、100日チャレンジのDay95として出す判断"
+  ],
+  "failuresAndFixes": [],
+  "social": {
+    "x": {
+      "summary": "",
+      "hashtags": [
+        "100日チャレンジ",
+        "個人開発"
+      ],
+      "emoji": "🌳",
+      "ai": "",
+      "human": "企画（3Dで盆栽を仕立てるアプリ）と、Day95として出す判断",
+      "failure": "",
+      "body": "",
+      "replies": [],
+      "codePublished": true
+    }
+  }
+}
