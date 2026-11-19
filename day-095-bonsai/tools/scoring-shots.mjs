@@ -1,5 +1,6 @@
 // 見た目・体験の採点役に渡す画像一式を、決まった手順で撮る（開発用・配信しない）。
-// 使い方: node day-095-bonsai/tools/scoring-shots.mjs --out <dir> [--only ui,fixed] [--gfx high]
+// 使い方: node day-095-bonsai/tools/scoring-shots.mjs --out <dir> [--only ui,fixed] [--gfx high] [--names B-pine,E-pine]
+// --names は固定ショットを名前の前方一致で絞る（直した所だけ撮り直す）。
 // 固定ショット（3D）は visual-direction.md の A〜E。画面（UI）は 390×844（指）・768×1024・1440×900 の初期と、
 // 道具を押している間・時間を進めたあと・メニュー・共有・写真の各状態。乱数・日付・視点は URL で固定する。
 import { mkdirSync, writeFileSync } from 'node:fs';
@@ -14,6 +15,8 @@ const opt = (name, fallback) => { const i = args.indexOf(name); return i >= 0 ? 
 const outDir = resolve(opt('--out', './scoring-shots'));
 const only = new Set((opt('--only', 'fixed,ui') || '').split(','));
 const gfx = opt('--gfx', 'high');
+const names = (opt('--names', '') || '').split(',').filter(Boolean);
+const wanted = (name) => !names.length || names.some((n) => name.startsWith(n));
 mkdirSync(outDir, { recursive: true });
 
 const base = `/?debug=1&fresh=1&gfx=${gfx}&seed=11`;
@@ -77,11 +80,11 @@ const FIXED = [
 ];
 
 if (only.has('fixed')) {
-  for (const [name, query, note] of FIXED) {
+  for (const [name, query, note] of FIXED.filter(([name]) => wanted(name))) {
     const logs = await open(phone, query, (page) => shot(page, `${name}-390`, `${note}（390×844・スマホ）`));
     if (logs.length) notes.push(`  - ${name}-390 のログ: ${logs.join(' / ')}`);
   }
-  for (const [name, query, note] of FIXED.slice(0, 2)) {
+  for (const [name, query, note] of FIXED.slice(0, 2).filter(([name]) => wanted(name))) {
     const logs = await open(wide, query, (page) => shot(page, `${name}-1440`, `${note}（1440×900・PC）`));
     if (logs.length) notes.push(`  - ${name}-1440 のログ: ${logs.join(' / ')}`);
   }

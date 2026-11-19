@@ -7,26 +7,26 @@
   - フォルダ・vendor/three.js・LICENSE・契約（contract.js・rng.js・noise.js）・見本の骨格・撮影の道具・仕様・テストの入口。
   - _Boundary: day-095-bonsai/lib/contract.js, rng.js, noise.js, tests/{index,shared,fixtures}, tools/, .kiro/specs/day-095-bonsai/_
   - _Requirements: 10.1_
-- [ ] 1. 木のモデル（A・Codex）
+- [x] 1. 木のモデル（A・Codex）
   - calendar・species・look・tree（苗・成長・切る・曲げる・芽摘み・保存）・pick・history と試験。
   - _Boundary: lib/calendar.js, species.js, look.js, tree.js, pick.js, history.js, tests/core/_
   - _Requirements: 2.1〜2.4, 3.1〜3.3, 4.1〜4.2, 5.1〜5.4, 7.1〜7.2_
-- [ ] 2. 木と葉の描画（B・Grok）
+- [x] 2. 木と葉の描画（B・Grok）
   - 幹・枝・根張り・針金の管、葉のカード、質感、光（朝昼夕夜）、季節の粒、カメラ、写真、view3d。
   - _Depends: 0（見本の骨格で先行）_
   - _Boundary: lib/view3d.js, tree-mesh.js, wire-mesh.js, foliage.js, textures-tree.js, stage.js, capture.js, tests/render/_
   - _Requirements: 1.1〜1.3, 2.2, 3.3, 5.3〜5.4, 6.2〜6.3, 8.1, 9.2, 9.7_
-- [ ] 3. 卓・鉢・壁（C・Antigravity）
+- [x] 3. 卓・鉢・壁（C・Antigravity）
   - diorama（3つの鉢・土・苔・石・卓・和紙の壁）と質感。
   - _Depends: 0_
   - _Boundary: lib/diorama.js, textures-stage.js, tests/render/diorama.test.mjs_
   - _Requirements: 6.1〜6.2_
-- [ ] 4. 画面と操作（D・Codex）
+- [x] 4. 画面と操作（D・Codex）
   - index.html・css・app・controls・ui・store・audio・lore。モデルと描画は契約どおりに呼ぶ（未完の間は代用品）。
   - _Depends: 0_
   - _Boundary: index.html, app.css, app.js, lib/controls.js, ui.js, audio.js, store.js, lore.js, favicon.svg, tests/ui/_
   - _Requirements: 1.2〜1.4, 2.1, 3.1, 4.1, 5.1, 7.1〜7.2, 8.1〜8.2, 9.1〜9.6_
-- [ ] 5. 統合する（親）
+- [x] 5. 統合する（親）
   - 代用品の撤去・契約の検証（validateSkeleton）・実ブラウザで通し・固定ショットの撮影・食い違いの修正。
   - _Depends: 1,2,3,4_
 - [ ] 6. 公開の基盤を整える（親）

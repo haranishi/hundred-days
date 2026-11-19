@@ -101,7 +101,8 @@ test('道具を選ぶと data-tool と押下状態が変わる（キーボード
   expect((await dataset(page)).tool).toBe('cut');
   await expect(page.getByRole('button', { name: '切る', exact: true })).toHaveAttribute('aria-pressed', 'true');
   await expect(page.getByRole('button', { name: '見る', exact: true })).toHaveAttribute('aria-pressed', 'false');
-  await page.locator('#view').focus();
+  // ボタンをマウスで押したあとも、盆栽の画面をクリックし直さずにキーボードが効く（フォーカスが画面に戻る）
+  await expect(page.locator('#view')).toBeFocused();
   await page.keyboard.press('3');
   expect((await dataset(page)).tool).toBe('bend');
   await page.keyboard.press('1');
@@ -191,8 +192,10 @@ test('時間を進める：1週間で7日・1か月で30日・次の季節へ。
   await page.getByRole('button', { name: '次の季節', exact: true }).click();
   await expect.poll(async () => (await dataset(page)).season).toBe('winter');
   const winterNodes = await nodeCount(page);
+  // 「次の季節」は季節の中ごろ（始まりの45日後）へ進む。冬の中ごろ（1月3週）から1か月と1週間では、まだ冬
   await page.getByRole('button', { name: '1か月', exact: true }).click();
-  await page.getByRole('button', { name: '1か月', exact: true }).click();
+  await page.getByRole('button', { name: '1週間', exact: true }).click();
+  await expect.poll(async () => (await dataset(page)).season).toBe('winter');
   expect(await nodeCount(page)).toBe(winterNodes);
   await page.getByRole('button', { name: '次の季節', exact: true }).click();
   await expect.poll(async () => (await dataset(page)).season).toBe('spring');

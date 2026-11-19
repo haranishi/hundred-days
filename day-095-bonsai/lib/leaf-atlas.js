@@ -102,8 +102,8 @@ function paintCurvedNeedle(ctx, x0, y0, ang, len, width, bend, body) {
   const y1 = y0 + dy * len;
   // 根元を暗く、先端を白に近い灰へ。instanceColor の深緑を掛けると先端だけ黄緑に抜ける。
   const g = ctx.createLinearGradient(x0, y0, x1, y1);
-  g.addColorStop(0, 'rgb(78,78,78)');
-  g.addColorStop(0.42, 'rgb(150,150,150)');
+  g.addColorStop(0, 'rgb(122,122,122)');
+  g.addColorStop(0.42, 'rgb(180,180,180)');
   g.addColorStop(1, 'rgb(248,248,248)');
   ctx.strokeStyle = g;
   ctx.fillStyle = g;
@@ -162,8 +162,8 @@ function paintNeedleHub(ctx, cx, cy, radius) {
   }
   ctx.closePath();
   const g = ctx.createRadialGradient(cx, cy, radius * 0.08, cx, cy, radius);
-  g.addColorStop(0, 'rgb(58,58,58)');
-  g.addColorStop(0.5, 'rgb(110,110,110)');
+  g.addColorStop(0, 'rgb(108,108,108)');
+  g.addColorStop(0.5, 'rgb(156,156,156)');
   g.addColorStop(1, 'rgb(210,210,210)');
   ctx.fillStyle = g;
   ctx.fill();
@@ -180,7 +180,7 @@ function paintPine(ctx, w, h) {
   for (const n of needles) paintCurvedNeedle(ctx, cx, cy, n.ang, n.len, n.width, n.bend, body);
   // 星は束の根元だけ。大きいと遠景で丸い房になり、針が隠れる。
   paintNeedleHub(ctx, cx, cy, span * 0.1);
-  ctx.fillStyle = 'rgb(72,72,72)';
+  ctx.fillStyle = 'rgb(116,116,116)';
   ctx.beginPath();
   ctx.ellipse(cx, cy, w * 0.018, h * 0.018, 0, 0, Math.PI * 2);
   ctx.fill();
