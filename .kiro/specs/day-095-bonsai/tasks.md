@@ -34,8 +34,8 @@
   - _Depends: 5_
   - _Boundary: meta.json, README.md, og.png, screenshot.webp, THIRD_PARTY_NOTICES.md, README.md(根), tests/e2e/day-095.spec.mjs_
   - _Requirements: 9.1, 10.1〜10.2_
-- [ ] 7. 評価と照合（Grok・Antigravity・Codex・親）
-  - 体験の採点（Grok・実際に遊ぶ）・見た目の採点（Antigravity と Grok・画像のみ）を最大3周。独立コードレビュー（Codex・読み取り専用）。文言の事実の照合（Codex・検索つき）。権利・漏洩の全文確認。
+- [x] 7. 評価と照合（Antigravity・Codex・Grok・親）
+  - 体験の採点（Antigravity・実際に遊ぶ。Grok は利用枠が切れて途中で使えなくなった）・見た目の採点（Antigravity・Codex・Grok・画像のみ）を最大3周。独立コードレビュー（Codex・読み取り専用）。文言の事実の照合（Codex・検索つき）。権利・漏洩の全文確認。
   - _Depends: 6_
 - [ ] 8. PR とマージ
   - 作業枝を push、公開用（published）でPR、CI の全通過、mainとの衝突の解消、承認を得てマージ、本番の確認。X投稿と実機の確認は本人。
