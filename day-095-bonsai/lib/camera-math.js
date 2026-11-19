@@ -214,12 +214,14 @@ export function createCameraRig(fov, applyPose, motion) {
       const { az, pol, dist, target } = partial;
       // app.js の自動回転は方位だけを送る。手動の回転は仰角も送る。
       const idle = Number.isFinite(az) && pol == null && dist == null && target == null && opts.animate === false;
-      if (idle && (manual || tween)) return false;
+      // 自動回転は、補間の最中だけ見送る。一度手で回したあと（manual）も、操作が止まれば再開する
+      // （manual は「成長で勝手に引かない」ための印で、無操作の回転まで止めるものではない）
+      if (idle && tween) return false;
       const next = clampCamera({ az: az ?? pose.az, pol: pol ?? pose.pol, dist, target }, lastFit);
       const sameTarget = target?.length === 3 && pose.target.every((v, i) => target[i] === v);
       if (dist == null || dist === pose.dist) next.dist = pose.dist;
       if (target == null || sameTarget) next.target = pose.target;
-      if (idle && bounds && !frameContains(bounds, next, fov, aspect)) {
+      if (idle && !manual && bounds && !frameContains(bounds, next, fov, aspect)) {
         lastFit = fitCamera(bounds, next, fov, aspect);
         move(lastFit);
         return true;

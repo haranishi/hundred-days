@@ -205,11 +205,14 @@ test('成長: 収まる間は視点を保ち、はみ出すと約0.9秒で引く
   view.setSkeleton(grown);
   probe.draw(20);
   assert.deepEqual(view.camera.get(), manual);
-  const draws = renderer.draws;
+  // 一度手で回したあとも、無操作の自動回転（方位だけ・補間なし）は受け付ける（要件1.4。レビューの指摘）。
+  // ただし、距離と注視点は動かさない（手で寄せた構図を、自動の収まりで壊さない）
   view.camera.set({ az: manual.az + 1 }, { animate: false });
   probe.draw();
-  assert.equal(renderer.draws, draws, '停止中も自動回転の更新で描き直している');
-  assert.deepEqual(view.camera.get(), manual);
+  const rotated = view.camera.get();
+  assert.equal(rotated.az, manual.az + 1, '手で回したあと、自動回転が再開しない');
+  assert.equal(rotated.dist, manual.dist);
+  assert.deepEqual(rotated.target, manual.target);
 
   view.camera.reset({ animate: true });
   probe.draw(12);

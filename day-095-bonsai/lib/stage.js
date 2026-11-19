@@ -202,7 +202,6 @@ export function createStage(THREE, scene, renderer, { gfx = 'high', seed = 1, cr
     } catch {
       // 同じ光で毎フレーム失敗し直さない。次に光が変わったときだけもう一度試す。
       envKey = key;
-      envTarget = null;
     }
   }
 
@@ -374,6 +373,9 @@ export function createStage(THREE, scene, renderer, { gfx = 'high', seed = 1, cr
       seasonMesh.dispose();
       burstMesh.dispose();
       scene.remove(sun, sun.target, contact, contact.target, hemi, lantern, seasonMesh, burstMesh);
+      // 影の描画先（WebGLRenderTarget）も解放する。外すだけでは残り、苗の作り直しや再試行のたびに増えていた
+      sun.dispose?.();
+      contact.dispose?.();
     },
   };
 }

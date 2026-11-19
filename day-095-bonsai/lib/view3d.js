@@ -111,6 +111,10 @@ export function createView3D(THREE, canvas, {
   let highlightMesh = null;
   let highlightPads = null;
   let pulseStart = null;
+  let wasMoving = false;
+  let contextLost = false;
+  let viewW = 1;
+  let viewH = 1;
   const marked = new Uint8Array(MAX_NODES);
   const padPose = new THREE.Object3D();
   const up = new THREE.Vector3(0, 1, 0);
@@ -156,7 +160,7 @@ export function createView3D(THREE, canvas, {
   }
 
   function requestRender() {
-    if (disposed) return;
+    if (disposed || contextLost) return;
     dirty = true;
     if (!raf) raf = requestAnimationFrame(tick);
   }
@@ -494,22 +498,26 @@ export function createView3D(THREE, canvas, {
     const dt = lastTime ? Math.min(0.05, (now - lastTime) / 1000) : 0;
     lastTime = now;
     const moving = step(dt, now);
-    if (dirty || moving) {
+    // 動きが止まった直後の1枚も描く。描かないと、最後に消えた粒や補間の最終の姿が、次の操作まで画面に残る
+    if (dirty || moving || wasMoving) {
       renderer.render(scene, camera);
       stats.triangles = renderer.info.render.triangles;
       stats.drawCalls = renderer.info.render.calls;
       if (dt > 0) stats.fps = stats.fps ? stats.fps * 0.85 + (1 / dt) * 0.15 : 1 / dt;
       dirty = false;
     }
+    wasMoving = moving;
     if (moving) raf = requestAnimationFrame(tick);
   }
 
-  canvas.addEventListener('webglcontextlost', (event) => {
+  const handleContextLost = (event) => {
     event.preventDefault();
+    contextLost = true;
     if (raf) cancelAnimationFrame(raf);
     raf = 0;
     if (typeof onContextLost === 'function') onContextLost(event);
-  });
+  };
+  canvas.addEventListener('webglcontextlost', handleContextLost);
 
   const view = {
     setSpecies(id) {
@@ -531,7 +539,8 @@ export function createView3D(THREE, canvas, {
     },
     setSkeleton(next, { animate = false } = {}) {
       skel = next;
-      growAnimate = !!(animate && motion);
+      // 生える節（fresh>0）が1つも無いときは、動かす意味が無い（毎フレーム木全体を作り直す無駄になる）
+      growAnimate = !!(animate && motion && next?.fresh?.some((v) => v > 0));
       growElapsed = growAnimate ? 0 : GROW_SECONDS;
       rebuild();
       cameraRig.updateBounds(sceneBounds());
@@ -632,9 +641,12 @@ export function createView3D(THREE, canvas, {
     resize(cssW, cssH, dpr = 1) {
       const cap = gfx === 'high' ? 2 : gfx === 'low' ? 1.25 : 1;
       const ratio = gfx === 'test' ? 1 : Math.min(Math.max(1, dpr), cap);
+      // 数でない・負の寸法は受け付けず、直前の有効な寸法を保つ
+      if (Number.isFinite(cssW) && cssW >= 1) viewW = cssW;
+      if (Number.isFinite(cssH) && cssH >= 1) viewH = cssH;
       renderer.setPixelRatio(ratio);
-      renderer.setSize(Math.max(1, cssW), Math.max(1, cssH), false);
-      camera.aspect = Math.max(1, cssW) / Math.max(1, cssH);
+      renderer.setSize(viewW, viewH, false);
+      camera.aspect = viewW / viewH;
       camera.updateProjectionMatrix();
       cameraRig.resize(camera.aspect);
       requestRender();
@@ -642,6 +654,7 @@ export function createView3D(THREE, canvas, {
     dispose() {
       if (disposed) return;
       disposed = true;
+      canvas.removeEventListener?.('webglcontextlost', handleContextLost);
       if (raf) cancelAnimationFrame(raf);
       for (const drop of drops) {
         scene.remove(drop.mesh);

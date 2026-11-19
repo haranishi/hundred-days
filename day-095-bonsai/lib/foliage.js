@@ -243,8 +243,10 @@ export function padCoreGeometry() {
       const b = a + 1;
       const c = a + cols;
       const d = c + 1;
-      if (j !== 0) indices.push(a, c, b);
-      if (j !== stacks - 1) indices.push(b, c, d);
+      // 反時計回りが表。外向きの法線（頂点法線と同じ向き）が表になるよう、a→b→c の順にする
+      // （逆順だと、片面の材質ではカメラに近い側が裏面として除かれ、内側だけが見えていた）
+      if (j !== 0) indices.push(a, b, c);
+      if (j !== stacks - 1) indices.push(b, d, c);
     }
   }
   return {

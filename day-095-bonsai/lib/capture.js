@@ -64,8 +64,16 @@ function flipToImage(ctx, pixels, width, height) {
 export async function captureFrame({
   THREE, renderer, scene, camera, pose, applyPose, bounds, overlay, width = 1080, height = 1350, caption, fov, createCanvas,
 }) {
-  const w = Math.max(16, width | 0);
-  const h = Math.max(16, height | 0);
+  // 寸法の上限：1辺 4096・総画素 1600万（8192四方だと、読み戻しの配列だけで256MiBを要求する）。通常は 1080×1350
+  const MAX_SIDE = 4096;
+  const MAX_PIXELS = 16_000_000;
+  let w = Math.min(MAX_SIDE, Math.max(16, Number.isFinite(width) ? width | 0 : 1080));
+  let h = Math.min(MAX_SIDE, Math.max(16, Number.isFinite(height) ? height | 0 : 1350));
+  if (w * h > MAX_PIXELS) {
+    const k = Math.sqrt(MAX_PIXELS / (w * h));
+    w = Math.max(16, Math.floor(w * k));
+    h = Math.max(16, Math.floor(h * k));
+  }
   const prevAspect = camera.aspect;
   const prevTarget = renderer.getRenderTarget();
   const overlayVisible = overlay?.visible;

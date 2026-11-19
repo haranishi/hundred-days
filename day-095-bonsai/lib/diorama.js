@@ -282,7 +282,10 @@ export function createDiorama(THREE, { gfx = 'high', seed = 1, createCanvas } = 
 
   function setPot(id) {
     if (disposed) return;
-    currentPotId = normalizePotId(id);
+    const next = normalizePotId(id);
+    // 同じ鉢をもう一度指定されたときは作り直さない（起動の直後の重複で、鉢・土・苔・質感を破棄して作り直す約330msの無駄があった）
+    if (activePotResources && next === currentPotId) return;
+    currentPotId = next;
     buildPotStage(currentPotId);
   }
 
