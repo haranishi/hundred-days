@@ -1,8 +1,10 @@
 import assert from 'node:assert/strict';
 import { registerHooks } from 'node:module';
 import { test } from 'node:test';
-import { CAMERA_DEFAULT, DEFAULTS, SAVE_NAME, SAVE_VERSION, TOOL_IDS } from '../../lib/contract.js';
+import { DEFAULTS, SAVE_NAME, SAVE_VERSION, TOOL_IDS } from '../../lib/contract.js';
 import { createTree } from '../../lib/tree.js';
+import { LEARNED_GFX_KEY } from '../../lib/gfx-select.js';
+import { createCameraRig } from '../../lib/camera-math.js';
 
 const viewFactory = Symbol.for('bonsai.test.createView3D');
 const viewModule = 'data:text/javascript,' + encodeURIComponent(
@@ -14,19 +16,22 @@ function send(target, type, props = {}) {
   target.dispatchEvent(Object.assign(new Event(type, { cancelable: true }), props));
 }
 
-async function boot(t, { raw = null, failFirstRead = false, failRemove = false, capturePhoto, reduced = false, gfx = 'test' } = {}) {
-  t.mock.timers.enable({ apis: ['setTimeout'] });
+async function boot(t, {
+  raw = null, learned = null, failFirstRead = false, failRemove = false, capturePhoto, reduced = false,
+  gfx = 'test', coarse = false, debug = true, prepare = async () => {},
+} = {}) {
+  t.mock.timers.enable({ apis: ['setTimeout', 'setInterval'] });
   const document = new EventTarget();
   const window = new EventTarget();
-  window.screen = { orientation: new EventTarget() };
+  window.screen = { orientation: new EventTarget(), width: 390, height: 844 };
   const elements = new Map();
   const frames = new Map();
   const reads = { get: 0, set: 0 };
-  const motion = new EventTarget();
-  motion.matches = reduced;
+  const motion = Object.assign(new EventTarget(), { matches: reduced });
   const highlights = [];
   const lookAnimations = [];
   let viewOptions;
+  const mounted = [];
   let resizeStage;
   let nextFrame = 0;
 
@@ -39,10 +44,14 @@ async function boot(t, { raw = null, failFirstRead = false, failRemove = false, 
       setAttribute() {}, removeAttribute() {}, append() {},
       querySelector: (selector) => id === 'assist' && selector === '[data-assist-key]' ? byId('assist-first') : null,
       querySelectorAll: () => [], matches: () => false, contains: () => false,
-      cloneNode: () => element(id), replaceWith: (next) => elements.set(id, next),
+      cloneNode: () => element(id),
+      replaceWith(next) {
+        if (document.activeElement === this) document.activeElement = document.body;
+        elements.set(id, next);
+      },
       showModal() { this.open = true; },
       close() { this.open = false; send(this, 'close'); },
-      focus() { document.activeElement = this; },
+      focus(options) { document.activeElement = this; this.focusOptions = options; },
       setPointerCapture: (pointerId) => captures.add(pointerId),
       hasPointerCapture: (pointerId) => captures.has(pointerId),
       releasePointerCapture: (pointerId) => captures.delete(pointerId),
@@ -66,22 +75,34 @@ async function boot(t, { raw = null, failFirstRead = false, failRemove = false, 
 
   function createView3D(_THREE, _canvas, options) {
     viewOptions = options;
-    return {
+    const rig = createCameraRig(30, () => {}, false);
+    const cameraSets = [];
+    const view = {
+      prepare,
       camera: {
-        get: () => CAMERA_DEFAULT, set() {}, reset() {},
+        get: rig.get,
+        isManual: rig.isManual,
+        set(next, opts) {
+          cameraSets.push({ next, opts });
+          rig.set(next, opts);
+        },
+        reset: rig.reset,
         pickRay: () => ({ origin: [0, 0, 8], dir: [0, 0, -1] }), pxToWorld: () => 0.01,
       },
       setPot() {}, setLight() {}, setSpecies() {}, setMoisture() {}, setSkeleton() {},
       setLook(_look, { animate }) { lookAnimations.push(animate); },
       setHighlight(value) { highlights.push(value); },
-      resize() {}, dispose() {}, requestRender() {},
+      resize() {}, dispose() { this.disposed = true; }, requestRender() {},
       capturePhoto,
     };
+    mounted.push({ view, options, cameraSets });
+    return view;
   }
 
   const globals = {
-    window, document, location: { search: `?debug=1&gfx=${gfx}` }, devicePixelRatio: 1,
-    matchMedia: () => motion,
+    window, document, location: { search: `?debug=${Number(debug)}&gfx=${gfx}` }, devicePixelRatio: 1,
+    navigator: { hardwareConcurrency: 8 },
+    matchMedia: (query) => query === '(pointer: coarse)' ? { matches: coarse } : motion,
     ResizeObserver: class {
       constructor(callback) { resizeStage = callback; }
       observe() {}
@@ -91,19 +112,22 @@ async function boot(t, { raw = null, failFirstRead = false, failRemove = false, 
     [viewFactory]: createView3D,
     localStorage: {
       getItem(name) {
+        if (name === LEARNED_GFX_KEY) return learned;
         assert.equal(name, SAVE_NAME);
         reads.get += 1;
         if (failFirstRead && reads.get === 1) throw new Error('SecurityError');
         return raw;
       },
       setItem(name, value) {
+        if (name === LEARNED_GFX_KEY) { learned = value; return; }
         assert.equal(name, SAVE_NAME);
         reads.set += 1;
         raw = value;
       },
       removeItem(name) {
-        assert.equal(name, SAVE_NAME);
         if (failRemove) throw new Error('SecurityError');
+        if (name === LEARNED_GFX_KEY) { learned = null; return; }
+        assert.equal(name, SAVE_NAME);
         raw = null;
       },
     },
@@ -152,7 +176,9 @@ async function boot(t, { raw = null, failFirstRead = false, failRemove = false, 
 
   paint();
   return {
-    window, byId, pointer, highlights, lookAnimations, viewOptions, reads, storageValue: () => raw, resizeStage,
+    window, document, byId, pointer, highlights, lookAnimations, viewOptions, reads, storageValue: () => raw, resizeStage,
+    mounted, motion, learnedValue: () => learned,
+    async settle() { await Promise.resolve(); paint(); },
     app: window.__bonsai, notice: () => byId('notice-text').textContent,
     click(id) { send(byId(id), 'click'); paint(); },
   };
@@ -351,4 +377,234 @@ test('道具の使い方を札と読み上げに出し、同じ道具の札は�
   assert.match(page.byId('live').textContent, /道具「見る」を選びました/);
   page.app.advance(7);
   assert.deepEqual(page.lookAnimations, [false, false]);
+});
+
+test('メニューで画質を変えると設定を保存し、カメラと木を保ったまま描画を作り直す', async (t) => {
+  const page = await boot(t, { gfx: '', coarse: true });
+  await page.settle();
+  const scene = page.app.view;
+  const tree = page.app.tree;
+  const pose = { az: -42, pol: 64, dist: 7, target: [0.1, 1.8, 0.4] };
+  scene.camera.set(pose);
+  assert.equal(page.byId('app').dataset.gfx, 'mid');
+
+  page.click('menu-open');
+  const input = page.byId('gfx');
+  assert.equal(input.value, 'auto');
+  input.value = 'high';
+  send(input, 'change');
+  assert.equal(page.byId('app').dataset.gfx, 'high');
+  assert.equal(page.byId('app').dataset.ready, 'false');
+  assert.equal(scene.disposed, true);
+  assert.deepEqual(page.app.view.camera.get(), pose);
+  assert.equal(page.app.view.camera.isManual(), true);
+  assert.equal(page.app.tree, tree);
+  await page.settle();
+  assert.equal(page.byId('app').dataset.ready, 'true');
+  send(page.window, 'pagehide');
+  assert.equal(JSON.parse(page.storageValue()).gfx, 'high');
+
+  page.app.feedFrames(Array(100).fill(60));
+  assert.equal(page.app.state().gfx, 'high');
+  assert.equal(page.mounted.length, 2);
+});
+
+test('自動では実行中の遅さを覚えて、カメラを保ち、一段下げたことを通知する', async (t) => {
+  const page = await boot(t, { gfx: '', coarse: true });
+  await page.settle();
+  const scene = page.app.view;
+  const pose = { az: 31, pol: 69, dist: 9, target: [0, 1.9, 0.5] };
+  scene.camera.set(pose);
+  page.document.hidden = true;
+  page.app.feedFrames(Array(70).fill(55));
+  assert.equal(page.byId('app').dataset.gfx, 'mid');
+  page.document.hidden = false;
+
+  for (let i = 0; i < 59; i += 1) page.viewOptions.onFrame(55);
+  assert.equal(page.app.view, scene);
+  page.app.feedFrames([55]);
+  assert.equal(page.byId('app').dataset.gfx, 'low');
+  assert.equal(scene.disposed, true);
+  assert.equal(JSON.parse(page.learnedValue()).tier, 'low');
+  assert.equal(page.app.state().gfxSetting, 'auto');
+  assert.deepEqual(page.app.view.camera.get(), pose);
+  assert.equal(page.app.view.camera.isManual(), true);
+  await page.settle();
+  assert.match(page.notice(), /動きが重いので、画質を下げました/);
+  assert.equal(page.byId('live').textContent, page.notice());
+});
+
+test('動きの軽減を切り替えても手動の視点を引き継ぐ', async (t) => {
+  const page = await boot(t, { gfx: '', coarse: true });
+  await page.settle();
+  const previous = page.app.view;
+  previous.camera.set({ az: 30, pol: 65, dist: 8 });
+  const pose = previous.camera.get();
+  page.motion.matches = true;
+  send(page.motion, 'change');
+  await page.settle();
+  assert.equal(previous.disposed, true);
+  assert.equal(page.app.view.camera.isManual(), true);
+  assert.deepEqual(page.app.view.camera.get(), pose);
+});
+
+test('保存した設定と覚えた画質よりURL指定が優先され、デバッグなしでは入口を出さない', async (t) => {
+  const raw = JSON.stringify({ ...JSON.parse(previousSave()), gfx: 'low' });
+  const page = await boot(t, { raw, gfx: 'mid', debug: false });
+  assert.equal(page.app, undefined);
+  assert.equal(page.byId('app').dataset.gfx, 'mid');
+  assert.equal(page.viewOptions.onFrame, undefined);
+  await page.settle();
+  page.click('menu-open');
+  assert.equal(page.byId('gfx').value, 'low');
+});
+
+test('以前の準備が失敗しても、画質の変更で始めた準備と読み込み表示を保つ', async (t) => {
+  const jobs = [];
+  const prepare = () => new Promise((resolve, reject) => jobs.push({ resolve, reject }));
+  const page = await boot(t, { gfx: '', coarse: true, prepare });
+  assert.equal(page.byId('loading').hidden, false);
+  page.click('menu-open');
+  const input = page.byId('gfx');
+  input.value = 'low';
+  send(input, 'change');
+  jobs[0].reject(new Error('古い描画の準備'));
+  await page.settle();
+  assert.equal(page.byId('fallback').hidden, true);
+  assert.equal(page.byId('loading').hidden, false);
+  jobs[1].resolve();
+  await page.settle();
+  assert.equal(page.byId('loading').hidden, true);
+  assert.equal(page.byId('app').dataset.ready, 'true');
+  assert.equal(page.byId('app').dataset.gfx, 'low');
+  assert.deepEqual(page.mounted.map(({ cameraSets }) => cameraSets.length), [0, 0]);
+});
+
+test('自動の再起動では期限内に覚えた軽めの画質から始める', async (t) => {
+  const raw = previousSave();
+  const learned = JSON.stringify({ tier: 'low', at: Date.now() });
+  const page = await boot(t, { raw, learned, gfx: '', coarse: true });
+  await page.settle();
+  assert.equal(page.byId('app').dataset.gfx, 'low');
+  page.click('menu-open');
+  assert.equal(page.byId('gfx').value, 'auto');
+  assert.equal(page.app.state().species, 'plum');
+});
+
+for (const [label, start, stop] of [
+  ['指で触れている', (page) => {
+    page.click('tool-bend');
+    page.pointer('pointerdown', 'view', 1);
+  }, (page) => page.pointer('pointerup', 'view', 1)],
+  ['早送りしている', (page) => page.click('fast-start'), (page) => page.click('fast-stop')],
+  ['ダイアログを開いている', (page) => page.click('menu-open'), (page) => page.byId('menu').close()],
+]) {
+  test(`自動降格は${label}間は待ち、操作が終わると一度だけ切り替える`, async (t) => {
+    const page = await boot(t, { gfx: '', coarse: true });
+    await page.settle();
+    const scene = page.app.view;
+    start(page);
+    page.app.feedFrames(Array(120).fill(55));
+    t.mock.timers.tick(400);
+    assert.equal(page.app.view, scene);
+    assert.equal(page.app.state().gfx, 'mid');
+    assert.equal(JSON.parse(page.learnedValue()).tier, 'low');
+    assert.doesNotMatch(page.notice(), /画質を下げました/);
+    stop(page);
+    t.mock.timers.tick(399);
+    assert.equal(page.app.view, scene);
+    t.mock.timers.tick(1);
+    await page.settle();
+    assert.equal(scene.disposed, true);
+    assert.equal(page.app.state().gfx, 'low');
+    assert.equal(page.app.view.camera.isManual(), false);
+    assert.match(page.notice(), /画質を下げました/);
+    t.mock.timers.tick(400);
+    assert.equal(page.mounted.length, 2);
+  });
+}
+
+for (const moveFocus of [false, true]) {
+  test(`自動降格中に${moveFocus ? 'メニューボタンへ移したフォーカスを保つ' : '失ったフォーカスを新しいキャンバスに戻す'}`, async (t) => {
+    const page = await boot(t, { gfx: '', coarse: true });
+    await page.settle();
+    const oldCanvas = page.byId('view');
+    oldCanvas.focus();
+    page.app.feedFrames(Array(60).fill(55));
+    const canvas = page.byId('view');
+    assert.notEqual(canvas, oldCanvas);
+    assert.equal(page.document.activeElement, page.document.body);
+    const menu = page.byId('menu-open');
+    if (moveFocus) menu.focus();
+    await page.settle();
+    assert.equal(page.document.activeElement, moveFocus ? menu : canvas);
+    assert.deepEqual(canvas.focusOptions, moveFocus ? undefined : { preventScroll: true });
+  });
+}
+
+for (const [label, replace, expected] of [
+  ['手動で画質を替える', (page) => {
+    page.byId('gfx').value = 'high';
+    send(page.byId('gfx'), 'change');
+    page.byId('menu').close();
+  }, 'high'],
+  ['苗を替える', (page) => {
+    page.byId('new-species').value = 'pine';
+    send(page.byId('new-tree'), 'submit');
+  }, 'mid'],
+  ['WebGL表示が止まる', (page) => {
+    send(page.byId('view'), 'webglcontextlost');
+    page.byId('menu').close();
+    page.click('retry-view');
+  }, 'mid'],
+]) {
+  test(`画質の変更を待つ間に${label}と予約を捨てる`, async (t) => {
+    const page = await boot(t, { gfx: '', coarse: true });
+    await page.settle();
+    page.click('menu-open');
+    page.app.feedFrames(Array(60).fill(55));
+    assert.equal(JSON.parse(page.learnedValue()).tier, 'low');
+    replace(page);
+    await page.settle();
+    t.mock.timers.tick(800);
+    assert.equal(page.mounted.length, 2);
+    assert.equal(page.app.state().gfx, expected);
+    assert.doesNotMatch(page.notice(), /画質を下げました/);
+    if (expected === 'mid') {
+      page.app.feedFrames(Array(60).fill(55));
+      assert.equal(page.app.state().gfx, 'low');
+      assert.equal(page.mounted.length, 3);
+    }
+  });
+}
+
+test('前面に戻った時点から自動降格の計測をやり直す', async (t) => {
+  const page = await boot(t, { gfx: '', coarse: true });
+  await page.settle();
+  const slow = Array(59).fill(55);
+  page.app.feedFrames(slow);
+  assert.equal(page.app.state().gfx, 'mid');
+  page.document.hidden = true;
+  send(page.document, 'visibilitychange');
+  page.app.feedFrames([55]);
+  page.document.hidden = false;
+  send(page.document, 'visibilitychange');
+  page.app.feedFrames(slow);
+  assert.equal(page.app.state().gfx, 'mid');
+  page.app.feedFrames([55]);
+  assert.equal(page.app.state().gfx, 'low');
+});
+
+test('保存を消して最初からやり直すと覚えた画質を捨て、端末に合わせて選び直す', async (t) => {
+  const raw = previousSave();
+  const learned = JSON.stringify({ tier: 'low', at: Date.now() });
+  const page = await boot(t, { raw, learned, gfx: '', coarse: true });
+  await page.settle();
+  assert.equal(page.app.state().gfx, 'low');
+  page.click('menu-open');
+  page.click('reset-open');
+  page.click('reset-confirm');
+  await page.settle();
+  assert.equal(page.learnedValue(), null);
+  assert.equal(page.app.state().gfx, 'mid');
 });

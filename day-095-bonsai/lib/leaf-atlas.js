@@ -2,10 +2,9 @@
 // 灰を白に近い値にすると、線形の色に掛かったあと ACES で彩度が落ちて鮭色になる。
 // 外は透明。alphaTest で輪郭を切ると、四角いカードの縁が残らない。
 
-const SIZE = { high: 256, low: 160, test: 64 };
-
+import { GFX_TIERS } from './gfx.js';
 export function leafAtlasSize(gfx = 'high') {
-  return SIZE[gfx] || SIZE.low;
+  return (GFX_TIERS[gfx] ?? GFX_TIERS.low).leafSize;
 }
 
 function mapleLeaf(ctx, cx, cy, radius, rot) {

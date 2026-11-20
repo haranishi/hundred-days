@@ -1,8 +1,8 @@
+import { GFX_TIERS } from '../../lib/gfx.js';
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import {
   MAX_LEAF_CARDS,
-  PAD_CARDS,
   PAD_FLAT,
   applyLookColors,
   capBudgets,
@@ -53,18 +53,19 @@ test('クォータニオンは +Z を指定した軸へ送る', () => {
 });
 
 test('枚数: 基準半径で画質どおり、低画質は半分、全体は 6000 以下、density 0 は 0', () => {
-  assert.equal(PAD_CARDS.low * 2, PAD_CARDS.high);
-  assert.equal(PAD_CARDS.test, 6);
+  assert.equal(GFX_TIERS.low.padCards * 2, GFX_TIERS.high.padCards);
+  assert.equal(GFX_TIERS.test.padCards, 6);
   assert.equal(PAD_FLAT, 0.45);
-  assert.equal(cardBudget(0.36, 1, 'high'), PAD_CARDS.high);
-  assert.equal(cardBudget(0.36, 1, 'low'), PAD_CARDS.low);
-  assert.equal(cardBudget(0.36, 1, 'test'), PAD_CARDS.test);
+  assert.equal(cardBudget(0.36, 1, 'high'), GFX_TIERS.high.padCards);
+  assert.equal(cardBudget(0.36, 1, 'mid'), GFX_TIERS.mid.padCards);
+  assert.equal(cardBudget(0.36, 1, 'low'), GFX_TIERS.low.padCards);
+  assert.equal(cardBudget(0.36, 1, 'test'), GFX_TIERS.test.padCards);
   assert.equal(cardBudget(0.36, 0, 'high'), 0);
   assert.ok(cardBudget(0.5, 1, 'high') >= cardBudget(0.3, 1, 'high'));
   assert.ok(cardBudget(0.36, 1, 'high') >= 60 && cardBudget(0.36, 1, 'high') <= 130);
-  const capped = capBudgets(Array.from({ length: 400 }, () => PAD_CARDS.high), MAX_LEAF_CARDS);
+  const capped = capBudgets(Array.from({ length: 400 }, () => GFX_TIERS.high.padCards), MAX_LEAF_CARDS);
   assert.ok(capped.reduce((s, n) => s + n, 0) <= MAX_LEAF_CARDS);
-  assert.ok(capped.some((n) => n < PAD_CARDS.high));
+  assert.ok(capped.some((n) => n < GFX_TIERS.high.padCards));
   const skel = makeSampleSkeleton({ seed: 4 });
   const plan = planFoliage(skel, autumn, { gfx: 'high', species: 'maple' });
   assert.ok(plan.count > 0 && plan.count <= MAX_LEAF_CARDS);

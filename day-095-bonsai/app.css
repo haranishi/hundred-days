@@ -17,6 +17,15 @@
 
 *, *::before, *::after { box-sizing: border-box; }
 html { -webkit-text-size-adjust: 100%; }
+html, body { overscroll-behavior: none; }
+/* 舞台や道具の長押しは、文字選択や端末のメニューに取られないようにする。 */
+.top, .stage, .tools, .calendar {
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
 body {
   margin: 0;
   background: var(--paper);

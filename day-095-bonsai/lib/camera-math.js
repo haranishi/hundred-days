@@ -209,9 +209,20 @@ export function createCameraRig(fov, applyPose, motion) {
 
   return {
     get: () => ({ ...pose, target: pose.target.slice() }),
+    isManual: () => manual,
     distanceLimits: () => distanceLimits(lastFit.dist),
     set(partial = {}, opts = {}) {
       const { az, pol, dist, target } = partial;
+      if (opts.restore && [az, pol, dist].every(Number.isFinite) && dist > 0
+        && target?.length === 3 && target.every(Number.isFinite)) {
+        // 作り直しの初回描画前は既定の距離範囲が残るため、直前の描画で有効だった姿勢を使う。
+        lastFit = home;
+        if (opts.manual === true) manual = true;
+        // 復元した構図を初回描画で上書きせず、以後の自動の収まりは手動操作の有無に従う。
+        started = true;
+        move({ az, pol, dist, target: target.slice() });
+        return true;
+      }
       // app.js の自動回転は方位だけを送る。手動の回転は仰角も送る。
       const idle = Number.isFinite(az) && pol == null && dist == null && target == null && opts.animate === false;
       // 自動回転は、補間の最中だけ見送る。一度手で回したあと（manual）も、操作が止まれば再開する

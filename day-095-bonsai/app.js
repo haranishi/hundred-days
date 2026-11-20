@@ -11,10 +11,13 @@ import { createToolMachine } from './lib/controls-tools.js';
 import { connectUI } from './lib/ui.js';
 import { createAudio } from './lib/audio.js';
 import { createStore } from './lib/store.js';
+import { GFX_SETTINGS, GFX_TIERS } from './lib/gfx.js';
+import { clearLearnedGfx, readLearnedGfx, resolveGfx, writeLearnedGfx } from './lib/gfx-select.js';
+import { createGfxGovernor } from './lib/gfx-governor.js';
 
 const options = launchOptions(location.search);
 const reduced = matchMedia('(prefers-reduced-motion: reduce)');
-const animate = () => !reduced.matches && options.gfx !== 'test';
+const animate = () => !reduced.matches && GFX_TIERS[gfx].motion;
 const store = createStore({ enabled: !options.fresh, restoreTree });
 const { status: saveStatus, save: saved } = store.read();
 const history = createHistory();
@@ -24,6 +27,10 @@ if (options.day > 0) initialTree.advance(options.day);
 let pot = options.pot ?? saved?.pot ?? DEFAULTS.pot;
 let light = options.light ?? saved?.light ?? DEFAULTS.light;
 let muted = saved?.muted ?? false;
+let gfxSetting = saved?.gfx ?? 'auto';
+let learnedGfx = options.fresh || options.gfx || gfxSetting !== 'auto' ? null : readLearnedGfx();
+let gfx = chooseGfx();
+let governor = autoGfx() ? createGfxGovernor({ tier: gfx }) : null;
 let tipsSeen = saved?.tipsSeen ?? false;
 let rememberOpeningTips = !options.directsTree && !options.pot && !options.light;
 // 「保存を消して最初から」の直後は、結果の通知を読めるよう、初回の案内カードを出さない（同じ位置で重なって読めなかった）
@@ -32,6 +39,9 @@ let tool = options.tool === 'water' && typeof initialTree.water !== 'function' ?
 let view = null;
 let controls = null;
 let ready = false;
+let loadingCamera;
+let pendingDowngrade = null;
+let downgradeTimer = 0;
 let fastTimer = 0;
 let inputGeneration = 0;
 
@@ -40,7 +50,7 @@ const ui = connectUI({
   state, tool: setTool, advance: advanceStep,
   undo: () => restore('undo'), redo: () => restore('redo'),
   photo, cameraReset, dismissTips, beforeDialog, afterDialog: scheduleOrbit,
-  reset, newTree, light: setLight, muted: setMuted, fast: fastForward, assist,
+  reset, newTree, light: setLight, gfx: setGfx, muted: setMuted, fast: fastForward, assist,
   retry: () => restartView(options.camera),
 });
 const actions = createActions({
@@ -56,12 +66,12 @@ function state() {
   const { label, season, seasonLabel } = calendarState(day);
   return {
     species, style, seed, day, moisture, season, seasonLabel, date: label, tool, pot, light, muted,
-    branches: actions.branches, gfx: options.gfx, ready, canWater: typeof actions.tree.water === 'function',
+    branches: actions.branches, gfx, gfxSetting, ready, canWater: typeof actions.tree.water === 'function',
     canUndo: history.canUndo, canRedo: history.canRedo,
   };
 }
 
-function save(writeOptions) { store.schedule({ tree: actions.tree, pot, light, muted, tipsSeen }, writeOptions); }
+function save(writeOptions) { store.schedule({ tree: actions.tree, pot, light, muted, tipsSeen, gfx: gfxSetting }, writeOptions); }
 
 function changedTree() {
   ui.sync(state());
@@ -187,6 +197,66 @@ function setLight(id) {
   save();
 }
 
+function autoGfx() { return !options.gfx && gfxSetting === 'auto'; }
+
+function chooseGfx() {
+  const width = window.innerWidth || window.screen?.width;
+  const height = window.innerHeight || window.screen?.height;
+  const device = globalThis.navigator;
+  return resolveGfx({
+    param: options.gfx, setting: gfxSetting, learned: learnedGfx,
+    env: {
+      coarse: matchMedia('(pointer: coarse)').matches,
+      minSide: Math.min(width, height),
+      memory: device?.deviceMemory,
+      cores: device?.hardwareConcurrency,
+      saveData: device?.connection?.saveData,
+    },
+  });
+}
+
+function selectGfx() {
+  gfx = chooseGfx();
+  governor = autoGfx() ? createGfxGovernor({ tier: gfx }) : null;
+}
+
+function setGfx(setting) {
+  if (!GFX_SETTINGS.includes(setting) || setting === gfxSetting) return;
+  gfxSetting = setting;
+  if (autoGfx() && !options.fresh) learnedGfx = readLearnedGfx();
+  selectGfx();
+  save();
+  restartViewWithCamera();
+}
+
+function recordFrame(frameMs) {
+  if (!ready || document.hidden || pendingDowngrade) return;
+  const change = governor?.push(frameMs, performance.now());
+  if (!change) return;
+  pendingDowngrade = learnedGfx = change.to;
+  if (!options.fresh) writeLearnedGfx(learnedGfx);
+  applyDowngrade();
+}
+
+function applyDowngrade() {
+  if (!pendingDowngrade) return;
+  // 作り直しで進行中の手入れや早送りが途切れないよう、安全に切り替えられるまで待つ。
+  if (tools.contactCount !== 0 || fastTimer || ui.modalOpen) {
+    downgradeTimer = setTimeout(applyDowngrade, 400);
+    return;
+  }
+  gfx = pendingDowngrade;
+  // 待っている時間でクールダウンが終わらないよう、実際に画質を下げる時刻を起点にする。
+  governor?.resetFrames({ changedAt: performance.now() });
+  restartViewWithCamera();
+  ui.notify('動きが重いので、画質を下げました。メニューで変えられます。');
+}
+
+function yieldToMain() {
+  if (typeof globalThis.scheduler?.yield === 'function') return globalThis.scheduler.yield();
+  return new Promise((resolve) => setTimeout(resolve, 0));
+}
+
 function setMuted(value) {
   muted = value;
   audio.setMuted(muted);
@@ -238,6 +308,10 @@ function workOnNewTree(seedling, initial) {
     notice = removed || options.fresh ? '初めの盆栽に戻しました。' : '画面は最初の盆栽に戻りましたが、この端末の保存は消せませんでした';
     rememberOpeningTips = false;
     light = DEFAULTS.light;
+    gfxSetting = 'auto';
+    learnedGfx = null;
+    clearLearnedGfx();
+    selectGfx();
     muted = tipsSeen = false;
     skipTipsOnce = true;
     audio.setMuted(false);
@@ -260,7 +334,15 @@ function resize() {
 }
 
 function detachView() {
+  clearTimeout(downgradeTimer);
+  downgradeTimer = 0;
+  // 予約を捨てたあとも、次の判定は実際に表示している段から始める。
+  if (governor && pendingDowngrade && pendingDowngrade !== gfx) {
+    governor = createGfxGovernor({ tier: gfx });
+  }
+  pendingDowngrade = null;
   ready = false;
+  loadingCamera = null;
   stopFast();
   stopOrbit();
   const previous = view;
@@ -283,31 +365,46 @@ function fallback(reason) {
   ui.sync(state());
 }
 
-function mountView(camera) {
+async function mountView(camera, manual, restoreFocus = false) {
+  loadingCamera = { camera, manual, restoreFocus };
   ui.status('loading');
   ui.sync(state());
   const canvas = ui.canvas;
+  const deferTextures = GFX_TIERS[gfx].motion;
+  let current;
+  governor?.resetFrames();
   try {
-    const current = createView3D(THREE, canvas, { gfx: options.gfx, reducedMotion: reduced.matches, seed: actions.tree.seed });
+    current = createView3D(THREE, canvas, {
+      gfx, reducedMotion: reduced.matches, seed: actions.tree.seed, deferTextures,
+      onFrame: governor ? recordFrame : undefined,
+    });
     view = current;
     resize();
     current.setPot(pot);
     current.setLight(light);
     actions.repaint();
-    if (camera) current.camera.set(camera, { animate: false });
-    controls = connectControls(canvas, { camera: current.camera, tools, reducedMotion: () => reduced.matches,
-      resting: () => options.gfx === 'test', onCommand: command, onInput: input });
+    if (camera) current.camera.set(camera, { animate: false, restore: !!camera.target, manual });
     canvas.addEventListener('webglcontextlost', (event) => {
       event.preventDefault();
       if (current === view) fallback('3D表示が中断されました。「もう一度」で作りかけの盆栽を表示できます。');
     }, { once: true });
+    if (deferTextures) {
+      await current.prepare({ yieldToMain });
+      if (view !== current) return;
+    }
+    controls = connectControls(canvas, { camera: current.camera, tools, reducedMotion: () => reduced.matches,
+      resting: () => !GFX_TIERS[gfx].motion, onCommand: command, onInput: input });
     current.requestRender();
     // 描画側が要求したフレームを経てから、操作を開始できることを知らせる。
     requestAnimationFrame(() => requestAnimationFrame(() => {
       if (view !== current) return;
       ready = true;
+      loadingCamera = null;
       ui.status('ready');
       ui.sync(state());
+      if (restoreFocus && (!document.activeElement || document.activeElement === document.body)) {
+        ui.canvas.focus({ preventScroll: true });
+      }
       const showTips = options.tips && !tipsSeen && !skipTipsOnce;
       skipTipsOnce = false;
       ui.showTips(showTips);
@@ -319,14 +416,24 @@ function mountView(camera) {
       scheduleOrbit();
     }));
   } catch {
+    if (view !== (current ?? null)) return;
     fallback('この端末では3D表示（WebGL 2）を始められませんでした。手入れの目安を下で読めます。');
   }
 }
 
-function restartView(camera) {
+function restartViewWithCamera() {
+  // 初回の準備中はまだ木に合わせた視点がないため、読み込み開始時の指定を引き継ぐ。
+  if (ready) restartView(view.camera.get(), view.camera.isManual());
+  else restartView(loadingCamera ? loadingCamera.camera : options.camera, loadingCamera?.manual);
+}
+
+function restartView(camera, manual) {
+  const active = document.activeElement;
+  const restoreFocus = active === ui.canvas
+    || (loadingCamera?.restoreFocus && (!active || active === document.body));
   detachView();
   ui.resetCanvas();
-  mountView(camera);
+  mountView(camera, manual, restoreFocus);
 }
 
 // 再現用の画面と、枝をねらっている間は自動回転を止める。
@@ -398,6 +505,8 @@ document.addEventListener('visibilitychange', () => {
     actions.cancelKeyboardBend();
     stopFast();
     store.flush();
+  } else {
+    governor?.resetFrames();
   }
   scheduleOrbit();
 });
@@ -406,11 +515,14 @@ if (typeof ResizeObserver === 'function') new ResizeObserver(resize).observe(ui.
 window.addEventListener('resize', resize);
 window.addEventListener('orientationchange', resize);
 window.screen?.orientation?.addEventListener('change', resize);
-reduced.addEventListener?.('change', () => { if (view) restartView(view.camera.get()); });
+reduced.addEventListener?.('change', () => { if (view) restartViewWithCamera(); });
 
 if (options.debug) {
   window.__bonsai = {
     get tree() { return actions.tree; }, get view() { return view; }, state, setTool, advance,
+    feedFrames(intervals) {
+      for (const ms of intervals) recordFrame(ms);
+    },
   };
 }
 

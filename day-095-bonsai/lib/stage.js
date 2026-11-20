@@ -1,5 +1,6 @@
 // 光と背景と、季節の粒・手入れの粒。数値は visual-direction の表が出発点。
 // 環境マップは鉢の釉と針金だけに渡す。scene.environment には置かない（幹と葉が金属になる）。
+import { GFX_TIERS } from './gfx.js';
 import { createRng } from './rng.js';
 import { wrapAzimuth } from './camera-math.js';
 
@@ -66,9 +67,8 @@ function makeCanvas(createCanvas, w, h) {
   return canvas;
 }
 
-export function createStage(THREE, scene, renderer, { gfx = 'high', seed = 1, createCanvas } = {}) {
-  const allowParticles = gfx !== 'test';
-  const shadowSize = gfx === 'high' ? 2048 : gfx === 'low' ? 1024 : 0;
+export function createStage(THREE, scene, renderer, { gfx = 'high', seed = 1, createCanvas, deferEnvironment = false } = {}) {
+  const { motion: allowParticles, shadowSize } = GFX_TIERS[gfx];
   const sun = new THREE.DirectionalLight(0xfffaf0, 3.2);
   sun.name = 'sun';
   sun.castShadow = shadowSize > 0;
@@ -129,13 +129,9 @@ export function createStage(THREE, scene, renderer, { gfx = 'high', seed = 1, cr
     scene.background = bgTex;
   }
 
-  // 環境の生成に失敗しても、直射と半球光だけで絵は出す（釉の映り込みだけ欠ける）。
-  let pmrem = null;
-  try {
-    pmrem = new THREE.PMREMGenerator(renderer);
-  } catch {
-    pmrem = null;
-  }
+  // 起動時は、質感と同じく描画を始める前の区切りで映り込みを用意する。
+  let environmentReady = !deferEnvironment;
+  let pmrem;
   let envTarget = null;
 
   const asColor = (preset) => ({
@@ -186,6 +182,15 @@ export function createStage(THREE, scene, renderer, { gfx = 'high', seed = 1, cr
   }
 
   function rebuildEnv(state) {
+    if (!environmentReady) return;
+    if (pmrem === undefined) {
+      try {
+        pmrem = new THREE.PMREMGenerator(renderer);
+      } catch {
+        // 映り込みが作れない端末でも、直射と半球光で表示する。
+        pmrem = null;
+      }
+    }
     if (!pmrem) return;
     const key = `${state.top.getHexString()}-${state.color.getHexString()}-${state.intensity.toFixed(2)}`;
     if (key === envKey) return;
@@ -333,6 +338,10 @@ export function createStage(THREE, scene, renderer, { gfx = 'high', seed = 1, cr
 
   return {
     envMap: () => envTarget?.texture || null,
+    prepareEnvironment() {
+      environmentReady = true;
+      rebuildEnv(mixPreset(from, to, smooth(lightT)));
+    },
     setLight(id, { animate = true } = {}) {
       const next = asColor(LIGHT_PRESETS[id] || LIGHT_PRESETS.noon);
       if (!animate) {

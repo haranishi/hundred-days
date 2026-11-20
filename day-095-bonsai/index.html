@@ -10,6 +10,47 @@
   <link rel="icon" href="./favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="./shared/share.css">
   <link rel="stylesheet" href="./app.css">
+  <link rel="modulepreload" href="./lib/app-actions.js">
+  <link rel="modulepreload" href="./lib/app-state.js">
+  <link rel="modulepreload" href="./lib/audio.js">
+  <link rel="modulepreload" href="./lib/calendar.js">
+  <link rel="modulepreload" href="./lib/camera-math.js">
+  <link rel="modulepreload" href="./lib/capture.js">
+  <link rel="modulepreload" href="./lib/contract.js">
+  <link rel="modulepreload" href="./lib/controls-gesture.js">
+  <link rel="modulepreload" href="./lib/controls-tools.js">
+  <link rel="modulepreload" href="./lib/controls.js">
+  <link rel="modulepreload" href="./lib/diorama-geometry.js">
+  <link rel="modulepreload" href="./lib/diorama.js">
+  <link rel="modulepreload" href="./lib/foliage.js">
+  <link rel="modulepreload" href="./lib/gfx-governor.js">
+  <link rel="modulepreload" href="./lib/gfx-select.js">
+  <link rel="modulepreload" href="./lib/gfx.js">
+  <link rel="modulepreload" href="./lib/history.js">
+  <link rel="modulepreload" href="./lib/leaf-atlas.js">
+  <link rel="modulepreload" href="./lib/look.js">
+  <link rel="modulepreload" href="./lib/lore.js">
+  <link rel="modulepreload" href="./lib/noise.js">
+  <link rel="modulepreload" href="./lib/pick.js">
+  <link rel="modulepreload" href="./lib/rng.js">
+  <link rel="modulepreload" href="./lib/seedling.js">
+  <link rel="modulepreload" href="./lib/stage.js">
+  <link rel="modulepreload" href="./lib/store.js">
+  <link rel="modulepreload" href="./lib/textures-stage.js">
+  <link rel="modulepreload" href="./lib/textures-tree.js">
+  <link rel="modulepreload" href="./lib/tree-curve.js">
+  <link rel="modulepreload" href="./lib/tree-growth.js">
+  <link rel="modulepreload" href="./lib/tree-math.js">
+  <link rel="modulepreload" href="./lib/tree-mesh.js">
+  <link rel="modulepreload" href="./lib/tree-save.js">
+  <link rel="modulepreload" href="./lib/tree-snapshot.js">
+  <link rel="modulepreload" href="./lib/tree-state.js">
+  <link rel="modulepreload" href="./lib/tree.js">
+  <link rel="modulepreload" href="./lib/ui-photo.js">
+  <link rel="modulepreload" href="./lib/ui.js">
+  <link rel="modulepreload" href="./lib/view3d.js">
+  <link rel="modulepreload" href="./lib/wire-mesh.js">
+  <link rel="modulepreload" href="./vendor/three.js">
   <script src="./shared/share.js" defer></script>
   <script type="module" src="./app.js"></script>
 </head>
@@ -171,13 +212,19 @@
           <option value="evening">夕</option>
           <option value="night">夜</option>
         </select></label>
+        <label>画質<select id="gfx">
+          <option value="auto" selected>自動</option>
+          <option value="high">高</option>
+          <option value="mid">標準</option>
+          <option value="low">軽め</option>
+        </select></label>
         <label class="check"><input type="checkbox" id="sound" checked>音を鳴らす</label>
       </div>
       <button type="button" class="button" id="fast-start" disabled>早送りを始める</button>
     </section>
     <details class="menu-group disclosure">
       <summary>このアプリについて</summary>
-      <p>盆栽はこのブラウザの中で育ちます。作りかけの盆栽、鉢・光・音の設定、案内の表示状況はこの端末に保存されます。盆栽の手入れと保存は、このブラウザの中だけで行います。共有を選んだときだけ、アプリのリンクや写真を共有先に渡します。</p>
+      <p>盆栽はこのブラウザの中で育ちます。作りかけの盆栽、鉢・光・画質・音の設定、案内の表示状況はこの端末に保存されます。盆栽の手入れと保存は、このブラウザの中だけで行います。共有を選んだときだけ、アプリのリンクや写真を共有先に渡します。</p>
       <div class="lore" id="about-lore"></div>
     </details>
     <details class="menu-group disclosure">

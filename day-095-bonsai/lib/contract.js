@@ -8,7 +8,7 @@ export const POT_IDS = Object.freeze(['oval-brown', 'round-blue', 'rect-grey']);
 export const LIGHT_IDS = Object.freeze(['morning', 'noon', 'evening', 'night']);
 export const TOOL_IDS = Object.freeze(['look', 'cut', 'bend', 'pinch', 'water']);
 export const SEASON_IDS = Object.freeze(['spring', 'summer', 'autumn', 'winter']);
-export const GFX_IDS = Object.freeze(['high', 'low', 'test']);
+export const GFX_IDS = Object.freeze(['high', 'mid', 'low', 'test']);
 
 /** 節（node）の印。フラグは足し合わせる。 */
 export const NODE_FLAG = Object.freeze({ WIRED: 1, PINCHED: 2, CUT: 4, FRESH: 8 });

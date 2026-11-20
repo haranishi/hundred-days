@@ -1,8 +1,8 @@
 // 葉はパッドごとの扁平な雲。殻だけに並べると中空の椀になるので、体積にも置く。
 // 色は look の sRGB を線形にしてから出す。明るい灰のアトラスのまま掛けると、ACES で鮭色に抜ける。
+import { GFX_TIERS } from './gfx.js';
 import { createRng } from './rng.js';
 
-export const PAD_CARDS = Object.freeze({ high: 120, low: 60, test: 6 });
 export const MAX_LEAF_CARDS = 6000;
 // 高さ / 幅。天面は少し丸く、下面は平ら。幅は水平方向の直径。
 export const PAD_FLAT = 0.45;
@@ -16,7 +16,7 @@ const clamp01 = (v) => clamp(v, 0, 1);
 /** density と半径で枚数を決める。半径 0.36・density 1 のとき、画質の枚数ちょうど。 */
 export function cardBudget(radius, density, gfx = 'high') {
   if (!(radius > 0) || !(density > 0)) return 0;
-  const cap = PAD_CARDS[gfx] ?? PAD_CARDS.low;
+  const cap = (GFX_TIERS[gfx] ?? GFX_TIERS.low).padCards;
   const sized = cap * clamp(density, 0, 1) * clamp(radius / REF_RADIUS, 0.72, 1.08);
   return Math.max(1, Math.round(sized));
 }
@@ -429,13 +429,14 @@ function tangentFrame(nx, ny, nz) {
  * core はパッド数ぶんの芯。gfx が test のときは置かない。
  */
 export function planFoliage(skel, look, { gfx = 'high', species = 'maple', nodeShift = null } = {}) {
+  const tier = GFX_TIERS[gfx] ?? GFX_TIERS.low;
   const pads = skel.pads;
   const countPads = pads ? pads.count : 0;
   const budgets = [];
   for (let p = 0; p < countPads; p += 1) {
     let n = cardBudget(pads.radius[p], pads.density[p], gfx);
-    // 小さいパッドだけを底上げする。大きいパッドを 130 より増やすと雲が均一な玉になる。
-    if (species === 'pine' && gfx === 'high' && n > 0) n = clamp(n, 80, 130);
+    // 最高画質の黒松は、小さいパッドも針の房に見える密度まで底上げする。
+    if (species === 'pine' && n > 0) n = Math.max(n, tier.pineMinCards);
     budgets.push(n);
   }
   // 黒松は1房を十字の2枚にする。枚数の上限は束の数で割ってから掛ける。
@@ -454,7 +455,7 @@ export function planFoliage(skel, look, { gfx = 'high', species = 'maple', nodeS
   const layer = new Uint8Array(total);
   const color = look && look.color ? look.color : [0.3, 0.5, 0.2];
   const color2 = look && look.color2 ? look.color2 : color;
-  const withCore = gfx !== 'test' && countPads > 0;
+  const withCore = tier.foliageCore && countPads > 0;
   const core = {
     count: withCore ? countPads : 0,
     position: new Float32Array((withCore ? countPads : 0) * 3),
