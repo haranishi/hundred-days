@@ -8,6 +8,7 @@ import { diagnose } from '../../lib/rules.js';
 import { loadCurrent, loadSlot, saveCurrent } from '../../lib/persist.js';
 import { mountToast } from '../../lib/ui-toast.js';
 import { MINIMAL } from '../fixtures/states.js';
+import { stripWrap } from '../render/f2e-wrap-helpers.mjs';
 
 const currentKey = STORAGE_PREFIX + 'current';
 const nextTurn = () => new Promise(resolve => setImmediate(resolve));
@@ -30,7 +31,11 @@ class Element extends EventTarget {
     this.dataset = {};
     this.text = this.className = '';
     this.scrollTop = 0;
-    this.style = { setProperty() {} };
+    this.style = {
+      setProperty(key, value) { this[key] = String(value); },
+      getPropertyValue(key) { return this[key] ?? ''; },
+      removeProperty(key) { delete this[key]; },
+    };
     this.classList = {
       add: name => this.className += ' ' + name,
       remove: name => this.className = this.className.split(/\s+/).filter(v => v !== name).join(' '),
@@ -102,7 +107,7 @@ class Element extends EventTarget {
   querySelector(s) { return this.querySelectorAll(s)[0] ?? null; }
   focus() { this.ownerDocument.activeElement = this; }
   getClientRects() { return this.closest('[hidden]') ? [] : [{}]; }
-  getBoundingClientRect() { return { left: 0, top: 0, right: 100, bottom: 100 }; }
+  getBoundingClientRect() { return { left: 0, top: 0, right: 100, bottom: 100, width: 100, height: 100 }; }
   scrollIntoView() {}
   showModal() { this.open = true; }
   close() {
@@ -124,7 +129,9 @@ function fire(target, type, fields = {}) {
   return event;
 }
 
-export function environment(t, { query = '', hash = '', draft } = {}) {
+export function environment(t, {
+  query = '', hash = '', draft, width = 1440, resizeObserver = class { observe() {} disconnect() {} },
+} = {}) {
   const doc = new EventTarget();
   doc.createElement = tag => new Element(tag, doc);
   doc.createElementNS = (_, tag) => doc.createElement(tag);
@@ -154,9 +161,12 @@ export function environment(t, { query = '', hash = '', draft } = {}) {
     removeItem: key => values.delete(key),
   };
   if (draft) saveCurrent(draft, localStorage);
-  const media = () => Object.assign(new EventTarget(), { matches: true });
+  const media = query => {
+    const minimum = query.match(/min-width:\s*(\d+)px/);
+    return Object.assign(new EventTarget(), { matches: !minimum || width >= Number(minimum[1]) });
+  };
   const globals = { document: doc, window, location, localStorage, matchMedia: media,
-    ResizeObserver: class { observe() {} disconnect() {} } };
+    ResizeObserver: resizeObserver };
   const previous = Object.getOwnPropertyDescriptors(globalThis);
   for (const [key, value] of Object.entries(globals)) Object.defineProperty(globalThis, key, { configurable: true, value });
   let mounted;
@@ -310,7 +320,7 @@ test('最初のリンクを復号している間に次のリンクへ移って�
   await e.visit(link(shared));
   await started;
   assert.equal(e.root.dataset.screen, 'viewer');
-  assert.match(e.root.querySelector('[data-view-page]').innerHTML, /共有された店/);
+  assert.match(stripWrap(e.root.querySelector('[data-view-page]').innerHTML), /共有された店/); // 文節の折れ目（<wbr>）を除いて比べる
 });
 
 test('壊れた共有リンクには、起動時も別リンクへの移動時も理由に続けて次の手を出す', async t => {
@@ -323,7 +333,7 @@ test('壊れた共有リンクには、起動時も別リンクへの移動時�
   assert.ok(notice(e.root).textContent.endsWith(help));
 });
 
-test('通知は1枚で、同じ文は同じノードの表示時間だけを延ばし、エラーは次の通知まで残す', t => {
+test('通知は1枚で、同じ文なら同じノードで4秒数え直し、エラーは次の通知まで残す', t => {
   const { root } = environment(t);
   const live = notice(root);
   const ui = mountToast(live);
@@ -331,10 +341,10 @@ test('通知は1枚で、同じ文は同じノードの表示時間だけを延�
   ui.toast('次');
   assert.equal(live.children.length, 1);
   const item = live.firstChild;
-  t.mock.timers.tick(5400);
+  t.mock.timers.tick(3900);
   ui.toast('次');
   assert.ok(live.firstChild === item);
-  t.mock.timers.tick(5499);
+  t.mock.timers.tick(3999);
   assert.equal(live.textContent, '次');
   t.mock.timers.tick(1);
   assert.equal(live.textContent, '');

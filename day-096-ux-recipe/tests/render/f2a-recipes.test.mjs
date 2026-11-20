@@ -1,7 +1,10 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { buildFromRecipe } from '../../lib/recipes.js';
-import { renderPage } from '../../lib/render.js';
+import { renderPage as renderPageRaw } from '../../lib/render.js';
+import { stripWrap } from './f2e-wrap-helpers.mjs';
+// 描画の結果に入る文節の折れ目（<wbr>・uxr-nb）は、文言の比較の邪魔になるので除く。折れ目そのものは f2e-wrap-*.test.mjs が見る。
+const renderPage = (...args) => stripWrap(renderPageRaw(...args));
 import { diagnose } from '../../lib/rules.js';
 
 test('参加レシピでは日程と料金を読み、過去の実績を確かめてから申し込める', () => {

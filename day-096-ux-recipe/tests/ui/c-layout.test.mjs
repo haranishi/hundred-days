@@ -113,9 +113,11 @@ test('プレビューではラベルの高さを枠の外に確保し、縮小�
   assert.match(css, /#slot-preview [^{]*:focus-visible\s*\{[^}]*outline:[^}]*outline-offset:[^}]*box-shadow:/);
 });
 
-test('スマホの通知はセーフエリアと上部バーの下に出て、画面下のボタンを空ける', () => {
+test('スマホの通知は、編集画面ではパネルの上端のすぐ上に出て、点数・流れの表示とパネルの中を覆わない', () => {
   const mobile = media('(width < 720px)');
-  const position = mobile.match(/\.app-toasts\s*\{([^}]*)\}/)?.[1] ?? '';
-  assert.match(position, /top:\s*calc\([^;]*safe-area-inset-top/);
-  assert.match(position, /bottom:\s*auto/);
+  // 入口・見るだけ（パネルなし）は画面の下。編集画面は、パネルの高さ（--ed-panel-h）の分だけ上。
+  assert.match(mobile, /\.app-shell > \.app-toasts\s*\{[^}]*bottom:\s*max\(16px, env\(safe-area-inset-bottom\)\)/);
+  const editor = mobile.match(/\.app-shell\[data-screen="editor"\] > \.app-toasts\s*\{([^}]*)\}/)?.[1] ?? '';
+  assert.match(editor, /bottom:\s*calc\(var\(--ed-panel-h, 0px\) \+ 12px\)/);
+  assert.doesNotMatch(editor, /\btop:/);
 });

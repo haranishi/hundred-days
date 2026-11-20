@@ -7,6 +7,7 @@ import { PAGE_CSS } from '../../lib/page-css.js';
 import { renderPage } from '../../lib/render.js';
 import { reduce } from '../../lib/state.js';
 import { MINIMAL, RESERVE_SAMPLE, STRESS, oneEach } from '../fixtures/states.js';
+import { stripWrap } from '../render/f2e-wrap-helpers.mjs';
 
 test('1ファイルのHTMLに描画器の本文と同じCSSを収める', () => {
   for (const state of [MINIMAL, RESERVE_SAMPLE, STRESS]) {
@@ -19,6 +20,16 @@ test('1ファイルのHTMLに描画器の本文と同じCSSを収める', () => 
     assert.equal(html.match(/<style>([\s\S]*?)<\/style>/)?.[1].trim(), PAGE_CSS.trim());
     assert.equal(html.match(/<body>([\s\S]*)<\/body>/)?.[1].trim(), renderPage(state, { mode: 'export' }));
   }
+});
+
+test('保存したHTMLは本文だけに折り返しを持ち、タイトルと店名は元の文言に一致する', () => {
+  const name = '読みたい資料を棚から探します。';
+  const html = buildStandaloneHtml({ ...MINIMAL, site: { name } });
+  const [head, body] = html.split('<body>');
+  assert.ok(head.includes('<title>' + name + '</title>'));
+  assert.doesNotMatch(head, /<wbr>/);
+  assert.ok(body.includes('読みたい<wbr>資料を<wbr>棚から<wbr>探します。'));
+  assert.ok(stripWrap(body).includes('<span class="uxr-brand">' + name + '</span>'));
 });
 
 test('全バリエーションの書き出しにスクリプト・通信先・イベント属性・style属性がない', () => {

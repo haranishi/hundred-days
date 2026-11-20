@@ -1,7 +1,10 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { BLOCK_SCHEMA, GOALS, countChars, resolveField } from '../../lib/contract.js';
-import { buildStandaloneHtml } from '../../lib/export-html.js';
+import { buildStandaloneHtml as buildStandaloneHtmlRaw } from '../../lib/export-html.js';
+import { stripWrap } from '../render/f2e-wrap-helpers.mjs';
+// 書き出すHTMLに入る文節の折れ目（<wbr>・uxr-nb）は、文言の比較の邪魔になるので除く。
+const buildStandaloneHtml = (...args) => stripWrap(buildStandaloneHtmlRaw(...args));
 import { buildFromRecipe } from '../../lib/recipes.js';
 import * as rules from '../../lib/rules.js';
 import { MINIMAL, block } from '../fixtures/states.js';

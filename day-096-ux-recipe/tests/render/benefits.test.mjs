@@ -1,7 +1,10 @@
 // benefits 部品の固有試験。3種（アイコン／番号つき／札つき一覧）・件数（2〜4件）・空項目スキップ時の連番・無害化を確かめる。
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { renderPage } from '../../lib/render.js';
+import { renderPage as renderPageRaw } from '../../lib/render.js';
+import { stripWrap } from './f2e-wrap-helpers.mjs';
+// 描画の結果に入る文節の折れ目（<wbr>・uxr-nb）は、文言の比較の邪魔になるので除く。折れ目そのものは f2e-wrap-*.test.mjs が見る。
+const renderPage = (...args) => stripWrap(renderPageRaw(...args));
 import { ico } from '../../lib/render-kit.js';
 import { emptyProps, oneEach } from '../fixtures/states.js';
 

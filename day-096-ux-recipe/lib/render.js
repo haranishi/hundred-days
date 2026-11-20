@@ -2,6 +2,7 @@
 // 出力のHTMLの約束は .kiro/specs/day-096-ux-recipe/interfaces-render.md。
 import { esc, makeCtx } from './render-kit.js';
 import { BLOCK_RENDERERS } from './blocks/index.js';
+import { wrapPageHtml } from './jp-wrap.js';
 
 export { esc };
 
@@ -22,5 +23,5 @@ export function renderPage(state, { mode = 'preview' } = {}) {
     ? `<span class="uxr-brand${name ? '' : ' is-empty'}"${mode === 'preview' ? ` data-path="site.name"${name ? '' : ' data-ph="サイトの名前"'}` : ''}>${esc(name)}</span>`
     : '';
   const blocks = state.blocks.map((b) => renderBlock(b, ctx)).join('');
-  return `<div class="uxr-page" data-theme="${esc(state.theme.preset)}" data-accent="${Number(state.theme.accent)}"><header class="uxr-head"><div class="uxr-head-in">${brand}</div></header><main class="uxr-main">${blocks}</main></div>`;
+  return wrapPageHtml(`<div class="uxr-page" data-theme="${esc(state.theme.preset)}" data-accent="${Number(state.theme.accent)}"><header class="uxr-head"><div class="uxr-head-in">${brand}</div></header><main class="uxr-main">${blocks}</main></div>`);
 }

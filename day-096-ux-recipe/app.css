@@ -467,7 +467,16 @@
   .ed-fold::before { content: ""; width: 6px; height: 6px; border: solid currentColor; border-width: 0 1.5px 1.5px 0; transform: rotate(45deg); }
   .ed-panel-body { grid-area: body; overflow: hidden; }
   .ed-panel-page { padding-bottom: 12px; }
-  .app-toasts { top: calc(env(safe-area-inset-top) + var(--ed-topbar-height) + 8px); bottom: auto; }
+  .app-shell > .app-toasts {
+    bottom: max(16px, env(safe-area-inset-bottom));
+  }
+  .app-shell[data-screen="editor"] > .app-toasts {
+    bottom: calc(var(--ed-panel-h, 0px) + 12px);
+    left: 12px;
+    right: 12px;
+    width: auto;
+    max-width: none;
+  }
   .app-view-bar .app-mast-inner { gap: 8px 12px; }
   .app-view-actions { width: 100%; gap: 4px; }
 }

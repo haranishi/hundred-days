@@ -14,7 +14,7 @@ export function mountToast(root) {
   function restart() {
     clearTimeout(timer);
     if (!current || current.kind === 'error' || current.item.matches(':hover, :focus-within')) return;
-    timer = setTimeout(clear, current.label ? 10000 : 5500);
+    timer = setTimeout(clear, current.label ? 10000 : 4000);
   }
 
   function toast(message, { kind = 'info', actionLabel, onAction } = {}) {

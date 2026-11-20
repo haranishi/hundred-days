@@ -1,7 +1,10 @@
 // proof 部品の固有試験。横ならび・カード2種、.uxr-num クラス、件数（2〜4件）、空項目の扱い、無害化を確かめる。
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { renderPage } from '../../lib/render.js';
+import { renderPage as renderPageRaw } from '../../lib/render.js';
+import { stripWrap } from './f2e-wrap-helpers.mjs';
+// 描画の結果に入る文節の折れ目（<wbr>・uxr-nb）は、文言の比較の邪魔になるので除く。折れ目そのものは f2e-wrap-*.test.mjs が見る。
+const renderPage = (...args) => stripWrap(renderPageRaw(...args));
 import { emptyProps, oneEach } from '../fixtures/states.js';
 
 const ITEMS = (n) => Array.from({ length: n }, (_, i) => ({ num: `${(i + 1) * 100}+`, label: `実績の説明${i + 1}` }));

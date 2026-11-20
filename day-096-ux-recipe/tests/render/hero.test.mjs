@@ -1,7 +1,10 @@
 // hero 部品の固有試験。見た目3種（中央／左寄せ＋図形／大見出し）・空の扱い・危険な文字の無害化を確かめる。
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { renderPage } from '../../lib/render.js';
+import { renderPage as renderPageRaw } from '../../lib/render.js';
+import { stripWrap } from './f2e-wrap-helpers.mjs';
+// 描画の結果に入る文節の折れ目（<wbr>・uxr-nb）は、文言の比較の邪魔になるので除く。折れ目そのものは f2e-wrap-*.test.mjs が見る。
+const renderPage = (...args) => stripWrap(renderPageRaw(...args));
 import { block, emptyProps, oneEach } from '../fixtures/states.js';
 import { SCHEMA_VERSION } from '../../lib/contract.js';
 

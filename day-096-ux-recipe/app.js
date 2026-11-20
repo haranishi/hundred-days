@@ -19,6 +19,7 @@ import { mountShare } from './lib/ui-share.js';
 import { mountSlots } from './lib/ui-slots.js';
 
 const TABS = ['outline', 'edit', 'diagnosis', 'look'];
+const PANEL_HEIGHT = '--ed-panel-h';
 
 const LINK_HELP = '送ってくれた人にリンクをもう一度送ってもらうか、下から目的を選んで始めてください。';
 const CURRENT_KEY = STORAGE_PREFIX + 'current';
@@ -199,6 +200,7 @@ export function openSavedState(ctx, state, draft) {
 }
 
 function mountPanelLayout(editor, ctx) {
+  const shell = editor.closest('.app-shell');
   const outline = editor.querySelector('#slot-outline');
   const preview = editor.querySelector('#slot-preview');
   const panel = editor.querySelector('#slot-panel');
@@ -211,6 +213,14 @@ function mountPanelLayout(editor, ctx) {
   const twoColumns = matchMedia('(min-width: 720px)');
   const events = new AbortController();
   const listen = { signal: events.signal };
+
+  function measureHeight(entries) {
+    // 境界線と端末下端の余白も、通知が避ける高さに含める。
+    const box = entries?.[0]?.borderBoxSize?.[0];
+    const height = editor.hidden ? 0 : (box?.blockSize ?? panel.getBoundingClientRect().height);
+    shell.style.setProperty(PANEL_HEIGHT, height + 'px');
+  }
+  const observer = new ResizeObserver(measureHeight);
 
   function paint() {
     const selected = ctx.getTab();
@@ -270,11 +280,16 @@ function mountPanelLayout(editor, ctx) {
   twoColumns.addEventListener('change', arrange, listen);
   arrange();
   const unsubscribe = ctx.subscribe(paint);
-  return { destroy() {
-    unsubscribe();
-    events.abort();
-    if (outline.parentElement === holder) preview.before(outline);
-  } };
+  observer.observe(panel, { box: 'border-box' });
+  return {
+    measureHeight,
+    destroy() {
+      observer.disconnect();
+      unsubscribe();
+      events.abort();
+      if (outline.parentElement === holder) preview.before(outline);
+    },
+  };
 }
 
 function mountViewer(root, state, ctx, adopt) {
@@ -372,10 +387,10 @@ export async function mountApp(root, { storage = persist } = {}) {
   }
   const notifications = mountToast(live);
   let toastDialog;
-  let undoState;
-  function clearUndoToast() {
-    if (!undoState) return;
-    undoState = null;
+  let toastState;
+  function clearEditToast() {
+    if (!toastState) return;
+    toastState = null;
     notifications.clear();
   }
   function returnNotifications(event) {
@@ -397,7 +412,7 @@ export async function mountApp(root, { storage = persist } = {}) {
   }
   function toast(message, options) {
     if (events.signal.aborted) return;
-    undoState = options?.actionLabel === '元に戻す' && typeof options.onAction === 'function' ? ctx.getState() : null;
+    toastState = options?.kind === 'error' ? null : ctx.getState();
     // 開いているダイアログの外は読み上げ対象から外れるため、結果も同じ面に出す。
     placeNotifications();
     notifications.toast(message, options);
@@ -447,8 +462,8 @@ export async function mountApp(root, { storage = persist } = {}) {
       }
     },
   });
-  const stopWatchingUndo = ctx.subscribe(({ state, reason }) => {
-    if (undoState !== state || reason === 'load') clearUndoToast();
+  const stopWatchingToast = ctx.subscribe(({ state, reason }) => {
+    if (toastState !== state || reason === 'load') clearEditToast();
   });
 
   const screens = { goal: local('screen-goal'), editor: local('screen-edit'), viewer: local('screen-view') };
@@ -496,11 +511,13 @@ export async function mountApp(root, { storage = persist } = {}) {
   }
   function show(screen) {
     navigation += 1;
-    if (screen !== root.dataset.screen) clearUndoToast();
+    // 別の共有ページを続けて開くと、画面名は同じでも前の案内は古くなる。
+    clearEditToast();
     closeDialogs();
     if (viewer && screen !== 'viewer') { viewer.destroy(); viewer = null; }
     root.dataset.screen = screen;
     for (const [key, node] of Object.entries(screens)) node.hidden = key !== screen;
+    if (screen !== 'editor') root.style.setProperty(PANEL_HEIGHT, '0px');
     if (screen === 'goal') goalUI.setDraft(currentDraft());
   }
   function consumeRoute() {
@@ -528,6 +545,7 @@ export async function mountApp(root, { storage = persist } = {}) {
         look: mountLook(local('panel-look'), ctx),
       };
     }
+    editor.layout.measureHeight();
     editor.preview.resume();
     editor.topbar.setSaveStatus(visibleSaveStatus());
     consumeRoute();
@@ -627,7 +645,7 @@ export async function mountApp(root, { storage = persist } = {}) {
       },
       load(id) {
         const state = useSlot(() => storage.loadSlot(id), null);
-        slotResult(!!state, '保存したページを開きました。', '保存したページを読み取れませんでした。');
+        if (!state) toast('保存したページを読み取れませんでした。', { kind: 'error' });
         return state;
       },
       ...createSlotMutations(storage, toast, id => slots.refreshList(id)),
@@ -776,7 +794,7 @@ export async function mountApp(root, { storage = persist } = {}) {
     closeDialogs();
     events.abort();
     openers.clear();
-    stopWatchingUndo();
+    stopWatchingToast();
     clearConflict();
     startupNotice?.destroy();
     for (const part of [goalUI, palette, share, slots, keys, viewer, ...Object.values(editor ?? {}), notifications]) part?.destroy?.();
@@ -785,6 +803,7 @@ export async function mountApp(root, { storage = persist } = {}) {
     local('ed-confirm-note').textContent = '';
     canonical?.remove();
     if (!originalLive) live.remove();
+    root.style.removeProperty(PANEL_HEIGHT);
     if (window.__uxr?.ctx === ctx) delete window.__uxr;
     delete root.dataset.ready;
   } };

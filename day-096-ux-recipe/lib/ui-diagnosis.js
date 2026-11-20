@@ -171,22 +171,29 @@ function ruleCard(item, ctx, opened) {
   return card;
 }
 
+function hasNewMustFailure(before, after) {
+  if (!before?.items || !after?.items) return false;
+  const missing = item => item.level === 'must' && !item.ok;
+  const alreadyMissing = new Set(before.items.filter(missing).map(item => item.id));
+  return after.items.some(item => missing(item) && !alreadyMissing.has(item.id));
+}
+
 export function mountDiagnosis(root, ctx) {
   let previous;
   const off = ctx.subscribe(({ state, diagnosis }) => {
     const current = diagnosis ?? (state ? ctx.diagnose() : null);
     if (previous === current && root.firstChild) return;
+    const scroll = hasNewMustFailure(previous, current) ? 0 : root.scrollTop;
     previous = current;
     if (current?.empty) {
       root.replaceChildren(element('p', 'cs-empty', '部品がありません。「構成」の「部品を足す」で足すか、目的を選び直してください。'));
-      root.scrollTop = 0;
+      root.scrollTop = scroll;
       return;
     }
     const model = diagnosisModel(current);
     const openDetails = new Set(Array.from(root.querySelectorAll('details[open]'), (el) => el.dataset.detail));
     const active = document.activeElement;
     const focusKey = root.contains(active) ? active.dataset.control : null;
-    const scroll = root.scrollTop;
     const panel = element('div', 'cs-panel cs-diagnosis');
     panel.append(scoreOverview(model, current?.samples, ctx));
     for (const group of model.groups) {

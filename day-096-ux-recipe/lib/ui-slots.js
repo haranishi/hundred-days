@@ -55,9 +55,13 @@ export function mountSlots(dialog, ctx) {
   function load(id) {
     const state = ctx.slots.load(id);
     if (!state) { refreshList(); return; }
-    // 履歴を引き継ぐことで、開く直前の編集へも戻れる。
+    // 下書きのない入口から開くと履歴は空で、戻せる作業もない。
+    const hadPage = Boolean(ctx.getState());
     ctx.dispatch({ type: 'replace', state });
     dialog.close();
+    ctx.toast('保存したページを開きました。', hadPage
+      ? { actionLabel: '元に戻す', onAction: () => ctx.undo() }
+      : undefined);
   }
 
   function focusRow(index) {

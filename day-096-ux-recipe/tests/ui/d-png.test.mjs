@@ -3,14 +3,16 @@ import assert from 'node:assert/strict';
 import { MINIMAL } from '../fixtures/states.js';
 import { PAGE_CSS } from '../../lib/page-css.js';
 import { pngDimensions } from '../../lib/png-export.js';
+import { stripWrap } from '../render/f2e-wrap-helpers.mjs';
 
 // Node には描画エンジンがないため、ここでは画素の照合・寸法の引き渡し・後始末を観測する。
 function canvasEnvironment(t, { pixel = [255, 0, 0, 255], failAt, height = 980.5 } = {}) {
   const renders = [];
   const canvases = [];
   const parsed = [];
-  const node = (tag) => ({
-    tag, attrs: {}, children: [], style: {}, scrollHeight: Math.floor(height),
+  const sources = [];
+  const node = (tag, ns = 'http://www.w3.org/1999/xhtml') => ({
+    tag, ns, attrs: {}, children: [], style: {}, scrollHeight: Math.floor(height),
     get firstElementChild() { return this.children[0]; },
     getBoundingClientRect() { return { height }; },
     setAttribute(key, value) { this.attrs[key] = String(value); },
@@ -36,22 +38,35 @@ function canvasEnvironment(t, { pixel = [255, 0, 0, 255], failAt, height = 980.5
       canvases.push(canvas);
       return canvas;
     },
-    createElementNS: (_ns, tag) => node(tag),
+    createElementNS: (ns, tag) => node(tag, ns),
     importNode: (el) => el,
   };
   class ImageStub extends EventTarget {
     set src(value) {
       assert.match(value, /^data:image\/svg\+xml/);
+      sources.push(decodeURIComponent(value.slice(value.indexOf(',') + 1)));
       queueMicrotask(() => this.dispatchEvent(new Event('load')));
     }
   }
   class SerializerStub {
-    serializeToString(svg) { renders.push(svg); return '<svg/>'; }
+    serializeToString(svg) {
+      renders.push(svg);
+      function xml(element, parentNs) {
+        const xmlns = element.ns === parentNs ? '' : ' xmlns="' + element.ns + '"';
+        const start = '<' + element.tag + xmlns;
+        const children = element.children.map(child => xml(child, element.ns)).join('');
+        return children ? start + '>' + children + '</' + element.tag + '>' : start + '/>';
+      }
+      return xml(svg);
+    }
   }
   class ParserStub {
     parseFromString(html, type) {
-      parsed.push({ html, type });
-      return { body: { firstElementChild: node('page') } };
+      // Node で画像に渡る空要素を追えるよう、実際の本文からそのノードだけを取り出す。
+      const page = node('div');
+      for (const [, tag] of html.matchAll(/<(br|input|wbr)\b/gi)) page.append(node(tag));
+      parsed.push({ html, type, page });
+      return { body: { firstElementChild: page } };
     }
   }
   for (const [key, value] of Object.entries({ document: doc, Image: ImageStub, XMLSerializer: SerializerStub, DOMParser: ParserStub })) {
@@ -59,7 +74,7 @@ function canvasEnvironment(t, { pixel = [255, 0, 0, 255], failAt, height = 980.5
     Object.defineProperty(globalThis, key, { value, configurable: true });
     t.after(() => { if (old) Object.defineProperty(globalThis, key, old); else delete globalThis[key]; });
   }
-  return { renders, canvases, parsed, doc };
+  return { renders, canvases, parsed, doc, sources };
 }
 
 test('foreignObject の画素を描けるか同時に尋ねても1回だけ試す。空の画素なら非対応', async (t) => {
@@ -118,10 +133,24 @@ test('ページの実測高とCSSを書く。試した後はキャンバスと�
   assert.deepEqual(foreign.attrs, { width: '960', height: '981' });
   assert.equal(foreign.firstElementChild.firstElementChild.textContent, PAGE_CSS);
   assert.equal(parsed[0].type, 'text/html');
-  assert.match(parsed[0].html, /ひだまり整体院/);
+  assert.match(stripWrap(parsed[0].html), /ひだまり整体院/);
   assert.doesNotMatch(parsed[0].html, /data-path/);
   assert.equal(canvases[1].width, 0);
   assert.equal(doc.body.children.length, 0);
+});
+
+test('文節入りのHTMLをDOMとしてforeignObjectに入れ、自己閉じのwbrを含むXMLを画像に渡す', async t => {
+  const { renders, parsed, sources } = canvasEnvironment(t);
+  const { exportPng } = await import('../../lib/png-export.js?test=wrap');
+  const blob = await exportPng({ ...MINIMAL, blocks: [], site: { name: '読みたい資料を棚から探します。' } });
+  assert.equal(blob?.type, 'image/png');
+  assert.equal(parsed[0].type, 'text/html');
+  assert.ok(parsed[0].html.includes('読みたい<wbr>資料を<wbr>棚から<wbr>探します。'));
+  const foreign = renders[1].firstElementChild;
+  assert.equal(foreign.tag, 'foreignObject');
+  assert.equal(foreign.firstElementChild.children[1], parsed[0].page);
+  assert.match(sources[1], /<foreignObject><div xmlns="http:\/\/www\.w3\.org\/1999\/xhtml">/);
+  assert.deepEqual(sources[1].match(/<wbr[^>]*>/g), ['<wbr/>', '<wbr/>', '<wbr/>']);
 });
 
 test('判定が通った後でも個別の書き出しに失敗したらnullを返す', async (t) => {
