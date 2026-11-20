@@ -76,6 +76,8 @@ export function createAutosaver(write, report) {
     let saved = false;
     try { saved = write(pending); }
     catch { /* 保存先がまた使えるときに、直近の入力を保存し直せるようにする。 */ }
+    // 競合で取り消されたときは、帯の「一時停止」を保存エラーで上書きしない。
+    if (!pending) return;
     if (saved) pending = null;
     report(saved ? 'saved' : 'error');
   }
@@ -303,6 +305,7 @@ function mountViewer(root, state, ctx, adopt) {
     if (target.hasAttribute('data-adopt')) adopt(state, target);
     else if (target.hasAttribute('data-choose')) ctx.toGoalScreen();
     else if (target.hasAttribute('data-app-send')) ctx.openAppShare(target);
+    else if (page.contains(target) && target.matches('.uxr-form-submit')) explainForm(event);
     else if (page.contains(target) && target.matches('a[href^="#"]')) {
       // 見本のページ内移動で、共有内容が入ったURLの断片を失わないようにする。
       event.preventDefault();
@@ -311,13 +314,13 @@ function mountViewer(root, state, ctx, adopt) {
       if (anchor) anchor.scrollIntoView({ block: 'start' });
     }
   }
-  function submit(event) {
+  function explainForm(event) {
     event.preventDefault();
     ctx.toast('このフォームは見本です。入力した内容は送信されません。');
   }
   root.addEventListener('click', click);
-  page.addEventListener('submit', submit);
-  return { destroy() { root.removeEventListener('click', click); page.removeEventListener('submit', submit); page.replaceChildren(); } };
+  page.addEventListener('submit', explainForm);
+  return { destroy() { root.removeEventListener('click', click); page.removeEventListener('submit', explainForm); page.replaceChildren(); } };
 }
 
 export function createSlotMutations(storage, toast, refreshList) {
@@ -416,7 +419,9 @@ export async function mountApp(root, { storage = persist } = {}) {
     placeNotifications();
     notifications.toast(message, options);
   }
-  const initial = storage.readCurrent();
+  const readDraft = () => storage.readCurrent(undefined, { includeRaw: true });
+  const initial = readDraft();
+  let lastDraftRaw = initial.raw;
   let draft = initial.state;
   let blocked = initial.status === 'unavailable' || initial.status === 'damaged' ? initial.status : null;
   let startupNotice;
@@ -443,7 +448,10 @@ export async function mountApp(root, { storage = persist } = {}) {
     }
     if (status === 'saved') saveFailureShown = false;
   }
-  const saver = createAutosaver(state => storage.saveCurrent(state), reportSave);
+  const saver = createAutosaver(state => storage.saveCurrent(state, undefined, {
+    beforeWrite: raw => !pauseForChangedDraft(raw),
+    onSaved(raw) { lastDraftRaw = raw; },
+  }), reportSave);
   const ctx = createEditor(draft ?? createState(), {
     onDirty(state) {
       if (events.signal.aborted || root.dataset.screen !== 'editor') return;
@@ -643,8 +651,8 @@ export async function mountApp(root, { storage = persist } = {}) {
         slotResult(result.ok, '名前をつけて保存しました。', result.reason);
         return result;
       },
-      load(id) {
-        const state = useSlot(() => storage.loadSlot(id), null);
+      load(id, expect) {
+        const state = useSlot(() => storage.loadSlot(id, undefined, expect), null);
         if (!state) toast('保存したページを読み取れませんでした。', { kind: 'error' });
         return state;
       },
@@ -707,6 +715,7 @@ export async function mountApp(root, { storage = persist } = {}) {
   }
   function keepLocalDraft() {
     if (!otherDraft) return;
+    lastDraftRaw = readDraft().raw ?? otherDraft.raw;
     clearConflict();
     draft = ctx.getState();
     saver.schedule(draft);
@@ -716,27 +725,36 @@ export async function mountApp(root, { storage = persist } = {}) {
   function loadOtherDraft() {
     if (!otherDraft) return;
     // 連続した書き込みでは、次のイベントが届く前に利用者が読み込みを選ぶこともある。
-    let latest;
-    try { latest = readOtherDraft(otherDraft.area?.getItem(CURRENT_KEY)); }
-    catch { /* 端末を読めなくなったら、受け取り時に検証した内容を使う。 */ }
-    draft = latest ?? otherDraft.state;
+    const latest = readDraft();
+    const chosen = latest.state ? latest : otherDraft;
+    draft = chosen.state;
+    lastDraftRaw = chosen.raw;
     clearConflict();
     ctx.restart(draft, { dirty: false });
     reportSave('saved');
     focusScreen();
+  }
+  function pauseForChangedDraft(raw) {
+    if (raw == null || raw === (otherDraft?.raw ?? lastDraftRaw)) return false;
+    const state = readOtherDraft(raw);
+    if (!state) return false;
+    // pagehide の即時保存も止める。入力中の値は、本人が選ぶまで編集履歴に残す。
+    saver.cancel();
+    otherDraft = { raw, state };
+    reportSave('paused');
+    conflictNotice ??= mountStorageNotice(local('slot-topbar'), keepLocalDraft, loadOtherDraft);
+    return true;
   }
   function storageChanged(event) {
     if (event.key !== CURRENT_KEY || event.newValue === null) return;
     try {
       if (event.storageArea && event.storageArea !== globalThis.localStorage) return;
     } catch { return; }
-    const incoming = readOtherDraft(event.newValue);
-    if (!incoming) return;
-    // pagehide の即時保存も止める。入力中の値は、本人が選ぶまで編集履歴に残す。
-    saver.cancel();
-    otherDraft = { state: incoming, area: event.storageArea };
-    reportSave('paused');
-    conflictNotice ??= mountStorageNotice(local('slot-topbar'), keepLocalDraft, loadOtherDraft);
+    let raw = event.newValue;
+    // 解決済みの変更通知が後から届いても、古い原文で再び保存を止めない。
+    try { if (event.storageArea) raw = event.storageArea.getItem(CURRENT_KEY); }
+    catch { /* 保存先を読めない場合は、通知に含まれる下書きから選べる。 */ }
+    pauseForChangedDraft(raw);
   }
   function enableAutosave() {
     window.addEventListener('storage', storageChanged, listen);

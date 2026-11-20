@@ -1,6 +1,7 @@
 import { MAX_SLOTS, SITE_NAME_MAX, STORAGE_PREFIX, clampText, validateState } from './contract.js';
 import { restoreState } from './state.js';
 
+const currentKey = STORAGE_PREFIX + 'current';
 const slotIds = Array.from({ length: MAX_SLOTS }, (_, i) => 's' + (i + 1));
 const slotKey = id => 'slot.' + id;
 
@@ -42,9 +43,12 @@ function classifyCurrent(raw) {
   return { status: state ? 'ok' : 'damaged', state };
 }
 
-export function readCurrent(storage) {
-  return withStorage(storage, { status: 'unavailable', state: null }, s =>
-    classifyCurrent(s.getItem(STORAGE_PREFIX + 'current')));
+export function readCurrent(storage, options) {
+  return withStorage(storage, { status: 'unavailable', state: null }, s => {
+    const raw = s.getItem(currentKey);
+    const current = classifyCurrent(raw);
+    return options?.includeRaw ? { ...current, raw } : current;
+  });
 }
 
 export function backupDamagedCurrent(storage) {
@@ -64,10 +68,19 @@ export function loadCurrent(storage) {
   return withStorage(storage, null, s => restoreState(read(s, 'current')));
 }
 
-export function saveCurrent(state, storage) {
+export function saveCurrent(state, storage, options) {
   return withStorage(storage, false, s => {
     const clean = restoreState(state);
-    return clean !== null && write(s, 'current', clean);
+    if (!clean) return false;
+    const raw = JSON.stringify(clean);
+    // 整形中に別のタブが保存した場合も拾うため、照合は書き込みの直前に置く。
+    if (options?.beforeWrite) {
+      const current = withStorage(s, null, area => area.getItem(currentKey));
+      if (!options.beforeWrite(current)) return false;
+    }
+    s.setItem(currentKey, raw);
+    options?.onSaved?.(raw);
+    return true;
   });
 }
 
@@ -142,30 +155,42 @@ export function listSlots(storage) {
     .map(({ id, name, goal, savedAt, blocks }) => ({ id, name, goal, savedAt, blocks })));
 }
 
+function isFreeSlot(raw, value) {
+  // 削除済みの枠には日時だけが残る。ほかの読めない記録は復旧のために残す。
+  return raw === null || (validSavedAt(value?.savedAt) && Object.keys(value).length === 1);
+}
+
 export function saveSlot(state, name, storage) {
   const failed = { ok: false, reason: 'この端末には保存できませんでした。' };
   return withStorage(storage, failed, s => {
     const clean = restoreState(state);
     if (!clean) return failed;
-    let slots = readSlots(s);
-    if (slots.size >= MAX_SLOTS) return { ok: false, reason: '保存は' + MAX_SLOTS + '件までです。不要な保存を消してください。' };
     const title = slotName(name, clean.site.name);
     const tried = new Set();
-    while (tried.size < MAX_SLOTS && slots.size < MAX_SLOTS) {
-      const id = slotIds.find(key => !slots.has(key) && !tried.has(key));
+    while (tried.size < MAX_SLOTS) {
+      const snapshot = new Map();
+      const slots = readSlots(s, snapshot);
+      const used = new Set(slots.keys());
+      for (const id of slotIds) {
+        const { raw, value } = snapshot.get(slotKey(id));
+        if (!isFreeSlot(raw, value)) used.add(id);
+      }
+      if (used.size >= MAX_SLOTS) {
+        if (!tried.size) return { ok: false, reason: '保存は' + MAX_SLOTS + '件までです。不要な保存を消してください。' };
+        break;
+      }
+      const id = slotIds.find(key => !used.has(key) && !tried.has(key));
       if (!id) break;
       tried.add(id);
       const key = slotKey(id);
-      const previous = read(s, key);
-      if (!validSavedAt(previous?.savedAt) || !restoreState(previous.state)) {
-        const savedAt = nextSlotTime(slots, previous);
-        const value = JSON.stringify({ name: title, savedAt, state: clean });
-        const fullKey = STORAGE_PREFIX + key;
-        s.setItem(fullKey, value);
-        if (s.getItem(fullKey) === value) return { ok: true, id };
-      }
-      // 読み戻しが違えばその枠は相手に残し、旧形式も含めて空きを調べ直す。
-      slots = readSlots(s);
+      const previous = snapshot.get(key);
+      const savedAt = nextSlotTime(slots, previous.value);
+      const value = JSON.stringify({ name: title, savedAt, state: clean });
+      const fullKey = STORAGE_PREFIX + key;
+      // 空きを選んだ後に書かれた原文も相手に残し、旧形式を含めて一覧を取り直す。
+      if (s.getItem(fullKey) !== previous.raw) continue;
+      s.setItem(fullKey, value);
+      if (s.getItem(fullKey) === value) return { ok: true, id };
     }
     return { ok: false, reason: '保存の枠が別のタブで使われました。もう一度お試しください。' };
   });
@@ -206,8 +231,10 @@ export function restoreSlot(record, storage) {
   });
 }
 
-export function loadSlot(id, storage) {
-  return getSlotRecord(id, storage)?.state ?? null;
+export function loadSlot(id, storage, expect) {
+  const slot = getSlotRecord(id, storage);
+  if (expect !== undefined && slot?.savedAt !== expect?.savedAt) return null;
+  return slot?.state ?? null;
 }
 
 function changeSlot(id, storage, expect, editsFor) {

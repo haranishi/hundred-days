@@ -148,7 +148,8 @@ function context(initial = MINIMAL, diagnose = () => ({ score: 80, items: [] }))
     toast(message, opts = {}) { toasts.push({ message, ...opts }); },
     viewUrl: async () => 'https://example.com/day96/#v=2.sample',
     slots: {
-      list: persist.listSlots, load: persist.loadSlot,
+      list: persist.listSlots,
+      load: (id, expect) => persist.loadSlot(id, undefined, expect),
       save: name => persist.saveSlot(present(history), name),
     },
   };
@@ -905,7 +906,7 @@ test('打鍵中の選択範囲を保ち、店名の全出現をまとめて置�
   assert.ok(replacementButton(root));
 });
 
-test('店名が収まらない欄だけを残し、何も置き換えられない2回目は履歴も通知も増やさない', (t) => {
+test('店名が収まらない欄だけを残し、全件が上限を超える2回目は履歴を増やさず件数を知らせる', (t) => {
   const { root } = environment(t, 'section');
   const from = MINIMAL.site.name;
   const name = '森'.repeat(24);
@@ -925,7 +926,7 @@ test('店名が収まらない欄だけを残し、何も置き換えられな�
   replacementButton(root).click();
   assert.ok(ctx.getHistory() === before);
   assert.equal(calls.length, 1);
-  assert.equal(toasts.length, 1);
+  assert.deepEqual(toasts.slice(1), [{ message: '文字数の上限のため、1か所は置き換えられませんでした。' }]);
 });
 
 test('保存を消した通知から、同じID・日時・名前・内容を一覧に戻せる', (t) => {

@@ -122,20 +122,18 @@ const isFaq = block => block.type === 'faq';
 const formFieldCount = block => block.variant === 1 ? 1 : block.props.items.length;
 const stageBlock = { notice: 'hero', understand: 'benefits', trust: 'voices', act: 'cta', relief: 'faq' };
 
-// 繰り返し欄を並べ替えた後も、文章そのものが残っていれば見本と分かる。
+const normalizeSampleText = value => value.normalize('NFKC').trim();
+
+// 行の位置や文字幅が変わっても、見本の人数を実際の人数として扱わない。
 const sampleText = new Map();
 for (const recipe of Object.values(RECIPES)) {
   const texts = new Set();
-  for (const block of recipe.blocks) {
+  // 「部品を足す」で入る汎用の見本（既定の「8人」など）も照合に含める。
+  const defaults = BLOCK_TYPES.map(type => makeBlock(recipe.goal, type, 'sample'));
+  for (const block of [...recipe.blocks, ...defaults]) {
     for (const { value } of textFields(block)) {
-      if (value.trim()) texts.add(value);
-    }
-  }
-  // 「部品を足す」で足したときの既定の文（レシピに無い種類は汎用の文）も、見本として数える。
-  // 数えないと、足したままの数字（既定の「8人」）でも、印だけで「本当の数字」を満たしてしまう。
-  for (const type of BLOCK_TYPES) {
-    for (const { value } of textFields(makeBlock(recipe.goal, type, 'sample'))) {
-      if (value.trim()) texts.add(value);
+      const text = normalizeSampleText(value);
+      if (text) texts.add(text);
     }
   }
   sampleText.set(recipe.goal, texts);
@@ -169,7 +167,7 @@ function assess(state) {
     let hasSample = false;
     for (const { field, value } of textFields(block)) {
       if (field.role === 'button') buttons.push({ block, label: value.trim() });
-      if (texts.has(value)) hasSample = true;
+      if (texts.has(normalizeSampleText(value))) hasSample = true;
     }
     if (hasSample) sampleBlocks.push(block);
   }
@@ -192,8 +190,7 @@ function assess(state) {
     'この流れはこのアプリ独自の整理です。' + (stageHelp ? `補いたいのは${stageHelp}です。` : ''));
   if (first >= 0) record('trust-before-action', blocks.slice(0, first).some(isTrust), blocks[first]);
   if (limits.length) {
-    // 前後の空白を変えただけでは、見本の人数を実際の人数に直したことにならない。
-    const unconfirmed = limits.find(({ props }) => props.real !== true || texts.has(props.value.trim()));
+    const unconfirmed = limits.find(({ props }) => props.real !== true || texts.has(normalizeSampleText(props.value)));
     const note = unconfirmed?.props.real === true
       ? `数字「${unconfirmed.props.value}」は見本のままです。実際の数字に直してから、「本当の数字です」に印を付けてください。`
       : undefined;
@@ -218,8 +215,8 @@ function assess(state) {
     record('form-short', !long, long);
   }
   if (heroes.length) {
-    const long = heroes.find(b => countChars(b.props.title) > 28);
-    record('hero-title-short', !long, long);
+    const invalid = heroes.find(({ props }) => !props.title.trim() || countChars(props.title) > 28);
+    record('hero-title-short', !invalid, invalid);
   }
   if (last >= 0 && faqGoals.has(goal)) record('faq-before-last-action', blocks.slice(0, last).some(isFaq), blocks[last]);
   if (blocks.length >= 6 && heroes.some(b => b.props.cta.trim())) {

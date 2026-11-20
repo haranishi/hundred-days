@@ -302,6 +302,10 @@ test.describe('共有・書き出し・保存', () => {
       await other.goto(link);
       await expect(other.locator('#app')).toHaveAttribute('data-screen', 'viewer', { timeout: 20_000 });
       await expect(other.locator('.uxr-page')).toBeVisible();
+      // 見本のフォームのボタンを押しても何も送信されず、「見本です」と知らせる（送信できる <form> は使わない）
+      await other.locator('.uxr-form-submit').first().click();
+      await expect(other.locator('#toasts')).toContainText('このフォームは見本です');
+      expect(await other.locator('.uxr-page form').count()).toBe(0);
       await other.getByRole('button', { name: /このレシピをもとに作る/ }).click();
       await expect(other.locator('#app')).toHaveAttribute('data-screen', 'editor');
       const broken = await stranger.newPage();

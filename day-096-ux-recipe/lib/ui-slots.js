@@ -52,8 +52,9 @@ export function mountSlots(dialog, ctx) {
     else hint.textContent = 'この端末に' + MAX_SLOTS + '件まで保存できます。';
   }
 
-  function load(id) {
-    const state = ctx.slots.load(id);
+  function load(id, expect) {
+    // 一覧を描いたあとで枠が別の作業に再利用されていたら、開かずに一覧を読み直す（別の作業を開いて自動保存で上書きしない）。
+    const state = ctx.slots.load(id, expect);
     if (!state) { refreshList(); return; }
     // 下書きのない入口から開くと履歴は空で、戻せる作業もない。
     const hadPage = Boolean(ctx.getState());
@@ -108,7 +109,7 @@ export function mountSlots(dialog, ctx) {
       if (slot.iso) time.dateTime = slot.iso;
       meta.append(element('span', '', slot.goal), element('span', '', slot.blocks), time);
       const actions = element('div', 'cs-actions');
-      const open = button('開く', () => load(slot.id));
+      const open = button('開く', () => load(slot.id, { savedAt: slot.savedAt }));
       open.dataset.slotOpen = slot.id;
       const rename = button('名前を変える', () => editName(slot, index, row, actions, rename));
       const remove = button('消す', () => {

@@ -163,7 +163,10 @@ function sampleNameGuide(ctx, siteInput) {
     if (root.hidden) return;
     const state = ctx.getState();
     const { state: next, replaced, skipped } = replaceNameUses(state, sampleSiteName(state.goal), state.site.name);
-    if (replaced === 0) return;
+    if (replaced === 0) {
+      if (skipped > 0) ctx.toast('文字数の上限のため、' + skipped + 'か所は置き換えられませんでした。');
+      return;
+    }
 
     const inLook = ctx.getTab() === 'look';
     const hadFocus = document.activeElement === apply;
