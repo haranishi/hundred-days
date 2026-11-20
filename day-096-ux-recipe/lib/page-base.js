@@ -17,7 +17,7 @@ export const BASE_CSS = `
 .uxr-page svg{max-width:100%}
 
 .uxr-page .uxr-head{border-bottom:1px solid var(--uxr-line);background:var(--uxr-bg)}
-.uxr-page .uxr-head-in{display:flex;align-items:center;gap:10px;max-width:960px;margin:0 auto;padding:14px var(--uxr-pad-x)}
+.uxr-page .uxr-head-in{display:flex;align-items:center;gap:10px;max-width:var(--uxr-max);margin:0 auto;padding:14px var(--uxr-pad-x)}
 .uxr-page .uxr-head-in::before{content:"";flex:none;width:.7em;height:.7em;border-radius:50%;background:var(--uxr-accent)}
 .uxr-page .uxr-brand{font-family:var(--uxr-font-head);font-weight:700;font-size:1.0625rem;letter-spacing:.02em;min-width:0}
 
@@ -57,13 +57,17 @@ export const BASE_CSS = `
 /* 編集中だけ出る「ここに書く」の目印（書き出しには空の項目が出ないので、ここは編集画面専用） */
 .uxr-page .is-empty::before{content:attr(data-ph);opacity:.5;font-style:normal;font-weight:400}
 
+/* 狭い画面では見出しの読み始めをそろえ、中央に視線を集める部品は元の配置を生かす。 */
+@container uxr (width < 560px){
+  .uxr-page .uxr-main > .uxr-block:not(.uxr-hero,.uxr-cta,.uxr-limited,.uxr-guarantee) .uxr-h2{text-align:left}
+}
 @container uxr (min-width:640px){
   .uxr-page .uxr-grid--2{grid-template-columns:repeat(2,minmax(0,1fr))}
   .uxr-page .uxr-grid--3{grid-template-columns:repeat(3,minmax(0,1fr))}
   .uxr-page .uxr-grid--4{grid-template-columns:repeat(4,minmax(0,1fr))}
 }
 @container uxr (min-width:720px){
-  .uxr-page .uxr-main,.uxr-page .uxr-head{--uxr-pad-x:32px;--uxr-pad-y:84px}
-  .uxr-page .uxr-main{--uxr-max:880px}
+  /* 本文と店名の帯は、内側の余白に加えて中央に置く箱の幅までそろえる。 */
+  .uxr-page .uxr-main,.uxr-page .uxr-head{--uxr-max:880px;--uxr-pad-x:32px;--uxr-pad-y:84px}
 }
 `;

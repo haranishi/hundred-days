@@ -6,6 +6,7 @@ function block(type, variant, props) {
 
 const reserve = {
   siteName: 'ひだまり整体院',
+  footerItems: [{ text: '受付 火〜土10〜18時' }, { text: 'ご予約は予約欄から' }],
   question: '初めての方に施術を予約してもらうには？',
   summary: 'どんな時間を過ごすのか、料金と来院の流れで伝えます。服装や日程変更の疑問に答えてから、予約を受け付けます。',
   theme: { preset: 'soft', accent: 0 },
@@ -52,6 +53,7 @@ const reserve = {
 
 const buy = {
   siteName: '手ぬぐい工房 あおい',
+  footerItems: [{ text: '手ぬぐいは工房から発送' }, { text: '送料は一包み200円' }],
   question: '手に取れない布を、納得して買ってもらうには？',
   summary: '何を包めるかで二つの大きさを比べ、送料まで含めて案内します。手入れの仕方も見てから一枚を選べます。',
   theme: { preset: 'lively', accent: 5 },
@@ -89,6 +91,7 @@ const buy = {
 
 const inquire = {
   siteName: 'ことのは設計室',
+  footerItems: [{ text: '受付 平日10〜17時' }, { text: '対面・通話で相談できます' }],
   question: '改装を考え始めた人に相談してもらうには？',
   summary: '相談できる範囲と、初回に何を話すかを先に示します。担当者の考え方を読んでから、顔合わせを申し込めます。',
   theme: { preset: 'crisp', accent: 1 },
@@ -126,6 +129,7 @@ const inquire = {
 
 const signup = {
   siteName: 'ひとこと日記',
+  footerItems: [{ text: 'お問い合わせはメールで' }],
   question: '日記を試してみたい人に登録してもらうには？',
   summary: '書いた一行を後でどう読めるか、日記の例で伝えます。公開範囲や退会の方法を確かめてから始められます。',
   theme: { preset: 'soft', accent: 3 },
@@ -162,6 +166,7 @@ const signup = {
 
 const apply = {
   siteName: 'まちのパン屋 こむぎ',
+  footerItems: [{ text: '面談は店内で行います' }, { text: '食パンの木札が目印' }],
   question: '働く姿を思い浮かべて応募してもらうには？',
   summary: '朝の仕事と一緒に働く人を紹介し、時間や時給を明らかにします。面談までの流れを見て、連絡先ひとつで応募できます。',
   theme: { preset: 'calm', accent: 2 },
@@ -204,6 +209,7 @@ const apply = {
 
 const event = {
   siteName: '春のまちあるきマルシェ',
+  footerItems: [{ text: '9時半に木の門で集合' }, { text: '雨天の連絡は当日朝に' }],
   question: '初参加の人に、当日を想像して申し込んでもらうには？',
   summary: '歩く道の様子、集合時刻、参加費をひと続きで案内します。定員を確認してから、代表の方がまとめて申し込めます。',
   theme: { preset: 'lively', accent: 4 },
@@ -245,6 +251,7 @@ const event = {
 
 const visit = {
   siteName: '喫茶 ひなた珈琲',
+  footerItems: [{ text: '営業時間は8時〜16時' }, { text: '月曜はお休みです' }],
   question: '近くを歩く人に、お店に寄ってもらうには？',
   summary: '席の様子と値段に続けて、朝食やプリンを頼める時間を案内します。入口の目印を確かめてからお店へ向かえます。',
   theme: { preset: 'calm', accent: 5 },
@@ -283,6 +290,7 @@ const visit = {
 
 const support = {
   siteName: '子ども食堂 むぎのいえ',
+  footerItems: [{ text: '活動日は毎週木曜' }, { text: '会計報告は食堂の入口で' }],
   question: '食卓の支え方を知って、応援してもらうには？',
   summary: '食堂の様子と支援の使い道を紹介し、一回と毎月の寄付を比べます。寄付を休む方法や、会計報告を読める場所も案内します。',
   theme: { preset: 'soft', accent: 2 },
@@ -322,9 +330,9 @@ const support = {
 export const SAMPLE_NOTICE = 'このページはサンプルです。';
 
 const drafts = { reserve, buy, inquire, signup, apply, event, visit, support };
-export const RECIPES = Object.fromEntries(Object.entries(drafts).map(([goal, draft]) => [goal, {
+export const RECIPES = Object.fromEntries(Object.entries(drafts).map(([goal, { footerItems, ...draft }]) => [goal, {
   goal, ...draft,
-  blocks: [...draft.blocks, block('footer', 0, { name: draft.siteName, text: SAMPLE_NOTICE, items: [] })],
+  blocks: [...draft.blocks, block('footer', 0, { name: draft.siteName, text: SAMPLE_NOTICE, items: footerItems })],
 }]));
 
 export function buildFromRecipe(goal) {

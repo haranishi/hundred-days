@@ -6,13 +6,13 @@ export const css = `
 /* 濃い地（--uxr-ink）に薄い文字（--uxr-bg）で、全4テーマで高いコントラストと落ち着いた締めを作る */
 .uxr-page .uxr-footer{background:var(--uxr-ink);color:var(--uxr-bg);border-top:3px solid var(--uxr-accent)}
 .uxr-page .uxr-footer .uxr-inner{padding-block:44px 48px;display:grid;gap:20px}
-.uxr-page .uxr-footer .uxr-foot-top{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:14px 28px}
+.uxr-page .uxr-footer .uxr-foot-top{display:grid;gap:12px}
 /* 仕切り線は本文の行長制限（max-width）に縛られず全幅で引き、左右の整列感を保つ */
 .uxr-page .uxr-footer .uxr-foot-top.has-sep{padding-bottom:18px;border-bottom:1px solid color-mix(in srgb,var(--uxr-bg) 20%,var(--uxr-ink))}
 .uxr-page .uxr-footer .uxr-foot-brand{display:flex;align-items:center;gap:10px;min-width:0}
 .uxr-page .uxr-footer .uxr-foot-dot{flex:none;width:10px;height:10px;border-radius:50%;background:var(--uxr-accent)}
 .uxr-page .uxr-footer .uxr-foot-name{font-family:var(--uxr-font-head);font-weight:var(--uxr-head-weight);font-size:1.0625rem;letter-spacing:.03em;color:var(--uxr-bg)}
-.uxr-page .uxr-footer .uxr-foot-links{display:flex;flex-wrap:wrap;gap:8px 20px;font-size:.875rem;color:color-mix(in srgb,var(--uxr-bg) 86%,var(--uxr-ink))}
+.uxr-page .uxr-footer .uxr-foot-links{display:grid;gap:4px;font-size:max(14px,.875rem);line-height:1.6;color:color-mix(in srgb,var(--uxr-bg) 86%,var(--uxr-ink))}
 .uxr-page .uxr-footer .uxr-foot-link{letter-spacing:.02em}
 .uxr-page .uxr-footer .uxr-foot-text{line-height:1.7;color:var(--uxr-bg);max-width:48em}
 
@@ -21,6 +21,7 @@ export const css = `
 
 @container uxr (min-width:720px){
   .uxr-page .uxr-footer .uxr-inner{padding-block:56px 64px;gap:22px}
+  .uxr-page .uxr-footer .uxr-foot-top{display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;gap:14px 28px}
 }
 `;
 

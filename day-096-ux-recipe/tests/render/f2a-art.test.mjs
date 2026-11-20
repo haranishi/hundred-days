@@ -25,7 +25,8 @@ test('左寄せのヒーローは本文を読めるまま、背景にだけ図�
   assert.match(css, /\.uxr-hero\.uxr-v1 \.uxr-hero-text\{[^}]*z-index:1/);
   assert.match(css, /\[data-theme="lively"\][^{]*\.uxr-hero-shape\{(?=[^}]*border:3px solid var\(--uxr-ink\))[^}]*box-shadow:/);
   assert.match(css, /\[data-theme="calm"\][^{]*\.uxr-hero-shape\{(?=[^}]*background:transparent)[^}]*border:1px solid/);
-  assert.match(css, /\[data-theme="crisp"\][^{]*\.uxr-hero-shape\{[^}]*border-radius:var\(--uxr-radius-sm\)/);
+  // きりっとの飾りは、塗りのない細い輪（斜線・塗りの四角形は、写真の抜け・描き損じに見えるので使わない）
+  assert.match(css, /\[data-theme="crisp"\][^{]*\.uxr-hero-shape\{(?=[^}]*background:(?:none|transparent))[^}]*border:1px solid var\(--uxr-accent-line\)/);
   assert.match(css, /@container uxr \(min-width:640px\)\{\s*\.uxr-page \.uxr-hero\.uxr-v1/);
 });
 

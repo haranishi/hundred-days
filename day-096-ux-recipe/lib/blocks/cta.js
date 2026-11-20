@@ -14,7 +14,7 @@ export const css = `
 .uxr-page .uxr-cta.uxr-v0 .uxr-cta-text,
 .uxr-page .uxr-cta.uxr-v0 .uxr-note{color:var(--uxr-accent-ink)}
 .uxr-page .uxr-cta.uxr-v0 .uxr-cta-text{max-width:34em}
-.uxr-page .uxr-cta.uxr-v0 .uxr-btn{margin-top:8px;min-width:min(100%,280px)}
+.uxr-page .uxr-cta.uxr-v0 .uxr-btn{margin-top:8px;min-width:min(var(--uxr-btn-max,100%),280px)}
 
 /* v1: 角丸や太枠と喧嘩しないよう、左の太い線は border-left でなく内側の擬似要素で描く */
 .uxr-page .uxr-cta.uxr-v1 .uxr-cta-card{position:relative;overflow:hidden;display:grid;gap:20px;padding:28px 24px 28px 32px;background:var(--uxr-surface);border:var(--uxr-card-border);border-radius:var(--uxr-radius);box-shadow:var(--uxr-shadow)}
@@ -22,7 +22,7 @@ export const css = `
 .uxr-page .uxr-cta.uxr-v1 .uxr-cta-main{display:grid;gap:10px;min-width:0}
 .uxr-page .uxr-cta.uxr-v1 .uxr-cta-text{color:var(--uxr-muted)}
 .uxr-page .uxr-cta.uxr-v1 .uxr-cta-side{display:grid;gap:8px;justify-items:start}
-.uxr-page .uxr-cta.uxr-v1 .uxr-cta-side .uxr-btn{min-width:min(100%,200px)}
+.uxr-page .uxr-cta.uxr-v1 .uxr-cta-side .uxr-btn{min-width:min(var(--uxr-btn-max,100%),200px)}
 
 .uxr-page[data-theme="lively"] .uxr-cta.uxr-v0{border-block:1px solid var(--uxr-ink)}
 .uxr-page[data-theme="lively"] .uxr-cta.uxr-v1 .uxr-cta-card::before{width:10px;border-right:2px solid var(--uxr-ink)}

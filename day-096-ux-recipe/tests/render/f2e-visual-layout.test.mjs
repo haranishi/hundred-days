@@ -20,8 +20,8 @@ test('問い合わせのヒーローは右上に線だけを描き、他のテ�
   assert.match(rule(css, '.uxr-page ' + shape), /aspect-ratio:1;[^}]*border-radius:50%/);
   const crisp = rule(css, '.uxr-page[data-theme="crisp"] ' + shape);
   assert.match(crisp, /background:(?:none|transparent)(?:;|$)/);
-  assert.match(crisp, /border-block:1px solid var\(--uxr-accent-line\)/);
-  assert.match(crisp, /transform:rotate\(/);
+  assert.match(crisp, /border:1px solid var\(--uxr-accent-line\)/);
+  assert.doesNotMatch(crisp, /rotate\(/, '斜線の飾りは描き損じに見える（採点3周目の指摘）');
   for (const theme of ['soft', 'lively', 'calm']) {
     const overrides = css.split(`.uxr-page[data-theme="${theme}"] ${shape}{`)[1]?.split('}')[0] ?? '';
     assert.doesNotMatch(overrides, /border-radius:(?!50%)/, theme);

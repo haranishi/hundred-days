@@ -22,7 +22,7 @@ export const css = `
 .uxr-page .uxr-limited.uxr-v1 .uxr-lim-text{font-size:.9375rem;color:var(--uxr-ink)}
 .uxr-page .uxr-limited.uxr-v1 .uxr-lim-val{font-size:1.125rem}
 
-.uxr-page[data-theme="lively"] .uxr-limited.uxr-v0{border-block:1px solid var(--uxr-ink)}
+.uxr-page[data-theme="lively"] .uxr-limited.uxr-v0{background:var(--uxr-bg);border-block:2px solid var(--uxr-ink)}
 .uxr-page[data-theme="lively"] .uxr-limited .uxr-lim-val{box-shadow:3px 3px 0 var(--uxr-ink)}
 .uxr-page[data-theme="calm"] .uxr-limited .uxr-lim-val{font-weight:700}
 
@@ -37,6 +37,9 @@ export const css = `
 }
 @container uxr (min-width:480px){
   .uxr-page .uxr-limited .uxr-lim-main{display:inline-flex;align-items:center;gap:8px;max-width:100%}
+}
+@container uxr (min-width:720px){
+  .uxr-page[data-theme="lively"] .uxr-limited.uxr-v0 .uxr-lim-text{flex-basis:100%}
 }
 `;
 

@@ -33,6 +33,12 @@ for (const goal of GOALS) {
     assert.ok(state.blocks.length >= 9 && state.blocks.length <= 11);
     assert.equal(state.blocks.at(-1).props.name, state.site.name);
     assert.equal(state.blocks.at(-1).props.text, 'このページはサンプルです。');
+    const details = state.blocks.at(-1).props.items;
+    assert.ok(details.length >= 1 && details.length <= 2, 'フッターの案内は1〜2件');
+    for (const { text } of details) {
+      assert.ok(text.trim(), '空の案内を載せない');
+      assert.doesNotMatch(text, /https?:\/\/|[@＠〒]|\d{2,4}[-ー]\d{2,4}[-ー]\d{4}/u);
+    }
 
     const report = diagnose(state);
     assert.deepEqual(report.stages.map(stage => stage.key), STAGES);
