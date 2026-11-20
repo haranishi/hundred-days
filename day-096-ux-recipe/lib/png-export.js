@@ -3,14 +3,23 @@ import { PAGE_CSS } from './page-css.js';
 import { renderPage } from './render.js';
 
 const SVG = 'http://www.w3.org/2000/svg';
+const MAX_EDGE = 16_000;
+const MAX_PIXELS = 16_000_000;
 
 export function pngDimensions(width, height, scale = 2) {
   if (![width, height, scale].every((n) => Number.isFinite(n) && n > 0)) return null;
   const cssWidth = Math.ceil(width);
   const cssHeight = Math.ceil(height);
-  const pixelWidth = Math.ceil(cssWidth * scale);
-  const pixelHeight = Math.ceil(cssHeight * scale);
-  if (![cssWidth, cssHeight, pixelWidth, pixelHeight].every(Number.isSafeInteger)) return null;
+  const maxScale = Math.min(MAX_EDGE / Math.max(cssWidth, cssHeight), Math.sqrt(MAX_PIXELS / (cssWidth * cssHeight)));
+  if (maxScale < 1) return null;
+  const fitted = Math.min(Math.max(1, scale), maxScale);
+  let pixelWidth = Math.ceil(cssWidth * fitted);
+  let pixelHeight = Math.ceil(cssHeight * fitted);
+  // 端数を切り上げて上限を越えると、WebKit はキャンバス全体を読み出せなくなる。
+  if (pixelWidth > MAX_EDGE || pixelHeight > MAX_EDGE || pixelWidth * pixelHeight > MAX_PIXELS) {
+    pixelWidth = Math.floor(cssWidth * fitted);
+    pixelHeight = Math.floor(cssHeight * fitted);
+  }
   return { width: cssWidth, height: cssHeight, pixelWidth, pixelHeight };
 }
 

@@ -35,7 +35,7 @@ export function scalarEditor(field, id, ctx) {
   return { root: text.root, input: text.input, update(next) { text.update(next.value); } };
 }
 
-function listEditor(field, id, ctx) {
+function listEditor(field, id, ctx, hint) {
   const root = element('section', 'cs-list');
   const header = element('div', 'cs-field-head');
   const count = element('span', 'cs-count');
@@ -44,6 +44,7 @@ function listEditor(field, id, ctx) {
   const rows = [];
   const add = button('項目を足す', () => act({ type: 'addItem' }, rows.length));
   root.append(header, body, add);
+  if (hint) root.insertBefore(hint, body);
 
   function act(action, nextIndex) {
     ctx.dispatch({ ...action, id, path: field.path });
@@ -111,10 +112,12 @@ function blockEditor(block, goal, ctx) {
   const variants = radioChoices('部品の見た目', schema.variants.map((label, value) => ({ value, label })),
     (variant) => ctx.dispatch({ type: 'setVariant', id, variant }));
   const fields = formModel(block, goal);
-  const editors = fields.map((field) => field.kind === 'list' ? listEditor(field, id, ctx) : scalarEditor(field, id, ctx));
+  const hint = type === 'form' ? element('p', 'cs-help', 'ひとこと表示では、先頭の1項目だけがページに出ます。') : null;
+  const editors = fields.map((field) => field.kind === 'list' ? listEditor(field, id, ctx, hint) : scalarEditor(field, id, ctx));
   panel.append(header, why, variants.root, ...editors.map((editor) => editor.root));
 
   function update(next, model = formModel(next, goal)) {
+    if (hint) hint.hidden = next.variant !== 1;
     variants.update(next.variant);
     model.forEach((field, i) => editors[i].update(field));
   }
@@ -130,11 +133,12 @@ export function mountInspector(root, ctx) {
     const block = state?.blocks.find((item) => item.id === selectedId);
     const goal = state?.goal;
     if (previous === block && previousGoal === goal && root.firstChild) return;
-    const scroll = root.scrollTop;
+    let scroll = 0;
     if (!block) {
       root.replaceChildren(element('p', 'cs-empty', '構成の一覧かプレビューで、編集したい部品を選んでください。'));
       editor = null;
     } else if (editor && previous?.id === block.id && previous.type === block.type && previousGoal === goal) {
+      scroll = root.scrollTop;
       editor.update(block);
     } else {
       editor = blockEditor(block, goal, ctx);

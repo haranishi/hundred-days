@@ -2,16 +2,17 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { MINIMAL } from '../fixtures/states.js';
 import { PAGE_CSS } from '../../lib/page-css.js';
+import { pngDimensions } from '../../lib/png-export.js';
 
 // Node には描画エンジンがないため、ここでは画素の照合・寸法の引き渡し・後始末を観測する。
-function canvasEnvironment(t, { pixel = [255, 0, 0, 255], failAt } = {}) {
+function canvasEnvironment(t, { pixel = [255, 0, 0, 255], failAt, height = 980.5 } = {}) {
   const renders = [];
   const canvases = [];
   const parsed = [];
   const node = (tag) => ({
-    tag, attrs: {}, children: [], style: {}, scrollHeight: 980,
+    tag, attrs: {}, children: [], style: {}, scrollHeight: Math.floor(height),
     get firstElementChild() { return this.children[0]; },
-    getBoundingClientRect() { return { height: 980.5 }; },
+    getBoundingClientRect() { return { height }; },
     setAttribute(key, value) { this.attrs[key] = String(value); },
     append(...nodes) { for (const child of nodes) { child.remove(); child.parent = this; this.children.push(child); } },
     remove() { if (this.parent) { this.parent.children.splice(this.parent.children.indexOf(this), 1); this.parent = null; } },
@@ -67,6 +68,30 @@ test('foreignObject の画素を描けるか同時に尋ねても1回だけ試�
   assert.deepEqual(await Promise.all([canExportPng(), canExportPng()]), [false, false]);
   assert.equal(await exportPng(MINIMAL), null);
   assert.equal(canvases.length, 1);
+});
+
+test('PNGは各辺16000画素・合計1600万画素までで、等倍でも収まらない寸法を断る', () => {
+  for (const [width, height] of [[100, 10_000], [10_000, 100], [1999, 3999], [1000, 16_000]]) {
+    const size = pngDimensions(width, height, 2);
+    assert.ok(size);
+    assert.ok(size.pixelWidth >= width && size.pixelWidth <= 16_000);
+    assert.ok(size.pixelHeight >= height && size.pixelHeight <= 16_000);
+    assert.ok(size.pixelWidth * size.pixelHeight <= 16_000_000);
+    assert.ok(Math.abs(size.pixelWidth - size.pixelHeight * width / height) <= Math.max(1, width / height));
+  }
+  assert.deepEqual(pngDimensions(2000, 2000, 2), { width: 2000, height: 2000, pixelWidth: 4000, pixelHeight: 4000 });
+  assert.equal(pngDimensions(1, 16_000.1, 2), null);
+  assert.equal(pngDimensions(16_000.1, 1, 2), null);
+  assert.equal(pngDimensions(4000.1, 4000, 1), null);
+});
+
+test('長いページのPNGも全体をキャンバスに収めて書き出す', async (t) => {
+  const { canvases } = canvasEnvironment(t, { height: 8000 });
+  const { exportPng } = await import('../../lib/png-export.js?test=tall-page');
+  assert.equal((await exportPng(MINIMAL, { width: 1000, scale: 2 }))?.type, 'image/png');
+  const [width, height] = canvases[1].drawn;
+  assert.ok(width >= 1000 && height >= 8000 && width * height <= 16_000_000);
+  assert.deepEqual(canvases[1].scaled, [width / 1000, height / 8000]);
 });
 
 test('画素が描けてもPNGを読み出せない環境は非対応として覚える', async (t) => {

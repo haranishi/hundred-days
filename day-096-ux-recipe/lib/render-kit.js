@@ -87,7 +87,7 @@ const ICONS = {
 };
 export const ICON_NAMES = Object.keys(ICONS);
 /** 線の絵（飾り用）。名前は ICON_NAMES。 */
-export const ico = (name, cls = '') => (ICONS[name]
+export const ico = (name, cls = '') => (Object.hasOwn(ICONS, name)
   ? `<svg class="uxr-ico${cls ? ` ${esc(cls)}` : ''}" viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${ICONS[name]}</svg>`
   : '');
 

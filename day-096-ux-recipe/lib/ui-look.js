@@ -49,7 +49,8 @@ export function textField({ label, max, kind = 'text', value = '' }, onEdit) {
     const limit = result.count >= max ? max + '文字まで入力できます。' : '';
     if (warning.textContent !== limit) warning.textContent = limit;
     // maxlength は UTF-16 の長さなので、絵文字の分を足して状態と同じ文字数を許す。
-    input.maxLength = composing ? max * 2 : max + input.value.length - result.count;
+    if (composing) input.removeAttribute('maxlength');
+    else input.maxLength = max + input.value.length - result.count;
   }
 
   function writeValue(next, start, end, direction) {
@@ -75,12 +76,13 @@ export function textField({ label, max, kind = 'text', value = '' }, onEdit) {
     showCount();
     if (modelValue === next) return;
     modelValue = next;
-    onEdit(next);
+    onEdit?.(next);
   }
 
   function beginEdit() {
     suffix = input.value.slice(input.selectionEnd);
-    input.maxLength = max * 2;
+    // 読みや貼り付けを途中で切ると、確定後の文字とカーソル位置を復元できない。
+    input.removeAttribute('maxlength');
   }
   input.addEventListener('beforeinput', () => { if (!composing) beginEdit(); });
   input.addEventListener('compositionstart', () => {
@@ -88,14 +90,16 @@ export function textField({ label, max, kind = 'text', value = '' }, onEdit) {
     composing = true;
   });
   input.addEventListener('input', (event) => {
-    if (event.isComposing) composing = true;
+    if (typeof event.isComposing === 'boolean') composing = event.isComposing;
     if (composing) showCount();
     else commitInput();
   });
-  input.addEventListener('compositionend', () => {
+  function finishComposition() {
     composing = false;
     commitInput();
-  });
+  }
+  input.addEventListener('compositionend', finishComposition);
+  input.addEventListener('blur', () => { if (composing) finishComposition(); });
   showCount();
 
   return {

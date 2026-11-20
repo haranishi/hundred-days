@@ -45,7 +45,8 @@ export function clearCurrent(storage) {
 }
 
 function slotName(name, fallback) {
-  return clampText(name, SITE_NAME_MAX) || fallback || '無題';
+  const trimmed = typeof name === 'string' ? name.trim() : name;
+  return clampText(trimmed, SITE_NAME_MAX).trim() || fallback.trim() || '無題';
 }
 
 // 固定の6枠なら、本文と別に目次を書かずに済む。容量不足でも片方だけが残らない。
@@ -96,29 +97,30 @@ export function loadSlot(id, storage) {
   return withStorage(storage, null, s => readSlots(s).get(id)?.state ?? null);
 }
 
-function changeSlot(id, storage, update) {
+export function deleteSlot(id, storage) {
   return withStorage(storage, false, s => {
     const slot = readSlots(s).get(id);
     if (!slot) return false;
-    const record = update(slot);
-    if (slot.legacy) {
-      const rows = read(s, 'slots');
-      if (!Array.isArray(rows)) return false;
-      const next = record ? rows.map(row => row?.id === id ? { ...row, ...record } : row) : rows.filter(row => row?.id !== id);
-      return write(s, 'slots', next);
+    // 旧一覧を先に更新すれば、書き戻しに失敗しても現在の版から削除をやり直せる。
+    const rows = read(s, 'slots');
+    if (Array.isArray(rows)) {
+      const remaining = rows.filter(row => row?.id !== id);
+      if (remaining.length < rows.length) write(s, 'slots', remaining);
     }
-    if (record) return write(s, slotKey(id), record);
-    s.removeItem(STORAGE_PREFIX + slotKey(id));
+    if (!slot.legacy) s.removeItem(STORAGE_PREFIX + slotKey(id));
     return true;
   });
 }
 
-export function deleteSlot(id, storage) {
-  return changeSlot(id, storage, () => null);
-}
-
 export function renameSlot(id, name, storage) {
-  return changeSlot(id, storage, slot => ({ name: slotName(name, slot.name), state: slot.state, savedAt: slot.savedAt }));
+  return withStorage(storage, false, s => {
+    const slot = readSlots(s).get(id);
+    if (!slot) return false;
+    const record = { name: slotName(name, slot.name), state: slot.state, savedAt: slot.savedAt };
+    if (!slot.legacy) return write(s, slotKey(id), record);
+    const rows = read(s, 'slots');
+    return Array.isArray(rows) && write(s, 'slots', rows.map(row => row?.id === id ? { ...row, ...record } : row));
+  });
 }
 
 function seenFlags(storage) {

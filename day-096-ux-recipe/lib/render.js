@@ -6,8 +6,8 @@ import { BLOCK_RENDERERS } from './blocks/index.js';
 export { esc };
 
 export function renderBlock(block, ctx) {
-  const m = BLOCK_RENDERERS[block.type];
-  return m ? m.render(block, ctx) : '';
+  if (!Object.hasOwn(BLOCK_RENDERERS, block.type)) return '';
+  return BLOCK_RENDERERS[block.type].render(block, ctx);
 }
 
 /**

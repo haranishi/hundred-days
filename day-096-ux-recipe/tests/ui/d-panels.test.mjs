@@ -1,12 +1,14 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { resolveObjectURL } from 'node:buffer';
+import { registerHooks } from 'node:module';
 import { block, MINIMAL, RESERVE_SAMPLE } from '../fixtures/states.js';
+import { SITE_NAME_MAX, countChars } from '../../lib/contract.js';
 import { commit, createHistory, present, redo, reduce, undo } from '../../lib/state.js';
 import { mountInspector, scalarEditor } from '../../lib/ui-inspector.js';
 import { formModel } from '../../lib/ui-form-model.js';
 import { mountDiagnosis } from '../../lib/ui-diagnosis.js';
-import { mountLook } from '../../lib/ui-look.js';
+import { mountLook, textField } from '../../lib/ui-look.js';
 import { mountShare } from '../../lib/ui-share.js';
 import { mountSlots } from '../../lib/ui-slots.js';
 
@@ -37,6 +39,8 @@ class TestElement extends EventTarget {
   get firstChild() { return this.children[0]; }
   get childElementCount() { return this.children.length; }
   get isConnected() { return this.ownerDocument.body.contains(this); }
+  get maxLength() { return Number(this.getAttribute('maxlength') ?? -1); }
+  set maxLength(value) { this.setAttribute('maxlength', value); }
   setAttribute(key, value) { this.attributes.set(key, String(value)); }
   getAttribute(key) { return this.attributes.get(key) ?? null; }
   removeAttribute(key) { this.attributes.delete(key); if (key === 'href') delete this.href; }
@@ -67,6 +71,15 @@ class TestElement extends EventTarget {
   setSelectionRange(start, end, direction) {
     this.selectionStart = start; this.selectionEnd = end; this.selectionDirection = direction;
   }
+  insertText(text) {
+    // ブラウザは利用者の挿入だけを UTF-16 の上限で切る。JS からの value 代入には上限を掛けない。
+    const left = this.value.slice(0, this.selectionStart);
+    const right = this.value.slice(this.selectionEnd);
+    const room = this.maxLength - left.length - right.length;
+    const inserted = this.maxLength < 0 ? text : text.slice(0, Math.max(0, room));
+    this.value = left + inserted + right;
+    this.setSelectionRange(left.length + inserted.length, left.length + inserted.length);
+  }
   focus() { this.ownerDocument.activeElement = this; }
   select() { this.setSelectionRange(0, this.value.length, 'forward'); }
   scrollIntoView() { this.scrolled = true; }
@@ -79,19 +92,21 @@ class TestElement extends EventTarget {
   }
 }
 
-function environment(t, tag, navigator = {}) {
+function environment(t, tag, navigator = {}, globals = {}) {
   const doc = {
     createElement(name) { return new TestElement(name, this); },
     createElementNS(_ns, name) { return this.createElement(name); },
     downloads: [], copied: [],
     execCommand(cmd) { assert.equal(cmd, 'copy'); this.copied.push(this.activeElement.value); return true; },
   };
-  for (const [key, value] of Object.entries({ document: doc, navigator })) {
+  for (const [key, value] of Object.entries({ document: doc, navigator, ...globals })) {
     const old = Object.getOwnPropertyDescriptor(globalThis, key);
     Object.defineProperty(globalThis, key, { configurable: true, value });
     t.after(() => { if (old) Object.defineProperty(globalThis, key, old); else delete globalThis[key]; });
   }
+  doc.documentElement = doc.createElement('html');
   doc.body = doc.createElement('body');
+  doc.documentElement.append(doc.body);
   const opener = doc.createElement('button');
   const root = doc.createElement(tag);
   doc.body.append(opener, root);
@@ -139,6 +154,207 @@ function context(initial = MINIMAL, diagnose = () => ({ score: 80, items: [] }))
   };
   return { ctx, calls, toasts, listeners };
 }
+
+test('上限10字の欄でも長い読みを最後まで打ち、短い候補に確定できる', (t) => {
+  const { root } = environment(t, 'section');
+  const changes = [];
+  const field = textField({ label: '時刻', max: 10, value: '前🌙後' }, value => changes.push(value));
+  const input = field.input;
+  root.append(field.root);
+  input.focus();
+  input.setSelectionRange(1, 1);
+  fire(input, 'compositionstart');
+  const reading = 'にじゅうよじをすぎてから';
+  for (let i = 0; i < 3; i++) {
+    fire(input, 'beforeinput', { isComposing: true });
+    input.insertText(reading);
+    fire(input, 'input', { isComposing: true });
+  }
+  assert.equal(input.value, '前' + reading.repeat(3) + '🌙後');
+  assert.equal(input.getAttribute('maxlength'), null);
+  assert.deepEqual(changes, []);
+  input.setSelectionRange(1, 1 + reading.length * 3);
+  input.insertText('翌朝');
+  fire(input, 'compositionend');
+  fire(input, 'input', { isComposing: false });
+  assert.deepEqual(changes, ['前翌朝🌙後']);
+  assert.equal(input.maxLength, 11);
+});
+
+test('貼り付けの直前はブラウザの上限を外し、確定時に後ろの文字を残して収める', (t) => {
+  const { root } = environment(t, 'section');
+  const changes = [];
+  const field = textField({ label: '時刻', max: 10, value: '後' }, value => changes.push(value));
+  root.append(field.root);
+  const input = field.input;
+  fire(input, 'beforeinput', { inputType: 'insertFromPaste' });
+  input.insertText('🌷'.repeat(15));
+  assert.equal(input.value, '🌷'.repeat(15) + '後');
+  fire(input, 'input', { isComposing: false });
+  assert.deepEqual(changes, ['🌷'.repeat(9) + '後']);
+  assert.equal(input.maxLength, 19);
+});
+
+for (const type of ['blur', 'input']) {
+  test('compositionend が届かなくても ' + type + ' で確定し、その後の編集も保存する', (t) => {
+    const { root } = environment(t, 'section');
+    const changes = [];
+    const field = textField({ label: '時刻', max: 10 }, value => changes.push(value));
+    root.append(field.root);
+    const input = field.input;
+    input.focus();
+    fire(input, 'compositionstart');
+    input.insertText('翌朝🌱');
+    fire(input, 'input', { isComposing: true });
+    assert.deepEqual(changes, []);
+    fire(input, type, type === 'input' ? { isComposing: false } : {});
+    assert.deepEqual(changes, ['翌朝🌱']);
+    assert.equal(input.maxLength, 11);
+    fire(input, 'compositionend');
+    fire(input, 'beforeinput');
+    input.insertText('から');
+    fire(input, 'input');
+    assert.deepEqual(changes, ['翌朝🌱', '翌朝🌱から']);
+  });
+}
+
+test('保存名に文字数と上限を表示し、絵文字を24字保存して開き直せる', (t) => {
+  const { doc, root } = environment(t, 'dialog');
+  const { ctx } = context();
+  const dialog = mountSlots(root, ctx);
+  dialog.open();
+  const input = doc.activeElement;
+  assert.equal(input.maxLength, SITE_NAME_MAX);
+  const description = input.getAttribute('aria-describedby').split(' ');
+  const count = find(root, el => description.includes(el.id) && el.className === 'cs-count');
+  assert.equal(count.textContent, countChars(MINIMAL.site.name) + '/24');
+  input.select();
+  fire(input, 'beforeinput');
+  input.insertText('🌷'.repeat(25));
+  fire(input, 'input', { isComposing: false });
+  assert.equal(count.textContent, '24/24');
+  assert.equal(input.value, '🌷'.repeat(24));
+  fire(find(root, el => el.tagName === 'FORM'), 'submit');
+  assert.equal(ctx.slots.list()[0].name, input.value);
+  root.close();
+  dialog.open();
+  assert.equal(input.value, MINIMAL.site.name);
+  assert.equal(count.textContent, countChars(MINIMAL.site.name) + '/24');
+  dialog.destroy();
+});
+
+test('フォームの見た目を切り替えると、ひとこと表示だけに先頭の項目を使う注記が出る', (t) => {
+  const { root } = environment(t, 'section');
+  const { ctx } = context(RESERVE_SAMPLE);
+  const panel = mountInspector(root, ctx);
+  ctx.select('b8');
+  const message = 'ひとこと表示では、先頭の1項目だけがページに出ます。';
+  const hint = () => find(root, el => el.tagName === 'P' && !el.hidden && el.textContent === message);
+  assert.equal(hint(), undefined);
+  ctx.dispatch({ type: 'setVariant', id: 'b8', variant: 1 });
+  assert.ok(hint());
+  assert.ok(descendants(root).indexOf(hint()) < descendants(root).indexOf(byPath(root, 'items.0.label')));
+  assert.equal(byPath(root, 'items.1.label').value, 'ご希望の日時');
+  ctx.dispatch({ type: 'setVariant', id: 'b8', variant: 0 });
+  assert.equal(hint(), undefined);
+  panel.destroy();
+});
+
+test('部品の編集中はスクロールを保ち、同じ種類でも別の部品を選ぶと冒頭に戻る', (t) => {
+  const { root } = environment(t, 'section');
+  const { ctx } = context({ ...MINIMAL, blocks: [block('b1', 'form', 0), block('b2', 'form', 0)] });
+  const panel = mountInspector(root, ctx);
+  root.scrollTop = 280;
+  ctx.dispatch({ type: 'setProp', id: 'b1', path: ['heading'], value: '受付' });
+  assert.equal(root.scrollTop, 280);
+  ctx.select('b2');
+  assert.equal(root.scrollTop, 0);
+  panel.destroy();
+});
+
+test('複数の「この部品を見る」はそれぞれの診断見出しを説明として参照する', (t) => {
+  const { root } = environment(t, 'section');
+  const items = ['見出しの位置', '見出しの長さ'].map((title, i) => ({
+    id: 'rule-' + i, level: 'should', ok: false, title, why: '理由', blockId: 'b1',
+  }));
+  const { ctx } = context(MINIMAL, () => ({ items, score: 0 }));
+  const panel = mountDiagnosis(root, ctx);
+  const views = descendants(root).filter(el => el.tagName === 'BUTTON' && el.textContent === 'この部品を見る');
+  const ids = views.map(view => view.getAttribute('aria-describedby'));
+  assert.equal(new Set(ids).size, 2);
+  assert.deepEqual(ids.map(id => find(root, el => el.id === id)?.textContent), items.map(item => item.title));
+  panel.destroy();
+});
+
+for (const fallback of ['null', 'documentElement']) {
+  test('共有を閉じてフォーカスが ' + fallback + ' なら開いたボタンへ戻す', (t) => {
+    const { doc, root, opener } = environment(t, 'dialog');
+    const { ctx } = context();
+    const share = mountShare(root, ctx);
+    share.open();
+    doc.activeElement = fallback === 'null' ? null : doc.documentElement;
+    root.close();
+    assert.ok(doc.activeElement === opener);
+    share.open();
+    const other = doc.createElement('button');
+    doc.body.append(other);
+    other.focus();
+    root.close();
+    assert.ok(doc.activeElement === other);
+    share.destroy();
+  });
+}
+
+test('HTMLを作れない場合はコピー失敗をダイアログで知らせる', async (t) => {
+  const { doc, root } = environment(t, 'dialog');
+  const { ctx, toasts } = context();
+  const share = mountShare(root, ctx);
+  share.open('export');
+  ctx.getState = () => ({ ...MINIMAL, site: null });
+  byText(root, 'BUTTON', 'HTMLをコピー').click();
+  await flush();
+  assert.deepEqual(toasts.at(-1), { message: 'HTMLをコピーできませんでした。', kind: 'error' });
+  assert.deepEqual(doc.copied, []);
+  share.destroy();
+});
+
+test('PNGの幅を選んでいる間にページが変わってもフォーカスを保つ', async (t) => {
+  const { doc, root } = environment(t, 'dialog', {}, {
+    Image: class extends EventTarget { set src(value) { queueMicrotask(() => fire(this, 'load')); } },
+    XMLSerializer: class { serializeToString() { return '<svg/>'; } },
+  });
+  const create = doc.createElement.bind(doc);
+  t.mock.method(doc, 'createElement', (tag) => {
+    const node = create(tag);
+    if (tag === 'canvas') {
+      node.getContext = () => ({ scale() {}, drawImage() {}, getImageData: () => ({ data: [255, 0, 0, 255] }) });
+      node.toBlob = (done, type) => done(new Blob(['png'], { type }));
+    }
+    return node;
+  });
+  // 実機では端末ごとに判定を覚える。非対応端末の試験とキャッシュを共有しないようにする。
+  const url = new URL('../../lib/ui-share.js?test=png-focus', import.meta.url);
+  const hook = registerHooks({
+    resolve(specifier, context, next) {
+      if (context.parentURL === url.href && specifier === './png-export.js') return next('./png-export.js?test=png-focus', context);
+      return next(specifier, context);
+    },
+  });
+  const { mountShare } = await import(url.href).finally(() => hook.deregister());
+  const { ctx } = context();
+  const share = mountShare(root, ctx);
+  share.open('export');
+  await flush();
+  const width = byName(root, 'スマホ幅');
+  assert.ok(width);
+  width.focus();
+  ctx.dispatch({ type: 'setSite', name: '更新後のページ' });
+  assert.ok(doc.activeElement === width, '状態変更直後');
+  await flush();
+  assert.ok(doc.activeElement === width, '対応判定後');
+  assert.equal(byName(root, 'スマホ幅'), width);
+  share.destroy();
+});
 
 test('編集パネルは変換が確定した1回だけ保存し、他の通知でフォーカス・選択・スクロールを奪わない', (t) => {
   const { doc, root } = environment(t, 'section');

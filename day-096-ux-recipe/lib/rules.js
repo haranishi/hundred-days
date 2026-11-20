@@ -103,6 +103,7 @@ const isAction = block => block.type === 'cta' || block.type === 'form';
 const isTrust = block => stageOf(block.type) === 'trust';
 const isPrice = block => block.type === 'menu' || block.type === 'plans';
 const isFaq = block => block.type === 'faq';
+const formFieldCount = block => block.variant === 1 ? 1 : block.props.items.length;
 const stageBlock = { notice: 'hero', understand: 'benefits', trust: 'voices', act: 'cta', relief: 'faq' };
 
 // 繰り返し欄を並べ替えても元の文章を見つけられるよう、項目の位置とは独立に照合する。
@@ -178,16 +179,17 @@ function assess(state) {
     const vague = buttons.find(({ label }) => !label || genericButtons.has(label.normalize('NFKC').toLowerCase()));
     record('button-label-result', !vague, vague?.block);
   }
-  if (buttons.length >= 2) {
+  const namedButtons = buttons.filter(({ label }) => label);
+  if (namedButtons.length >= 2) {
     const labels = new Set();
-    const third = buttons.find(({ label }) => {
-      if (label) labels.add(label);
+    const third = namedButtons.find(({ label }) => {
+      labels.add(label);
       return labels.size > 2;
     });
     record('button-label-consistent', !third, third?.block);
   }
   if (forms.length) {
-    const long = forms.find(b => b.props.items.length > 4);
+    const long = forms.find(b => formFieldCount(b) > 4);
     record('form-short', !long, long);
   }
   if (heroes.length) {
@@ -298,7 +300,7 @@ const repairs = {
   *'form-short'(state) {
     const actions = [];
     for (const block of state.blocks.filter(b => b.type === 'form')) {
-      for (let index = block.props.items.length - 1; index >= 4; index--) {
+      for (let index = formFieldCount(block) - 1; index >= 4; index--) {
         actions.push({ type: 'removeItem', id: block.id, path: ['items'], index });
       }
     }

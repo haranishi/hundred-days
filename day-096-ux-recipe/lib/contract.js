@@ -274,17 +274,18 @@ export function validateState(state) {
   if (!Array.isArray(state.blocks)) { errors.push('blocks: 配列ではありません'); return errors; }
   if (state.blocks.length > MAX_BLOCKS) errors.push(`blocks: ${MAX_BLOCKS}件を超えています`);
   const ids = new Set();
-  state.blocks.forEach((b, i) => {
+  for (let i = 0; i < state.blocks.length; i += 1) { // 添字で回す（forEach は疎配列の空の要素を飛ばす）
+    const b = state.blocks[i];
     const where = `blocks[${i}]`;
-    if (!isObj(b)) { errors.push(`${where}: オブジェクトではありません`); return; }
+    if (!isObj(b)) { errors.push(`${where}: オブジェクトではありません`); continue; }
     if (typeof b.id !== 'string' || !ID_RE.test(b.id)) errors.push(`${where}.id: 不正です`);
     else if (ids.has(b.id)) errors.push(`${where}.id: 重複しています`);
     else ids.add(b.id);
-    if (!isBlockType(b.type)) { errors.push(`${where}.type: 知らない部品です`); return; }
+    if (!isBlockType(b.type)) { errors.push(`${where}.type: 知らない部品です`); continue; }
     const def = BLOCK_SCHEMA[b.type];
     if (!isIndex(b.variant) || b.variant >= def.variants.length) errors.push(`${where}.variant: 範囲外です`);
     validateFields(def.fields, b.props, `${where}.props`, errors);
-  });
+  }
   return errors;
 }
 

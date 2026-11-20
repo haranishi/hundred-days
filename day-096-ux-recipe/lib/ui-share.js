@@ -30,7 +30,7 @@ export function dialogFrame(dialog, title) {
   function restoreFocus() {
     if (dialog.open) return;
     const active = document.activeElement;
-    if (opener?.isConnected && (active === document.body || dialog.contains(active))) {
+    if (opener?.isConnected && (!active || active === document.documentElement || active === document.body || dialog.contains(active))) {
       opener.focus({ preventScroll: true });
     }
     opener = null;
@@ -218,7 +218,13 @@ export function mountShare(dialog, ctx) {
       ctx.toast('HTMLを保存できませんでした。', { kind: 'error' });
     }
   }, 'cs-btn cs-primary');
-  const htmlCopy = button('HTMLをコピー', () => { void copy(buildStandaloneHtml(ctx.getState())); });
+  const htmlCopy = button('HTMLをコピー', async () => {
+    try {
+      await copy(buildStandaloneHtml(ctx.getState()));
+    } catch {
+      ctx.toast('HTMLをコピーできませんでした。', { kind: 'error' });
+    }
+  });
   htmlActions.append(htmlDownload, htmlCopy);
   const pngArea = element('div', 'cs-png');
   const widths = radioChoices('画像の幅', DEVICES.map((device) => ({
@@ -239,7 +245,7 @@ export function mountShare(dialog, ctx) {
       if (ticket === revision) pngSave.disabled = false;
     }
   });
-  pngArea.append(widths.root, element('p', 'cs-help', '選んだ幅の2倍の解像度で保存します。'), pngSave);
+  pngArea.append(widths.root, element('p', 'cs-help', '通常は選んだ幅の2倍で保存します。長いページは倍率を下げます。'), pngSave);
   const note = element('p', 'cs-notice', '書き出したページは制作の叩き台です。公開する前に、見本の文章・ボタンの行き先・フォームの送信先を見直してください。');
   pages.export.append(htmlActions, note);
 
@@ -251,10 +257,14 @@ export function mountShare(dialog, ctx) {
       return;
     }
     htmlDownload.disabled = htmlCopy.disabled = !state;
-    pngArea.remove();
-    if (state) void canExportPng().then((ok) => {
+    if (!state) {
+      pngArea.remove();
+      return;
+    }
+    pngSave.disabled = false;
+    if (pages.export.contains(pngArea)) return;
+    void canExportPng().then((ok) => {
       if (!ok || ticket !== revision || !dialog.open) return;
-      pngSave.disabled = false;
       pages.export.insertBefore(pngArea, note);
     });
   }

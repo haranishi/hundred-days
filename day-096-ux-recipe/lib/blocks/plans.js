@@ -60,6 +60,7 @@ export function render(block, ctx) {
     const body = block.variant === 1
       ? (head || lines ? `<div class="uxr-plan-body">${head}${lines}</div>` : '')
       : `${head}${lines}`;
+    if (!ribbon && !body) return '';
     return `<li class="uxr-card uxr-plan${item.pick ? ' is-pick' : ''}">${ribbon}${body}</li>`;
   }).join('');
   const list = cards ? `<ul class="uxr-plan-grid">${cards}</ul>` : '';

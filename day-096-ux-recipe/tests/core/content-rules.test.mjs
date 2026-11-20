@@ -44,6 +44,32 @@ const copiedQuestion = buildFromRecipe('buy').blocks.find(b => b.type === 'faq')
 const loneSample = { ...page('buy'), blocks: [block('b1', 'faq', 1, { items: [{}, { q: copiedQuestion }] })] };
 const twelveBlocks = reduce(longPage, { type: 'removeBlock', id: longPage.blocks[8].id });
 
+test('ボタン名のまとまりは空白を除いて2件から診断し、名前の欠落は別の項目で知らせる', () => {
+  const buttons = (...labels) => ({ ...MINIMAL, blocks: labels.map((button, i) => block('b' + i, 'cta', 0, { button })) });
+  for (const labels of [['', '　'], ['予約する', '　', '']]) {
+    const state = buttons(...labels);
+    assert.equal(itemOf(state, 'button-label-consistent'), undefined);
+    assert.equal(itemOf(state, 'button-label-result').ok, false);
+  }
+  assert.equal(itemOf(buttons('', '予約する', '予約する'), 'button-label-consistent').ok, true);
+});
+
+test('ひとこと表示は6枠あっても1項目として診断する', () => {
+  const items = Array.from({ length: 6 }, (_, i) => ({ label: '質問' + i }));
+  const state = { ...MINIMAL, blocks: [block('short', 'form', 1, { items })] };
+  assert.equal(itemOf(state, 'form-short').ok, true);
+});
+
+test('縦のフォームを短くしても、ひとこと表示の非表示の項目を保つ', () => {
+  const items = Array.from({ length: 6 }, (_, i) => ({ label: '質問' + i }));
+  const state = { ...MINIMAL, blocks: [block('short', 'form', 1, { items }), block('long', 'form', 0, { items })] };
+  const rule = itemOf(state, 'form-short');
+  assert.equal(rule.blockId, 'long');
+  const next = applyFix(state, 'form-short');
+  assert.deepEqual(next.blocks[0], state.blocks[0]);
+  assert.deepEqual(next.blocks[1].props.items, items.slice(0, 4));
+});
+
 const examples = [
   { id: 'has-action', level: 'must', yes: reserve('form'), no: reserve('hero', 'limited') },
   { id: 'hero-first', level: 'must', yes: reserve('hero'), no: reserve('pain', 'hero', 'cta') },

@@ -45,7 +45,9 @@ function ruleCard(item, ctx, opened) {
   marker.setAttribute('aria-hidden', 'true');
   const status = element('span', 'cs-rule-status', item.ok ? 'できています' : '要確認');
   status.prepend(marker);
-  summary.append(status, element('span', 'cs-rule-title', item.title));
+  const title = element('span', 'cs-rule-title', item.title);
+  title.id = controlId('rule-title');
+  summary.append(status, title);
   const reason = element('div', 'cs-reason');
   reason.append(element('p', '', item.why));
   if (item.note) reason.append(element('p', 'cs-help', item.note));
@@ -86,6 +88,7 @@ function ruleCard(item, ctx, opened) {
   }
   if (item.blockId) {
     const view = button('この部品を見る', () => ctx.select(item.blockId, { tab: 'edit' }));
+    view.setAttribute('aria-describedby', title.id);
     view.dataset.control = item.id + '/block';
     actions.append(view);
   }

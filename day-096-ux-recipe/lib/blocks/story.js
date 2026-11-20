@@ -41,6 +41,7 @@ export function render(block, ctx) {
   const heading = txt(ctx, block, 'heading', { tag: 'h2', cls: 'uxr-h2' });
   const text = multi(ctx, block, 'text', { cls: 'uxr-story-text' });
   const whoName = txt(ctx, block, 'who', { cls: 'uxr-story-who-name' });
+  if (!heading && !text && !whoName) return sec(ctx, block, '');
   const head = heading ? `<div class="uxr-story-head">${heading}<i class="uxr-story-rule" aria-hidden="true"></i></div>` : '';
   if (v === 1) {
     const quote = text ? `<blockquote>${text}</blockquote>` : '';

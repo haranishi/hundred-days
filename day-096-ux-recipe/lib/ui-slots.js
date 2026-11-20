@@ -1,5 +1,5 @@
-import { GOAL_LABEL, MAX_SLOTS } from './contract.js';
-import { button, controlId, element } from './ui-look.js';
+import { GOAL_LABEL, MAX_SLOTS, SITE_NAME_MAX } from './contract.js';
+import { button, controlId, element, textField } from './ui-look.js';
 import { dialogFrame } from './ui-share.js';
 
 const dateFormat = new Intl.DateTimeFormat('ja-JP', {
@@ -7,32 +7,34 @@ const dateFormat = new Intl.DateTimeFormat('ja-JP', {
 });
 
 export function slotListModel(slots) {
-  const rows = slots.map((slot) => {
-    const date = new Date(slot.savedAt ?? NaN);
-    const validDate = Number.isFinite(date.getTime());
+  const dated = slots.map((slot) => {
+    const time = new Date(slot.savedAt ?? NaN).getTime();
+    return { slot, time: Number.isFinite(time) ? time : -Infinity };
+  });
+  dated.sort((a, b) => b.time - a.time);
+  const rows = dated.map(({ slot, time }) => {
+    const validDate = Number.isFinite(time);
     return {
       id: slot.id, name: slot.name || '無題', goal: GOAL_LABEL[slot.goal] ?? '目的不明',
-      date: validDate ? dateFormat.format(date) : '日時不明',
-      iso: validDate ? date.toISOString() : '', blocks: '部品' + slot.blocks + '個',
+      date: validDate ? dateFormat.format(time) : '日時不明',
+      iso: validDate ? new Date(time).toISOString() : '', blocks: '部品' + slot.blocks + '個',
     };
-  }).sort((a, b) => b.iso.localeCompare(a.iso));
+  });
   return { rows, count: rows.length + '/' + MAX_SLOTS, full: rows.length >= MAX_SLOTS };
 }
 
 export function mountSlots(dialog, ctx) {
   const frame = dialogFrame(dialog, '保存・開く');
   const form = element('form', 'cs-slot-form');
-  const name = element('input', 'cs-input');
-  name.type = 'text';
-  name.id = controlId('slot-name');
-  const label = element('label', 'cs-label', '保存する名前');
-  label.htmlFor = name.id;
+  const nameField = textField({ label: '保存する名前', max: SITE_NAME_MAX });
+  const name = nameField.input;
   const save = element('button', 'cs-btn cs-primary', '保存する');
   save.type = 'submit';
   const inputRow = element('div', 'cs-save-row');
+  nameField.root.insertBefore(inputRow, name);
   inputRow.append(name, save);
   const hint = element('p', 'cs-help');
-  form.append(element('h3', 'cs-subtitle', '名前をつけて保存'), label, inputRow, hint);
+  form.append(element('h3', 'cs-subtitle', '名前をつけて保存'), nameField.root, hint);
   const head = element('div', 'cs-field-head');
   const count = element('span', 'cs-count');
   count.setAttribute('aria-live', 'polite');
@@ -101,7 +103,7 @@ export function mountSlots(dialog, ctx) {
   const off = ctx.subscribe(() => { if (dialog.open) availability(); });
   return {
     open() {
-      if (!dialog.open) name.value = ctx.getState()?.site.name ?? '';
+      if (!dialog.open) nameField.update(ctx.getState()?.site.name ?? '');
       refreshList();
       frame.show(name.disabled ? list.querySelector('[data-slot-open]') ?? frame.close : name);
     },

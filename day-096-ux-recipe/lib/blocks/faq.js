@@ -56,11 +56,11 @@ export function render(block, ctx) {
     return sec(ctx, block, `${heading}${list}`);
   }
 
-  const list = items.map(({ i }) => {
+  const list = items.map(({ i }, index) => {
     const q = txt(ctx, block, `items.${i}.q`, { cls: 'uxr-faq-qt' });
     const a = multi(ctx, block, `items.${i}.a`);
     // 編集中はすべての答えを直接押して編集できるよう開き、書き出しは1件目だけ開いて見本を示す
-    const open = ctx.mode === 'preview' || i === 0 ? ' open=""' : '';
+    const open = ctx.mode === 'preview' || index === 0 ? ' open=""' : '';
     const answer = a ? `<div class="uxr-faq-a">${a}</div>` : '';
     return `<details class="uxr-faq-item"${open}><summary class="uxr-faq-q"><i class="uxr-faq-qmark" aria-hidden="true">Q</i>${q}<i class="uxr-faq-toggle" aria-hidden="true"></i></summary>${answer}</details>`;
   }).join('');

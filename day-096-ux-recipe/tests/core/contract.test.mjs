@@ -157,6 +157,7 @@ test('疎配列（空の要素）と site.name の制御文字を、検証が見
   const clean = sanitizeState({ goal: 'buy', blocks: [{ id: 'b1', type: 'pain', props: { items: new Array(3) } }] });
   assert.deepEqual(validateState(clean), []);
   assert.ok(clean.blocks[0].props.items.every((it) => it && typeof it.text === 'string'), '空の要素は、空の項目に作り直す');
+  assert.ok(validateState({ ...structuredClone(MINIMAL), blocks: new Array(1) }).length, 'blocks の疎配列も不正');
   for (const name of ['a\u0000b', 'a\u202Eb', 'a\nb']) assert.ok(validateState({ ...structuredClone(MINIMAL), site: { name } }).length, JSON.stringify(name));
 });
 

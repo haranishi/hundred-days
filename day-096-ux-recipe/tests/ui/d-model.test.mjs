@@ -130,3 +130,10 @@ test('保存一覧を新しい順に表示し、日時・部品数・6件の境�
   assert.equal(model.full, false);
   assert.equal(slotListModel(Array(MAX_SLOTS).fill(list[0])).full, true);
 });
+
+test('保存できる日時が西暦1万年をまたいでも新しい順で表示する', () => {
+  const slots = [10_000, 9_999, 2_026].map((year) => ({
+    id: String(year), name: '案', goal: 'buy', blocks: 1, savedAt: Date.UTC(year, 0, 1),
+  }));
+  assert.deepEqual(slotListModel(slots).rows.map(row => row.id), ['10000', '9999', '2026']);
+});

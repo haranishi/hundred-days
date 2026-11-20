@@ -16,6 +16,42 @@ function memoryStorage() {
   };
 }
 
+test('新旧両方にある枠を消すと旧版も消え、他の保存は残る', () => {
+  const s = memoryStorage();
+  const { id } = saveSlot(MINIMAL, '新しい版', s);
+  const old = { id, name: '古い版', savedAt: 1, state: RESERVE_SAMPLE };
+  const other = { ...old, id: '別の枠' };
+  s.setItem(STORAGE_PREFIX + 'slots', JSON.stringify([old, other, old]));
+  assert.deepEqual(loadSlot(id, s), MINIMAL);
+  assert.equal(deleteSlot(id, s), true);
+  assert.deepEqual(listSlots(s).map(row => row.id), [other.id]);
+  assert.equal(loadSlot(id, s), null);
+  assert.deepEqual(loadSlot(other.id, s), RESERVE_SAMPLE);
+  assert.equal(saveSlot(MINIMAL, '使い直す', s).id, id);
+});
+
+test('旧一覧を書き戻せないときは新しい版を残し、削除をやり直せる', () => {
+  const s = memoryStorage();
+  const { id } = saveSlot(MINIMAL, '編集中の版', s);
+  s.setItem(STORAGE_PREFIX + 'slots', JSON.stringify([{ id, savedAt: 1, state: RESERVE_SAMPLE }]));
+  const full = { ...s, setItem() { throw new DOMException('容量不足', 'QuotaExceededError'); } };
+  assert.equal(deleteSlot(id, full), false);
+  assert.deepEqual(loadSlot(id, s), MINIMAL);
+  assert.equal(deleteSlot(id, s), true);
+  assert.equal(loadSlot(id, s), null);
+});
+
+test('空白だけの保存名は既定名に戻り、前後の空白は24字に数えない', () => {
+  const s = memoryStorage();
+  const { id } = saveSlot({ ...MINIMAL, site: { name: '　 ' } }, '　 ', s);
+  assert.equal(listSlots(s)[0].name, '無題');
+  saveSlot(MINIMAL, '　 ', s);
+  assert.equal(listSlots(s)[0].name, MINIMAL.site.name);
+  renameSlot(id, ' '.repeat(25) + '🌷'.repeat(25) + '　', s);
+  renameSlot(id, '　', s);
+  assert.equal(listSlots(s).find(row => row.id === id).name, '🌷'.repeat(24));
+});
+
 test('現在の作業を保存して開き、消せる', () => {
   const storage = memoryStorage();
   for (const state of [MINIMAL, RESERVE_SAMPLE, STRESS]) {
