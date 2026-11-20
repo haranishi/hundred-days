@@ -81,7 +81,7 @@ export const BLOCK_TYPES = [
 ];
 
 export const BLOCK_SCHEMA = {
-  hero: { label: 'ファーストビュー', stage: 'notice', effect: 'show', variants: ['中央', '左寄せ', '大見出し'], fields: [
+  hero: { label: '最初の画面', stage: 'notice', effect: 'show', variants: ['中央', '左寄せ', '大見出し'], fields: [
     t('eyebrow', '小さな見出し', 20), t('title', 'キャッチコピー', 32, { role: 'headline' }), l('lead', '説明', 90),
     t('cta', 'ボタンの文言', 14, { role: 'button' }), t('note', 'ボタンの下の一言', 30)] },
   pain: { label: 'こんなお悩み', stage: 'notice', effect: 'show', variants: ['チェック', 'カード'], fields: [
