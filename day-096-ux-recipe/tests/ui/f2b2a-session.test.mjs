@@ -124,7 +124,7 @@ function fire(target, type, fields = {}) {
   return event;
 }
 
-function environment(t, { query = '', hash = '', draft } = {}) {
+export function environment(t, { query = '', hash = '', draft } = {}) {
   const doc = new EventTarget();
   doc.createElement = tag => new Element(tag, doc);
   doc.createElementNS = (_, tag) => doc.createElement(tag);
@@ -170,7 +170,7 @@ function environment(t, { query = '', hash = '', draft } = {}) {
   });
   return {
     doc, root, window, location, localStorage,
-    start: async () => { mounted = await app.mountApp(root); return mounted.ctx; },
+    start: async options => { mounted = await app.mountApp(root, options); return mounted.ctx; },
     stop() { mounted.destroy(); mounted = null; },
     async visit(hash) { location.hash = hash; window.dispatchEvent(new Event('hashchange')); await nextTurn(); },
     storage(key, newValue) {

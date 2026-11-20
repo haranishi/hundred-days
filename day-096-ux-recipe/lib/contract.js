@@ -43,7 +43,7 @@ export const STAGE_COLORS = {
 
 // ---- UXの効果（部品箱の分け方）----
 export const EFFECTS = ['show', 'clarify', 'reassure', 'push'];
-export const EFFECT_LABEL = { show: '見せる', clarify: '迷わせない', reassure: '安心させる', push: '背中を押す' };
+export const EFFECT_LABEL = { show: '見せる', clarify: '迷わせない', reassure: '不安を減らす', push: '背中を押す' };
 
 // ---- 見た目 ----
 export const THEMES = ['soft', 'crisp', 'lively', 'calm'];

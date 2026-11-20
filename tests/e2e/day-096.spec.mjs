@@ -479,6 +479,32 @@ test.describe('操作性（スマホ・キーボード・動きを減らす）',
     await page.locator('#slot-preview .uxr-hero').first().tap();
     await expect(page.getByLabel('キャッチコピー', { exact: true })).toBeVisible();
   });
+
+  test('スマホ幅: 構成のつまみを指（タッチ）でドラッグして、並べ替えられる（Chromium・CDPのタッチ入力）', async ({ page, browserName }) => {
+    test.skip(browserName !== 'chromium', 'CDP のタッチ入力は Chromium だけ');
+    await startEditor(page);
+    await tab(page, '構成');
+    const rows = outlineRows(page);
+    await expect(rows.nth(3)).toBeVisible();
+    await settle(page); // パネルが開く動きの途中で位置を測ると、指の置き場所がずれる（評価役の失敗の原因でもあった）
+    const before = await types(page);
+    const grip = await rows.nth(3).getByRole('button', { name: '並べ替えのつまみ' }).boundingBox();
+    const target = await rows.nth(1).boundingBox();
+    const cdp = await page.context().newCDPSession(page);
+    const x = grip.x + grip.width / 2;
+    const y0 = grip.y + grip.height / 2;
+    const y1 = target.y + target.height / 2 - 6;
+    const touch = (type, y) => cdp.send('Input.dispatchTouchEvent', { type, touchPoints: type === 'touchEnd' ? [] : [{ x, y, id: 1 }] });
+    await touch('touchStart', y0);
+    await page.waitForTimeout(120);
+    for (let i = 1; i <= 12; i += 1) {
+      await touch('touchMove', y0 + ((y1 - y0) * i) / 12);
+      await page.waitForTimeout(30);
+    }
+    await page.waitForTimeout(150);
+    await touch('touchEnd', y1);
+    await expect.poll(async () => (await types(page))[1]).toBe(before[3]);
+  });
 });
 
 test.describe('キーボードとアクセシビリティ', () => {

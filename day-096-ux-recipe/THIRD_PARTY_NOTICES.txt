@@ -1,0 +1,12 @@
+UXレシピ（100日チャレンジ Day096）が配布物に含める第三者のソフトウェアの許諾
+
+========================================================================
+budoux 0.10.4  (Apache-2.0)
+Copyright 2021 Google LLC
+https://github.com/google/budoux
+
+同梱したファイル（改変なし）:
+  vendor/budoux/parser.js  … 日本語の文節分けの Parser（BudouX の module/parser.js）
+  vendor/budoux/ja.js      … 日本語のモデル（BudouX の module/data/models/ja.js）
+許諾の全文: vendor/budoux/LICENSE（Apache License 2.0）
+用途: ページの本文を文節で折り返すため、文節の境目に <wbr> を入れる（通信はしない・端末の中だけで動く）。

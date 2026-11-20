@@ -4,16 +4,16 @@ import { resolveObjectURL } from 'node:buffer';
 import { registerHooks } from 'node:module';
 import { block, MINIMAL, RESERVE_SAMPLE } from '../fixtures/states.js';
 import { SITE_NAME_MAX, STORAGE_PREFIX, countChars } from '../../lib/contract.js';
-import { createEditor } from '../../app.js';
+import { createEditor, createSlotMutations } from '../../app.js';
 import { CONFIDENCE_NOTE } from '../../lib/rules.js';
-import { deleteSlot, listSlots, loadSlot, saveSlot } from '../../lib/persist.js';
+import * as persist from '../../lib/persist.js';
 import { commit, createHistory, present, redo, reduce, undo } from '../../lib/state.js';
 import { mountInspector, scalarEditor } from '../../lib/ui-inspector.js';
 import { formModel } from '../../lib/ui-form-model.js';
 import { mountDiagnosis } from '../../lib/ui-diagnosis.js';
 import { mountLook, textField } from '../../lib/ui-look.js';
 import { mountShare } from '../../lib/ui-share.js';
-import { mountSlots } from '../../lib/ui-slots.js';
+import { mountSlots as mountSlotPanel } from '../../lib/ui-slots.js';
 
 // 通知で入力欄が取り替わった場合も検出できるよう、同じノードを参照して操作する。
 const descendants = (el) => el.children.flatMap((child) => [child, ...descendants(child)]);
@@ -148,11 +148,17 @@ function context(initial = MINIMAL, diagnose = () => ({ score: 80, items: [] }))
     toast(message, opts = {}) { toasts.push({ message, ...opts }); },
     viewUrl: async () => 'https://example.com/day96/#v=2.sample',
     slots: {
-      list: listSlots, load: loadSlot, remove: deleteSlot,
-      save: name => saveSlot(present(history), name),
+      list: persist.listSlots, load: persist.loadSlot,
+      save: name => persist.saveSlot(present(history), name),
     },
   };
   return { ctx, calls, toasts, listeners };
+}
+
+function mountSlots(root, ctx) {
+  const panel = mountSlotPanel(root, ctx);
+  Object.assign(ctx.slots, createSlotMutations(persist, ctx.toast, panel.refreshList));
+  return panel;
 }
 
 test('上限10字の欄でも長い読みを最後まで打ち、短い候補に確定できる', (t) => {

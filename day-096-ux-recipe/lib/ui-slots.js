@@ -1,5 +1,4 @@
 import { GOAL_LABEL, MAX_SLOTS, SITE_NAME_MAX } from './contract.js';
-import { deleteSlot, getSlotRecord, restoreSlot } from './persist.js';
 import { button, controlId, element, textField } from './ui-look.js';
 import { dialogFrame } from './ui-share.js';
 
@@ -16,7 +15,7 @@ export function slotListModel(slots) {
   const rows = dated.map(({ slot, time }) => {
     const validDate = Number.isFinite(time);
     return {
-      id: slot.id, name: slot.name || '無題', goal: GOAL_LABEL[slot.goal] ?? '目的不明',
+      id: slot.id, savedAt: slot.savedAt, name: slot.name || '無題', goal: GOAL_LABEL[slot.goal] ?? '目的不明',
       date: validDate ? dateFormat.format(time) : '日時不明',
       iso: validDate ? new Date(time).toISOString() : '', blocks: '部品' + slot.blocks + '個',
     };
@@ -61,39 +60,35 @@ export function mountSlots(dialog, ctx) {
     dialog.close();
   }
 
-  function removeSlot(slot, index) {
-    const record = getSlotRecord(slot.id);
-    // 通常の削除通知と二重にせず、記録を確保できたときだけ削除して取り消しを案内する。
-    const removed = record && deleteSlot(slot.id);
-    refreshList();
+  function focusRow(index) {
     const next = list.querySelectorAll('[data-slot-open]');
     (next[Math.min(index, next.length - 1)] ?? (name.disabled ? frame.close : name)).focus();
-    if (!removed) {
-      ctx.toast('保存を削除できませんでした。', { kind: 'error' });
-      return;
-    }
-    ctx.toast(slot.name + 'を消しました。', {
-      actionLabel: '元に戻す',
-      onAction() {
-        // 通知を押すまでに、空いたIDを新しい保存が使うことがある。
-        const slots = ctx.slots.list();
-        const available = slots.length < MAX_SLOTS && !slots.some(current => current.id === slot.id);
-        const restored = available && restoreSlot(record);
-        refreshList();
-        if (!restored) {
-          ctx.toast('元に戻せませんでした（保存枠がいっぱいです）。', { kind: 'error' });
-          return;
-        }
-        if (dialog.open) {
-          const buttons = Array.from(list.querySelectorAll('[data-slot-open]'));
-          buttons.find(open => open.dataset.slotOpen === slot.id)?.focus();
-        }
-        ctx.toast('元に戻しました。');
-      },
+  }
+
+  function editName(slot, index, row, actions, trigger) {
+    const form = element('form', 'cs-field');
+    const field = textField({ label: '新しい保存名', max: SITE_NAME_MAX, value: slot.name });
+    const submit = element('button', 'cs-btn cs-primary', '変更する');
+    submit.type = 'submit';
+    const cancel = button('やめる', () => {
+      form.remove();
+      actions.hidden = false;
+      trigger.focus();
+    });
+    const buttons = element('div', 'cs-actions');
+    buttons.append(submit, cancel);
+    form.append(field.root, buttons);
+    actions.hidden = true;
+    row.append(form);
+    field.input.focus();
+    form.addEventListener('submit', event => {
+      event.preventDefault();
+      ctx.slots.rename(slot.id, field.input.value, { savedAt: slot.savedAt });
+      if (!row.isConnected) focusRow(index);
     });
   }
 
-  function refreshList() {
+  function refreshList(focusId) {
     const model = slotListModel(ctx.slots.list());
     const scroll = dialog.scrollTop;
     full = model.full;
@@ -111,14 +106,22 @@ export function mountSlots(dialog, ctx) {
       const actions = element('div', 'cs-actions');
       const open = button('開く', () => load(slot.id));
       open.dataset.slotOpen = slot.id;
-      const remove = button('消す', () => removeSlot(slot, index), 'cs-btn cs-danger');
+      const rename = button('名前を変える', () => editName(slot, index, row, actions, rename));
+      const remove = button('消す', () => {
+        ctx.slots.remove(slot.id, { savedAt: slot.savedAt });
+        focusRow(index);
+      }, 'cs-btn cs-danger');
       open.setAttribute('aria-describedby', title.id);
+      rename.setAttribute('aria-describedby', title.id);
       remove.setAttribute('aria-describedby', title.id);
-      actions.append(open, remove);
+      actions.append(open, rename, remove);
       row.append(title, meta, actions);
       return row;
     }));
     dialog.scrollTop = scroll;
+    if (dialog.open && focusId !== undefined) {
+      Array.from(list.querySelectorAll('[data-slot-open]')).find(open => open.dataset.slotOpen === focusId)?.focus();
+    }
   }
 
   form.addEventListener('submit', (event) => {
@@ -130,6 +133,7 @@ export function mountSlots(dialog, ctx) {
   });
   const off = ctx.subscribe(() => { if (dialog.open) availability(); });
   return {
+    refreshList,
     open() {
       if (!dialog.open) nameField.update(ctx.getState()?.site.name ?? '');
       refreshList();

@@ -75,6 +75,13 @@ export function mountTopbar(root, ctx) {
 }
 
 export function mountStorageNotice(topbar, keepLocal, loadOther) {
+  return mountNotice(topbar, '別のタブで、この作業が更新されました。', [
+    ['このタブの内容で保存を続ける', keepLocal],
+    ['別のタブの内容を読み込む', loadOther],
+  ]);
+}
+
+export function mountNotice(topbar, message, choices) {
   const doc = topbar.ownerDocument;
   const group = doc.createElement('div');
   const banner = doc.createElement('div');
@@ -83,14 +90,11 @@ export function mountStorageNotice(topbar, keepLocal, loadOther) {
   const inner = doc.createElement('div');
   inner.className = 'app-mast-inner';
   const note = doc.createElement('span');
-  note.textContent = '別のタブで、この作業が更新されました。';
+  note.textContent = message;
   const actions = doc.createElement('div');
   actions.className = 'app-view-actions';
   const events = new AbortController();
-  for (const [label, choose] of [
-    ['このタブの内容で保存を続ける', keepLocal],
-    ['別のタブの内容を読み込む', loadOther],
-  ]) {
+  for (const [label, choose] of choices) {
     const button = doc.createElement('button');
     button.type = 'button';
     button.className = 'app-btn';
@@ -103,9 +107,12 @@ export function mountStorageNotice(topbar, keepLocal, loadOther) {
   group.append(topbar, banner);
   banner.append(inner);
   inner.append(note, actions);
-  return { destroy() {
-    events.abort();
-    group.before(topbar);
-    group.remove();
-  } };
+  return {
+    setMessage(text) { note.textContent = text; },
+    destroy() {
+      events.abort();
+      group.before(topbar);
+      group.remove();
+    },
+  };
 }

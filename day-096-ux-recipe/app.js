@@ -2,14 +2,14 @@ import { DEVICES, GOALS, GOAL_LABEL, HASH_VIEW, STORAGE_PREFIX, validateState } 
 import { createState, restoreState, reduce, createHistory, commit, present, undo, redo, canUndo, canRedo } from './lib/state.js';
 import { diagnose } from './lib/rules.js';
 import { isUntouched } from './lib/sample.js';
-import * as storage from './lib/persist.js';
+import * as persist from './lib/persist.js';
 import { decodeState, viewUrl } from './lib/codec.js';
 import { renderPage } from './lib/render.js';
 import { createDraftDialog, DRAFT_WARNING, mountGoal } from './lib/ui-goal.js';
 import { mountOutline } from './lib/ui-outline.js';
 import { mountPreview, installPageStyle } from './lib/ui-preview.js';
 import { mountPalette } from './lib/ui-palette.js';
-import { mountStorageNotice, mountTopbar } from './lib/ui-topbar.js';
+import { mountNotice, mountStorageNotice, mountTopbar } from './lib/ui-topbar.js';
 import { mountToast } from './lib/ui-toast.js';
 import { mountKeys } from './lib/keys.js';
 import { mountInspector } from './lib/ui-inspector.js';
@@ -305,7 +305,48 @@ function mountViewer(root, state, ctx, adopt) {
   return { destroy() { root.removeEventListener('click', click); page.removeEventListener('submit', submit); page.replaceChildren(); } };
 }
 
-export async function mountApp(root) {
+export function createSlotMutations(storage, toast, refreshList) {
+  function failed(result, message) {
+    if (result.reason === 'changed') {
+      refreshList();
+      message = '保存の一覧が別のタブで変わっていました。一覧を更新しました。';
+    }
+    toast(message, { kind: 'error' });
+    return false;
+  }
+  return {
+    remove(id, expect) {
+      const result = storage.tryDeleteSlot(id, undefined, expect);
+      if (!result.ok) return failed(result, '保存を削除できませんでした。');
+      refreshList();
+      if (expect === undefined) {
+        toast('保存を削除しました。');
+      } else {
+        // 取り消しには、一覧を開いたときの本文でなく実際に消した記録を使う。
+        const { record } = result;
+        toast(record.name + 'を消しました。', {
+          actionLabel: '元に戻す',
+          onAction() {
+            const restored = storage.restoreSlot(record);
+            refreshList(restored ? id : undefined);
+            if (restored) toast('元に戻しました。');
+            else toast('元に戻せませんでした（保存枠がいっぱいです）。', { kind: 'error' });
+          },
+        });
+      }
+      return true;
+    },
+    rename(id, name, expect) {
+      const result = storage.tryRenameSlot(id, name, undefined, expect);
+      if (!result.ok) return failed(result, '保存の名前を変えられませんでした。');
+      refreshList(id);
+      toast('保存の名前を変えました。');
+      return true;
+    },
+  };
+}
+
+export async function mountApp(root, { storage = persist } = {}) {
   const doc = root.ownerDocument;
   const local = id => root.querySelector('#' + id);
   const query = new URLSearchParams(location.search);
@@ -361,11 +402,10 @@ export async function mountApp(root) {
     placeNotifications();
     notifications.toast(message, options);
   }
-  let draft = null;
-  try { draft = storage.loadCurrent(); }
-  catch {
-    toast('端末の下書きを読み取れませんでした。', { kind: 'error' });
-  }
+  const initial = storage.readCurrent();
+  let draft = initial.state;
+  let blocked = initial.status === 'unavailable' || initial.status === 'damaged' ? initial.status : null;
+  let startupNotice;
   const currentDraft = () => draft;
   let editor;
   let viewer;
@@ -376,7 +416,8 @@ export async function mountApp(root) {
   let otherDraft;
   let conflictNotice;
   function visibleSaveStatus() {
-    if (otherDraft) return 'paused';
+    if (blocked === 'unavailable') return 'error';
+    if (blocked || otherDraft) return 'paused';
     return ctx.getState() === draft ? saveStatus : 'idle';
   }
   function reportSave(status) {
@@ -393,7 +434,7 @@ export async function mountApp(root) {
     onDirty(state) {
       if (events.signal.aborted || root.dataset.screen !== 'editor') return;
       draft = state;
-      if (!otherDraft) saver.schedule(state);
+      if (!blocked && !otherDraft) saver.schedule(state);
     },
     onSelect(id, path) {
       editor?.preview.scrollToBlock(id);
@@ -589,16 +630,7 @@ export async function mountApp(root) {
         slotResult(!!state, '保存したページを開きました。', '保存したページを読み取れませんでした。');
         return state;
       },
-      remove(id) {
-        const ok = useSlot(() => storage.deleteSlot(id), false);
-        slotResult(ok, '保存を削除しました。', '保存を削除できませんでした。');
-        return ok;
-      },
-      rename(id, name) {
-        const ok = useSlot(() => storage.renameSlot(id, name), false);
-        slotResult(ok, '保存の名前を変えました。', '保存の名前を変えられませんでした。');
-        return ok;
-      },
+      ...createSlotMutations(storage, toast, id => slots.refreshList(id)),
     },
   });
 
@@ -688,11 +720,42 @@ export async function mountApp(root) {
     reportSave('paused');
     conflictNotice ??= mountStorageNotice(local('slot-topbar'), keepLocalDraft, loadOtherDraft);
   }
+  function enableAutosave() {
+    window.addEventListener('storage', storageChanged, listen);
+    window.addEventListener('pagehide', saver.flush, listen);
+    doc.addEventListener('visibilitychange', () => { if (doc.hidden) saver.flush(); }, listen);
+  }
+  function dismissStartupNotice() {
+    startupNotice.destroy();
+    startupNotice = null;
+    focusScreen();
+  }
+  function startWithNewDraft() {
+    if (!storage.backupDamagedCurrent()) {
+      startupNotice.setMessage('元の下書きのコピーを残せませんでした。自動保存は停止中です。');
+      return;
+    }
+    blocked = null;
+    dismissStartupNotice();
+    enableAutosave();
+    draft = ctx.getState();
+    saver.schedule(draft);
+    saver.flush();
+  }
+  if (blocked === 'damaged') {
+    startupNotice = mountNotice(local('slot-topbar'), '保存されていた下書きを読み取れませんでした。', [
+      ['新しい内容で保存を始める', startWithNewDraft],
+      ['このまま保存しない', dismissStartupNotice],
+    ]);
+  } else if (blocked === 'unavailable') {
+    startupNotice = mountNotice(local('slot-topbar'), 'この端末では、作業を保存できません。作ったページは「共有・書き出し」から残してください。', [
+      ['閉じる', dismissStartupNotice],
+    ]);
+  } else {
+    enableAutosave();
+  }
   let ready = false;
-  window.addEventListener('storage', storageChanged, listen);
   window.addEventListener('hashchange', () => { if (ready) void followHash(); }, listen);
-  window.addEventListener('pagehide', saver.flush, listen);
-  doc.addEventListener('visibilitychange', () => { if (doc.hidden) saver.flush(); }, listen);
 
   await startAtCurrentHash(location, currentDraft(), route => {
     if (handledHash !== location.hash) {
@@ -715,6 +778,7 @@ export async function mountApp(root) {
     openers.clear();
     stopWatchingUndo();
     clearConflict();
+    startupNotice?.destroy();
     for (const part of [goalUI, palette, share, slots, keys, viewer, ...Object.values(editor ?? {}), notifications]) part?.destroy?.();
     draftDialog.remove();
     goalConfirm.textContent = originalGoalLabel;

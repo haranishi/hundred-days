@@ -53,7 +53,7 @@ mount の規約: 渡された要素の**中だけ**を触る。subscribe のた�
 - `mountOutline(root, ctx)`: 構成リスト（`role="list"`）。行=段階チップ（記号＋色）・部品名・中身の一部・「並べ替えのつまみ」・「上へ移動」「下へ移動」「複製」「削除」。つまみのドラッグ（pointer events・`touch-action:none`・端の自動スクロール・並べ替え後に `aria-live` で「<部品名>を<n>番目に移動しました」）。末尾に「部品を足す」。`dnd.js` の計算は純粋に切り出して試験。
 - `mountPreview(root, ctx)` → `{ scrollToBlock(id) }`: 上に流れメーター（5段階の帯＋部品数・点のバッジ→診断タブ・「スマホ表示」「パソコン表示」）。下にページ（`renderPage(state,{mode:'preview'})` を `innerHTML`）。`PAGE_CSS` は `<style>` を1回だけ。
   委譲クリック: `[data-path]` なら `select(blockId,{path})`・それ以外は `select(blockId)`。**プレビュー内の `<a>`・`<summary>` の既定動作を止める**（`#v=` を壊さない）。選択中は `.is-selected`（2pxの外線＋部品名のタグ）。再描画でスクロール位置を保つ。
-- `mountPalette(dialog, ctx)` → `{ open(index?) }`: 「部品を足す」。効果別（見せる・迷わせない・安心させる・背中を押す）に19種。各項目=段階チップ・名前・role の1文。上限18で無効化。選ぶと `addBlock`（選択中の直後）→選択→プレビューへ移動。
+- `mountPalette(dialog, ctx)` → `{ open(index?) }`: 「部品を足す」。効果別（見せる・迷わせない・不安を減らす・背中を押す）に19種。各項目=段階チップ・名前・role の1文。上限18で無効化。選ぶと `addBlock`（選択中の直後）→選択→プレビューへ移動。
 - `ui-topbar.js`: 「目的を選び直す」・目的名とサイト名・「元に戻す」「やり直す」・「保存・開く」・「共有・書き出し」（主）。自動保存の表示。`ui-toast.js`: 積み重ね・自動で消える・操作つき。
 - `keys.js`: Ctrl/⌘+Z・Shift+Ctrl/⌘+Z・Ctrl+Y・Delete（入力中は無効・削除は toast で元に戻せる）・Alt+↑↓（選択中を移動）・Esc。
 - 見るだけ画面: ページ（幅は端末に合わせる）・診断の点・「このレシピをもとに作る」「目的を選んで作る」・このアプリを共有する。
