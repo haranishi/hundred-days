@@ -77,6 +77,13 @@
   scroll-margin-block: 12px;
 }
 textarea.cs-input { resize: vertical; }
+textarea.cs-input[rows="2"] {
+  resize: none;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  field-sizing: content;
+  min-height: calc(2lh + 20px);
+}
 .cs-btn, .cs-chip, .cs-tab, .cs-choice, .cs-check {
   display: inline-flex;
   align-items: center;
@@ -216,6 +223,12 @@ textarea.cs-input { resize: vertical; }
   font-size: 12px; font-weight: 600; color: var(--cs-muted); white-space: nowrap;
 }
 .cs-rule-mark { color: var(--cs-accent); font-size: 15px; }
+.cs-rule-alert {
+  margin: 0 0 8px;
+  padding-inline-start: 10px;
+  border-inline-start: 3px solid var(--cs-danger);
+  font-size: 14px;
+}
 .cs-reason { display: grid; gap: 8px; padding-block: 0 12px; font-size: 14px; }
 .cs-sources { margin: 0; padding: 0; list-style: none; }
 .cs-sources li { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; }

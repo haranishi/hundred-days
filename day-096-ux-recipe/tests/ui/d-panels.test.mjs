@@ -161,6 +161,47 @@ function mountSlots(root, ctx) {
   return panel;
 }
 
+test('短文の上限23字は1行、24字は折り返す2行、長文は改行できる3行になる', t => {
+  environment(t, 'section');
+  const short = textField({ label: '短い見出し', kind: 'text', max: 23 }).input;
+  const wrapped = textField({ label: 'サイトの名前', max: 24 }).input;
+  const long = textField({ label: '説明', kind: 'long', max: 90 }).input;
+  assert.deepEqual([short.tagName, short.type], ['INPUT', 'text']);
+  assert.deepEqual([wrapped.tagName, wrapped.rows], ['TEXTAREA', 2]);
+  assert.deepEqual([long.tagName, long.rows], ['TEXTAREA', 3]);
+  assert.equal(fire(long, 'keydown', { key: 'Enter' }), true);
+  long.value = '初日\n二日目';
+  fire(long, 'input');
+  assert.equal(long.value, '初日\n二日目');
+});
+
+test('折り返す短文欄は通常のEnterで改行せず、変換の確定を妨げず、貼り付けた改行だけを空白にする', t => {
+  environment(t, 'section');
+  const changes = [];
+  const { input } = textField({ label: 'キャッチコピー', kind: 'text', max: 32 }, value => changes.push(value));
+  assert.equal(fire(input, 'keydown', { key: 'Enter' }), false);
+  assert.equal(fire(input, 'keydown', { key: 'a' }), true);
+  assert.equal(fire(input, 'keydown', { key: 'Enter', isComposing: true }), true);
+  assert.equal(fire(input, 'keydown', { key: 'Enter', keyCode: 229 }), true);
+  fire(input, 'compositionstart');
+  input.value = 'はる';
+  fire(input, 'input', { isComposing: true });
+  assert.equal(fire(input, 'keydown', { key: 'Enter' }), true);
+  assert.equal(input.getAttribute('maxlength'), null);
+  assert.deepEqual(changes, []);
+  input.value = '春🌷';
+  fire(input, 'blur');
+  fire(input, 'compositionend');
+  assert.deepEqual(changes, ['春🌷']);
+  assert.equal(input.maxLength, 33);
+  input.setSelectionRange(input.value.length, input.value.length);
+  fire(input, 'beforeinput', { inputType: 'insertFromPaste' });
+  input.insertText('\r\n花の市');
+  fire(input, 'input');
+  assert.deepEqual(changes, ['春🌷', '春🌷 花の市']);
+  assert.equal(input.value, changes.at(-1));
+});
+
 test('上限10字の欄でも長い読みを最後まで打ち、短い候補に確定できる', (t) => {
   const { root } = environment(t, 'section');
   const changes = [];
@@ -246,6 +287,25 @@ test('保存名に文字数と上限を表示し、絵文字を24字保存して
   dialog.open();
   assert.equal(input.value, MINIMAL.site.name);
   assert.equal(count.textContent, countChars(MINIMAL.site.name) + '/24');
+  dialog.destroy();
+});
+
+test('2行の保存名欄は通常のEnterで保存でき、変換確定のEnterでは保存しない', t => {
+  const { doc, root } = environment(t, 'dialog');
+  const { ctx } = context();
+  const dialog = mountSlots(root, ctx);
+  dialog.open();
+  const input = doc.activeElement;
+  assert.equal(input.tagName, 'TEXTAREA');
+  const form = find(root, el => el.tagName === 'FORM');
+  // DOMの代役にはフォームとの関連付けや送信の既定動作がない。
+  input.form = form;
+  form.requestSubmit = () => fire(form, 'submit');
+  input.value = '春の案';
+  fire(input, 'keydown', { key: 'Enter', isComposing: true });
+  assert.equal(ctx.slots.list().length, 0);
+  fire(input, 'keydown', { key: 'Enter' });
+  assert.deepEqual(ctx.slots.list().map(slot => slot.name), ['春の案']);
   dialog.destroy();
 });
 
@@ -480,6 +540,26 @@ test('言い換え候補は文字として表示し、押した項目だけが�
   ctx.undo();
   assert.equal(editor.input.value, title.value);
   off();
+});
+
+test('達成した必須と未達のおすすめ・ヒントの補足は開閉欄に残り、補足のない必須に空段落は出ない', t => {
+  const { root } = environment(t, 'section');
+  const items = [
+    { id: 'done', level: 'must', ok: true, note: '達成した理由' },
+    { id: 'recommended', level: 'should', ok: false, note: 'おすすめの理由' },
+    { id: 'hint', level: 'tip', ok: false, note: 'ヒントの理由' },
+    { id: 'missing', level: 'must', ok: false },
+  ];
+  const { ctx } = context(MINIMAL, () => ({
+    score: 50, items: items.map(item => ({ title: '診断項目', why: '判断の理由', sources: [], ...item })),
+  }));
+  t.after(mountDiagnosis(root, ctx).destroy);
+  for (const item of items) {
+    const detail = find(root, el => el.dataset.detail === item.id);
+    assert.ok(detail);
+    assert.ok(!detail.parent.children.some(el => el.tagName === 'P'));
+    if (item.note) assert.ok(byText(detail, 'P', item.note));
+  }
 });
 
 test('診断理由の開閉を保ち、根拠・確度・目安を表示し、なおす操作を1回で取り消せる', (t) => {

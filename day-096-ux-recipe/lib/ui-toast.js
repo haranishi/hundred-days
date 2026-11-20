@@ -11,10 +11,21 @@ export function mountToast(root) {
     current = null;
   }
 
+  function finishActionToast(action) {
+    const { item, origin } = current;
+    const hadFocus = item.contains(doc.activeElement);
+    clear();
+    action?.();
+    if (hadFocus && origin?.isConnected && !origin.disabled && origin.getClientRects().length) {
+      origin.focus({ preventScroll: true });
+    }
+  }
+
   function restart() {
     clearTimeout(timer);
-    if (!current || current.kind === 'error' || current.item.matches(':hover, :focus-within')) return;
-    timer = setTimeout(clear, current.label ? 10000 : 4000);
+    if (!current || current.kind === 'error') return;
+    if (current.label) timer = setTimeout(finishActionToast, 8000);
+    else if (!current.item.matches(':hover, :focus-within')) timer = setTimeout(clear, 4000);
   }
 
   function toast(message, { kind = 'info', actionLabel, onAction } = {}) {
@@ -39,27 +50,23 @@ export function mountToast(root) {
     current = entry;
     const listen = { signal: entry.events.signal };
     if (label) {
-      const origin = doc.activeElement;
+      entry.origin = doc.activeElement;
       const button = doc.createElement('button');
       button.type = 'button';
       button.className = 'app-toast-action';
       button.textContent = label;
-      button.addEventListener('click', () => {
-        const hadFocus = item.contains(doc.activeElement);
-        clear();
-        entry.onAction();
-        if (hadFocus && origin?.isConnected && !origin.disabled && origin.getClientRects().length) origin.focus({ preventScroll: true });
-      }, listen);
+      button.addEventListener('click', () => finishActionToast(entry.onAction), listen);
       item.append(button);
+    } else if (kind !== 'error') {
+      const stop = () => clearTimeout(timer);
+      item.addEventListener('focusin', stop, listen);
+      item.addEventListener('focusout', () => queueMicrotask(() => { if (current === entry) restart(); }), listen);
+      item.addEventListener('pointerenter', stop, listen);
+      item.addEventListener('pointerleave', restart, listen);
     }
-    const stop = () => clearTimeout(timer);
-    item.addEventListener('focusin', stop, listen);
-    item.addEventListener('focusout', () => queueMicrotask(() => { if (current === entry) restart(); }), listen);
-    item.addEventListener('pointerenter', stop, listen);
-    item.addEventListener('pointerleave', restart, listen);
     root.append(item);
     restart();
   }
 
-  return { toast, clear, destroy: clear };
+  return { toast, clear, dismissAll: clear, destroy: clear };
 }

@@ -121,7 +121,8 @@ for (const action of ['消す', '名前を変える']) {
       button(dialog, action).click();
       assert.deepEqual(remove.mock.calls.at(-1)?.arguments, [id, expected]);
     } else {
-      const input = dialog.querySelector('.cs-slot-row').querySelector('input');
+      const input = dialog.querySelector('.cs-slot-row').querySelector('textarea');
+      assert.equal(input?.rows, 2);
       input.value = '古い名前変更';
       input.closest('form').dispatchEvent(new Event('submit', { cancelable: true }));
       assert.deepEqual(rename.mock.calls.at(-1)?.arguments, [id, '古い名前変更', expected]);

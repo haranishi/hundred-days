@@ -221,14 +221,14 @@ test('読み取りエラーは編集と画面移動を経ても次の通知ま�
   assert.equal(live.textContent, '保存しました。');
 });
 
-test('ボタン付きの通知は10秒で消え、期限を過ぎたボタンを押しても実行しない', async t => {
+test('ボタン付きの通知は8秒で消え、期限を過ぎたボタンを押しても実行しない', async t => {
   const e = environment(t, { draft: MINIMAL });
   const ctx = await e.start();
   const live = e.root.querySelector('#toasts');
   const action = t.mock.fn();
   ctx.toast('なおしました', { actionLabel: '元に戻す', onAction: action });
   const button = live.querySelector('button');
-  t.mock.timers.tick(9999);
+  t.mock.timers.tick(7999);
   assert.ok(live.contains(button));
   t.mock.timers.tick(1);
   assert.equal(live.childElementCount, 0);

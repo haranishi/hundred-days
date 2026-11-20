@@ -292,7 +292,9 @@ test('閲覧から入口で保存したとき、保存名の初期値も本文�
   e.root.querySelector('[data-choose]').click();
   ctx.openSlots();
   const dialog = activeDialog(e.root);
-  assert.equal(dialog.querySelector('input').value, MINIMAL.site.name);
+  const name = dialog.querySelector('textarea');
+  assert.equal(name?.rows, 2);
+  assert.equal(name.value, MINIMAL.site.name);
   fire(dialog.querySelector('form'), 'submit');
   const row = ctx.slots.list()[0];
   assert.equal(row.name, MINIMAL.site.name);

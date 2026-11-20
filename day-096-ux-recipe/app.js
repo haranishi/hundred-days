@@ -388,10 +388,9 @@ export async function mountApp(root, { storage = persist } = {}) {
   const notifications = mountToast(live);
   let toastDialog;
   let toastState;
-  function clearEditToast() {
-    if (!toastState) return;
+  function dismissToasts() {
     toastState = null;
-    notifications.clear();
+    notifications.dismissAll();
   }
   function returnNotifications(event) {
     if (event && (event.target !== toastDialog || toastDialog.open)) return;
@@ -454,7 +453,7 @@ export async function mountApp(root, { storage = persist } = {}) {
     onSelect(id, path) {
       editor?.preview.scrollToBlock(id);
       if (path === 'site.name') {
-        local('panel-look').querySelector('input[aria-label="サイトの名前"], input[type="text"], input:not([type])')?.focus();
+        editor?.look.focusPath();
       } else if (path) {
         editor?.inspector.focusPath(path);
       } else if (root.dataset.screen === 'editor' && (doc.activeElement === doc.body || doc.activeElement?.closest('[hidden]'))) {
@@ -463,7 +462,7 @@ export async function mountApp(root, { storage = persist } = {}) {
     },
   });
   const stopWatchingToast = ctx.subscribe(({ state, reason }) => {
-    if (toastState !== state || reason === 'load') clearEditToast();
+    if (toastState && (toastState !== state || reason === 'load')) dismissToasts();
   });
 
   const screens = { goal: local('screen-goal'), editor: local('screen-edit'), viewer: local('screen-view') };
@@ -476,6 +475,7 @@ export async function mountApp(root, { storage = persist } = {}) {
   function openDialog(dialog, trigger, open = () => dialog.showModal()) {
     if (dialog.open || events.signal.aborted) return;
     openers.set(dialog, trigger ?? doc.activeElement);
+    dismissToasts();
     const result = open();
     if (live.childElementCount) placeNotifications();
     return result;
@@ -512,7 +512,7 @@ export async function mountApp(root, { storage = persist } = {}) {
   function show(screen) {
     navigation += 1;
     // 別の共有ページを続けて開くと、画面名は同じでも前の案内は古くなる。
-    clearEditToast();
+    if (toastState) dismissToasts();
     closeDialogs();
     if (viewer && screen !== 'viewer') { viewer.destroy(); viewer = null; }
     root.dataset.screen = screen;

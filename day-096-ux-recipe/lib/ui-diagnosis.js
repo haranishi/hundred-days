@@ -135,10 +135,13 @@ function ruleCard(item, ctx, opened) {
   summary.append(status, title);
   const reason = element('div', 'cs-reason');
   reason.append(element('p', '', item.why));
-  if (item.note) reason.append(element('p', 'cs-help', item.note));
-  reason.append(element('h4', 'cs-label', '根拠'), sourceList(item));
   details.append(summary, reason);
   card.append(details);
+  if (item.note) {
+    if (!item.ok && item.level === 'must') card.append(element('p', 'cs-rule-alert', item.note));
+    else reason.append(element('p', 'cs-help', item.note));
+  }
+  reason.append(element('h4', 'cs-label', '根拠'), sourceList(item));
   const actions = element('div', 'cs-actions cs-rule-actions');
   // 期限や人数は、編集する人が元の表示を確かめてから確認の印を付ける。
   if (!item.ok && item.fix && item.id !== 'honest-limited') {

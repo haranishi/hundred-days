@@ -26,8 +26,9 @@ export function textField({ label, max, kind = 'text', value = '' }, onEdit) {
   const count = element('span', 'cs-count');
   const warning = element('span', 'cs-limit');
   const multiline = kind === 'long';
-  const input = element(multiline ? 'textarea' : 'input', 'cs-input');
-  if (multiline) input.rows = 3;
+  const useTextarea = multiline || (kind === 'text' && max >= 24);
+  const input = element(useTextarea ? 'textarea' : 'input', 'cs-input');
+  if (useTextarea) input.rows = multiline ? 3 : 2;
   else input.type = 'text';
   input.id = controlId('field');
   caption.htmlFor = input.id;
@@ -84,6 +85,14 @@ export function textField({ label, max, kind = 'text', value = '' }, onEdit) {
     suffix = input.value.slice(input.selectionEnd);
     // 読みや貼り付けを途中で切ると、確定後の文字とカーソル位置を復元できない。
     input.removeAttribute('maxlength');
+  }
+  if (useTextarea && !multiline) {
+    input.addEventListener('keydown', (event) => {
+      if (event.key !== 'Enter' || composing || event.isComposing || event.keyCode === 229) return;
+      event.preventDefault();
+      // 保存名の欄では、折り返しても従来どおりEnterでフォームを送信できるようにする。
+      input.form?.requestSubmit();
+    });
   }
   input.addEventListener('beforeinput', () => { if (!composing) beginEdit(); });
   input.addEventListener('compositionstart', () => {

@@ -121,3 +121,12 @@ test('スマホの通知は、編集画面ではパネルの上端のすぐ上�
   assert.match(editor, /bottom:\s*calc\(var\(--ed-panel-h, 0px\) \+ 12px\)/);
   assert.doesNotMatch(editor, /\btop:/);
 });
+
+test('720px以上の通知は画面下端から16pxの中央に置き、幅を520pxまでに収める', () => {
+  const toast = media('(min-width: 720px)').match(/\.app-toasts\s*\{([^}]*)\}/)?.[1] ?? '';
+  assert.match(toast, /\bleft:\s*50%\s*;/);
+  assert.match(toast, /\bright:\s*auto\s*;/);
+  assert.match(toast, /\bbottom:\s*16px\s*;/);
+  assert.match(toast, /\btransform:\s*translateX\(-50%\)\s*;/);
+  assert.match(toast, /\bmax-width:\s*min\(520px,\s*calc\(100vw\s*-\s*32px\)\)\s*;/);
+});
