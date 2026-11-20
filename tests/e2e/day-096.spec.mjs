@@ -198,6 +198,42 @@ test.describe('共有・書き出し・保存', () => {
     expect(html).not.toMatch(/https?:\/\//);
   });
 
+  test('画像（PNG）の書き出し: 2倍の大きさで、ページの全面が描かれる（WebKitは viewBox で拡大すると左上にしか描かれない）', async ({ page }) => {
+    await startEditor(page, '買ってもらう');
+    await page.getByRole('button', { name: '共有・書き出し' }).click();
+    await page.locator('#dlg-share').getByRole('tab', { name: '書き出し' }).click();
+    const png = page.getByRole('button', { name: /画像で保存/ });
+    await png.first().waitFor({ timeout: 5000 }).catch(() => {}); // 書き出せるかの判定は非同期
+    test.skip(!(await png.count()), 'この環境では画像の書き出しが出ない（出さない判定）');
+    const [download] = await Promise.all([page.waitForEvent('download'), png.first().click()]);
+    const base64 = readFileSync(await download.path()).toString('base64');
+    const m = await page.evaluate(async (b64) => {
+      const img = new Image();
+      img.src = `data:image/png;base64,${b64}`;
+      await img.decode();
+      const c = document.createElement('canvas');
+      c.width = img.width; c.height = img.height;
+      const g = c.getContext('2d');
+      g.drawImage(img, 0, 0);
+      const d = g.getImageData(0, 0, c.width, c.height).data;
+      const bg = [d[0], d[1], d[2]];
+      let first = -1; let last = -1; let rightHalf = 0;
+      for (let y = 0; y < c.height; y += 2) {
+        let hit = false;
+        for (let x = 0; x < c.width; x += 4) {
+          const i = (y * c.width + x) * 4;
+          if (Math.abs(d[i] - bg[0]) + Math.abs(d[i + 1] - bg[1]) + Math.abs(d[i + 2] - bg[2]) > 30) { hit = true; if (x > c.width / 2) rightHalf += 1; }
+        }
+        if (hit) { if (first < 0) first = y; last = y; }
+      }
+      return { w: img.width, h: img.height, first, last, rightHalf };
+    }, base64);
+    expect(m.w).toBe(780);
+    expect(m.first, '上端から描かれる').toBeLessThan(120);
+    expect(m.last, '下端まで描かれる').toBeGreaterThan(m.h * 0.97);
+    expect(m.rightHalf, '右半分にも描かれる').toBeGreaterThan(50);
+  });
+
   test('保存: 再読み込みで続きから・名前をつけた保存を開いて戻せる', async ({ page }) => {
     await startEditor(page);
     const id = (await getState(page)).blocks[0].id;

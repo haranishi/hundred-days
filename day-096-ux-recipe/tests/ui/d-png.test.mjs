@@ -24,6 +24,7 @@ function canvasEnvironment(t, { pixel = [255, 0, 0, 255], failAt } = {}) {
       const index = canvases.length;
       const canvas = node('canvas');
       canvas.getContext = () => ({
+        scale: (x, y) => { canvas.scaled = [x, y]; },
         drawImage: () => { canvas.drawn = [canvas.width, canvas.height]; },
         getImageData: () => ({ data: pixel }),
       });
@@ -84,7 +85,9 @@ test('ページの実測高とCSSを書く。試した後はキャンバスと�
   assert.equal(blob.type, 'image/png');
   assert.deepEqual(canvases[1].drawn, [1920, 1962]);
   const svg = renders[1];
-  assert.deepEqual(svg.attrs, { width: '1920', height: '1962', viewBox: '0 0 960 981' });
+  // SVGは等倍で作り、キャンバス側で2倍に拡大する（viewBox で拡大すると WebKit は左上の4分の1にしか描かない）
+  assert.deepEqual(svg.attrs, { width: '960', height: '981' });
+  assert.deepEqual(canvases[1].scaled, [2, 2]);
   const foreign = svg.firstElementChild;
   assert.equal(foreign.tag, 'foreignObject');
   assert.deepEqual(foreign.attrs, { width: '960', height: '981' });
