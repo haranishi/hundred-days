@@ -72,6 +72,7 @@ export function createEditor(initial, { onDirty = () => {}, onSelect = () => {},
   let history = createHistory(initial);
   let selectedId = initial.blocks[0]?.id ?? null;
   let tab = 'edit';
+  let mobilePanelOpen = false;
   let device = 'phone';
   const listeners = new Set();
   const cache = new WeakMap();
@@ -108,6 +109,7 @@ export function createEditor(initial, { onDirty = () => {}, onSelect = () => {},
   return {
     getState, getHistory: () => history, getSelectedId: () => selectedId,
     getTab: () => tab, getDevice: () => device, diagnose: diagnosis,
+    isMobilePanelOpen: () => mobilePanelOpen,
     dispatch(action, { coalesce } = {}) {
       let next;
       try { next = reduce(getState(), action); }
@@ -130,13 +132,25 @@ export function createEditor(initial, { onDirty = () => {}, onSelect = () => {},
       const nextTab = requested ?? (id || path ? 'edit' : tab);
       selectedId = id;
       if (TABS.includes(nextTab)) tab = nextTab;
+      if (id || path) mobilePanelOpen = true;
       notify('select');
       onSelect(id, path);
     },
-    setTab(next) {
+    setTab(next, { toggle = false } = {}) {
       if (!TABS.includes(next)) return;
-      if (tab !== next) { tab = next; notify('tab'); }
+      // 診断の点数などから同じタブを指定した場合も、依頼された内容を開く。
+      const open = !(toggle && tab === next && mobilePanelOpen);
+      if (tab !== next || mobilePanelOpen !== open) {
+        tab = next;
+        mobilePanelOpen = open;
+        notify('tab');
+      }
       onTab();
+    },
+    foldPanel() {
+      if (!mobilePanelOpen) return;
+      mobilePanelOpen = false;
+      notify('tab');
     },
     setDevice(next) {
       if (next === device || !DEVICES.some(item => item.key === next)) return;
@@ -166,26 +180,26 @@ function mountPanelLayout(editor, ctx) {
   const panes = new Map(tabs.map(button => [button.dataset.tab, panel.querySelector('#' + button.getAttribute('aria-controls'))]));
   const wide = matchMedia('(min-width: 1100px)');
   const twoColumns = matchMedia('(min-width: 720px)');
-  let collapsed = false;
   const events = new AbortController();
   const listen = { signal: events.signal };
 
   function paint() {
     const selected = ctx.getTab();
     const current = wide.matches && selected === 'outline' ? 'edit' : selected;
-    const folded = collapsed && !twoColumns.matches;
+    const folded = !twoColumns.matches && !ctx.isMobilePanelOpen();
     editor.dataset.folded = String(folded);
     body.hidden = folded;
+    fold.hidden = folded || twoColumns.matches;
     fold.setAttribute('aria-expanded', String(!folded));
-    fold.textContent = folded ? 'パネルを開く' : 'パネルをたたむ';
     for (const button of tabs) {
       const active = button.dataset.tab === current;
-      button.setAttribute('aria-selected', String(active));
+      button.setAttribute('aria-selected', String(active && !folded));
+      if (twoColumns.matches) button.removeAttribute('aria-expanded');
+      else button.setAttribute('aria-expanded', String(active && !folded));
       button.tabIndex = active ? 0 : -1;
-      panes.get(button.dataset.tab).hidden = !active;
+      panes.get(button.dataset.tab).hidden = !active || folded;
     }
   }
-  function unfold() { collapsed = false; paint(); }
   function arrange() {
     const active = document.activeElement;
     const hadFocus = outline.contains(active);
@@ -194,9 +208,9 @@ function mountPanelLayout(editor, ctx) {
     tabs[0].hidden = wide.matches;
     if (wide.matches && outline.parentElement === holder) preview.before(outline);
     if (!wide.matches && outline.parentElement !== holder) holder.append(outline);
-    if (twoColumns.matches) collapsed = false;
     if (wide.matches && ctx.getTab() === 'outline') ctx.setTab('edit');
     else if (!wide.matches && hadFocus) ctx.setTab('outline');
+    else if (!twoColumns.matches && body.contains(active)) ctx.setTab(ctx.getTab());
     paint();
     if (hadFocus) active.focus({ preventScroll: true });
     scroller.scrollTop = y;
@@ -204,8 +218,12 @@ function mountPanelLayout(editor, ctx) {
 
   panel.addEventListener('click', e => {
     const button = e.target.closest('button');
-    if (button === fold) { collapsed = !collapsed; paint(); }
-    else if (button?.matches('[role="tab"][data-tab]') && tabs.includes(button)) ctx.setTab(button.dataset.tab);
+    if (button === fold) {
+      ctx.foldPanel();
+      tabs.find(tab => tab.dataset.tab === ctx.getTab())?.focus({ preventScroll: true });
+    } else if (tabs.includes(button)) {
+      ctx.setTab(button.dataset.tab, { toggle: !twoColumns.matches });
+    }
   }, listen);
   panel.addEventListener('keydown', e => {
     const visible = tabs.filter(tab => !tab.hidden);
@@ -221,11 +239,8 @@ function mountPanelLayout(editor, ctx) {
   wide.addEventListener('change', arrange, listen);
   twoColumns.addEventListener('change', arrange, listen);
   arrange();
-  const unsubscribe = ctx.subscribe(({ reason }) => {
-    if (reason === 'select' || reason === 'tab' || reason === 'load') unfold();
-    else paint();
-  });
-  return { unfold, destroy() { unsubscribe(); events.abort(); } };
+  const unsubscribe = ctx.subscribe(paint);
+  return { destroy() { unsubscribe(); events.abort(); } };
 }
 
 function mountViewer(root, state, ctx, adopt) {
@@ -323,7 +338,6 @@ export async function mountApp(root) {
         local('tab-' + ctx.getTab()).focus({ preventScroll: true });
       }
     },
-    onTab() { editor?.layout.unfold(); },
   });
 
   const screens = { goal: local('screen-goal'), editor: local('screen-edit'), viewer: local('screen-view') };
@@ -373,6 +387,7 @@ export async function mountApp(root) {
   }
   let shownTip = false;
   function enterEditor(change) {
+    ctx.foldPanel();
     show('editor');
     choosingAgain = false;
     change();
@@ -392,8 +407,9 @@ export async function mountApp(root) {
     consumeRoute();
     focusScreen();
     if (!shownTip && query.get('tips') !== '0' && !storage.hasSeen('editor-tip')) {
-      const side = matchMedia('(min-width: 720px)').matches ? '右' : '下';
-      toast('部品をタップすると、なぜそこにあるのかが' + side + 'に出ます');
+      toast(matchMedia('(min-width: 720px)').matches
+        ? '部品を選ぶと、右の編集パネルでそこに置く理由を読めます。'
+        : '部品をタップすると、下に編集パネルが開きます。そこに置く理由も読めます。');
       storage.markSeen('editor-tip');
       shownTip = true;
     }

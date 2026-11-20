@@ -47,7 +47,7 @@
       </div></header>
       <div class="app-goal-inner">
         <div class="app-goal-intro">
-          <h1 class="app-question" tabindex="-1">お客さんに、<wbr>どうなってほしいですか？</h1>
+          <h1 class="app-question" tabindex="-1">お客さんに、<wbr><span class="app-question-phrase">どうなってほしいですか？</span></h1>
           <p class="app-intro-text">目的をひとつ選ぶと、ページの部品が順番に並びます。<br>部品を入れ替えながら、お客さんに伝わる流れを探せます。</p>
         </div>
         <div class="app-goal-actions">
@@ -61,20 +61,20 @@
         </section>
       </div>
     </main>
-    <div id="screen-edit" class="ed-editor" hidden>
+    <div id="screen-edit" class="ed-editor" data-folded="true" hidden>
       <header id="slot-topbar" class="ed-topbar">
         <div class="ed-identity">
           <button type="button" class="app-btn ed-icon-btn" data-goal aria-label="目的を選び直す" title="目的を選び直す"><svg class="ed-icon" aria-hidden="true"><use href="#i-back"/></svg></button>
           <div class="ed-document"><span class="ed-goal-name" data-goal-name></span><h1 class="ed-site" data-site tabindex="-1"></h1></div>
         </div>
         <div class="ed-top-actions">
-          <span class="ed-save-status" data-save-status role="status"></span>
+          <span class="ed-save-status" data-save-status role="status" aria-live="polite"></span>
           <div class="ed-history">
             <button type="button" class="app-btn ed-icon-btn" data-undo aria-label="元に戻す" title="元に戻す"><svg class="ed-icon" aria-hidden="true"><use href="#i-undo"/></svg></button>
             <button type="button" class="app-btn ed-icon-btn" data-redo aria-label="やり直す" title="やり直す"><svg class="ed-icon" aria-hidden="true"><use href="#i-redo"/></svg></button>
           </div>
-          <button type="button" class="app-btn" data-slots><svg class="ed-icon" aria-hidden="true"><use href="#i-open"/></svg>保存・開く</button>
-          <button type="button" class="app-btn app-primary" data-send><svg class="ed-icon" aria-hidden="true"><use href="#i-send"/></svg>共有・書き出し</button>
+          <button type="button" class="app-btn" data-slots aria-label="保存・開く" title="保存・開く"><svg class="ed-icon" aria-hidden="true"><use href="#i-open"/></svg><span class="ed-wide-label">保存・開く</span></button>
+          <button type="button" class="app-btn app-primary" data-send aria-label="共有・書き出し"><svg class="ed-icon" aria-hidden="true"><use href="#i-send"/></svg><span>共有<span class="ed-wide-label">・書き出し</span></span></button>
         </div>
       </header>
       <div class="ed-workspace">
@@ -105,13 +105,13 @@
           </div>
         </section>
         <aside id="slot-panel" class="ed-panel" aria-label="構成と編集">
-          <button type="button" class="ed-fold" data-fold aria-controls="ed-panel-body" aria-expanded="true">パネルをたたむ</button>
           <div class="ed-tabs" role="tablist" aria-label="編集パネル">
             <button type="button" id="tab-outline" class="ed-tab" role="tab" aria-controls="panel-outline" data-tab="outline">構成</button>
             <button type="button" id="tab-edit" class="ed-tab" role="tab" aria-controls="panel-edit" data-tab="edit">編集</button>
             <button type="button" id="tab-diagnosis" class="ed-tab" role="tab" aria-controls="panel-diagnosis" data-tab="diagnosis">診断</button>
             <button type="button" id="tab-look" class="ed-tab" role="tab" aria-controls="panel-look" data-tab="look">見た目</button>
           </div>
+          <button type="button" class="ed-fold" data-fold aria-controls="ed-panel-body" aria-expanded="true">パネルをたたむ</button>
           <div id="ed-panel-body" class="ed-panel-body">
             <div id="panel-outline" class="ed-panel-page" role="tabpanel" aria-labelledby="tab-outline" hidden></div>
             <div id="panel-edit" class="ed-panel-page" role="tabpanel" aria-labelledby="tab-edit"></div>

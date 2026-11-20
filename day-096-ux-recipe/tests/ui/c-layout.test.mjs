@@ -1,0 +1,104 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
+import { createEditor } from '../../app.js';
+import { flowMeter, previewScrollDelta } from '../../lib/ui-preview.js';
+import { MINIMAL } from '../fixtures/states.js';
+
+const view = { top: 100, bottom: 450 };
+
+test('短い部品は上下に余白を残して全体を見せる。すでに見えているときは動かさない', () => {
+  assert.equal(previewScrollDelta(view, { top: 120, bottom: 220 }), 0);
+  assert.equal(previewScrollDelta(view, { top: 80, bottom: 180 }), -32);
+  assert.equal(previewScrollDelta(view, { top: 400, bottom: 500 }), 62);
+});
+
+test('長い部品ではタップした文章を残す。構成から選んだときは部品の先頭を見せる', () => {
+  const block = { top: -200, bottom: 800 };
+  const part = { top: 540, bottom: 600 };
+  assert.equal(previewScrollDelta(view, block, part), 162);
+  assert.equal(previewScrollDelta(view, block, { top: 160, bottom: 240 }), 0);
+  assert.equal(previewScrollDelta(view, block), -312);
+  assert.equal(previewScrollDelta(view, block, block, 850), 236);
+});
+
+test('パネルが伸びる間も押した部品が見え、画面が広がったらその位置を保つ', () => {
+  let offset = 0;
+  for (const bottom of [792, 650, 510, 456, 792]) {
+    const visible = { top: 96, bottom };
+    const block = { top: 644 - offset, bottom: 764 - offset };
+    const delta = previewScrollDelta(visible, block);
+    offset += delta;
+    assert.ok(block.top - delta >= visible.top && block.bottom - delta <= bottom);
+    if (bottom === 792) assert.equal(delta, 0);
+  }
+  assert.equal(previewScrollDelta({ top: 0, bottom: 0 }, { top: 20, bottom: 40 }), 0);
+});
+
+test('スマホではタブ帯から始まり、タブの切替・同じタブの再押下・畳むボタンを区別する', () => {
+  const ctx = createEditor(MINIMAL);
+  const press = tab => ctx.setTab(tab, { toggle: true });
+  const state = () => [ctx.getTab(), ctx.isMobilePanelOpen()];
+  assert.deepEqual(state(), ['edit', false]);
+  press('edit');
+  assert.deepEqual(state(), ['edit', true]);
+  press('outline');
+  assert.deepEqual(state(), ['outline', true]);
+  press('outline');
+  assert.deepEqual(state(), ['outline', false]);
+  press('look');
+  ctx.foldPanel();
+  assert.deepEqual(state(), ['look', false]);
+  assert.equal(ctx.canUndo(), false);
+});
+
+test('点数・部品・サイト名からの指定は、同じタブが開いていても対象を表示する', () => {
+  const ctx = createEditor(MINIMAL);
+  ctx.setTab('diagnosis');
+  ctx.setTab('diagnosis');
+  assert.equal(ctx.isMobilePanelOpen(), true);
+  ctx.foldPanel();
+  ctx.select('b999');
+  ctx.select(null);
+  assert.equal(ctx.isMobilePanelOpen(), false);
+  const id = MINIMAL.blocks[1].id;
+  ctx.select(id);
+  ctx.select(id, { path: 'note' });
+  assert.deepEqual([ctx.getSelectedId(), ctx.getTab(), ctx.isMobilePanelOpen()], [id, 'edit', true]);
+  ctx.foldPanel();
+  ctx.select(null, { path: 'site.name', tab: 'look' });
+  assert.deepEqual([ctx.getTab(), ctx.isMobilePanelOpen()], ['look', true]);
+});
+
+test('短いメーターにも5段階の名前と件数があり、ゼロと2桁も読み上げられる', () => {
+  const ctx = createEditor(MINIMAL);
+  const meter = () => flowMeter(ctx.diagnose().stages);
+  assert.deepEqual(meter().map(step => step.description),
+    ['気づく 1個', 'わかる 0個', '信じる 0個', '動く 0個', '安心 1個']);
+  for (let i = 0; i < 9; i++) ctx.dispatch({ type: 'duplicateBlock', id: MINIMAL.blocks[0].id });
+  assert.equal(meter()[0].count, 10);
+  assert.equal(meter()[0].description, '気づく 10個');
+});
+
+test('上部バーで文字を省いても5つの操作名と保存状態の読み上げを保つ', () => {
+  const html = readFileSync(new URL('../../index.html', import.meta.url), 'utf8');
+  const bar = html.match(/<header id="slot-topbar"[^>]*>([\s\S]*?)<\/header>/)[1];
+  const labels = [...bar.matchAll(/<button\b[^>]*>/g)].map(([tag]) => tag.match(/aria-label="([^"]+)"/)?.[1]);
+  assert.deepEqual(labels, ['目的を選び直す', '元に戻す', 'やり直す', '保存・開く', '共有・書き出し']);
+  const status = bar.match(/<span\b[^>]*data-save-status[^>]*>/)[0];
+  assert.match(status, /role="status"/);
+  assert.match(status, /aria-live="polite"/);
+});
+
+test('構成の操作を畳むCSSは、幅1100px以上でホバーできる端末の非選択・非操作行だけに効く', () => {
+  const css = readFileSync(new URL('../../app.css', import.meta.url), 'utf8');
+  const desktop = css.match(/@media \(min-width: 1100px\) and \(hover: hover\)\s*\{((?:[^{}]|\{[^{}]*\})*)\}/)?.[1];
+  assert.ok(desktop);
+  const hidden = desktop.match(/\.ed-row:not\(([^)]+)\) \.ed-row-actions\s*\{([^}]+)\}/);
+  assert.ok(hidden);
+  assert.deepEqual(hidden[1].split(/,\s*/), ['.is-selected', ':hover', ':focus-within']);
+  assert.match(hidden[2], /height:\s*0;/);
+  assert.match(hidden[2], /opacity:\s*0;/);
+  assert.match(hidden[2], /pointer-events:\s*none;/);
+  assert.doesNotMatch(css, /\.ed-row-actions\s*\{[^}]*(display:\s*none|visibility:\s*hidden)/);
+});
