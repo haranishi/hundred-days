@@ -1,51 +1,65 @@
 export function mountToast(root) {
-  const entries = new Map();
-  function remove(item) {
-    entries.get(item)?.stop();
-    entries.delete(item);
-    item.remove();
+  const doc = root.ownerDocument;
+  let current;
+  let timer;
+
+  function clear() {
+    clearTimeout(timer);
+    if (!current) return;
+    current.events.abort();
+    current.item.remove();
+    current = null;
+  }
+
+  function restart() {
+    clearTimeout(timer);
+    if (!current || current.kind === 'error' || current.item.matches(':hover, :focus-within')) return;
+    timer = setTimeout(clear, current.label ? 10000 : 5500);
   }
 
   function toast(message, { kind = 'info', actionLabel, onAction } = {}) {
-    const item = document.createElement('div');
+    const label = typeof onAction === 'function' ? actionLabel : undefined;
+    if (current && current.message === message && current.kind === kind && current.label === label) {
+      // 同じ案内をもう一度読み上げず、ボタンは直近の操作を指すようにする。
+      current.onAction = onAction;
+      restart();
+      return;
+    }
+
+    clear();
+    const item = doc.createElement('div');
     item.className = 'app-toast';
     item.dataset.kind = kind;
-    const text = document.createElement('span');
+    if (kind === 'error') item.setAttribute('role', 'alert');
+    const text = doc.createElement('span');
     text.textContent = message;
     item.append(text);
-    if (kind === 'error') item.setAttribute('role', 'alert');
-    const delay = onAction || kind === 'error' ? 10000 : 5500;
-    let timer;
-    const stop = () => clearTimeout(timer);
-    function restart() {
-      stop();
-      if (!item.matches(':hover, :focus-within')) timer = setTimeout(() => remove(item), delay);
-    }
-    if (actionLabel && typeof onAction === 'function') {
-      const origin = document.activeElement;
-      const button = document.createElement('button');
+
+    const entry = { item, message, kind, label, onAction, events: new AbortController() };
+    current = entry;
+    const listen = { signal: entry.events.signal };
+    if (label) {
+      const origin = doc.activeElement;
+      const button = doc.createElement('button');
       button.type = 'button';
       button.className = 'app-toast-action';
-      button.textContent = actionLabel;
+      button.textContent = label;
       button.addEventListener('click', () => {
-        const hadFocus = item.contains(document.activeElement);
-        remove(item);
-        onAction();
+        const hadFocus = item.contains(doc.activeElement);
+        clear();
+        entry.onAction();
         if (hadFocus && origin?.isConnected && !origin.disabled && origin.getClientRects().length) origin.focus({ preventScroll: true });
-      });
+      }, listen);
       item.append(button);
     }
-    item.addEventListener('focusin', stop);
-    item.addEventListener('focusout', () => queueMicrotask(() => { if (item.isConnected) restart(); }));
-    item.addEventListener('pointerenter', stop);
-    item.addEventListener('pointerleave', restart);
-    entries.set(item, { stop });
+    const stop = () => clearTimeout(timer);
+    item.addEventListener('focusin', stop, listen);
+    item.addEventListener('focusout', () => queueMicrotask(() => { if (current === entry) restart(); }), listen);
+    item.addEventListener('pointerenter', stop, listen);
+    item.addEventListener('pointerleave', restart, listen);
     root.append(item);
-    if (entries.size > 3) {
-      const oldest = [...entries.keys()].find(node => !node.contains(document.activeElement));
-      if (oldest) remove(oldest);
-    }
     restart();
   }
-  return { toast, destroy() { for (const item of entries.keys()) remove(item); } };
+
+  return { toast, clear, destroy: clear };
 }

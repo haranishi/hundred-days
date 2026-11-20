@@ -23,7 +23,20 @@ test('19種の役割・置き場所・迷いやすい点は、それぞれ60字�
   }
 });
 
-test('理由・補足に未確認の言い切りがなく、全15項目から確度つきの出典をたどれる', () => {
+test('部品の説明は迷いや取り違えの可能性を伝え、来た人の行動を言い切らない', () => {
+  for (const type of ['steps', 'team', 'form']) {
+    assert.match(BLOCK_INFO[type].mistake, /迷いやすくなります。$/u, type);
+  }
+  assert.match(BLOCK_INFO.limited.mistake, /実際の空きと取り違えられやすくなります。$/u);
+  for (const [type, info] of Object.entries(BLOCK_INFO)) {
+    for (const text of Object.values(info)) {
+      assert.doesNotMatch(text, /迷います|取り違えます|誰でも|だれでも|すべて|必ず/u, type);
+    }
+    assert.doesNotMatch(info.mistake, /見えません|伝わりません|わからなくなります|見比べられません|見当がつきません|抱えたまま移動します/u, type);
+  }
+});
+
+test('全15項目の理由・補足に未確認の言い切りがなく、出典がある項目だけにリンクがある', () => {
   const full = { ...MINIMAL, blocks: Array.from({ length: 18 }, (_, i) => makeBlock('reserve', 'hero', `b${i + 1}`)) };
   const twelve = buildFromRecipe('buy');
   twelve.blocks = ['hero', 'benefits', 'compare', 'voices', 'menu', 'guarantee', 'proof', 'story', 'team', 'steps', 'cta', 'footer']
@@ -39,9 +52,13 @@ test('理由・補足に未確認の言い切りがなく、全15項目から確
       assert.ok(item.sources.length > 0, item.id);
       for (const entry of item.sources) {
         assert.ok(entry.label.trim(), item.id);
-        assert.match(entry.url, /^https:\/\//u);
-        assert.equal(new URL(entry.url).protocol, 'https:');
         assert.ok(['確認済み', '一部確認', '独自の整理'].includes(entry.confidence));
+        // 独自の基準に別の話題の資料を添えると、資料が基準を支えているように見えてしまう。
+        if (entry.confidence === '独自の整理') assert.equal(entry.url, undefined, item.id);
+        else {
+          assert.match(entry.url, /^https:\/\//u);
+          assert.equal(new URL(entry.url).protocol, 'https:');
+        }
       }
       if (['hero-title-short', 'form-short', 'not-too-long'].includes(item.id)) assert.ok(item.note.includes(guide), item.id);
       if (item.id === 'flow-complete') {
@@ -59,9 +76,13 @@ test('理由・補足に未確認の言い切りがなく、全15項目から確
 
 test('調査の確度を配置の一般論に広げず、数値の目安は補足で示す', () => {
   const items = diagnose(buildFromRecipe('reserve')).items;
-  for (const id of ['hero-first', 'action-reachable-again', 'faq-before-last-action', 'no-adjacent-same', 'not-too-long']) {
-    assert.ok(items.find(i => i.id === id).sources.every(s => s.confidence === '一部確認'), id);
+  for (const [id, confidence] of [
+    ['hero-first', '一部確認'], ['action-reachable-again', '一部確認'], ['faq-before-last-action', '一部確認'],
+    ['no-adjacent-same', '独自の整理'], ['not-too-long', '独自の整理'],
+  ]) {
+    assert.deepEqual(new Set(items.find(i => i.id === id).sources.map(s => s.confidence)), new Set([confidence]), id);
   }
+  assert.match(items.find(i => i.id === 'no-adjacent-same').note, /同じ形式を続けるのが向く場面/u);
   for (const [id, threshold] of [['hero-title-short', '28字'], ['form-short', '4項目'], ['not-too-long', '12部品']]) {
     const item = items.find(i => i.id === id);
     assert.ok(item.note.includes(threshold));

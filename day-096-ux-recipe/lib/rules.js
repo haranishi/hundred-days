@@ -11,43 +11,49 @@ export const CONFIDENCE_NOTE = {
 };
 
 const guide = 'このアプリの目安です（調査で決まった基準ではありません）。';
-const buttonSource = { label: '英国政府デザインシステム・ボタンの名前', url: 'https://design-system.service.gov.uk/components/button/', confidence: '確認済み' };
 
-function source(label, url, confidence = '確認済み') {
+function source(label, url, confidence) {
   return { label, url, confidence };
 }
+
+const buttonSource = source('英国政府デザインシステム・ボタンの名前', 'https://design-system.service.gov.uk/components/button/', '確認済み');
+const startButtonSource = source('英国政府デザインシステム・ボタン（開始のボタンを含む）', buttonSource.url, '一部確認');
+const appGuideline = { label: CONFIDENCE_NOTE['独自の整理'], confidence: '独自の整理' };
 
 const copy = {
   'has-action': {
     level: 'must', title: '手続きに進む入口がある',
-    why: 'ボタンや入力欄があると、来た人は手続きに進めます。',
-    sources: [buttonSource],
+    why: 'ボタンや入力欄があると、来た人が手続きに進みやすくなります。',
+    sources: [startButtonSource],
   },
   'hero-first': {
     level: 'must', title: 'ページの先頭に用件を伝える見出しがある',
-    why: '来た人が、冒頭で自分の用件に合うページか判断できます。',
+    why: '冒頭に用件が書いてあると、自分に合うページか判断しやすくなります。',
     sources: [source('NN/g・ホームページの冒頭で伝えること', 'https://www.nngroup.com/articles/top-ten-guidelines-for-homepage-usability/', '一部確認')],
   },
   'flow-complete': {
     level: 'must', title: 'お客さんの各段階に応じた案内がある',
-    why: '手続きの前後に、来た人が何を確かめられるか見渡せます。',
-    sources: [source('英国政府デザインシステム・手続き後の案内を考える参考', 'https://design-system.service.gov.uk/patterns/confirmation-pages/', '独自の整理')],
+    why: '手続きの前後にどんな案内があるか、段階ごとに見渡しやすくなります。',
+    sources: [appGuideline],
   },
   'trust-before-action': {
     level: 'must', title: '最初の手続きの前に信頼を判断する材料がある',
-    why: '来た人が、仕事ぶりを見てから任せたい相手か考えられます。',
-    sources: [source('NN/g・手続きを頼む前の信頼', 'https://www.nngroup.com/articles/commitment-levels/')],
+    why: '先に仕事ぶりを見られると、任せたい相手かどうかを考えやすくなります。',
+    sources: [source('NN/g・個人情報を求める前に示す判断材料', 'https://www.nngroup.com/articles/commitment-levels/', '一部確認')],
   },
   'honest-limited': {
     level: 'must', title: '期限や人数の表示すべてに確認の印がある',
-    why: '来た人は、本当の期限や空き状況をもとに予定を立てられます。',
+    why: '実際の期限や空き状況がわかると、予定を立てやすくなります。',
     note: '表示した期限や人数を受付の記録と照らしてから、その部品の編集欄で「本当の数字です」に印を付けてください。',
-    sources: [source('消費者庁・期限表示の事例', 'https://www.caa.go.jp/policies/future/ppi/assets/caa_futurer101_251003_01.pdf#page=7')],
+    sources: [source('消費者庁・残り時間が延びる表示の事例', 'https://www.caa.go.jp/policies/future/ppi/assets/caa_futurer101_251003_01.pdf#page=7', '一部確認')],
   },
   'price-before-action': {
     level: 'should', title: '最初の手続きの前に費用の案内がある',
-    why: '来た人が、申し込む前に予算に合うか確かめられます。',
-    sources: [source('Baymard・注文前にわかる送料', 'https://baymard.com/research-articles/show-shipping-costs-on-product-pages')],
+    why: '申し込む前に費用がわかると、予算に合うか判断しやすくなります。',
+    sources: [
+      source('Baymard・注文前にわかる送料', 'https://baymard.com/research-articles/show-shipping-costs-on-product-pages', '一部確認'),
+      source('英国政府デザインシステム・サービスを使い始める前の案内', 'https://design-system.service.gov.uk/patterns/start-using-a-service/', '一部確認'),
+    ],
   },
   'button-label-result': {
     level: 'should', title: 'どのボタンにも押した結果がわかる名前がある',
@@ -58,23 +64,23 @@ const copy = {
     level: 'should', title: 'ボタンの呼び方にまとまりがある',
     why: '同じ操作の名前がそろうと、来た人が見つけやすくなります。',
     note: '案内を見るボタンと申し込みを送るボタンには、それぞれの働きに合う名前を使えます。',
-    sources: [source('W3C・同じ機能に一貫した名前を付ける', 'https://www.w3.org/WAI/WCAG22/Understanding/consistent-identification')],
+    sources: [source('W3C・同じ機能に一貫した名前を付ける', 'https://www.w3.org/WAI/WCAG22/Understanding/consistent-identification', '確認済み')],
   },
   'form-short': {
     level: 'should', title: '手短に記入できる申し込み欄がある',
     why: '尋ねることを絞ると、来た人の記入の手間が減ります。',
     note: '入力欄が4項目以内なら、この項目に印が付きます。' + guide,
-    sources: [source('W3C・利用しやすい入力フォーム', 'https://www.w3.org/WAI/tutorials/forms/')],
+    sources: [source('W3C・利用しやすい入力フォーム', 'https://www.w3.org/WAI/tutorials/forms/', '確認済み')],
   },
   'hero-title-short': {
     level: 'tip', title: '入口に拾い読みしやすい短い見出しがある',
     why: '中身が伝わる短い見出しは、読みたい箇所を探す手がかりです。',
     note: '冒頭の見出しが28字以内なら、この項目に印が付きます。' + guide,
-    sources: [source('NN/g・見出しを手がかりに読む行動', 'https://www.nngroup.com/articles/layer-cake-pattern-scanning/')],
+    sources: [source('NN/g・見出しを手がかりに読む行動', 'https://www.nngroup.com/articles/layer-cake-pattern-scanning/', '一部確認')],
   },
   'faq-before-last-action': {
     level: 'tip', title: '最後の手続きの前に疑問に答える場所がある',
-    why: '申し込みで迷ったとき、気になる条件のそばで答えを探せます。',
+    why: '申し込みで迷ったとき、手続きの前に気になる条件を確かめやすくなります。',
     note: '質問をひとまとめにするほか、料金や使い方の説明に答えを添える方法もあります。',
     sources: [source('Baymard・商品を選ぶときの質問と回答', 'https://baymard.com/research-articles/product-page-faq-and-qa', '一部確認')],
   },
@@ -85,21 +91,24 @@ const copy = {
   },
   'no-adjacent-same': {
     level: 'tip', title: '隣り合う部品の種類に変化がある',
-    why: '関連する話がまとまると、来た人がつながりをつかめます。',
+    why: '部品の種類が変わると、話の切れ目に気づきやすくなります。',
     note: 'いくつかの商品を比べてほしいときなど、同じ形式を続けるのが向く場面もあります。',
-    sources: [source('NN/g・関連する情報のまとめ方', 'https://www.nngroup.com/articles/chunking/', '一部確認')],
+    sources: [appGuideline],
   },
   'not-too-long': {
     level: 'tip', title: '部品数を絞った構成がある',
-    why: '大切なことを先に伝えると、来た人が探す手間を減らせます。',
+    why: '部品を絞ると、来た人が大切な案内を見つけやすくなります。',
     note: 'ページが12部品以内なら、この項目に印が付きます。' + guide,
-    sources: [source('NN/g・スクロールと注意の向き方', 'https://www.nngroup.com/articles/scrolling-and-attention/', '一部確認')],
+    sources: [appGuideline],
   },
   'replace-samples': {
     level: 'tip', title: '見本を自分の案内に書き換えた文章がある',
-    why: '来た人が、実際の品物やサービスの様子を思い描けます。',
+    why: '実際の品物やサービスに合わせて書くと、使う場面を思い描きやすくなります。',
     note: 'この目的の見本と同じ文章が残っている部品を示します。ボタンの名前や注意書きも含みます。',
-    sources: [source('Studio・テンプレートの文章を編集する', 'https://help.studio.design/ja/articles/9974045-テンプレートを編集する')],
+    sources: [
+      source('Studio・テンプレートの文章を編集する手順', 'https://help.studio.design/ja/articles/9974045-テンプレートを編集する', '一部確認'),
+      source('Shopify・商品説明の書き方', 'https://www.shopify.com/jp/blog/seo-product-descriptions', '一部確認'),
+    ],
   },
 };
 

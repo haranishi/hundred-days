@@ -1,14 +1,37 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { bootChoice, resolveStart, createAutosaver, createEditor, openSavedState } from '../../app.js';
+import * as session from '../../app.js';
+import { createState } from '../../lib/state.js';
 import { MINIMAL, RESERVE_SAMPLE } from '../fixtures/states.js';
 
-test('共有リンク、目的指定、保存、入口の順で開始し、fresh は共有リンクに影響しない', () => {
+test('共有リンクを優先し、目的指定で編集済みの下書きを置き換えるときは入口に戻る', () => {
   assert.deepEqual(bootChoice({ hash: '#v=abc', search: '?goal=buy&fresh=1' }, MINIMAL), { screen: 'viewer', code: 'abc' });
-  assert.deepEqual(bootChoice({ search: '?goal=buy' }, MINIMAL), { screen: 'editor', goal: 'buy' });
+  assert.deepEqual(bootChoice({ search: '?goal=buy' }, createState('reserve')), { screen: 'editor', goal: 'buy' });
+  assert.deepEqual(bootChoice({ search: '?goal=buy' }, MINIMAL), {
+    screen: 'goal', notice: '続きの作業があるため、目的の選択から始めます。',
+  });
   assert.deepEqual(bootChoice({ search: '?goal=constructor' }, MINIMAL), { screen: 'editor', state: MINIMAL });
   assert.deepEqual(bootChoice({ search: '?fresh=1' }, MINIMAL), { screen: 'goal' });
   assert.deepEqual(bootChoice({}, null), { screen: 'goal' });
+});
+
+test('遅いAの解決中にBへ移ったとき、起動時に適用するのは最後のURLだけ', async () => {
+  const location = { hash: '#v=A', search: '' };
+  const first = Promise.withResolvers();
+  const reads = [];
+  const displayed = [];
+  const start = session.startAtCurrentHash(location, MINIMAL, route => displayed.push(route), async (url, saved) => {
+    assert.equal(saved, MINIMAL);
+    reads.push(url.hash);
+    if (url.hash === '#v=A') await first.promise;
+    return { screen: 'viewer', state: url.hash === '#v=A' ? MINIMAL : RESERVE_SAMPLE };
+  });
+  location.hash = '#v=B';
+  first.resolve();
+  await start;
+  assert.deepEqual(reads, ['#v=A', '#v=B']);
+  assert.deepEqual(displayed, [{ screen: 'viewer', state: RESERVE_SAMPLE }]);
 });
 
 test('読み取れない共有リンクは理由を添えて入口へ戻る。保存や目的は開かない', async () => {

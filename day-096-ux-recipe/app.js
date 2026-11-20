@@ -1,14 +1,15 @@
-import { DEVICES, GOALS, GOAL_LABEL, HASH_VIEW, sanitizeState } from './lib/contract.js';
-import { createState, reduce, createHistory, commit, present, undo, redo, canUndo, canRedo } from './lib/state.js';
+import { DEVICES, GOALS, GOAL_LABEL, HASH_VIEW, STORAGE_PREFIX, validateState } from './lib/contract.js';
+import { createState, restoreState, reduce, createHistory, commit, present, undo, redo, canUndo, canRedo } from './lib/state.js';
 import { diagnose } from './lib/rules.js';
+import { isUntouched } from './lib/sample.js';
 import * as storage from './lib/persist.js';
 import { decodeState, viewUrl } from './lib/codec.js';
 import { renderPage } from './lib/render.js';
-import { mountGoal } from './lib/ui-goal.js';
+import { createDraftDialog, DRAFT_WARNING, mountGoal } from './lib/ui-goal.js';
 import { mountOutline } from './lib/ui-outline.js';
 import { mountPreview, installPageStyle } from './lib/ui-preview.js';
 import { mountPalette } from './lib/ui-palette.js';
-import { mountTopbar } from './lib/ui-topbar.js';
+import { mountStorageNotice, mountTopbar } from './lib/ui-topbar.js';
 import { mountToast } from './lib/ui-toast.js';
 import { mountKeys } from './lib/keys.js';
 import { mountInspector } from './lib/ui-inspector.js';
@@ -19,9 +20,14 @@ import { mountSlots } from './lib/ui-slots.js';
 
 const TABS = ['outline', 'edit', 'diagnosis', 'look'];
 
-function readReplacement(raw) {
-  try { return sanitizeState(raw); }
-  catch { return null; }
+const LINK_HELP = '送ってくれた人にリンクをもう一度送ってもらうか、下から目的を選んで始めてください。';
+const CURRENT_KEY = STORAGE_PREFIX + 'current';
+
+function readOtherDraft(value) {
+  try {
+    const raw = JSON.parse(value);
+    return validateState(raw).length ? null : restoreState(raw);
+  } catch { return null; }
 }
 
 export function bootChoice({ hash = '', search = '' }, saved) {
@@ -29,7 +35,10 @@ export function bootChoice({ hash = '', search = '' }, saved) {
   const prefix = '#' + HASH_VIEW + '=';
   if (hash.startsWith(prefix)) return { screen: 'viewer', code: hash.slice(prefix.length) };
   const goal = query.get('goal');
-  if (GOALS.includes(goal)) return { screen: 'editor', goal };
+  if (GOALS.includes(goal)) {
+    if (saved && !isUntouched(saved)) return { screen: 'goal', notice: '続きの作業があるため、目的の選択から始めます。' };
+    return { screen: 'editor', goal };
+  }
   if (saved && query.get('fresh') !== '1') return { screen: 'editor', state: saved };
   return { screen: 'goal' };
 }
@@ -42,6 +51,18 @@ export async function resolveStart(location, saved, decode = decodeState) {
     return result.ok ? { screen: 'viewer', state: result.state } : { screen: 'goal', reason: result.reason };
   } catch {
     return { screen: 'goal', reason: 'このリンクを読み取れませんでした。' };
+  }
+}
+
+export async function startAtCurrentHash(location, saved, display, resolve = resolveStart) {
+  // 復号中にリンクが変わった場合、古い画面で新しいURLを消費しないようにする。
+  for (;;) {
+    const { hash, search } = location;
+    const route = await resolve({ hash, search }, saved);
+    if (hash === location.hash) {
+      display(route);
+      return;
+    }
   }
 }
 
@@ -65,6 +86,10 @@ export function createAutosaver(write, report) {
       timer = setTimeout(flush, 400);
     },
     flush,
+    cancel() {
+      clearTimeout(timer);
+      pending = null;
+    },
   };
 }
 
@@ -110,14 +135,14 @@ export function createEditor(initial, { onDirty = () => {}, onSelect = () => {},
     getState, getHistory: () => history, getSelectedId: () => selectedId,
     getTab: () => tab, getDevice: () => device, diagnose: diagnosis,
     isMobilePanelOpen: () => mobilePanelOpen,
-    dispatch(action, { coalesce } = {}) {
+    dispatch(action, { coalesce, dirty = true } = {}) {
       let next;
       try { next = reduce(getState(), action); }
       catch (error) {
         if (action?.type === 'replace') return false;
         throw error;
       }
-      return update(commit(history, next, coalesce), 'dispatch', action);
+      return update(commit(history, next, coalesce), 'dispatch', action, dirty);
     },
     restart(state, { dirty = true } = {}) { return update(createHistory(state), 'load', undefined, dirty); },
     undo: () => update(undo(history), 'undo'), redo: () => update(redo(history), 'redo'),
@@ -160,13 +185,17 @@ export function createEditor(initial, { onDirty = () => {}, onSelect = () => {},
   };
 }
 
-export function openSavedState(ctx, state, draft) {
-  const clean = readReplacement(state);
+function replaceDraft(ctx, state, draft, dirty) {
+  const clean = restoreState(state);
   if (!clean) return false;
-  if (!draft) return ctx.restart(clean);
-  // リンクから来た人も、以前の下書きがあれば1回の「元に戻す」で戻れるようにする。
+  if (!draft) return ctx.restart(clean, { dirty });
+  // 見本を選んだだけでも履歴には載せる。端末の下書きは最初の編集まで残す。
   if (ctx.getState() !== draft) ctx.restart(draft, { dirty: false });
-  return ctx.dispatch({ type: 'replace', state: clean });
+  return ctx.dispatch({ type: 'replace', state: clean }, { dirty });
+}
+
+export function openSavedState(ctx, state, draft) {
+  return replaceDraft(ctx, state, draft, true);
 }
 
 function mountPanelLayout(editor, ctx) {
@@ -226,6 +255,7 @@ function mountPanelLayout(editor, ctx) {
     }
   }, listen);
   panel.addEventListener('keydown', e => {
+    if (e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return;
     const visible = tabs.filter(tab => !tab.hidden);
     const index = visible.indexOf(e.target);
     if (index < 0) return;
@@ -240,18 +270,22 @@ function mountPanelLayout(editor, ctx) {
   twoColumns.addEventListener('change', arrange, listen);
   arrange();
   const unsubscribe = ctx.subscribe(paint);
-  return { destroy() { unsubscribe(); events.abort(); } };
+  return { destroy() {
+    unsubscribe();
+    events.abort();
+    if (outline.parentElement === holder) preview.before(outline);
+  } };
 }
 
 function mountViewer(root, state, ctx, adopt) {
   installPageStyle(root.ownerDocument);
   const page = root.querySelector('[data-view-page]');
   page.innerHTML = renderPage(state, { mode: 'export' });
-  root.querySelector('[data-score]').textContent = 'UX診断 ' + ctx.diagnose().score + '点';
+  root.querySelector('[data-score]').textContent = 'UX診断 ' + diagnose(state).score + '点';
   function click(event) {
     const target = event.target.closest('button, a');
     if (!target) return;
-    if (target.hasAttribute('data-adopt')) adopt(state);
+    if (target.hasAttribute('data-adopt')) adopt(state, target);
     else if (target.hasAttribute('data-choose')) ctx.toGoalScreen();
     else if (target.hasAttribute('data-app-send')) ctx.openAppShare(target);
     else if (page.contains(target) && target.matches('a[href^="#"]')) {
@@ -276,57 +310,90 @@ export async function mountApp(root) {
   const local = id => root.querySelector('#' + id);
   const query = new URLSearchParams(location.search);
   const base = location.origin + location.pathname;
+  const events = new AbortController();
+  const listen = { signal: events.signal };
+  let canonical;
   // 手元でも「このアプリを共有する」には、受け取った人のレシピや起動用の引数を含めない。
   if (!doc.querySelector('link[rel="canonical"]')) {
-    const canonical = doc.createElement('link');
+    canonical = doc.createElement('link');
     canonical.rel = 'canonical';
     canonical.href = base;
     doc.head.append(canonical);
   }
-  const live = local('toasts');
+  const originalLive = local('toasts');
+  const live = originalLive ?? doc.createElement('div');
+  if (!originalLive) {
+    live.id = 'toasts';
+    live.className = 'app-toasts';
+    live.setAttribute('aria-live', 'polite');
+    live.setAttribute('aria-relevant', 'additions');
+    root.append(live);
+  }
   const notifications = mountToast(live);
+  let toastDialog;
+  let undoState;
+  function clearUndoToast() {
+    if (!undoState) return;
+    undoState = null;
+    notifications.clear();
+  }
+  function returnNotifications(event) {
+    if (event && (event.target !== toastDialog || toastDialog.open)) return;
+    toastDialog?.removeEventListener('close', returnNotifications);
+    toastDialog = null;
+    if (live.parentElement !== root) root.append(live);
+  }
   function placeNotifications() {
-    const layer = [...root.querySelectorAll('dialog[open]')].at(-1) ?? root;
+    if (events.signal.aborted) return;
+    const dialog = [...root.querySelectorAll('dialog[open]')].at(-1);
+    if (toastDialog !== dialog) {
+      toastDialog?.removeEventListener('close', returnNotifications);
+      toastDialog = dialog;
+      dialog?.addEventListener('close', returnNotifications, listen);
+    }
+    const layer = dialog ?? root;
     if (live.parentElement !== layer) layer.append(live);
   }
   function toast(message, options) {
+    if (events.signal.aborted) return;
+    undoState = options?.actionLabel === '元に戻す' && typeof options.onAction === 'function' ? ctx.getState() : null;
     // 開いているダイアログの外は読み上げ対象から外れるため、結果も同じ面に出す。
     placeNotifications();
     notifications.toast(message, options);
-    queueMicrotask(placeNotifications);
   }
-  let draft = query.get('fresh') === '1' ? null : undefined;
-  function currentDraft() {
-    if (draft !== undefined) return draft;
-    try { draft = storage.loadCurrent(); }
-    catch {
-      draft = null;
-      toast('端末の下書きを読み取れませんでした。', { kind: 'error' });
-    }
-    return draft;
+  let draft = null;
+  try { draft = storage.loadCurrent(); }
+  catch {
+    toast('端末の下書きを読み取れませんでした。', { kind: 'error' });
   }
-  const explicit = bootChoice(location, null);
-  const route = await resolveStart(location, explicit.screen === 'goal' ? currentDraft() : null);
-  const initial = route.state ?? createState(route.goal ?? GOALS[0]);
+  const currentDraft = () => draft;
   let editor;
   let viewer;
+  let viewerOrigin;
   let choosingAgain = false;
   let saveStatus = draft ? 'saved' : 'idle';
   let saveFailureShown = false;
-  const saver = createAutosaver(state => storage.saveCurrent(state), status => {
+  let otherDraft;
+  let conflictNotice;
+  function visibleSaveStatus() {
+    if (otherDraft) return 'paused';
+    return ctx.getState() === draft ? saveStatus : 'idle';
+  }
+  function reportSave(status) {
     saveStatus = status;
-    editor?.topbar.setSaveStatus(status);
+    editor?.topbar.setSaveStatus(visibleSaveStatus());
     if (status === 'error' && !saveFailureShown) {
       toast('端末に保存できませんでした。共有リンクからページを残せます。', { kind: 'error' });
       saveFailureShown = true;
     }
     if (status === 'saved') saveFailureShown = false;
-  });
-  const ctx = createEditor(initial, {
+  }
+  const saver = createAutosaver(state => storage.saveCurrent(state), reportSave);
+  const ctx = createEditor(draft ?? createState(), {
     onDirty(state) {
-      if (root.dataset.screen !== 'editor') return;
+      if (events.signal.aborted || root.dataset.screen !== 'editor') return;
       draft = state;
-      saver.schedule(state);
+      if (!otherDraft) saver.schedule(state);
     },
     onSelect(id, path) {
       editor?.preview.scrollToBlock(id);
@@ -339,16 +406,23 @@ export async function mountApp(root) {
       }
     },
   });
+  const stopWatchingUndo = ctx.subscribe(({ state, reason }) => {
+    if (undoState !== state || reason === 'load') clearUndoToast();
+  });
 
   const screens = { goal: local('screen-goal'), editor: local('screen-edit'), viewer: local('screen-view') };
-  const events = new AbortController();
-  const listen = { signal: events.signal };
   let navigation = 0;
+  let handledHash;
+  let proposal;
+  const draftDialog = createDraftDialog(doc);
+  root.append(draftDialog);
   const openers = new Map();
   function openDialog(dialog, trigger, open = () => dialog.showModal()) {
-    if (dialog.open) return;
+    if (dialog.open || events.signal.aborted) return;
     openers.set(dialog, trigger ?? doc.activeElement);
-    return open();
+    const result = open();
+    if (live.childElementCount) placeNotifications();
+    return result;
   }
   function focusScreen() {
     const target = root.dataset.screen === 'editor' ? screens.editor.querySelector('[data-site]') : screens.goal.querySelector('h1');
@@ -357,7 +431,7 @@ export async function mountApp(root) {
   for (const dialog of root.querySelectorAll('dialog')) {
     dialog.addEventListener('close', () => {
       if (dialog.open) return;
-      placeNotifications();
+      if (proposal?.dialog === dialog) proposal = null;
       const button = openers.get(dialog);
       openers.delete(dialog);
       if (root.querySelector('dialog[open]')) return;
@@ -371,23 +445,34 @@ export async function mountApp(root) {
     }, listen);
   }
 
+  function closeDialogs() {
+    proposal = null;
+    for (const dialog of root.querySelectorAll('dialog[open]')) {
+      openers.delete(dialog);
+      dialog.close();
+    }
+    returnNotifications();
+  }
   function show(screen) {
+    navigation += 1;
+    if (screen !== root.dataset.screen) clearUndoToast();
+    closeDialogs();
     if (viewer && screen !== 'viewer') { viewer.destroy(); viewer = null; }
     root.dataset.screen = screen;
     for (const [key, node] of Object.entries(screens)) node.hidden = key !== screen;
     if (screen === 'goal') goalUI.setDraft(currentDraft());
   }
   function consumeRoute() {
-    navigation += 1;
     const url = new URL(location.href);
     url.searchParams.delete('goal');
     url.searchParams.delete('fresh');
     if (url.hash.startsWith('#' + HASH_VIEW + '=')) url.hash = '';
     if (url.href !== location.href) window.history.replaceState(window.history.state, '', url.href);
+    handledHash = location.hash;
   }
   let shownTip = false;
-  function enterEditor(change) {
-    ctx.foldPanel();
+  function enterEditor(change = () => {}, preservePanel = false) {
+    if (!preservePanel) ctx.foldPanel();
     show('editor');
     choosingAgain = false;
     change();
@@ -403,7 +488,7 @@ export async function mountApp(root) {
       };
     }
     editor.preview.resume();
-    editor.topbar.setSaveStatus(saveStatus);
+    editor.topbar.setSaveStatus(visibleSaveStatus());
     consumeRoute();
     focusScreen();
     if (!shownTip && query.get('tips') !== '0' && !storage.hasSeen('editor-tip')) {
@@ -426,25 +511,45 @@ export async function mountApp(root) {
     if (!draft) return;
     enterEditor(() => { if (ctx.getState() !== draft) ctx.restart(draft, { dirty: false }); });
   }
-  const confirmation = local('dlg-goal-change');
-  let proposedGoal;
+  const goalDialog = local('dlg-goal-change');
+  const goalConfirm = goalDialog.querySelector('[data-confirm]');
+  const originalGoalLabel = goalConfirm.textContent;
+  function confirmReplacement(dialog, trigger, apply) {
+    if (!draft || isUntouched(draft)) { apply(); return; }
+    proposal = { dialog, navigation, hash: location.hash, apply };
+    openDialog(dialog, trigger);
+  }
+  for (const dialog of [draftDialog, goalDialog]) {
+    dialog.querySelector('[data-confirm]').addEventListener('click', () => {
+      const pending = proposal;
+      if (!dialog.open || pending?.dialog !== dialog || pending.navigation !== navigation || pending.hash !== location.hash) return;
+      proposal = null;
+      dialog.close();
+      pending.apply();
+    }, listen);
+  }
+  function startRecipe(goal, keepTheme = false) {
+    enterEditor(() => {
+      if (keepTheme) ctx.dispatch({ type: 'setGoal', goal }, { dirty: false });
+      else replaceDraft(ctx, createState(goal), currentDraft(), false);
+    });
+  }
   function chooseGoal(goal, trigger) {
     if (!GOALS.includes(goal)) return;
-    if (!choosingAgain) { enterEditor(() => ctx.restart(createState(goal))); return; }
-    if (goal === ctx.getState().goal) { resume(); return; }
-    proposedGoal = goal;
-    local('ed-confirm-note').textContent = '「' + GOAL_LABEL[goal] + '」の部品に入れ替えます。見た目は引き継ぎます。変更後も元に戻せます。';
-    openDialog(confirmation, trigger);
+    if (!choosingAgain) {
+      confirmReplacement(draftDialog, trigger, () => startRecipe(goal));
+      return;
+    }
+    if (goal === ctx.getState().goal) { enterEditor(); return; }
+    local('ed-confirm-note').textContent = '「' + GOAL_LABEL[goal] + '」の部品に入れ替えます。見た目は引き継ぎます。変更後も元に戻せます。' + DRAFT_WARNING;
+    goalConfirm.textContent = '置き換える';
+    confirmReplacement(goalDialog, trigger, () => startRecipe(goal, true));
   }
-  confirmation.querySelector('[data-confirm]').addEventListener('click', () => {
-    confirmation.close();
-    enterEditor(() => ctx.dispatch({ type: 'setGoal', goal: proposedGoal }));
-  }, listen);
 
   const dispatch = ctx.dispatch;
   ctx.dispatch = (action, options) => {
     if (root.dataset.screen !== 'editor') {
-      if (action?.type !== 'replace' || !readReplacement(action.state)) return false;
+      if (action?.type !== 'replace' || !restoreState(action.state)) return false;
       enterEditor(() => openSavedState(ctx, action.state, currentDraft()));
       return true;
     }
@@ -457,6 +562,7 @@ export async function mountApp(root) {
     try { return operation(); }
     catch { return fallback; }
   }
+  const stateToSave = () => root.dataset.screen === 'editor' ? ctx.getState() : currentDraft();
   Object.assign(ctx, {
     toast, chooseGoal, toGoalScreen, resume,
     viewUrl: () => viewUrl(ctx.getState(), base),
@@ -471,7 +577,7 @@ export async function mountApp(root) {
         return rows ?? [];
       },
       save(name) {
-        const state = root.dataset.screen === 'goal' ? draft : ctx.getState();
+        const state = stateToSave();
         const result = state
           ? useSlot(() => storage.saveSlot(state, name), { ok: false, reason: 'この端末に保存できませんでした。' })
           : { ok: false, reason: '先にページの目的を選んでください。' };
@@ -499,22 +605,41 @@ export async function mountApp(root) {
   const goalUI = mountGoal(screens.goal, ctx);
   const palette = mountPalette(local('dlg-palette'), ctx);
   const share = mountShare(local('dlg-share'), ctx);
-  const slots = mountSlots(local('dlg-slots'), ctx);
+  // 入口での保存名と本文が、どちらも同じ下書きから取られるようにする。
+  const slots = mountSlots(local('dlg-slots'), { ...ctx, getState: stateToSave });
   const keys = mountKeys(root, ctx);
   function enterViewer(state) {
     saver.flush();
+    if (!viewer) viewerOrigin = editor && root.dataset.screen === 'editor' ? 'editor' : 'goal';
     viewer?.destroy();
     show('viewer');
     editor?.preview.pause();
-    if (ctx.getState() !== state) ctx.restart(state, { dirty: false });
-    viewer = mountViewer(screens.viewer, state, ctx, shared => enterEditor(() => openSavedState(ctx, shared, currentDraft())));
+    viewer = mountViewer(screens.viewer, state, ctx, (shared, trigger) => {
+      confirmReplacement(draftDialog, trigger, () => enterEditor(() => openSavedState(ctx, shared, currentDraft())));
+    });
+  }
+  function showEntrance(route) {
+    choosingAgain = false;
+    saver.flush();
+    show('goal');
+    if (route.reason || route.notice) {
+      consumeRoute();
+      focusScreen();
+      if (route.reason) toast(route.reason + LINK_HELP, { kind: 'error' });
+      else toast(route.notice);
+    }
   }
   async function followHash() {
-    const request = ++navigation;
     const hash = location.hash;
+    // 復号し終えたリンクの変更通知が遅れて届いても、新たに開いた確認を閉じない。
+    if (handledHash === hash) return;
+    handledHash = hash;
+    const request = ++navigation;
+    closeDialogs();
     if (!hash.startsWith('#' + HASH_VIEW + '=')) {
       if (root.dataset.screen === 'viewer') {
-        if (currentDraft()) resume();
+        if (viewerOrigin === 'editor') enterEditor(undefined, true);
+        else if (currentDraft()) resume();
         else toGoalScreen();
       }
       return;
@@ -523,36 +648,79 @@ export async function mountApp(root) {
     // 同じタブで次のリンクを開いた人に、先に開いたレシピを遅れて表示しない。
     if (request !== navigation || hash !== location.hash) return;
     if (next.screen === 'viewer') enterViewer(next.state);
-    else {
-      choosingAgain = false;
-      saver.flush();
-      show('goal');
-      consumeRoute();
-      focusScreen();
-      toast(next.reason, { kind: 'error' });
-    }
+    else showEntrance(next);
   }
-  window.addEventListener('hashchange', followHash, listen);
+  function clearConflict() {
+    otherDraft = null;
+    conflictNotice?.destroy();
+    conflictNotice = null;
+  }
+  function keepLocalDraft() {
+    if (!otherDraft) return;
+    clearConflict();
+    draft = ctx.getState();
+    saver.schedule(draft);
+    saver.flush();
+    focusScreen();
+  }
+  function loadOtherDraft() {
+    if (!otherDraft) return;
+    // 連続した書き込みでは、次のイベントが届く前に利用者が読み込みを選ぶこともある。
+    let latest;
+    try { latest = readOtherDraft(otherDraft.area?.getItem(CURRENT_KEY)); }
+    catch { /* 端末を読めなくなったら、受け取り時に検証した内容を使う。 */ }
+    draft = latest ?? otherDraft.state;
+    clearConflict();
+    ctx.restart(draft, { dirty: false });
+    reportSave('saved');
+    focusScreen();
+  }
+  function storageChanged(event) {
+    if (event.key !== CURRENT_KEY || event.newValue === null) return;
+    try {
+      if (event.storageArea && event.storageArea !== globalThis.localStorage) return;
+    } catch { return; }
+    const incoming = readOtherDraft(event.newValue);
+    if (!incoming) return;
+    // pagehide の即時保存も止める。入力中の値は、本人が選ぶまで編集履歴に残す。
+    saver.cancel();
+    otherDraft = { state: incoming, area: event.storageArea };
+    reportSave('paused');
+    conflictNotice ??= mountStorageNotice(local('slot-topbar'), keepLocalDraft, loadOtherDraft);
+  }
+  let ready = false;
+  window.addEventListener('storage', storageChanged, listen);
+  window.addEventListener('hashchange', () => { if (ready) void followHash(); }, listen);
   window.addEventListener('pagehide', saver.flush, listen);
   doc.addEventListener('visibilitychange', () => { if (doc.hidden) saver.flush(); }, listen);
 
-  if (route.screen === 'viewer') {
-    enterViewer(route.state);
-  } else if (route.screen === 'editor') {
-    enterEditor(() => {
-      if (route.goal) ctx.restart(initial);
-    });
-  } else {
-    show('goal');
-    if (route.reason) { consumeRoute(); toast(route.reason, { kind: 'error' }); }
-  }
+  await startAtCurrentHash(location, currentDraft(), route => {
+    if (handledHash !== location.hash) {
+      handledHash = location.hash;
+      if (route.screen === 'viewer') enterViewer(route.state);
+      else if (route.goal) startRecipe(route.goal);
+      else if (route.screen === 'editor') enterEditor();
+      else showEntrance(route);
+    }
+    ready = true;
+  });
   if (query.get('debug') === '1') window.__uxr = { ctx, getState: ctx.getState, dispatch: ctx.dispatch, diagnose: ctx.diagnose };
   root.dataset.ready = 'true';
   return { ctx, destroy() {
+    if (events.signal.aborted) return;
     navigation += 1;
     saver.flush();
+    closeDialogs();
     events.abort();
+    openers.clear();
+    stopWatchingUndo();
+    clearConflict();
     for (const part of [goalUI, palette, share, slots, keys, viewer, ...Object.values(editor ?? {}), notifications]) part?.destroy?.();
+    draftDialog.remove();
+    goalConfirm.textContent = originalGoalLabel;
+    local('ed-confirm-note').textContent = '';
+    canonical?.remove();
+    if (!originalLive) live.remove();
     if (window.__uxr?.ctx === ctx) delete window.__uxr;
     delete root.dataset.ready;
   } };

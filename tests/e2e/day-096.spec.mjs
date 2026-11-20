@@ -23,10 +23,10 @@ async function open(page, query = 'fresh=1', path = '') {
   return errors;
 }
 
-/** 目的を選ぶ。作業中の状態があるときは、確認ダイアログ（目的を変えますか？）で「目的を変える」を押す。 */
+/** 目的を選ぶ。作業中の状態があるときは、確認ダイアログ（置き換えますか？）で「置き換える」を押す。 */
 async function pickGoal(page, label) {
   await page.getByRole('button', { name: new RegExp(label) }).first().click();
-  const confirm = page.locator('#dlg-goal-change').getByRole('button', { name: '目的を変える' });
+  const confirm = page.locator('dialog[open]').getByRole('button', { name: /^(置き換える|目的を変える)$/ });
   if (await confirm.isVisible().catch(() => false)) await confirm.click();
 }
 /** 動き（アニメーション・遷移）が終わって、レイアウトが落ち着くまで待つ。寸法を測る前に使う（負荷が高いと途中の値を測って偶発的に落ちる）。 */
@@ -243,23 +243,34 @@ test.describe('組み立てと編集', () => {
 });
 
 test.describe('共有・書き出し・保存', () => {
-  test('共有リンク（#v=）を開くと「見るだけ」の画面になり、「もとに作る」で編集できる。壊れたリンクは理由を出す', async ({ page, browser }) => {
+  test('共有リンク（#v=）を開くと「見るだけ」の画面になり、「もとに作る」で編集できる。壊れたリンクは理由と次の手を出す', async ({ page, browser }) => {
     await startEditor(page);
     await tab(page, '見た目');
     await page.getByLabel('サイトの名前').fill('共有テスト');
     await page.getByRole('button', { name: '共有・書き出し' }).click();
-    const link = await page.locator('#dlg-share input[readonly]').first().inputValue();
-    expect(link).toContain('#v=');
-    const other = await (await browser.newContext()).newPage();
-    await other.goto(link);
-    await expect(other.locator('#app')).toHaveAttribute('data-screen', 'viewer', { timeout: 20_000 });
-    await expect(other.locator('.uxr-page')).toBeVisible();
-    await other.getByRole('button', { name: /このレシピをもとに作る/ }).click();
-    await expect(other.locator('#app')).toHaveAttribute('data-screen', 'editor');
-    const broken = await (await browser.newContext()).newPage();
-    await broken.goto(`${base}#v=zzzz`);
-    await expect(broken.locator('#app')).toHaveAttribute('data-screen', 'goal', { timeout: 20_000 });
-    await expect(broken.locator('#toasts')).toContainText('読み取れ');
+    // 共有リンクは非同期（圧縮）で作られ、できるまで欄は空・コピーのボタンは無効。値が入るのを待つ。
+    const field = page.locator('#dlg-share input[readonly]').first();
+    await expect(field).toHaveValue(/#v=/);
+    const link = await field.inputValue();
+    // 別のコンテキストはフィクスチャの管理の外。閉じないと、後続のテストの間も動き続けて遅くする（実際に全体が20〜40倍遅くなった）。
+    const receiver = await browser.newContext();
+    const stranger = await browser.newContext();
+    try {
+      const other = await receiver.newPage();
+      await other.goto(link);
+      await expect(other.locator('#app')).toHaveAttribute('data-screen', 'viewer', { timeout: 20_000 });
+      await expect(other.locator('.uxr-page')).toBeVisible();
+      await other.getByRole('button', { name: /このレシピをもとに作る/ }).click();
+      await expect(other.locator('#app')).toHaveAttribute('data-screen', 'editor');
+      const broken = await stranger.newPage();
+      await broken.goto(`${base}#v=zzzz`);
+      await expect(broken.locator('#app')).toHaveAttribute('data-screen', 'goal', { timeout: 20_000 });
+      await expect(broken.locator('#toasts')).toContainText('読み取れ');
+      await expect(broken.locator('#toasts')).toContainText('もう一度送ってもらう'); // 次の手を添える
+    } finally {
+      await receiver.close();
+      await stranger.close();
+    }
   });
 
   test('HTMLの書き出し: 1ファイル・スクリプトなし・ページの見た目のCSSつき', async ({ page }) => {
@@ -339,6 +350,105 @@ test.describe('共有・書き出し・保存', () => {
     await page.locator('#toasts').getByRole('button', { name: '元に戻す' }).click();
     await expect(rows).toHaveCount(1);
     await expect(rows.first()).toContainText('消す確認');
+  });
+});
+
+test.describe('下書きを失わない（置き換えの確認・履歴・別のタブ・通知）', () => {
+  const setHero = (page, value) => page.evaluate((v) => {
+    const hero = window.__uxr.getState().blocks.find((b) => b.type === 'hero');
+    window.__uxr.dispatch({ type: 'setProp', id: hero.id, path: ['title'], value: v });
+  }, value);
+  const stored = (page) => page.evaluate(() => {
+    const key = Object.keys(localStorage).find((k) => k.endsWith('current'));
+    const raw = key ? JSON.parse(localStorage.getItem(key)) : null;
+    return raw?.blocks?.find((b) => b.type === 'hero')?.props.title ?? null;
+  });
+
+  test('触った下書きがあると、入口で目的を選んだとき置き換えの確認が出る。「やめる」で残り、置き換えても「元に戻す」で戻る', async ({ page }) => {
+    await startEditor(page);
+    await setHero(page, '触った跡');
+    await page.waitForTimeout(700); // 自動保存（400ms）
+    await page.goto(`${base}?debug=1&tips=0&fresh=1`);
+    await expect(page.locator('#app')).toHaveAttribute('data-screen', 'goal');
+    await page.getByRole('button', { name: /買ってもらう/ }).first().click();
+    const dialog = page.locator('dialog[open]');
+    await expect(dialog).toContainText('置き換えますか');
+    await dialog.getByRole('button', { name: 'やめる' }).click();
+    await expect(page.locator('#app')).toHaveAttribute('data-screen', 'goal');
+    expect(await stored(page)).toBe('触った跡'); // 選んだだけでは、以前の下書きは消えない
+    await page.getByRole('button', { name: /買ってもらう/ }).first().click();
+    await page.locator('dialog[open]').getByRole('button', { name: '置き換える' }).click();
+    await expect(page.locator('#app')).toHaveAttribute('data-screen', 'editor');
+    expect((await getState(page)).goal).toBe('buy');
+    await page.locator('#slot-topbar').getByRole('button', { name: '元に戻す' }).click();
+    expect((await getState(page)).goal).toBe('reserve');
+    expect(await heroTitle(page)).toBe('触った跡');
+  });
+
+  test('見るだけ画面に出入りしても、編集の「元に戻す」は消えない', async ({ page }) => {
+    await startEditor(page);
+    const original = await heroTitle(page);
+    await setHero(page, '履歴の確認');
+    await page.getByRole('button', { name: '共有・書き出し' }).click();
+    const field = page.locator('#dlg-share input[readonly]').first();
+    await expect(field).toHaveValue(/#v=/);
+    const hash = new URL(await field.inputValue()).hash;
+    await page.keyboard.press('Escape');
+    await page.evaluate((h) => { location.hash = h; }, hash);
+    await expect(page.locator('#app')).toHaveAttribute('data-screen', 'viewer');
+    await page.goBack();
+    await expect(page.locator('#app')).toHaveAttribute('data-screen', 'editor');
+    expect(await heroTitle(page)).toBe('履歴の確認');
+    await page.locator('#slot-topbar').getByRole('button', { name: '元に戻す' }).click();
+    expect(await heroTitle(page)).toBe(original);
+  });
+
+  test('別のタブで作業が更新されると、自動保存を止めて知らせる（黙って上書きしない）。選んだ内容で再開できる', async ({ page }) => {
+    await startEditor(page);
+    await setHero(page, 'タブAの内容');
+    await page.waitForTimeout(700);
+    const other = await page.context().newPage();
+    await open(other, '');
+    await expect(other.locator('#app')).toHaveAttribute('data-screen', 'editor');
+    expect(await heroTitle(other)).toBe('タブAの内容');
+    await setHero(other, 'タブBの内容');
+    await other.waitForTimeout(700);
+    await expect(page.getByText('別のタブで、この作業が更新されました。')).toBeVisible();
+    await setHero(page, 'タブAの続き');
+    await page.waitForTimeout(700);
+    expect(await stored(page), '知らせている間は、このタブの自動保存が止まっている').toBe('タブBの内容');
+    await page.getByRole('button', { name: 'このタブの内容で保存を続ける' }).click();
+    await expect.poll(() => stored(page)).toBe('タブAの続き');
+    // A が保存を再開すると、B にも知らせが出る（B の自動保存も止まる＝どちらも黙って上書きしない）。
+    await expect(other.getByText('別のタブで、この作業が更新されました。')).toBeVisible();
+    // B が「このタブの内容で保存を続ける」を選ぶと、今度は A に知らせが出る → A は「別のタブの内容を読み込む」。
+    await other.getByRole('button', { name: 'このタブの内容で保存を続ける' }).click();
+    await expect(page.getByText('別のタブで、この作業が更新されました。')).toBeVisible();
+    await page.getByRole('button', { name: '別のタブの内容を読み込む' }).click();
+    expect(await heroTitle(page)).toBe('タブBの内容');
+    await other.close();
+  });
+
+  test('通知は同時に1枚。「元に戻す」付きの通知は、そのあとの別の編集で消える', async ({ page }) => {
+    await startEditor(page);
+    const rows = outlineRows(page);
+    await rowAction(rows.nth(3), '削除');
+    await rowAction(rows.nth(2), '削除');
+    await expect(page.locator('#toasts .app-toast')).toHaveCount(1);
+    await expect(page.locator('#toasts').getByRole('button', { name: '元に戻す' })).toHaveCount(1);
+    await setHero(page, '別の編集');
+    await expect(page.locator('#toasts').getByRole('button', { name: '元に戻す' })).toHaveCount(0);
+  });
+
+  test('パネルのタブで Alt+← を押しても、ブラウザの「戻る」を奪わない（← → のタブ移動は効く）', async ({ page }) => {
+    await startEditor(page);
+    await page.evaluate(() => { document.addEventListener('keydown', (e) => { window.__prevented = e.defaultPrevented; }); });
+    const current = page.getByRole('tab', { selected: true }).first();
+    await current.focus();
+    await page.keyboard.press('Alt+ArrowLeft');
+    expect(await page.evaluate(() => window.__prevented)).toBe(false);
+    await page.keyboard.press('ArrowRight');
+    expect(await page.evaluate(() => window.__prevented)).toBe(true);
   });
 });
 

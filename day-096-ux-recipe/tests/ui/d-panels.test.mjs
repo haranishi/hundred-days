@@ -494,6 +494,7 @@ test('診断理由の開閉を保ち、根拠・確度・目安を表示し、�
   assert.match(root.textContent, /一部確認/);
   const source = byText(root, 'A', '資料');
   assert.deepEqual([source.href, source.target, source.rel], ['https://example.com/info', '_blank', 'noopener noreferrer']);
+  assert.match(source.getAttribute('aria-label') ?? '', /資料.*一部確認/u);
   const fix = byText(root, 'BUTTON', 'なおす');
   fix.focus(); fix.click();
   assert.equal(ctx.getState().site.name, '短い名前');
@@ -598,6 +599,28 @@ test('最後の部品を消すと点と項目の代わりに追加方法が出�
   assert.ok(find(root, el => el.tagName === 'SVG'));
   assert.doesNotMatch(root.textContent, /部品がありません/u);
 });
+
+for (const [name, sources] of [
+  ['空の出典一覧', []],
+  ['URLのない独自の整理', [{ label: 'このアプリの整理（出典はありません）', confidence: '独自の整理' }]],
+]) {
+  test(name + 'では、項目内にリンクのない根拠と説明があり、読み上げ名でも確度がわかる', (t) => {
+    const { root } = environment(t, 'section');
+    const { ctx } = context(MINIMAL, () => ({ score: 0, items: [
+      { id: 'flow-complete', title: '各段階の案内がある', ok: false, level: 'must', why: '流れを確かめやすくなります。', sources },
+    ] }));
+    mountDiagnosis(root, ctx);
+    const details = find(root, el => el.dataset.detail === 'flow-complete');
+    details.open = true;
+    assert.ok(byText(details, 'H4', '根拠'));
+    const row = find(details, el => el.tagName === 'LI');
+    assert.ok(row);
+    assert.ok(byText(row, 'SPAN', '独自の整理'));
+    assert.ok(row.textContent.includes(CONFIDENCE_NOTE['独自の整理']));
+    assert.match(row.getAttribute('aria-label') ?? '', /独自の整理/u);
+    assert.equal(find(details, el => el.tagName === 'A'), undefined);
+  });
+}
 
 test('根拠の印とパネル末尾の折りたたみから、それぞれの印の説明を読める', (t) => {
   const { root } = environment(t, 'section');

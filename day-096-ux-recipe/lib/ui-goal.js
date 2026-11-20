@@ -1,6 +1,8 @@
 import { BLOCK_SCHEMA, GOALS, GOAL_LABEL, GOAL_NOTE, STAGES, STAGE_COLORS, STAGE_LABEL } from './contract.js';
 import { RECIPES } from './recipes.js';
 
+export const DRAFT_WARNING = 'いまの作業は、新しいページに置き換わります。残したいときは、先に「保存・開く」で名前をつけて保存してください。';
+
 export function recipeStages(blocks) {
   return blocks.map(block => BLOCK_SCHEMA[block.type].stage);
 }
@@ -70,7 +72,8 @@ export function mountGoal(root, ctx) {
     item.append(mark, STAGE_LABEL[key]);
     return item;
   });
-  root.querySelector('[data-legend]').replaceChildren(...legend);
+  const legendRow = root.querySelector('[data-legend]');
+  legendRow.replaceChildren(...legend);
   const resume = root.querySelector('[data-resume]');
   const name = root.querySelector('[data-draft-name]');
   function click(event) {
@@ -88,6 +91,43 @@ export function mountGoal(root, ctx) {
       name.hidden = !state;
       name.textContent = state ? state.site.name || GOAL_LABEL[state.goal] : '';
     },
-    destroy() { root.removeEventListener('click', click); },
+    destroy() {
+      root.removeEventListener('click', click);
+      cards.replaceChildren();
+      legendRow.replaceChildren();
+    },
   };
+}
+
+export function createDraftDialog(doc) {
+  const dialog = doc.createElement('dialog');
+  dialog.className = 'app-dialog ed-confirm';
+  const title = doc.createElement('h2');
+  title.id = 'ed-draft-title';
+  title.className = 'ed-dialog-title';
+  title.textContent = '作業中のページを置き換えますか？';
+  const note = doc.createElement('p');
+  note.id = 'ed-draft-warning';
+  note.textContent = DRAFT_WARNING;
+  dialog.setAttribute('aria-labelledby', title.id);
+  dialog.setAttribute('aria-describedby', note.id);
+  const actions = doc.createElement('div');
+  actions.className = 'ed-confirm-actions';
+  const form = doc.createElement('form');
+  form.method = 'dialog';
+  const cancel = doc.createElement('button');
+  cancel.type = 'submit';
+  cancel.className = 'app-btn';
+  cancel.textContent = 'やめる';
+  // Enterで作業を置き換えるには、自分で決定ボタンへ移る必要がある。
+  cancel.autofocus = true;
+  form.append(cancel);
+  const confirm = doc.createElement('button');
+  confirm.type = 'button';
+  confirm.className = 'app-btn app-primary';
+  confirm.dataset.confirm = '';
+  confirm.textContent = '置き換える';
+  actions.append(form, confirm);
+  dialog.append(title, note, actions);
+  return dialog;
 }

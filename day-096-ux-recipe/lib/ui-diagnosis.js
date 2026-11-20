@@ -70,6 +70,34 @@ function confidenceLegend(opened) {
   return legend;
 }
 
+function sourceList({ id, sources }) {
+  const list = element('ul', 'cs-sources');
+  // 箇条書きの点を消しても、読み上げでは根拠の一覧としてたどれるようにする。
+  list.setAttribute('role', 'list');
+  const entries = sources?.length ? sources : [{ confidence: '独自の整理' }];
+  for (const { label, url, confidence } of entries) {
+    const row = element('li');
+    const badge = element('span', 'cs-confidence', confidence);
+    const note = CONFIDENCE_NOTE[confidence] ?? '';
+    badge.title = note;
+    if (confidence !== '独自の整理' && /^https:\/\//i.test(url ?? '')) {
+      const link = element('a', 'cs-source', label);
+      link.href = url;
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+      link.dataset.control = id + '/source/' + list.childElementCount;
+      link.setAttribute('aria-label', label + '（' + confidence + '）');
+      row.append(link, badge);
+    } else {
+      const explanation = confidence === '独自の整理' ? note : label;
+      row.setAttribute('aria-label', confidence + '。' + explanation);
+      row.append(badge, element('span', 'cs-help', explanation));
+    }
+    list.append(row);
+  }
+  return list;
+}
+
 function ruleCard(item, ctx, opened) {
   const card = element('article', 'cs-rule');
   const details = element('details', 'cs-rule-details');
@@ -87,24 +115,7 @@ function ruleCard(item, ctx, opened) {
   const reason = element('div', 'cs-reason');
   reason.append(element('p', '', item.why));
   if (item.note) reason.append(element('p', 'cs-help', item.note));
-  if (item.sources?.length) {
-    const sources = element('ul', 'cs-sources');
-    for (const source of item.sources) {
-      const row = element('li');
-      const reference = /^https:\/\//i.test(source.url ?? '') ? element('a', 'cs-source', source.label) : element('span', '', source.label);
-      if (reference.tagName === 'A') {
-        reference.href = source.url;
-        reference.target = '_blank';
-        reference.rel = 'noopener noreferrer';
-        reference.dataset.control = item.id + '/source/' + sources.childElementCount;
-      }
-      const badge = element('span', 'cs-confidence', source.confidence);
-      badge.title = CONFIDENCE_NOTE[source.confidence] ?? '';
-      row.append(reference, badge);
-      sources.append(row);
-    }
-    reason.append(element('h4', 'cs-label', '根拠'), sources);
-  }
+  reason.append(element('h4', 'cs-label', '根拠'), sourceList(item));
   details.append(summary, reason);
   card.append(details);
   const actions = element('div', 'cs-actions cs-rule-actions');
