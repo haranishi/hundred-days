@@ -57,6 +57,7 @@ export function connectUI(handlers) {
   const newStyle = byId('new-style');
   const newPot = byId('new-pot');
   const light = byId('light');
+  const gfx = byId('gfx');
   const sound = byId('sound');
   const tools = [...document.querySelectorAll('button[data-tool]')];
   const time = [...document.querySelectorAll('button[data-advance]')];
@@ -150,6 +151,7 @@ export function connectUI(handlers) {
     newStyle.value = state.style;
     newPot.value = state.pot;
     light.value = state.light;
+    gfx.value = state.gfxSetting;
     sound.checked = !state.muted;
   }
 
@@ -237,6 +239,7 @@ export function connectUI(handlers) {
     if (handlers.newTree({ species: newSpecies.value, style: newStyle.value, pot: newPot.value })) menu.close();
   });
   light.addEventListener('change', () => handlers.light(light.value));
+  gfx.addEventListener('change', () => handlers.gfx(gfx.value));
   sound.addEventListener('change', () => handlers.muted(!sound.checked));
 
   function resetCanvas() {

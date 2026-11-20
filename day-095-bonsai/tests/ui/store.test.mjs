@@ -25,17 +25,18 @@ test('保存を遅らせてまとめ、確定した最後の木と設定だけ�
   const tree = seedling.clone();
   store.schedule({ tree, ...settings });
   tree.advance(7);
-  store.schedule({ tree, ...settings, light: 'morning', muted: true });
+  store.schedule({ tree, ...settings, light: 'morning', muted: true, gfx: 'mid' });
   const expectedTree = tree.toJSON();
   tree.advance(7);
   assert.equal(data.calls.set, 0);
   await wait(35);
   assert.equal(data.calls.set, 1);
-  assert.deepEqual(JSON.parse(data.value()), { ...record, tree: expectedTree, light: 'morning', muted: true });
+  assert.deepEqual(JSON.parse(data.value()), { ...record, tree: expectedTree, light: 'morning', muted: true, gfx: 'mid' });
   const { status, save: saved } = store.read();
   assert.equal(status, 'restored');
   assert.deepEqual(saved.tree.toJSON(), expectedTree);
   assert.equal(saved.muted, true);
+  assert.equal(saved.gfx, 'mid');
   assert.equal(saved.tipsSeen, true);
   assert.equal(saved.pot, DEFAULTS.pot);
 });
@@ -245,4 +246,12 @@ test('freshでは保存を読み書きせず、既存の保存も消さない', 
   store.clear();
   assert.deepEqual(data.calls, { get: 0, set: 0, remove: 0 });
   assert.deepEqual(JSON.parse(data.value()), record);
+});
+
+test('画質がない保存や未知の画質が入った保存を自動で復元する', () => {
+  for (const gfx of [undefined, 'test', 'unknown']) {
+    const data = memory(JSON.stringify({ ...record, gfx }));
+    const store = createStore({ restoreTree, storage: data.storage });
+    assert.equal(store.read().save.gfx, 'auto');
+  }
 });

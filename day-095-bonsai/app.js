@@ -11,10 +11,13 @@ import { createToolMachine } from './lib/controls-tools.js';
 import { connectUI } from './lib/ui.js';
 import { createAudio } from './lib/audio.js';
 import { createStore } from './lib/store.js';
+import { GFX_SETTINGS, GFX_TIERS } from './lib/gfx.js';
+import { readLearnedGfx, resolveGfx, writeLearnedGfx } from './lib/gfx-select.js';
+import { createGfxGovernor } from './lib/gfx-governor.js';
 
 const options = launchOptions(location.search);
 const reduced = matchMedia('(prefers-reduced-motion: reduce)');
-const animate = () => !reduced.matches && options.gfx !== 'test';
+const animate = () => !reduced.matches && GFX_TIERS[gfx].motion;
 const store = createStore({ enabled: !options.fresh, restoreTree });
 const { status: saveStatus, save: saved } = store.read();
 const history = createHistory();
@@ -24,6 +27,10 @@ if (options.day > 0) initialTree.advance(options.day);
 let pot = options.pot ?? saved?.pot ?? DEFAULTS.pot;
 let light = options.light ?? saved?.light ?? DEFAULTS.light;
 let muted = saved?.muted ?? false;
+let gfxSetting = saved?.gfx ?? 'auto';
+let learnedGfx = options.fresh || options.gfx || gfxSetting !== 'auto' ? null : readLearnedGfx();
+let gfx = chooseGfx();
+let governor = autoGfx() ? createGfxGovernor({ tier: gfx }) : null;
 let tipsSeen = saved?.tipsSeen ?? false;
 let rememberOpeningTips = !options.directsTree && !options.pot && !options.light;
 // 「保存を消して最初から」の直後は、結果の通知を読めるよう、初回の案内カードを出さない（同じ位置で重なって読めなかった）
@@ -40,7 +47,7 @@ const ui = connectUI({
   state, tool: setTool, advance: advanceStep,
   undo: () => restore('undo'), redo: () => restore('redo'),
   photo, cameraReset, dismissTips, beforeDialog, afterDialog: scheduleOrbit,
-  reset, newTree, light: setLight, muted: setMuted, fast: fastForward, assist,
+  reset, newTree, light: setLight, gfx: setGfx, muted: setMuted, fast: fastForward, assist,
   retry: () => restartView(options.camera),
 });
 const actions = createActions({
@@ -56,12 +63,12 @@ function state() {
   const { label, season, seasonLabel } = calendarState(day);
   return {
     species, style, seed, day, moisture, season, seasonLabel, date: label, tool, pot, light, muted,
-    branches: actions.branches, gfx: options.gfx, ready, canWater: typeof actions.tree.water === 'function',
+    branches: actions.branches, gfx, gfxSetting, ready, canWater: typeof actions.tree.water === 'function',
     canUndo: history.canUndo, canRedo: history.canRedo,
   };
 }
 
-function save(writeOptions) { store.schedule({ tree: actions.tree, pot, light, muted, tipsSeen }, writeOptions); }
+function save(writeOptions) { store.schedule({ tree: actions.tree, pot, light, muted, tipsSeen, gfx: gfxSetting }, writeOptions); }
 
 function changedTree() {
   ui.sync(state());
@@ -187,6 +194,54 @@ function setLight(id) {
   save();
 }
 
+function autoGfx() { return !options.gfx && gfxSetting === 'auto'; }
+
+function chooseGfx() {
+  const width = window.innerWidth || window.screen?.width;
+  const height = window.innerHeight || window.screen?.height;
+  const device = globalThis.navigator;
+  return resolveGfx({
+    param: options.gfx, setting: gfxSetting, learned: learnedGfx,
+    env: {
+      coarse: matchMedia('(pointer: coarse)').matches,
+      minSide: Math.min(width, height),
+      memory: device?.deviceMemory,
+      cores: device?.hardwareConcurrency,
+      saveData: device?.connection?.saveData,
+    },
+  });
+}
+
+function selectGfx() {
+  if (autoGfx() && !options.fresh) learnedGfx = readLearnedGfx();
+  gfx = chooseGfx();
+  governor = autoGfx() ? createGfxGovernor({ tier: gfx }) : null;
+}
+
+function setGfx(setting) {
+  if (!GFX_SETTINGS.includes(setting) || setting === gfxSetting) return;
+  gfxSetting = setting;
+  selectGfx();
+  save();
+  restartView(view?.camera.get() ?? options.camera);
+}
+
+function recordFrame(frameMs) {
+  if (!ready || document.hidden) return;
+  const change = governor?.push(frameMs, performance.now());
+  if (!change) return;
+  learnedGfx = gfx = change.to;
+  if (!options.fresh) writeLearnedGfx(gfx);
+  const camera = view.camera.get();
+  restartView(camera);
+  ui.notify('動きが重いので、画質を下げました。メニューで変えられます。');
+}
+
+function yieldToMain() {
+  if (typeof globalThis.scheduler?.yield === 'function') return globalThis.scheduler.yield();
+  return new Promise((resolve) => setTimeout(resolve, 0));
+}
+
 function setMuted(value) {
   muted = value;
   audio.setMuted(muted);
@@ -238,6 +293,8 @@ function workOnNewTree(seedling, initial) {
     notice = removed || options.fresh ? '初めの盆栽に戻しました。' : '画面は最初の盆栽に戻りましたが、この端末の保存は消せませんでした';
     rememberOpeningTips = false;
     light = DEFAULTS.light;
+    gfxSetting = 'auto';
+    selectGfx();
     muted = tipsSeen = false;
     skipTipsOnce = true;
     audio.setMuted(false);
@@ -283,24 +340,34 @@ function fallback(reason) {
   ui.sync(state());
 }
 
-function mountView(camera) {
+async function mountView(camera) {
   ui.status('loading');
   ui.sync(state());
   const canvas = ui.canvas;
+  const deferTextures = GFX_TIERS[gfx].motion;
+  let current;
+  governor?.resetFrames();
   try {
-    const current = createView3D(THREE, canvas, { gfx: options.gfx, reducedMotion: reduced.matches, seed: actions.tree.seed });
+    current = createView3D(THREE, canvas, {
+      gfx, reducedMotion: reduced.matches, seed: actions.tree.seed, deferTextures,
+      onFrame: governor ? recordFrame : undefined,
+    });
     view = current;
     resize();
     current.setPot(pot);
     current.setLight(light);
     actions.repaint();
-    if (camera) current.camera.set(camera, { animate: false });
-    controls = connectControls(canvas, { camera: current.camera, tools, reducedMotion: () => reduced.matches,
-      resting: () => options.gfx === 'test', onCommand: command, onInput: input });
+    if (camera) current.camera.set(camera, { animate: false, restore: !!camera.target });
     canvas.addEventListener('webglcontextlost', (event) => {
       event.preventDefault();
       if (current === view) fallback('3D表示が中断されました。「もう一度」で作りかけの盆栽を表示できます。');
     }, { once: true });
+    if (deferTextures) {
+      await current.prepare({ yieldToMain });
+      if (view !== current) return;
+    }
+    controls = connectControls(canvas, { camera: current.camera, tools, reducedMotion: () => reduced.matches,
+      resting: () => !GFX_TIERS[gfx].motion, onCommand: command, onInput: input });
     current.requestRender();
     // 描画側が要求したフレームを経てから、操作を開始できることを知らせる。
     requestAnimationFrame(() => requestAnimationFrame(() => {
@@ -319,6 +386,7 @@ function mountView(camera) {
       scheduleOrbit();
     }));
   } catch {
+    if (view !== (current ?? null)) return;
     fallback('この端末では3D表示（WebGL 2）を始められませんでした。手入れの目安を下で読めます。');
   }
 }
@@ -411,6 +479,9 @@ reduced.addEventListener?.('change', () => { if (view) restartView(view.camera.g
 if (options.debug) {
   window.__bonsai = {
     get tree() { return actions.tree; }, get view() { return view; }, state, setTool, advance,
+    feedFrames(intervals) {
+      for (const ms of intervals) recordFrame(ms);
+    },
   };
 }
 

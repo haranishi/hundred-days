@@ -1,4 +1,5 @@
 import { LIGHT_IDS, POT_IDS, SAVE_NAME, SAVE_VERSION } from './contract.js';
+import { GFX_SETTINGS } from './gfx.js';
 
 const MAX_SAVE_BYTES = 400 * 1024;
 const encoder = new TextEncoder();
@@ -6,6 +7,8 @@ const encoder = new TextEncoder();
 function fits(raw) {
   return typeof raw === 'string' && raw.length <= MAX_SAVE_BYTES && encoder.encode(raw).length <= MAX_SAVE_BYTES;
 }
+
+const gfxSetting = (value) => GFX_SETTINGS.includes(value) ? value : 'auto';
 
 function isSave(value) {
   return value?.v === SAVE_VERSION
@@ -50,7 +53,7 @@ export function createStore({
       const tree = restoreTree(record.tree);
       if (!tree) throw new Error('盆栽を復元できません');
       writeHeld = false;
-      return { status: 'restored', save: { ...record, tree } };
+      return { status: 'restored', save: { ...record, tree, gfx: gfxSetting(record.gfx) } };
     } catch {
       // 一時的な端末エラーでも既存の盆栽を守れるよう、利用者が選ぶまで保留する。
       writeHeld = true;
@@ -79,12 +82,12 @@ export function createStore({
     }
   }
 
-  function schedule({ tree, pot, light, muted, tipsSeen }, { replace = false } = {}) {
+  function schedule({ tree, pot, light, muted, tipsSeen, gfx }, { replace = false } = {}) {
     if (!enabled || (writeHeld && !replace)) return;
     const scheduledGeneration = generation;
     try {
       // 離した時点の状態を取ると、待ち時間に次の曲げを始めても途中の形を保存しない。
-      const record = { v: SAVE_VERSION, tree: tree.toJSON(), pot, light, muted, tipsSeen, savedAt: now() };
+      const record = { v: SAVE_VERSION, tree: tree.toJSON(), pot, light, muted, tipsSeen, gfx: gfxSetting(gfx), savedAt: now() };
       if (!isSave(record)) return;
       let previous;
       try {

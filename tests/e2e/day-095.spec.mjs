@@ -334,3 +334,126 @@ test('WebGL が使えないときは、理由と手入れの基本の文章が�
   await expect(page.locator('body')).toContainText('WebGL');
   await expect(page.locator('body')).toContainText('目安');
 });
+
+/* ---- スマホの速さと画質（要件 11）。3Dは実際の画質の段（mid・low・自動）で開く。 ---- */
+
+async function openRaw(page, query) {
+  const errors = [];
+  page.on('pageerror', (e) => errors.push(e.message));
+  page.on('console', (m) => { if (m.type() === 'error') errors.push(m.text()); });
+  await page.goto(`${base}${query}`);
+  await expect(page.locator('#app')).toHaveAttribute('data-ready', 'true', { timeout: 120_000 });
+  return errors;
+}
+
+const gfxOf = async (page) => (await dataset(page)).gfx;
+const camera = (page) => page.evaluate(() => { const c = window.__bonsai.view.camera.get(); return { az: c.az, pol: c.pol, dist: c.dist }; });
+
+test.describe('画質（標準・軽め・自動）', () => {
+  test.setTimeout(120_000);
+
+  test('標準（gfx=mid）で開き、枝を切れる', async ({ page }) => {
+    const errors = await openRaw(page, '?debug=1&gfx=mid&fresh=1&tips=0&seed=11');
+    expect(await gfxOf(page)).toBe('mid');
+    const before = await nodeCount(page);
+    await tool(page, '切る');
+    const p = await screenPoint(page, 'twig');
+    await page.mouse.move(p.x, p.y);
+    await page.mouse.down();
+    await page.mouse.up();
+    await expect.poll(() => nodeCount(page)).toBeLessThan(before);
+    expect(errors).toEqual([]);
+  });
+
+  test('PC（細かい操作・大きな画面）は自動で高になる', async ({ page }) => {
+    const errors = await openRaw(page, '?debug=1&fresh=1&tips=0&seed=11');
+    expect(await gfxOf(page)).toBe('high');
+    expect(errors).toEqual([]);
+  });
+
+  test('メニューの「画質」で替えると、その場で作り直し、視点を保つ。選んだ値は再読み込みのあとも残る', async ({ page }) => {
+    await page.goto(`${base}?debug=1&gfx=test&tips=0&fresh=1`);
+    await page.evaluate(() => localStorage.clear());
+    // gfx= を付けると、画質はURLが優先される。保存した設定を読むときは付けない（seed・fresh も付けない）
+    const errors = await openRaw(page, '?debug=1&tips=0');
+    const first = await gfxOf(page);
+    expect(['high', 'mid']).toContain(first);
+    await page.locator('#view').focus();
+    await page.keyboard.press('ArrowRight');
+    const before = await camera(page);
+    await page.getByRole('button', { name: 'メニュー', exact: true }).click();
+    const dialog = page.getByRole('dialog', { name: 'メニュー' });
+    await expect(dialog.locator('#gfx')).toHaveValue('auto');
+    await dialog.locator('#gfx').selectOption('low');
+    await expect(page.locator('#app')).toHaveAttribute('data-ready', 'true', { timeout: 120_000 });
+    await expect.poll(() => gfxOf(page)).toBe('low');
+    const after = await camera(page);
+    expect(after.az).toBeCloseTo(before.az, 0);
+    expect(after.dist).toBeCloseTo(before.dist, 1);
+    await page.waitForTimeout(1500);
+    await page.reload();
+    await expect(page.locator('#app')).toHaveAttribute('data-ready', 'true', { timeout: 120_000 });
+    expect(await gfxOf(page)).toBe('low');
+    await page.getByRole('button', { name: 'メニュー', exact: true }).click();
+    await expect(page.getByRole('dialog', { name: 'メニュー' }).locator('#gfx')).toHaveValue('low');
+    expect(errors).toEqual([]);
+  });
+
+  test('スマホ相当の画面は自動で標準。描画が遅いと1段ずつ下げ、通知し、視点を保ち、次の起動でも覚えている', async ({ browser }) => {
+    const context = await browser.newContext(phone);
+    const page = await context.newPage();
+    await page.goto(`${base}?debug=1&tips=0&fresh=1`);
+    await page.evaluate(() => localStorage.clear());
+    const errors = await openRaw(page, '?debug=1&tips=0');
+    expect(await gfxOf(page)).toBe('mid');
+    const before = await camera(page);
+    // 遅い描画の間隔（60ms＝約17fps）を流し込む。時間に頼らず、実際の描画の間隔の代わりにする（?debug=1 の入口）
+    await page.evaluate(() => window.__bonsai.feedFrames(Array(80).fill(60)));
+    await expect.poll(() => gfxOf(page), { timeout: 120_000 }).toBe('low');
+    await expect(page.locator('#app')).toHaveAttribute('data-ready', 'true', { timeout: 120_000 });
+    await expect(page.locator('#notice')).toContainText('画質を下げました');
+    const after = await camera(page);
+    expect(after.az).toBeCloseTo(before.az, 0);
+    expect(after.dist).toBeCloseTo(before.dist, 1);
+    // 1段しか下がらない（low が最低）。さらに遅い列を流しても、何も起きない
+    await page.evaluate(() => window.__bonsai.feedFrames(Array(200).fill(90)));
+    expect(await gfxOf(page)).toBe('low');
+    await page.waitForTimeout(500);
+    await page.reload();
+    await expect(page.locator('#app')).toHaveAttribute('data-ready', 'true', { timeout: 120_000 });
+    expect(await gfxOf(page)).toBe('low');
+    expect(errors).toEqual([]);
+    await context.close();
+  });
+});
+
+test.describe('スマホで触る面と先読み', () => {
+  test.use(phone);
+
+  test('道具・時間・舞台は長押しで選択や端末のメニューが出ず、共有のURL欄は選べる', async ({ page }) => {
+    await open(page);
+    const styles = await page.evaluate(() => {
+      const pick = (selector) => { const el = document.querySelector(selector); const s = getComputedStyle(el); return { user: s.userSelect || s.webkitUserSelect, callout: s.getPropertyValue('-webkit-touch-callout') || 'none' }; };
+      return {
+        tools: pick('.tools'), stage: pick('.stage'), calendar: pick('.calendar'), top: pick('.top'),
+        overscroll: getComputedStyle(document.documentElement).overscrollBehaviorY,
+        share: getComputedStyle(document.querySelector('#share-panel input')).userSelect,
+      };
+    });
+    for (const key of ['tools', 'stage', 'calendar', 'top']) expect(styles[key].user, key).toBe('none');
+    expect(styles.overscroll).toBe('none');
+    expect(styles.share).not.toBe('none');
+  });
+
+  test('先に読むモジュールの一覧が、実際に取れる（modulepreload）', async ({ page, request }) => {
+    await open(page);
+    const hrefs = await page.evaluate(() => Array.from(document.querySelectorAll('link[rel="modulepreload"]')).map((l) => l.href));
+    expect(hrefs.length).toBeGreaterThan(30);
+    const bad = [];
+    for (const href of hrefs) {
+      const res = await request.get(href);
+      if (!res.ok()) bad.push(`${res.status()} ${href}`);
+    }
+    expect(bad).toEqual([]);
+  });
+});

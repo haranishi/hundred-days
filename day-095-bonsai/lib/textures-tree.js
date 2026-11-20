@@ -1,5 +1,6 @@
 // 樹皮の色と凹凸。canvas に描く前の色計算はタイルノイズだけなので、端がつながり、Node で試験できる。
 // 紅葉は滑らかな灰褐、黒松は板状の割れ、梅は荒いまだら。画像ファイルは使わない。
+import { GFX_TIERS } from './gfx.js';
 import { tileNoise2 } from './noise.js';
 
 export const BARK_RGB = Object.freeze({
@@ -60,9 +61,7 @@ export function barkSample(species, u, v, seed = 1) {
 }
 
 export function barkSize(gfx = 'high') {
-  if (gfx === 'test') return 64;
-  if (gfx === 'low') return 160;
-  return 256;
+  return (GFX_TIERS[gfx] ?? GFX_TIERS.high).barkSize;
 }
 
 function paint(ctx, width, height, species, seed, channel) {
@@ -117,7 +116,7 @@ export function createBarkTextures(THREE, species, { seed = 1, gfx = 'high', cre
   if (THREE.NoColorSpace) bumpMap.colorSpace = THREE.NoColorSpace;
   map.wrapS = map.wrapT = THREE.RepeatWrapping;
   bumpMap.wrapS = bumpMap.wrapT = THREE.RepeatWrapping;
-  map.anisotropy = gfx === 'high' ? 8 : 4;
+  map.anisotropy = (GFX_TIERS[gfx] ?? GFX_TIERS.high).anisotropy;
   map.needsUpdate = true;
   bumpMap.needsUpdate = true;
   return { map, bump: bumpMap, size };

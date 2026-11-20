@@ -2,6 +2,7 @@
 // DOM や Canvas に一切依存せず、Node 単体でもすべての頂点・法線・UV・頂点色・境界箱を検証できる。
 // 同じ種（seed）からは常に同一の頂点列が生成され、異なる種からは異なる頂点列が生成される。
 
+import { GFX_TIERS } from './gfx.js';
 import { createRng } from './rng.js';
 import { fbm2, fbm3 } from './noise.js';
 
@@ -136,7 +137,7 @@ function getPotRings(spec) {
 export function buildPotGeometry(THREE, potId, { gfx = 'high', seed = 1 } = {}) {
   const spec = POT_SPECS[potId] || POT_SPECS['oval-brown'];
   const rings = getPotRings(spec);
-  const radialSegs = gfx === 'test' ? 24 : gfx === 'low' ? 48 : 64;
+  const radialSegs = GFX_TIERS[gfx].potSegments;
   const ringCount = rings.length;
   const cols = radialSegs + 1;
   const vertCount = ringCount * cols;
@@ -255,8 +256,8 @@ function getStoneLayouts(spec, seed) {
 /** 土の BufferGeometry を構築する。 */
 export function buildSoilGeometry(THREE, potId, { gfx = 'high', seed = 1 } = {}) {
   const spec = POT_SPECS[potId] || POT_SPECS['oval-brown'];
-  const radialSegs = gfx === 'test' ? 20 : gfx === 'low' ? 36 : 48;
-  const ringSegs = gfx === 'test' ? 4 : gfx === 'low' ? 7 : 10;
+  const radialSegs = GFX_TIERS[gfx].soilRadial;
+  const ringSegs = GFX_TIERS[gfx].soilRings;
   const halfW = spec.width * 0.5 * spec.innerScale;
   const halfD = spec.depth * 0.5 * spec.innerScale;
   const noiseSeed = createRng(seed).fork(`soil-geom-${spec.id}`).int(1, 100000);
@@ -334,8 +335,8 @@ export function buildMossGeometry(THREE, potId, { gfx = 'high', seed = 1 } = {})
     return 0.42 * n1 + 0.34 * n2 + 0.24 * n3 + n4 + treeBoost + stoneBoost - rimPenalty - hardRim;
   };
 
-  const gridX = gfx === 'test' ? 14 : gfx === 'low' ? 30 : 48;
-  const gridZ = gfx === 'test' ? 12 : gfx === 'low' ? 24 : 36;
+  const gridX = GFX_TIERS[gfx].mossX;
+  const gridZ = GFX_TIERS[gfx].mossZ;
   const cols = gridX + 1;
   const rows = gridZ + 1;
   const stepX = (halfW * 1.92) / gridX;
@@ -467,8 +468,8 @@ export function buildMossGeometry(THREE, potId, { gfx = 'high', seed = 1 } = {})
     }
   }
 
-  const microCount = gfx === 'test' ? 4 : gfx === 'low' ? 12 : 24;
-  const microRadSegs = gfx === 'test' ? 6 : 8;
+  const microCount = GFX_TIERS[gfx].mossClumps;
+  const microRadSegs = GFX_TIERS[gfx].mossRadial;
   for (let m = 0; m < microCount; m += 1) {
     const angle = (m / microCount) * Math.PI * 2 + rng.range(-0.25, 0.25);
     const dist = m < 6 ? rng.range(0.14, 0.28) : rng.range(0.26, 0.78);
@@ -496,8 +497,8 @@ export function buildMossGeometry(THREE, potId, { gfx = 'high', seed = 1 } = {})
 export function buildStonesGeometry(THREE, potId, { gfx = 'high', seed = 1 } = {}) {
   const spec = POT_SPECS[potId] || POT_SPECS['oval-brown'];
   const { stones, stoneNoiseSeed } = getStoneLayouts(spec, seed);
-  const latBands = gfx === 'test' ? 5 : 7;
-  const lonBands = gfx === 'test' ? 7 : 10;
+  const latBands = GFX_TIERS[gfx].stoneLat;
+  const lonBands = GFX_TIERS[gfx].stoneLon;
   const positions = [];
   const uvs = [];
   const colors = [];
@@ -641,8 +642,8 @@ export function buildWallGeometry(THREE, { gfx = 'high' } = {}) {
   const width = WALL_WIDTH;
   const height = WALL_HEIGHT;
   const centerY = 2.0;
-  const segX = gfx === 'test' ? 12 : gfx === 'low' ? 28 : 48;
-  const segY = gfx === 'test' ? 8 : gfx === 'low' ? 18 : 28;
+  const segX = GFX_TIERS[gfx].wallX;
+  const segY = GFX_TIERS[gfx].wallY;
   // 旧寸法（44×28 で 4.0×2.5 周期）と同じ実寸模様サイズ（約11単位/周期）を維持する
   const repeatX = (width / 44.0) * 4.0;
   const repeatY = (height / 28.0) * 2.5;

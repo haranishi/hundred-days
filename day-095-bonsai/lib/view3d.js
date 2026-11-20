@@ -13,6 +13,7 @@ import {
 } from './foliage.js';
 import { createStage } from './stage.js';
 import { captureFrame } from './capture.js';
+import { GFX_TIERS } from './gfx.js';
 
 const FOV = 30;
 const HIGHLIGHT_COLOR = { cut: 0xe0482f, bend: 0x2f6fa3, pinch: 0xe8b030, select: 0xfff2c0 };
@@ -71,27 +72,33 @@ function blendLook(a, b, t) {
 }
 
 export function createView3D(THREE, canvas, {
-  gfx = 'high', reducedMotion = false, seed = 1, createCanvas, onContextLost,
+  gfx = 'high', reducedMotion = false, seed = 1, createCanvas, onContextLost, onFrame, deferTextures = false,
 } = {}) {
   if (!THREE || typeof THREE.WebGLRenderer !== 'function') throw new Error('描画の入口を作れません');
-  const motion = gfx !== 'test' && !reducedMotion;
+  const tier = GFX_TIERS[gfx];
+  const motion = tier.motion && !reducedMotion;
+  const deferred = deferTextures && tier.motion;
+  let prepared = !deferred;
+  let preparation;
+  let yieldTextures;
+  let stageTexturesReady = false;
   const renderer = new THREE.WebGLRenderer({
-    canvas, antialias: gfx !== 'test', alpha: false, powerPreference: 'high-performance',
+    canvas, antialias: tier.antialias, alpha: false, powerPreference: 'high-performance',
   });
   if (THREE.SRGBColorSpace) renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.ACESFilmicToneMapping || THREE.ACESFilmicToneMapping;
-  renderer.shadowMap.enabled = gfx !== 'test';
+  renderer.shadowMap.enabled = tier.shadowSize > 0;
   renderer.shadowMap.type = THREE.PCFShadowMap;
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(FOV, 1, 0.08, 140);
-  const diorama = createDiorama(THREE, { gfx, seed, createCanvas });
+  const diorama = createDiorama(THREE, { gfx, seed, createCanvas, deferTextures: deferred });
   scene.add(diorama.group);
   const treeRoot = new THREE.Group();
   treeRoot.name = 'bonsai';
   diorama.treeAnchor.add(treeRoot);
   const highlightRoot = new THREE.Group();
   treeRoot.add(highlightRoot);
-  const stage = createStage(THREE, scene, renderer, { gfx, seed, createCanvas });
+  const stage = createStage(THREE, scene, renderer, { gfx, seed, createCanvas, deferEnvironment: deferred });
   const wireExpansion = { value: 0 };
   const wireMat = createWireMaterial(THREE, wireExpansion);
 
@@ -137,7 +144,9 @@ export function createView3D(THREE, canvas, {
   const stats = { triangles: 0, drawCalls: 0, cards: 0, fps: 0 };
   let raf = 0;
   let dirty = false;
-  let lastTime = 0;
+  let lastTime = null;
+  let movedCamera = false;
+  let wasMovingCamera = false;
 
   function shownLook() {
     return lookT >= 1 ? lookTo : blendLook(lookFrom, lookTo, lookT);
@@ -162,7 +171,8 @@ export function createView3D(THREE, canvas, {
   function requestRender() {
     if (disposed || contextLost) return;
     dirty = true;
-    if (!raf) raf = requestAnimationFrame(tick);
+    // 質感が揃う前に描くと、描画のたびに別のシェーダーが必要になる。
+    if (prepared && !raf) raf = requestAnimationFrame(tick);
   }
 
   function frameStage() {
@@ -182,24 +192,89 @@ export function createView3D(THREE, canvas, {
 
   const sceneBounds = () => [skeletonBounds(skel), ...stageBounds];
 
-  function ensureTextures() {
-    if (barkMat && leafMat) return;
-    barkTex = createBarkTextures(THREE, species, { seed, gfx, createCanvas });
-    leafTex = createLeafTextures(THREE, species, { gfx, createCanvas });
+  function ensureMaterials() {
+    if (barkMat) return;
     barkMat = new THREE.MeshStandardMaterial({
-      map: barkTex.map, bumpMap: barkTex.bump, bumpScale: barkBumpScale(species),
+      bumpScale: barkBumpScale(species),
       roughness: species === 'pine' ? 0.94 : 0.84, metalness: 0, vertexColors: true,
     });
     cutMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.62, metalness: 0, vertexColors: true });
     const leafRough = species === 'pine' ? 0.55 : 0.76;
     leafMat = new THREE.MeshStandardMaterial({
-      map: leafTex.leaf, color: 0xffffff, alphaTest: 0.45, side: THREE.DoubleSide,
+      color: 0xffffff, alphaTest: 0.45, side: THREE.DoubleSide,
       roughness: leafRough, metalness: 0,
     });
     flowerMat = new THREE.MeshStandardMaterial({
-      map: leafTex.flower, color: 0xffffff, alphaTest: 0.4, side: THREE.DoubleSide,
+      color: 0xffffff, alphaTest: 0.4, side: THREE.DoubleSide,
       roughness: 0.45, metalness: 0,
     });
+  }
+
+  function loadBark() {
+    ensureMaterials();
+    if (barkTex) return;
+    barkTex = createBarkTextures(THREE, species, { seed, gfx, createCanvas });
+    barkMat.map = barkTex.map;
+    barkMat.bumpMap = barkTex.bump;
+    barkMat.needsUpdate = true;
+  }
+
+  function loadLeaves() {
+    ensureMaterials();
+    if (leafTex) return;
+    leafTex = createLeafTextures(THREE, species, { gfx, createCanvas });
+    leafMat.map = leafTex.leaf;
+    flowerMat.map = leafTex.flower;
+    leafMat.needsUpdate = flowerMat.needsUpdate = true;
+  }
+
+  function ensureTextures() {
+    ensureMaterials();
+    if (prepared) {
+      loadBark();
+      loadLeaves();
+    }
+  }
+
+  async function runPreparationStage(name, work) {
+    if (disposed || contextLost) return;
+    await yieldTextures();
+    if (disposed || contextLost) return;
+    const mark = `bonsai:prepare:${name}`;
+    performance.mark(`${mark}:start`);
+    try {
+      await work();
+    } finally {
+      performance.mark(`${mark}:end`);
+    }
+  }
+
+  function prepare({ yieldToMain } = {}) {
+    if (!deferred || disposed || contextLost) return Promise.resolve();
+    if (preparation) return preparation;
+    yieldTextures = yieldToMain ?? (() => new Promise((resolve) => setTimeout(resolve, 0)));
+    preparation = (async () => {
+      await diorama.prepare(runPreparationStage);
+      stageTexturesReady = true;
+      // 鉢が準備中に交換された場合は、最後に選ばれた鉢の質感を揃える。
+      await diorama.preparePot(runPreparationStage);
+      do {
+        await runPreparationStage('bark', loadBark);
+        await runPreparationStage('leaves', loadLeaves);
+        await runPreparationStage('environment', () => {
+          stage.prepareEnvironment();
+          refreshEnv();
+        });
+        if (typeof renderer.compileAsync === 'function') {
+          await runPreparationStage('compile', () => renderer.compileAsync(scene, camera));
+        }
+        // コンパイル待ちに樹種が変わったら、今の樹種の質感とシェーダーを揃える。
+      } while (!disposed && !contextLost && (!barkTex || !leafTex));
+      if (disposed || contextLost) return;
+      prepared = true;
+      requestRender();
+    })();
+    return preparation;
   }
 
   function refreshEnv() {
@@ -396,7 +471,7 @@ export function createView3D(THREE, canvas, {
         geometry(THREE, built.position, built.normal, built.uv, built.color, built.index),
         barkMat,
       );
-      trunk.castShadow = gfx !== 'test';
+      trunk.castShadow = tier.shadowSize > 0;
       trunk.receiveShadow = true;
       treeRoot.add(trunk);
     }
@@ -430,7 +505,7 @@ export function createView3D(THREE, canvas, {
       treeRoot.add(flowerMesh);
     }
     // FOLIAGE-CORE (B): パッドの内側の扁平な芯。透けた穴と、カードの穴だらけの影を埋める。
-    coreMesh = createCoreMesh(THREE, plan, { castShadow: gfx !== 'test' });
+    coreMesh = createCoreMesh(THREE, plan, { castShadow: tier.shadowSize > 0 });
     if (coreMesh) {
       writeCoreInstances(coreMesh, plan, look);
       treeRoot.add(coreMesh);
@@ -495,7 +570,12 @@ export function createView3D(THREE, canvas, {
   function tick(now) {
     raf = 0;
     if (disposed) return;
-    const dt = lastTime ? Math.min(0.05, (now - lastTime) / 1000) : 0;
+    const frameMs = lastTime === null ? 0 : now - lastTime;
+    const dt = Math.min(0.05, frameMs / 1000);
+    const cameraMoving = movedCamera;
+    movedCamera = false;
+    // 回転や慣性は操作側のフレームで進むので、連続した視点変更も拾う。
+    const followsMotion = wasMoving || wasMovingCamera && cameraMoving;
     lastTime = now;
     const moving = step(dt, now);
     // 動きが止まった直後の1枚も描く。描かないと、最後に消えた粒や補間の最終の姿が、次の操作まで画面に残る
@@ -507,7 +587,12 @@ export function createView3D(THREE, canvas, {
       dirty = false;
     }
     wasMoving = moving;
-    if (moving) raf = requestAnimationFrame(tick);
+    wasMovingCamera = cameraMoving;
+    // 回転の次に確認だけのフレームを置き、操作の休止を描画間隔として数えない。
+    if (moving || cameraMoving && onFrame) raf = requestAnimationFrame(tick);
+    if (tier.motion && followsMotion && (moving || cameraMoving) && frameMs > 0 && !globalThis.document?.hidden) {
+      onFrame?.(frameMs);
+    }
   }
 
   const handleContextLost = (event) => {
@@ -520,6 +605,7 @@ export function createView3D(THREE, canvas, {
   canvas.addEventListener('webglcontextlost', handleContextLost);
 
   const view = {
+    prepare,
     setSpecies(id) {
       const next = id || 'maple';
       if (next === species && barkMat) return;
@@ -567,6 +653,12 @@ export function createView3D(THREE, canvas, {
     },
     setPot(id) {
       diorama.setPot(id);
+      if (stageTexturesReady) {
+        // すぐに鉢の形を描き、交換の質感が揃ったらもう一度描く。
+        void diorama.preparePot(runPreparationStage).then(requestRender, () => {
+          // 質感を作れないときは、先に描いた地の色で盆栽を表示し続ける。
+        });
+      }
       stageBounds = frameStage();
       if (skel) cameraRig.updateBounds(sceneBounds());
       boundEnv = null;
@@ -574,7 +666,7 @@ export function createView3D(THREE, canvas, {
       requestRender();
     },
     setLight(id) {
-      stage.setLight(id, { animate: motion });
+      stage.setLight(id, { animate: motion && prepared });
       requestRender();
     },
     setMoisture(m) {
@@ -606,7 +698,14 @@ export function createView3D(THREE, canvas, {
       get: cameraRig.get,
       distanceLimits: cameraRig.distanceLimits,
       set(partial, opts) {
-        if (cameraRig.set(partial, opts)) requestRender();
+        const before = onFrame && prepared ? cameraRig.get() : null;
+        if (!cameraRig.set(partial, opts)) return;
+        if (before) {
+          const after = cameraRig.get();
+          movedCamera ||= before.az !== after.az || before.pol !== after.pol || before.dist !== after.dist
+            || before.target.some((value, i) => value !== after.target[i]);
+        }
+        requestRender();
       },
       reset(opts) {
         cameraRig.reset(opts);
@@ -639,8 +738,7 @@ export function createView3D(THREE, canvas, {
     },
     requestRender,
     resize(cssW, cssH, dpr = 1) {
-      const cap = gfx === 'high' ? 2 : gfx === 'low' ? 1.25 : 1;
-      const ratio = gfx === 'test' ? 1 : Math.min(Math.max(1, dpr), cap);
+      const ratio = tier.dpr === 1 ? 1 : Math.min(Math.max(1, dpr), tier.dpr);
       // 数でない・負の寸法は受け付けず、直前の有効な寸法を保つ
       if (Number.isFinite(cssW) && cssW >= 1) viewW = cssW;
       if (Number.isFinite(cssH) && cssH >= 1) viewH = cssH;

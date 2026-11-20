@@ -3,6 +3,7 @@ import { registerHooks } from 'node:module';
 import { test } from 'node:test';
 import { CAMERA_DEFAULT, DEFAULTS, SAVE_NAME, SAVE_VERSION, TOOL_IDS } from '../../lib/contract.js';
 import { createTree } from '../../lib/tree.js';
+import { LEARNED_GFX_KEY } from '../../lib/gfx-select.js';
 
 const viewFactory = Symbol.for('bonsai.test.createView3D');
 const viewModule = 'data:text/javascript,' + encodeURIComponent(
@@ -14,11 +15,14 @@ function send(target, type, props = {}) {
   target.dispatchEvent(Object.assign(new Event(type, { cancelable: true }), props));
 }
 
-async function boot(t, { raw = null, failFirstRead = false, failRemove = false, capturePhoto, reduced = false, gfx = 'test' } = {}) {
+async function boot(t, {
+  raw = null, learned = null, failFirstRead = false, failRemove = false, capturePhoto, reduced = false,
+  gfx = 'test', coarse = false, debug = true, prepare = async () => {},
+} = {}) {
   t.mock.timers.enable({ apis: ['setTimeout'] });
   const document = new EventTarget();
   const window = new EventTarget();
-  window.screen = { orientation: new EventTarget() };
+  window.screen = { orientation: new EventTarget(), width: 390, height: 844 };
   const elements = new Map();
   const frames = new Map();
   const reads = { get: 0, set: 0 };
@@ -27,6 +31,7 @@ async function boot(t, { raw = null, failFirstRead = false, failRemove = false, 
   const highlights = [];
   const lookAnimations = [];
   let viewOptions;
+  const mounted = [];
   let resizeStage;
   let nextFrame = 0;
 
@@ -66,22 +71,27 @@ async function boot(t, { raw = null, failFirstRead = false, failRemove = false, 
 
   function createView3D(_THREE, _canvas, options) {
     viewOptions = options;
-    return {
+    let pose = CAMERA_DEFAULT;
+    const view = {
+      prepare,
       camera: {
-        get: () => CAMERA_DEFAULT, set() {}, reset() {},
+        get: () => pose, set(next) { pose = { ...pose, ...next }; }, reset() {},
         pickRay: () => ({ origin: [0, 0, 8], dir: [0, 0, -1] }), pxToWorld: () => 0.01,
       },
       setPot() {}, setLight() {}, setSpecies() {}, setMoisture() {}, setSkeleton() {},
       setLook(_look, { animate }) { lookAnimations.push(animate); },
       setHighlight(value) { highlights.push(value); },
-      resize() {}, dispose() {}, requestRender() {},
+      resize() {}, dispose() { this.disposed = true; }, requestRender() {},
       capturePhoto,
     };
+    mounted.push({ view, options });
+    return view;
   }
 
   const globals = {
-    window, document, location: { search: `?debug=1&gfx=${gfx}` }, devicePixelRatio: 1,
-    matchMedia: () => motion,
+    window, document, location: { search: `?debug=${Number(debug)}&gfx=${gfx}` }, devicePixelRatio: 1,
+    navigator: { hardwareConcurrency: 8 },
+    matchMedia: (query) => query === '(pointer: coarse)' ? { matches: coarse } : motion,
     ResizeObserver: class {
       constructor(callback) { resizeStage = callback; }
       observe() {}
@@ -91,12 +101,14 @@ async function boot(t, { raw = null, failFirstRead = false, failRemove = false, 
     [viewFactory]: createView3D,
     localStorage: {
       getItem(name) {
+        if (name === LEARNED_GFX_KEY) return learned;
         assert.equal(name, SAVE_NAME);
         reads.get += 1;
         if (failFirstRead && reads.get === 1) throw new Error('SecurityError');
         return raw;
       },
       setItem(name, value) {
+        if (name === LEARNED_GFX_KEY) { learned = value; return; }
         assert.equal(name, SAVE_NAME);
         reads.set += 1;
         raw = value;
@@ -152,7 +164,9 @@ async function boot(t, { raw = null, failFirstRead = false, failRemove = false, 
 
   paint();
   return {
-    window, byId, pointer, highlights, lookAnimations, viewOptions, reads, storageValue: () => raw, resizeStage,
+    window, document, byId, pointer, highlights, lookAnimations, viewOptions, reads, storageValue: () => raw, resizeStage,
+    mounted, learnedValue: () => learned,
+    async settle() { await Promise.resolve(); paint(); },
     app: window.__bonsai, notice: () => byId('notice-text').textContent,
     click(id) { send(byId(id), 'click'); paint(); },
   };
@@ -351,4 +365,99 @@ test('道具の使い方を札と読み上げに出し、同じ道具の札は�
   assert.match(page.byId('live').textContent, /道具「見る」を選びました/);
   page.app.advance(7);
   assert.deepEqual(page.lookAnimations, [false, false]);
+});
+
+test('メニューで画質を変えると設定を保存し、カメラと木を保ったまま描画を作り直す', async (t) => {
+  const page = await boot(t, { gfx: '', coarse: true });
+  await page.settle();
+  const scene = page.app.view;
+  const tree = page.app.tree;
+  const pose = { az: -42, pol: 64, dist: 7, target: [0.1, 1.8, 0.4] };
+  scene.camera.set(pose);
+  assert.equal(page.byId('app').dataset.gfx, 'mid');
+
+  page.click('menu-open');
+  const input = page.byId('gfx');
+  assert.equal(input.value, 'auto');
+  input.value = 'high';
+  send(input, 'change');
+  assert.equal(page.byId('app').dataset.gfx, 'high');
+  assert.equal(page.byId('app').dataset.ready, 'false');
+  assert.equal(scene.disposed, true);
+  assert.deepEqual(page.app.view.camera.get(), pose);
+  assert.equal(page.app.tree, tree);
+  await page.settle();
+  assert.equal(page.byId('app').dataset.ready, 'true');
+  send(page.window, 'pagehide');
+  assert.equal(JSON.parse(page.storageValue()).gfx, 'high');
+
+  page.app.feedFrames(Array(100).fill(60));
+  assert.equal(page.app.state().gfx, 'high');
+  assert.equal(page.mounted.length, 2);
+});
+
+test('自動では実行中の遅さを覚えて、カメラを保ち、一段下げたことを通知する', async (t) => {
+  const page = await boot(t, { gfx: '', coarse: true });
+  await page.settle();
+  const scene = page.app.view;
+  const pose = { az: 31, pol: 69, dist: 9, target: [0, 1.9, 0.5] };
+  scene.camera.set(pose);
+  page.document.hidden = true;
+  page.app.feedFrames(Array(70).fill(55));
+  assert.equal(page.byId('app').dataset.gfx, 'mid');
+  page.document.hidden = false;
+
+  for (let i = 0; i < 59; i += 1) page.viewOptions.onFrame(55);
+  assert.equal(page.app.view, scene);
+  page.app.feedFrames([55]);
+  assert.equal(page.byId('app').dataset.gfx, 'low');
+  assert.equal(scene.disposed, true);
+  assert.equal(JSON.parse(page.learnedValue()).tier, 'low');
+  assert.equal(page.app.state().gfxSetting, 'auto');
+  assert.deepEqual(page.app.view.camera.get(), pose);
+  await page.settle();
+  assert.match(page.notice(), /動きが重いので、画質を下げました/);
+  assert.equal(page.byId('live').textContent, page.notice());
+});
+
+test('保存した設定と覚えた画質よりURL指定が優先され、デバッグなしでは入口を出さない', async (t) => {
+  const raw = JSON.stringify({ ...JSON.parse(previousSave()), gfx: 'low' });
+  const page = await boot(t, { raw, gfx: 'mid', debug: false });
+  assert.equal(page.app, undefined);
+  assert.equal(page.byId('app').dataset.gfx, 'mid');
+  assert.equal(page.viewOptions.onFrame, undefined);
+  await page.settle();
+  page.click('menu-open');
+  assert.equal(page.byId('gfx').value, 'low');
+});
+
+test('以前の準備が失敗しても、画質の変更で始めた準備と読み込み表示を保つ', async (t) => {
+  const jobs = [];
+  const prepare = () => new Promise((resolve, reject) => jobs.push({ resolve, reject }));
+  const page = await boot(t, { gfx: '', coarse: true, prepare });
+  assert.equal(page.byId('loading').hidden, false);
+  page.click('menu-open');
+  const input = page.byId('gfx');
+  input.value = 'low';
+  send(input, 'change');
+  jobs[0].reject(new Error('古い描画の準備'));
+  await page.settle();
+  assert.equal(page.byId('fallback').hidden, true);
+  assert.equal(page.byId('loading').hidden, false);
+  jobs[1].resolve();
+  await page.settle();
+  assert.equal(page.byId('loading').hidden, true);
+  assert.equal(page.byId('app').dataset.ready, 'true');
+  assert.equal(page.byId('app').dataset.gfx, 'low');
+});
+
+test('自動の再起動では期限内に覚えた軽めの画質から始める', async (t) => {
+  const raw = previousSave();
+  const learned = JSON.stringify({ tier: 'low', at: Date.now() });
+  const page = await boot(t, { raw, learned, gfx: '', coarse: true });
+  await page.settle();
+  assert.equal(page.byId('app').dataset.gfx, 'low');
+  page.click('menu-open');
+  assert.equal(page.byId('gfx').value, 'auto');
+  assert.equal(page.app.state().species, 'plum');
 });

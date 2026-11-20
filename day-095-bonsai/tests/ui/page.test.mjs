@@ -87,3 +87,30 @@ test('和紙の面に対して本文と小さい文字は4.5対1、フォーカ�
     assert.ok(background / (luminance('focus') + 0.05) >= 3, `${surface}上のフォーカス`);
   }
 });
+
+test('モジュールの先読み一覧は app.js の静的 import をたどった結果と一致する', () => {
+  const root = new URL('../../', import.meta.url);
+  const head = read('index.html').split('</head>')[0];
+  const entry = new URL(head.match(/<script type="module" src="([^"]+)"/)[1], root);
+  const staticImport = /^[ \t]*(?:import\s+(?:[^;'"]*?\bfrom\s*)?|export\s+(?:\*|\{[^}]*\})\s+from\s*)['"]([^'"]+)['"]/gm;
+  const imported = new Set();
+  function visit(source) {
+    for (const [, specifier] of readFileSync(source, 'utf8').matchAll(staticImport)) {
+      const target = new URL(specifier, source);
+      if (imported.has(target.href)) continue;
+      imported.add(target.href);
+      visit(target);
+    }
+  }
+  visit(entry);
+  const preloads = [...head.matchAll(/<link rel="modulepreload" href="([^"]+)">/g)]
+    .map(([, href]) => new URL(href, root).href);
+  assert.ok(imported.has(new URL('vendor/three.js', root).href));
+  assert.deepEqual(preloads.sort(), [...imported].sort());
+});
+
+test('設定メニューの画質は自動・高・標準・軽めの順で選べる', () => {
+  const select = read('index.html').match(/<label>画質<select id="gfx">([\s\S]*?)<\/select><\/label>/)?.[1] ?? '';
+  assert.deepEqual([...select.matchAll(/<option value="([^"]+)"[^>]*>([^<]+)<\/option>/g)]
+    .map(([, id, label]) => [id, label]), [['auto', '自動'], ['high', '高'], ['mid', '標準'], ['low', '軽め']]);
+});

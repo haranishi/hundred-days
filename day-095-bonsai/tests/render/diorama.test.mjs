@@ -395,19 +395,16 @@ test('苔の色（くすんだ深い緑 #3f5a2e〜#6b8a4c）・被覆率（約6�
   diorama.dispose();
 });
 
-test('gfx (high / low / test) で苔の塊の頂点数とテクスチャ解像度が段階的に減る', () => {
-  assert.equal(getStageTextureSize('high'), 1024);
-  assert.equal(getStageTextureSize('low'), 512);
-  assert.equal(getStageTextureSize('test'), 128);
-
-  const mossHigh = buildMossGeometry(THREE, 'oval-brown', { gfx: 'high', seed: 5 });
-  const mossLow = buildMossGeometry(THREE, 'oval-brown', { gfx: 'low', seed: 5 });
-  const mossTest = buildMossGeometry(THREE, 'oval-brown', { gfx: 'test', seed: 5 });
-
-  const cHigh = mossHigh.getAttribute('position').count;
-  const cLow = mossLow.getAttribute('position').count;
-  const cTest = mossTest.getAttribute('position').count;
-  assert.ok(cTest < cLow && cLow < cHigh, `苔の頂点数が test(${cTest}) < low(${cLow}) < high(${cHigh}) でない`);
+test('画質の段が下がると苔の頂点数と質感の辺が小さくなる', () => {
+  const levels = ['high', 'mid', 'low', 'test'];
+  assert.deepEqual(levels.map(getStageTextureSize), [1024, 512, 256, 128]);
+  const counts = levels.map((gfx) => {
+    const geometry = buildMossGeometry(THREE, 'oval-brown', { gfx, seed: 5 });
+    const count = geometry.getAttribute('position').count;
+    geometry.dispose();
+    return count;
+  });
+  assert.ok(counts.slice(1).every((count, i) => count < counts[i]), counts.join(' > '));
 });
 
 test('setMoisture と setLook: 土の濃さ変化、季節による壁・卓の微細な色味変化、苔の不変性', () => {
@@ -581,5 +578,56 @@ test('変異検査: 鉢の寸法・添字・NaN・info・棚の持ち送り不�
   // 棚から壁を離した変異（隙間あり）を検出すること
   assert.ok(inspectShelfBrackets(tableGeom, diorama.info.wallZ - 0.2).errors.some((e) => /密着していない/.test(e)));
 
+  diorama.dispose();
+});
+
+test('遅延の舞台は質感を順に適用し、鉢を交換しても共通の質感を再利用する', async () => {
+  const create = createMockCanvasFactory();
+  let allocations = 0;
+  const diorama = createDiorama(THREE, {
+    gfx: 'low', deferTextures: true, createCanvas(w, h) { allocations += 1; return create(w, h); },
+  });
+  const names = ['table', 'wall', 'soil', 'moss', 'pot'];
+  const material = (name) => diorama.group.getObjectByName(name).material;
+  assert.deepEqual(names.map((name) => material(name).map), names.map(() => null));
+  assert.equal(allocations, 0);
+  const loaded = [];
+  await diorama.prepare(async (name, work) => {
+    assert.equal(allocations, loaded.length);
+    assert.equal(material(name).map, null);
+    await Promise.resolve();
+    work();
+    loaded.push(name);
+    assert.equal(material(name).map.image.width, 256);
+    assert.equal(material(name).bumpMap, material(name).map);
+    assert.equal(material(name).version, 1);
+  });
+  assert.deepEqual(loaded, names);
+
+  const shared = names.slice(0, -1).map((name) => material(name).map);
+  let disposed = 0;
+  material('pot').map.addEventListener('dispose', () => { disposed += 1; });
+  diorama.setPot('round-blue');
+  assert.equal(disposed, 1);
+  assert.equal(material('pot').map, null);
+  let finish;
+  const oldPot = diorama.preparePot(async (_name, work) => {
+    await new Promise((resolve) => { finish = resolve; });
+    work();
+  });
+  diorama.setPot('rect-grey');
+  finish();
+  await oldPot;
+  assert.equal(allocations, 5);
+  assert.equal(material('pot').map, null);
+
+  await diorama.preparePot(async (name, work) => {
+    assert.equal(name, 'pot');
+    assert.equal(material(name).map, null);
+    work();
+  });
+  assert.equal(allocations, 6);
+  assert.ok(material('pot').map);
+  assert.deepEqual(names.slice(0, -1).map((name) => material(name).map), shared);
   diorama.dispose();
 });

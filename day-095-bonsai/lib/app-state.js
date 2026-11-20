@@ -50,7 +50,7 @@ export function launchOptions(search) {
     debug: params.get('debug') === '1',
     fresh: params.get('fresh') === '1',
     tips: params.get('tips') !== '0',
-    gfx: option('gfx', GFX_IDS) ?? 'high',
+    gfx: option('gfx', GFX_IDS),
     tool: option('tool', TOOL_IDS) ?? 'look',
     camera: cameraFrom(params.get('cam')),
     pot: option('pot', POT_IDS),

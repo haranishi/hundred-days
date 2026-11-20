@@ -3,14 +3,13 @@
 // マテリアルの基調色（material.color）と乗算されたときに狙いの発色になるよう、
 // テクスチャは陰影・色むら・繊維・木目・苔の粒立ちのニュアンスとして描く。
 
+import { GFX_TIERS } from './gfx.js';
 import { createRng } from './rng.js';
 import { hash3, tileNoise2 } from './noise.js';
 
 /** 画質設定に応じたテクスチャの一辺のピクセル数を返す。CIや軽量環境での負荷を抑えるため段階を分ける。 */
 export function getStageTextureSize(gfx = 'high') {
-  if (gfx === 'test') return 128;
-  if (gfx === 'low') return 512;
-  return 1024;
+  return (GFX_TIERS[gfx] ?? GFX_TIERS.high).stageSize;
 }
 
 const clampByte = (v) => (v < 0 ? 0 : v > 255 ? 255 : v | 0);
@@ -38,7 +37,7 @@ function wrapCanvasTexture(THREE, canvas, gfx) {
   if (THREE.SRGBColorSpace) tex.colorSpace = THREE.SRGBColorSpace;
   tex.wrapS = THREE.RepeatWrapping;
   tex.wrapT = THREE.RepeatWrapping;
-  tex.anisotropy = gfx === 'high' ? 8 : gfx === 'low' ? 4 : 1;
+  tex.anisotropy = (GFX_TIERS[gfx] ?? GFX_TIERS.high).anisotropy;
   tex.needsUpdate = true;
   return tex;
 }
@@ -209,7 +208,7 @@ export function createMossTexture(THREE, { gfx = 'high', seed = 1, createCanvas 
 
   // Canvas 2D パスが使える環境では、微細な苔の毛足と淡い粒・暗緑の斑点をシームレスに重ね描きする
   if (typeof ctx.beginPath === 'function' && typeof ctx.stroke === 'function') {
-    const speckCount = gfx === 'test' ? 180 : gfx === 'low' ? 900 : 2200;
+    const speckCount = GFX_TIERS[gfx].mossSpecks;
     const scale = size / 512;
     ctx.lineCap = 'round';
     for (let i = 0; i < speckCount; i += 1) {
@@ -348,7 +347,7 @@ export function createWallTexture(THREE, { gfx = 'high', seed = 1, createCanvas 
 
   // 2) 楮・三椏の細い繊維の線を Canvas 2D パスでシームレス（端をまたぐ線は反対側にもラップ）に重ね描きする
   if (typeof ctx.beginPath === 'function' && typeof ctx.stroke === 'function') {
-    const fiberCount = gfx === 'test' ? 180 : gfx === 'low' ? 800 : 2000;
+    const fiberCount = GFX_TIERS[gfx].wallFibers;
     ctx.lineCap = 'round';
     for (let i = 0; i < fiberCount; i += 1) {
       const x0 = rng.range(0, size);

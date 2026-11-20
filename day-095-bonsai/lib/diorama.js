@@ -56,11 +56,12 @@ function normalizePotId(id) {
  * 舞台（卓・鉢・土・苔・石・和紙の壁）を生成する。
  * @param {object} THREE - three.js モジュール
  * @param {object} [options]
- * @param {'high'|'low'|'test'} [options.gfx='high']
+ * @param {'high'|'mid'|'low'|'test'} [options.gfx='high']
  * @param {number} [options.seed=1]
  * @param {Function|null} [options.createCanvas]
+ * @param {boolean} [options.deferTextures=false]
  */
-export function createDiorama(THREE, { gfx = 'high', seed = 1, createCanvas } = {}) {
+export function createDiorama(THREE, { gfx = 'high', seed = 1, createCanvas, deferTextures = false } = {}) {
   if (!THREE || typeof THREE.Group !== 'function') {
     throw new Error('createDiorama: THREE モジュールが必要です');
   }
@@ -94,13 +95,18 @@ export function createDiorama(THREE, { gfx = 'high', seed = 1, createCanvas } = 
     treeOffset: [TREE_OFFSET[0], TREE_OFFSET[1], TREE_OFFSET[2]],
   };
 
-  // 鉢の切り替えで変わらない共通テクスチャ（土・苔・卓・壁）を一度だけ作る
-  const sharedTextures = {
-    soil: createSoilTexture(THREE, { gfx, seed, createCanvas }),
-    moss: createMossTexture(THREE, { gfx, seed, createCanvas }),
-    table: createTableTexture(THREE, { gfx, seed, createCanvas }),
-    wall: createWallTexture(THREE, { gfx, seed, createCanvas }),
+  // 鉢を交換しても同じ卓・壁・土・苔の質感を再利用する。
+  const textureOptions = { gfx, seed, createCanvas };
+  const sharedFactories = {
+    table: createTableTexture, wall: createWallTexture, soil: createSoilTexture, moss: createMossTexture,
   };
+  const sharedTextures = {};
+  if (!deferTextures) {
+    // 従来の同期生成の順序を保つ。
+    for (const name of ['soil', 'moss', 'table', 'wall']) {
+      sharedTextures[name] = sharedFactories[name](THREE, textureOptions);
+    }
+  }
 
   // 卓メッシュ（上面は常に info.tableY に合わせる）
   const tableGeometry = buildTableGeometry(THREE, { seed });
@@ -109,7 +115,8 @@ export function createDiorama(THREE, { gfx = 'high', seed = 1, createCanvas } = 
     roughness: 0.52,
     metalness: 0.02,
     vertexColors: true,
-    ...(sharedTextures.table ? { map: sharedTextures.table, bumpMap: sharedTextures.table, bumpScale: 0.008 } : {}),
+    map: sharedTextures.table ?? null,
+    bumpMap: sharedTextures.table ?? null, bumpScale: 0.008,
   });
   const tableMesh = new THREE.Mesh(tableGeometry, tableMaterial);
   tableMesh.name = 'table';
@@ -139,7 +146,8 @@ export function createDiorama(THREE, { gfx = 'high', seed = 1, createCanvas } = 
     roughness: 0.94,
     metalness: 0.0,
     vertexColors: true,
-    ...(sharedTextures.wall ? { map: sharedTextures.wall, bumpMap: sharedTextures.wall, bumpScale: 0.005 } : {}),
+    map: sharedTextures.wall ?? null,
+    bumpMap: sharedTextures.wall ?? null, bumpScale: 0.005,
   });
   const wallMesh = new THREE.Mesh(wallGeometry, wallMaterial);
   wallMesh.name = 'wall';
@@ -187,20 +195,15 @@ export function createDiorama(THREE, { gfx = 'high', seed = 1, createCanvas } = 
     const spec = POT_SPECS[potId];
     const PotMaterialCtor = THREE.MeshPhysicalMaterial || THREE.MeshStandardMaterial;
 
-    const potTexture = createPotTexture(THREE, potId, { gfx, seed, createCanvas });
+    const potTexture = deferTextures ? null : createPotTexture(THREE, potId, textureOptions);
     const potGeom = buildPotGeometry(THREE, potId, { gfx, seed });
     const potMatParams = {
       color: new THREE.Color(spec.color),
       roughness: spec.roughness,
       metalness: spec.metalness,
       vertexColors: true,
-      ...(potTexture
-        ? {
-            map: potTexture,
-            bumpMap: potTexture,
-            bumpScale: potId === 'oval-brown' ? 0.022 : 0.006,
-          }
-        : {}),
+      map: potTexture, bumpMap: potTexture,
+      bumpScale: potId === 'oval-brown' ? 0.022 : 0.006,
     };
     if (THREE.MeshPhysicalMaterial) {
       potMatParams.clearcoat = spec.clearcoat;
@@ -219,7 +222,8 @@ export function createDiorama(THREE, { gfx = 'high', seed = 1, createCanvas } = 
       roughness: 0.88,
       metalness: 0.0,
       vertexColors: true,
-      ...(sharedTextures.soil ? { map: sharedTextures.soil, bumpMap: sharedTextures.soil, bumpScale: 0.016 } : {}),
+      map: sharedTextures.soil ?? null,
+      bumpMap: sharedTextures.soil ?? null, bumpScale: 0.016,
     });
     applyMoistureToMaterial(soilMat, currentMoisture);
     const soilMesh = new THREE.Mesh(soilGeom, soilMat);
@@ -233,7 +237,8 @@ export function createDiorama(THREE, { gfx = 'high', seed = 1, createCanvas } = 
       roughness: 0.95,
       metalness: 0.0,
       vertexColors: true,
-      ...(sharedTextures.moss ? { map: sharedTextures.moss, bumpMap: sharedTextures.moss, bumpScale: 0.022 } : {}),
+      map: sharedTextures.moss ?? null,
+      bumpMap: sharedTextures.moss ?? null, bumpScale: 0.022,
     });
     const mossMesh = new THREE.Mesh(mossGeom, mossMat);
     mossMesh.name = 'moss';
@@ -287,6 +292,40 @@ export function createDiorama(THREE, { gfx = 'high', seed = 1, createCanvas } = 
     if (activePotResources && next === currentPotId) return;
     currentPotId = next;
     buildPotStage(currentPotId);
+  }
+
+  function applyTexture(material, texture) {
+    if (!texture) return;
+    material.map = material.bumpMap = texture;
+    material.needsUpdate = true;
+  }
+
+  async function preparePot(runStage) {
+    const pot = activePotResources;
+    if (!deferTextures || !pot || pot.textureReady) return;
+    // 待っている間に鉢が替わったら、古い鉢のために質感を作らない。
+    await runStage('pot', () => {
+      if (disposed || activePotResources !== pot || pot.textureReady) return;
+      const texture = createPotTexture(THREE, pot.potId, textureOptions);
+      if (texture) pot.textures.push(texture);
+      applyTexture(pot.potMesh.material, texture);
+      pot.textureReady = true;
+    });
+  }
+
+  async function prepare(runStage) {
+    if (!deferTextures || disposed) return;
+    for (const [name, create] of Object.entries(sharedFactories)) {
+      if (disposed) return;
+      if (Object.hasOwn(sharedTextures, name)) continue;
+      await runStage(name, () => {
+        if (disposed) return;
+        const texture = sharedTextures[name] = create(THREE, textureOptions);
+        const material = group.getObjectByName(name).material;
+        applyTexture(material, texture);
+      });
+    }
+    await preparePot(runStage);
   }
 
   function setMoisture(m) {
@@ -360,6 +399,8 @@ export function createDiorama(THREE, { gfx = 'high', seed = 1, createCanvas } = 
     group,
     treeAnchor,
     setPot,
+    prepare,
+    preparePot,
     setMoisture,
     setLook,
     update,
