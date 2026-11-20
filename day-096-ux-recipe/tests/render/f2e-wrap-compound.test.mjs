@@ -28,3 +28,11 @@ test('ひらがなが続く語（新しい店・聞いた翌朝）の境目は�
   const html = wrapped('新しい店で聞いた翌朝');
   assert.equal(stripWrap(html), '<p>新しい店で聞いた翌朝</p>');
 });
+
+test('1文字だけの文節を作らない（「食卓を開いた｜日」→「食卓を開いた日」・先頭の「お｜店」）', () => {
+  const html = wrapped('食卓を開いた日');
+  assert.ok(!html.includes('<wbr>日'), `「日」だけの文節が残っている: ${html}`);
+  assert.equal(stripWrap(html), '<p>食卓を開いた日</p>');
+  const first = wrapped('お店の台所を見つける');
+  assert.ok(!first.includes('お<wbr>'), `先頭の「お」だけの文節が残っている: ${first}`);
+});

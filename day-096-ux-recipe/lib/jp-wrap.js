@@ -49,6 +49,18 @@ function textForParser(source) {
   return { text, offsets };
 }
 
+// 1文字だけの文節（「開いた｜日」「お｜店」）は、行頭や行末に1字だけ残る原因になる。その前後の境目を捨てて、隣の文節に付ける。
+function dropSingleCharChunks(text, breaks) {
+  const points = [0, ...[...breaks].sort((a, b) => a - b), text.length];
+  for (let i = 0; i + 1 < points.length; i += 1) {
+    const [start, end] = [points[i], points[i + 1]];
+    if (end - start !== 1 || !/[\p{L}\p{N}]/u.test(text[start])) continue;
+    // 先頭の1字は後ろへ、それ以外は前へ付ける。
+    if (i === 0) breaks.delete(end);
+    else breaks.delete(start);
+  }
+}
+
 function protectedRanges(text, breaks) {
   const ranges = [];
   function protect(start, end) {
@@ -91,6 +103,7 @@ function wrapText(source) {
     INSIDE_KATAKANA.lastIndex = pos;
     return !INSIDE_KATAKANA.test(text) && !OPEN.includes(text[pos - 1]) && !NO_START.includes(text[pos]) && !insideCompound(text, pos);
   }));
+  dropSingleCharChunks(text, breaks);
   const spans = protectedRanges(text, breaks);
   for (const [start, end] of spans) {
     breaks.add(start);

@@ -29,4 +29,6 @@ test('ページ末尾のCSSで自動分節を上書きし、保護した語だ�
   assert.ok(PAGE_CSS.endsWith(WRAP_CSS));
   assert.match(WRAP_CSS, /\.uxr-page\s*\{\s*word-break:keep-all;overflow-wrap:anywhere;line-break:strict;?\s*\}/);
   assert.match(WRAP_CSS, /\.uxr-page \.uxr-nb\s*\{\s*white-space:nowrap;?\s*\}/);
+  // 文章の要素は break-word（pretty/balance が anywhere の途中を選ぶのを防ぐ）。容れ物の anywhere は残す。
+  assert.match(WRAP_CSS, /:where\([^)]*\bp\b[^)]*\)\s*\{\s*overflow-wrap:break-word;?\s*\}/);
 });
