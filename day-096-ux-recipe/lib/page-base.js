@@ -19,6 +19,8 @@ export const BASE_CSS = `
 .uxr-page .uxr-main{display:block}
 .uxr-page .uxr-block{position:relative;background:var(--uxr-bg)}
 .uxr-page .uxr-inner{max-width:var(--uxr-max);margin:0 auto;padding:var(--uxr-pad-y) var(--uxr-pad-x)}
+/* 書き出しで全項目が空の部品は、色だけの帯を残さず枠ごと隠す（編集中は「ここに書く」の要素があるので対象外） */
+.uxr-page .uxr-block:has(> .uxr-inner:empty){display:none}
 .uxr-page .uxr-main>.uxr-block:nth-child(even):not(.uxr-hero):not(.uxr-cta):not(.uxr-footer):not(.uxr-limited):not(.uxr-guarantee){background:var(--uxr-surface2)}
 
 .uxr-page .uxr-eyebrow{display:inline-block;font-size:.8125rem;font-weight:700;letter-spacing:.08em;color:var(--uxr-accent-text);text-transform:var(--uxr-eyebrow-case)}
