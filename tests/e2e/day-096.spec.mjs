@@ -29,6 +29,11 @@ async function pickGoal(page, label) {
   const confirm = page.locator('#dlg-goal-change').getByRole('button', { name: '目的を変える' });
   if (await confirm.isVisible().catch(() => false)) await confirm.click();
 }
+/** 動き（アニメーション・遷移）が終わって、レイアウトが落ち着くまで待つ。寸法を測る前に使う（負荷が高いと途中の値を測って偶発的に落ちる）。 */
+async function settle(page) {
+  await page.waitForFunction(() => document.getAnimations().every((a) => a.playState !== 'running'), null, { timeout: 8000 });
+  await page.evaluate(() => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))));
+}
 const outlineRows = (page) => page.locator('#slot-outline li.ed-row');
 /** 構成の行の操作（上へ移動・複製など）は、ホバー・フォーカス・選択のある行にだけ見える。行へ寄せてから押す。 */
 async function rowAction(row, name) {
@@ -264,7 +269,8 @@ test.describe('操作性（スマホ・キーボード・動きを減らす）',
     const collapsed = await page.locator('#slot-preview').boundingBox();
     expect(collapsed.height, '畳んだ状態のプレビューの高さ').toBeGreaterThan(600);
     await tab(page, '編集');
-    await expect.poll(async () => (await page.locator('#slot-panel').boundingBox()).height, { message: '開く動きが終わるまで待つ' }).toBeGreaterThan(220);
+    await expect.poll(async () => (await page.locator('#slot-panel').boundingBox()).height, { message: '開く動きが始まるまで待つ' }).toBeGreaterThan(100);
+    await settle(page);
     const preview = await page.locator('#slot-preview').boundingBox();
     const panel = await page.locator('#slot-panel').boundingBox();
     expect(panel.height, '開いたパネルの高さ').toBeGreaterThan(220);
@@ -276,6 +282,7 @@ test.describe('操作性（スマホ・キーボード・動きを減らす）',
       .filter((e) => e.w > 0 && Math.min(e.w, e.h) < 43));
     expect(small, `44px未満の操作部: ${JSON.stringify(small)}`).toEqual([]);
     await tab(page, '編集'); // 開いているタブをもう一度押すと畳む
+    await settle(page);
     await expect.poll(async () => (await page.locator('#slot-preview').boundingBox()).height).toBeGreaterThan(600);
     await page.locator('#slot-preview .uxr-hero').first().tap();
     await expect(page.getByLabel('キャッチコピー', { exact: true })).toBeVisible();
