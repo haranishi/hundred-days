@@ -41,7 +41,7 @@ mount の規約: 渡された要素の**中だけ**を触る。subscribe のた�
   `fix` があり満たしていなければ「なおす」ボタン（押すと `dispatch(fix.action)`・toast「なおしました」＋元に戻す）。`blockId` があれば「この部品を見る」。末尾に診断の見かた（点はこのアプリの目安・根拠は各項目）。
 - `mountLook(root, ctx)`: サイトの名前（入力・24字）・テーマ4つ（ラジオ・小さな見本つき）・強調色6つ（ラジオ・色の名前）。
 - `mountShare(dialog, ctx)` → `{ open(tab) }`: タブ「リンク」「書き出し」。リンク: 共有リンク（読み取り専用の入力）・「リンクをコピー」・「Xで投稿」（`https://x.com/intent/post?text=&url=`）・「LINEで送る」（`https://social-plugins.line.me/lineit/share?url=`）・
-  `navigator.share` があるときだけ「端末の共有を開く」・Instagram と YouTube は偽のボタンを作らず説明の1行・内容がリンクに入っていて、サーバーへは送られないが、受け取った人と共有先には見えることの1行・2000字超で注意。共有文は「UXレシピで「<目的>」のページを組み立てました（UX診断 <点>点）」。
+  `navigator.share` があるときだけ「端末の共有を開く」・Instagram と YouTube は偽のボタンを作らず説明の1行・内容がリンクに入っていて、サーバーへは送られないが、受け取った人と共有先には見えることの1行・3000字超で、断定しない知らせ（「リンクが長めです。貼り付け先で全文が入らないときは、HTMLで渡せます。」）。普通のページ（約2200字）では出さない。この閾値は調べて決めた値ではなく目安。共有文は「UXレシピで「<目的>」のページを組み立てました（UX診断 <点>点）」。
   書き出し: 「HTMLをダウンロード」（Blob＋`a[download]`・`exportFileName`）・「HTMLをコピー」・「画像で保存(PNG)」（スマホ幅/パソコン幅・2倍・`canExportPng()` が false なら出さない）・叩き台である注意。
 - `mountSlots(dialog, ctx)` → `{ open() }`: 名前をつけて保存（入力＋「保存する」）・一覧（名前・目的・日時・部品数・「開く」「消す」）・件数「n/6」。開くと `dispatch({type:'replace',state})`（元に戻せる）。
 - `ui-form-model.js`（純粋）: `formModel(block, goal)` → 入力欄の記述（path・kind・label・max・値・role・suggestions・list の min/max と項目）。`counter(value,max)`。Node で試験。

@@ -151,6 +151,15 @@ test('採番: 12字を超えない。番号が大きすぎるときは、空い�
   assert.ok(nextBlockId([{ id: 'b9999999999' }]).length <= 12);
 });
 
+test('疎配列（空の要素）と site.name の制御文字を、検証が見逃さない', () => {
+  const sparse = { ...structuredClone(MINIMAL), blocks: [{ id: 'b1', type: 'pain', variant: 0, props: { heading: '', lead: '', items: new Array(2) } }] };
+  assert.ok(validateState(sparse).length, '疎配列は不正');
+  const clean = sanitizeState({ goal: 'buy', blocks: [{ id: 'b1', type: 'pain', props: { items: new Array(3) } }] });
+  assert.deepEqual(validateState(clean), []);
+  assert.ok(clean.blocks[0].props.items.every((it) => it && typeof it.text === 'string'), '空の要素は、空の項目に作り直す');
+  for (const name of ['a\u0000b', 'a\u202Eb', 'a\nb']) assert.ok(validateState({ ...structuredClone(MINIMAL), site: { name } }).length, JSON.stringify(name));
+});
+
 test('目的・テーマ・バージョンの一覧', () => {
   assert.equal(GOALS.length, 8);
   assert.equal(THEMES.length, 4);

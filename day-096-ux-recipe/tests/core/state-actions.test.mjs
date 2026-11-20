@@ -213,5 +213,9 @@ test('壊れた操作・存在しないid・型の違う添字とpathはすべ�
   for (const broken of [null, undefined, [], {}, { ...state, blocks: [null] }, { ...state, blocks: Array(2) }, sparseRows, { ...state, theme: {} }]) {
     assert.strictEqual(reduce(broken, { type: 'setSite', name: '店' }), broken);
   }
-  assert.strictEqual(reduce(state, { type: 'replace', state: sparseRows }), state);
+  // 疎配列（空の要素）は、他の欠けた項目と同じく、空の項目に作り直して受け入れる（契約の sanitize が配列を添字で作る）
+  const repaired = reduce(state, { type: 'replace', state: sparseRows });
+  assert.notStrictEqual(repaired, state);
+  assert.deepEqual(validateState(repaired), []);
+  assert.ok(repaired.blocks[0].props.items.every((item) => item && typeof item.title === 'string'));
 });

@@ -179,7 +179,8 @@ function sanitizeFields(fields, raw) {
     else if (f.kind === 'long') out[f.key] = clampText(v, f.max, true);
     else if (f.kind === 'check') out[f.key] = v === true;
     else {
-      const arr = Array.isArray(v) ? v.slice(0, f.max).map((it) => sanitizeFields(f.item, it)) : [];
+      // 添字で作る（map は疎配列の空の要素を飛ばし、空の要素が検証をすり抜けるため）
+      const arr = Array.isArray(v) ? Array.from({ length: Math.min(v.length, f.max) }, (_, i) => sanitizeFields(f.item, v[i])) : [];
       while (arr.length < f.min) arr.push(blankFields(f.item));
       out[f.key] = arr;
     }
@@ -257,7 +258,7 @@ function validateFields(fields, obj, where, errors) {
     } else if (!Array.isArray(v)) errors.push(`${at}: 配列ではありません`);
     else {
       if (v.length < f.min || v.length > f.max) errors.push(`${at}: 件数が ${f.min}〜${f.max} の外です（${v.length}）`);
-      v.forEach((it, i) => validateFields(f.item, it, `${at}[${i}]`, errors));
+      for (let i = 0; i < v.length; i += 1) validateFields(f.item, v[i], `${at}[${i}]`, errors); // 添字で回す（forEach は空の要素を飛ばす）
     }
   }
 }
@@ -268,7 +269,7 @@ export function validateState(state) {
   if (!isObj(state)) return ['state: オブジェクトではありません'];
   if (state.v !== SCHEMA_VERSION) errors.push(`v: ${SCHEMA_VERSION} ではありません`);
   if (!GOALS.includes(state.goal)) errors.push('goal: 知らない目的です');
-  if (!isObj(state.site) || typeof state.site.name !== 'string' || countChars(state.site.name) > SITE_NAME_MAX) errors.push('site.name: 文字列（24文字まで）ではありません');
+  if (!isObj(state.site) || typeof state.site.name !== 'string' || countChars(state.site.name) > SITE_NAME_MAX || HAS_CONTROL_SINGLE.test(state.site.name)) errors.push('site.name: 文字列（24文字まで・制御文字なし）ではありません');
   if (!isObj(state.theme) || !THEMES.includes(state.theme.preset) || !isIndex(state.theme.accent) || state.theme.accent >= ACCENTS.length) errors.push('theme: preset・accent が不正です');
   if (!Array.isArray(state.blocks)) { errors.push('blocks: 配列ではありません'); return errors; }
   if (state.blocks.length > MAX_BLOCKS) errors.push(`blocks: ${MAX_BLOCKS}件を超えています`);
