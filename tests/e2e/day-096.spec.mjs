@@ -269,7 +269,7 @@ test.describe('操作性（スマホ・キーボード・動きを減らす）',
     const panel = await page.locator('#slot-panel').boundingBox();
     expect(panel.height, '開いたパネルの高さ').toBeGreaterThan(220);
     expect(preview.height, 'パネルを開いてもプレビューが見える').toBeGreaterThan(200);
-    expect(preview.y + preview.height).toBeLessThanOrEqual(panel.y + 4);
+    expect(preview.y + preview.height).toBeLessThanOrEqual(panel.y + 12); // パネルの角丸の分だけ重なってよい
     const small = await page.evaluate(() => [...document.querySelectorAll('#app button, #app [role="tab"], #app [role="radio"], #app input[type="radio"], #app input[type="checkbox"]')]
       .filter((e) => e.offsetParent !== null && !e.closest('.uxr-page'))
       .map((e) => { const box = (e.matches('input') ? e.closest('label') ?? e : e).getBoundingClientRect(); return { name: (e.getAttribute('aria-label') || e.textContent || '').trim().slice(0, 20), w: Math.round(box.width), h: Math.round(box.height) }; })
