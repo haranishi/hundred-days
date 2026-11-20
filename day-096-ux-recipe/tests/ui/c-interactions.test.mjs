@@ -42,7 +42,10 @@ test('キー操作はIME・入力欄・ダイアログに割り込まない', ()
   assert.equal(keyAction({ key: 'ArrowDown', altKey: true }), 'down');
   assert.equal(keyAction({ key: 'Escape' }), 'escape');
   assert.equal(keyAction({ key: 'Delete' }), 'remove');
-  for (const flags of [{ editing: true }, { modal: true }, { isComposing: true }, { keyCode: 229 }, { repeat: true }]) {
+  for (const flags of [
+    { editing: true }, { modal: true }, { isComposing: true }, { keyCode: 229 }, { repeat: true },
+    { ctrlKey: true }, { metaKey: true }, { shiftKey: true }, { altKey: true },
+  ]) {
     assert.equal(keyAction({ key: 'Delete', ...flags }), null);
   }
   assert.equal(keyAction({ key: 'Backspace' }), null);

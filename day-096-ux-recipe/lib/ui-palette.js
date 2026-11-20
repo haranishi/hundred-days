@@ -2,6 +2,8 @@ import { BLOCK_SCHEMA, BLOCK_TYPES, EFFECT_LABEL, EFFECTS, MAX_BLOCKS } from './
 import { BLOCK_INFO } from './blocks.js';
 import { stageMark } from './ui-goal.js';
 
+export const blockLimitMessage = MAX_BLOCKS + '個までです。どれかを削除すると足せます。';
+
 export function insertionIndex(blocks, selectedId, index) {
   if (Number.isInteger(index)) return Math.max(0, Math.min(blocks.length, index));
   const selected = blocks.findIndex(block => block.id === selectedId);
@@ -12,7 +14,7 @@ export function mountPalette(dialog, ctx) {
   const groups = dialog.querySelector('[data-groups]');
   const note = dialog.querySelector('[data-limit]');
   let requestedIndex;
-  for (const effect of EFFECTS) {
+  const sections = EFFECTS.map(effect => {
     const section = document.createElement('section');
     const heading = document.createElement('h3');
     heading.className = 'ed-group-title';
@@ -37,12 +39,13 @@ export function mountPalette(dialog, ctx) {
       button.append(stageMark(BLOCK_SCHEMA[type].stage), text);
       section.append(button);
     }
-    groups.append(section);
-  }
+    return section;
+  });
+  groups.append(...sections);
 
   function update() {
     const full = ctx.getState().blocks.length >= MAX_BLOCKS;
-    note.textContent = full ? '部品は' + MAX_BLOCKS + '個までです。追加するには、先にひとつ削除してください。'
+    note.textContent = full ? blockLimitMessage
       : 'お客さんに伝えたいことに合わせて選んでください。';
     for (const choice of groups.querySelectorAll('button')) choice.disabled = full;
   }
@@ -71,6 +74,10 @@ export function mountPalette(dialog, ctx) {
       if (!dialog.open) dialog.showModal();
       dialog.scrollTop = 0;
     },
-    destroy() { unsubscribe(); groups.removeEventListener('click', click); },
+    destroy() {
+      unsubscribe();
+      groups.removeEventListener('click', click);
+      for (const section of sections) section.remove();
+    },
   };
 }

@@ -36,9 +36,13 @@ async function settle(page) {
 }
 const outlineRows = (page) => page.locator('#slot-outline li.ed-row');
 /** 構成の行の操作（上へ移動・複製など）は、ホバー・フォーカス・選択のある行にだけ見える。行へ寄せてから押す。 */
+/** 行の操作（▲▼・複製・削除）は、選択中の行にだけ出る。先に選んでから押す。 */
 async function rowAction(row, name) {
-  await row.hover();
-  await row.getByRole('button', { name, exact: true }).click();
+  const selected = await row.evaluate((el) => el.classList.contains('is-selected'));
+  if (!selected) await row.locator('.ed-pick').click();
+  const button = row.getByRole('button', { name, exact: true });
+  await expect(button).toBeVisible();
+  await button.click();
 }
 const getState = (page) => page.evaluate(() => window.__uxr.getState());
 const types = async (page) => (await getState(page)).blocks.map((b) => b.type);
@@ -144,6 +148,25 @@ test.describe('組み立てと編集', () => {
     expect((await types(page)).length).toBe(n + 2);
   });
 
+  test('複製した直後の複製の行を、そのまま削除できる（押している間に行が動かない・マウスを動かしても跳ねない）', async ({ page }) => {
+    await startEditor(page);
+    const rows = outlineRows(page);
+    const n = (await types(page)).length;
+    await rowAction(rows.nth(4), '複製');
+    expect((await types(page)).length).toBe(n + 1);
+    // 複製の行（選択中）の削除を、先にホバーせず、普通のクリックで押す。
+    const selectedRow = page.locator('#slot-outline li.ed-row.is-selected');
+    await expect(selectedRow).toHaveCount(1);
+    await selectedRow.getByRole('button', { name: '削除', exact: true }).click();
+    expect((await types(page)).length).toBe(n);
+    // 行の位置が、マウスを動かしただけでは変わらない（ホバー・フォーカスで高さを変えない）。
+    const tops = () => rows.evaluateAll((els) => els.map((el) => Math.round(el.getBoundingClientRect().top)));
+    const before = await tops();
+    for (const i of [0, 3, 6, 2]) await rows.nth(i).hover();
+    await rows.nth(1).locator('.ed-pick').focus();
+    expect(await tops()).toEqual(before);
+  });
+
   test('診断: ヒーローを消すと点が下がり、「なおす」で戻る。期限・残り枠は「本当の数字」を確認するまで残る', async ({ page }) => {
     await startEditor(page);
     const full = await page.evaluate(() => window.__uxr.diagnose().score);
@@ -161,6 +184,50 @@ test.describe('組み立てと編集', () => {
     expect(limited?.props.real).toBe(false);
     const items = await page.evaluate(() => window.__uxr.diagnose().items);
     expect(items.find((i) => i.id === 'honest-limited')?.ok).toBe(false);
+  });
+
+  test('診断: 期限・残り枠の確認の印は、アプリが勝手に付けない。「この部品を見る」から本人が付ける', async ({ page }) => {
+    await startEditor(page, '参加してもらう');
+    await tab(page, '診断');
+    const card = page.locator('article.cs-rule').filter({ hasText: '期限や人数の表示すべてに確認の印がある' });
+    await expect(card.getByRole('button', { name: 'なおす' })).toHaveCount(0);
+    await card.getByRole('button', { name: 'この部品を見る' }).click();
+    const real = page.getByRole('checkbox', { name: '本当の数字です' });
+    await expect(real).toBeFocused();
+    const limitedReal = async () => (await getState(page)).blocks.find((b) => b.type === 'limited').props.real;
+    expect(await limitedReal()).toBe(false);
+    await page.keyboard.press('Space');
+    expect(await limitedReal()).toBe(true);
+    const item = await page.evaluate(() => window.__uxr.diagnose().items.find((i) => i.id === 'honest-limited'));
+    expect(item.ok).toBe(true);
+  });
+
+  test('診断: 見出しが空だと「先頭に用件を伝える見出し」が✗になる。部品が0個なら0点で案内が出る', async ({ page }) => {
+    await startEditor(page);
+    const heroId = (await getState(page)).blocks.find((b) => b.type === 'hero').id;
+    await page.evaluate((id) => window.__uxr.dispatch({ type: 'setProp', id, path: ['title'], value: '' }), heroId);
+    const first = await page.evaluate(() => window.__uxr.diagnose().items.find((i) => i.id === 'hero-first'));
+    expect(first.ok).toBe(false);
+    for (const id of (await getState(page)).blocks.map((b) => b.id)) {
+      await page.evaluate((x) => window.__uxr.dispatch({ type: 'removeBlock', id: x }), id);
+    }
+    await tab(page, '診断');
+    await expect(page.locator('#panel-diagnosis')).toContainText('部品がありません');
+    expect(await page.evaluate(() => window.__uxr.diagnose().score)).toBe(0);
+  });
+
+  test('見た目: サイトの名前を変えると、文章に残る見本の店名をまとめて置き換えられる（1回の元に戻す）', async ({ page }) => {
+    await startEditor(page);
+    const sampleName = (await getState(page)).site.name;
+    const uses = async () => JSON.stringify((await getState(page)).blocks).split(sampleName).length - 1;
+    expect(await uses()).toBeGreaterThan(0);
+    await tab(page, '見た目');
+    await page.getByLabel('サイトの名前').fill('テスト食堂');
+    await expect(page.locator('#panel-look')).toContainText(sampleName);
+    await page.locator('#panel-look').getByRole('button', { name: /置き換える/ }).click();
+    expect(await uses()).toBe(0);
+    await page.locator('#slot-topbar').getByRole('button', { name: '元に戻す' }).click();
+    expect(await uses()).toBeGreaterThan(0);
   });
 
   test('見た目: テーマと強調色とサイトの名前が、プレビューに反映される', async ({ page }) => {
@@ -257,6 +324,21 @@ test.describe('共有・書き出し・保存', () => {
     await page.locator('#dlg-slots').getByRole('textbox').fill('確認用');
     await page.locator('#dlg-slots').getByRole('button', { name: '保存する' }).click();
     await expect(page.locator('#dlg-slots')).toContainText('確認用');
+  });
+
+  test('保存: 保存した枠を消しても、通知の「元に戻す」で戻せる', async ({ page }) => {
+    await startEditor(page);
+    await page.getByRole('button', { name: '保存・開く' }).click();
+    const dialog = page.locator('#dlg-slots');
+    await dialog.getByRole('textbox').fill('消す確認');
+    await dialog.getByRole('button', { name: '保存する' }).click();
+    const rows = dialog.locator('li.cs-slot-row');
+    await expect(rows).toHaveCount(1);
+    await rows.first().getByRole('button', { name: '消す' }).click();
+    await expect(rows).toHaveCount(0); // 通知の文にも名前が出るので、一覧の行で数える
+    await page.locator('#toasts').getByRole('button', { name: '元に戻す' }).click();
+    await expect(rows).toHaveCount(1);
+    await expect(rows.first()).toContainText('消す確認');
   });
 });
 

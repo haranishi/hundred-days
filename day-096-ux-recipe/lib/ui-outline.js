@@ -2,6 +2,7 @@ import { BLOCK_SCHEMA, MAX_BLOCKS } from './contract.js';
 import { attachDrag } from './dnd.js';
 import { removeWithUndo } from './keys.js';
 import { stageMark, toolIcon } from './ui-goal.js';
+import { blockLimitMessage } from './ui-palette.js';
 
 export function blockExcerpt(block) {
   const fields = BLOCK_SCHEMA[block.type].fields;
@@ -40,6 +41,7 @@ function makeRow(block) {
   summary.id = 'ed-excerpt-' + block.id;
   pick.setAttribute('aria-labelledby', name.id);
   pick.setAttribute('aria-describedby', summary.id);
+  pick.setAttribute('aria-keyshortcuts', 'Alt+ArrowUp Alt+ArrowDown');
   const text = document.createElement('span');
   text.className = 'ed-row-text';
   text.append(name, summary);
@@ -60,7 +62,10 @@ export function mountOutline(root, ctx) {
   const scroller = root.querySelector('[data-scroller]');
   const count = root.querySelector('[data-count]');
   const add = root.querySelector('[data-add]');
+  const limitNote = root.querySelector('[data-add-limit]');
+  limitNote.textContent = blockLimitMessage;
   const announcement = root.querySelector('[data-announcement]');
+  const wide = matchMedia('(min-width: 1100px)');
   let previous = null;
   let rows = new Map();
 
@@ -71,14 +76,16 @@ export function mountOutline(root, ctx) {
   const drag = attachDrag(list, scroller, move);
 
   function render({ state, selectedId, action }) {
-    if (previous !== state.blocks) {
+    const blocks = state.blocks;
+    const changed = previous !== blocks;
+    const y = scroller.scrollTop;
+    const active = root.ownerDocument.activeElement;
+    const focused = list.contains(active) ? active : null;
+    const oldRow = focused?.closest('[data-row]');
+    const oldIndex = oldRow ? [...list.children].indexOf(oldRow) : -1;
+    if (changed) {
       drag.cancel();
-      const y = scroller.scrollTop;
-      const focused = list.contains(document.activeElement) ? document.activeElement : null;
-      const oldRow = focused?.closest('[data-row]');
-      const oldIndex = oldRow ? [...list.children].indexOf(oldRow) : -1;
       const next = new Map();
-      const blocks = state.blocks;
       for (const [index, block] of blocks.entries()) {
         const existing = rows.get(block.id);
         const row = existing?.dataset.type === block.type ? existing : makeRow(block);
@@ -95,20 +102,10 @@ export function mountOutline(root, ctx) {
       rows = next;
       count.textContent = blocks.length + ' / ' + MAX_BLOCKS;
       add.disabled = blocks.length >= MAX_BLOCKS;
+      limitNote.hidden = !add.disabled;
+      if (add.disabled) add.setAttribute('aria-describedby', limitNote.id);
+      else add.removeAttribute('aria-describedby');
       root.querySelector('[data-empty]').hidden = blocks.length > 0;
-      if (focused && (document.activeElement !== focused || focused.disabled)) {
-        const nextRow = rows.get(oldRow?.dataset.row) ?? list.children[Math.min(oldIndex, blocks.length - 1)];
-        const same = rows.has(oldRow?.dataset.row) && nextRow?.querySelector('[data-act="' + focused.dataset.act + '"]');
-        const target = same && !same.disabled ? same : nextRow?.querySelector('[data-act="select"]');
-        (target ?? add).focus({ preventScroll: true });
-      }
-      scroller.scrollTop = y;
-      if (focused && action?.type === 'moveBlock' && list.contains(document.activeElement)) {
-        const box = scroller.getBoundingClientRect();
-        const target = document.activeElement.getBoundingClientRect();
-        if (target.top < box.top) scroller.scrollTop += target.top - box.top - 4;
-        else if (target.bottom > box.bottom) scroller.scrollTop += target.bottom - box.bottom + 4;
-      }
       previous = blocks;
       if (action?.type === 'moveBlock') {
         const index = blocks.findIndex(block => block.id === action.id);
@@ -116,8 +113,27 @@ export function mountOutline(root, ctx) {
       }
     }
     for (const [id, row] of rows) {
-      row.classList.toggle('is-selected', id === selectedId);
-      row.querySelector('[data-act="select"]').setAttribute('aria-pressed', String(id === selectedId));
+      const selected = id === selectedId;
+      row.classList.toggle('is-selected', selected);
+      row.querySelector('.ed-row-actions').hidden = wide.matches && !selected;
+      // 名前でも並べ替えられるため、広い画面ではTabで選択行の操作段へ直接進める。
+      row.querySelector('[data-act="grip"]').tabIndex = wide.matches ? -1 : 0;
+      row.querySelector('[data-act="select"]').setAttribute('aria-pressed', String(selected));
+    }
+    if (oldRow && !root.closest('[hidden]') &&
+        (root.ownerDocument.activeElement !== focused || focused.disabled || focused.closest('[hidden]'))) {
+      const sameRow = rows.get(oldRow.dataset.row);
+      const same = sameRow?.querySelector('[data-act="' + focused.dataset.act + '"]');
+      const nextRow = sameRow ?? list.children[Math.min(oldIndex, blocks.length - 1)];
+      const target = same && !same.disabled && !same.closest('[hidden]') ? same : nextRow?.querySelector('[data-act="select"]');
+      (target ?? add).focus({ preventScroll: true });
+    }
+    if (changed) scroller.scrollTop = y;
+    if (focused && action?.type === 'moveBlock' && list.contains(root.ownerDocument.activeElement)) {
+      const box = scroller.getBoundingClientRect();
+      const target = root.ownerDocument.activeElement.getBoundingClientRect();
+      if (target.top < box.top) scroller.scrollTop += target.top - box.top - 4;
+      else if (target.bottom > box.bottom) scroller.scrollTop += target.bottom - box.bottom + 4;
     }
   }
 
@@ -127,6 +143,7 @@ export function mountOutline(root, ctx) {
     if (button === add) { ctx.openPalette(undefined, add); return; }
     const id = button.closest('[data-row]')?.dataset.row;
     if (!id) return;
+    button.focus({ preventScroll: true });
     const blocks = ctx.getState().blocks;
     const from = blocks.findIndex(block => block.id === id);
     switch (button.dataset.act) {
@@ -136,14 +153,31 @@ export function mountOutline(root, ctx) {
       case 'copy': {
         ctx.dispatch({ type: 'duplicateBlock', id });
         const added = ctx.getState().blocks[from + 1];
-        if (added && blocks.length < ctx.getState().blocks.length) ctx.select(added.id, { tab: ctx.getTab() });
+        if (added && blocks.length < ctx.getState().blocks.length) {
+          ctx.select(added.id, { tab: ctx.getTab() });
+          // 広い画面では複製元の操作段が閉じるので、複製先で続きの操作ができるようにする。
+          if (wide.matches) {
+            const row = rows.get(added.id);
+            const copy = row.querySelector('[data-act="copy"]');
+            (copy.disabled ? row.querySelector('[data-act="select"]') : copy).focus();
+          }
+        }
         break;
       }
       case 'grip': ctx.select(id, { tab: ctx.getTab() }); break;
       case 'select': ctx.select(id); break;
     }
   }
+  const resize = () => render({ state: ctx.getState(), selectedId: ctx.getSelectedId() });
   const unsubscribe = ctx.subscribe(render);
+  wide.addEventListener('change', resize);
   root.addEventListener('click', click);
-  return { destroy() { unsubscribe(); drag.destroy(); root.removeEventListener('click', click); } };
+  return { destroy() {
+    unsubscribe();
+    drag.destroy();
+    wide.removeEventListener('change', resize);
+    root.removeEventListener('click', click);
+    for (const row of rows.values()) row.remove();
+    rows.clear();
+  } };
 }

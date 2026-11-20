@@ -45,13 +45,13 @@ export function mountPreview(root, ctx) {
   const paperSpace = page.parentElement;
   const scroll = root.querySelector('.ed-preview-scroll');
   const score = root.querySelector('[data-score]');
+  const scaleNote = root.querySelector('[data-scale-note]');
   const meter = root.querySelector('.ed-meter');
   const devices = [...root.querySelectorAll('button[data-device]')];
-  const deviceChoice = matchMedia('(min-width: 720px)');
+  const twoColumns = matchMedia('(min-width: 720px)');
   let width;
   let lastState;
   let lastCounts;
-  let lastSelected;
   let paused = false;
   let pickingInPage = false;
   let tap = null;
@@ -62,15 +62,17 @@ export function mountPreview(root, ctx) {
   tag.setAttribute('aria-hidden', 'true');
 
   function fit() {
-    if (paperSpace.clientWidth && width) {
-      page.style.zoom = String(previewScale(paperSpace.clientWidth, width));
-    }
+    if (!paperSpace.clientWidth || !width) return;
+    const scale = previewScale(paperSpace.clientWidth, width);
+    page.style.setProperty('--ed-preview-scale', String(scale));
+    // 数%の縮みでは案内を出さない（スマホ枠が少し縮むだけで毎回出ると、ただの雑音になる）。パソコン表示の縮小が対象。
+    scaleNote.hidden = scale >= 0.9;
   }
   const observer = new ResizeObserver(() => {
     fit();
     const height = scroll.clientHeight;
     // パネルが伸びる間も、狭くなった分だけプレビューを送る。
-    if (height > 0 && height < viewportHeight && !deviceChoice.matches && ctx.isMobilePanelOpen()) {
+    if (height > 0 && height < viewportHeight && !twoColumns.matches && ctx.isMobilePanelOpen()) {
       revealBlock(ctx.getSelectedId());
     }
     viewportHeight = height;
@@ -109,7 +111,7 @@ export function mountPreview(root, ctx) {
 
   function applyDevice() {
     if (paused) return;
-    const key = deviceChoice.matches ? ctx.getDevice() : 'phone';
+    const key = ctx.getDevice();
     const device = DEVICES.find(item => item.key === key);
     if (device.width === width) return;
     width = device.width;
@@ -118,62 +120,85 @@ export function mountPreview(root, ctx) {
     for (const button of devices) button.setAttribute('aria-pressed', String(button.dataset.device === key));
     fit();
   }
-  deviceChoice.addEventListener('change', applyDevice);
+
+  function rememberFocus() {
+    const active = root.ownerDocument.activeElement;
+    if (!page.contains(active)) return null;
+    const block = active.closest('[data-block-id]');
+    const summary = active.closest('summary');
+    return {
+      id: block?.dataset.blockId, path: active.closest('[data-path]')?.dataset.path,
+      // 質問の文章にだけ編集用の印があり、Tabが止まるsummary自体には付かない。
+      question: summary && block ? [...block.querySelectorAll('summary')].indexOf(summary) : -1,
+      range: typeof active.selectionStart === 'number'
+        ? [active.selectionStart, active.selectionEnd, active.selectionDirection] : null,
+    };
+  }
+
+  function restoreFocus(saved) {
+    if (!saved) return;
+    const block = blocks.get(saved.id);
+    const scope = saved.id ? block : page;
+    const field = saved.path && [...(scope?.querySelectorAll('[data-path]') ?? [])].find(el => el.dataset.path === saved.path);
+    const control = field && field.closest('a, button, input, textarea, select, summary, [tabindex]');
+    const summary = saved.question >= 0 ? block?.querySelectorAll('summary')[saved.question] : null;
+    const target = control || summary || block || scroll;
+    target.focus({ preventScroll: true });
+    if (saved.range && typeof target.selectionStart === 'number') target.setSelectionRange(...saved.range);
+  }
+
+  function markSelected(id) {
+    const next = blocks.get(id) ?? null;
+    const previous = tag.parentElement;
+    if (previous === next) return;
+    previous?.classList.remove('is-selected');
+    tag.remove();
+    if (next) {
+      next.classList.add('is-selected');
+      tag.textContent = next.dataset.blockLabel;
+      next.append(tag);
+    }
+  }
 
   function render({ state, selectedId, diagnosis, reason, action }) {
     if (paused) return;
     applyDevice();
-    if (state !== lastState) {
-      const freshPage = reason === 'load' || action?.type === 'setGoal' || action?.type === 'replace';
-      const y = freshPage ? 0 : scroll.scrollTop;
-      const x = scroll.scrollLeft;
-      const active = root.ownerDocument.activeElement;
-      const focused = page.contains(active);
-      const focusId = active?.closest('[data-block-id]')?.dataset.blockId;
-      const focusPath = active?.closest('[data-path]')?.dataset.path;
-      page.innerHTML = renderPage(state, { mode: 'preview' });
-      tap = null;
-      blocks = new Map([...page.querySelectorAll('[data-block-id]')].map(node => [node.dataset.blockId, node]));
-      for (const block of state.blocks) {
-        const node = blocks.get(block.id);
-        if (!node) continue;
-        node.dataset.blockLabel = BLOCK_SCHEMA[block.type].label;
-        node.tabIndex = 0;
-        node.setAttribute('aria-label', BLOCK_SCHEMA[block.type].label);
-      }
-      const brand = page.querySelector('[data-path="site.name"]');
-      if (brand) { brand.tabIndex = 0; brand.setAttribute('role', 'button'); }
-      if (focused) {
-        const node = blocks.get(focusId) ?? page;
-        const target = focusPath && [...node.querySelectorAll('[data-path]')].find(el => el.dataset.path === focusPath);
-        const fallback = blocks.get(focusId) ?? scroll;
-        (target?.matches('a,button,summary,[tabindex]') ? target : fallback).focus({ preventScroll: true });
-      }
-      drawFlow(diagnosis);
-      fit();
-      scroll.scrollTop = y;
-      scroll.scrollLeft = x;
-      lastState = state;
-      lastSelected = null;
+    if (state === lastState) {
+      markSelected(selectedId);
+      return;
     }
-    if (lastSelected !== selectedId) {
-      blocks.get(lastSelected)?.classList.remove('is-selected');
-      tag.remove();
-      const selected = blocks.get(selectedId);
-      if (selected) {
-        selected.classList.add('is-selected');
-        tag.textContent = selected.dataset.blockLabel;
-        selected.append(tag);
-      }
-      lastSelected = selectedId;
+    const freshPage = reason === 'load' || action?.type === 'setGoal' || action?.type === 'replace';
+    const y = freshPage ? 0 : scroll.scrollTop;
+    const x = scroll.scrollLeft;
+    const focused = rememberFocus();
+    page.innerHTML = renderPage(state, { mode: 'preview' });
+    tap = null;
+    blocks = new Map([...page.querySelectorAll('[data-block-id]')].map(node => [node.dataset.blockId, node]));
+    for (const block of state.blocks) {
+      const node = blocks.get(block.id);
+      if (!node) continue;
+      node.dataset.blockLabel = BLOCK_SCHEMA[block.type].label;
+      node.tabIndex = 0;
+      node.setAttribute('aria-label', BLOCK_SCHEMA[block.type].label);
     }
+    const brand = page.querySelector('[data-path="site.name"]');
+    if (brand) { brand.tabIndex = 0; brand.setAttribute('role', 'button'); }
+    markSelected(selectedId);
+    restoreFocus(focused);
+    drawFlow(diagnosis);
+    fit();
+    scroll.scrollTop = y;
+    scroll.scrollLeft = x;
+    lastState = state;
   }
 
   function revealBlock(id) {
     const part = tap && tap.id === id ? tap.node : null;
     const block = blocks.get(id) ?? part;
     if (!block) return;
-    const delta = previewScrollDelta(scroll.getBoundingClientRect(), block.getBoundingClientRect(),
+    const bounds = block.getBoundingClientRect();
+    const taggedBounds = tag.parentElement === block ? { top: tag.getBoundingClientRect().top, bottom: bounds.bottom } : bounds;
+    const delta = previewScrollDelta(scroll.getBoundingClientRect(), taggedBounds,
       part?.getBoundingClientRect(), part ? tap.offset : undefined);
     if (delta) scroll.scrollTop += delta;
   }
@@ -187,7 +212,7 @@ export function mountPreview(root, ctx) {
     pickingInPage = true;
     try { ctx.select(id, options); }
     finally { pickingInPage = false; }
-    if (!deviceChoice.matches) revealBlock(id);
+    if (!twoColumns.matches) revealBlock(id);
   }
 
   function click(event) {
@@ -228,6 +253,7 @@ export function mountPreview(root, ctx) {
       // 見るだけ画面と編集画面に、同じページ内リンクの行き先を二つ作らない。
       paused = true;
       tap = null;
+      markSelected(null);
       page.replaceChildren();
       blocks.clear();
       lastState = null;
@@ -240,7 +266,6 @@ export function mountPreview(root, ctx) {
     destroy() {
       unsubscribe();
       observer.disconnect();
-      deviceChoice.removeEventListener('change', applyDevice);
       root.removeEventListener('click', click);
       page.removeEventListener('keydown', keydown);
       page.removeEventListener('submit', stopSubmit);

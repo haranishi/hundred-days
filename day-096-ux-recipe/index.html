@@ -40,6 +40,11 @@
     <symbol id="i-pc" viewBox="0 0 24 24"><rect x="2" y="3.5" width="20" height="14" rx="2"/><path d="M12 17.5V21m-5 0h10"/></symbol>
   </svg>
   <div id="app" class="app-shell" data-screen="goal">
+    <nav class="ed-skips" aria-label="編集画面の移動">
+      <a href="#slot-outline" data-skip="outline">構成へ</a>
+      <a href="#slot-preview" data-skip="preview">プレビューへ</a>
+      <a href="#slot-panel" data-skip="panel">編集パネルへ</a>
+    </nav>
     <main id="screen-goal" class="app-goal">
       <header class="app-mast"><div class="app-mast-inner">
         <div class="app-brand"><img src="./favicon.svg" width="32" height="32" alt="">UXレシピ</div>
@@ -85,6 +90,7 @@
             <ol class="ed-rows" role="list"></ol>
             <p class="ed-empty" data-empty hidden>部品を足して、ページを組み立てましょう。</p>
             <button type="button" class="app-btn ed-add" data-add><svg class="ed-icon" aria-hidden="true"><use href="#i-add"/></svg>部品を足す</button>
+            <p id="ed-add-limit" class="ed-limit-note" data-add-limit hidden></p>
           </div>
           <span class="ed-sr" aria-live="polite" aria-atomic="true" data-announcement></span>
         </section>
@@ -99,6 +105,7 @@
               <button type="button" class="app-btn ed-score" data-score></button>
             </div>
             <ol class="ed-meter" aria-label="お客さんの流れ" role="list"></ol>
+            <p class="ed-scale-note" data-scale-note hidden>縮小して表示しています</p>
           </div>
           <div class="ed-preview-scroll" role="region" tabindex="0" aria-label="ページのプレビュー">
             <div class="ed-frame" data-frame><div class="ed-paper-space"><div class="ed-page-surface" data-page></div></div></div>

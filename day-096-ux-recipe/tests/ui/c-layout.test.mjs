@@ -90,15 +90,32 @@ test('上部バーで文字を省いても5つの操作名と保存状態の読�
   assert.match(status, /aria-live="polite"/);
 });
 
-test('構成の操作を畳むCSSは、幅1100px以上でホバーできる端末の非選択・非操作行だけに効く', () => {
-  const css = readFileSync(new URL('../../app.css', import.meta.url), 'utf8');
-  const desktop = css.match(/@media \(min-width: 1100px\) and \(hover: hover\)\s*\{((?:[^{}]|\{[^{}]*\})*)\}/)?.[1];
-  assert.ok(desktop);
-  const hidden = desktop.match(/\.ed-row:not\(([^)]+)\) \.ed-row-actions\s*\{([^}]+)\}/);
-  assert.ok(hidden);
-  assert.deepEqual(hidden[1].split(/,\s*/), ['.is-selected', ':hover', ':focus-within']);
-  assert.match(hidden[2], /height:\s*0;/);
-  assert.match(hidden[2], /opacity:\s*0;/);
-  assert.match(hidden[2], /pointer-events:\s*none;/);
-  assert.doesNotMatch(css, /\.ed-row-actions\s*\{[^}]*(display:\s*none|visibility:\s*hidden)/);
+const css = readFileSync(new URL('../../app.css', import.meta.url), 'utf8');
+const media = condition => css.split('@media ' + condition + ' {')[1]?.split('@media')[0] ?? '';
+
+test('広い構成では選択だけで操作段を表示し、ホバーやフォーカスで行を伸縮しない', () => {
+  assert.match(media('(min-width: 1100px)'), /\.ed-row:not\(\.is-selected\) \.ed-row-actions\s*\{[^}]*display:\s*none/);
+  assert.doesNotMatch(css, /\.ed-row[^{}]*(?::hover|:focus-within)[^{}]*\.ed-row-actions/);
+});
+
+test('狭い構成では名前・つまみ・操作が同じ段に収まり、44pxのボタンと抜粋の省略を保つ', () => {
+  const compact = media('(width < 1100px)');
+  assert.match(compact, /\.ed-row\s*\{[^}]*grid-template-columns:\s*minmax\(44px, 1fr\) 44px auto/);
+  assert.match(compact, /\.ed-row-actions\s*\{[^}]*grid-column:\s*auto/);
+  assert.match(compact, /\.ed-row-control\s*\{[^}]*width:\s*44px/);
+  assert.match(css, /\.ed-excerpt\s*\{[^}]*text-overflow:\s*ellipsis/);
+});
+
+test('プレビューではラベルの高さを枠の外に確保し、縮小時もサイト名を44px以上押せる', () => {
+  assert.match(css, /\.uxr-block\.is-selected\s*\{[^}]*margin-block-start:/);
+  assert.match(css, /\.ed-block-tag\s*\{[^}]*bottom:\s*calc\(100%/);
+  assert.match(css, /\[data-path="site\.name"\]\s*\{[^}]*min-height:\s*calc\(44px \/ var\(--ed-preview-scale/);
+  assert.match(css, /#slot-preview [^{]*:focus-visible\s*\{[^}]*outline:[^}]*outline-offset:[^}]*box-shadow:/);
+});
+
+test('スマホの通知はセーフエリアと上部バーの下に出て、画面下のボタンを空ける', () => {
+  const mobile = media('(width < 720px)');
+  const position = mobile.match(/\.app-toasts\s*\{([^}]*)\}/)?.[1] ?? '';
+  assert.match(position, /top:\s*calc\([^;]*safe-area-inset-top/);
+  assert.match(position, /bottom:\s*auto/);
 });
