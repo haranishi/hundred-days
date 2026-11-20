@@ -1,0 +1,43 @@
+{
+  "day": 96,
+  "season": 3,
+  "title": "UXレシピ — 目的を選ぶと、ページの組み立て方が出る",
+  "description": "登録なし・無料のブラウザアプリ。予約・購入・応募など8つの目的から選ぶと、その目的のページが部品の並びとして組み上がる。部品は入れ替えられ、触るたびに「UXの流れ」と、理由つきの診断が更新される。できたページは、共有リンク・HTML・画像で持ち出せる。",
+  "tags": [
+    "UX",
+    "ページ制作",
+    "診断",
+    "ブラウザ完結",
+    "スマホ対応"
+  ],
+  "status": "draft",
+  "publicUrl": "https://rairakku.com/100days/day-096-ux-recipe/",
+  "screenshot": "screenshot.webp",
+  "startedAt": "2026-11-20",
+  "finishedAt": null,
+  "actualMinutes": null,
+  "sourceOfIdea": "本人が「UIとかをUXごとに組み立てられる、簡単で直感的に使えるWebアプリを、100日チャレンジの挑戦として」と依頼した。",
+  "aiHandled": [],
+  "humanHandled": [
+    "企画（UIをUXごとに、簡単で直感的に組み立てるアプリ）と、100日チャレンジのDay96として出す判断",
+    "形の選択（目的から組み立てる）・公開の範囲・使うAI（Codex・Antigravity・Grok）の指定",
+    "1日で公開できる規模でなくてよい、作り込んでほしい、という方針"
+  ],
+  "failuresAndFixes": [],
+  "social": {
+    "x": {
+      "summary": "予約・購入・応募など、目的を選ぶと、ページの部品が順番に並ぶ。入れ替えるたびに、理由つきの診断が出る。登録なし・無料。",
+      "hashtags": [
+        "100日チャレンジ",
+        "個人開発"
+      ],
+      "emoji": "🧩",
+      "ai": "",
+      "human": "",
+      "failure": "",
+      "body": "",
+      "replies": [],
+      "codePublished": true
+    }
+  }
+}
