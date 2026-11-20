@@ -141,7 +141,7 @@ Day 051「ハコニワ」も外部公開アプリです。本体は独立リポ�
 | 093 | find | [制作記録のみ](day-093-find/) | [紹介ページ](https://day93.rairakku.com/) |
 | 094 | スーパーやりたい放題 | [day-094-super-yaritai/](day-094-super-yaritai/) | [紹介ページ](https://day94.rairakku.com/) |
 | 095 | 盆栽日和 — 3Dの盆栽を、切って曲げて育てる | [day-095-bonsai/](day-095-bonsai/) | [アプリを開く](https://rairakku.com/100days/day-095-bonsai/) |
-| 096 | UXレシピ — 目的を選ぶと、ページの組み立て方が出る | [day-096-ux-recipe/](day-096-ux-recipe/) | 未公開 |
+| 096 | UXレシピ — 目的を選ぶと、ページの組み立て方が出る | [day-096-ux-recipe/](day-096-ux-recipe/) | [アプリを開く](https://rairakku.com/100days/day-096-ux-recipe/) |
 <!-- day-index:end -->
 
 ## 1日アプリのルール
