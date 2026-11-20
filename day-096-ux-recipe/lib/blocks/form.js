@@ -52,15 +52,17 @@ export function render(block, ctx) {
   }
 
   const fieldHtml = fields.map(({ item, i }) => {
-    const fid = `uxr-${esc(block.id)}-f${i}`;
+    // ブロックのIDは - と _ を含められるので、単純なつなぎ（b1-f0）だと別のIDと重なる。欄の番号・IDの長さ・IDの順に並べて、1通りに読める形にする。
+    const fid = `uxr-f${i}-${block.id.length}-${esc(block.id)}`;
     return `<div class="uxr-field"><label class="uxr-field-label" for="${fid}">${esc(item.label)}</label><input class="uxr-input" id="${fid}" name="field_${i}" type="text" /></div>`;
   }).join('');
   const submitLabel = typeof block.props.submit === 'string' ? block.props.submit : '';
-  const submit = submitLabel ? `<button class="uxr-btn uxr-form-submit" type="submit">${esc(submitLabel)}</button>` : '';
+  // 見本のフォームは、送信が起きない形にする。<form>＋type=submit だと、公開したHTMLで入力が配信元へGETで送られる（Enterでも送られる）。
+  const submit = submitLabel ? `<button class="uxr-btn uxr-form-submit" type="button">${esc(submitLabel)}</button>` : '';
   const formInner = v1
     ? (fieldHtml || submit ? `<div class="uxr-form-inline">${fieldHtml}${submit}</div>` : '')
     : `${fieldHtml}${submit ? `<div class="uxr-form-actions">${submit}</div>` : ''}`;
-  const form = formInner ? `<form class="uxr-form-box" action="#">${formInner}</form>` : '';
+  const form = formInner ? `<div class="uxr-form-box" role="group" aria-label="入力欄の見本">${formInner}</div>` : '';
   const body = heading || form || note ? `<div class="uxr-card uxr-form-card">${heading}${form}${note}</div>` : '';
   return sec(ctx, block, body);
 }

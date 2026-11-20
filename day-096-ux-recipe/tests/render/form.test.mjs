@@ -26,12 +26,14 @@ test('form preview: フォーカスを奪わない div の枠で描き、本物�
   }
 });
 
-test('form export: 本物の form/label/input/button を描き、v1 は先頭1項目だけ使う', () => {
+test('form export: 送信が起きない見本（<form>を使わず、ボタンは type=button）。label/input を描き、v1 は先頭1項目だけ使う', () => {
   const v0 = renderPage(oneEach('form', 0, sample), { mode: 'export' });
-  assert.ok(v0.includes('<form class="uxr-form-box" action="#">'));
+  // <form> と type=submit があると、公開したHTMLで入力が配信元へGETで送られる（Enterでも）。見本は送信しない。
+  assert.ok(!v0.includes('<form') && !v0.includes('type="submit"') && !v0.includes('action='), '書き出しに送信できる形が無い');
+  assert.ok(v0.includes('<div class="uxr-form-box" role="group" aria-label="入力欄の見本">'));
   assert.equal((v0.match(/<input class="uxr-input"/g) ?? []).length, 3);
-  assert.equal((v0.match(/<label class="uxr-field-label" for="uxr-b1-f\d+"/g) ?? []).length, 3);
-  assert.ok(v0.includes('<button class="uxr-btn uxr-form-submit" type="submit">予約を送る</button>'));
+  assert.equal((v0.match(/<label class="uxr-field-label" for="uxr-f\d+-2-b1"/g) ?? []).length, 3);
+  assert.ok(v0.includes('<button class="uxr-btn uxr-form-submit" type="button">予約を送る</button>'));
 
   const v1 = renderPage(oneEach('form', 1, maxProps('form')), { mode: 'export' });
   assert.ok(v1.includes('class="uxr-form-inline"'));
@@ -64,4 +66,12 @@ test('form: 空の扱いと危険な文字の無害化（preview/export・v0/v1�
       assert.ok(!safe.includes('<img src=x') && safe.includes('&lt;img src=x'), `v${variant}/${mode}`);
     }
   }
+});
+
+test('form export: 欄のIDは、IDに - や _ を含む別の部品と重ならない（b1 の0番目と b1-f0 の欄）', () => {
+  const a = oneEach('form', 0, sample);
+  const html = renderPage({ ...a, blocks: [{ ...a.blocks[0], id: 'b1' }, { ...a.blocks[0], id: 'b1-f0' }] }, { mode: 'export' });
+  const ids = [...html.matchAll(/ id="(uxr-f\d+-\d+-[^"]+)"/g)].map(m => m[1]);
+  assert.ok(ids.length >= 4);
+  assert.equal(new Set(ids).size, ids.length, `IDが重なっている: ${ids.join(',')}`);
 });
