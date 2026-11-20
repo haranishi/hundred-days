@@ -17,7 +17,8 @@ test('1ファイルのHTMLに描画器の本文と同じCSSを収める', () => 
     assert.match(html, /<meta charset="utf-8">/i);
     assert.match(html, /<meta name="viewport" content="[^"]*width=device-width[^"]*">/);
     assert.match(html, /<meta name="generator" content="[^"]+">/);
-    assert.equal(html.match(/<style>([\s\S]*?)<\/style>/)?.[1].trim(), PAGE_CSS.trim());
+    // 書き出し専用の先頭の指定（ブラウザの既定の余白を消す）のあとに、描画器と同じCSSがそのまま続く
+    assert.equal(html.match(/<style>([\s\S]*?)<\/style>/)?.[1].trim(), ('html,body{margin:0}.uxr-page{min-height:100vh}' + PAGE_CSS).trim());
     assert.equal(html.match(/<body>([\s\S]*)<\/body>/)?.[1].trim(), renderPage(state, { mode: 'export' }));
   }
 });
@@ -77,4 +78,10 @@ test('編集したページを共有リンクから開いて書き出すと、�
   assert.equal(html, buildStandaloneHtml(edited));
   assert.doesNotMatch(html, /<script/i);
   assert.match(html, /<title>&lt;\/title&gt;&lt;script&gt;<\/title>/);
+});
+
+test('書き出したHTMLは、ブラウザの既定の余白（body の margin）を消し、背景が端まで届く', () => {
+  const html = buildStandaloneHtml(MINIMAL);
+  assert.match(html, /<style>html,body\{margin:0\}/, 'body の余白の初期化が先頭にある（上と左右に白い枠が出ていた）');
+  assert.match(html, /\.uxr-page\{min-height:100vh\}/, 'ページの背景が画面の下まで届く');
 });

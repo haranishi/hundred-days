@@ -11,7 +11,7 @@ export function buildStandaloneHtml(state) {
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="generator" content="UXレシピ（100日チャレンジ Day96）">
 <title>${esc(state.site.name)}</title>
-<style>${PAGE_CSS}</style>
+<style>html,body{margin:0}.uxr-page{min-height:100vh}${PAGE_CSS}</style>
 </head>
 <body>
 ${renderPage(state, { mode: 'export' })}
