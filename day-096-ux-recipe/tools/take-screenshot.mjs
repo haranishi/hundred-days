@@ -22,6 +22,7 @@ const select = opt('select', '');
 if (select) await s.page.locator('#slot-outline li.ed-row').filter({ hasText: select }).first().click();
 if (tab) await s.page.getByRole('tab', { name: tab }).first().click().catch(() => {});
 await s.page.waitForFunction(() => document.getAnimations().every((a) => a.playState !== 'running'), null, { timeout: 5_000 }).catch(() => {});
+await s.page.mouse.move(760, 6); // ポインターを何もない所へ（プレビューの文字にホバーの点線が付かないように）
 await s.page.waitForTimeout(2000); // 自動保存の表示（「保存中…」）が落ち着くまで待つ
 await s.page.screenshot({ path: out });
 console.log(out);
