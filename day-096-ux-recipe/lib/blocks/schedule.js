@@ -34,8 +34,9 @@ export const css = `
   /* 4件のとき3+1の端数にせず2×2で安定させる */
   .uxr-page .uxr-schedule.uxr-v1 .uxr-sched-cards:has(> :nth-child(4):last-child){grid-template-columns:repeat(2,minmax(0,1fr))}
 }
-@container uxr (min-width:600px){
-  .uxr-page .uxr-schedule.uxr-v0 .uxr-sched-item{grid-template-columns:minmax(5.5em,8.5em) 24px minmax(0,1fr);gap:0 18px}
+@container uxr (min-width:720px){
+  .uxr-page .uxr-schedule.uxr-v0 .uxr-sched-item{grid-template-columns:5.5em 24px minmax(0,1fr);gap:0 18px}
+  .uxr-page .uxr-schedule.uxr-v0 .uxr-sched-tcol{text-align:start}
 }
 `;
 

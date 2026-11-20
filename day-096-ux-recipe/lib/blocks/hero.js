@@ -26,7 +26,8 @@ export const css = `
 /* 図形を本文の外へ浮かせると、短い見出しでも画像一枚分の空白ができない。 */
 .uxr-page .uxr-hero.uxr-v1 .uxr-hero-shape{position:absolute;z-index:0;top:0;right:0;width:60%;aspect-ratio:1;transform:translate(70%,-60%);border-radius:50%;background:var(--uxr-accent-soft);pointer-events:none}
 .uxr-page .uxr-hero.uxr-v1 .uxr-hero-text{position:relative;z-index:1}
-.uxr-page[data-theme="crisp"] .uxr-hero.uxr-v1 .uxr-hero-shape{border-radius:var(--uxr-radius-sm)}
+/* 見出しより上の余白に二本の斜線を収め、長い文章にも掛からないようにする。 */
+.uxr-page[data-theme="crisp"] .uxr-hero.uxr-v1 .uxr-hero-shape{top:12px;right:-6px;width:clamp(64px,12cqw,96px);height:10px;aspect-ratio:auto;transform:rotate(-25deg);background:none;border-block:1px solid var(--uxr-accent-line);border-radius:var(--uxr-radius-sm)}
 .uxr-page[data-theme="lively"] .uxr-hero.uxr-v1 .uxr-hero-shape{border:3px solid var(--uxr-ink);box-shadow:6px 6px 0 var(--uxr-ink)}
 .uxr-page[data-theme="calm"] .uxr-hero.uxr-v1 .uxr-hero-shape{background:transparent;border:1px solid var(--uxr-accent-line)}
 

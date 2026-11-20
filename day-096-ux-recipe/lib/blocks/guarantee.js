@@ -10,7 +10,7 @@ export const css = `
 /* v0: 薄い強調地と上下の線で「安心の帯」として独立させる */
 .uxr-page .uxr-guarantee.uxr-v0{background:var(--uxr-accent-soft);border-top:1px solid var(--uxr-accent-line);border-bottom:1px solid var(--uxr-accent-line)}
 .uxr-page .uxr-guarantee.uxr-v0 .uxr-inner{padding-block:40px}
-.uxr-page .uxr-guarantee.uxr-v0 .uxr-guar-band{display:grid;gap:18px;align-items:start}
+.uxr-page .uxr-guarantee.uxr-v0 .uxr-guar-band{display:grid;grid-template-columns:minmax(0,1fr);gap:18px;align-items:start}
 .uxr-page .uxr-guarantee.uxr-v0 .uxr-guar-crest{display:grid;place-items:center;width:58px;height:58px;border-radius:calc(var(--uxr-radius)*.65);background:var(--uxr-surface);border:1.5px solid var(--uxr-accent-line);color:var(--uxr-accent-text);box-shadow:var(--uxr-shadow)}
 .uxr-page .uxr-guarantee.uxr-v0 .uxr-guar-crest .uxr-ico{width:30px;height:30px}
 .uxr-page .uxr-guarantee.uxr-v0 .uxr-h2{margin-bottom:10px}
@@ -31,8 +31,9 @@ export const css = `
 .uxr-page[data-theme="lively"] .uxr-guarantee .uxr-guar-chip{border:1.5px solid var(--uxr-ink)}
 .uxr-page[data-theme="calm"] .uxr-guarantee.uxr-v1 .uxr-guar-seal{background:transparent;border:1px solid var(--uxr-accent-line)}
 
-@container uxr (min-width:600px){
-  .uxr-page .uxr-guarantee.uxr-v0 .uxr-guar-band{grid-template-columns:auto 1fr;gap:24px;align-items:center}
+@container uxr (min-width:720px){
+  .uxr-page .uxr-guarantee.uxr-v1 .uxr-guar-panel{justify-items:start;text-align:start}
+  .uxr-page .uxr-guarantee.uxr-v1 .uxr-guar-chips{justify-content:flex-start}
 }
 `;
 

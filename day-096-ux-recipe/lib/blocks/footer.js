@@ -14,7 +14,7 @@ export const css = `
 .uxr-page .uxr-footer .uxr-foot-name{font-family:var(--uxr-font-head);font-weight:var(--uxr-head-weight);font-size:1.0625rem;letter-spacing:.03em;color:var(--uxr-bg)}
 .uxr-page .uxr-footer .uxr-foot-links{display:flex;flex-wrap:wrap;gap:8px 20px;font-size:.875rem;color:color-mix(in srgb,var(--uxr-bg) 86%,var(--uxr-ink))}
 .uxr-page .uxr-footer .uxr-foot-link{letter-spacing:.02em}
-.uxr-page .uxr-footer .uxr-foot-text{font-size:.8125rem;line-height:1.7;color:color-mix(in srgb,var(--uxr-bg) 82%,var(--uxr-ink));max-width:48em}
+.uxr-page .uxr-footer .uxr-foot-text{line-height:1.7;color:var(--uxr-bg);max-width:48em}
 
 .uxr-page[data-theme="calm"] .uxr-footer{border-top-width:2px}
 .uxr-page[data-theme="calm"] .uxr-footer .uxr-foot-name{letter-spacing:.08em}
@@ -32,7 +32,7 @@ export function render(block, ctx) {
     return label ? `<li>${label}</li>` : '';
   }).filter(Boolean).join('');
   const links = linkItems ? `<ul class="uxr-foot-links">${linkItems}</ul>` : '';
-  const text = multi(ctx, block, 'text', { cls: 'uxr-foot-text' });
+  const text = multi(ctx, block, 'text', { cls: 'uxr-note uxr-foot-text' });
   const top = brand || links ? `<div class="uxr-foot-top${text ? ' has-sep' : ''}">${brand}${links}</div>` : '';
   return sec(ctx, block, `${top}${text}`);
 }

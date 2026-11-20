@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { BLOCK_SCHEMA, BLOCK_TYPES, GOALS, STAGES, countChars, resolveField, validateState } from '../../lib/contract.js';
 import { makeBlock, GENERIC } from '../../lib/blocks.js';
 import { RECIPES, buildFromRecipe, suggestionsFor } from '../../lib/recipes.js';
+import { renderPage } from '../../lib/render.js';
 import { createState } from '../../lib/state.js';
 import { diagnose } from '../../lib/rules.js';
 
@@ -10,7 +11,7 @@ const layouts = {
   reserve: ['soft', 0, 'hero0 pain0 benefits0 menu0 voices0 steps0 faq0 form0 access0 footer0'],
   buy: ['lively', 5, 'hero2 benefits1 compare0 voices1 menu1 guarantee0 faq1 cta0 footer0'],
   inquire: ['crisp', 1, 'hero1 pain1 benefits2 steps1 proof1 story0 faq1 form1 footer0'],
-  signup: ['soft', 3, 'hero0 benefits0 steps1 story1 voices1 guarantee1 faq0 cta1 footer0'],
+  signup: ['soft', 3, 'hero0 benefits0 steps1 story0 voices1 guarantee1 faq0 cta1 footer0'],
   apply: ['calm', 2, 'hero1 story1 benefits2 team0 steps0 voices0 access1 faq0 form1 footer0'],
   event: ['lively', 4, 'hero2 benefits1 schedule0 menu1 proof1 limited0 access0 faq1 form0 footer0'],
   visit: ['calm', 5, 'hero0 benefits1 menu0 schedule1 voices1 access0 faq1 cta0 footer0'],
@@ -41,6 +42,14 @@ for (const goal of GOALS) {
       goal === 'event' ? ['honest-limited', 'replace-samples'] : ['replace-samples']);
   });
 }
+
+test('8つのレシピの公開ページには作業メモを載せず、参加者には受付順を知らせる', () => {
+  for (const goal of GOALS) {
+    const html = renderPage(buildFromRecipe(goal), { mode: 'export' }).replaceAll('<wbr>', '');
+    assert.doesNotMatch(html, /見本です|公開前に|照らして|担当者に確かめて/u, goal);
+    if (goal === 'event') assert.match(html, /お申し込みの順にご案内します。/u);
+  }
+});
 
 test('下書きの件数、使う色と見た目、編集するたびに独立した中身', () => {
   assert.deepEqual(Object.keys(RECIPES), GOALS);

@@ -1,7 +1,6 @@
-// 選ばれる理由（benefits）。アイコン・番号・左右交互の3つの語り口で、強みを分かりやすく並べる。
+// 選ばれる理由（benefits）。札と文章の位置をそろえ、各項目の違いを目で追えるようにする。
 import { each, ico, multi, sec, txt } from '../render-kit.js';
-
-const BENEFIT_ICONS = ['check', 'heart', 'shield', 'clock', 'spark', 'leaf'];
+import { pickIcon } from '../icon-pick.js';
 
 export const css = `
 .uxr-page .uxr-benefits .uxr-h2{text-align:left}
@@ -35,9 +34,6 @@ export const css = `
 .uxr-page .uxr-benefits.uxr-v2 .uxr-ben-num{color:var(--uxr-accent-text);font-size:.8125rem;font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:.08em}
 .uxr-page .uxr-benefits.uxr-v2 .uxr-ben-title{font-size:1.1875rem}
 
-@container uxr (min-width:560px){
-  .uxr-page .uxr-benefits.uxr-v2 .uxr-ben-item:nth-child(even){flex-direction:row-reverse}
-}
 @container uxr (min-width:600px){
   /* 2件は2列、3件は3列、4件は2×2に組むことで1件だけ取り残される崩れを防ぐ */
   .uxr-page .uxr-benefits.uxr-v0 .uxr-ben-list{grid-template-columns:repeat(auto-fit,minmax(min(100%,210px),1fr))}
@@ -50,14 +46,16 @@ export function render(block, ctx) {
   const v = block.variant;
   const heading = txt(ctx, block, 'heading', { tag: 'h2', cls: 'uxr-h2' });
   const entries = each(ctx, block, 'items');
-  const rows = entries.map(({ i }, idx) => {
+  const rows = entries.map(({ item, i }, idx) => {
     const title = txt(ctx, block, `items.${i}.title`, { tag: 'h3', cls: 'uxr-h3 uxr-ben-title' });
     const text = multi(ctx, block, `items.${i}.text`, { cls: 'uxr-ben-text' });
     if (!title && !text) return '';
     const num = String(idx + 1).padStart(2, '0');
     const number = `<span class="uxr-ben-num" aria-hidden="true">${num}</span>`;
     const body = `<div class="uxr-ben-body">${v === 2 ? number : ''}${title}${text}</div>`;
-    const mark = v === 1 ? number : `<span class="uxr-ico-badge" aria-hidden="true">${ico(BENEFIT_ICONS[idx % BENEFIT_ICONS.length])}</span>`;
+    const description = [item.title, item.text].join(' ');
+    const mark = v === 1 ? number
+      : `<span class="uxr-ico-badge" aria-hidden="true">${ico(pickIcon(description, i))}</span>`;
     return `<li class="uxr-ben-item">${mark}${body}</li>`;
   }).filter(Boolean).join('');
   const tag = v === 1 ? 'ol' : 'ul';

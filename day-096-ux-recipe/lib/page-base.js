@@ -33,7 +33,7 @@ export const BASE_CSS = `
 .uxr-page .uxr-h2{font-size:clamp(1.35rem,5.6cqw,2rem);margin-bottom:var(--uxr-h2-gap)}
 .uxr-page .uxr-h3{font-size:1.0625rem}
 .uxr-page .uxr-lead{font-size:1.0625rem;color:var(--uxr-muted)}
-.uxr-page .uxr-note{font-size:.8125rem;line-height:1.6;color:var(--uxr-muted)}
+.uxr-page .uxr-note{font-size:max(14px,.875rem);line-height:1.6;color:var(--uxr-muted)}
 .uxr-page .uxr-muted{color:var(--uxr-muted)}
 
 .uxr-page .uxr-btn{display:inline-flex;align-items:center;justify-content:center;gap:.5em;min-height:52px;padding:.75em 1.7em;border:var(--uxr-btn-border);border-radius:var(--uxr-btn-radius);background:var(--uxr-accent);color:var(--uxr-accent-ink);font:inherit;font-weight:700;font-size:1rem;letter-spacing:.03em;line-height:1.4;text-decoration:none;text-align:center;cursor:pointer;box-shadow:var(--uxr-btn-shadow);transition:transform .12s ease,filter .12s ease}

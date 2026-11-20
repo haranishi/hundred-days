@@ -163,6 +163,7 @@ test('段階がいくつ欠けても一手でそろい、既存の部品と編�
 test('期限と人数は受付の記録を見て一つずつ確認し、ほかの修正では印が付かない', () => {
   const state = reserve('limited', 'hero', 'limited', 'limited');
   state.blocks[2].props.real = true;
+  state.blocks[2].props.value = '10人'; // 数字を実際の値に直してある（足したままの既定の数字では、印だけでは満たさない）
   const original = structuredClone(state);
   let confirmed = state;
   for (const index of [0, 3]) {
@@ -172,6 +173,7 @@ test('期限と人数は受付の記録を見て一つずつ確認し、ほか�
     assert.equal(Object.hasOwn(item, 'fix'), false);
     assert.match(item.note, /受付の記録.*編集欄.*本当の数字です/u);
     confirmed = reduce(confirmed, { type: 'setProp', id: item.blockId, path: ['real'], value: true });
+    confirmed = reduce(confirmed, { type: 'setProp', id: item.blockId, path: ['value'], value: '16人' });
     assert.deepEqual(validateState(confirmed), []);
   }
   assert.equal(itemOf(confirmed, 'honest-limited').ok, true);
@@ -179,7 +181,7 @@ test('期限と人数は受付の記録を見て一つずつ確認し、ほか�
   assert.deepEqual(undo(commit(createHistory(state), confirmed)).present, original);
   assert.deepEqual(state, original);
   assert.deepEqual(confirmed.blocks, state.blocks.map(b =>
-    b.type === 'limited' ? { ...b, props: { ...b.props, real: true } } : b));
+    b.type === 'limited' ? { ...b, props: { ...b.props, real: true, value: b.props.value === '10人' ? '10人' : '16人' } } : b));
   for (const item of diagnose(state).items.filter(i => i.fix)) {
     const after = reduce(state, item.fix.action);
     assert.deepEqual(after.blocks.filter(b => b.type === 'limited'), state.blocks.filter(b => b.type === 'limited'));

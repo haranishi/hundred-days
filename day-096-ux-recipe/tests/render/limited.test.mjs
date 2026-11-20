@@ -2,6 +2,7 @@
 // v0の帯・v1のバッジ・real（本当の数字です）がページに出ないこと・空・無害化を確かめる。
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { css } from '../../lib/blocks/limited.js';
 import { renderPage } from '../../lib/render.js';
 import { emptyProps, oneEach } from '../fixtures/states.js';
 
@@ -15,12 +16,28 @@ const sample = {
 
 test('limited v0（帯）と v1（バッジ）の構造', () => {
   const v0 = renderPage(oneEach('limited', 0, sample), { mode: 'export' });
-  assert.ok(v0.includes('class="uxr-lim-bar"') && v0.includes('class="uxr-lim-val-box"'));
+  assert.ok(v0.includes('class="uxr-lim-bar"') && v0.includes('class="uxr-lim-val"'));
   assert.ok(v0.includes('残り3枠') && v0.includes('今月の受付'));
 
   const v1 = renderPage(oneEach('limited', 1, sample), { mode: 'export' });
   assert.ok(v1.includes('class="uxr-lim-badge"') && v1.includes('uxr-lim-ico'));
-  assert.ok(!v1.includes('uxr-lim-val-box'));
+  assert.ok(v1.includes('class="uxr-lim-val"'));
+});
+
+test('定員は縁のない白文字の札で示し、480pxからラベルと同じ行に並べる', () => {
+  for (const variant of [0, 1]) {
+    const html = renderPage(oneEach('limited', variant, sample), { mode: 'export' });
+    const group = html.match(/<div class="uxr-lim-main">(.*?)<\/div>/)?.[1] ?? '';
+    assert.match(group, /class="uxr-lim-label"[^>]*>.*class="uxr-lim-val"/);
+    assert.doesNotMatch(group, /uxr-lim-text/);
+  }
+  const badge = css.match(/\.uxr-limited \.uxr-lim-val\{([^}]+)\}/)[1];
+  assert.match(badge, /background:var\(--uxr-accent\)/);
+  assert.match(badge, /color:var\(--uxr-accent-ink\)/);
+  assert.doesNotMatch(css, /\.uxr-lim-val(?:-box)?\{[^}]*border(?:-width)?:\s*[1-9]/);
+  const wide = css.split('@container uxr (min-width:480px)')[1] ?? '';
+  assert.match(wide, /\.uxr-lim-main\{[^}]*display:inline-flex/);
+  assert.match(wide, /\.uxr-lim-main\{[^}]*gap:8px/);
 });
 
 test('limited: real は編集用の確認項目であり、true/false ともページに一切描かれない', () => {

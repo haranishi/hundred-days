@@ -1,22 +1,26 @@
-// benefits 部品の固有試験。3種（アイコン／番号つき／左右交互）・件数（2〜4件）・空項目スキップ時の連番・無害化を確かめる。
+// benefits 部品の固有試験。3種（アイコン／番号つき／札つき一覧）・件数（2〜4件）・空項目スキップ時の連番・無害化を確かめる。
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { renderPage } from '../../lib/render.js';
+import { ico } from '../../lib/render-kit.js';
 import { emptyProps, oneEach } from '../fixtures/states.js';
 
 const ITEMS = (n) => Array.from({ length: n }, (_, i) => ({ title: `理由${i + 1}`, text: `説明文${i + 1}\n改行あり` }));
 
 test('benefits: 3つのバリエーションで固有のマークアップとアイコン・番号を出す', () => {
-  const props = { heading: '選ばれる理由', items: ITEMS(4) };
+  const props = { heading: '選ばれる理由', items: [
+    { title: '朝の四時間', text: '説明文1\n改行あり' },
+    { title: 'お給料', text: '時給1,450円です' },
+    { title: '大切に使う', text: '' },
+    { title: '安心', text: '保証があります' },
+  ] };
 
   const v0 = renderPage(oneEach('benefits', 0, props), { mode: 'export' });
   assert.ok(v0.includes('<ul class="uxr-ben-list">'));
   assert.equal((v0.match(/class="uxr-ico-badge"/g) || []).length, 4, 'v0 は項目数ぶんのアイコンバッジを持つ');
-  // check -> heart -> shield -> clock の順にSVGパスが入る
-  assert.ok(v0.includes('M5 12.5l4.5 4.5L19 7.5'), '1件目は check アイコン');
-  assert.ok(v0.includes('M12 20s-7-4.4-7-10'), '2件目は heart アイコン');
-  assert.ok(v0.includes('M12 3l7 3v5c0 4.5'), '3件目は shield アイコン');
-  assert.ok(v0.includes('M12 7.5V12l3 2'), '4件目は clock アイコン');
+  const expected = ['clock', 'yen', 'heart', 'shield'].map(name => ico(name));
+  const badges = html => [...html.matchAll(/class="uxr-ico-badge" aria-hidden="true">(<svg\b.*?<\/svg>)/g)].map(m => m[1]);
+  assert.deepEqual(badges(v0), expected);
   assert.ok(v0.includes('説明文1<br>改行あり'));
 
   const v1 = renderPage(oneEach('benefits', 1, props), { mode: 'export' });
@@ -26,6 +30,7 @@ test('benefits: 3つのバリエーションで固有のマークアップとア
   }
 
   const v2 = renderPage(oneEach('benefits', 2, props), { mode: 'export' });
+  assert.deepEqual(badges(v2), expected);
   assert.ok(v2.includes('<ul class="uxr-ben-list">'));
   assert.equal((v2.match(/<li class="uxr-ben-item"><span class="uxr-ico-badge" aria-hidden="true"><svg/g) || []).length, 4, '各行の先頭に札を1個ずつ置く');
   for (const [index, item] of props.items.entries()) {

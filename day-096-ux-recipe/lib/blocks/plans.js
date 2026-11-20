@@ -11,7 +11,6 @@ export const css = `
 .uxr-page .uxr-plans .uxr-plan-ribbon .uxr-ico{width:15px;height:15px}
 .uxr-page .uxr-plans .uxr-plan-head{display:grid;gap:6px}
 .uxr-page .uxr-plans .uxr-plan-price{font-size:clamp(1.45rem,5.2cqw,1.85rem);line-height:1.2;color:var(--uxr-accent-text)}
-.uxr-page .uxr-plans .uxr-plan-note{font-size:.875rem;line-height:1.6;color:var(--uxr-muted)}
 .uxr-page .uxr-plans .uxr-plan-lines{display:grid;gap:8px;padding-top:14px;border-top:1px solid color-mix(in srgb,var(--uxr-line) 85%,transparent);font-size:.9375rem;line-height:1.6}
 .uxr-page .uxr-plans .uxr-plan-lines li{display:flex;align-items:flex-start;gap:8px}
 .uxr-page .uxr-plans .uxr-plan-ck{width:1.15em;height:1.15em;margin-top:.22em;color:var(--uxr-accent-text)}
@@ -54,7 +53,7 @@ export function render(block, ctx) {
     const ribbon = item.pick ? `<div class="uxr-plan-ribbon">${ico('star')}<span>おすすめ</span></div>` : '';
     const name = txt(ctx, block, `items.${i}.name`, { tag: 'h3', cls: 'uxr-h3 uxr-plan-name' });
     const price = txt(ctx, block, `items.${i}.price`, { tag: 'p', cls: 'uxr-price uxr-plan-price' });
-    const note = txt(ctx, block, `items.${i}.note`, { tag: 'p', cls: 'uxr-plan-note' });
+    const note = txt(ctx, block, `items.${i}.note`, { tag: 'p', cls: 'uxr-note uxr-plan-note' });
     const head = name || price || note ? `<div class="uxr-plan-head">${name}${price}${note}</div>` : '';
     const lines = renderLines(ctx, block, i, item.lines);
     const body = block.variant === 1

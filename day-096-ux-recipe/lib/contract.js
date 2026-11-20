@@ -86,7 +86,7 @@ export const BLOCK_SCHEMA = {
     t('cta', 'ボタンの文言', 14, { role: 'button' }), t('note', 'ボタンの下の一言', 30)] },
   pain: { label: 'こんなお悩み', stage: 'notice', effect: 'show', variants: ['チェック', 'カード'], fields: [
     t('heading', '見出し', 24), list('items', 'お悩み', 2, 5, [t('text', 'お悩み', 36)]), l('lead', 'つなぎの一言', 60)] },
-  benefits: { label: '選ばれる理由', stage: 'understand', effect: 'clarify', variants: ['アイコン', '番号つき', '左右交互'], fields: [
+  benefits: { label: '選ばれる理由', stage: 'understand', effect: 'clarify', variants: ['アイコン', '番号つき', '札つき一覧'], fields: [
     t('heading', '見出し', 28), list('items', '理由', 2, 4, [t('title', '見出し', 16), l('text', '説明', 60)])] },
   steps: { label: 'ご利用の流れ', stage: 'understand', effect: 'clarify', variants: ['縦', '横'], fields: [
     t('heading', '見出し', 24), list('items', '手順', 2, 5, [t('title', '見出し', 16), l('text', '説明', 50)])] },

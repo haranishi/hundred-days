@@ -26,7 +26,7 @@ test('左寄せのヒーローは本文を読めるまま、背景にだけ図�
   assert.match(css, /@container uxr \(min-width:640px\)\{\s*\.uxr-page \.uxr-hero\.uxr-v1/);
 });
 
-test('左右交互の理由は64pxの札と文章を一行に置き、560pxから偶数行だけ反転する', () => {
+test('札つき一覧の理由は64pxの札と文章を一行に置く（札は常に左。左右に振らない）', () => {
   const page = oneEach('benefits', 2, { items: [{ title: '一つ目', text: '説明' }, { title: '二つ目' }] });
   const html = renderPage(page, { mode: 'export' });
   const { css } = BLOCK_RENDERERS.benefits;
@@ -38,10 +38,9 @@ test('左右交互の理由は64pxの札と文章を一行に置き、560pxか�
   assert.match(css, /\.uxr-benefits\.uxr-v2 \.uxr-ico-badge\{(?=[^}]*width:64px)[^}]*height:64px/);
   assert.match(css, /\.uxr-benefits\.uxr-v2 \.uxr-ico-badge \.uxr-ico\{(?=[^}]*width:30px)[^}]*height:30px/);
   assert.match(css, /\.uxr-ben-item\s*\+\s*\.uxr-ben-item\{[^}]*border-top:1px solid/);
-  const split = css.split('@container uxr (min-width:560px)');
-  assert.equal(split.length, 2);
-  assert.doesNotMatch(split[0], /row-reverse/);
-  assert.match(split[1], /^\s*\{\s*\.uxr-page \.uxr-benefits\.uxr-v2 \.uxr-ben-item:nth-child\(even\)\{flex-direction:row-reverse\}/);
+  // 札だけが左右に振れて文字は左のまま、というちぐはぐを避ける（採点2周目の指摘）。札は常に左。
+  assert.doesNotMatch(css, /row-reverse/);
+  assert.doesNotMatch(css, /nth-child\(even\)/);
 });
 
 test('保証のシールは64pxの丸に収まり、説明だけなら文章だけを残す', () => {

@@ -1,4 +1,4 @@
-import { BLOCK_SCHEMA, LEVEL_WEIGHT, MAX_BLOCKS, STAGES, STAGE_LABEL, STAGE_NOTE, countChars, nextBlockId, resolveField, stageOf } from './contract.js';
+import { BLOCK_SCHEMA, BLOCK_TYPES, LEVEL_WEIGHT, MAX_BLOCKS, STAGES, STAGE_LABEL, STAGE_NOTE, countChars, nextBlockId, resolveField, stageOf } from './contract.js';
 import { makeBlock } from './blocks.js';
 import { RECIPES } from './recipes.js';
 import { textFields } from './sample.js';
@@ -128,6 +128,13 @@ for (const recipe of Object.values(RECIPES)) {
   const texts = new Set();
   for (const block of recipe.blocks) {
     for (const { value } of textFields(block)) {
+      if (value.trim()) texts.add(value);
+    }
+  }
+  // 「部品を足す」で足したときの既定の文（レシピに無い種類は汎用の文）も、見本として数える。
+  // 数えないと、足したままの数字（既定の「8人」）でも、印だけで「本当の数字」を満たしてしまう。
+  for (const type of BLOCK_TYPES) {
+    for (const { value } of textFields(makeBlock(recipe.goal, type, 'sample'))) {
       if (value.trim()) texts.add(value);
     }
   }

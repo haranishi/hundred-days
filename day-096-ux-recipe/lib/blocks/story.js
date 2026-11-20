@@ -11,11 +11,11 @@ export const css = `
 .uxr-page .uxr-story .uxr-story-dash{color:var(--uxr-accent-text);flex:none}
 
 /* v0: 文章。見出しと本文の呼吸を取り、広い幅では雑誌のコラムのように2段で組む */
-.uxr-page .uxr-story.uxr-v0 .uxr-story-wrap{display:grid;gap:22px;max-width:680px;margin-inline:auto}
+.uxr-page .uxr-story.uxr-v0 .uxr-story-wrap{display:grid;gap:22px}
 .uxr-page[data-theme="calm"] .uxr-story.uxr-v0 .uxr-story-text{letter-spacing:.04em}
 
 /* v1: 引用風。角丸を歪ませない内側の太い縦線（calmは背景なし左線）と大きめ文字で想いを際立たせる */
-.uxr-page .uxr-story.uxr-v1 .uxr-story-wrap{display:grid;gap:20px;max-width:720px;margin-inline:auto}
+.uxr-page .uxr-story.uxr-v1 .uxr-story-wrap{display:grid;gap:20px}
 .uxr-page .uxr-story.uxr-v1 .uxr-story-quote{position:relative;display:grid;gap:18px;padding:24px 22px 24px 34px;background:var(--uxr-surface);border:var(--uxr-card-border);border-radius:var(--uxr-radius);box-shadow:var(--uxr-shadow);overflow:hidden}
 .uxr-page .uxr-story.uxr-v1 .uxr-story-quote::before{content:"";position:absolute;left:14px;top:22px;bottom:22px;width:4px;border-radius:999px;background:var(--uxr-accent)}
 .uxr-page .uxr-story.uxr-v1 .uxr-story-text{font-size:clamp(1.0625rem,3cqw,1.25rem);line-height:1.92;letter-spacing:.03em;max-width:32em}
@@ -27,7 +27,6 @@ export const css = `
 .uxr-page[data-theme="calm"] .uxr-story.uxr-v1 .uxr-story-text{font-family:var(--uxr-font-head);letter-spacing:.05em}
 
 @container uxr (min-width:680px){
-  .uxr-page .uxr-story.uxr-v0 .uxr-story-wrap{max-width:none}
   .uxr-page .uxr-story.uxr-v0 .uxr-story-wrap:has(.uxr-story-head){grid-template-columns:minmax(0,.78fr) minmax(0,1.42fr);gap:36px;align-items:start}
   .uxr-page .uxr-story.uxr-v1 .uxr-story-quote{padding:32px 34px 32px 46px}
   .uxr-page .uxr-story.uxr-v1 .uxr-story-quote::before{left:18px;top:26px;bottom:26px;width:5px}
