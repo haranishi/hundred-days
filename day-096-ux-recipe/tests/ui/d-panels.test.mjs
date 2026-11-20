@@ -371,11 +371,11 @@ test('共有リンクの失敗を伝え、作り直せたら長さの注意を�
   await flush();
   assert.match(root.textContent, /リンクを作れませんでした/);
   assert.equal(byText(root, 'BUTTON', 'リンクをコピー').disabled, true);
-  const long = 'https://example.com/#v=1.' + 'z'.repeat(2000);
+  const long = 'https://example.com/#v=1.' + 'z'.repeat(3000);
   ctx.viewUrl = async () => long;
   dialog.open();
   await flush();
-  assert.equal(find(root, (el) => el.tagName === 'P' && el.textContent.includes('2000字')).hidden, false);
+  assert.equal(find(root, (el) => el.tagName === 'P' && el.textContent.includes('リンクが長め')).hidden, false);
   byText(root, 'BUTTON', 'リンクをコピー').click();
   await flush();
   assert.deepEqual(copied, [long]);

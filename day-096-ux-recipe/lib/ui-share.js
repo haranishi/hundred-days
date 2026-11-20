@@ -3,6 +3,9 @@ import { buildStandaloneHtml } from './export-html.js';
 import { canExportPng, exportPng } from './png-export.js';
 import { button, controlId, element, radioChoices } from './ui-look.js';
 
+// 長いリンクの知らせを出す字数。調べて決めた値ではなく、普通のページ（約2200字）では出さないための目安。
+const LONG_LINK = 3000;
+
 export function shareLinks(url, goal, score) {
   const text = 'UXレシピで「' + GOAL_LABEL[goal] + '」のページを組み立てました（UX診断 ' + score + '点）';
   const x = new URL('https://x.com/intent/post');
@@ -10,7 +13,7 @@ export function shareLinks(url, goal, score) {
   x.searchParams.set('url', url);
   const line = new URL('https://social-plugins.line.me/lineit/share');
   line.searchParams.set('url', url);
-  return { url, text, xUrl: x.href, lineUrl: line.href, tooLong: countChars(url) > 2000 };
+  return { url, text, xUrl: x.href, lineUrl: line.href, tooLong: countChars(url) > LONG_LINK };
 }
 
 export function dialogFrame(dialog, title) {
@@ -150,7 +153,7 @@ export function mountShare(dialog, ctx) {
   caption.htmlFor = url.id;
   const status = element('p', 'cs-help');
   status.setAttribute('role', 'status');
-  const longNote = element('p', 'cs-notice', 'リンクが2000字を超えています。送り先で全文を貼れないときは、HTMLで渡せます。');
+  const longNote = element('p', 'cs-notice', 'リンクが長めです。貼り付け先で全文が入らないときは、HTMLで渡せます。');
   const copyLink = button('リンクをコピー', () => { if (links) void copy(links.url); }, 'cs-btn cs-primary');
   const x = externalLink('Xで投稿');
   const line = externalLink('LINEで送る');

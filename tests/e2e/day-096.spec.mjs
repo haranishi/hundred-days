@@ -23,7 +23,13 @@ async function open(page, query = 'fresh=1', path = '') {
   return errors;
 }
 
-const pickGoal = (page, label) => page.getByRole('button', { name: new RegExp(label) }).first().click();
+/** 目的を選ぶ。作業中の状態があるときは、確認ダイアログ（目的を変えますか？）で「目的を変える」を押す。 */
+async function pickGoal(page, label) {
+  await page.getByRole('button', { name: new RegExp(label) }).first().click();
+  const confirm = page.locator('#dlg-goal-change').getByRole('button', { name: '目的を変える' });
+  if (await confirm.isVisible().catch(() => false)) await confirm.click();
+}
+const outlineRows = (page) => page.locator('#slot-outline li.ed-row');
 const getState = (page) => page.evaluate(() => window.__uxr.getState());
 const types = async (page) => (await getState(page)).blocks.map((b) => b.type);
 const heroTitle = async (page) => (await getState(page)).blocks.find((b) => b.type === 'hero').props.title;
@@ -78,7 +84,7 @@ test.describe('組み立てと編集', () => {
     await startEditor(page);
     const before = await heroTitle(page);
     await page.locator('#slot-preview .uxr-hero [data-path="title"]').click();
-    const input = page.getByLabel('キャッチコピー');
+    const input = page.getByLabel('キャッチコピー', { exact: true });
     await expect(input).toBeFocused();
     await input.fill('');
     await page.keyboard.type('新しい見出しです');
@@ -91,7 +97,7 @@ test.describe('組み立てと編集', () => {
 
   test('並べ替え: ▲▼ボタン・キーボード・つまみのドラッグ（マウス）', async ({ page }) => {
     await startEditor(page);
-    const rows = page.locator('#slot-outline [role="listitem"], #panel-outline [role="listitem"]').filter({ visible: true });
+    const rows = outlineRows(page);
     const first = await types(page);
     await rows.nth(1).getByRole('button', { name: '下へ移動' }).click();
     const afterDown = await types(page);
@@ -119,7 +125,7 @@ test.describe('組み立てと編集', () => {
     await page.getByRole('button', { name: '部品を足す' }).first().click();
     await page.locator('#dlg-palette').getByRole('button', { name: /よくある質問/ }).first().click();
     expect((await types(page)).length).toBe(n + 1);
-    const rows = page.locator('#slot-outline [role="listitem"], #panel-outline [role="listitem"]').filter({ visible: true });
+    const rows = outlineRows(page);
     await rows.first().getByRole('button', { name: '複製' }).click();
     expect((await types(page)).length).toBe(n + 2);
     await rows.first().getByRole('button', { name: '削除' }).click();
@@ -162,7 +168,8 @@ test.describe('組み立てと編集', () => {
 test.describe('共有・書き出し・保存', () => {
   test('共有リンク（#v=）を開くと「見るだけ」の画面になり、「もとに作る」で編集できる。壊れたリンクは理由を出す', async ({ page, browser }) => {
     await startEditor(page);
-    await page.getByLabel('サイトの名前').fill('共有テスト').catch(() => {});
+    await tab(page, '見た目');
+    await page.getByLabel('サイトの名前').fill('共有テスト');
     await page.getByRole('button', { name: '共有・書き出し' }).click();
     const link = await page.locator('#dlg-share input[readonly]').first().inputValue();
     expect(link).toContain('#v=');
@@ -218,13 +225,13 @@ test.describe('操作性（スマホ・キーボード・動きを減らす）',
     expect(preview.height).toBeGreaterThan(200);
     expect(panel.height).toBeGreaterThan(120);
     expect(preview.y + preview.height).toBeLessThanOrEqual(panel.y + 4);
-    const small = await page.evaluate(() => [...document.querySelectorAll('#app button, #app [role="tab"], #app [role="radio"]')]
+    const small = await page.evaluate(() => [...document.querySelectorAll('#app button, #app [role="tab"], #app [role="radio"], #app input[type="radio"], #app input[type="checkbox"]')]
       .filter((e) => e.offsetParent !== null && !e.closest('.uxr-page'))
-      .map((e) => ({ name: (e.getAttribute('aria-label') || e.textContent || '').trim().slice(0, 20), w: Math.round(e.getBoundingClientRect().width), h: Math.round(e.getBoundingClientRect().height) }))
+      .map((e) => { const box = (e.matches('input') ? e.closest('label') ?? e : e).getBoundingClientRect(); return { name: (e.getAttribute('aria-label') || e.textContent || '').trim().slice(0, 20), w: Math.round(box.width), h: Math.round(box.height) }; })
       .filter((e) => e.w > 0 && Math.min(e.w, e.h) < 43));
     expect(small, `44px未満の操作部: ${JSON.stringify(small)}`).toEqual([]);
     await page.locator('#slot-preview .uxr-hero').first().tap();
-    await expect(page.getByLabel('キャッチコピー')).toBeVisible();
+    await expect(page.getByLabel('キャッチコピー', { exact: true })).toBeVisible();
   });
 });
 

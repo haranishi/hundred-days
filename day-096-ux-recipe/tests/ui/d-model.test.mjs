@@ -95,8 +95,9 @@ test('共有文と投稿先の引数から、元の共有リンクを1文字も�
     assert.equal(line.searchParams.get('url'), url);
     assert.equal(line.hash, '');
   }
-  assert.equal(shareLinks('x'.repeat(2000), 'support', 0).tooLong, false);
-  assert.equal(shareLinks('x'.repeat(2001), 'support', 0).tooLong, true);
+  assert.equal(shareLinks('x'.repeat(3000), 'support', 0).tooLong, false);
+  assert.equal(shareLinks('x'.repeat(3001), 'support', 0).tooLong, true);
+  assert.equal(shareLinks('x'.repeat(2201), 'support', 0).tooLong, false, '普通のページの長さ（約2200字）では知らせない');
 });
 
 test('書き出す幅に対して全ページの高さを切り上げ、ファイル名は目的で決まる', () => {
