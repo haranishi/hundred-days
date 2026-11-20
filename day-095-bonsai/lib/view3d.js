@@ -81,7 +81,7 @@ export function createView3D(THREE, canvas, {
   let prepared = !deferred;
   let preparation;
   let yieldTextures;
-  let stageTexturesReady = false;
+  let potVersion = 0;
   const renderer = new THREE.WebGLRenderer({
     canvas, antialias: tier.antialias, alpha: false, powerPreference: 'high-performance',
   });
@@ -255,9 +255,9 @@ export function createView3D(THREE, canvas, {
     yieldTextures = yieldToMain ?? (() => new Promise((resolve) => setTimeout(resolve, 0)));
     preparation = (async () => {
       await diorama.prepare(runPreparationStage);
-      stageTexturesReady = true;
       // 鉢が準備中に交換された場合は、最後に選ばれた鉢の質感を揃える。
       await diorama.preparePot(runPreparationStage);
+      let preparedPotVersion;
       do {
         await runPreparationStage('bark', loadBark);
         await runPreparationStage('leaves', loadLeaves);
@@ -268,8 +268,10 @@ export function createView3D(THREE, canvas, {
         if (typeof renderer.compileAsync === 'function') {
           await runPreparationStage('compile', () => renderer.compileAsync(scene, camera));
         }
-        // コンパイル待ちに樹種が変わったら、今の樹種の質感とシェーダーを揃える。
-      } while (!disposed && !contextLost && (!barkTex || !leafTex));
+        preparedPotVersion = potVersion;
+        // 待機中に鉢や樹種が変わっても、古い組み合わせのまま準備を終えない。
+        await diorama.preparePot(runPreparationStage);
+      } while (!disposed && !contextLost && (!barkTex || !leafTex || preparedPotVersion !== potVersion));
       if (disposed || contextLost) return;
       prepared = true;
       requestRender();
@@ -653,7 +655,8 @@ export function createView3D(THREE, canvas, {
     },
     setPot(id) {
       diorama.setPot(id);
-      if (stageTexturesReady) {
+      potVersion += 1;
+      if (prepared && deferred) {
         // すぐに鉢の形を描き、交換の質感が揃ったらもう一度描く。
         void diorama.preparePot(runPreparationStage).then(requestRender, () => {
           // 質感を作れないときは、先に描いた地の色で盆栽を表示し続ける。
@@ -696,6 +699,7 @@ export function createView3D(THREE, canvas, {
     },
     camera: {
       get: cameraRig.get,
+      isManual: cameraRig.isManual,
       distanceLimits: cameraRig.distanceLimits,
       set(partial, opts) {
         const before = onFrame && prepared ? cameraRig.get() : null;

@@ -6,16 +6,27 @@ export function createGfxGovernor({
   let index = AUTO_TIERS.indexOf(tier);
   let lastChange = -Infinity;
   let remaining;
+  let longFrames;
   const samples = [];
 
-  function resetFrames() {
+  function resetFrames({ changedAt = lastChange } = {}) {
+    lastChange = changedAt;
     remaining = warmup;
+    longFrames = 0;
     samples.length = 0;
   }
 
   function push(frameMs, nowMs) {
     if (index < 0 || index >= AUTO_TIERS.length - 1 || !Number.isFinite(frameMs) || frameMs <= 0
-      || frameMs > maxFrameMs || !Number.isFinite(nowMs)) return null;
+      || !Number.isFinite(nowMs)) return null;
+    // 一時的な休止は除き、長い間隔が6枚続いたら低速の描画として数える。
+    if (frameMs > maxFrameMs) {
+      longFrames += 1;
+      if (longFrames < 6) return null;
+      frameMs = maxFrameMs;
+    } else {
+      longFrames = 0;
+    }
     if (remaining > 0) {
       remaining -= 1;
       return null;

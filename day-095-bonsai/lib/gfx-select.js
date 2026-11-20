@@ -36,3 +36,12 @@ export function writeLearnedGfx(tier, { storage = () => globalThis.localStorage,
     return false;
   }
 }
+
+export function clearLearnedGfx({ storage = () => globalThis.localStorage } = {}) {
+  try {
+    storage().removeItem(LEARNED_GFX_KEY);
+    return true;
+  } catch {
+    return false;
+  }
+}

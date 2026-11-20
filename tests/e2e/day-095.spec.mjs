@@ -347,6 +347,11 @@ async function openRaw(page, query) {
 }
 
 const gfxOf = async (page) => (await dataset(page)).gfx;
+// 端末の情報を固定する。実行環境のコア数やメモリで、自動の画質が変わらないように（CI は4コアで、指で操作する画面では「処理が少ない端末」＝軽め）
+const fixDevice = (page, { cores = 8, memory = 8 } = {}) => page.addInitScript(({ cores, memory }) => {
+  Object.defineProperty(navigator, 'hardwareConcurrency', { get: () => cores });
+  Object.defineProperty(navigator, 'deviceMemory', { get: () => memory });
+}, { cores, memory });
 const camera = (page) => page.evaluate(() => { const c = window.__bonsai.view.camera.get(); return { az: c.az, pol: c.pol, dist: c.dist }; });
 
 test.describe('画質（標準・軽め・自動）', () => {
@@ -366,12 +371,14 @@ test.describe('画質（標準・軽め・自動）', () => {
   });
 
   test('PC（細かい操作・大きな画面）は自動で高になる', async ({ page }) => {
+    await fixDevice(page);
     const errors = await openRaw(page, '?debug=1&fresh=1&tips=0&seed=11');
     expect(await gfxOf(page)).toBe('high');
     expect(errors).toEqual([]);
   });
 
   test('メニューの「画質」で替えると、その場で作り直し、視点を保つ。選んだ値は再読み込みのあとも残る', async ({ page }) => {
+    await fixDevice(page);
     await page.goto(`${base}?debug=1&gfx=test&tips=0&fresh=1`);
     await page.evaluate(() => localStorage.clear());
     // gfx= を付けると、画質はURLが優先される。保存した設定を読むときは付けない（seed・fresh も付けない）
@@ -402,6 +409,7 @@ test.describe('画質（標準・軽め・自動）', () => {
   test('スマホ相当の画面は自動で標準。描画が遅いと1段ずつ下げ、通知し、視点を保ち、次の起動でも覚えている', async ({ browser }) => {
     const context = await browser.newContext(phone);
     const page = await context.newPage();
+    await fixDevice(page);
     await page.goto(`${base}?debug=1&tips=0&fresh=1`);
     await page.evaluate(() => localStorage.clear());
     const errors = await openRaw(page, '?debug=1&tips=0');
@@ -425,6 +433,17 @@ test.describe('画質（標準・軽め・自動）', () => {
     expect(errors).toEqual([]);
     await context.close();
   });
+});
+
+test('処理の少ない端末（指で操作・4コア以下）は、自動で軽めから始まる', async ({ browser }) => {
+  test.setTimeout(120_000);
+  const context = await browser.newContext(phone);
+  const page = await context.newPage();
+  await fixDevice(page, { cores: 4, memory: 8 });
+  const errors = await openRaw(page, '?debug=1&fresh=1&tips=0');
+  expect(await gfxOf(page)).toBe('low');
+  expect(errors).toEqual([]);
+  await context.close();
 });
 
 test.describe('スマホで触る面と先読み', () => {

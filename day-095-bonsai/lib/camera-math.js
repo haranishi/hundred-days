@@ -209,6 +209,7 @@ export function createCameraRig(fov, applyPose, motion) {
 
   return {
     get: () => ({ ...pose, target: pose.target.slice() }),
+    isManual: () => manual,
     distanceLimits: () => distanceLimits(lastFit.dist),
     set(partial = {}, opts = {}) {
       const { az, pol, dist, target } = partial;
@@ -216,7 +217,9 @@ export function createCameraRig(fov, applyPose, motion) {
         && target?.length === 3 && target.every(Number.isFinite)) {
         // 作り直しの初回描画前は既定の距離範囲が残るため、直前の描画で有効だった姿勢を使う。
         lastFit = home;
-        manual = true;
+        if (opts.manual === true) manual = true;
+        // 復元した構図を初回描画で上書きせず、以後の自動の収まりは手動操作の有無に従う。
+        started = true;
         move({ az, pol, dist, target: target.slice() });
         return true;
       }

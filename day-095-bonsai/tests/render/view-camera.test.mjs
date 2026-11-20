@@ -348,6 +348,40 @@ test('作り直し前のカメラは既定の範囲外の引きと注視点も�
   assert.deepEqual(view.camera.get(), beforeRestart);
 });
 
+for (const manual of [undefined, true]) {
+  test(`復元した${manual ? '手動視点は幅の変化や成長で動かない' : '自動視点は幅の変化と成長に合わせて収まる'}`, (t) => {
+    const { view, renderer, size, draw } = startView(t);
+    const skel = makeSampleSkeleton({ seed: 11 });
+    size(960, 600);
+    view.setSkeleton(skel);
+    const pose = { ...CAMERA_DEFAULT, dist: 7 };
+    view.camera.set(pose, { restore: true, ...(manual ? { manual } : {}) });
+    draw();
+    assert.equal(view.camera.isManual(), !!manual);
+    assert.deepEqual(view.camera.get(), pose);
+
+    size(220, 600);
+    draw();
+    const narrow = view.camera.get();
+    if (manual) assert.deepEqual(narrow, pose);
+    else {
+      assert.ok(narrow.dist > pose.dist);
+      assertInFrame(skeletonBounds(skel), renderer.camera);
+      assertInFrame(potBounds(renderer), renderer.camera);
+    }
+
+    const grown = makeSampleSkeleton({ seed: 11 });
+    grown.pads.center[0] += 12;
+    view.setSkeleton(grown);
+    draw();
+    if (manual) assert.deepEqual(view.camera.get(), pose);
+    else {
+      assert.ok(view.camera.get().dist > narrow.dist);
+      assertInFrame(skeletonBounds(grown), renderer.camera);
+    }
+  });
+}
+
 test('遅延準備は質感ごとに処理を返し、コンパイルのあとで最初のフレームを描く', async (t) => {
   const canvases = [];
   const { view, renderer, draw } = startView(t, {
@@ -468,4 +502,50 @@ test('コンパイル待ちに樹種が変わったときも、現在の樹種�
   await preparing;
   draw();
   assert.equal(renderer.draws, 1);
+});
+
+test('コンパイルや鉢の質感を待つ途中で鉢が替わっても、最後の鉢の質感を最初の描画に使う', async (t) => {
+  let scene;
+  let finishCompile;
+  let finishPotYield;
+  let waitForPot = false;
+  const { view, renderer, draw } = startView(t, {
+    gfx: 'low', deferTextures: true,
+    createCanvas(w) {
+      return waitForPot && w === 256 ? {
+        getContext: () => ({
+          createImageData: (width, height) => ({ data: new Uint8ClampedArray(width * height * 4) }),
+          putImageData() {},
+        }),
+      } : null;
+    },
+  });
+  view.setSkeleton(makeSampleSkeleton());
+  renderer.compileAsync = (next) => {
+    scene = next;
+    if (!finishCompile) return new Promise((resolve) => { finishCompile = resolve; });
+  };
+  let prepared = false;
+  const preparing = view.prepare({ yieldToMain: () => {
+    if (waitForPot && !finishPotYield) return new Promise((resolve) => { finishPotYield = resolve; });
+  } }).then(() => { prepared = true; });
+  await new Promise(setImmediate);
+
+  view.setPot('round-blue');
+  waitForPot = true;
+  finishCompile();
+  await new Promise(setImmediate);
+  assert.equal(prepared, false);
+  draw();
+  assert.equal(renderer.draws, 0);
+
+  view.setPot('rect-grey');
+  const lastPot = scene.getObjectByName('pot');
+  assert.equal(lastPot.material.map, null);
+  finishPotYield();
+  await preparing;
+  assert.ok(lastPot.material.map?.isTexture);
+  draw();
+  assert.equal(renderer.draws, 1);
+  assert.equal(renderer.scene.getObjectByName('pot'), lastPot);
 });

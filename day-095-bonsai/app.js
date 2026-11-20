@@ -12,7 +12,7 @@ import { connectUI } from './lib/ui.js';
 import { createAudio } from './lib/audio.js';
 import { createStore } from './lib/store.js';
 import { GFX_SETTINGS, GFX_TIERS } from './lib/gfx.js';
-import { readLearnedGfx, resolveGfx, writeLearnedGfx } from './lib/gfx-select.js';
+import { clearLearnedGfx, readLearnedGfx, resolveGfx, writeLearnedGfx } from './lib/gfx-select.js';
 import { createGfxGovernor } from './lib/gfx-governor.js';
 
 const options = launchOptions(location.search);
@@ -39,6 +39,9 @@ let tool = options.tool === 'water' && typeof initialTree.water !== 'function' ?
 let view = null;
 let controls = null;
 let ready = false;
+let loadingCamera;
+let pendingDowngrade = null;
+let downgradeTimer = 0;
 let fastTimer = 0;
 let inputGeneration = 0;
 
@@ -213,7 +216,6 @@ function chooseGfx() {
 }
 
 function selectGfx() {
-  if (autoGfx() && !options.fresh) learnedGfx = readLearnedGfx();
   gfx = chooseGfx();
   governor = autoGfx() ? createGfxGovernor({ tier: gfx }) : null;
 }
@@ -221,19 +223,32 @@ function selectGfx() {
 function setGfx(setting) {
   if (!GFX_SETTINGS.includes(setting) || setting === gfxSetting) return;
   gfxSetting = setting;
+  if (autoGfx() && !options.fresh) learnedGfx = readLearnedGfx();
   selectGfx();
   save();
-  restartView(view?.camera.get() ?? options.camera);
+  restartViewWithCamera();
 }
 
 function recordFrame(frameMs) {
-  if (!ready || document.hidden) return;
+  if (!ready || document.hidden || pendingDowngrade) return;
   const change = governor?.push(frameMs, performance.now());
   if (!change) return;
-  learnedGfx = gfx = change.to;
-  if (!options.fresh) writeLearnedGfx(gfx);
-  const camera = view.camera.get();
-  restartView(camera);
+  pendingDowngrade = learnedGfx = change.to;
+  if (!options.fresh) writeLearnedGfx(learnedGfx);
+  applyDowngrade();
+}
+
+function applyDowngrade() {
+  if (!pendingDowngrade) return;
+  // 作り直しで進行中の手入れや早送りが途切れないよう、安全に切り替えられるまで待つ。
+  if (tools.contactCount !== 0 || fastTimer || ui.modalOpen) {
+    downgradeTimer = setTimeout(applyDowngrade, 400);
+    return;
+  }
+  gfx = pendingDowngrade;
+  // 待っている時間でクールダウンが終わらないよう、実際に画質を下げる時刻を起点にする。
+  governor?.resetFrames({ changedAt: performance.now() });
+  restartViewWithCamera();
   ui.notify('動きが重いので、画質を下げました。メニューで変えられます。');
 }
 
@@ -294,6 +309,8 @@ function workOnNewTree(seedling, initial) {
     rememberOpeningTips = false;
     light = DEFAULTS.light;
     gfxSetting = 'auto';
+    learnedGfx = null;
+    clearLearnedGfx();
     selectGfx();
     muted = tipsSeen = false;
     skipTipsOnce = true;
@@ -317,7 +334,15 @@ function resize() {
 }
 
 function detachView() {
+  clearTimeout(downgradeTimer);
+  downgradeTimer = 0;
+  // 予約を捨てたあとも、次の判定は実際に表示している段から始める。
+  if (governor && pendingDowngrade && pendingDowngrade !== gfx) {
+    governor = createGfxGovernor({ tier: gfx });
+  }
+  pendingDowngrade = null;
   ready = false;
+  loadingCamera = null;
   stopFast();
   stopOrbit();
   const previous = view;
@@ -340,7 +365,8 @@ function fallback(reason) {
   ui.sync(state());
 }
 
-async function mountView(camera) {
+async function mountView(camera, manual, restoreFocus = false) {
+  loadingCamera = { camera, manual, restoreFocus };
   ui.status('loading');
   ui.sync(state());
   const canvas = ui.canvas;
@@ -357,7 +383,7 @@ async function mountView(camera) {
     current.setPot(pot);
     current.setLight(light);
     actions.repaint();
-    if (camera) current.camera.set(camera, { animate: false, restore: !!camera.target });
+    if (camera) current.camera.set(camera, { animate: false, restore: !!camera.target, manual });
     canvas.addEventListener('webglcontextlost', (event) => {
       event.preventDefault();
       if (current === view) fallback('3D表示が中断されました。「もう一度」で作りかけの盆栽を表示できます。');
@@ -373,8 +399,12 @@ async function mountView(camera) {
     requestAnimationFrame(() => requestAnimationFrame(() => {
       if (view !== current) return;
       ready = true;
+      loadingCamera = null;
       ui.status('ready');
       ui.sync(state());
+      if (restoreFocus && (!document.activeElement || document.activeElement === document.body)) {
+        ui.canvas.focus({ preventScroll: true });
+      }
       const showTips = options.tips && !tipsSeen && !skipTipsOnce;
       skipTipsOnce = false;
       ui.showTips(showTips);
@@ -391,10 +421,19 @@ async function mountView(camera) {
   }
 }
 
-function restartView(camera) {
+function restartViewWithCamera() {
+  // 初回の準備中はまだ木に合わせた視点がないため、読み込み開始時の指定を引き継ぐ。
+  if (ready) restartView(view.camera.get(), view.camera.isManual());
+  else restartView(loadingCamera ? loadingCamera.camera : options.camera, loadingCamera?.manual);
+}
+
+function restartView(camera, manual) {
+  const active = document.activeElement;
+  const restoreFocus = active === ui.canvas
+    || (loadingCamera?.restoreFocus && (!active || active === document.body));
   detachView();
   ui.resetCanvas();
-  mountView(camera);
+  mountView(camera, manual, restoreFocus);
 }
 
 // 再現用の画面と、枝をねらっている間は自動回転を止める。
@@ -466,6 +505,8 @@ document.addEventListener('visibilitychange', () => {
     actions.cancelKeyboardBend();
     stopFast();
     store.flush();
+  } else {
+    governor?.resetFrames();
   }
   scheduleOrbit();
 });
@@ -474,7 +515,7 @@ if (typeof ResizeObserver === 'function') new ResizeObserver(resize).observe(ui.
 window.addEventListener('resize', resize);
 window.addEventListener('orientationchange', resize);
 window.screen?.orientation?.addEventListener('change', resize);
-reduced.addEventListener?.('change', () => { if (view) restartView(view.camera.get()); });
+reduced.addEventListener?.('change', () => { if (view) restartViewWithCamera(); });
 
 if (options.debug) {
   window.__bonsai = {

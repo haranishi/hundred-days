@@ -3,7 +3,7 @@ import { test } from 'node:test';
 import { GFX_IDS } from '../../lib/contract.js';
 import { GFX_TIERS } from '../../lib/gfx.js';
 import { createGfxGovernor } from '../../lib/gfx-governor.js';
-import { LEARNED_GFX_KEY, readLearnedGfx, resolveGfx, writeLearnedGfx } from '../../lib/gfx-select.js';
+import { clearLearnedGfx, LEARNED_GFX_KEY, readLearnedGfx, resolveGfx, writeLearnedGfx } from '../../lib/gfx-select.js';
 
 test('画質表に全段の描画設定が揃う', () => {
   assert.deepEqual(Object.keys(GFX_TIERS), GFX_IDS);
@@ -51,6 +51,7 @@ test('覚えた画質は30日で失効し、壊れた値や保存例外を無視
   const storage = () => ({
     getItem(key) { assert.equal(key, LEARNED_GFX_KEY); return raw; },
     setItem(key, value) { assert.equal(key, LEARNED_GFX_KEY); raw = value; },
+    removeItem(key) { assert.equal(key, LEARNED_GFX_KEY); raw = null; },
   });
   const day = 24 * 60 * 60 * 1000;
   assert.equal(readLearnedGfx({ storage, now: day }), null);
@@ -59,6 +60,8 @@ test('覚えた画質は30日で失効し、壊れた値や保存例外を無視
   assert.equal(readLearnedGfx({ storage, now: 31 * day - 1 }), 'mid');
   assert.equal(readLearnedGfx({ storage, now: 31 * day }), null);
   assert.equal(readLearnedGfx({ storage, now: 0 }), null);
+  assert.equal(clearLearnedGfx({ storage }), true);
+  assert.equal(readLearnedGfx({ storage, now: day }), null);
   for (const invalid of ['{', '{"tier":"test","at":1}', '{"tier":"low","at":"1"}']) {
     raw = invalid;
     assert.equal(readLearnedGfx({ storage, now: day }), null);
@@ -67,6 +70,7 @@ test('覚えた画質は30日で失効し、壊れた値や保存例外を無視
   const denied = () => { throw new Error('SecurityError'); };
   assert.equal(readLearnedGfx({ storage: denied, now: day }), null);
   assert.equal(writeLearnedGfx('low', { storage: denied, now: day }), false);
+  assert.equal(clearLearnedGfx({ storage: denied }), false);
 });
 
 test('遅いフレームが続いたときだけ一段ずつ下げ、3秒の間隔と最低画質を守る', () => {
@@ -76,6 +80,14 @@ test('遅いフレームが続いたときだけ一段ずつ下げ、3秒の間�
   for (let i = 0; i < 90; i += 1) assert.equal(push(45, 3050 + i * 30), null);
   assert.deepEqual(push(50, 6000), { from: 'mid', to: 'low' });
   for (let i = 0; i < 90; i += 1) assert.equal(push(90, 6000 + i * 90), null);
+});
+
+test('降格が保留されたときは実際に画質を変えた時刻から3秒待つ', () => {
+  const { push, resetFrames } = createGfxGovernor({ tier: 'high', windowSize: 1, warmup: 0 });
+  assert.deepEqual(push(50, 1000), { from: 'high', to: 'mid' });
+  resetFrames({ changedAt: 5000 });
+  assert.equal(push(50, 7999), null);
+  assert.deepEqual(push(50, 8000), { from: 'mid', to: 'low' });
 });
 
 test('速い描画、30fps固定、少数の詰まり、試験用の段では画質を下げない', () => {
@@ -93,4 +105,14 @@ test('250ms超と無効な間隔はウォームアップ中も窓にも入れな
     assert.equal(push(interval, 1000), null);
   }
   assert.deepEqual(push(250, 1000), { from: 'mid', to: 'low' });
+});
+
+test('250ms超は6回目から窓に入り、250ms以下や計測の再開で連続回数を数え直す', () => {
+  const { push, resetFrames } = createGfxGovernor({ tier: 'mid', windowSize: 2, warmup: 0 });
+  for (const restart of [() => assert.equal(push(250, 2000), null), resetFrames]) {
+    for (let i = 0; i < 5; i += 1) assert.equal(push(500, 2000), null);
+    restart();
+  }
+  for (let i = 0; i < 6; i += 1) assert.equal(push(500, 2000), null);
+  assert.deepEqual(push(500, 2000), { from: 'mid', to: 'low' });
 });
