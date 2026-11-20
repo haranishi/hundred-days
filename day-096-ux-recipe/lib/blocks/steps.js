@@ -46,6 +46,10 @@ export const css = `
   .uxr-page .uxr-steps.uxr-v1 .uxr-steps-list:has(>:nth-child(5)) .uxr-step-item:nth-child(3) .uxr-step-head::after,
   .uxr-page .uxr-steps.uxr-v1 .uxr-steps-list:has(>:nth-child(5)) .uxr-step-item:nth-child(3) .uxr-step-arrow{display:none}
 }
+@container uxr (min-width:720px){
+  .uxr-page .uxr-steps.uxr-v1 .uxr-steps-list{grid-auto-rows:1fr}
+  .uxr-page .uxr-steps.uxr-v1 .uxr-step-body{align-self:stretch}
+}
 @container uxr (min-width:820px){
   .uxr-page .uxr-steps.uxr-v1 .uxr-steps-list:has(>:nth-child(5)){grid-template-columns:repeat(5,minmax(0,1fr))}
   .uxr-page .uxr-steps.uxr-v1 .uxr-steps-list:has(>:nth-child(5)) .uxr-step-body{padding:14px 12px}

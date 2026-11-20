@@ -27,8 +27,10 @@ test('benefits: 3つのバリエーションで固有のマークアップとア
 
   const v2 = renderPage(oneEach('benefits', 2, props), { mode: 'export' });
   assert.ok(v2.includes('<ul class="uxr-ben-list">'));
-  assert.equal((v2.match(/class="uxr-ben-visual"/g) || []).length, 4, 'v2 は図形枠を持つ');
-  assert.equal((v2.match(/class="uxr-ben-emblem"/g) || []).length, 4);
+  assert.equal((v2.match(/<li class="uxr-ben-item"><span class="uxr-ico-badge" aria-hidden="true"><svg/g) || []).length, 4, '各行の先頭に札を1個ずつ置く');
+  for (const [index, item] of props.items.entries()) {
+    assert.ok(v2.includes(`class="uxr-ben-num" aria-hidden="true">0${index + 1}</span><h3 class="uxr-h3 uxr-ben-title">${item.title}</h3>`));
+  }
 });
 
 test('benefits: 最小2件〜最大4件、途中の空項目スキップでも番号が詰まり、空状態が崩れない', () => {

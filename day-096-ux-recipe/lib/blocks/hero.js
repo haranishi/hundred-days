@@ -1,5 +1,5 @@
 // ファーストビュー（hero）。4テーマの人格を揃え、狭い幅から広い幅まで視線が自然に通る構成にする。
-import { btn, ico, multi, sec, txt } from '../render-kit.js';
+import { btn, multi, sec, txt } from '../render-kit.js';
 
 export const css = `
 .uxr-page .uxr-hero{overflow:hidden;isolation:isolate}
@@ -23,28 +23,12 @@ export const css = `
 .uxr-page[data-theme="calm"] .uxr-hero.uxr-v0::before{background:none}
 .uxr-page[data-theme="calm"] .uxr-hero.uxr-v0 .uxr-chip{background:transparent;border:1px solid var(--uxr-accent-line);border-radius:var(--uxr-radius);padding:.3em 1.1em;letter-spacing:.12em}
 
-/* v1: 左寄せ＋図形。写真の代わりに幾何学の重なりと線の絵で、テーマごとの佇まいを作る */
-.uxr-page .uxr-hero.uxr-v1 .uxr-hero-grid{display:grid;gap:28px;align-items:center}
-.uxr-page .uxr-hero.uxr-v1 .uxr-art{position:relative;height:188px;width:100%;max-width:320px;margin-inline:auto}
-.uxr-page .uxr-hero.uxr-v1 .uxr-art i{position:absolute;display:block;border-radius:var(--uxr-radius)}
-.uxr-page .uxr-hero.uxr-v1 .uxr-art .b{inset:20% 0 2% 24%;z-index:0;background:var(--uxr-accent-soft);border:var(--uxr-card-border)}
-.uxr-page .uxr-hero.uxr-v1 .uxr-art .b::after{content:"";position:absolute;inset:12px;border-radius:var(--uxr-radius-sm);background:repeating-linear-gradient(-45deg,var(--uxr-accent-line) 0 1px,transparent 1px 10px);opacity:.6}
-.uxr-page .uxr-hero.uxr-v1 .uxr-art .a{inset:8% 26% 18% 4%;z-index:1;display:grid;place-items:center;background:var(--uxr-accent);box-shadow:var(--uxr-shadow);transform:rotate(-2deg);color:var(--uxr-accent-ink)}
-.uxr-page .uxr-hero.uxr-v1 .uxr-art .a::after{content:"";position:absolute;inset:11px;border-radius:calc(var(--uxr-radius)*.65);border:1px solid color-mix(in srgb,var(--uxr-accent-ink) 32%,transparent);pointer-events:none}
-.uxr-page .uxr-hero.uxr-v1 .uxr-art .a .uxr-ico{width:40px;height:40px}
-.uxr-page .uxr-hero.uxr-v1 .uxr-art .c{right:4%;top:0;width:54px;height:54px;z-index:2;border-radius:var(--uxr-radius-sm);background:var(--uxr-surface);border:var(--uxr-card-border);box-shadow:var(--uxr-shadow)}
-.uxr-page .uxr-hero.uxr-v1 .uxr-art .c::after{content:"";position:absolute;inset:14px;border-radius:50%;border:2px solid var(--uxr-accent)}
-.uxr-page .uxr-hero.uxr-v1 .uxr-art .d{left:0;bottom:4%;width:74px;height:10px;z-index:2;border-radius:var(--uxr-radius-sm);background:repeating-linear-gradient(90deg,var(--uxr-accent) 0 14px,transparent 14px 20px);opacity:.55}
-.uxr-page[data-theme="crisp"] .uxr-hero.uxr-v1 .uxr-art .a{transform:none}
-.uxr-page[data-theme="crisp"] .uxr-hero.uxr-v1 .uxr-art .c::after{border-radius:2px}
-.uxr-page[data-theme="lively"] .uxr-hero.uxr-v1 .uxr-art .a{border:2px solid var(--uxr-ink);box-shadow:4px 4px 0 var(--uxr-ink)}
-.uxr-page[data-theme="lively"] .uxr-hero.uxr-v1 .uxr-art .b{box-shadow:4px 4px 0 var(--uxr-ink)}
-.uxr-page[data-theme="lively"] .uxr-hero.uxr-v1 .uxr-art .d{opacity:1}
-.uxr-page[data-theme="calm"] .uxr-hero.uxr-v1 .uxr-art .a{transform:none;background:var(--uxr-surface);border:1px solid var(--uxr-accent-line);box-shadow:none;color:var(--uxr-accent-text)}
-.uxr-page[data-theme="calm"] .uxr-hero.uxr-v1 .uxr-art .a::after{border-color:var(--uxr-line)}
-.uxr-page[data-theme="calm"] .uxr-hero.uxr-v1 .uxr-art .c{box-shadow:none;border-color:var(--uxr-accent-line)}
-.uxr-page[data-theme="calm"] .uxr-hero.uxr-v1 .uxr-art .c::after{border-width:1px;border-radius:var(--uxr-radius)}
-.uxr-page[data-theme="calm"] .uxr-hero.uxr-v1 .uxr-art .d{width:96px;height:2px;background:var(--uxr-accent-line);opacity:1}
+/* 図形を本文の外へ浮かせると、短い見出しでも画像一枚分の空白ができない。 */
+.uxr-page .uxr-hero.uxr-v1 .uxr-hero-shape{position:absolute;z-index:0;top:0;right:0;width:60%;aspect-ratio:1;transform:translate(70%,-60%);border-radius:50%;background:var(--uxr-accent-soft);pointer-events:none}
+.uxr-page .uxr-hero.uxr-v1 .uxr-hero-text{position:relative;z-index:1}
+.uxr-page[data-theme="crisp"] .uxr-hero.uxr-v1 .uxr-hero-shape{border-radius:var(--uxr-radius-sm)}
+.uxr-page[data-theme="lively"] .uxr-hero.uxr-v1 .uxr-hero-shape{border:3px solid var(--uxr-ink);box-shadow:6px 6px 0 var(--uxr-ink)}
+.uxr-page[data-theme="calm"] .uxr-hero.uxr-v1 .uxr-hero-shape{background:transparent;border:1px solid var(--uxr-accent-line)}
 
 /* v2: 大見出し。全幅の帯で見開きを締め、2〜3行に折り返しても下線マーカーと左端が揃うようにする */
 .uxr-page .uxr-hero.uxr-v2{border-top:6px solid var(--uxr-accent)}
@@ -60,10 +44,8 @@ export const css = `
 .uxr-page[data-theme="calm"] .uxr-hero.uxr-v2 .uxr-h1{background:linear-gradient(transparent 84%,var(--uxr-accent-line) 84%,var(--uxr-accent-line) 96%,transparent 96%)}
 
 @container uxr (min-width:640px){
-  .uxr-page .uxr-hero.uxr-v1 .uxr-hero-grid{grid-template-columns:1.18fr .82fr;gap:36px}
-  .uxr-page .uxr-hero.uxr-v1 .uxr-art{height:276px;max-width:none;margin-inline:0}
-  .uxr-page .uxr-hero.uxr-v1 .uxr-art .a .uxr-ico{width:50px;height:50px}
-  .uxr-page .uxr-hero.uxr-v1 .uxr-art .c{width:68px;height:68px}
+  .uxr-page .uxr-hero.uxr-v1 .uxr-hero-shape{transform:translate(48%,-44%)}
+  .uxr-page .uxr-hero.uxr-v1 .uxr-hero-text{max-width:72%}
   .uxr-page .uxr-hero.uxr-v2 .uxr-actions .uxr-btn{width:auto}
 }
 `;
@@ -82,10 +64,6 @@ export function render(block, ctx) {
   const hasContent = Boolean(head || lead || actions);
   // 書き出し時に全項目が空なら、飾りの図形だけを残さずすっきり畳む
   if (!hasContent) return sec(ctx, block, '');
-  const text = `<div class="uxr-hero-text">${head}${lead}${actions}</div>`;
-  if (v === 1) {
-    const art = `<div class="uxr-art" aria-hidden="true"><i class="b"></i><i class="a">${ico('spark')}</i><i class="c"></i><i class="d"></i></div>`;
-    return sec(ctx, block, `<div class="uxr-hero-grid">${text}${art}</div>`);
-  }
-  return sec(ctx, block, text);
+  const shape = v === 1 ? '<i class="uxr-hero-shape" aria-hidden="true"></i>' : '';
+  return sec(ctx, block, `${shape}<div class="uxr-hero-text">${head}${lead}${actions}</div>`);
 }

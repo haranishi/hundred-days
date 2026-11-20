@@ -59,8 +59,14 @@ export function each(ctx, block, key = 'items') {
   return items.map((item, i) => ({ item, i })).filter(({ item }) => isPreview(ctx) || Object.values(item).some((v) => v === true || (typeof v === 'string' && v !== '')));
 }
 
-/** 名前の最初の1文字（丸いアイコンの中身）。 */
-export const initial = (name) => Array.from(String(name ?? '').trim())[0] ?? '・';
+const graphemes = typeof Intl.Segmenter === 'function' ? new Intl.Segmenter('ja') : null;
+
+/** 結合する濁点も名前の一文字に含め、空欄には印を足さない。 */
+export function initial(name) {
+  const text = String(name ?? '').trim();
+  if (graphemes) return graphemes.segment(text).containing(0)?.segment ?? '';
+  return Array.from(text.normalize('NFC'))[0] ?? '';
+}
 
 const ICONS = {
   check: '<path d="M5 12.5l4.5 4.5L19 7.5"/>',

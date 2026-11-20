@@ -41,7 +41,7 @@ test('team: 最小1人〜最大4人、空項目・一部項目欠損の扱いが
 
     const emptyPrev = renderPage(oneEach('team', variant, emptyProps('team')), { mode: 'preview' });
     assert.ok(emptyPrev.includes('data-path="items.0.name"') && emptyPrev.includes('data-path="items.0.role"') && emptyPrev.includes('data-path="items.0.text"'));
-    assert.ok(emptyPrev.includes('class="uxr-team-avatar" aria-hidden="true">・</span>'));
+    assert.doesNotMatch(emptyPrev, /uxr-team-avatar/, '名前が空の間は印を出さない');
 
     const emptyExp = renderPage(oneEach('team', variant, emptyProps('team')), { mode: 'export' });
     assert.ok(!emptyExp.includes('uxr-team-list'));

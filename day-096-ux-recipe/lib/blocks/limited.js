@@ -19,6 +19,7 @@ export const css = `
 /* v1: さりげなく添えるコンパクトなバッジ */
 .uxr-page .uxr-limited.uxr-v1 .uxr-inner{padding-block:24px;display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center}
 .uxr-page .uxr-limited.uxr-v1 .uxr-lim-badge{display:inline-flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:8px 12px;max-width:100%;padding:10px 18px;border-radius:var(--uxr-radius);background:var(--uxr-surface);border:var(--uxr-card-border);box-shadow:var(--uxr-shadow)}
+.uxr-page .uxr-limited.uxr-v1 .uxr-lim-caption{display:contents}
 .uxr-page .uxr-limited.uxr-v1 .uxr-lim-ico{width:18px;height:18px;color:var(--uxr-accent-text)}
 .uxr-page .uxr-limited.uxr-v1 .uxr-lim-text{font-size:.9375rem;color:var(--uxr-ink)}
 .uxr-page .uxr-limited.uxr-v1 .uxr-lim-val{font-size:1.125rem}
@@ -28,6 +29,17 @@ export const css = `
 .uxr-page[data-theme="lively"] .uxr-limited.uxr-v0 .uxr-lim-val-box{border:2px solid var(--uxr-ink)}
 .uxr-page[data-theme="lively"] .uxr-limited .uxr-lim-label{border:1.5px solid var(--uxr-ink)}
 .uxr-page[data-theme="calm"] .uxr-limited .uxr-lim-val{font-weight:700}
+
+@container uxr (max-width:480px){
+  .uxr-page .uxr-limited.uxr-v0 .uxr-lim-bar,
+  .uxr-page .uxr-limited.uxr-v1 .uxr-lim-badge{display:grid;grid-template-columns:minmax(0,1fr);gap:8px}
+  .uxr-page .uxr-limited.uxr-v0 .uxr-lim-main{display:contents}
+  .uxr-page .uxr-limited.uxr-v0 .uxr-lim-label,
+  .uxr-page .uxr-limited.uxr-v0 .uxr-lim-val-box{justify-self:start;max-width:100%}
+  .uxr-page .uxr-limited.uxr-v1 .uxr-lim-badge{width:100%;justify-items:center}
+  .uxr-page .uxr-limited.uxr-v1 .uxr-lim-caption{display:inline-flex;align-items:center;gap:8px}
+  .uxr-page .uxr-limited .uxr-lim-text{order:1;justify-self:stretch}
+}
 `;
 
 export function render(block, ctx) {
@@ -38,7 +50,7 @@ export function render(block, ctx) {
 
   if (block.variant === 1) {
     const content = label || text || value
-      ? `<div class="uxr-lim-badge">${ico('calendar', 'uxr-lim-ico')}${label}${text}${value}</div>`
+      ? `<div class="uxr-lim-badge"><span class="uxr-lim-caption">${ico('calendar', 'uxr-lim-ico')}${label}</span>${text}${value}</div>`
       : '';
     return sec(ctx, block, `${content}${note}`);
   }

@@ -28,13 +28,13 @@ test('hero: 3つのバリエーションで固有の構造と飛び先を出し�
 
   const v1 = renderPage(baseState(1), { mode: 'export' });
   assert.ok(v1.includes('class="uxr-eyebrow">駅徒歩3分の整体院</span>'));
-  assert.ok(v1.includes('class="uxr-hero-grid"') && v1.includes('class="uxr-art" aria-hidden="true"'), 'v1 は左寄せ＋図形');
-  assert.ok(v1.includes('<svg class="uxr-ico"'), 'v1 の図形に線の絵が入る');
+  assert.ok(v1.includes('<i class="uxr-hero-shape" aria-hidden="true"></i><div class="uxr-hero-text">'), '背景の飾りと、読める文章を隣に置く');
+  assert.ok(!v0.includes('uxr-hero-shape') && !v1.includes('uxr-h1wrap'), '背景の図形は左寄せだけに使う');
 
   const v2 = renderPage(baseState(2), { mode: 'export' });
   assert.ok(v2.includes('class="uxr-eyebrow">駅徒歩3分の整体院</span>'));
   assert.ok(v2.includes('<div class="uxr-h1wrap"><h1 class="uxr-h1">'), 'v2 は複数行マーカー用のラッパーを持つ');
-  assert.ok(!v2.includes('uxr-art'));
+  assert.ok(!v2.includes('uxr-hero-shape'));
 });
 
 test('hero: 空の項目は preview で目印を残し、export では余分な枠ごと消える', () => {
@@ -45,7 +45,7 @@ test('hero: 空の項目は preview で目印を残し、export では余分な�
       assert.ok(prev.includes(`data-path="${p}"`), `v${variant} preview に ${p}`);
     }
     const exp = renderPage(emptyState, { mode: 'export' });
-    assert.ok(!exp.includes('uxr-hero-text') && !exp.includes('uxr-art') && !exp.includes('uxr-actions'), `v${variant} 空の export は中身を畳む`);
+    assert.ok(!exp.includes('uxr-hero-text') && !exp.includes('uxr-hero-shape') && !exp.includes('uxr-actions'), `v${variant} 空の export は中身を畳む`);
 
     const partial = renderPage(oneEach('hero', variant, { title: '見出しだけ', note: '注記だけ' }), { mode: 'export' });
     assert.ok(partial.includes('<h1 class="uxr-h1">見出しだけ</h1>'));

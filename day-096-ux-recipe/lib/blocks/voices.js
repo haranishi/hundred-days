@@ -43,16 +43,41 @@ export const css = `
 }
 `;
 
+const HONORIFIC = /(?:さん|さま|ちゃん|くん|先生|様|氏)$/u;
+const ROLE = /(?:担当(?:者)?|当番|店主|係|代表|先輩|スタッフ)$/u;
+const PROFILE = /(?:員|職|師|士|部長|店長|利用者|参加者|お客|匿名|[たるの]方|[0-9０-９]+代)$/u;
+
+function nameInCredit(credit, teamNames) {
+  // 自由記入の肩書きを人名と取り違えないよう、スタッフの名前か、署名の書式で特定できた名前だけを使う。
+  const signature = String(credit ?? '').split(/[（(]/u, 1)[0].trim();
+  const bare = signature.replace(HONORIFIC, '').trim();
+  if (teamNames.has(bare)) return bare;
+  const parts = signature.split('・').map(part => {
+    const label = part.trim();
+    return { name: label.replace(HONORIFIC, '').trim(), signed: HONORIFIC.test(label) };
+  });
+  const known = parts.filter(part => teamNames.has(part.name));
+  if (known.length === 1) return known[0].name;
+
+  const possible = parts.filter(({ name }) => name && !ROLE.test(name) && !PROFILE.test(name));
+  const signed = possible.filter(part => part.signed);
+  if (signed.length === 1) return signed[0].name;
+  // 見本には「配膳当番・とわ」のように、片方を役割と明示した署名もある。
+  return parts.length === 2 && possible.length === 1 && parts.some(part => ROLE.test(part.name)) ? possible[0].name : '';
+}
+
 export function render(block, ctx) {
   const heading = txt(ctx, block, 'heading', { tag: 'h2', cls: 'uxr-h2' });
+  const teams = (ctx.state?.blocks ?? []).filter(b => b.type === 'team');
+  const teamNames = new Set(teams.flatMap(team => each(ctx, team).map(({ item }) => item.name?.trim())).filter(Boolean));
   const cards = each(ctx, block, 'items').map(({ item, i }) => {
     const quote = multi(ctx, block, `items.${i}.quote`, { cls: 'uxr-voice-quote' });
     const who = txt(ctx, block, `items.${i}.who`, { cls: 'uxr-voice-who' });
     if (!quote && !who) return '';
     const body = quote ? `<blockquote class="uxr-voice-body">${quote}</blockquote>` : '';
-    const foot = who
-      ? `<figcaption class="uxr-voice-foot"><span class="uxr-voice-avatar" aria-hidden="true">${esc(initial(item.who))}</span>${who}</figcaption>`
-      : '';
+    const letter = initial(nameInCredit(item.who, teamNames));
+    const avatar = letter ? `<span class="uxr-voice-avatar" aria-hidden="true">${esc(letter)}</span>` : '';
+    const foot = who ? `<figcaption class="uxr-voice-foot">${avatar}${who}</figcaption>` : '';
     return `<figure class="uxr-voice">${body}${foot}</figure>`;
   }).filter(Boolean).join('');
   const list = cards ? `<div class="uxr-voices-list">${cards}</div>` : '';

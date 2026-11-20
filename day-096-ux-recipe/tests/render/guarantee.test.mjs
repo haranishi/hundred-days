@@ -18,10 +18,9 @@ test('guarantee v0（帯）: 盾のアイコンと帯・安心の一言チップ
   assert.equal((html.match(/class="uxr-guar-chip"/g) ?? []).length, 2);
 });
 
-test('guarantee v1（シール）: 円形シールの中に盾と見出しが収まる', () => {
+test('guarantee v1（シール）: 丸い盾の隣に読める見出しがある', () => {
   const html = renderPage(oneEach('guarantee', 1, sample), { mode: 'export' });
-  assert.ok(html.includes('class="uxr-guar-seal"'));
-  assert.ok(html.includes('uxr-guar-seal-title'));
+  assert.match(html, /class="uxr-guar-seal" aria-hidden="true"><svg\b[\s\S]*?<\/svg><\/span><h2 class="uxr-h2 uxr-guar-seal-title">30日間の返金保証<\/h2>/);
   assert.equal((html.match(/class="uxr-guar-chip"/g) ?? []).length, 2);
 });
 

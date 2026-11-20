@@ -2,12 +2,17 @@
 // 幅は画面でなく「ページの幅」（container query）で変える。スマホ枠・パソコン幅の切替で、そのまま効く。
 // 部品ごとのCSSは lib/blocks/*.js の css。ここにある「トークン」と「基本部品」を使って書く。
 export const BASE_CSS = `
-.uxr-page{container-type:inline-size;container-name:uxr;width:100%;min-height:100%;margin:0;background:var(--uxr-bg);color:var(--uxr-ink);font-family:var(--uxr-font);font-size:16px;line-height:1.75;-webkit-text-size-adjust:100%;text-size-adjust:100%;overflow-wrap:anywhere;--uxr-max:720px;--uxr-pad-x:20px;--uxr-pad-y:56px}
+.uxr-page{container-type:inline-size;container-name:uxr;width:100%;min-height:100%;margin:0;background:var(--uxr-bg);color:var(--uxr-ink);font-family:var(--uxr-font);font-size:16px;line-height:1.75;-webkit-text-size-adjust:100%;text-size-adjust:100%;overflow-wrap:anywhere;line-break:strict;--uxr-max:720px;--uxr-pad-x:20px;--uxr-pad-y:56px}
+@supports (word-break:auto-phrase){
+  .uxr-page{word-break:auto-phrase}
+}
 .uxr-page *,.uxr-page *::before,.uxr-page *::after{box-sizing:border-box}
 .uxr-page :where(h1,h2,h3,h4,p,ul,ol,li,figure,dl,dd,blockquote,table){margin:0;padding:0}
 .uxr-page :where(ul,ol){list-style:none}
-.uxr-page :where(h1,h2,h3,h4){font-family:var(--uxr-font-head);font-weight:var(--uxr-head-weight);line-height:1.38;letter-spacing:var(--uxr-head-track);text-wrap:balance;word-break:auto-phrase}
-.uxr-page :where(p,li,dd,blockquote){text-wrap:pretty;word-break:auto-phrase}
+.uxr-page :where(h1,h2,h3,h4){font-family:var(--uxr-font-head);font-weight:var(--uxr-head-weight);line-height:1.38;letter-spacing:var(--uxr-head-track)}
+.uxr-page :where(p,li,dt,dd,blockquote,th,td,.uxr-lead,.uxr-note,.uxr-lim-text){text-wrap:pretty}
+/* 下線を引く大見出しはインラインなので、実際に行を組む親にも指定する。 */
+.uxr-page :where(h1,h2,h3,h4,.uxr-h1,.uxr-h2,.uxr-h3,.uxr-h1wrap){text-wrap:balance}
 .uxr-page :where(a){color:inherit}
 .uxr-page svg{max-width:100%}
 

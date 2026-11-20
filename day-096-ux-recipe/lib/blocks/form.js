@@ -8,19 +8,15 @@ export const css = `
 .uxr-page .uxr-form .uxr-form-box{display:grid;gap:16px}
 .uxr-page .uxr-form .uxr-field{display:grid;gap:6px;min-width:0}
 .uxr-page .uxr-form .uxr-field-label{display:block;font-size:.9375rem;font-weight:700;line-height:1.45;color:var(--uxr-ink)}
-.uxr-page .uxr-form .uxr-input,
-.uxr-page .uxr-form .uxr-input-mock{display:block;width:100%;min-height:48px;padding:11px 14px;border:1.5px solid var(--uxr-line);border-radius:var(--uxr-radius-sm);background:var(--uxr-bg);color:var(--uxr-ink);font:inherit;font-size:1rem;line-height:1.5}
-.uxr-page .uxr-form .uxr-input:focus-visible{outline:3px solid var(--uxr-accent);outline-offset:1px;border-color:var(--uxr-accent)}
+.uxr-page .uxr-form :is(.uxr-input,.uxr-input-mock,textarea,select){display:block;width:100%;min-height:48px;padding:11px 14px;border:1.5px solid var(--uxr-field-line);border-radius:var(--uxr-radius-sm);background:var(--uxr-bg);color:var(--uxr-ink);font:inherit;font-size:1rem;line-height:1.5}
+.uxr-page .uxr-form :is(.uxr-input,textarea,select):focus-visible{outline:3px solid var(--uxr-accent);outline-offset:1px;border-color:var(--uxr-accent)}
 .uxr-page .uxr-form .uxr-form-submit{width:100%}
 .uxr-page .uxr-form .uxr-form-note{margin-top:12px}
 
 .uxr-page .uxr-form.uxr-v0 .uxr-form-actions{margin-top:6px}
 .uxr-page .uxr-form.uxr-v1 .uxr-form-inline{display:grid;gap:12px}
 
-.uxr-page[data-theme="lively"] .uxr-form .uxr-input,
-.uxr-page[data-theme="lively"] .uxr-form .uxr-input-mock{border:2px solid var(--uxr-ink);background:var(--uxr-surface)}
-.uxr-page[data-theme="calm"] .uxr-form .uxr-input,
-.uxr-page[data-theme="calm"] .uxr-form .uxr-input-mock{border-width:1px}
+.uxr-page[data-theme="lively"] .uxr-form :is(.uxr-input,.uxr-input-mock,textarea,select){border-width:2px;background:var(--uxr-surface)}
 
 @container uxr (min-width:580px){
   .uxr-page .uxr-form .uxr-form-card{padding:32px}

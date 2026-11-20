@@ -15,7 +15,7 @@ export const css = `
 /* v0: 丸。枠線で囲わず大きな頭文字の丸を主役に据え、親しみやすく開いた印象にする */
 .uxr-page .uxr-team.uxr-v0 .uxr-team-list{display:grid;gap:28px}
 .uxr-page .uxr-team.uxr-v0 .uxr-team-item{display:flex;flex-direction:column;align-items:center;text-align:center;gap:12px}
-.uxr-page .uxr-team.uxr-v0 .uxr-team-avatar{width:76px;height:76px;font-size:1.75rem}
+.uxr-page .uxr-team.uxr-v0 .uxr-team-avatar{width:72px;height:72px;font-size:1.75rem}
 .uxr-page .uxr-team.uxr-v0 .uxr-team-meta{display:grid;gap:4px;justify-items:center}
 .uxr-page .uxr-team.uxr-v0 .uxr-team-text{max-width:26em}
 
@@ -32,7 +32,6 @@ export const css = `
   .uxr-page .uxr-team.uxr-v0 .uxr-team-list{grid-template-columns:repeat(auto-fit,minmax(min(100%,210px),1fr));gap:28px 22px}
   .uxr-page .uxr-team.uxr-v0 .uxr-team-list:has(>:nth-child(4):last-child){grid-template-columns:repeat(2,minmax(0,1fr))}
   .uxr-page .uxr-team.uxr-v0 .uxr-team-item:only-child{max-width:420px;margin-inline:auto;width:100%}
-  .uxr-page .uxr-team.uxr-v0 .uxr-team-avatar{width:84px;height:84px;font-size:1.9rem}
   /* v1: 名前と役割が窮屈にならない2列を基本にし、1人だけ中央寄せ、3人の最後を揃える */
   .uxr-page .uxr-team.uxr-v1 .uxr-team-list{grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
   .uxr-page .uxr-team.uxr-v1 .uxr-team-item:only-child{grid-column:1/-1;max-width:540px;margin-inline:auto;width:100%}
@@ -57,10 +56,12 @@ export function render(block, ctx) {
     const role = txt(ctx, block, `items.${i}.role`, { tag: 'p', cls: 'uxr-team-role' });
     const text = multi(ctx, block, `items.${i}.text`, { cls: 'uxr-team-text' });
     if (!name && !role && !text) return '';
-    const avatar = `<span class="uxr-team-avatar" aria-hidden="true">${esc(initial(item.name))}</span>`;
+    const letter = initial(item.name);
+    const avatar = letter ? `<span class="uxr-team-avatar" aria-hidden="true">${esc(letter)}</span>` : '';
     const meta = role || name ? `<div class="uxr-team-meta">${role}${name}</div>` : '';
     if (v === 1) {
-      return `<li class="uxr-team-item"><div class="uxr-team-head">${avatar}${meta}</div>${text}</li>`;
+      const head = avatar || meta ? `<div class="uxr-team-head">${avatar}${meta}</div>` : '';
+      return `<li class="uxr-team-item">${head}${text}</li>`;
     }
     return `<li class="uxr-team-item">${avatar}${meta}${text}</li>`;
   }).filter(Boolean).join('');

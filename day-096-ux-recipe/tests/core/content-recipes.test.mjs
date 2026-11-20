@@ -12,7 +12,7 @@ const layouts = {
   inquire: ['crisp', 1, 'hero1 pain1 benefits2 steps1 proof1 story0 faq1 form1 footer0'],
   signup: ['soft', 3, 'hero0 benefits0 steps1 story1 voices1 guarantee1 faq0 cta1 footer0'],
   apply: ['calm', 2, 'hero1 story1 benefits2 team0 steps0 voices0 access1 faq0 form1 footer0'],
-  event: ['lively', 4, 'hero2 benefits1 proof1 schedule0 menu1 limited0 access0 faq1 form0 footer0'],
+  event: ['lively', 4, 'hero2 benefits1 schedule0 menu1 proof1 limited0 access0 faq1 form0 footer0'],
   visit: ['calm', 5, 'hero0 benefits1 menu0 schedule1 voices1 access0 faq1 cta0 footer0'],
   support: ['soft', 2, 'hero1 story1 proof0 benefits2 plans0 voices0 faq0 guarantee1 cta1 footer0'],
 };

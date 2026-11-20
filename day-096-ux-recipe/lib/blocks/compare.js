@@ -8,11 +8,9 @@ export const css = `
 /* v0: 狭い幅でも横スクロールさせない固定レイアウトの比較表 */
 .uxr-page .uxr-compare.uxr-v0 .uxr-cmp-wrap{background:var(--uxr-surface);border:var(--uxr-card-border);border-radius:var(--uxr-radius);box-shadow:var(--uxr-shadow);overflow:hidden}
 .uxr-page .uxr-compare.uxr-v0 .uxr-cmp-table{width:100%;table-layout:fixed;border-collapse:separate;border-spacing:0;font-size:.875rem;line-height:1.55}
-.uxr-page .uxr-compare.uxr-v0 .uxr-cmp-col-label{width:38%}
-.uxr-page .uxr-compare.uxr-v0 .uxr-cmp-col-left{width:32%}
-.uxr-page .uxr-compare.uxr-v0 .uxr-cmp-col-right{width:30%}
+.uxr-page .uxr-compare.uxr-v0 .uxr-cmp-col-label{width:26%}
 .uxr-page .uxr-compare.uxr-v0 th,
-.uxr-page .uxr-compare.uxr-v0 td{padding:12px 9px;text-align:left;vertical-align:top;border-bottom:1px solid color-mix(in srgb,var(--uxr-line) 70%,transparent)}
+.uxr-page .uxr-compare.uxr-v0 td{padding:12px 9px;text-align:left;vertical-align:top;text-wrap:balance;word-break:auto-phrase;border-bottom:1px solid color-mix(in srgb,var(--uxr-line) 70%,transparent)}
 .uxr-page .uxr-compare.uxr-v0 tbody tr:last-child th,
 .uxr-page .uxr-compare.uxr-v0 tbody tr:last-child td{border-bottom:0}
 .uxr-page .uxr-compare.uxr-v0 thead th{font-family:var(--uxr-font-head);font-weight:var(--uxr-head-weight);text-align:center;vertical-align:middle}
@@ -47,8 +45,17 @@ export const css = `
 .uxr-page[data-theme="lively"] .uxr-compare.uxr-v1 .uxr-cmp-head{border-bottom:2px solid var(--uxr-ink)}
 .uxr-page[data-theme="lively"] .uxr-compare.uxr-v1 .uxr-cmp-mark{border:1.5px solid var(--uxr-ink)}
 
+/* 固定表では見出し列にだけ幅を与え、両側の値を常に同じ幅で読めるようにする。 */
+@container uxr (max-width:336px){
+  .uxr-page .uxr-compare.uxr-v0 .uxr-cmp-col-label{width:5.5em}
+}
+@container uxr (max-width:420px){
+  .uxr-page .uxr-compare.uxr-v0 th,
+  .uxr-page .uxr-compare.uxr-v0 td{padding:10px 6px}
+}
 @container uxr (min-width:560px){
   .uxr-page .uxr-compare.uxr-v0 .uxr-cmp-table{font-size:.9375rem}
+  .uxr-page .uxr-compare.uxr-v0 .uxr-cmp-col-label{width:9em}
   .uxr-page .uxr-compare.uxr-v0 th,
   .uxr-page .uxr-compare.uxr-v0 td{padding:14px 16px}
   .uxr-page .uxr-compare.uxr-v1 .uxr-cmp-cols{grid-template-columns:repeat(2,minmax(0,1fr));align-items:stretch}
@@ -95,7 +102,7 @@ export function render(block, ctx) {
   }).join('');
   const hasTable = leftName || rightName || bodyRows;
   const table = hasTable
-    ? `<div class="uxr-cmp-wrap"><table class="uxr-cmp-table"><colgroup><col class="uxr-cmp-col-label" /><col class="uxr-cmp-col-left" /><col class="uxr-cmp-col-right" /></colgroup><thead><tr><th scope="col" class="uxr-cmp-corner"><span class="uxr-sr">項目</span></th><th scope="col" class="uxr-cmp-ours">${leftName}</th><th scope="col" class="uxr-cmp-other">${rightName}</th></tr></thead>${bodyRows ? `<tbody>${bodyRows}</tbody>` : ''}</table></div>`
+    ? `<div class="uxr-cmp-wrap"><table class="uxr-cmp-table"><colgroup><col class="uxr-cmp-col-label" /><col span="2" /></colgroup><thead><tr><th scope="col" class="uxr-cmp-corner"><span class="uxr-sr">項目</span></th><th scope="col" class="uxr-cmp-ours">${leftName}</th><th scope="col" class="uxr-cmp-other">${rightName}</th></tr></thead>${bodyRows ? `<tbody>${bodyRows}</tbody>` : ''}</table></div>`
     : '';
   return sec(ctx, block, `${heading}${table}`);
 }

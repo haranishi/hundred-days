@@ -16,28 +16,23 @@ export const css = `
 .uxr-page .uxr-guarantee.uxr-v0 .uxr-h2{margin-bottom:10px}
 .uxr-page .uxr-guarantee.uxr-v0 .uxr-guar-text{color:var(--uxr-ink);max-width:42em}
 
-/* v1: 印章のように見出しを収めた円形シールと、寄り添う説明 */
-.uxr-page .uxr-guarantee.uxr-v1 .uxr-guar-panel{display:grid;gap:24px;justify-items:center;align-items:center;padding:28px 22px}
-.uxr-page .uxr-guarantee.uxr-v1 .uxr-guar-seal{position:relative;flex:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;width:192px;height:192px;padding:24px 20px;border-radius:50%;background:var(--uxr-accent-soft);border:2px solid var(--uxr-accent);color:var(--uxr-accent-text);text-align:center}
-.uxr-page .uxr-guarantee.uxr-v1 .uxr-guar-seal::before{content:"";position:absolute;inset:7px;border-radius:50%;border:1.5px dashed var(--uxr-accent-line);pointer-events:none}
-.uxr-page .uxr-guarantee.uxr-v1 .uxr-guar-seal .uxr-ico{width:24px;height:24px}
-.uxr-page .uxr-guarantee.uxr-v1 .uxr-guar-seal-title{font-size:.9375rem;line-height:1.32;color:var(--uxr-accent-text);margin:0}
-.uxr-page .uxr-guarantee.uxr-v1 .uxr-guar-copy{display:grid;gap:4px;min-width:0;width:100%;text-align:center}
+/* 盾と見出しを分けると、長い見出しにも短い説明にも同じ大きさの印を添えられる。 */
+.uxr-page .uxr-guarantee.uxr-v1 .uxr-guar-panel{display:grid;gap:14px;justify-items:center;text-align:center}
+.uxr-page .uxr-guarantee.uxr-v1 .uxr-guar-seal{display:grid;place-items:center;width:64px;height:64px;border-radius:50%;background:var(--uxr-accent-soft);border:1.5px solid var(--uxr-accent);color:var(--uxr-accent-text)}
+.uxr-page .uxr-guarantee.uxr-v1 .uxr-guar-seal .uxr-ico{width:30px;height:30px}
+.uxr-page .uxr-guarantee.uxr-v1 .uxr-guar-seal-title{margin:0}
+.uxr-page .uxr-guarantee.uxr-v1 .uxr-guar-copy{min-width:0;max-width:42em}
 .uxr-page .uxr-guarantee.uxr-v1 .uxr-guar-text{color:var(--uxr-ink)}
 .uxr-page .uxr-guarantee.uxr-v1 .uxr-guar-chips{justify-content:center}
 
 .uxr-page[data-theme="lively"] .uxr-guarantee.uxr-v0{border-block:1px solid var(--uxr-ink)}
 .uxr-page[data-theme="lively"] .uxr-guarantee.uxr-v0 .uxr-guar-crest{border:2px solid var(--uxr-ink)}
 .uxr-page[data-theme="lively"] .uxr-guarantee.uxr-v1 .uxr-guar-seal{border-color:var(--uxr-ink);box-shadow:4px 4px 0 var(--uxr-ink)}
-.uxr-page[data-theme="lively"] .uxr-guarantee.uxr-v1 .uxr-guar-seal::before{border-color:var(--uxr-ink)}
 .uxr-page[data-theme="lively"] .uxr-guarantee .uxr-guar-chip{border:1.5px solid var(--uxr-ink)}
-.uxr-page[data-theme="calm"] .uxr-guarantee.uxr-v1 .uxr-guar-seal::before{border-style:solid;border-width:1px}
+.uxr-page[data-theme="calm"] .uxr-guarantee.uxr-v1 .uxr-guar-seal{background:transparent;border:1px solid var(--uxr-accent-line)}
 
 @container uxr (min-width:600px){
   .uxr-page .uxr-guarantee.uxr-v0 .uxr-guar-band{grid-template-columns:auto 1fr;gap:24px;align-items:center}
-  .uxr-page .uxr-guarantee.uxr-v1 .uxr-guar-panel{grid-template-columns:auto 1fr;gap:32px;padding:34px 36px;justify-items:start}
-  .uxr-page .uxr-guarantee.uxr-v1 .uxr-guar-copy{text-align:left}
-  .uxr-page .uxr-guarantee.uxr-v1 .uxr-guar-chips{justify-content:flex-start}
 }
 `;
 
@@ -53,9 +48,9 @@ export function render(block, ctx) {
     const title = txt(ctx, block, 'title', { tag: 'h2', cls: 'uxr-h2 uxr-guar-seal-title' });
     // 書き出しで中身がすべて空のときは、盾だけの空シールを残さず畳む
     if (!title && !text && !chips) return sec(ctx, block, '');
-    const seal = `<div class="uxr-guar-seal">${ico('shield')}${title}</div>`;
+    const seal = title ? `<span class="uxr-guar-seal" aria-hidden="true">${ico('shield')}</span>` : '';
     const copy = text || chips ? `<div class="uxr-guar-copy">${text}${chips}</div>` : '';
-    return sec(ctx, block, `<div class="uxr-card uxr-guar-panel">${seal}${copy}</div>`);
+    return sec(ctx, block, `<div class="uxr-guar-panel">${seal}${title}${copy}</div>`);
   }
 
   const title = txt(ctx, block, 'title', { tag: 'h2', cls: 'uxr-h2' });

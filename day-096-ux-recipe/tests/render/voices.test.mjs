@@ -36,7 +36,7 @@ test('voices: 最小1件〜最大3件、空項目・who 欠損の扱いが両バ
 
     const emptyPrev = renderPage(oneEach('voices', variant, emptyProps('voices')), { mode: 'preview' });
     assert.ok(emptyPrev.includes('data-path="items.0.quote"') && emptyPrev.includes('data-path="items.0.who"'));
-    assert.ok(emptyPrev.includes('class="uxr-voice-avatar" aria-hidden="true">・</span>'), '空のとき頭文字は中点');
+    assert.doesNotMatch(emptyPrev, /uxr-voice-avatar/, '誰の声かを編集でき、名前が空の間は印を出さない');
 
     const emptyExp = renderPage(oneEach('voices', variant, emptyProps('voices')), { mode: 'export' });
     assert.ok(!emptyExp.includes('uxr-voices-list'));
@@ -48,7 +48,7 @@ test('voices: 危険な文字（<img onerror> 等・頭文字の < を含む）�
   for (const variant of [0, 1]) {
     const html = renderPage(oneEach('voices', variant, {
       heading: xss.slice(0, 24),
-      items: [{ quote: xss, who: xss.slice(0, 20) }],
+      items: [{ quote: xss, who: xss.slice(0, 20) }, { who: '<さん', quote: '感想' }],
     }), { mode: 'export' });
     assert.ok(!html.includes('<img'), `v${variant}: 生の img タグが出ない`);
     assert.ok(!/<[^>]*\son[a-z]+\s*=/i.test(html), `v${variant}: on* がHTML属性にならない`);
