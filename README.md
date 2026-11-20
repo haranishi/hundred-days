@@ -140,6 +140,7 @@ Day 051「ハコニワ」も外部公開アプリです。本体は独立リポ�
 | 092 | てことば — 3Dの手で覚える手話と指文字 | [day-092-shuwa/](day-092-shuwa/) | [アプリを開く](https://rairakku.com/100days/day-092-shuwa/) |
 | 093 | find | [制作記録のみ](day-093-find/) | [紹介ページ](https://day93.rairakku.com/) |
 | 094 | スーパーやりたい放題 | [day-094-super-yaritai/](day-094-super-yaritai/) | [紹介ページ](https://day94.rairakku.com/) |
+| 095 | 盆栽日和 — 3Dの盆栽を、切って曲げて育てる | [day-095-bonsai/](day-095-bonsai/) | [アプリを開く](https://rairakku.com/100days/day-095-bonsai/) |
 <!-- day-index:end -->
 
 ## 1日アプリのルール

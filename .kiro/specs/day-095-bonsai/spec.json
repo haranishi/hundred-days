@@ -1,0 +1,25 @@
+{
+  "feature_name": "day-095-bonsai",
+  "language": "ja",
+  "phase": "implementation",
+  "approvals": {
+    "requirements": true,
+    "design": true,
+    "tasks": true
+  },
+  "approval_basis": "2026-11-19の本人の依頼「盆栽をするアプリ。3Dで盆栽を作成できるWebアプリを、Grok・Codex（GPT 6.2 Astra）・Antigravityなど3D制作に強いAIを使って、100日チャレンジのDay95として、マージまでを考えた設計で、スキルとハーネスを存分に活用して作る」に基づき、要件・設計・タスクを確定した。",
+  "updated_at": "2026-11-19",
+  "branch": "feat/day095-bonsai",
+  "folder": "day-095-bonsai",
+  "assumptions": [
+    "題名は「盆栽日和 — 3Dの盆栽を、切って曲げて育てる」。J-PlatPat での商標の確認は未実施（本人の確認事項）",
+    "『盆栽画』は『盆栽が（作れる）』の聞き違いと解釈し、写真として保存・共有できる機能（要件8）も入れた",
+    "Antigravity の『Carbon』は一覧になく、Gemini 4 Argon（`gemini-4-argon-high`）を使う。Codex の『GPT 6.2 Astra』は `gpt-6.2-astra`",
+    "マージは本人の承認を得てから行う（hundred-days の main は本番に直結する）"
+  ],
+  "priority": {
+    "P0": "公開に必須（紅葉・黒松・切る・曲げる・芽摘み・時間と季節・鉢・元に戻す・保存・写真と共有・操作性・公開の門）",
+    "P1": "梅・樹形3種・水やり・夜の光・早送り・自動で回る・針金を外す・画像つき共有"
+  },
+  "verification": {}
+}
