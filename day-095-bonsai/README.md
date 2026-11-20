@@ -42,4 +42,4 @@ npm run publish:check -- --day 95
 ```
 
 3Dの描画には、three.js 0.186.0（MIT）をまとめたDay087と同じファイルを `vendor/` に同梱している（未改変）。書体は端末標準。
-撮影・確認用の道具は `tools/`（配信しない）。仕様と検証記録は [Day095仕様](../.kiro/specs/day-095-bonsai/tasks.md) を参照。
+撮影・確認用の道具は `tools/`（配信しない）。宣伝動画の作り方は [tools/promo/README.md](tools/promo/README.md)。仕様と検証記録は [Day095仕様](../.kiro/specs/day-095-bonsai/tasks.md) を参照。

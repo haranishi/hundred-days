@@ -54,3 +54,11 @@
 - [x] Node の単体試験で画質・準備・保存・切替・先読みを確認する。[検証の記録](verification.md)
 - [x] 親が通し試験と起動の計測を行う（Chromium 25件・WebKit 17件・4倍遅いCPUでの起動時間。実機の計測は本人の端末で）。
 - [x] 独立レビュー A〜F を修正し、自動・手動視点の復元、降格の保留と破棄、フォーカス、長いフレーム間隔とタブ復帰、学習した画質の消去、準備中の鉢交換を単体試験で確認する。 `node --test day-095-bonsai/tests/` は tests 247、pass 247、fail 0。
+
+## 宣伝動画（要件 12）
+
+- [x] 絵コンテ（`tools/promo/timeline.mjs`）・撮影（`render-promo.mjs`）・BGMの合成と検査（`promo-audio.mjs`・`verify-audio.mjs`）を作る。撮影は Day087 の道具を、盆栽用に作り替えた（Codex）。切る枝・曲げる枝の選定と撮り直し（親）。
+- [x] 画面のコマだけの採点を最大3周行う（Codex・Antigravity。Grok は利用枠切れ）。[検証の記録](verification.md)
+- [x] 一覧のカード用 `demo.mp4`（字幕つき・16秒）を置き、`meta.json` に登録する。動画3本と検証物を Drive へ渡す。
+- [ ] X投稿は本人。BGMは耳で聴いて、A案（和）かB案（やさしい）かを選ぶ。
+
