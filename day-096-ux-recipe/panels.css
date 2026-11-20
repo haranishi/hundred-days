@@ -201,6 +201,12 @@ textarea.cs-input { resize: vertical; }
 .cs-ring-number { fill: var(--cs-text); font-size: 30px; font-weight: 750; }
 .cs-ring-unit { fill: var(--cs-muted); font-size: 12px; }
 .cs-score-comment { margin-top: 4px; font-size: 14px; }
+.cs-writing-progress { grid-column: 1 / -1; display: grid; gap: 4px; }
+.cs-progress-track { height: 6px; border-radius: 3px; background: var(--cs-tint); }
+.cs-progress-fill {
+  display: block; height: 100%; border-radius: inherit;
+  background: var(--cs-accent); transition: width 160ms ease;
+}
 .cs-rule-group { gap: 0; }
 .cs-group-title { padding-bottom: 8px; }
 .cs-rule { padding-block: 4px; border-top: 1px solid var(--cs-line); min-width: 0; }

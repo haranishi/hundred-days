@@ -233,6 +233,73 @@ test('広い構成で名前を選ぶと次のTabは操作段へ進み、矢印�
   assert.equal(stops()[1].dataset.act, 'grip');
 });
 
+function outlineKeyboard(t) {
+  const { root, ctx, doc } = setup(t, RESERVE_SAMPLE, 980);
+  const outline = root.querySelector('#slot-outline');
+  t.after(mountOutline(outline, ctx).destroy);
+  const list = outline.querySelector('.ed-rows');
+  const names = list.querySelectorAll('.ed-pick');
+  const press = (key, flags = {}) => fire(list, 'keydown', doc.activeElement, { key, ...flags });
+  return { list, names, doc, ctx, press };
+}
+
+test('構成の名前で上下の矢印を押すと隣へ移り、端で止まる。選択と並びは保つ', t => {
+  const { doc, ctx, names, press } = outlineKeyboard(t);
+  names[0].focus();
+  const selected = ctx.getSelectedId();
+  assert.ok(!press('ArrowUp').defaultPrevented);
+  assert.ok(doc.activeElement === names[0]);
+  assert.ok(press('ArrowDown').defaultPrevented);
+  assert.ok(doc.activeElement === names[1]);
+  assert.equal(ctx.getSelectedId(), selected);
+  assert.ok(press('ArrowUp').defaultPrevented);
+  assert.ok(doc.activeElement === names[0]);
+  names.at(-1).focus();
+  assert.ok(!press('ArrowDown').defaultPrevented);
+  assert.ok(doc.activeElement === names.at(-1));
+  assert.equal(ctx.getState(), RESERVE_SAMPLE);
+});
+
+test('構成の名前でHomeは先頭、Endは末尾へ移り、すでに端にいればキーを横取りしない', t => {
+  const { doc, ctx, names, press } = outlineKeyboard(t);
+  names[3].focus();
+  for (const [key, target] of [['End', names.at(-1)], ['Home', names[0]]]) {
+    assert.ok(press(key).defaultPrevented, key);
+    assert.ok(doc.activeElement === target, key);
+    assert.ok(!press(key).defaultPrevented, key);
+  }
+  assert.equal(ctx.getSelectedId(), RESERVE_SAMPLE.blocks[0].id);
+});
+
+test('修飾キー・変換中のキー・Tab・Enterは名前のフォーカス移動に使わない', t => {
+  const { doc, names, press } = outlineKeyboard(t);
+  const pick = names[2];
+  pick.focus();
+  for (const flags of [
+    { altKey: true }, { ctrlKey: true }, { metaKey: true }, { shiftKey: true }, { isComposing: true }, { keyCode: 229 },
+  ]) {
+    for (const key of ['ArrowUp', 'ArrowDown', 'Home', 'End']) {
+      assert.ok(!press(key, flags).defaultPrevented);
+      assert.ok(doc.activeElement === pick);
+    }
+  }
+  for (const key of ['Tab', 'Enter']) assert.ok(!press(key).defaultPrevented);
+});
+
+test('つまみ・操作ボタン・入力欄では、矢印とHome・Endをそのまま使える', t => {
+  const { doc, list, press } = outlineKeyboard(t);
+  const row = list.children[2];
+  const input = doc.createElement('input');
+  row.append(input);
+  for (const target of [row.querySelector('[data-act="grip"]'), row.querySelector('[data-act="copy"]'), input]) {
+    target.focus();
+    for (const key of ['ArrowUp', 'ArrowDown', 'Home', 'End']) {
+      assert.ok(!press(key).defaultPrevented);
+      assert.ok(doc.activeElement === target);
+    }
+  }
+});
+
 test('18個になった構成では追加ボタンの説明をその場で読め、1個消すと追加できる', t => {
   const { root, ctx, doc } = setup(t, STRESS);
   const outline = root.querySelector('#slot-outline');

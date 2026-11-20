@@ -46,7 +46,7 @@
 | hero-first | must | 常に | 先頭が hero | 無ければ hero を先頭に足す／あれば先頭へ移す |
 | flow-complete | must | 常に | 5段階すべてに部品がある | 足りない段階の既定の部品（notice→hero understand→benefits trust→voices act→cta relief→faq） |
 | trust-before-action | must | 行動の部品がある | 最初の form/cta より前に、trust 段階の部品 | voices を最初の行動の直前に足す |
-| honest-limited | must | limited がある | すべての limited で real===true | real を true にする（ラベル「本当の数字だと確認した」） |
+| honest-limited | must | limited がある | すべての limited で real===true **かつ**、数字（value）がそのレシピの見本のままでない（空なら real だけ） | **なおすは無い**（確認の印は本人が付ける。アプリが代わりに付けない）。診断の「この部品を見る」で「本当の数字です」の欄へ移る |
 | price-before-action | should | 目的 reserve・buy・event・visit で行動の部品がある | 最初の form/cta より前に menu か plans | menu を足す |
 | button-label-result | should | ボタンの文言（role=button）がある | 空でなく、総称（送信・こちら・詳細・詳しくはこちら・クリック・OK・Submit）でない | なし |
 | button-label-consistent | should | ボタンの文言が2つ以上 | 空でない文言の種類が2以内 | なし |

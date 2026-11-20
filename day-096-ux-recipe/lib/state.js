@@ -3,7 +3,7 @@ import {
   clampText, getPath, nextBlockId, resolveField, sanitizeState, setPath, validateState,
 } from './contract.js';
 import { makeBlock } from './blocks.js';
-import { buildFromRecipe } from './recipes.js';
+import { RECIPES, buildFromRecipe } from './recipes.js';
 
 export function createState(goal = GOALS[0]) {
   return buildFromRecipe(GOALS.includes(goal) ? goal : GOALS[0]);
@@ -102,9 +102,13 @@ function applyAction(state, action) {
   switch (action.type) {
     case 'replace':
       return restoreState(action.state) ?? state;
-    case 'setGoal':
+    case 'setGoal': {
       if (!GOALS.includes(action.goal) || action.goal === state.goal) return state;
-      return { ...createState(action.goal), theme: state.theme };
+      const next = createState(action.goal);
+      const name = state.site.name;
+      const site = name.trim() && name !== RECIPES[state.goal].siteName ? state.site : next.site;
+      return { ...next, site, theme: state.theme };
+    }
     case 'setSite': {
       if (!isTextInput(action.name)) return state;
       const name = clampText(action.name, SITE_NAME_MAX);

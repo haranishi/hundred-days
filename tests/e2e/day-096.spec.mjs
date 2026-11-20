@@ -133,6 +133,25 @@ test.describe('組み立てと編集', () => {
     expect((await types(page))[3]).toBe(first[1]);
   });
 
+  test('構成リスト: ↑↓キーで隣の行の名前のボタンへフォーカスが移る（選択は変わらない・Tabの順は変えない）', async ({ page }) => {
+    await startEditor(page);
+    const rows = outlineRows(page);
+    const picks = rows.locator('.ed-pick');
+    const selectedBefore = await page.locator('#slot-outline li.ed-row.is-selected').getAttribute('data-block-id');
+    await picks.nth(0).focus();
+    await page.keyboard.press('ArrowDown');
+    await expect(picks.nth(1)).toBeFocused();
+    await page.keyboard.press('ArrowDown');
+    await expect(picks.nth(2)).toBeFocused();
+    await page.keyboard.press('ArrowUp');
+    await expect(picks.nth(1)).toBeFocused();
+    await page.keyboard.press('End');
+    await expect(picks.last()).toBeFocused();
+    await page.keyboard.press('Home');
+    await expect(picks.first()).toBeFocused();
+    expect(await page.locator('#slot-outline li.ed-row.is-selected').getAttribute('data-block-id')).toBe(selectedBefore);
+  });
+
   test('部品を足す・複製・削除（削除は元に戻せる）', async ({ page }) => {
     await startEditor(page);
     const n = (await types(page)).length;
@@ -186,7 +205,7 @@ test.describe('組み立てと編集', () => {
     expect(items.find((i) => i.id === 'honest-limited')?.ok).toBe(false);
   });
 
-  test('診断: 期限・残り枠の確認の印は、アプリが勝手に付けない。「この部品を見る」から本人が付ける', async ({ page }) => {
+  test('診断: 期限・残り枠の確認の印は、アプリが勝手に付けない。本人が印を付け、数字も見本から直して、初めて満たす', async ({ page }) => {
     await startEditor(page, '参加してもらう');
     await tab(page, '診断');
     const card = page.locator('article.cs-rule').filter({ hasText: '期限や人数の表示すべてに確認の印がある' });
@@ -194,12 +213,35 @@ test.describe('組み立てと編集', () => {
     await card.getByRole('button', { name: 'この部品を見る' }).click();
     const real = page.getByRole('checkbox', { name: '本当の数字です' });
     await expect(real).toBeFocused();
-    const limitedReal = async () => (await getState(page)).blocks.find((b) => b.type === 'limited').props.real;
-    expect(await limitedReal()).toBe(false);
+    const limited = async () => (await getState(page)).blocks.find((b) => b.type === 'limited').props;
+    const honest = () => page.evaluate(() => window.__uxr.diagnose().items.find((i) => i.id === 'honest-limited'));
+    expect((await limited()).real).toBe(false);
     await page.keyboard.press('Space');
-    expect(await limitedReal()).toBe(true);
-    const item = await page.evaluate(() => window.__uxr.diagnose().items.find((i) => i.id === 'honest-limited'));
-    expect(item.ok).toBe(true);
+    expect((await limited()).real).toBe(true);
+    // 数字が見本のまま（12人）では、印があっても満たさない
+    const sampleValue = (await limited()).value;
+    expect((await honest()).ok).toBe(false);
+    expect((await honest()).note).toContain(sampleValue);
+    // 数字を実際の値に直すと満たす
+    await page.getByLabel('数字', { exact: true }).fill('16人');
+    expect((await honest()).ok).toBe(true);
+  });
+
+  test('診断: 「自分の文章に直した部品 x / N」の進み具合が出て、文章を直すと増える', async ({ page }) => {
+    await startEditor(page);
+    await tab(page, '診断');
+    const bar = page.locator('#panel-diagnosis').getByRole('progressbar', { name: '自分の文章に直した部品' });
+    await expect(bar).toHaveAttribute('aria-valuenow', '0');
+    const total = Number(await bar.getAttribute('aria-valuemax'));
+    expect(total).toBeGreaterThan(5);
+    // 部品の文字を全部書き換えるのは大変なので、診断の数え方（見本の文章が残る部品の数）が1つ減る操作で確かめる
+    const hero = (await getState(page)).blocks.find((b) => b.type === 'hero');
+    for (const key of ['title', 'lead', 'eyebrow', 'cta', 'note']) {
+      if (typeof hero.props[key] === 'string') {
+        await page.evaluate(([id, k]) => window.__uxr.dispatch({ type: 'setProp', id, path: [k], value: `書き換えた${k}` }), [hero.id, key]);
+      }
+    }
+    await expect(bar).toHaveAttribute('aria-valuenow', '1');
   });
 
   test('診断: 見出しが空だと「先頭に用件を伝える見出し」が✗になる。部品が0個なら0点で案内が出る', async ({ page }) => {

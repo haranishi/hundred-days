@@ -18,6 +18,7 @@ const fair = buildFromRecipe('event');
 const itemOf = (state, id) => diagnose(state).items.find(item => item.id === id);
 const prop = (state, type, key, value) =>
   reduce(state, { type: 'setProp', id: state.blocks.find(b => b.type === type).id, path: [key], value });
+const checkedFair = prop(fair, 'limited', 'real', true);
 
 function applyFix(state, id) {
   const old = structuredClone(state);
@@ -75,8 +76,8 @@ const examples = [
   { id: 'hero-first', level: 'must', yes: reserve('hero'), no: reserve('pain', 'hero', 'cta') },
   { id: 'flow-complete', level: 'must', yes: booking, no: reserve('footer') },
   { id: 'trust-before-action', level: 'must', yes: reserve('story', 'form'), no: reserve('hero', 'menu', 'form', 'voices', 'cta'), outside: reserve('hero', 'limited') },
-  { id: 'honest-limited', level: 'must', yes: prop(fair, 'limited', 'real', true), no: fair, outside: reserve('cta'),
-    edit: s => prop(s, 'limited', 'real', true) },
+  { id: 'honest-limited', level: 'must', yes: prop(checkedFair, 'limited', 'value', '16人'), no: checkedFair, outside: reserve('cta'),
+    edit: s => prop(s, 'limited', 'value', '16人') },
   { id: 'price-before-action', level: 'should', yes: reserve('plans', 'cta'), no: reserve('hero', 'voices', 'form', 'menu', 'cta'), outside: page('support', 'form') },
   { id: 'button-label-result', level: 'should', yes: booking, no: prop(booking, 'form', 'submit', 'こちら'), outside: reserve('pain'),
     edit: s => prop(s, 'form', 'submit', '希望日を伝える') },

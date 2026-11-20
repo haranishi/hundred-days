@@ -37,12 +37,33 @@ function scoreRing({ score, angle }) {
   return ring;
 }
 
+function writingProgress(total, remaining) {
+  const edited = total - remaining;
+  const label = '自分の文章に直した部品';
+  const caption = edited === total ? 'すべての部品の文章を直しました。' : `${label}: ${edited} / ${total}`;
+  const progress = element('div', 'cs-writing-progress');
+  const track = element('div', 'cs-progress-track');
+  track.setAttribute('role', 'progressbar');
+  track.setAttribute('aria-label', label);
+  track.setAttribute('aria-valuemin', '0');
+  track.setAttribute('aria-valuemax', String(total));
+  track.setAttribute('aria-valuenow', String(edited));
+  track.setAttribute('aria-valuetext', `${edited} 個 / ${total} 個`);
+  const fill = element('span', 'cs-progress-fill');
+  fill.style.width = `${100 * edited / total}%`;
+  track.append(fill);
+  progress.append(element('p', 'cs-help', caption), track);
+  return progress;
+}
+
 function scoreOverview(model, samples, ctx) {
   const overview = element('header', 'cs-score');
   const message = element('div');
   message.append(element('h2', 'cs-title', 'UX診断'), element('p', 'cs-score-comment', model.comment));
   overview.append(scoreRing(model), message, element('p', 'cs-help',
     'この点は、部品の組み立て方を見たものです。文章の良し悪しは見ていません。'));
+  const total = ctx.getState()?.blocks.length ?? 0;
+  if (samples && total > 0) overview.append(writingProgress(total, samples.count));
   if (samples?.count > 0) {
     const actions = element('div', 'cs-actions');
     const count = element('span', 'cs-help', '見本の文章が残っている部品: ' + samples.count + '個');

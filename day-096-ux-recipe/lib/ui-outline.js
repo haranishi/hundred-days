@@ -41,7 +41,7 @@ function makeRow(block) {
   summary.id = 'ed-excerpt-' + block.id;
   pick.setAttribute('aria-labelledby', name.id);
   pick.setAttribute('aria-describedby', summary.id);
-  pick.setAttribute('aria-keyshortcuts', 'Alt+ArrowUp Alt+ArrowDown');
+  pick.setAttribute('aria-keyshortcuts', 'ArrowUp ArrowDown Home End Alt+ArrowUp Alt+ArrowDown');
   const text = document.createElement('span');
   text.className = 'ed-row-text';
   text.append(name, summary);
@@ -168,15 +168,38 @@ export function mountOutline(root, ctx) {
       case 'select': ctx.select(id); break;
     }
   }
+
+  function navigate(event) {
+    if (event.defaultPrevented || event.isComposing || event.keyCode === 229 || event.target.isContentEditable ||
+        event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return;
+    const names = Array.from(list.querySelectorAll('.ed-pick'));
+    const from = names.indexOf(event.target);
+    if (from < 0) return;
+    let next;
+    switch (event.key) {
+      case 'ArrowUp': next = names[from - 1]; break;
+      case 'ArrowDown': next = names[from + 1]; break;
+      case 'Home': next = names[0]; break;
+      case 'End': next = names.at(-1); break;
+      default: return;
+    }
+    if (next && next !== event.target) {
+      next.focus();
+      event.preventDefault();
+    }
+  }
+
   const resize = () => render({ state: ctx.getState(), selectedId: ctx.getSelectedId() });
   const unsubscribe = ctx.subscribe(render);
   wide.addEventListener('change', resize);
   root.addEventListener('click', click);
+  list.addEventListener('keydown', navigate);
   return { destroy() {
     unsubscribe();
     drag.destroy();
     wide.removeEventListener('change', resize);
     root.removeEventListener('click', click);
+    list.removeEventListener('keydown', navigate);
     for (const row of rows.values()) row.remove();
     rows.clear();
   } };

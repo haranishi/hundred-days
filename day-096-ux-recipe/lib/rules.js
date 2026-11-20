@@ -185,8 +185,12 @@ function assess(state) {
     'この流れはこのアプリ独自の整理です。' + (stageHelp ? `補いたいのは${stageHelp}です。` : ''));
   if (first >= 0) record('trust-before-action', blocks.slice(0, first).some(isTrust), blocks[first]);
   if (limits.length) {
-    const unconfirmed = limits.find(b => b.props.real !== true);
-    record('honest-limited', !unconfirmed, unconfirmed);
+    // 前後の空白を変えただけでは、見本の人数を実際の人数に直したことにならない。
+    const unconfirmed = limits.find(({ props }) => props.real !== true || texts.has(props.value.trim()));
+    const note = unconfirmed?.props.real === true
+      ? `数字「${unconfirmed.props.value}」は見本のままです。実際の数字に直してから、「本当の数字です」に印を付けてください。`
+      : undefined;
+    record('honest-limited', !unconfirmed, unconfirmed, note);
   }
   if (first >= 0 && priceGoals.has(goal)) record('price-before-action', blocks.slice(0, first).some(isPrice), blocks[first]);
   if (buttons.length) {

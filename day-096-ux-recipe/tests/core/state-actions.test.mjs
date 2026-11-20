@@ -9,16 +9,34 @@ import { buildFromRecipe } from '../../lib/recipes.js';
 import { createState, reduce } from '../../lib/state.js';
 import { MINIMAL, RESERVE_SAMPLE, STRESS, block, emptyProps, oneEach } from '../fixtures/states.js';
 
-test('8つの目的からレシピを作り、目的変更では現在のテーマを引き継ぐ', () => {
+test('8つの目的からレシピを作り、目的変更では自分の店名と現在のテーマを引き継ぐ', () => {
   for (const goal of GOALS) {
     const recipe = buildFromRecipe(goal);
     assert.deepEqual(createState(goal), recipe);
     const next = reduce(STRESS, { type: 'setGoal', goal });
     assert.strictEqual(next.theme, STRESS.theme);
     if (goal === STRESS.goal) assert.strictEqual(next, STRESS);
-    else assert.deepEqual(next, { ...recipe, theme: STRESS.theme });
+    else assert.deepEqual(next, { ...recipe, site: STRESS.site, theme: STRESS.theme });
     assert.deepEqual(validateState(next), []);
   }
+});
+
+test('目的を変えると、見本の店名と空欄には新しい目的の店名が入る', () => {
+  const start = createState('reserve');
+  const nextName = buildFromRecipe('event').site.name;
+  for (const name of [start.site.name, '', ' 　']) {
+    const from = reduce(start, { type: 'setSite', name });
+    assert.equal(reduce(from, { type: 'setGoal', goal: 'event' }).site.name, nextName);
+  }
+});
+
+test('店名と見た目を編集したあとで目的を変えても、入力した店名とテーマを保つ', () => {
+  const name = '　木の実商店 ';
+  const named = reduce(createState('reserve'), { type: 'setSite', name });
+  const styled = reduce(named, { type: 'setTheme', preset: 'calm', accent: 3 });
+  const next = reduce(styled, { type: 'setGoal', goal: 'event' });
+  assert.equal(next.site.name, name);
+  assert.deepEqual(next.theme, { preset: 'calm', accent: 3 });
 });
 
 test('選んだ位置に目的の部品を追加し、省略時は最初のフッターの前に置く', () => {
