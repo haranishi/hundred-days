@@ -1,4 +1,5 @@
 import { GOAL_LABEL, MAX_SLOTS, SITE_NAME_MAX } from './contract.js';
+import { deleteSlot, getSlotRecord, restoreSlot } from './persist.js';
 import { button, controlId, element, textField } from './ui-look.js';
 import { dialogFrame } from './ui-share.js';
 
@@ -60,6 +61,38 @@ export function mountSlots(dialog, ctx) {
     dialog.close();
   }
 
+  function removeSlot(slot, index) {
+    const record = getSlotRecord(slot.id);
+    // 通常の削除通知と二重にせず、記録を確保できたときだけ削除して取り消しを案内する。
+    const removed = record && deleteSlot(slot.id);
+    refreshList();
+    const next = list.querySelectorAll('[data-slot-open]');
+    (next[Math.min(index, next.length - 1)] ?? (name.disabled ? frame.close : name)).focus();
+    if (!removed) {
+      ctx.toast('保存を削除できませんでした。', { kind: 'error' });
+      return;
+    }
+    ctx.toast(slot.name + 'を消しました。', {
+      actionLabel: '元に戻す',
+      onAction() {
+        // 通知を押すまでに、空いたIDを新しい保存が使うことがある。
+        const slots = ctx.slots.list();
+        const available = slots.length < MAX_SLOTS && !slots.some(current => current.id === slot.id);
+        const restored = available && restoreSlot(record);
+        refreshList();
+        if (!restored) {
+          ctx.toast('元に戻せませんでした（保存枠がいっぱいです）。', { kind: 'error' });
+          return;
+        }
+        if (dialog.open) {
+          const buttons = Array.from(list.querySelectorAll('[data-slot-open]'));
+          buttons.find(open => open.dataset.slotOpen === slot.id)?.focus();
+        }
+        ctx.toast('元に戻しました。');
+      },
+    });
+  }
+
   function refreshList() {
     const model = slotListModel(ctx.slots.list());
     const scroll = dialog.scrollTop;
@@ -78,12 +111,7 @@ export function mountSlots(dialog, ctx) {
       const actions = element('div', 'cs-actions');
       const open = button('開く', () => load(slot.id));
       open.dataset.slotOpen = slot.id;
-      const remove = button('消す', () => {
-        ctx.slots.remove(slot.id);
-        refreshList();
-        const next = list.querySelectorAll('[data-slot-open]');
-        (next[Math.min(index, next.length - 1)] ?? (name.disabled ? frame.close : name)).focus();
-      }, 'cs-btn cs-danger');
+      const remove = button('消す', () => removeSlot(slot, index), 'cs-btn cs-danger');
       open.setAttribute('aria-describedby', title.id);
       remove.setAttribute('aria-describedby', title.id);
       actions.append(open, remove);

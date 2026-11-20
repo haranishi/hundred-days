@@ -1,7 +1,14 @@
-import { BLOCK_SCHEMA, LEVEL_WEIGHT, MAX_BLOCKS, STAGES, STAGE_LABEL, STAGE_NOTE, countChars, nextBlockId, stageOf } from './contract.js';
+import { BLOCK_SCHEMA, LEVEL_WEIGHT, MAX_BLOCKS, STAGES, STAGE_LABEL, STAGE_NOTE, countChars, nextBlockId, resolveField, stageOf } from './contract.js';
 import { makeBlock } from './blocks.js';
 import { RECIPES } from './recipes.js';
+import { textFields } from './sample.js';
 import { reduce } from './state.js';
+
+export const CONFIDENCE_NOTE = {
+  '確認済み': '出典のページに、同じ内容が書かれています。',
+  '一部確認': '出典に近い内容があります。この説明には、そこから広げた部分があります。',
+  '独自の整理': 'この基準は出典に書かれていません。このアプリの考え方です。',
+};
 
 const guide = 'このアプリの目安です（調査で決まった基準ではありません）。';
 const buttonSource = { label: '英国政府デザインシステム・ボタンの名前', url: 'https://design-system.service.gov.uk/components/button/', confidence: '確認済み' };
@@ -34,7 +41,7 @@ const copy = {
   'honest-limited': {
     level: 'must', title: '期限や人数の表示すべてに確認の印がある',
     why: '来た人は、本当の期限や空き状況をもとに予定を立てられます。',
-    note: '印を付ける前に、表示した期限や人数をそれぞれ受付の記録と照らしてください。',
+    note: '表示した期限や人数を受付の記録と照らしてから、その部品の編集欄で「本当の数字です」に印を付けてください。',
     sources: [source('消費者庁・期限表示の事例', 'https://www.caa.go.jp/policies/future/ppi/assets/caa_futurer101_251003_01.pdf#page=7')],
   },
   'price-before-action': {
@@ -106,23 +113,12 @@ const isFaq = block => block.type === 'faq';
 const formFieldCount = block => block.variant === 1 ? 1 : block.props.items.length;
 const stageBlock = { notice: 'hero', understand: 'benefits', trust: 'voices', act: 'cta', relief: 'faq' };
 
-// 繰り返し欄を並べ替えても元の文章を見つけられるよう、項目の位置とは独立に照合する。
-function* textFields(fields, props) {
-  for (const field of fields) {
-    const value = props[field.key];
-    if (field.kind === 'list') {
-      for (const row of value) yield* textFields(field.item, row);
-    } else if (field.kind === 'text' || field.kind === 'long') {
-      yield { role: field.role, value };
-    }
-  }
-}
-
+// 繰り返し欄を並べ替えた後も、文章そのものが残っていれば見本と分かる。
 const sampleText = new Map();
 for (const recipe of Object.values(RECIPES)) {
   const texts = new Set();
   for (const block of recipe.blocks) {
-    for (const { value } of textFields(BLOCK_SCHEMA[block.type].fields, block.props)) {
+    for (const { value } of textFields(block)) {
       if (value.trim()) texts.add(value);
     }
   }
@@ -141,6 +137,9 @@ export function stageCoverage(state) {
 function assess(state) {
   const { blocks, goal } = state;
   const stages = stageCoverage(state);
+  if (!blocks.length) {
+    return { score: 0, passed: 0, total: 0, items: [], stages, empty: true, samples: { count: 0, blockIds: [] } };
+  }
   const missingStages = stages.filter(stage => !stage.ok);
   const first = blocks.findIndex(isAction);
   const last = blocks.findLastIndex(isAction);
@@ -148,12 +147,15 @@ function assess(state) {
   const limits = blocks.filter(b => b.type === 'limited');
   const forms = blocks.filter(b => b.type === 'form');
   const buttons = [];
-  let unchanged;
+  const sampleBlocks = [];
+  const texts = sampleText.get(goal);
   for (const block of blocks) {
-    for (const { role, value } of textFields(BLOCK_SCHEMA[block.type].fields, block.props)) {
-      if (role === 'button') buttons.push({ block, label: value.trim() });
-      if (!unchanged && sampleText.get(goal).has(value)) unchanged = block;
+    let hasSample = false;
+    for (const { field, value } of textFields(block)) {
+      if (field.role === 'button') buttons.push({ block, label: value.trim() });
+      if (texts.has(value)) hasSample = true;
     }
+    if (hasSample) sampleBlocks.push(block);
   }
 
   const items = [];
@@ -165,7 +167,10 @@ function assess(state) {
   }
 
   record('has-action', first >= 0);
-  record('hero-first', blocks[0]?.type === 'hero', heroes[0] ?? blocks[0]);
+  const firstIsHero = blocks[0].type === 'hero';
+  const missingTitle = firstIsHero && !blocks[0].props.title.trim();
+  record('hero-first', firstIsHero && !missingTitle, heroes[0] ?? blocks[0], missingTitle
+    ? `${BLOCK_SCHEMA.hero.label}の「${resolveField('hero', ['title']).label}」が空です。` : undefined);
   const stageHelp = missingStages.map(stage => `${stage.label}（${STAGE_NOTE[stage.key]}）`).join('・');
   record('flow-complete', missingStages.length === 0, undefined,
     'この流れはこのアプリ独自の整理です。' + (stageHelp ? `補いたいのは${stageHelp}です。` : ''));
@@ -203,12 +208,15 @@ function assess(state) {
   const repeated = blocks.find((b, i) => b.type === blocks[i - 1]?.type);
   record('no-adjacent-same', !repeated, repeated);
   record('not-too-long', blocks.length <= 12);
-  record('replace-samples', !unchanged, unchanged);
+  record('replace-samples', sampleBlocks.length === 0, sampleBlocks[0]);
 
   const totalWeight = items.reduce((sum, item) => sum + LEVEL_WEIGHT[item.level], 0);
   const passed = items.filter(item => item.ok);
   const passedWeight = passed.reduce((sum, item) => sum + LEVEL_WEIGHT[item.level], 0);
-  return { score: Math.round(100 * passedWeight / totalWeight), passed: passed.length, total: items.length, items, stages };
+  return {
+    score: Math.round(100 * passedWeight / totalWeight), passed: passed.length, total: items.length, items, stages,
+    empty: false, samples: { count: sampleBlocks.length, blockIds: sampleBlocks.map(block => block.id) },
+  };
 }
 
 const insertionEnd = blocks => blocks.at(-1)?.type === 'footer' ? blocks.length - 1 : blocks.length;
@@ -289,11 +297,6 @@ const repairs = {
   'trust-before-action'(state) {
     return before(state, state.blocks.findIndex(isAction), 'voices', isTrust, '手続きの前に利用した人の声を足す', '判断の材料を手続きの前に移す');
   },
-  *'honest-limited'(state) {
-    const actions = state.blocks.filter(b => b.type === 'limited' && !b.props.real)
-      .map(b => ({ type: 'setProp', id: b.id, path: ['real'], value: true }));
-    yield { label: '本当の数字だと確認した', action: together(state, actions) };
-  },
   'price-before-action'(state) {
     return before(state, state.blocks.findIndex(isAction), 'menu', isPrice, '手続きの前に料金を足す', '料金を手続きの前に移す');
   },
@@ -321,6 +324,8 @@ export function diagnose(state) {
   const report = assess(state);
   for (const item of report.items) {
     if (item.ok || !repairs[item.id]) continue;
+    // 見出しがすでに先頭なら、空欄に書く言葉は本人が決める。
+    if (item.id === 'hero-first' && state.blocks[0].type === 'hero') continue;
     let tradeoff;
     for (const fix of repairs[item.id](state, report.stages)) {
       const after = assess(reduce(state, fix.action));

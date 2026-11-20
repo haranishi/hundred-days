@@ -36,7 +36,7 @@
 .cs-subtitle, .cs-group-title, .cs-slot-name { font-size: 16px; }
 .cs-label, .cs-row-title { font-size: 14px; }
 .cs-field, .cs-list, .cs-slot-form, .cs-slot-row, .cs-guide { display: grid; gap: 8px; min-width: 0; }
-.cs-field-head, .cs-block-head, .cs-dialog-head, .cs-score {
+.cs-field-head, .cs-block-head, .cs-dialog-head {
   display: flex;
   align-items: center;
   gap: 12px;
@@ -126,10 +126,16 @@ textarea.cs-input { resize: vertical; }
 .cs-choice:has(:checked) { border-color: var(--cs-accent); box-shadow: inset 0 0 0 1px var(--cs-accent); }
 .cs-choice:has(:focus-visible) { outline: 3px solid var(--cs-focus); outline-offset: 2px; }
 .cs-check { justify-self: start; }
-.cs-theme-choices, .cs-accent-choices {
+.cs-theme-choices {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(112px, 100%), 1fr));
 }
+.cs-accent-choices {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(6rem, 100%), 1fr));
+}
+.cs-accent-choices .cs-choice { flex-wrap: wrap; justify-content: center; gap: 4px 6px; padding: 6px 4px; }
+.cs-accent-choices .cs-choice-text { flex-basis: 100%; text-align: center; white-space: nowrap; }
 .cs-theme-choices .cs-choice { display: grid; grid-template-columns: auto 1fr; gap: 8px; padding: 10px; }
 .cs-theme-sample {
   grid-column: 1 / -1;
@@ -184,7 +190,11 @@ textarea.cs-input { resize: vertical; }
   border: 1px solid var(--cs-line); border-radius: 14px;
 }
 .cs-row-title { padding-inline: 4px; }
-.cs-score { gap: 16px; border-bottom: 1px solid var(--cs-line); padding-bottom: 16px; }
+.cs-score {
+  display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: 8px 16px;
+  border-bottom: 1px solid var(--cs-line); padding-bottom: 16px;
+}
+.cs-score > .cs-help, .cs-score > .cs-actions { grid-column: 1 / -1; }
 .cs-ring { width: 84px; height: 84px; flex: none; font-variant-numeric: tabular-nums; }
 .cs-ring-track { stroke: var(--cs-line); }
 .cs-ring-value { stroke: var(--cs-accent); stroke-linecap: round; }

@@ -2,8 +2,8 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import { MAX_SLOTS, STORAGE_PREFIX, sanitizeState, validateState } from '../../lib/contract.js';
 import {
-  clearCurrent, deleteSlot, hasSeen, listSlots, loadCurrent, loadSlot,
-  markSeen, renameSlot, saveCurrent, saveSlot,
+  clearCurrent, deleteSlot, getSlotRecord, hasSeen, listSlots, loadCurrent, loadSlot,
+  markSeen, renameSlot, restoreSlot, saveCurrent, saveSlot,
 } from '../../lib/persist.js';
 import { MINIMAL, RESERVE_SAMPLE, STRESS } from '../fixtures/states.js';
 
@@ -15,6 +15,92 @@ function memoryStorage() {
     removeItem(key) { data.delete(key); },
   };
 }
+
+test('途中の枠を消して戻すと、一覧の順・本文・ID・保存時刻がすべて削除前に戻る', () => {
+  const s = memoryStorage();
+  saveSlot(MINIMAL, '最初', s);
+  const { id } = saveSlot(RESERVE_SAMPLE, '戻す枠', s);
+  saveSlot(STRESS, '最後', s);
+  const before = listSlots(s);
+  const record = getSlotRecord(id, s);
+  assert.deepEqual(record, { ...before[1], state: RESERVE_SAMPLE });
+  assert.equal(restoreSlot(record, s), false);
+  assert.equal(deleteSlot(id, s), true);
+  assert.equal(getSlotRecord(id, s), null);
+  assert.deepEqual(listSlots(s), [before[0], before[2]]);
+  assert.equal(restoreSlot(structuredClone(record), s), true);
+  assert.deepEqual(listSlots(s), before);
+  assert.deepEqual(getSlotRecord(id, s), record);
+  assert.deepEqual(loadSlot(id, s), RESERVE_SAMPLE);
+  assert.equal(deleteSlot(id, s), true);
+  assert.equal(saveSlot(MINIMAL, '使い直した枠', s).id, id);
+  assert.equal(restoreSlot(record, s), false);
+  assert.deepEqual(loadSlot(id, s), MINIMAL);
+});
+
+test('旧一覧のIDと同時刻の並び順も、現在の形式の枠と混在したまま復元できる', () => {
+  const s = memoryStorage();
+  const row = { id: 's1', name: '現在の保存', savedAt: 100, state: MINIMAL };
+  s.setItem(STORAGE_PREFIX + 'slot.s1', JSON.stringify(row));
+  const ids = ['旧ろ', 's5', '旧い'];
+  const legacy = ids.map(id => ({ ...row, id, name: id, state: STRESS }));
+  s.setItem(STORAGE_PREFIX + 'slots', JSON.stringify([{ id: 's5', savedAt: -1 }, ...legacy]));
+  const before = listSlots(s);
+  assert.deepEqual(before.map(slot => slot.id), ['s1', ...ids]);
+  for (const id of [ids[0], ids[1], ids[2], 's1']) {
+    const record = getSlotRecord(id, s);
+    assert.equal(deleteSlot(id, s), true);
+    assert.equal(getSlotRecord(id, s), null);
+    assert.equal(restoreSlot(JSON.parse(JSON.stringify(record)), s), true);
+    assert.deepEqual(listSlots(s), before);
+    assert.deepEqual(loadSlot(id, s), id === 's1' ? MINIMAL : STRESS);
+  }
+});
+
+test('空いた間に6枠が埋まれば、別のIDでも復元せず、保存済みのページを保つ', () => {
+  const s = memoryStorage();
+  s.setItem(STORAGE_PREFIX + 'slots', JSON.stringify([{ id: '控え', name: '旧', savedAt: 0, state: MINIMAL }]));
+  const record = getSlotRecord('控え', s);
+  assert.equal(deleteSlot('控え', s), true);
+  for (let i = 0; i < MAX_SLOTS; i++) assert.equal(saveSlot(RESERVE_SAMPLE, '新' + i, s).ok, true);
+  const full = listSlots(s);
+  assert.equal(restoreSlot(record, s), false);
+  assert.deepEqual(listSlots(s), full);
+  assert.equal(getSlotRecord(record.id, s), null);
+});
+
+test('壊れた記録を戻そうとしても一覧を変えず、正しい記録ならあとで戻せる', () => {
+  const s = memoryStorage();
+  const { id } = saveSlot(RESERVE_SAMPLE, '控え', s);
+  saveSlot(MINIMAL, '残す', s);
+  const record = getSlotRecord(id, s);
+  assert.equal(deleteSlot(id, s), true);
+  const before = listSlots(s);
+  for (const bad of [null, [], {}, { ...record, id: '' }, { ...record, name: 3 },
+    { ...record, savedAt: -1 }, { ...record, savedAt: Number.MAX_SAFE_INTEGER },
+    { ...record, state: { goal: 'reserve' } }, { ...record, goal: 'buy' }, { ...record, blocks: 99 }]) {
+    assert.equal(restoreSlot(bad, s), false);
+    assert.deepEqual(listSlots(s), before);
+  }
+  assert.equal(restoreSlot(record, s), true);
+  assert.deepEqual(loadSlot(id, s), RESERVE_SAMPLE);
+});
+
+test('新旧どちらの枠も容量不足では復元に失敗し、空きができれば同じ記録でやり直せる', () => {
+  const s = memoryStorage();
+  const { id } = saveSlot(MINIMAL, '新', s);
+  s.setItem(STORAGE_PREFIX + 'slots', JSON.stringify([{ id: '旧', name: '旧', savedAt: 1, state: STRESS }]));
+  const full = { ...s, setItem() { throw new DOMException('容量不足', 'QuotaExceededError'); } };
+  const before = listSlots(s);
+  for (const key of [id, '旧']) {
+    const record = getSlotRecord(key, s);
+    assert.equal(deleteSlot(key, s), true);
+    assert.equal(restoreSlot(record, full), false);
+    assert.equal(getSlotRecord(key, s), null);
+    assert.equal(restoreSlot(record, s), true);
+    assert.deepEqual(listSlots(s), before);
+  }
+});
 
 test('新旧両方にある枠を消すと旧版も消え、他の保存は残る', () => {
   const s = memoryStorage();
@@ -173,6 +259,9 @@ function unavailable(s) {
   assert.doesNotThrow(() => clearCurrent(s));
   assert.deepEqual(listSlots(s), []);
   assert.equal(loadSlot('s1', s), null);
+  assert.equal(getSlotRecord('s1', s), null);
+  const record = { id: 's1', name: '控え', savedAt: 0, goal: MINIMAL.goal, blocks: MINIMAL.blocks.length, state: MINIMAL };
+  assert.equal(restoreSlot(record, s), false);
   const result = saveSlot(MINIMAL, '試験', s);
   assert.equal(result.ok, false);
   assert.match(result.reason, /保存/);
@@ -228,6 +317,9 @@ test('getItemの例外で一覧を空と誤認して既存の保存を潰さな�
   assert.equal(loadCurrent(broken), null);
   assert.deepEqual(listSlots(broken), []);
   assert.equal(loadSlot(original.id, broken), null);
+  const record = getSlotRecord(original.id, s);
+  assert.equal(getSlotRecord(original.id, broken), null);
+  assert.equal(restoreSlot({ ...record, id: 's2' }, broken), false);
   assert.equal(saveSlot(RESERVE_SAMPLE, '', broken).ok, false);
   assert.equal(renameSlot(original.id, '別名', broken), false);
   assert.equal(deleteSlot(original.id, broken), false);

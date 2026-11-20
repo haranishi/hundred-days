@@ -3,7 +3,10 @@ import assert from 'node:assert/strict';
 import { resolveObjectURL } from 'node:buffer';
 import { registerHooks } from 'node:module';
 import { block, MINIMAL, RESERVE_SAMPLE } from '../fixtures/states.js';
-import { SITE_NAME_MAX, countChars } from '../../lib/contract.js';
+import { SITE_NAME_MAX, STORAGE_PREFIX, countChars } from '../../lib/contract.js';
+import { createEditor } from '../../app.js';
+import { CONFIDENCE_NOTE } from '../../lib/rules.js';
+import { deleteSlot, listSlots, loadSlot, saveSlot } from '../../lib/persist.js';
 import { commit, createHistory, present, redo, reduce, undo } from '../../lib/state.js';
 import { mountInspector, scalarEditor } from '../../lib/ui-inspector.js';
 import { formModel } from '../../lib/ui-form-model.js';
@@ -93,13 +96,19 @@ class TestElement extends EventTarget {
 }
 
 function environment(t, tag, navigator = {}, globals = {}) {
+  const entries = new Map();
+  const localStorage = {
+    getItem: key => entries.get(key) ?? null,
+    setItem: (key, value) => entries.set(key, value),
+    removeItem: key => entries.delete(key),
+  };
   const doc = {
     createElement(name) { return new TestElement(name, this); },
     createElementNS(_ns, name) { return this.createElement(name); },
     downloads: [], copied: [],
     execCommand(cmd) { assert.equal(cmd, 'copy'); this.copied.push(this.activeElement.value); return true; },
   };
-  for (const [key, value] of Object.entries({ document: doc, navigator, ...globals })) {
+  for (const [key, value] of Object.entries({ document: doc, navigator, localStorage, ...globals })) {
     const old = Object.getOwnPropertyDescriptor(globalThis, key);
     Object.defineProperty(globalThis, key, { configurable: true, value });
     t.after(() => { if (old) Object.defineProperty(globalThis, key, old); else delete globalThis[key]; });
@@ -122,8 +131,6 @@ function context(initial = MINIMAL, diagnose = () => ({ score: 80, items: [] }))
   const listeners = new Set();
   const calls = [];
   const toasts = [];
-  const entries = new Map();
-  let sequence = 0;
   function snapshot(reason) { return { state: present(history), selectedId, diagnosis, reason }; }
   function notify(reason) { listeners.forEach((fn) => fn(snapshot(reason))); }
   function change(next, reason) { history = next; diagnosis = diagnose(present(next)); notify(reason); }
@@ -141,15 +148,8 @@ function context(initial = MINIMAL, diagnose = () => ({ score: 80, items: [] }))
     toast(message, opts = {}) { toasts.push({ message, ...opts }); },
     viewUrl: async () => 'https://example.com/day96/#v=2.sample',
     slots: {
-      list: () => [...entries.values()].map(({ state, ...meta }) => meta),
-      save(name) {
-        const id = 's' + (++sequence);
-        const state = present(history);
-        entries.set(id, { id, state, name, goal: state.goal, blocks: state.blocks.length, savedAt: sequence });
-        return { ok: true, id };
-      },
-      load: (id) => entries.get(id)?.state ?? null,
-      remove: (id) => entries.delete(id),
+      list: listSlots, load: loadSlot, remove: deleteSlot,
+      save: name => saveSlot(present(history), name),
     },
   };
   return { ctx, calls, toasts, listeners };
@@ -509,6 +509,116 @@ test('診断理由の開閉を保ち、根拠・確度・目安を表示し、�
   assert.equal(listeners.size, 0);
 });
 
+for (const [rule, id, path] of [
+  ['honest-limited', 'b1', 'real'], ['hero-first', 'b2', 'title'], ['hero-title-short', 'b2', 'title'],
+]) {
+  test('診断の「この部品を見る」から編集欄へ移る ' + rule, (t) => {
+    const { root, doc } = environment(t, 'section');
+    const edit = doc.createElement('section');
+    doc.body.append(edit);
+    const state = { ...MINIMAL, blocks: [
+      block('b1', 'limited', 0), block('b2', 'hero', 0, { title: '山'.repeat(29) }),
+    ] };
+    const ctx = createEditor(state, { onSelect: (_id, key) => inspector.focusPath(key) });
+    const inspector = mountInspector(edit, ctx);
+    const diagnosis = mountDiagnosis(root, ctx);
+    ctx.setTab('diagnosis');
+    const view = find(root, el => el.dataset.control === rule + '/block');
+    assert.ok(view);
+    view.click();
+    const field = byPath(edit, path);
+    assert.equal(ctx.getTab(), 'edit');
+    assert.equal(ctx.getSelectedId(), id);
+    assert.ok(doc.activeElement === field, '指定した欄がフォーカスを受け取る');
+    assert.equal(field.scrolled, true);
+    if (path === 'real') {
+      assert.equal(field.type, 'checkbox');
+      assert.equal(field.checked, false);
+      assert.deepEqual(descendants(view.parent).filter(el => el.tagName === 'BUTTON').map(el => el.textContent),
+        ['この部品を見る']);
+    }
+    assert.equal(ctx.canUndo(), false);
+    diagnosis.destroy();
+    inspector.destroy();
+  });
+}
+
+test('ファーストビューが無いときは別の部品へ飛ばず、診断から見出しを足せる', (t) => {
+  const { root } = environment(t, 'section');
+  const ctx = createEditor({ ...MINIMAL, blocks: [MINIMAL.blocks[1]] });
+  ctx.toast = t.mock.fn();
+  mountDiagnosis(root, ctx);
+  assert.ok(!find(root, el => el.dataset.control === 'hero-first/block'));
+  find(root, el => el.dataset.control === 'hero-first/fix').click();
+  assert.equal(ctx.getState().blocks[0].type, 'hero');
+});
+
+test('診断の点のそばに採点対象があり、達成・未達の両方を文字で読める', (t) => {
+  const { root } = environment(t, 'section');
+  const { ctx } = context(MINIMAL, () => ({ score: 50, items: [true, false].map(ok => ({
+    id: String(ok), level: 'must', title: '見出しがある', ok, why: '用件を伝えます。',
+  })) }));
+  mountDiagnosis(root, ctx);
+  const score = find(root, el => el.className === 'cs-score');
+  assert.match(score.textContent, /この点は、部品の組み立て方を見たものです。文章の良し悪しは見ていません。/u);
+  for (const [id, label] of [['true', 'できています'], ['false', 'まだです']]) {
+    const row = find(root, el => el.dataset.detail === id);
+    assert.ok(row.firstChild.textContent.includes(label));
+    assert.ok(row.firstChild.textContent.includes('見出しがある'));
+  }
+});
+
+test('見本の件数から最初の部品へ移り、見本がすべて消えたら件数とボタンを外す', (t) => {
+  const { root } = environment(t, 'section');
+  const { ctx } = context(MINIMAL, state => ({
+    score: 90, items: [], samples: state.site.name === '更新'
+      ? { count: 0, blockIds: [] } : { count: 2, blockIds: ['b2', 'b1'] },
+  }));
+  const select = t.mock.method(ctx, 'select');
+  mountDiagnosis(root, ctx);
+  const view = byText(root, 'BUTTON', '見る');
+  assert.ok(view);
+  assert.match(root.textContent, /見本の文章が残っている部品: 2個/u);
+  view.click();
+  assert.deepEqual(select.mock.calls[0].arguments, ['b2', { tab: 'edit' }]);
+  ctx.dispatch({ type: 'setSite', name: '更新' });
+  assert.doesNotMatch(root.textContent, /見本の文章が残っている部品/u);
+  assert.equal(byText(root, 'BUTTON', '見る'), undefined);
+});
+
+test('最後の部品を消すと点と項目の代わりに追加方法が出て、取り消すと診断に戻る', (t) => {
+  const { root } = environment(t, 'section');
+  const ctx = createEditor({ ...MINIMAL, blocks: [MINIMAL.blocks[0]] });
+  mountDiagnosis(root, ctx);
+  ctx.dispatch({ type: 'removeBlock', id: 'b1' });
+  assert.match(root.textContent, /部品がありません。「構成」の「部品を足す」で足すか、目的を選び直してください。/u);
+  assert.equal(find(root, el => el.tagName === 'SVG' || el.tagName === 'ARTICLE'), undefined);
+  assert.doesNotMatch(root.textContent, /できていること|組み立て方を見たもの/u);
+  ctx.undo();
+  assert.ok(find(root, el => el.tagName === 'SVG'));
+  assert.doesNotMatch(root.textContent, /部品がありません/u);
+});
+
+test('根拠の印とパネル末尾の折りたたみから、それぞれの印の説明を読める', (t) => {
+  const { root } = environment(t, 'section');
+  const sources = Object.keys(CONFIDENCE_NOTE).map(confidence => ({ label: '資料', confidence }));
+  const { ctx } = context(MINIMAL, () => ({ score: 0, items: [
+    { id: 'guide', title: '見出しがある', ok: false, level: 'must', why: '用件を伝えます。', sources },
+  ] }));
+  mountDiagnosis(root, ctx);
+  const legend = byText(root, 'SUMMARY', '根拠の印の意味')?.parent;
+  assert.equal(legend?.tagName, 'DETAILS');
+  const item = find(root, el => el.dataset.detail === 'guide');
+  for (const [badge, note] of Object.entries(CONFIDENCE_NOTE)) {
+    assert.ok(legend.textContent.includes(badge) && legend.textContent.includes(note), badge);
+    const mark = byText(item, 'SPAN', badge);
+    assert.ok([mark.title, mark.getAttribute('title'), mark.getAttribute('aria-label')].some(label => label?.includes(note)), badge);
+  }
+  legend.open = true;
+  ctx.dispatch({ type: 'setTheme', accent: 1 });
+  assert.equal(byText(root, 'SUMMARY', '根拠の印の意味').parent.open, true);
+});
+
 test('共有リンクの生成中は送れず、遅れて届いた古い結果は捨てる。端末の共有はその場で開く', async (t) => {
   const sent = [];
   const { root, doc, opener } = environment(t, 'dialog', { share: (value) => { sent.push(value); } });
@@ -632,6 +742,132 @@ test('名前をつけて端末に6件保存できる。開くは置き換え1回
   dialog.destroy();
   assert.equal(listeners.size, 0);
 });
+
+function replacementButton(root) {
+  return find(root, el => {
+    if (el.tagName !== 'BUTTON' || !el.textContent.endsWith('に置き換える')) return false;
+    for (let node = el; node; node = node.parent) {
+      if (node.hidden) return false;
+    }
+    return true;
+  });
+}
+
+test('打鍵中の選択範囲を保ち、店名の全出現をまとめて置き換え、1回で元に戻せる', (t) => {
+  const { root, doc } = environment(t, 'section');
+  const from = MINIMAL.site.name;
+  const state = { ...MINIMAL, blocks: [
+    block('b1', 'hero', 0, { lead: from + 'から' + from + 'へ' }),
+    block('b2', 'footer', 0, { items: [{ text: from }] }),
+  ] };
+  const ctx = createEditor(state);
+  ctx.setTab('look');
+  const dispatch = t.mock.method(ctx, 'dispatch');
+  ctx.toast = t.mock.fn();
+  mountLook(root, ctx);
+  const input = byPath(root, 'site.name');
+  input.focus();
+  assert.equal(replacementButton(root), undefined, '見本の店名のまま');
+  for (const name of ['', '　', '花のお店', '花の庭']) {
+    input.value = name;
+    input.setSelectionRange(0, Math.min(2, name.length), 'backward');
+    fire(input, 'input', { isComposing: false });
+    assert.ok(input === byPath(root, 'site.name') && doc.activeElement === input);
+    assert.deepEqual([input.selectionStart, input.selectionEnd, input.selectionDirection], [0, Math.min(2, name.length), 'backward']);
+    if (name.trim()) {
+      assert.equal(replacementButton(root)?.textContent, 'いまの店名「' + name + '」に置き換える');
+      assert.ok(root.textContent.includes('文章の中に、見本の店名「' + from + '」が3か所あります。'));
+    } else assert.equal(replacementButton(root), undefined);
+  }
+  const renamed = ctx.getState();
+  const action = replacementButton(root);
+  action.focus();
+  action.click();
+  assert.equal(ctx.getState().blocks[0].props.lead, '花の庭から花の庭へ');
+  assert.equal(ctx.getState().blocks[1].props.items[0].text, '花の庭');
+  assert.equal(replacementButton(root), undefined, '本文に見本の店名が残っていない');
+  assert.equal(ctx.getTab(), 'look');
+  assert.equal(dispatch.mock.calls.filter(call => call.arguments[0].type === 'replace').length, 1);
+  const [message, options] = ctx.toast.mock.calls[0].arguments;
+  assert.equal(message, '3か所を置き換えました。');
+  assert.equal(options.actionLabel, '元に戻す');
+  options.onAction();
+  assert.deepEqual(ctx.getState(), renamed);
+  assert.ok(replacementButton(root));
+});
+
+test('店名が収まらない欄だけを残し、何も置き換えられない2回目は履歴も通知も増やさない', (t) => {
+  const { root } = environment(t, 'section');
+  const from = MINIMAL.site.name;
+  const name = '森'.repeat(24);
+  const state = { ...MINIMAL, site: { name }, blocks: [
+    block('b1', 'hero', 0, { title: from + 'と' + from }),
+    block('b2', 'footer', 0, { name: from }),
+  ] };
+  const { ctx, calls, toasts } = context(state);
+  mountLook(root, ctx);
+  assert.ok(replacementButton(root));
+  replacementButton(root).click();
+  assert.equal(ctx.getState().blocks[0].props.title, from + 'と' + from);
+  assert.equal(ctx.getState().blocks[1].props.name, name);
+  assert.match(toasts[0].message, /^1か所を置き換えました。\s*1か所は文字数の上限のため置き換えていません。$/u);
+  assert.ok(root.textContent.includes('」が2か所あります。'));
+  const before = ctx.getHistory();
+  replacementButton(root).click();
+  assert.ok(ctx.getHistory() === before);
+  assert.equal(calls.length, 1);
+  assert.equal(toasts.length, 1);
+});
+
+test('保存を消した通知から、同じID・日時・名前・内容を一覧に戻せる', (t) => {
+  const { root } = environment(t, 'dialog');
+  const { ctx, toasts } = context();
+  const { id } = ctx.slots.save('春の案');
+  const before = ctx.slots.list();
+  const dialog = mountSlots(root, ctx);
+  dialog.open();
+  byText(root, 'BUTTON', '消す').click();
+  assert.deepEqual(ctx.slots.list(), []);
+  assert.match(root.textContent, /0\/6/);
+  assert.equal(toasts.length, 1);
+  assert.equal(toasts[0].message, '春の案を消しました。');
+  assert.equal(toasts[0].actionLabel, '元に戻す');
+  toasts[0].onAction();
+  assert.deepEqual(ctx.slots.list(), before);
+  assert.deepEqual(ctx.slots.load(id), MINIMAL);
+  assert.match(root.textContent, /1\/6/);
+  assert.ok(byText(root, 'H4', '春の案'));
+  assert.equal(toasts[1].message, '元に戻しました。');
+});
+
+for (const conflict of ['同じIDを再利用', '別の6枠で満杯']) {
+  test('古い削除通知の「元に戻す」はその後の保存を守る ' + conflict, (t) => {
+    const { root } = environment(t, 'dialog');
+    const { ctx, toasts } = context();
+    if (conflict === '同じIDを再利用') ctx.slots.save('前の案');
+    else {
+      // 旧形式のIDなら、同じIDが使用中という条件と切り分けて満杯の状態を試せる。
+      localStorage.setItem(STORAGE_PREFIX + 'slots', JSON.stringify([
+        { id: 'older', name: '前の案', savedAt: 42, state: MINIMAL },
+      ]));
+    }
+    const removed = ctx.slots.list()[0];
+    const dialog = mountSlots(root, ctx);
+    dialog.open();
+    byText(root, 'BUTTON', '消す').click();
+    const notification = toasts.at(-1);
+    assert.equal(notification?.actionLabel, '元に戻す');
+    ctx.dispatch({ type: 'setSite', name: '別のページ' });
+    const count = conflict === '同じIDを再利用' ? 1 : 6;
+    for (let i = 0; i < count; i++) ctx.slots.save('新しい案' + i);
+    const current = ctx.slots.list();
+    assert.equal(current.some(slot => slot.id === removed.id), count === 1);
+    notification.onAction();
+    assert.deepEqual(ctx.slots.list(), current);
+    for (const slot of current) assert.equal(ctx.slots.load(slot.id).site.name, '別のページ');
+    assert.equal(toasts.at(-1).message, '元に戻せませんでした（保存枠がいっぱいです）。');
+  });
+}
 
 test('目的画面からも保存一覧を開ける。現在のページが空なら保存は無効になる', (t) => {
   const { root } = environment(t, 'dialog');

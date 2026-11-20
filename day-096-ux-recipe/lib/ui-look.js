@@ -1,5 +1,6 @@
 import { ACCENTS, SITE_NAME_MAX, THEMES, THEME_LABEL, clampText, countChars } from './contract.js';
 import { counter } from './ui-form-model.js';
+import { countNameUses, replaceNameUses, sampleSiteName } from './sample.js';
 
 let sequence = 0;
 export const controlId = (kind) => 'cs-' + kind + '-' + (++sequence);
@@ -145,12 +146,50 @@ export function radioChoices(label, options, choose) {
   };
 }
 
+function sampleNameGuide(ctx, siteInput) {
+  const root = element('div', 'cs-guide');
+  root.hidden = true;
+  const note = element('p', 'cs-help');
+  const apply = button('', () => {
+    if (root.hidden) return;
+    const state = ctx.getState();
+    const { state: next, replaced, skipped } = replaceNameUses(state, sampleSiteName(state.goal), state.site.name);
+    if (replaced === 0) return;
+
+    const inLook = ctx.getTab() === 'look';
+    const hadFocus = document.activeElement === apply;
+    ctx.dispatch({ type: 'replace', state: next });
+    // ページを開くときと同じ置き換え操作でも、店名を編集した人は見た目の欄に戻る。
+    if (inLook && ctx.getTab() !== 'look') ctx.setTab('look');
+    if (hadFocus && root.hidden) siteInput.focus();
+    let message = replaced + 'か所を置き換えました。';
+    if (skipped > 0) message += skipped + 'か所は文字数の上限のため置き換えていません。';
+    ctx.toast(message, { actionLabel: '元に戻す', onAction: () => ctx.undo() });
+  });
+  root.append(note, apply);
+  return {
+    root,
+    update(state) {
+      const from = sampleSiteName(state.goal);
+      const name = state.site.name;
+      const count = from && name.trim() && from !== name ? countNameUses(state, from) : 0;
+      root.hidden = count === 0;
+      if (count > 0) {
+        note.textContent = '文章の中に、見本の店名「' + from + '」が' + count + 'か所あります。';
+        apply.textContent = 'いまの店名「' + name + '」に置き換える';
+      }
+    },
+  };
+}
+
 export function mountLook(root, ctx) {
   const panel = element('div', 'cs-panel');
   const site = textField({ label: 'サイトの名前', max: SITE_NAME_MAX }, (name) => {
     ctx.dispatch({ type: 'setSite', name }, { coalesce: 'site.name' });
   });
   site.input.dataset.path = 'site.name';
+  const guide = sampleNameGuide(ctx, site.input);
+  site.root.append(guide.root);
   const themes = radioChoices('テーマ', THEMES.map((preset) => {
     const sample = element('span', 'cs-theme-sample');
     sample.dataset.preset = preset;
@@ -174,6 +213,7 @@ export function mountLook(root, ctx) {
   const off = ctx.subscribe(({ state }) => {
     if (!state) return;
     site.update(state.site.name);
+    guide.update(state);
     themes.update(state.theme.preset);
     accents.update(state.theme.accent);
     themes.root.style.setProperty('--cs-sample-accent', ACCENTS[state.theme.accent].hex);

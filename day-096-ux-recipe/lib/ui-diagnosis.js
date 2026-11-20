@@ -1,5 +1,8 @@
 import { LEVELS, LEVEL_LABEL } from './contract.js';
+import { CONFIDENCE_NOTE } from './rules.js';
 import { button, controlId, element } from './ui-look.js';
+
+const EDIT_PATH = { 'honest-limited': 'real', 'hero-first': 'title', 'hero-title-short': 'title' };
 
 export function diagnosisModel(diagnosis) {
   const items = diagnosis?.items ?? [];
@@ -34,6 +37,39 @@ function scoreRing({ score, angle }) {
   return ring;
 }
 
+function scoreOverview(model, samples, ctx) {
+  const overview = element('header', 'cs-score');
+  const message = element('div');
+  message.append(element('h2', 'cs-title', 'UX診断'), element('p', 'cs-score-comment', model.comment));
+  overview.append(scoreRing(model), message, element('p', 'cs-help',
+    'この点は、部品の組み立て方を見たものです。文章の良し悪しは見ていません。'));
+  if (samples?.count > 0) {
+    const actions = element('div', 'cs-actions');
+    const count = element('span', 'cs-help', '見本の文章が残っている部品: ' + samples.count + '個');
+    count.id = controlId('samples');
+    const view = button('見る', () => ctx.select(samples.blockIds[0], { tab: 'edit' }));
+    view.setAttribute('aria-describedby', count.id);
+    view.dataset.control = 'samples/block';
+    actions.append(count, view);
+    overview.append(actions);
+  }
+  return overview;
+}
+
+function confidenceLegend(opened) {
+  const legend = element('details');
+  legend.dataset.detail = 'confidence';
+  legend.open = opened.has('confidence');
+  const summary = element('summary', 'cs-summary', '根拠の印の意味');
+  summary.dataset.control = 'confidence';
+  const meanings = element('dl', 'cs-explainer');
+  for (const [name, note] of Object.entries(CONFIDENCE_NOTE)) {
+    meanings.append(element('dt', '', name), element('dd', '', note));
+  }
+  legend.append(summary, meanings);
+  return legend;
+}
+
 function ruleCard(item, ctx, opened) {
   const card = element('article', 'cs-rule');
   const details = element('details', 'cs-rule-details');
@@ -43,7 +79,7 @@ function ruleCard(item, ctx, opened) {
   summary.dataset.control = item.id + '/reason';
   const marker = element('span', 'cs-rule-mark', item.ok ? '✓' : '！');
   marker.setAttribute('aria-hidden', 'true');
-  const status = element('span', 'cs-rule-status', item.ok ? 'できています' : '要確認');
+  const status = element('span', 'cs-rule-status', item.ok ? 'できています' : 'まだです');
   status.prepend(marker);
   const title = element('span', 'cs-rule-title', item.title);
   title.id = controlId('rule-title');
@@ -62,7 +98,9 @@ function ruleCard(item, ctx, opened) {
         reference.rel = 'noopener noreferrer';
         reference.dataset.control = item.id + '/source/' + sources.childElementCount;
       }
-      row.append(reference, element('span', 'cs-confidence', source.confidence));
+      const badge = element('span', 'cs-confidence', source.confidence);
+      badge.title = CONFIDENCE_NOTE[source.confidence] ?? '';
+      row.append(reference, badge);
       sources.append(row);
     }
     reason.append(element('h4', 'cs-label', '根拠'), sources);
@@ -70,7 +108,8 @@ function ruleCard(item, ctx, opened) {
   details.append(summary, reason);
   card.append(details);
   const actions = element('div', 'cs-actions cs-rule-actions');
-  if (!item.ok && item.fix) {
+  // 期限や人数は、編集する人が元の表示を確かめてから確認の印を付ける。
+  if (!item.ok && item.fix && item.id !== 'honest-limited') {
     const label = element('p', 'cs-fix-label', item.fix.label);
     label.id = controlId('fix');
     const fix = button('なおす', () => {
@@ -86,8 +125,12 @@ function ruleCard(item, ctx, opened) {
     fix.dataset.control = item.id + '/fix';
     actions.append(label, fix);
   }
-  if (item.blockId) {
-    const view = button('この部品を見る', () => ctx.select(item.blockId, { tab: 'edit' }));
+  // 見出しを足す前は先頭の別部品のIDが返ることがあり、そこにはキャッチコピーがない。
+  const canView = item.blockId && (item.id !== 'hero-first'
+    || ctx.getState().blocks.some(block => block.id === item.blockId && block.type === 'hero'));
+  if (canView) {
+    const path = EDIT_PATH[item.id];
+    const view = button('この部品を見る', () => ctx.select(item.blockId, path ? { tab: 'edit', path } : { tab: 'edit' }));
     view.setAttribute('aria-describedby', title.id);
     view.dataset.control = item.id + '/block';
     actions.append(view);
@@ -102,17 +145,18 @@ export function mountDiagnosis(root, ctx) {
     const current = diagnosis ?? (state ? ctx.diagnose() : null);
     if (previous === current && root.firstChild) return;
     previous = current;
+    if (current?.empty) {
+      root.replaceChildren(element('p', 'cs-empty', '部品がありません。「構成」の「部品を足す」で足すか、目的を選び直してください。'));
+      root.scrollTop = 0;
+      return;
+    }
     const model = diagnosisModel(current);
     const openDetails = new Set(Array.from(root.querySelectorAll('details[open]'), (el) => el.dataset.detail));
     const active = document.activeElement;
     const focusKey = root.contains(active) ? active.dataset.control : null;
     const scroll = root.scrollTop;
     const panel = element('div', 'cs-panel cs-diagnosis');
-    const overview = element('div', 'cs-score');
-    const message = element('div');
-    message.append(element('h2', 'cs-title', 'UX診断'), element('p', 'cs-score-comment', model.comment));
-    overview.append(scoreRing(model), message);
-    panel.append(overview);
+    panel.append(scoreOverview(model, current?.samples, ctx));
     for (const group of model.groups) {
       const section = element('section', 'cs-rule-group');
       section.append(element('h3', 'cs-group-title', group.label));
@@ -129,7 +173,8 @@ export function mountDiagnosis(root, ctx) {
     if (!model.done.length) done.append(element('p', 'cs-help', '項目を満たすと、ここに表示されます。'));
     const guide = element('footer', 'cs-guide');
     guide.append(element('h3', 'cs-subtitle', '診断の見かた'),
-      element('p', 'cs-help', '点はこのアプリの目安です。各項目を開くと、理由とその根拠を確認できます。'));
+      element('p', 'cs-help', '点はこのアプリの目安です。各項目を開くと、理由とその根拠を確認できます。'),
+      confidenceLegend(openDetails));
     panel.append(done, guide);
     root.replaceChildren(panel);
     if (focusKey) {

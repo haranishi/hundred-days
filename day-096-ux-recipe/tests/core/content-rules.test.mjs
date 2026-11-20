@@ -73,23 +73,24 @@ test('縦のフォームを短くしても、ひとこと表示の非表示の�
 const examples = [
   { id: 'has-action', level: 'must', yes: reserve('form'), no: reserve('hero', 'limited') },
   { id: 'hero-first', level: 'must', yes: reserve('hero'), no: reserve('pain', 'hero', 'cta') },
-  { id: 'flow-complete', level: 'must', yes: booking, no: empty },
+  { id: 'flow-complete', level: 'must', yes: booking, no: reserve('footer') },
   { id: 'trust-before-action', level: 'must', yes: reserve('story', 'form'), no: reserve('hero', 'menu', 'form', 'voices', 'cta'), outside: reserve('hero', 'limited') },
-  { id: 'honest-limited', level: 'must', yes: prop(fair, 'limited', 'real', true), no: fair, outside: empty },
+  { id: 'honest-limited', level: 'must', yes: prop(fair, 'limited', 'real', true), no: fair, outside: reserve('cta'),
+    edit: s => prop(s, 'limited', 'real', true) },
   { id: 'price-before-action', level: 'should', yes: reserve('plans', 'cta'), no: reserve('hero', 'voices', 'form', 'menu', 'cta'), outside: page('support', 'form') },
-  { id: 'button-label-result', level: 'should', yes: booking, no: prop(booking, 'form', 'submit', 'こちら'), outside: empty,
+  { id: 'button-label-result', level: 'should', yes: booking, no: prop(booking, 'form', 'submit', 'こちら'), outside: reserve('pain'),
     edit: s => prop(s, 'form', 'submit', '希望日を伝える') },
   { id: 'button-label-consistent', level: 'should', yes: booking, no: threeLabels, outside: reserve('form'),
     edit: s => prop(s, 'cta', 'button', s.blocks[2].props.submit) },
   { id: 'form-short', level: 'should', yes: booking, no: needsFewerFields, outside: reserve('hero', 'cta') },
-  { id: 'hero-title-short', level: 'tip', yes: prop(booking, 'hero', 'title', '🌱'.repeat(28)), no: prop(booking, 'hero', 'title', '🌱'.repeat(29)), outside: empty,
+  { id: 'hero-title-short', level: 'tip', yes: prop(booking, 'hero', 'title', '🌱'.repeat(28)), no: prop(booking, 'hero', 'title', '🌱'.repeat(29)), outside: reserve('pain'),
     edit: s => prop(s, 'hero', 'title', '座って相談する整体室') },
   { id: 'faq-before-last-action', level: 'tip', yes: reserve('cta', 'faq', 'form'), no: reserve('hero', 'voices', 'menu', 'form', 'faq', 'footer'), outside: page('visit', 'form') },
   { id: 'action-reachable-again', level: 'tip', yes: booking, no: reserve('hero', 'cta', 'menu', 'voices', 'benefits', 'faq', 'footer'), outside: reserve('hero', 'menu', 'voices', 'cta', 'footer') },
   { id: 'no-adjacent-same', level: 'tip', yes: reserve('hero', 'pain', 'hero'), no: repeated,
     edit: s => reduce(s, { type: 'removeBlock', id: s.blocks[2].id }) },
   { id: 'not-too-long', level: 'tip', yes: twelveBlocks, no: longPage, edit: () => twelveBlocks },
-  { id: 'replace-samples', level: 'tip', yes: empty, no: loneSample,
+  { id: 'replace-samples', level: 'tip', yes: { ...empty, blocks: [block('b1', 'story', 0, { text: '木の椅子を作っています。' })] }, no: loneSample,
     edit: s => reduce(s, { type: 'setProp', id: 'b1', path: ['items', 1, 'q'], value: '色の違いを選べますか？' }) },
 ];
 
@@ -104,7 +105,7 @@ for (const { id, level, yes, no, outside, edit } of examples) {
     assert.equal(failed.title, passed.title);
     assert.equal(passed.fix, undefined);
     if (outside) assert.equal(itemOf(outside, id), undefined);
-    else for (const state of [empty, MINIMAL, STRESS]) assert.ok(itemOf(state, id));
+    else for (const state of [reserve('footer'), MINIMAL, STRESS]) assert.ok(itemOf(state, id));
     if (!edit) {
       applyFix(no, id);
     } else {
@@ -133,7 +134,7 @@ test('点は適用項目だけの重み付き割合で、件数は重みと区�
     const weight = items => items.reduce((sum, i) => sum + LEVEL_WEIGHT[i.level], 0);
     assert.equal(r.total, r.items.length);
     assert.equal(r.passed, satisfied.length);
-    assert.equal(r.score, Math.round(100 * weight(satisfied) / weight(r.items)));
+    assert.equal(r.score, state.blocks.length ? Math.round(100 * weight(satisfied) / weight(r.items)) : 0);
     assert.deepEqual(r.stages, stageCoverage(state));
     assert.equal(r.stages.reduce((sum, s) => sum + s.count, 0), state.blocks.length);
     for (const s of r.stages) {
@@ -144,7 +145,7 @@ test('点は適用項目だけの重み付き割合で、件数は重みと区�
 });
 
 test('段階がいくつ欠けても一手でそろい、既存の部品と編集内容を保つ', () => {
-  for (const state of [empty, MINIMAL, reserve('form', 'footer'), reserve('limited')]) {
+  for (const state of [reserve('menu'), MINIMAL, reserve('form', 'footer'), reserve('limited')]) {
     const before = stageCoverage(state);
     const after = applyFix(state, 'flow-complete');
     const added = after.blocks.filter(b => !state.blocks.some(old => old.id === b.id));
@@ -158,15 +159,27 @@ test('段階がいくつ欠けても一手でそろい、既存の部品と編�
   assert.equal(applyFix(displaced, 'hero-first').blocks[0].id, displaced.blocks[1].id);
 });
 
-test('確認の印は本人の操作で全件に付き、ほかの修正では変わらない', () => {
+test('期限と人数は受付の記録を見て一つずつ確認し、ほかの修正では印が付かない', () => {
   const state = reserve('limited', 'hero', 'limited', 'limited');
   state.blocks[2].props.real = true;
-  const fix = itemOf(state, 'honest-limited').fix;
-  assert.equal(fix.label, '本当の数字だと確認した');
-  const confirmed = applyFix(state, 'honest-limited');
+  const original = structuredClone(state);
+  let confirmed = state;
+  for (const index of [0, 3]) {
+    const item = itemOf(confirmed, 'honest-limited');
+    assert.equal(item.ok, false);
+    assert.equal(item.blockId, state.blocks[index].id);
+    assert.equal(Object.hasOwn(item, 'fix'), false);
+    assert.match(item.note, /受付の記録.*編集欄.*本当の数字です/u);
+    confirmed = reduce(confirmed, { type: 'setProp', id: item.blockId, path: ['real'], value: true });
+    assert.deepEqual(validateState(confirmed), []);
+  }
+  assert.equal(itemOf(confirmed, 'honest-limited').ok, true);
+  assert.ok(diagnose(confirmed).score > diagnose(state).score);
+  assert.deepEqual(undo(commit(createHistory(state), confirmed)).present, original);
+  assert.deepEqual(state, original);
   assert.deepEqual(confirmed.blocks, state.blocks.map(b =>
     b.type === 'limited' ? { ...b, props: { ...b.props, real: true } } : b));
-  for (const item of diagnose(state).items.filter(i => i.fix && i.id !== 'honest-limited')) {
+  for (const item of diagnose(state).items.filter(i => i.fix)) {
     const after = reduce(state, item.fix.action);
     assert.deepEqual(after.blocks.filter(b => b.type === 'limited'), state.blocks.filter(b => b.type === 'limited'));
   }

@@ -51,8 +51,10 @@ test('理由・補足に未確認の言い切りがなく、全15項目から確
     }
   }
   assert.equal(ids.size, 15);
-  const missing = diagnose({ ...MINIMAL, blocks: [] }).items.find(item => item.id === 'flow-complete');
-  for (const stage of STAGES) assert.ok(missing.note.includes(STAGE_NOTE[stage]), stage);
+  for (const [present, block] of [['notice', MINIMAL.blocks[0]], ['relief', MINIMAL.blocks[1]]]) {
+    const missing = diagnose({ ...MINIMAL, blocks: [block] }).items.find(item => item.id === 'flow-complete');
+    for (const stage of STAGES) assert.equal(missing.note.includes(STAGE_NOTE[stage]), stage !== present, stage);
+  }
 });
 
 test('調査の確度を配置の一般論に広げず、数値の目安は補足で示す', () => {
