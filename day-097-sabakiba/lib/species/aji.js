@@ -16,5 +16,5 @@ export default {
   vent: 50, cavityEnd: 49, vertebrae: { pre: 10, caudal: 14 }, vertebraDia: 6, swimBladder: true,
   pinbones: { count: 20, from: 30, to: 65 }, scutes: { count: 71, from: 28 },
   look: { colors: { dorsal: '#2F4858', flank: '#B8C7CC', belly: '#EEF2F5', fin: '#A5A882', iris: '#D8D6C8' },
-    patterns: ['opercleSpot'], scale: { size: 0.13, gloss: 0.65 }, flesh: 'pink' },
+    patterns: ['opercleSpot'], scale: { size: 0.075, gloss: 0.7 }, flesh: 'pink' },
 };

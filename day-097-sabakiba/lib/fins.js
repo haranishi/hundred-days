@@ -24,7 +24,7 @@ function medianFin(group, a, data, up, name, m, q, fringe) {
     const root = a.flank(s, direction), peak = long ? 0.11 : 0.23;
     const envelope = fringe ? Math.sin(Math.PI * t) ** 0.75 : t < peak
       ? Math.sin(t / peak * Math.PI / 2) : (1 - (t - peak) / (1 - peak)) ** (long ? 0.64 : 1.45);
-    const height = (0.025 + envelope * 0.975) * data.height / 100 * a.SL;
+    const height = (0.025 + envelope * 0.975) * data.height / 100 * a.SL * 0.72; // 調査の高さは推定で大きめに出るため、見た目の目安として控えめにする
     return { root, tip: [root[0] + height * (long ? 0.45 : 0.32), root[1] + direction * height, 0] };
   }, count + 2, a.SL * 0.0019, m, q);
 }
