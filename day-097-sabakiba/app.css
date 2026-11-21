@@ -540,3 +540,10 @@ kbd { display: inline-block; padding: 1px 6px; border: 1px solid var(--edge); bo
   :focus-visible { outline-color: Highlight; }
   .pill[aria-pressed="true"], .chip-btn[aria-pressed="true"] { border: 2px solid Highlight; }
 }
+
+/* 320px幅の小さなスマホ：操作の列が横にはみ出さないよう、余白とスライダーの最小幅を詰める */
+@media (max-width: 340px) {
+  .playback-bar { gap: 4px; padding-inline: 6px; }
+  .playback-bar .ctrl-btn { padding-inline: 8px; }
+  .u-slider { min-width: 36px; }
+}
