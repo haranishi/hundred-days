@@ -72,10 +72,14 @@ export function curveOwner(name, side) {
   return name === 'kidneyLine' || name === 'boneLift' ? 'bone' : null;
 }
 
-export const TOOL_IDS = ['deba', 'yanagi', 'petty', 'shears', 'tweezers', 'scaler'];
+export const TOOL_IDS = ['deba', 'yanagi', 'petty', 'shears', 'tweezers', 'scaler', 'thumb'];
 export const TOOL_LABELS = {
-  deba: '出刃包丁', yanagi: '柳刃包丁', petty: 'ペティナイフ', shears: 'キッチンばさみ', tweezers: '骨抜き', scaler: 'うろこ取り',
+  deba: '出刃包丁', yanagi: '柳刃包丁', petty: 'ペティナイフ', shears: 'キッチンばさみ', tweezers: '骨抜き', scaler: 'うろこ取り', thumb: '親指',
 };
+
+// 魚の模様（`look.patterns[]` の語彙。皮の材質が解釈する）。opercleSpot＝鰓蓋の黒い斑（アジ）・flankSpots＝体側の黒点の列（イワシ）・wavyStripes＝背の波状の縞（サバ）・
+// blueSpots＝体の青い小斑点（マダイ）・bellyStripes＝腹側の縞（カツオ）・flatSpots＝有眼側の斑紋（ヒラメ）・sandyMottle＝砂色の細かい斑（キス）・lateralBand＝体側の帯（サンマの銀の帯など）
+export const PATTERNS = ['opercleSpot', 'flankSpots', 'wavyStripes', 'blueSpots', 'bellyStripes', 'flatSpots', 'sandyMottle', 'lateralBand'];
 export const MOTIONS = ['pull', 'push', 'press', 'slice', 'scrape', 'peel', 'pluck'];
 export const LEADS = ['heel', 'mid', 'tip'];
 export const CAMERA_PRESETS = ['cook', 'side', 'top', 'front', 'closeup'];
@@ -236,5 +240,7 @@ export function validateSpecies(sp) {
   const c = (sp.look && sp.look.colors) || {};
   for (const k of ['dorsal', 'flank', 'belly', 'fin', 'iris']) if (!hex.test(c[k] || '')) E(`look.colors.${k} が #RRGGBB でない`);
   if (!['white', 'red', 'pink'].includes(sp.look && sp.look.flesh)) E('look.flesh が不正');
+  for (const pat of (sp.look && sp.look.patterns) || []) if (!PATTERNS.includes(pat)) E(`look.patterns に未知の模様: ${pat}`);
+  if (sp.look && sp.look.blindSide !== undefined && !hex.test(sp.look.blindSide)) E('look.blindSide が #RRGGBB でない（平たい魚の無眼側の色）');
   return errs;
 }

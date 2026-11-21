@@ -148,7 +148,7 @@ function geometryCheck(geometry, name) {
   return indices.length / 3;
 }
 
-test('6種の模型は法線・正の体積・閉じた面を持ち、外接箱が実寸の範囲で各3,000三角形以内', () => {
+test('7種の道具の模型は法線・正の体積・閉じた面を持ち、外接箱が実寸の範囲で各3,000三角形以内', () => {
   for (const tool of TOOL_IDS) {
     const g = buildKnife(tool);
     assert.equal(g.isGroup, true);
@@ -170,7 +170,7 @@ test('6種の模型は法線・正の体積・閉じた面を持ち、外接箱�
     });
     assert.ok(triangles > 0 && triangles <= 3000, tool);
     const [lengthCm, height, width] = sub(hi, lo);
-    const range = { deba: [26, 31], yanagi: [35, 40], petty: [22, 26], shears: [12, 18], tweezers: [8, 11], scaler: [14, 18] }[tool];
+    const range = { deba: [26, 31], yanagi: [35, 40], petty: [22, 26], shears: [12, 18], tweezers: [8, 11], scaler: [14, 18], thumb: [5, 7] }[tool];
     assert.ok(lengthCm >= range[0] && lengthCm <= range[1], tool);
     assert.ok(height > 0.5 && height < 7 && width > 0.25 && width < 3, tool);
   }

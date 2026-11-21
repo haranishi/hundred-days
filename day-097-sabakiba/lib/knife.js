@@ -131,6 +131,19 @@ function scaler(group, materials) {
   }
 }
 
+// 親指（手開き）。原点は指の腹の先（接触点）、+xが指先の向き、爪は+y側。円柱と箱だけで作る（閉じた面）。
+function thumb(group) {
+  const skinTone = new THREE.MeshStandardMaterial({ color: 0xe6b595, roughness: 0.58 });
+  const finger = mesh('finger', new THREE.CylinderGeometry(0.82, 0.9, 5.6, 20), skinTone);
+  finger.geometry.rotateZ(-Math.PI / 2);
+  finger.geometry.scale(1, 1, 0.82);
+  finger.position.set(-2.8, 0, 0);
+  group.add(finger);
+  const nail = mesh('nail', new THREE.BoxGeometry(1.5, 0.16, 1.1), new THREE.MeshStandardMaterial({ color: 0xf6dcd0, roughness: 0.3 }));
+  nail.position.set(-0.95, 0.74, 0);
+  group.add(nail);
+}
+
 export function buildKnife(tool) {
   if (!TOOL_IDS.includes(tool)) throw new RangeError('道具の名前が登録されていません。');
   const group = new THREE.Group();
@@ -147,6 +160,7 @@ export function buildKnife(tool) {
     grip(group, -spec.length / 2, spec.height * 0.66, spec.handle, tool === 'petty' ? 1.0 : 1.23, materials);
   } else if (tool === 'shears') shears(group, materials);
   else if (tool === 'tweezers') tweezers(group, materials);
+  else if (tool === 'thumb') thumb(group);
   else scaler(group, materials);
   return group;
 }
