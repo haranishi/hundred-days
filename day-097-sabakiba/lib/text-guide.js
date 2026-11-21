@@ -1,23 +1,26 @@
 // 3Dが使えないとき（?gl=off・WebGL初期化失敗）の文章ガイド。純粋なデータ整形とDOM描画を分ける。
 import { METHODS } from './contract.js';
+import safetyContent from './content/safety.js';
 import { collectProcedureTools, formatStepView } from './ui-format.js';
-import { appendRubyText, h, icon, makeRuby } from './ui-icons.js';
+import { appendRubyText, h, icon, makeRuby, stepNoteBody } from './ui-icons.js';
+
+export const DEVICE_GL_REASON = 'この端末では3Dを表示できないため、文章で手順をご案内します。';
 
 /** 3Dが使えない環境向けの文章ガイド用データを組み立てる（純関数・Node試験可能）。 */
 export function buildTextGuideData({
   speciesMeta,
   procedure,
   partsData = null,
-  safetyIntro = '',
+  safetyIntro = safetyContent.intro,
   leftHanded = false,
-  reason = 'この端末では3D表示を使えないため、文章のガイドを表示しています。',
+  reason = DEVICE_GL_REASON,
 }) {
   const steps = procedure && Array.isArray(procedure.steps)
-    ? procedure.steps.map((st, idx) => formatStepView(st, idx, procedure.steps.length, leftHanded))
+    ? procedure.steps.map((st, idx, steps) => formatStepView(st, idx, steps.length, leftHanded, steps))
     : [];
   const tools = collectProcedureTools(procedure);
   return {
-    reason: String(reason || '3D表示を使えないため、文章のガイドを表示しています。'),
+    reason: String(reason || DEVICE_GL_REASON),
     speciesMeta,
     methodLabel: speciesMeta ? (METHODS[speciesMeta.method] || '') : '',
     leftHanded: Boolean(leftHanded),
@@ -25,7 +28,7 @@ export function buildTextGuideData({
     steps,
     parts: partsData && Array.isArray(partsData.parts) ? partsData.parts : [],
     keep: partsData && partsData.keep ? partsData.keep : '',
-    safetyIntro: safetyIntro || '参考情報です。刃物と生ものを扱います。自己責任で無理のない範囲で行ってください。',
+    safetyIntro: safetyIntro || safetyContent.intro,
   };
 }
 
@@ -85,7 +88,7 @@ export function renderTextGuide(container, data, { onToggleLeftHanded } = {}) {
   // 安全のひとこと
   const safetySec = h('section', { class: 'card-section callout callout--warn' }, [
     h('div', { class: 'callout-body' }, [
-      h('p', { class: 'callout-title' }, [icon('shield', 'icon icon--warn'), 'さばく前の確認']),
+      h('h3', { class: 'callout-title' }, [icon('shield', 'icon icon--warn'), 'さばく前の確認']),
       ...String(data.safetyIntro).split('\n').filter(Boolean).map((line) => h('p', {}, [line])),
       h('a', { class: 'text-link', href: '#/safety' }, ['「さばく前に」の詳しい注意を読む']),
     ]),
@@ -117,7 +120,7 @@ export function renderTextGuide(container, data, { onToggleLeftHanded } = {}) {
 
       const placeBox = h('p', { class: 'place-bar' }, [
         icon('place'),
-        h('strong', {}, ['魚の置き方：']),
+        h('strong', { class: 'place-label' }, ['置き方']),
       ]);
       appendRubyText(placeBox, st.place);
       li.append(placeBox);
@@ -144,16 +147,14 @@ export function renderTextGuide(container, data, { onToggleLeftHanded } = {}) {
       }
 
       const meta = h('dl', { class: 'step-notes' });
-      const addRow = (dtLabel, textVal, cls = '') => {
+      const addRow = (dtLabel, textVal, cls = '', sameAs = null) => {
         if (!textVal) return;
         const dt = h('dt', { class: cls }, [dtLabel]);
-        const dd = h('dd', { class: cls });
-        appendRubyText(dd, textVal);
-        meta.append(dt, dd);
+        meta.append(dt, stepNoteBody(textVal, sameAs, cls));
       };
-      addRow('コツ', st.tip);
-      addRow('やりがち', st.mistake);
-      addRow('✓ できた目印', st.done, 'note--done');
+      addRow('コツ', st.tip, '', st.tipSameAs);
+      addRow('やりがち', st.mistake, '', st.mistakeSameAs);
+      addRow('✓ できた目印', st.done, 'note--done', st.doneSameAs);
       if (st.safety) addRow('▲ 安全の注意', st.safety, 'note--warn');
       li.append(meta);
 

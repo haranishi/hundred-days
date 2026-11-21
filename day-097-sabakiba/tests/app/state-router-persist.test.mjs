@@ -1,7 +1,7 @@
 // 経路（lib/router.js）と保存（lib/persist.js）の単体試験。
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { formatRoute, parseQueryParams, parseRoute, resolveInitialLocation } from '../../lib/router.js';
+import { formatRoute, normalizeRoute, parseQueryParams, parseRoute, resolveInitialLocation } from '../../lib/router.js';
 import {
   STORAGE_NAME, defaultPersisted, loadPersisted, parsePersisted, savePersisted, serializePersisted,
 } from '../../lib/persist.js';
@@ -30,9 +30,6 @@ test('router: 壊れた経路は valid:false で入口（home）へ戻す', () =
   const broken = [
     '#/unknown',
     '#/fish/unicorn',
-    '#/fish/aji/0',
-    '#/fish/aji/-1',
-    '#/fish/aji/abc',
     '#/fish/aji/2/extra',
     '#/done/dragon',
     '#/parts/nope',
@@ -43,6 +40,22 @@ test('router: 壊れた経路は valid:false で入口（home）へ戻す', () =
     assert.equal(res.name, 'home', h);
     assert.equal(res.valid, false, h);
   }
+});
+
+test('表示できる番号は維持し、範囲外は実在する端の手順へ、未知の魚は入口へそろえる', () => {
+  for (const n of [1, 7, 15]) {
+    const parsed = parseRoute(`#/fish/aji/${n}`);
+    assert.equal(normalizeRoute(parsed, 15), parsed);
+  }
+  for (const [raw, n] of [['99', 15], ['1000', 15], ['9'.repeat(400), 15],
+    ['0', 1], ['-1', 1], ['abc', 1], ['3.5', 1], ['02', 2]]) {
+    const parsed = parseRoute(`#/fish/aji/${raw}`);
+    const route = normalizeRoute(parsed, 15);
+    assert.equal(formatRoute(route), `#/fish/aji/${n}`);
+    assert.equal(normalizeRoute(route, 15), route);
+  }
+  assert.equal(formatRoute(normalizeRoute(parseRoute('#/fish/unicorn/99'), 15)), '#/');
+  assert.equal(normalizeRoute({ name: 'guide', species: 'unicorn', step: 0 }, 15).name, 'home');
 });
 
 test('router: ハッシュ末尾のクエリ（#/fish/aji/2?debug=1）と search クエリ（?gl=off#/fish/aji/2）の両方を正しく解釈する', () => {

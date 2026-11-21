@@ -1,7 +1,6 @@
 // 「さばき場」アプリの入口。状態・経路・保存・3Dシーン（スタブ）・各画面・キーボード操作をつなぐ。
 import { SPECIES_META } from './lib/species/meta.js';
 import { getProcedure } from './lib/procedures/index.js';
-import safetyContent from './lib/content/safety.js';
 import partsContent from './lib/content/parts.js';
 import { addSample, createSession, finish } from './lib/practice.js';
 import {
@@ -11,14 +10,16 @@ import {
   toggleLabels, toggleLeftHanded, toggleLoop, togglePlaying, toggleSpeed, toggleXray,
 } from './lib/app-state.js';
 import { loadPersisted, savePersisted } from './lib/persist.js';
-import { formatRoute, parseRoute, resolveInitialLocation } from './lib/router.js';
+import { formatRoute, normalizeRoute, parseRoute, resolveInitialLocation } from './lib/router.js';
 import { createFishScene } from './lib/scene-fish.js';
+import { createViewer } from './lib/view3d.js';
+import { withKnifeCamera } from './lib/knife.js';
 import { buildStepSpeechText, formatStepView } from './lib/ui-format.js';
 import { renderHome } from './lib/ui-home.js';
 import { renderIntro } from './lib/ui-intro.js';
 import { mountGuideView, renderStepsSheet } from './lib/ui-guide.js';
 import { renderDone, renderParts, renderSafety, syncSettingsDialog } from './lib/ui-pages.js';
-import { buildTextGuideData, renderTextGuide } from './lib/text-guide.js';
+import { buildTextGuideData, DEVICE_GL_REASON, renderTextGuide } from './lib/text-guide.js';
 import { createWakeLockManager } from './lib/wake-lock.js';
 import { createSpeechManager } from './lib/speech.js';
 import { h, icon } from './lib/ui-icons.js';
@@ -49,7 +50,7 @@ let state = createInitialState({
 let route = initialLoc.route;
 let filter = { method: 'all', beginnerOnly: false };
 let glDisabled = params.gl === 'off';
-let glReason = glDisabled ? '3D表示オフ（gl=off）の指定により、文章のガイドを表示しています。' : '';
+const glReason = glDisabled ? '3D表示を切っているため、文章で手順をご案内します。' : DEVICE_GL_REASON;
 let clockFrozen = params.t !== null;
 let pendingFixedU = params.t;
 let lastNavHash = null;
@@ -219,16 +220,23 @@ function updateWakeLockForRoute() {
   wakeMgr.setEnabled(shouldHold);
 }
 
-function navigateTo(nextRoute, { replace = false } = {}) {
+function navigateTo(nextRoute) {
   const hash = formatRoute(nextRoute);
   route = nextRoute;
-  lastNavHash = hash;
   if (window.location.hash !== hash) {
-    if (replace && window.history && typeof window.history.replaceState === 'function') {
-      window.history.replaceState(null, '', hash);
-    } else {
-      window.location.hash = hash;
-    }
+    lastNavHash = hash;
+    window.location.hash = hash;
+  }
+  renderCurrentRoute();
+}
+
+function renderLocation(parsed) {
+  const total = parsed.name === 'guide' ? getProcedure(parsed.species)?.steps.length : 0;
+  route = normalizeRoute(parsed, total);
+  if (route !== parsed) {
+    const hash = window.location.hash;
+    const query = hash.indexOf('?');
+    window.history.replaceState(window.history.state, '', formatRoute(route) + (query < 0 ? '' : hash.slice(query)));
   }
   renderCurrentRoute();
 }
@@ -307,9 +315,8 @@ function renderFallbackTextGuide(speciesId) {
     speciesMeta: meta,
     procedure: proc,
     partsData: partsContent[speciesId] || null,
-    safetyIntro: safetyContent.intro,
     leftHanded: state.leftHanded,
-    reason: glReason || 'この端末では3D表示を使えないため、文章のガイドを表示しています。',
+    reason: glReason,
   });
   renderTextGuide(mainEl, data, {
     onToggleLeftHanded() {
@@ -351,14 +358,13 @@ function renderGuideRoute(speciesId, stepIndex) {
     return;
   }
 
-  const clampedStep = Math.min(proc.steps.length - 1, Math.max(0, stepIndex));
   const speciesChanged = state.species !== speciesId;
-  const stepChanged = state.step !== clampedStep;
+  const stepChanged = state.step !== stepIndex;
 
   if (speciesChanged) {
-    state = selectSpecies(state, speciesId, { step: clampedStep, stepCount: proc.steps.length });
+    state = selectSpecies(state, speciesId, { step: stepIndex, stepCount: proc.steps.length });
   } else {
-    state = setStep(state, clampedStep, proc.steps.length, {
+    state = setStep(state, stepIndex, proc.steps.length, {
       autoPlay: !clockFrozen,
       reducedMotion: prefersReducedMotion(),
     });
@@ -492,7 +498,7 @@ function renderGuideRoute(speciesId, stepIndex) {
       speciesId,
       quality: state.quality,
       debug: params.debug,
-    });
+    }, { makeViewer: options => withKnifeCamera(createViewer(options)) });
     scene = created;
     sceneSpecies = speciesId;
     sceneQuality = state.quality;
@@ -505,10 +511,9 @@ function renderGuideRoute(speciesId, stepIndex) {
       syncGuideUI();
       markReady();
       startLoopIfNeeded();
-    }).catch((err) => {
+    }).catch(() => {
       if (scene !== created) return;
       glDisabled = true;
-      glReason = (err && err.message) ? err.message : '3D表示の初期化に失敗したため、文章のガイドに切り替えました。';
       renderFallbackTextGuide(speciesId);
     });
   } else {
@@ -560,12 +565,12 @@ function renderCurrentRoute() {
 
   switch (route.name) {
     case 'home':
+    default:
       renderHome(mainEl, {
         state,
         filter,
         onFilterChange(nextFilter) {
           filter = nextFilter;
-          renderCurrentRoute();
         },
       });
       break;
@@ -584,8 +589,6 @@ function renderCurrentRoute() {
     case 'parts':
       renderParts(mainEl, { speciesId: route.species });
       break;
-    default:
-      renderHome(mainEl, { state, filter, onFilterChange: (f) => { filter = f; renderCurrentRoute(); } });
   }
   window.scrollTo(0, 0);
   markReady();
@@ -657,13 +660,7 @@ window.addEventListener('hashchange', () => {
     return;
   }
   lastNavHash = null;
-  const parsed = parseRoute(window.location.hash);
-  route = parsed;
-  if (!parsed.valid) {
-    navigateTo({ name: 'home' }, { replace: true });
-    return;
-  }
-  renderCurrentRoute();
+  renderLocation(parseRoute(window.location.hash));
 });
 
 // タブ非表示時はアニメーションループを止める
@@ -755,7 +752,7 @@ if (params.debug) {
       }
       renderCurrentRoute();
       const target = scene;
-      if (!target) throw new Error(glReason || 'この魚の3Dはまだ準備中です');
+      if (!target) throw new Error(glDisabled ? glReason : 'この魚の3Dはまだ準備中です');
       await target.ready;
       if (target !== scene) throw new Error('撮影する魚が切り替わりました。');
       await target.resetCamera({ immediate: true, capture: true });
@@ -796,10 +793,6 @@ if (params.debug) {
   };
 }
 
-// 初期描画（壊れたハッシュは入口へ正規化）
+// 初期表示も、履歴をたどったときと同じ手順番号にそろえます。
 syncSettingsUI();
-if (!route.valid) {
-  navigateTo({ name: 'home' }, { replace: true });
-} else {
-  renderCurrentRoute();
-}
+renderLocation(initialLoc.route);

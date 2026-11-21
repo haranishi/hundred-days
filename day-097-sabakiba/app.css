@@ -257,10 +257,10 @@ body[data-route="guide"] .main { display: flex; flex-direction: column; overflow
 
 /* ガイド画面（スマホ縦 390×844・横 844×390・PC 1280×800） */
 .guide-layout {
-  display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(240px, 55dvh) minmax(0, 1fr);
+  display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(220px, 42dvh) minmax(0, 1fr);
   flex: 1 1 auto; min-height: 0; overflow: hidden;
 }
-.guide-layout[data-mode="practice"] { grid-template-rows: minmax(240px, 52dvh) minmax(0, 1fr); }
+.guide-layout[data-mode="practice"] { grid-template-rows: minmax(240px, 48dvh) minmax(0, 1fr); }
 
 .stage-pane { display: grid; grid-template-rows: minmax(0, 1fr) auto; min-height: 0; border-bottom: 1px solid var(--line); background: #ece6da; }
 .stage { position: relative; min-height: 0; overflow: hidden; user-select: none; -webkit-user-select: none; }
@@ -311,10 +311,10 @@ body[data-route="guide"] .main { display: flex; flex-direction: column; overflow
   border-bottom: 1px solid var(--line); background: var(--bg);
 }
 .step-counter { font-size: 18px; font-weight: 800; font-variant-numeric: tabular-nums; white-space: nowrap; }
-.step-dots { display: flex; align-items: center; gap: 5px; flex: 1; min-width: 0; overflow: hidden; }
-.step-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--line); flex: none; }
+.step-dots { display: flex; align-items: center; gap: min(5px, 1.6%); flex: 1; min-width: 0; }
+.step-dot { flex: 1 1 0; min-width: 3px; max-width: 8px; height: 7px; border-radius: 999px; background: var(--line); }
 .step-dot[data-state="done"] { background: var(--done); }
-.step-dot[data-state="current"] { width: 18px; border-radius: 999px; background: var(--cut); }
+.step-dot[data-state="current"] { flex: 2.4 1 0; max-width: 18px; background: var(--cut); }
 
 .card-scroll {
   min-height: 0; overflow-y: auto; overscroll-behavior: contain;
@@ -328,6 +328,7 @@ body[data-route="guide"] .main { display: flex; flex-direction: column; overflow
 }
 .place-label { font-size: 12px; font-weight: 800; color: var(--muted); }
 .place-text { font-weight: 700; }
+.place-short { display: none; }
 .step-block { margin-bottom: 10px; }
 .block-heading { display: flex; align-items: center; gap: 5px; margin: 0 0 6px; font-size: 13px; font-weight: 800; color: var(--muted); }
 .how-list { margin: 0; padding-left: 1.25em; display: grid; gap: 5px; font-size: 14.5px; }
@@ -345,6 +346,7 @@ body[data-route="guide"] .main { display: flex; flex-direction: column; overflow
 .step-notes dd { margin: 0 0 4px 22px; }
 .step-notes .note--done { color: var(--done-ink); }
 .step-notes .note--warn { color: var(--warn-ink); }
+.step-notes .note-reference { color: var(--muted); font-size: 12.5px; }
 
 /* 親指の届く下端バー：「次へ」が最大 */
 .thumb-bar {
@@ -495,6 +497,36 @@ kbd { display: inline-block; padding: 1px 6px; border: 1px solid var(--edge); bo
 #share-panel input { display: block; width: 100%; min-height: 44px; margin-top: 8px; }
 
 /* レスポンシブ（スマホ横 844×390・タブレット・PC 1280×800） */
+@media (width < 600px) {
+  .home-hero { margin-bottom: 10px; }
+  .home-sub { font-size: 14px; line-height: 1.45; }
+  .filter-bar { margin-bottom: 10px; padding: 8px; }
+  .filter-chips {
+    flex-wrap: nowrap; gap: 6px; padding: 5px; overflow-x: auto;
+    scroll-snap-type: x proximity; -webkit-overflow-scrolling: touch;
+  }
+  .chip-btn { flex: none; min-width: 44px; white-space: nowrap; scroll-snap-align: start; }
+  .filter-subrow { margin-top: 3px; padding: 4px 5px 0; }
+  .filter-count { font-size: 12px; }
+  .species-grid { gap: 8px; }
+  .species-card {
+    display: grid; grid-template-columns: clamp(96px, 26vw, 110px) minmax(0, 1fr);
+    min-height: 146px; align-items: center; gap: 10px; padding: 8px;
+  }
+  .species-media { padding: 0; }
+  .status-pill { top: auto; right: 0; bottom: 100%; }
+  .species-body { min-width: 0; gap: 4px; padding: 0; }
+  .species-head { align-items: center; flex-wrap: wrap; gap: 4px 6px; }
+  .species-name { font-size: 18px; }
+  .species-full, .meta-season, .meta-skilled { display: none; }
+  .species-meta { gap: 1px; line-height: 1.45; }
+  .meta-item dt { width: 4em; }
+  .species-blurb {
+    display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden;
+    padding-top: 0; border-top: 0; font-size: 13px; line-height: 1.45;
+  }
+}
+
 @media (min-width: 600px) {
   .brand-tagline { display: block; }
   .home-kicker { display: none; }
@@ -531,6 +563,24 @@ kbd { display: inline-block; padding: 1px 6px; border: 1px solid var(--edge); bo
   .sheet { inset: 0; margin: auto; border-radius: var(--radius-lg); max-height: min(82dvh, 680px); }
 }
 
+/* 一列のときだけ帯を詰めます。44pxの操作領域と端末の左右の余白は維持します。 */
+@media (width < 640px), (orientation: portrait) and (width < 820px) {
+  .step-bar { padding-block: 1px; }
+  .playback-bar { padding-block: 2px; }
+  .card-scroll { padding-block: 6px 10px; }
+  .step-title { margin-bottom: 2px; }
+  .step-summary { margin-bottom: 4px; font-size: 13px; line-height: 1.35; }
+  .step-card .place-bar {
+    flex-wrap: nowrap; gap: 4px; margin-bottom: 4px; padding: 3px 5px; font-size: 12.5px; line-height: 1.4;
+  }
+  .step-card .place-bar .icon { display: none; }
+  .step-card .place-label { flex: none; }
+  .step-card .place-full { position: absolute; width: 1px; height: 1px; clip-path: inset(50%); overflow: hidden; }
+  .step-card .place-short { display: inline; }
+  .step-card .block-heading { margin-bottom: 2px; line-height: 1.35; }
+  .step-card .how-list { font-size: 14px; line-height: 1.45; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .sheet[open] { animation: none; }
   .species-card, .button { transition: none; }
@@ -545,5 +595,5 @@ kbd { display: inline-block; padding: 1px 6px; border: 1px solid var(--edge); bo
 @media (max-width: 340px) {
   .playback-bar { gap: 4px; padding-inline: 6px; }
   .playback-bar .ctrl-btn { padding-inline: 8px; }
-  .u-slider { min-width: 36px; }
+  .u-slider { min-width: 44px; }
 }

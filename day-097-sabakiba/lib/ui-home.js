@@ -15,7 +15,7 @@ export function renderHome(container, { state, filter, onFilterChange }) {
     h('p', { class: 'home-kicker' }, ['魚のさばき方を、3Dで見ながら。']),
     h('h2', { class: 'home-lead' }, ['さばく魚をえらぶ']),
     h('p', { class: 'home-sub' }, [
-      '台所と同じ向きで、骨の位置や刃の通り道を確かめながら一尾をさばけます。まずは定番の魚から選んでみてください。',
+      '台所と同じ向きの3Dで、骨の位置や刃の通り道を確かめながら一尾をさばけます。',
     ]),
   ]);
   page.append(hero);
@@ -37,7 +37,7 @@ export function renderHome(container, { state, filter, onFilterChange }) {
         h('div', { class: 'resume-body' }, [
           h('div', { class: 'resume-title-row' }, [
             h('strong', { class: 'resume-name' }, [item.meta.name]),
-            h('span', { class: 'badge badge--method' }, [item.methodLabel]),
+            appendRubyText(h('span', { class: 'badge badge--method' }), item.methodLabel),
           ]),
           h('p', { class: 'resume-step' }, [
             `手順 ${item.stepNumber} / ${item.totalSteps}：${item.stepTitle}`,
@@ -53,103 +53,67 @@ export function renderHome(container, { state, filter, onFilterChange }) {
 
   // 絞り込みバー（方法チップ＋初心者向け）
   const filterBar = h('section', { class: 'filter-bar', 'aria-label': '魚の絞り込み' });
-  const chips = h('div', { class: 'filter-chips', role: 'group', 'aria-label': 'さばき方で絞る' });
+  const chips = h('div', { class: 'filter-chips', role: 'group', 'aria-label': 'さばき方と難易度で絞る' });
+  const methodButtons = new Map();
 
   const methodEntries = [['all', 'すべて'], ...Object.entries(METHODS)];
   for (const [key, label] of methodEntries) {
-    const active = filter.method === key;
     const btn = h('button', {
       type: 'button',
       class: 'chip-btn',
-      'aria-pressed': String(active),
       dataset: { testid: `filter-method-${key}` },
-      onClick: () => onFilterChange({ ...filter, method: key }),
+      onClick: () => changeFilter({ ...filter, method: key }),
     });
     appendRubyText(btn, label);
     chips.append(btn);
+    methodButtons.set(key, btn);
   }
 
   const beginnerBtn = h('button', {
     type: 'button',
     class: 'chip-btn chip-btn--beginner',
-    'aria-pressed': String(Boolean(filter.beginnerOnly)),
     dataset: { testid: 'filter-beginner' },
-    onClick: () => onFilterChange({ ...filter, beginnerOnly: !filter.beginnerOnly }),
+    onClick: () => changeFilter({ ...filter, beginnerOnly: !filter.beginnerOnly }),
   }, [
     icon('starFill', 'icon icon--star'),
     '初心者向け（★1〜2）',
   ]);
 
-  const matched = filterSpecies(SPECIES_ORDER, SPECIES_META, filter);
-  const countText = h('p', { class: 'filter-count', 'aria-live': 'polite' }, [
-    `${SPECIES_ORDER.length}種のうち ${matched.length}種を表示しています。`,
-  ]);
-
-  filterBar.append(chips, h('div', { class: 'filter-subrow' }, [beginnerBtn, countText]));
+  chips.append(beginnerBtn);
+  const countText = h('p', { class: 'filter-count', 'aria-live': 'polite' });
+  filterBar.append(chips, h('div', { class: 'filter-subrow' }, [countText]));
   page.append(filterBar);
 
   // 魚カード一覧
   const grid = h('section', { class: 'species-grid', 'aria-label': '魚の一覧' });
-  if (matched.length === 0) {
-    const empty = h('div', { class: 'empty-state' }, [
-      h('p', {}, ['条件に合う魚がありませんでした。絞り込みを解除してご覧ください。']),
-      h('button', {
-        type: 'button',
-        class: 'button',
-        onClick: () => onFilterChange({ method: 'all', beginnerOnly: false }),
-      }, ['絞り込みをすべて解除する']),
-    ]);
-    grid.append(empty);
-  } else {
-    for (const sp of matched) {
-      const proc = getProcedure(sp.id);
-      const savedStep = state.progress && Number.isInteger(state.progress[sp.id]) ? state.progress[sp.id] : null;
-      const methodLabel = METHODS[sp.method] || sp.method;
+  const empty = h('div', { class: 'empty-state' }, [
+    h('p', {}, ['条件に合う魚がありませんでした。絞り込みを解除してご覧ください。']),
+    h('button', {
+      type: 'button',
+      class: 'button',
+      onClick() {
+        changeFilter({ method: 'all', beginnerOnly: false });
+        methodButtons.get('all').focus();
+      },
+    }, ['絞り込みをすべて解除する']),
+  ]);
 
-      const card = h('a', {
-        class: 'species-card',
-        href: `#/fish/${sp.id}`,
-        dataset: { testid: `species-card-${sp.id}` },
-      });
-
-      const media = h('div', { class: 'species-media' }, [thumbFor(sp.id)]);
-      if (!proc) {
-        media.append(h('span', { class: 'status-pill status-pill--soon' }, ['手順準備中']));
-      } else if (savedStep !== null) {
-        media.append(h('span', { class: 'status-pill status-pill--progress' }, [`手順 ${savedStep + 1}/${proc.steps.length}`]));
-      }
-
-      const head = h('div', { class: 'species-head' }, [
-        h('div', { class: 'species-name-block' }, [
-          h('h3', { class: 'species-name' }, [makeRuby(sp.name, sp.kana)]),
-          h('span', { class: 'species-full' }, [sp.nameFull]),
-        ]),
-        h('span', { class: 'badge badge--method' }, [methodLabel]),
-      ]);
-
-      const metaRow = h('dl', { class: 'species-meta' }, [
-        h('div', { class: 'meta-item' }, [
-          h('dt', {}, ['難易度']),
-          h('dd', {}, [difficultyStars(sp.difficulty)]),
-        ]),
-        h('div', { class: 'meta-item' }, [
-          h('dt', {}, ['所要時間']),
-          h('dd', {}, [`初心者 約${sp.minutes.novice}分 ／ 慣れた人 約${sp.minutes.skilled}分`]),
-        ]),
-        h('div', { class: 'meta-item' }, [
-          h('dt', {}, ['大きさ・旬']),
-          h('dd', {}, [`約${sp.sizeCm.typical}cm（${sp.sizeCm.min}〜${sp.sizeCm.max}cm）・${sp.season}`]),
-        ]),
-      ]);
-
-      const blurb = h('p', { class: 'species-blurb' });
-      appendRubyText(blurb, sp.blurb);
-
-      const body = h('div', { class: 'species-body' }, [head, metaRow, blurb]);
-      card.append(media, body);
-      grid.append(card);
-    }
+  function updateMatches() {
+    const matched = filterSpecies(SPECIES_ORDER, SPECIES_META, filter);
+    for (const [key, button] of methodButtons) button.setAttribute('aria-pressed', String(key === filter.method));
+    beginnerBtn.setAttribute('aria-pressed', String(filter.beginnerOnly));
+    countText.textContent = `${SPECIES_ORDER.length}種のうち ${matched.length}種を表示しています。`;
+    grid.replaceChildren(...matched.map(sp => speciesCard(sp, state.progress)));
+    if (!matched.length) grid.append(empty);
   }
+
+  function changeFilter(nextFilter) {
+    filter = nextFilter;
+    updateMatches();
+    onFilterChange(nextFilter);
+  }
+
+  updateMatches();
   page.append(grid);
 
   // フッター（誠実さの明記）
@@ -166,4 +130,54 @@ export function renderHome(container, { state, filter, onFilterChange }) {
   page.append(footer);
 
   container.append(page);
+}
+
+function speciesCard(sp, progress) {
+  const proc = getProcedure(sp.id);
+  const savedStep = Number.isInteger(progress?.[sp.id]) ? progress[sp.id] : null;
+  const methodLabel = METHODS[sp.method] || sp.method;
+
+  const card = h('a', {
+    class: 'species-card',
+    href: `#/fish/${sp.id}`,
+    dataset: { testid: `species-card-${sp.id}` },
+  });
+
+  const media = h('div', { class: 'species-media' }, [thumbFor(sp.id)]);
+  if (!proc) {
+    media.append(h('span', { class: 'status-pill status-pill--soon' }, ['手順準備中']));
+  } else if (savedStep !== null) {
+    media.append(h('span', { class: 'status-pill status-pill--progress' }, [`手順 ${savedStep + 1}/${proc.steps.length}`]));
+  }
+
+  const head = h('div', { class: 'species-head' }, [
+    h('div', { class: 'species-name-block' }, [
+      h('h3', { class: 'species-name' }, [makeRuby(sp.name, sp.kana)]),
+      h('span', { class: 'species-full' }, [sp.nameFull]),
+    ]),
+    appendRubyText(h('span', { class: 'badge badge--method' }), methodLabel),
+  ]);
+
+  const metaRow = h('dl', { class: 'species-meta' }, [
+    h('div', { class: 'meta-item' }, [
+      h('dt', {}, ['難易度']),
+      h('dd', {}, [difficultyStars(sp.difficulty)]),
+    ]),
+    h('div', { class: 'meta-item' }, [
+      h('dt', {}, ['所要時間']),
+      h('dd', {}, [`初心者 約${sp.minutes.novice}分`,
+        h('span', { class: 'meta-skilled' }, [` ／ 慣れた人 約${sp.minutes.skilled}分`])]),
+    ]),
+    h('div', { class: 'meta-item meta-season' }, [
+      h('dt', {}, ['大きさ・旬']),
+      h('dd', {}, [`約${sp.sizeCm.typical}cm（${sp.sizeCm.min}〜${sp.sizeCm.max}cm）・${sp.season}`]),
+    ]),
+  ]);
+
+  const blurb = h('p', { class: 'species-blurb' });
+  appendRubyText(blurb, sp.blurb);
+
+  const body = h('div', { class: 'species-body' }, [head, metaRow, blurb]);
+  card.append(media, body);
+  return card;
 }

@@ -92,7 +92,10 @@ for (const id of SPECIES_IDS) {
         const expected = words.map(w => resolveText(w, leftHanded));
         const rendered = formatStepView(s, i, steps.length, leftHanded);
         const state = stateAt(compiled, i, 0.5, { leftHanded });
-        assert.deepEqual(allText(rendered), expected, where);
+        const handLines = s.hands.map(h => [h.who, resolveText(h.text, leftHanded)].join(':'));
+        assert.deepEqual(rendered.hands.map(h => [h.who, h.text].join(':')), [...new Set(handLines)], where);
+        assert.deepEqual(allText({ ...rendered, hands: [] }),
+          allText({ ...s, hands: [] }).map(w => resolveText(w, leftHanded)), where);
         assert.deepEqual(allText(state), expected, where);
         expected.forEach(w => assert.doesNotMatch(w, /[{}]/u, where));
       }

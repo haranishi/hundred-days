@@ -58,7 +58,7 @@ test('8種116手順の中間と終端で、見える部品が実際のまな板�
   } finally { stage.dispose(); }
 });
 
-test('カメラは表示中の刃の接点の周囲8cmと魚を囲み、練習中は魚の範囲へ戻ります', () => {
+test('カメラは表示中の刃の接点の周囲4.5cmと魚を囲み、練習中は魚の範囲へ戻ります', () => {
   const d = createFishDisplay(buildFishModel('aji', { quality: 'light' }), getProcedure('aji'));
   try {
     for (const [i, step] of d.proc.steps.entries()) for (const cut of step.cuts ?? []) {
@@ -69,13 +69,15 @@ test('カメラは表示中の刃の接点の周囲8cmと魚を囲み、練習�
       d.apply(s, step, false, null);
       assert.ok(d.knife.visible);
       const contact = new THREE.Vector3(...s.knife.pos).applyMatrix4(d.pose.matrixFor(s.knife.owner));
-      const work = new THREE.Box3().setFromCenterAndSize(contact, new THREE.Vector3(16, 16, 16));
+      // 盤の面では前後左右に4.5cm、上下は刃の接点から下0.5・上1.5cm（上下に広げると外接球が膨らんで魚が小さくなる）。
+      const work = new THREE.Box3(new THREE.Vector3(contact.x - 4.5, contact.y - 0.5, contact.z - 4.5),
+        new THREE.Vector3(contact.x + 4.5, contact.y + 1.5, contact.z + 4.5));
       const expected = fish.clone().union(work);
       assert.ok(expected.min.distanceTo(d.bounds.min) + expected.max.distanceTo(d.bounds.max) < 1e-8);
       for (const preset of ['cook', 'top']) {
         const rig = createCameraRig({ aspect: 390 / 350, bounds: d.bounds, reducedMotion: true });
         rig.applyPreset(preset, { focus: d.focus, headDirection: d.head, zoom: s.camera.zoom });
-        for (const axis of ['x', 'y', 'z']) for (const delta of [-8, 8]) {
+        for (const [axis, delta] of [['x', -4.5], ['x', 4.5], ['z', -4.5], ['z', 4.5], ['y', -0.5], ['y', 1.5]]) {
           const p = contact.clone();
           p[axis] += delta;
           p.project(rig.camera);

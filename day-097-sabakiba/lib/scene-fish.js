@@ -16,6 +16,9 @@ import { createGuides, pointAtCutDepth } from './guides.js';
 import { createSceneOverlay } from './scene-overlay.js';
 
 // 固定された小物を部品の内側で材質ごとにまとめます。色・UV・断面属性と三角形の向きも引き継ぎます。
+// 刃の接触点から、盤の面で前後左右にこの距離（cm）までを、視点の枠に含める。
+const WORK_REACH_CM = 4.5;
+
 function batchMeshes(root, geometries) {
   const meshes = root.children.filter(o => o.isMesh && !o.isInstancedMesh && !o.userData.pieceId && !o.children.length);
   const draws = new Map();
@@ -240,7 +243,7 @@ export function createFishDisplay(model, raw, { boardTop = 0, rng = createRng(97
     const rest = new THREE.Box3(new THREE.Vector3().fromArray(model.anatomy.bounds.min),
       new THREE.Vector3().fromArray(model.anatomy.bounds.max));
     const bounds = new THREE.Box3(), focus = new THREE.Vector3(), head = new THREE.Vector3();
-    const workSphere = new THREE.Sphere(new THREE.Vector3(), 8), workBox = new THREE.Box3();
+    const workSphere = new THREE.Sphere(new THREE.Vector3(), 0), workBox = new THREE.Box3();
     function apply(state, step, xray, practiceCut) {
       const m = model.materials, uniforms = state.uniforms;
       const seeInside = practiceCut && (practiceCut.through || CURVE_INFO[practiceCut.curve].inner);
@@ -256,8 +259,11 @@ export function createFishDisplay(model, raw, { boardTop = 0, rng = createRng(97
       guides.update(state, step, pose, amount, practiceCut, boardTop);
       tools.update(state.knife, pose, practiceCut);
       if (tools.holder.visible) {
+        // 刃の接触点のまわりだけを枠に足す。上下に広げすぎると外接球が膨らみ、魚が画面で小さくなる。
         workSphere.center.setFromMatrixPosition(tools.holder.matrix);
-        bounds.union(workSphere.getBoundingBox(workBox));
+        const c = workSphere.center;
+        bounds.union(workBox.set(new THREE.Vector3(c.x - WORK_REACH_CM, c.y - 0.5, c.z - WORK_REACH_CM),
+          new THREE.Vector3(c.x + WORK_REACH_CM, c.y + 1.5, c.z + WORK_REACH_CM)));
       }
       const key = step.camera.focus;
       const pivot = typeof key === 'string' && key.startsWith('piece:') && model.pieces[key.slice(6)]?.pivot;

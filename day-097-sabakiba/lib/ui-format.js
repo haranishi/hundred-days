@@ -36,6 +36,10 @@ export const RUBY_DICT = [
   ['五枚おろし', 'ごまいおろし'],
   ['出刃包丁', 'でばぼうちょう'],
   ['柳刃包丁', 'やなぎばぼうちょう'],
+  ['有眼側', 'ゆうがんそく'],
+  ['無眼側', 'むがんそく'],
+  ['血合い骨', 'ちあいぼね'],
+  ['骨抜き', 'ほねぬき'],
   ['兜焼き', 'かぶとやき'],
   ['背開き', 'せびらき'],
   ['手開き', 'てびらき'],
@@ -174,17 +178,31 @@ export function collectProcedureTools(procedure) {
   return out;
 }
 
-/** 1手順のデータを表示用に整形する。すべての文章に resolveText を適用する。 */
-export function formatStepView(step, stepIndex, totalSteps, leftHanded = false) {
+// 二枚の身を別々に置く説明は、小さい画面でも両方の向きを同時に読める表記にします。
+const COMPACT_PLACES = new Map([
+  ['皮を下にし、腹の縁を手前に置きます。頭側は一枚目が{L}、二枚目が{R}です。',
+    '皮は下、腹の縁は手前、頭側は①{L}・②{R}です。'],
+  ['皮を上にして頭側を{L}にそろえ、一枚目は背、二枚目は腹を手前にします。',
+    '皮は上、頭側は{L}、手前は①背・②腹です。'],
+]);
+
+/** 手順列があるときは、同じ欄の文を最初に読める手順番号も返します。 */
+export function formatStepView(step, stepIndex, totalSteps, leftHanded = false, steps = []) {
   if (!step) return null;
   const tx = (s) => resolveText(s, leftHanded);
   const tools = (step.tools || []).map((id) => ({ id, label: TOOL_LABELS[id] || id }));
-  const hands = (step.hands || []).map((h) => ({
-    anchor: h.anchor,
-    who: h.who,
-    whoLabel: h.who === 'dom' ? (leftHanded ? '左手（刃側）' : '右手（刃側）') : (leftHanded ? '右手（押さえ）' : '左手（押さえ）'),
-    text: tx(h.text),
-  }));
+  const hands = [];
+  for (const hand of step.hands || []) {
+    const whoLabel = hand.who === 'dom' ? tx('{R}手（刃側）') : tx('{L}手（押さえ）');
+    const text = tx(hand.text);
+    if (!hands.some(row => row.whoLabel === whoLabel && row.text === text)) {
+      hands.push({ anchor: hand.anchor, who: hand.who, whoLabel, text });
+    }
+  }
+  function firstEarlierStep(field) {
+    const first = steps.findIndex(other => other[field] === step[field]);
+    return step[field] && first >= 0 && first < stepIndex ? first + 1 : null;
+  }
   const labels = (step.labels || []).map((l) => ({
     anchor: l.anchor,
     text: tx(l.text),
@@ -207,10 +225,14 @@ export function formatStepView(step, stepIndex, totalSteps, leftHanded = false) 
     title: tx(step.title),
     summary: tx(step.summary),
     place: tx(step.place),
+    compactPlace: COMPACT_PLACES.has(step.place) ? tx(COMPACT_PLACES.get(step.place)) : null,
     how: (step.how || []).map((line) => tx(line)),
     tip: tx(step.tip),
+    tipSameAs: firstEarlierStep('tip'),
     mistake: tx(step.mistake),
+    mistakeSameAs: firstEarlierStep('mistake'),
     done: tx(step.done),
+    doneSameAs: firstEarlierStep('done'),
     safety: step.safety ? tx(step.safety) : null,
     tools,
     hands,

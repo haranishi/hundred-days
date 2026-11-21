@@ -1,7 +1,7 @@
 // さばき方ガイド画面（#/fish/<id>/<n>）：3D領域・操作札・再生バー・手順カード・なぞって練習・手順一覧シート。
 import { SPECIES_META } from './species/meta.js';
 import { VIEW_LABELS, formatPracticeResult, formatStepView } from './ui-format.js';
-import { appendRubyText, h, icon } from './ui-icons.js';
+import { appendRubyText, h, icon, stepNoteBody } from './ui-icons.js';
 
 /** ガイド画面の骨格DOMを構築し、更新用ハンドルを返す。 */
 export function mountGuideView(container, { speciesId, procedure, actions }) {
@@ -195,10 +195,12 @@ export function mountGuideView(container, { speciesId, procedure, actions }) {
     // 魚の置き方（最重要項目）
     const placeEl = h('div', { class: 'place-bar' }, [
       icon('place'),
-      h('span', { class: 'place-label' }, ['魚の置き方']),
-      h('span', { class: 'place-text' }),
+      h('span', { class: 'place-label' }, ['置き方']),
+      appendRubyText(h('span', { class: stepView.compactPlace ? 'place-text place-full' : 'place-text' }), stepView.place),
     ]);
-    appendRubyText(placeEl.lastChild, stepView.place);
+    if (stepView.compactPlace) {
+      placeEl.append(appendRubyText(h('span', { class: 'place-text place-short', 'aria-hidden': 'true' }), stepView.compactPlace));
+    }
     guideArticle.append(placeEl);
 
     // どうする
@@ -242,16 +244,14 @@ export function mountGuideView(container, { speciesId, procedure, actions }) {
 
     // コツ・やりがち・できた目印・安全
     const notes = h('dl', { class: 'step-notes' });
-    const addNote = (iconName, iconCls, label, text, rowCls = '') => {
+    const addNote = (iconName, iconCls, label, text, rowCls = '', sameAs = null) => {
       if (!text) return;
       const dt = h('dt', { class: rowCls }, [icon(iconName, `icon ${iconCls}`), label]);
-      const dd = h('dd', { class: rowCls });
-      appendRubyText(dd, text);
-      notes.append(dt, dd);
+      notes.append(dt, stepNoteBody(text, sameAs, rowCls));
     };
-    addNote('tip', '', 'コツ', stepView.tip);
-    addNote('alert', 'icon--muted', 'やりがち', stepView.mistake);
-    addNote('check', 'icon--done', 'できた目印', stepView.done, 'note--done');
+    addNote('tip', '', 'コツ', stepView.tip, '', stepView.tipSameAs);
+    addNote('alert', 'icon--muted', 'やりがち', stepView.mistake, '', stepView.mistakeSameAs);
+    addNote('check', 'icon--done', 'できた目印', stepView.done, 'note--done', stepView.doneSameAs);
     if (stepView.safety) {
       addNote('alert', 'icon--warn', '安全の注意', stepView.safety, 'note--warn');
     }
@@ -268,7 +268,7 @@ export function mountGuideView(container, { speciesId, procedure, actions }) {
           h('h2', { class: 'step-title', 'aria-live': 'polite' }, [stepView.title]),
         ]),
         h('p', { class: 'practice-inst' }, [
-          '光っている線を、指で一筆でなぞります。小刻みに動かさず、一定の速さで引いてみましょう。',
+          '指を離さず、朱色の線を一筆でなぞります。一定の速さで引いてみましょう。',
         ]),
         h('p', { class: 'practice-status', role: 'status', 'aria-live': 'polite' }, [
           statusText || '上の図の朱色の線に沿ってなぞってください。',
@@ -332,7 +332,7 @@ export function mountGuideView(container, { speciesId, procedure, actions }) {
   function update({ state, practiceResult, practiceStatus, speechSupported, forcePracticeButton = false }) {
     const stepRaw = procedure.steps[state.step];
     if (!stepRaw) return;
-    const stepView = formatStepView(stepRaw, state.step, totalSteps, state.leftHanded);
+    const stepView = formatStepView(stepRaw, state.step, totalSteps, state.leftHanded, procedure.steps);
     const bestScore = state.best && state.best[speciesId] ? state.best[speciesId][stepRaw.id] : null;
 
     root.dataset.mode = state.mode;

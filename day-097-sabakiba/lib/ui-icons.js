@@ -41,26 +41,22 @@ export function h(tag, attrs = {}, children = []) {
   return el;
 }
 
-/** 文字列を読み仮名（<ruby>）付きで要素へ追加する。 */
+/** 本文を一つのインライン要素に収め、親の flex や grid の間隔がルビの前後に入るのを防ぎます。 */
 export function appendRubyText(parent, text, opts = {}) {
   const tokens = tokenizeRuby(text, opts);
+  if (!tokens.length) return parent;
+  const span = document.createElement('span');
   for (const tok of tokens) {
-    if (tok.type === 'text') {
-      parent.append(document.createTextNode(tok.text));
-    } else {
-      const ruby = document.createElement('ruby');
-      ruby.append(document.createTextNode(tok.base));
-      const rp1 = document.createElement('rp');
-      rp1.textContent = '（';
-      const rt = document.createElement('rt');
-      rt.textContent = tok.rt;
-      const rp2 = document.createElement('rp');
-      rp2.textContent = '）';
-      ruby.append(rp1, rt, rp2);
-      parent.append(ruby);
-    }
+    span.append(tok.type === 'ruby' ? makeRuby(tok.base, tok.rt) : document.createTextNode(tok.text));
   }
+  parent.append(span);
   return parent;
+}
+
+/** コツなどの説明欄に、本文または初出の手順番号を表示します。 */
+export function stepNoteBody(text, sameAs, className = '') {
+  if (sameAs) return h('dd', { class: 'note-reference' }, [`手順${sameAs}と同じです。`]);
+  return appendRubyText(h('dd', { class: className }), text);
 }
 
 /** 明示的な読み仮名付き <ruby> を1つ作る。 */

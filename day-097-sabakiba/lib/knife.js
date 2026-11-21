@@ -6,6 +6,7 @@
 // 同じ純関数を時間側からも使い、時間を読むだけの画面では three を読み込まずに済むようにする。
 import * as THREE from '../vendor/three.js';
 import { TOOL_IDS } from './contract.js';
+import { easeInOut } from './easing.js';
 export { knifePose } from './timeline.js';
 
 const BLADES = {
@@ -14,8 +15,51 @@ const BLADES = {
   petty: { length: 13, height: 2.6, thick: 0.22, handle: 9,  tip: 0.47 },
 };
 
-function steel(color, roughness) {
-  return new THREE.MeshStandardMaterial({ color, metalness: 0.86, roughness });
+const FADE_START_CM = 9;
+const FADE_END_CM = 24;
+const cookOverviews = new WeakMap();
+
+export function nearFadeAlpha(depthCm) {
+  return easeInOut((depthCm - FADE_START_CM) / (FADE_END_CM - FADE_START_CM));
+}
+
+// 画面の選択が「台所」でも、手順が接写を指定することがあります。実際の構図を材質に伝えます。
+export function withKnifeCamera(viewer) {
+  const rig = viewer.rig;
+  let preset = 'cook';
+  cookOverviews.set(rig.camera, () => preset === 'cook' && !rig.userTouched);
+  const tracked = Object.create(rig);
+  tracked.applyPreset = (name, ...args) => {
+    preset = name;
+    return rig.applyPreset(name, ...args);
+  };
+  viewer.rig = tracked;
+  return viewer;
+}
+
+// clone() は同じクラスを生成するので、刃の明暗の材質も初回コンパイルから同じ減衰を使います。
+class KnifeMaterial extends THREE.MeshStandardMaterial {
+  #fadeEnabled = { value: true };
+
+  constructor(parameters) {
+    super(parameters);
+    this.transparent = true;
+    this.depthWrite = false;
+  }
+
+  onBeforeRender(_renderer, _scene, camera) {
+    this.#fadeEnabled.value = !cookOverviews.get(camera)?.();
+  }
+
+  onBeforeCompile(shader) {
+    shader.uniforms.knifeFadeEnabled = this.#fadeEnabled;
+    // r186 は vViewPosition に -mvPosition.xyz を渡すため、手前から奥へ z が増えます。
+    shader.fragmentShader = 'uniform bool knifeFadeEnabled;\n' + shader.fragmentShader.replace('#include <opaque_fragment>',
+      `if (knifeFadeEnabled) diffuseColor.a *= smoothstep(${FADE_START_CM.toFixed(1)}, ${FADE_END_CM.toFixed(1)}, vViewPosition.z);
+       #include <opaque_fragment>`);
+  }
+
+  customProgramCacheKey() { return 'sabakiba-knife-near-fade'; }
 }
 
 function mesh(name, geometry, material) {
@@ -149,16 +193,20 @@ export function buildKnife(tool) {
   const group = new THREE.Group();
   group.userData.tool = tool;
   group.name = tool;
+  const Material = BLADES[tool] ? KnifeMaterial : THREE.MeshStandardMaterial;
+  const steel = (color, roughness) => new Material({ color, metalness: 0.86, roughness });
   const materials = {
     steel: steel(0xb8c2c6, 0.31), bevel: steel(0xe6eff0, 0.19),
-    wood: new THREE.MeshStandardMaterial({ color: 0xae7846, roughness: 0.63 }),
+    wood: new Material({ color: 0xae7846, roughness: 0.63 }),
     grip: new THREE.MeshStandardMaterial({ color: 0x343d3c, roughness: 0.59 }),
   };
   if (BLADES[tool]) {
     const spec = BLADES[tool];
-    // 刃は半透明にして、刃の下の切り線と身の様子が見えるようにする（柄・口金・鋲は不透明のまま）。
-    const ghost = (m) => { const c = m.clone(); c.transparent = true; c.opacity = 0.74; c.depthWrite = false; return c; };
-    group.add(mesh('blade', bladeGeometry(spec), [ghost(materials.steel), ghost(materials.bevel)]));
+    // シーンが材質別にメッシュをまとめ直した後も、魚（0〜4）と切り線（8）の間に描きます。
+    group.addEventListener('childadded', ({ child }) => { child.renderOrder = 5; });
+    const faces = [materials.steel.clone(), materials.bevel.clone()];
+    for (const material of faces) material.opacity = 0.74;
+    group.add(mesh('blade', bladeGeometry(spec), faces));
     grip(group, -spec.length / 2, spec.height * 0.66, spec.handle, tool === 'petty' ? 1.0 : 1.23, materials);
   } else if (tool === 'shears') shears(group, materials);
   else if (tool === 'tweezers') tweezers(group, materials);

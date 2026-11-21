@@ -112,14 +112,7 @@ export function renderSafety(container) {
   page.append(h('section', { class: 'callout callout--warn' }, [
     icon('alert', 'icon icon--warn'),
     h('div', { class: 'callout-body' }, [
-      h('p', { class: 'callout-title' }, ['参考情報・自己責任について']),
-      ...String(safetyContent.intro).split('\n').filter(Boolean).map((line) => h('p', {}, [line])),
-      h('p', { class: 'small-note' }, [
-        'フグなど毒のある魚のさばき方は資格が必要なため、このアプリでは扱っていません。見分けがつかない魚や、毒の有無が不明な魚はさばかないでください。',
-      ]),
-      h('p', { class: 'small-note' }, [
-        '掲載している手順は複数の公開資料をもとにした標準的な方法です。地域や流派によって手順が異なる場合があります。',
-      ]),
+      ...safetyContent.intro.split('\n').map(line => appendRubyText(h('p'), line)),
     ]),
   ]));
 
@@ -227,7 +220,9 @@ export function renderParts(container, { speciesId }) {
     h('h3', { class: 'section-heading' }, ['よく使う言葉（用語集）']),
   ]);
   const dl = h('dl', { class: 'glossary-list' });
-  for (const item of glossaryContent) {
+  const terms = glossaryContent.filter(item => !item.species || item.species.includes(sp.id));
+  const rank = item => item.term === METHODS[sp.method] ? 0 : item.species ? 1 : 2;
+  for (const item of terms.sort((a, b) => rank(a) - rank(b))) {
     const dt = h('dt', { class: 'glossary-term' }, [makeRuby(item.term, item.kana)]);
     const dd = h('dd', { class: 'glossary-desc' });
     appendRubyText(dd, item.text);

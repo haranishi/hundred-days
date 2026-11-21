@@ -38,7 +38,7 @@ export function renderIntro(container, { speciesId, state }) {
     h('div', { class: 'intro-thumb' }, [thumbFor(speciesId)]),
     h('div', { class: 'intro-title-wrap' }, [
       h('div', { class: 'intro-badges' }, [
-        h('span', { class: 'badge badge--method' }, [methodLabel]),
+        appendRubyText(h('span', { class: 'badge badge--method' }), methodLabel),
         proc
           ? h('span', { class: 'badge badge--neutral' }, [`全${proc.steps.length}手順`])
           : h('span', { class: 'badge badge--warn' }, ['手順準備中']),

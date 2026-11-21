@@ -1,4 +1,4 @@
-// ハッシュ経路（#/…）と撮影・試験用クエリの解析・生成。壊れた経路は入口（#/）へ戻す。
+// ハッシュ経路（#/…）と撮影・試験用クエリを読みます。魚が分かる場合は手順番号を補正します。
 import { SPECIES_IDS } from './contract.js';
 import { VALID_QUALITIES } from './app-state.js';
 
@@ -24,7 +24,7 @@ export function parseQueryParams(search = '', hash = '') {
   const rawStep = merged.get('step');
   let step = null;
   if (rawStep !== null && /^\d+$/.test(rawStep)) {
-    step = Number(rawStep);
+    step = Math.min(Number(rawStep), Number.MAX_SAFE_INTEGER);
   }
 
   const rawHand = merged.get('hand');
@@ -86,13 +86,9 @@ export function parseRoute(hash = '', validSpecies = SPECIES_IDS) {
 
   if (parts[0] === 'fish' && parts.length === 3) {
     const [, species, numStr] = parts;
-    if (validSpecies.includes(species) && /^[1-9]\d*$/.test(numStr)) {
-      const n = Number(numStr);
-      if (Number.isSafeInteger(n) && n <= 999) {
-        return { name: 'guide', species, step: n - 1, valid: true };
-      }
-    }
-    return { name: 'home', valid: false };
+    if (!validSpecies.includes(species)) return { name: 'home', valid: false };
+    const number = /^\d+$/.test(numStr) ? Math.min(Number(numStr), Number.MAX_SAFE_INTEGER) : 0;
+    return { name: 'guide', species, step: Math.max(0, number - 1), valid: number > 0 && String(number) === numStr };
   }
 
   if (parts[0] === 'done' && parts.length === 2) {
@@ -110,6 +106,19 @@ export function parseRoute(hash = '', validSpecies = SPECIES_IDS) {
   }
 
   return { name: 'home', valid: false };
+}
+
+/** 表示できる手順にそろえます。同じオブジェクトなら、履歴の書き換えは不要です。 */
+export function normalizeRoute(route, totalSteps) {
+  if (!route || (['guide', 'intro', 'parts', 'done'].includes(route.name) && !SPECIES_IDS.includes(route.species))) {
+    return { name: 'home', valid: true };
+  }
+  if (route.name === 'guide') {
+    const last = Number.isInteger(totalSteps) ? Math.max(0, totalSteps - 1) : 0;
+    const step = Number.isInteger(route.step) ? Math.min(last, Math.max(0, route.step)) : 0;
+    return route.valid !== false && step === route.step ? route : { ...route, step, valid: true };
+  }
+  return route.valid === false ? { name: 'home', valid: true } : route;
 }
 
 /** 経路オブジェクトから正規のハッシュ文字列を生成する。 */
