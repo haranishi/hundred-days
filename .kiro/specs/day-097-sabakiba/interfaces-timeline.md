@@ -35,7 +35,7 @@ poseTransform(pose) -> {q:[x,y,z,w], p:[x,y,z]} // 魚(FLF)→盤。頭の向き
 `state` = `{ pose, pieces:{[id]:{visible,opacity,move:[x,y,z],rot:{axis:[x,y,z],deg,pivot}}}, uniforms:{scale,slitOpen,xray},
 incisions:[{curve,side,progress,through}], knife:null|{tool,curve,side,t,motion,lead,angleDeg,pos,quat}, highlights, hands, labels, effects:[{kind,t,curve,side}], camera }`。
 - 魚に付く点（`knife.pos`・手・ラベル・focus）は **FLF**。部品の動きは盤の座標系。ビュー側は `toWorld` で合成する（部品に付けたものは、その部品の動きを含める）。
-- ポーズ変更は手順の最初の25%で補間。切り替え前後の姿勢は直前の手順の終わりが起点。
+- ポーズ変更は手順の最初の12%で補間（`POSE_WINDOW_END`。長いと途中の斜めの絵が「置き方」の文と食い違って見える）。切り替え前後の姿勢は直前の手順の終わりが起点。
 
 ## 包丁 `lib/knife.js`（three）
 `buildKnife(tool)` → `Group`（局所座標＝原点は刃先の接触点・+x＝刃元→切っ先・+y＝峰・刃は±zの面）。実寸（出刃の刃渡り16cm・柳刃24cm・ペティ13cm）。

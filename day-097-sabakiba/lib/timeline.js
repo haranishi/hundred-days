@@ -302,12 +302,16 @@ function activeKnife(anatomy, cuts, u) {
 
 export const stepCount = proc => proc.steps.length;
 
+/** 魚の置き直し（姿勢の補間）が終わる手順の進み具合。 */
+export const POSE_WINDOW_END = 0.12;
+
 export function stateAt(proc, i, progress, { leftHanded = false } = {}) {
   if (!Number.isInteger(i) || i < 0 || i >= stepCount(proc)) throw new RangeError('手順番号が範囲外です。');
   const u = clamp01(progress);
   const frame = proc.frames[i];
   const { step, startPose, endPose, camera } = frame;
-  const t = easeInOut(windowT(u, [0, 0.25]));
+  // 置き直しの動きは手順の最初の12%で終える（長いと、途中の斜めの絵が「置き方」の文と食い違って見える）。
+  const t = easeInOut(windowT(u, [0, POSE_WINDOW_END]));
   const { head, dorsal } = t === 0 ? frame.previous : step.pose;
   const text = value => resolveText(value, leftHanded);
   const marks = entries => entries.map(m => ({ ...m, pos: [...m.pos], text: text(m.text) }));

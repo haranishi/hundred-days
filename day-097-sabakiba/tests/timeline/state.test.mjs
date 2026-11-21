@@ -4,7 +4,7 @@ import {
   ALL_PIECE_IDS, ANCHOR_NAMES, ANCHOR_OWNER, CURVE_INFO, PIECE_IDS, PIECE_PARENT, validateProcedure,
 } from '../../lib/contract.js';
 import { clamp01, easeInOut, easeOut, lerp, slerpQuat, windowT } from '../../lib/easing.js';
-import { createProcedure, endStateOf, poseTransform, resolveText, stateAt, stepCount } from '../../lib/timeline.js';
+import { createProcedure, endStateOf, poseTransform, resolveText, stateAt, stepCount, POSE_WINDOW_END } from '../../lib/timeline.js';
 import aji from '../../lib/procedures/aji.js';
 import { fakeAnatomy as anatomy } from '../fixtures/fake-anatomy.js';
 
@@ -213,7 +213,7 @@ test('刃の接近と離脱はそれぞれの窓の前後10%に限り、演出�
   assert.equal(at(1).highlights[0].owner, 'L.dorsal');
 });
 
-test('姿勢は最初の四分の一で球面補間し、焦点と目印は移動前の点と持ち主を返す', () => {
+test('姿勢は最初の12%で球面補間し、焦点と目印は移動前の点と持ち主を返す', () => {
   const raw = blank();
   raw.steps[1].pose = { head: 'R', dorsal: 'F', p: [4, 2, 0] };
   const focuses = ['eye', { curve: 'scaleSweep', side: 'R' }, 'piece:L.strip', [2, 3, 4], 'bodyCenter'];
@@ -221,9 +221,10 @@ test('姿勢は最初の四分の一で球面補間し、焦点と目印は移�
   raw.steps[1].hands = [{ anchor: 'peduncle', piece: 'R.dorsal', who: 'off', text: '{L}手です。' }];
   raw.steps[2].labels = [{ anchor: 'piece:L.strip', text: '腹の骨' }];
   const p = createProcedure(raw, anatomy);
-  const middle = stateAt(p, 1, 0.125), start = poseTransform(raw.steps[0].pose), end = poseTransform(raw.steps[1].pose);
+  const middle = stateAt(p, 1, POSE_WINDOW_END / 2), start = poseTransform(raw.steps[0].pose), end = poseTransform(raw.steps[1].pose);
   assert.deepEqual(middle.pose.p, [2, 1, 0]);
   assert.deepEqual(middle.pose.q, slerpQuat(start.q, end.q, 0.5));
+  assert.deepEqual(stateAt(p, 1, POSE_WINDOW_END).pose.q, end.q);
   assert.deepEqual(stateAt(p, 1, 0.25).pose.q, end.q);
   const cams = focuses.map((_, i) => stateAt(p, i, 0).camera);
   assert.deepEqual(cams[0], { preset: 'top', focusPoint: anatomy.point('eye'), focusOwner: ANCHOR_OWNER.eye, zoom: 1 });
