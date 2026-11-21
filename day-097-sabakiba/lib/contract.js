@@ -58,6 +58,12 @@ export const CURVE_INFO = {
 };
 export const CURVE_NAMES = Object.keys(CURVE_INFO);
 
+// 姿勢の固定。魚を置き直す（姿勢が変わる）とき、体から離れた部品は一緒に回らず、離れた時点の向きのまま盤の上に残る
+// （外した頭や、板の脇へ移した身が、置き直すたびにくるくる向きを変えない）。根の部品だけが対象（子は親に従う）。
+// 盤の座標で LOCK_MIN_MOVE_CM 以上動かした（置き場を変えた）ときに固定される。蝶番で開くだけ（変位0）では固定しない。
+export const POSE_LOCK_ROOTS = ['head', 'viscera', 'L.dorsal', 'R.dorsal'];
+export const LOCK_MIN_MOVE_CM = 2;
+
 // 点・線がどの部品に付いているか。動いた部品に付いたものは、その部品の動きに従う。null は動かない（休めの姿勢の魚に付く）。
 export const ANCHOR_OWNER = {
   snout: 'head', eye: 'head', mouth: 'head', opercleTop: 'head', opercleBottom: 'head', pectoralBase: 'head', pelvicBase: 'head',

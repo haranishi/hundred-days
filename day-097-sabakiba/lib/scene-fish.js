@@ -154,7 +154,7 @@ function bindPieces(model, geometries, variants) {
 
 function createTools(geometries, materials) {
   const holder = new THREE.Group(), cache = new Map();
-  const glow = new THREE.Mesh(new THREE.SphereGeometry(0.18, 10, 8),
+  const glow = new THREE.Mesh(new THREE.SphereGeometry(0.22, 10, 8),
     new THREE.MeshBasicMaterial({ color: '#e5422f', toneMapped: false }));
   geometries.add(glow.geometry);
   materials.add(glow.material);
@@ -190,7 +190,7 @@ function createTools(geometries, materials) {
         current?.object.removeFromParent();
         current = next;
         holder.add(next.object);
-        glow.position.copy(next.tip);
+        glow.position.set(0, 0, 0); // 赤い点は、刃が線に触れる点（接触点）に置く。刃の先に置くと、切り線から離れて見える
       }
       knifeMatrix(knife, pose.matrixFor(knife.owner), holder.matrix);
       holder.matrixWorldNeedsUpdate = true;
