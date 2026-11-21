@@ -22,7 +22,10 @@ export const SECURITY_HEADERS = {
 };
 
 function resolveFile(urlPath) {
-  const clean = normalize(decodeURIComponent(urlPath.split('?')[0])).replace(/^([/\\])+/, '');
+  let decoded;
+  // 壊れたパーセント表記（/%E0%A4%A など）で例外を出して、サーバーごと落ちないようにする。
+  try { decoded = decodeURIComponent(urlPath.split('?')[0]); } catch { return null; }
+  const clean = normalize(decoded).replace(/^([/\\])+/, '');
   const target = resolve(dayRoot, clean === '' ? 'index.html' : clean);
   if (target !== dayRoot && !target.startsWith(dayRoot + sep)) return null;
   if (existsSync(target) && statSync(target).isFile()) return target;

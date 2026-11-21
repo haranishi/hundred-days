@@ -72,7 +72,8 @@ test('30ms間隔で補間した速さの変動係数を使い、イベントの�
   const speeds = grid.slice(1).map((a, k) => Math.abs(a - grid[k]) / 30);
   const mean = speeds.reduce((a, b) => a + b, 0) / speeds.length;
   const cv = Math.sqrt(speeds.reduce((sum, v) => sum + (v - mean) ** 2, 0) / speeds.length) / mean;
-  near(trace(changing, { times }).smoothness, 1 - 0.8 * cv);
+  // 両端の2%（動き出す前・止まった後）は速さの計算から外すので、全区間で測った値と、わずかにずれる。
+  near(trace(changing, { times }).smoothness, 1 - 0.8 * cv, 0.01);
   assert.equal(trace([0, 10]).smoothness, 0.5);
   assert.equal(trace([0, 5, 10], { times: [0, 10, 22] }).smoothness, 0.5);
   near(trace([0, 5, 10], { times: [0, 3.6e9, 7.2e9] }).smoothness, 1);
@@ -158,4 +159,33 @@ test('軌跡から判別した理由に応じて、異なるコメントを10種
     assert.ok(result.comment.split('。').filter(Boolean).length <= 2);
   }
   assert.ok(new Set(examples.map(([r]) => r.comment)).size >= 10);
+});
+
+test('始点や終点で指を止めても、なめらかさは下がらない（案内どおり丸に指を置いてから引ける）', () => {
+  const points = Array.from({ length: 41 }, (_, i) => [i * 0.5, 0, 0]);
+  const trace = (restStart, restEnd) => {
+    const session = createSession({ curvePoints: points, tolerance: 0.5 });
+    let t = 0;
+    addSample(session, [0, 0, 0], t);
+    // 始点に指を置いたまま止まる。
+    t += restStart;
+    for (let i = 1; i <= 40; i++) { t += 25; addSample(session, [i * 0.5, 0, 0], t); }
+    // 終点で止めてから離す。
+    t += restEnd;
+    addSample(session, [20, 0, 0], t);
+    return finish(session);
+  };
+  const steady = trace(0, 0);
+  assert.ok(steady.smoothness > 0.95 && steady.score >= 95, JSON.stringify(steady));
+  for (const [a, b] of [[300, 0], [0, 600], [600, 1000], [1000, 1000]]) {
+    const rested = trace(a, b);
+    assert.ok(Math.abs(rested.smoothness - steady.smoothness) < 0.05, `${a}/${b}: ${rested.smoothness}`);
+    assert.ok(rested.score >= steady.score - 2, `${a}/${b}: ${rested.score}`);
+  }
+  // 途中で長く止まるのは、これまでどおり減点する。
+  const session = createSession({ curvePoints: points, tolerance: 0.5 });
+  let t = 0;
+  addSample(session, [0, 0, 0], t);
+  for (let i = 1; i <= 40; i++) { t += i === 20 ? 1200 : 25; addSample(session, [i * 0.5, 0, 0], t); }
+  assert.ok(finish(session).smoothness < steady.smoothness - 0.2);
 });

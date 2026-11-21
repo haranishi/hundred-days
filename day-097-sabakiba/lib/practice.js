@@ -59,7 +59,19 @@ function countReversals(samples, length) {
   return count;
 }
 
-function strokeSmoothness(samples, reversals) {
+// 始点に指を置いてから動き出すまでと、終点で止めてから離すまでは、速さの計算から外す（案内どおりの自然な動作が減点されないように）。
+// 端から弧長の2%以内にとどまっている間の点を落とす。
+const REST_FRACTION = 0.02;
+function movingPart(samples, length) {
+  let first = 0, last = samples.length - 1;
+  while (first < last && samples[first].a - samples[0].a < REST_FRACTION * length) first++;
+  while (last > first && samples.at(-1).a - samples[last].a < REST_FRACTION * length) last--;
+  // 動いている間の点が3つ未満なら、全体で測る。
+  return last - first + 1 >= 3 ? samples.slice(first, last + 1) : samples;
+}
+
+function strokeSmoothness(all, reversals, length) {
+  const samples = movingPart(all, length);
   if (samples.length < 3) return 0.5;
   const tickMs = 30, start = samples[0].t;
   let ticks = 0, atTick = samples[0].a, mean = 0, m2 = 0;
@@ -129,7 +141,7 @@ export function finish({ samples, path, tolerance }) {
   const coveredSpan = reached(max / path.length) - reached(min / path.length);
   const coverage = clamp01(coveredSpan * clamp01((1 - first) / 0.85) * clamp01(last / 0.85));
   const reversals = countReversals(samples, path.length);
-  const smoothness = strokeSmoothness(samples, reversals);
+  const smoothness = strokeSmoothness(samples, reversals, path.length);
   const limit = coverage < 0.7 || first >= 0.2 ? 60 : 100;
   const score = Math.min(limit, Math.round(100 * (0.65 * accuracy + 0.2 * smoothness + 0.15 * coverage)));
   const grade = score >= 92 ? 'S' : score >= 80 ? 'A' : score >= 65 ? 'B' : score >= 45 ? 'C' : 'D';

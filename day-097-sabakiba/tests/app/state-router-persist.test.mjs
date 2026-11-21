@@ -165,3 +165,21 @@ test('persist: 壊れたJSON・旧版・未知のキー・不正な値で落ち�
   assert.equal(savePersisted(createInitialState(), failing), false);
   assert.equal(typeof serializePersisted(null), 'string');
 });
+
+test('保存するとき、別のタブが先に記録した自己ベストを消さず、大きいほうを残す', async () => {
+  const { savePersisted, loadPersisted, mergeBest } = await import('../../lib/persist.js');
+  assert.deepEqual(mergeBest({ aji: { head: 70, belly: 40 } }, { aji: { head: 55 }, tai: { ribs: 90 } }),
+    { aji: { head: 70, belly: 40 }, tai: { ribs: 90 } });
+  assert.deepEqual(mergeBest(null, undefined), {});
+  const data = new Map();
+  const storage = { getItem: k => data.get(k) ?? null, setItem: (k, v) => data.set(k, v), removeItem: k => data.delete(k) };
+  // タブBが先に自己ベストを記録して保存する。
+  assert.equal(savePersisted({ ...createInitialState(), best: { aji: { head: 88 } } }, storage), true);
+  // 古い状態のタブAが、設定を変えて保存しても、Bの記録は残る。
+  assert.equal(savePersisted({ ...createInitialState(), leftHanded: true, best: { aji: { head: 60, belly: 50 } } }, storage), true);
+  const after = loadPersisted(storage);
+  assert.equal(after.leftHanded, true);
+  assert.deepEqual(after.best, { aji: { head: 88, belly: 50 } });
+  // 読めない保存先でも落ちない。
+  assert.equal(savePersisted(createInitialState(), { setItem() {}, getItem() { throw new Error('読めない'); } }), true);
+});

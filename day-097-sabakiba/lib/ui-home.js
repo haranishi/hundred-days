@@ -56,6 +56,18 @@ export function renderHome(container, { state, filter, onFilterChange }) {
   const chips = h('div', { class: 'filter-chips', role: 'group', 'aria-label': 'さばき方と難易度で絞る' });
   const methodButtons = new Map();
 
+  const beginnerBtn = h('button', {
+    type: 'button',
+    class: 'chip-btn chip-btn--beginner',
+    'aria-label': '初心者向け（難易度★1〜2）の魚だけに絞る',
+    dataset: { testid: 'filter-beginner' },
+    onClick: () => changeFilter({ ...filter, beginnerOnly: !filter.beginnerOnly }),
+  }, [
+    icon('starFill', 'icon icon--star'),
+    '初心者向け',
+  ]);
+
+
   const methodEntries = [['all', 'すべて'], ...Object.entries(METHODS)];
   for (const [key, label] of methodEntries) {
     const btn = h('button', {
@@ -67,19 +79,10 @@ export function renderHome(container, { state, filter, onFilterChange }) {
     appendRubyText(btn, label);
     chips.append(btn);
     methodButtons.set(key, btn);
+    // 「初心者向け」は横に流れる列の2番目（「すべて」の隣）に置く。右端だと、見落とされる。
+    if (key === 'all') chips.append(beginnerBtn);
   }
 
-  const beginnerBtn = h('button', {
-    type: 'button',
-    class: 'chip-btn chip-btn--beginner',
-    dataset: { testid: 'filter-beginner' },
-    onClick: () => changeFilter({ ...filter, beginnerOnly: !filter.beginnerOnly }),
-  }, [
-    icon('starFill', 'icon icon--star'),
-    '初心者向け（★1〜2）',
-  ]);
-
-  chips.append(beginnerBtn);
   const countText = h('p', { class: 'filter-count', 'aria-live': 'polite' });
   filterBar.append(chips, h('div', { class: 'filter-subrow' }, [countText]));
   page.append(filterBar);

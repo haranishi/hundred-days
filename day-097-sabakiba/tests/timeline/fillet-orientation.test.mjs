@@ -17,6 +17,8 @@ const FILLETS = ['R.dorsal', 'L.dorsal', 'R.ventral', 'L.ventral'];
 export function skinClaim(place) {
   if (/皮(?:を|が)下/u.test(place)) return 'down';
   if (/皮(?:を|が)上/u.test(place)) return 'up';
+  // 「開いた身を上に」は、身（切り口）が上＝皮が下（手開き・背開き）。
+  if (/開(?:い)?た?身を上/u.test(place)) return 'down';
   return null;
 }
 
@@ -24,7 +26,8 @@ test('skinClaim は「皮を下」「皮が下」「皮を上」を拾い、ほ�
   assert.equal(skinClaim('皮を下にし、腹の縁を手前に置きます。'), 'down');
   assert.equal(skinClaim('四枚の身を皮が下になるよう並べます。'), 'down');
   assert.equal(skinClaim('皮を上にし、頭の切り口を{L}にそろえます。'), 'up');
-  assert.equal(skinClaim('開いた身を上に、頭側を{R}に置きます。'), null);
+  assert.equal(skinClaim('開いた身を上に、頭側を{R}に置きます。'), 'down');
+  assert.equal(skinClaim('開き身を伏せ、皮を上、頭側を{R}に置きます。'), 'up');
   assert.equal(skinClaim('黒い面を上に、頭側を{L}、腹を手前に置きます。'), null);
 });
 
@@ -35,6 +38,7 @@ for (const id of SPECIES_IDS) {
     t.after(() => display.dispose());
     const normal = new THREE.Vector3();
     const problems = [];
+    let checked = 0;
     raw.steps.forEach((step, index) => {
       const claim = skinClaim(step.place);
       if (!claim) return;
@@ -48,6 +52,7 @@ for (const id of SPECIES_IDS) {
           // 片身の皮の外向きは、右の身が局所の -z、左の身が +z（魚の左体側が +z）。
           normal.set(0, 0, piece.startsWith('R.') ? -1 : 1).transformDirection(display.pose.matrixFor(piece));
           const up = normal.y > 0.35, down = normal.y < -0.35;
+          checked++;
           if (claim === 'down' ? !down : !up) {
             problems.push(`手順${index + 1}(${step.id}) u=${u} ${piece}: 文は「皮を${claim === 'down' ? '下' : '上'}」だが、皮の向きの上向き成分=${normal.y.toFixed(2)}`);
           }
@@ -55,5 +60,7 @@ for (const id of SPECIES_IDS) {
       }
     });
     assert.deepEqual(problems, []);
+    // 何も調べずに通ることを防ぐ。宣言のある手順で、見えている片身を実際に調べた。
+    assert.ok(checked >= 8, id + ' で調べた片身の数 ' + checked);
   });
 }

@@ -138,11 +138,32 @@ export function loadPersisted(storage = defaultStorage()) {
   return result.data;
 }
 
-/** ストレージへ安全に保存する。失敗しても例外を出さない。 */
+/** 練習のベストを、魚×手順ごとに大きいほうを残して合わせる。 */
+export function mergeBest(a, b) {
+  const left = cleanBest(a), right = cleanBest(b), out = {};
+  for (const sp of new Set([...Object.keys(left), ...Object.keys(right)])) {
+    const table = { ...left[sp] };
+    for (const [stepId, score] of Object.entries(right[sp] ?? {})) table[stepId] = Math.max(table[stepId] ?? 0, score);
+    out[sp] = table;
+  }
+  return out;
+}
+
+/**
+ * ストレージへ安全に保存する。失敗しても例外を出さない。
+ * 別のタブが先に自己ベストを記録していても、このタブの保存で消さない（ベストは大きいほうを残す）。
+ */
 export function savePersisted(state, storage = defaultStorage()) {
   if (!storage || typeof storage.setItem !== 'function') return false;
   try {
-    storage.setItem(STORAGE_NAME, serializePersisted(state));
+    let merged = state;
+    try {
+      const stored = typeof storage.getItem === 'function' ? parsePersisted(storage.getItem(STORAGE_NAME)).data : null;
+      if (stored) merged = { ...state, best: mergeBest(stored.best, state?.best) };
+    } catch {
+      // 読めなければ、このタブの値だけを保存する。
+    }
+    storage.setItem(STORAGE_NAME, serializePersisted(merged));
     return true;
   } catch {
     return false;

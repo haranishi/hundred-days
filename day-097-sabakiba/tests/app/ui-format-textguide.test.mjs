@@ -400,7 +400,10 @@ test('入口は7つの絞り込みを同じ列に置き、結果の更新後も�
   assert.equal(root.querySelectorAll('.species-card').length, 8);
   const names = root.querySelectorAll('.species-name');
   assert.ok(names.every(name => name.querySelector('rt')));
-  const beginner = buttons.at(-1);
+  // 「初心者向け」は、見落とされないよう「すべて」の隣（2番目）に置く。
+  const beginner = buttons[1];
+  assert.equal(beginner.dataset.testid, 'filter-beginner');
+  assert.equal(buttons[0].dataset.testid, 'filter-method-all');
   strip.scrollLeft = 120;
   beginner.focus();
   beginner.dispatchEvent(new Event('click'));

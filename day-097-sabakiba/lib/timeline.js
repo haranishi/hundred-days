@@ -300,21 +300,33 @@ function activeKnife(anatomy, cuts, u) {
     ...knifePose(anatomy, cut, t, { path, reference, liftCm }) };
 }
 
+/** u に最も近い窓の切りの持ち主。切りの合間・手順の終わりでも、直前に終わった切りの側を返す（同じ近さなら先の切り）。 */
+export function workingOwner(cuts, u) {
+  let best = null, gap = Infinity;
+  for (const { cut } of cuts) {
+    const [a, b] = cut.window;
+    const distance = Math.max(a - u, u - b, 0);
+    if (distance < gap - 1e-12) { best = cut; gap = distance; }
+  }
+  return best ? curveOwner(best.curve, best.side ?? null) : null;
+}
+
 // 手の印の持ち主（'R.dorsal'・'skin.L' など）が右か左か。
 const sideOfOwner = owner => /^([RL])\./u.exec(owner ?? '')?.[1] ?? /\.([RL])$/u.exec(owner ?? '')?.[1] ?? null;
 
 /**
  * 同じ手・同じ文の印が複数あるとき（身が2枚あるなど）、いま包丁が働いている側の1つだけを残す。
- * 2つ出すと「どちらの身を押さえるのか」が分からない。包丁が無い間は先頭を残す。
+ * 2つ出すと「どちらの身を押さえるのか」が分からない。切りが1つも無い手順では先頭を残す。
+ * workingOwner は、いま働いている切りの持ち主（切りの合間は、直前に終わった切り。まだ始まっていなければ最初の切り）。
  */
-export function activeHands(hands, knife) {
+export function activeHands(hands, workingOwner) {
   const groups = new Map();
   for (const hand of hands) {
     const key = hand.who + '|' + hand.text;
     if (!groups.has(key)) groups.set(key, []);
     groups.get(key).push(hand);
   }
-  const side = sideOfOwner(knife?.owner);
+  const side = sideOfOwner(workingOwner);
   // 組が最初に出た順に、各組から1つ。
   return [...groups.values()].map(group => (side && group.find(hand => sideOfOwner(hand.owner) === side)) || group[0]);
 }
@@ -344,7 +356,7 @@ export function stateAt(proc, i, progress, { leftHanded = false } = {}) {
   return {
     ...persistentAt(frame, u),
     pose: { head, dorsal, q: slerpQuat(startPose.q, endPose.q, t), p: mixVector(startPose.p, endPose.p, t), t },
-    knife, highlights, hands: activeHands(marks(frame.hands), knife), labels: marks(frame.labels), effects,
+    knife, highlights, hands: activeHands(marks(frame.hands), workingOwner(frame.cuts, u)), labels: marks(frame.labels), effects,
     camera: { ...camera, focusPoint: [...camera.focusPoint] },
     title: text(step.title), summary: text(step.summary), how: step.how.map(text), tip: text(step.tip),
     mistake: text(step.mistake), done: text(step.done), place: text(step.place),

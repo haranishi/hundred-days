@@ -27,6 +27,21 @@ async function open(page, hash = '', query = 'debug=1') {
 const ready3d = (page) => expect(page.locator('body')).toHaveAttribute('data-ready', 'true', READY);
 const cards = (page) => page.locator('[data-testid^="species-card-"]');
 
+test('試験用フックなし（利用者が開く経路）: 入口→アジを選ぶ→始める→3Dが出て、エラー0・外部通信0・フックは公開されない', async ({ page }) => {
+  test.setTimeout(150_000);
+  const { errors, externals } = await open(page, '', '');
+  await expect(cards(page)).toHaveCount(8);
+  await page.getByTestId('species-card-aji').first().click();
+  await page.getByTestId('btn-start').click();
+  await ready3d(page);
+  await expect(page.getByTestId('step-title')).toBeVisible();
+  expect(await page.evaluate(() => typeof window.__sabaki)).toBe('undefined');
+  await page.getByTestId('btn-next').click();
+  await expect(page.getByTestId('step-counter')).toContainText('2 /');
+  expect(errors).toEqual([]);
+  expect(externals()).toEqual([]);
+});
+
 test('入口: 8種のカードが並び、方法と初心者向けで絞り込める', async ({ page }) => {
   const { errors } = await open(page);
   await expect(cards(page)).toHaveCount(8);

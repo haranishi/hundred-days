@@ -2,7 +2,7 @@
 
 ## 状態 `lib/app-state.js`（純JS・試験つき）
 `{ species, step, u, playing, speed(0.5|1), loop, mode:'guide'|'practice', view:'cook'|'side'|'top', xray, labels, leftHanded, quality:'auto'|'high'|'standard'|'light', speech, wake, progress:{[sp]:step}, best:{[sp]:{[stepId]:score}} }`。
-経路（hash）: `#/` 入口・`#/fish/<id>` 前置き・`#/fish/<id>/<n>` n手順目・`#/safety`・`#/parts/<id>`・`#/done/<id>`。URL の `?sp=&step=&hand=L&gfx=&seed=&t=&debug=1` は撮影・試験用。
+経路（hash）: `#/` 入口・`#/fish/<id>` 前置き・`#/fish/<id>/<n>` n手順目・`#/safety`・`#/parts/<id>`・`#/done/<id>`。URL の `?sp=&step=&hand=L&gfx=&seed=&t=&debug=1` は撮影・試験用（**`?step=` は0始まり**、ハッシュの `#/fish/<id>/<n>` は1始まり）。
 保存は `lib/persist.js`・名前は `STORAGE_NAME='sabakiba.v1'`（`〜_KEY` は誤検知されるので使わない）。壊れた保存は捨てて既定に戻す（例外を出さない）。
 
 ## 視点・操作（WP-3）
