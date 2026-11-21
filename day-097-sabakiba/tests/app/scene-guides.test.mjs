@@ -4,7 +4,9 @@ import * as THREE from '../../vendor/three.js';
 import { createAnatomy } from '../../lib/anatomy.js';
 import { getSpecies } from '../../lib/species/index.js';
 import { createRng } from '../../lib/rng.js';
-import { createGuides, pointAtCutDepth } from '../../lib/guides.js';
+import { createGuides, pointAtCutDepth, screenDistanceToCurve } from '../../lib/guides.js';
+import { addSample, createSession, finish, PRACTICE_REACH_PX } from '../../lib/practice.js';
+import { measurePolyline, pointOnPath } from '../../lib/easing.js';
 import { placeCaption } from '../../lib/scene-overlay.js';
 import { buildFishModel, visitPieceMeshes } from '../../lib/pieces.js';
 import { makeBasicMaterials } from '../../lib/materials-basic.js';
@@ -102,6 +104,89 @@ test('透視の入力は反転・遠近投影の後もカーブの深さに戻�
   const off = point(x, y + 18);
   assert.ok(off.distanceTo(actual) > 0.3);
   assert.ok(Math.abs(off.applyMatrix4(owner).project(camera).y - (projected.y - 36 / rect.height)) < 1e-8);
+});
+
+test('魚を外れた指も線から28 CSS pxまで拾い、横のずれはcmに比例して採点に残ります', () => {
+  const camera = new THREE.OrthographicCamera(-10, 10, 5, -5, 0.1, 30);
+  camera.position.z = 10; camera.updateMatrixWorld();
+  const rect = { left: 37, top: 81, width: 400, height: 200 }, owner = new THREE.Matrix4();
+  const points = [[-4, 0, 0], [-2, 0, 0], [4, 0, 0]];
+  const cx = rect.left + 200, cy = rect.top + 100;
+  const distance = (x, y) => screenDistanceToCurve(camera, owner, rect, x, y, points);
+  const pick = (x, y) => pointAtCutDepth(camera, owner, rect, x, y, points, PRACTICE_REACH_PX);
+  assert.deepEqual(distance(cx, cy), { distancePx: 0, t: 0.5 });
+  for (const px of [0, 7, 14, 28]) {
+    assert.equal(distance(cx, cy + px).distancePx, px);
+    const point = pick(cx, cy + px);
+    assert.ok(point && Math.abs(point[1] + px / 20) < 1e-10);
+  }
+  assert.equal(distance(cx, cy + 30).distancePx, 30);
+  assert.equal(pick(cx, cy + 30), null);
+  for (const wiggle of [0, 0.25]) {
+    const session = createSession({ curvePoints: points, tolerance: 0.5 });
+    for (let i = 0; i <= 40; i++) {
+      const y = cy + 20 * wiggle * Math.sin(i * Math.PI / 8);
+      addSample(session, pick(cx - 80 + i * 4, y), i * 30);
+    }
+    const result = finish(session);
+    if (wiggle === 0) {
+      assert.ok(result.score >= 95); assert.equal(result.grade, 'S');
+    } else {
+      assert.ok(result.score >= 65 && result.accuracy < 1);
+      assert.ok(Math.abs(result.maxDist - wiggle) < 1e-10);
+    }
+  }
+});
+
+test('斜めの遠近投影でも t は魚の弧長に一致し、反転とカメラ移動後も同じ点に戻ります', () => {
+  const points = [[-2, 0, -4], [0, 1, 1], [0, 1, 1], [3, -1, 2]], path = measurePolyline(points);
+  const rect = { left: 17, top: 52, width: 390, height: 404 };
+  const camera = new THREE.PerspectiveCamera(35, rect.width / rect.height, 0.5, 100);
+  for (const z of [15, 32]) for (const sign of [1, -1]) {
+    camera.position.set(1, 4, z); camera.lookAt(0, 0, 0); camera.updateMatrixWorld();
+    const owner = new THREE.Matrix4().makeScale(sign, 1, 1).setPosition(0.4, 0.7, 1);
+    for (const t of [0, 0.25, 0.66, 0.89, 1]) {
+      const local = new THREE.Vector3(...pointOnPath(path, t)), q = local.clone().applyMatrix4(owner).project(camera);
+      const x = rect.left + (1 + q.x) * rect.width / 2, y = rect.top + (1 - q.y) * rect.height / 2;
+      const nearest = screenDistanceToCurve(camera, owner, rect, x, y, points);
+      assert.ok(nearest.distancePx < 1e-9 && Math.abs(nearest.t - t) < 1e-9);
+      assert.ok(new THREE.Vector3(...pointAtCutDepth(camera, owner, rect, x, y, points)).distanceTo(local) < 1e-8);
+    }
+  }
+  const behind = [[0, 0, 60], [0, 0, 70]], identity = new THREE.Matrix4();
+  assert.equal(pointAtCutDepth(camera, identity, rect, 190, 220, behind), null);
+  assert.equal(screenDistanceToCurve(camera, identity, rect, 190, 220, behind).distancePx, Infinity);
+});
+
+test('練習のときだけ逆向きの始点に32pxの緑の輪を置き、終点の矢じりを24pxにします', () => {
+  const g = createGuides(anatomy, createRng(4));
+  const cut = { curve: 'headCut', side: 'L', reverse: true }, step = { cuts: [cut] };
+  const update = (practice, placement = pose) => g.update(empty, step, placement, 0, practice, 0);
+  try {
+    update(null);
+    const mesh = g.group.getObjectByName('headCut/L/r');
+    const offsets = mesh.geometry.attributes.aOffset;
+    const length = offsets.getX(offsets.count - 1) - offsets.getX(offsets.count - 2);
+    assert.equal(length * mesh.material.uniforms.uArrowScale.value, 11);
+    assert.equal(g.group.getObjectByName('practice-start'), undefined);
+    update(cut);
+    const ring = g.group.getObjectByName('practice-start');
+    assert.ok(ring.visible && !ring.material.depthTest && ring.renderOrder > mesh.renderOrder);
+    assert.equal(ring.material.uniforms.uColor.value.getHexString(), '2f8f5b');
+    assert.equal(ring.geometry.parameters.outerRadius * 2, 32);
+    const start = new THREE.Vector3(...g.curvePoints(cut)[0]).applyMatrix4(matrix);
+    assert.ok(new THREE.Vector3().setFromMatrixPosition(ring.matrix).distanceTo(start) < 1e-9);
+    assert.equal(length * mesh.material.uniforms.uArrowScale.value, 24);
+    for (const [w, h] of [[390, 404], [800, 600]]) {
+      g.setViewport(w, h);
+      assert.deepEqual(ring.material.uniforms.uViewport.value.toArray(), [w, h]);
+    }
+    update(cut, { ...pose, visible: () => false });
+    assert.ok(!ring.visible && !mesh.visible);
+    update(null);
+    assert.ok(!ring.visible && mesh.visible);
+    assert.equal(mesh.material.uniforms.uArrowScale.value, 1);
+  } finally { g.dispose(); }
 });
 
 test('狭い盤面の端でも、同じ位置の札を上下に分けて枠内と操作ボタンの外に置きます', () => {

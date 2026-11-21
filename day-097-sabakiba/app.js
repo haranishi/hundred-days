@@ -243,40 +243,33 @@ function renderLocation(parsed) {
 
 function handlePracticeSample(payload) {
   if (state.mode !== 'practice' || !activePracticeConfig) return;
-  const point = payload && payload.point ? payload.point : [0, 0, 0];
-  const tMs = Number.isFinite(payload && payload.tMs) ? payload.tMs : performance.now();
-  const phase = payload && payload.phase ? payload.phase : 'move';
-  const curvePoints = (payload && Array.isArray(payload.curvePoints) && payload.curvePoints.length >= 2)
-    ? payload.curvePoints
-    : [[-5, 0, 0], [0, 0, 0], [5, 0, 0]];
-
-  if (phase === 'start' || !practiceSession) {
+  if (payload?.reason === 'far-from-start') {
     practiceResult = null;
-    practiceSession = createSession({ curvePoints, tolerance: activePracticeConfig.tolerance || 0.5 });
-    practiceStatus = 'なぞっています… そのまま終点まで一筆で引きます。';
-    addSample(practiceSession, point, tMs);
+    practiceStatus = '線の始まり（緑の丸）に触れてから、そのまま引きます。';
     syncGuideUI();
     return;
   }
-
-  addSample(practiceSession, point, tMs);
-
+  const { point, phase = 'move', curvePoints } = payload ?? {};
+  if (!point) return;
+  if (phase === 'start') {
+    if (!Array.isArray(curvePoints) || curvePoints.length < 2) return;
+    practiceResult = null;
+    practiceSession = createSession({ curvePoints, tolerance: activePracticeConfig.tolerance });
+    practiceStatus = 'なぞっています… そのまま終点まで一筆で引きます。';
+  }
+  if (!practiceSession) return;
+  addSample(practiceSession, point, Number.isFinite(payload.tMs) ? payload.tMs : performance.now());
   if (phase === 'end') {
     const scored = finish(practiceSession);
     practiceSession = null;
-    const proc = getProcedure(state.species);
-    const stepObj = proc && proc.steps[state.step];
-    const stepId = (stepObj && stepObj.id) || 'step';
+    const stepId = getProcedure(state.species)?.steps[state.step]?.id ?? 'step';
     const updated = recordBest(state, state.species, stepId, scored.score);
     state = updated.state;
     persistNow();
-    practiceResult = {
-      result: scored,
-      previousBest: updated.previousBest,
-    };
+    practiceResult = { result: scored, previousBest: updated.previousBest };
     practiceStatus = '';
-    syncGuideUI();
   }
+  if (phase === 'start' || phase === 'end') syncGuideUI();
 }
 
 function startPracticeMode(overrideCfg = null) {
@@ -287,7 +280,7 @@ function startPracticeMode(overrideCfg = null) {
   activePracticeConfig = { cut: cfg.cut || 'cut', tolerance: cfg.tolerance || 0.5 };
   practiceSession = null;
   practiceResult = null;
-  practiceStatus = '上の図の朱色の線に沿って、一筆でなぞってください。';
+  practiceStatus = '緑の丸から、朱色の線に沿って、一筆でなぞります。';
   state = enterPractice(state, true);
   stopLoop();
   if (scene) scene.setPractice({ cutId: activePracticeConfig.cut });
@@ -504,6 +497,7 @@ function renderGuideRoute(speciesId, stepIndex) {
     sceneQuality = state.quality;
 
     created.on('practice-sample', handlePracticeSample);
+    created.on('practice-miss', handlePracticeSample);
 
     created.ready.then(() => {
       if (scene !== created) return;
@@ -791,6 +785,9 @@ if (params.debug) {
       return true;
     },
   };
+  if (new URLSearchParams(window.location.search).get('debug') === '1') {
+    window.__sabaki.practiceGuide = () => scene?.practiceGuide() ?? null;
+  }
 }
 
 // 初期表示も、履歴をたどったときと同じ手順番号にそろえます。

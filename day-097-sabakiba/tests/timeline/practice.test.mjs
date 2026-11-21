@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { createSession, addSample, finish } from '../../lib/practice.js';
+import { createSession, addSample, finish, PRACTICE_REACH_PX, PRACTICE_START_REACH_PX } from '../../lib/practice.js';
 
 const line = [[0, 0, 0], [0.7, 0, 0], [0.7, 0, 0], [10, 0, 0]];
 const near = (a, b, eps = 1e-9) => assert.ok(Math.abs(a - b) < eps, `${a} と ${b}`);
@@ -121,6 +121,26 @@ test('空の軌跡・同時刻・遅着・無効な座標を扱い、一度記�
   assert.deepEqual(finish(s), trace([0, 4, 10], { times: [0, 30, 90] }));
   assert.throws(() => addSample(s, [0, NaN, 0], 100), TypeError);
   assert.throws(() => addSample(s, [0, 0, 0], Infinity), TypeError);
+});
+
+test('指の受付は線から28px・始点から40pxで、cmの許容幅とは独立しています', () => {
+  assert.equal(PRACTICE_REACH_PX, 28);
+  assert.equal(PRACTICE_START_REACH_PX, 40);
+});
+
+test('端の3%は一度触れれば届いたと数え、2割からの一筆は60点までです', () => {
+  const endpoints = trace(range(0.3, 9.7));
+  near(endpoints.coverage, 1);
+  assert.ok(endpoints.score >= 95 && endpoints.grade === 'S');
+  near(trace([0.4, 0.25, 5, 9.75, 9.6]).coverage, 1);
+  near(trace(range(0.31, 9.69)).coverage, 0.938);
+  near(trace([0.2, 0.2]).coverage, 0);
+  const late = trace(range(2, 10));
+  assert.equal(late.score, 60);
+  assert.match(late.comment, /緑の丸/);
+  const reverse = trace(range(10, 0));
+  assert.equal(reverse.coverage, 0);
+  assert.ok(reverse.score <= 60 && reverse.reversals === 1);
 });
 
 test('軌跡から判別した理由に応じて、異なるコメントを10種類以上返す', () => {

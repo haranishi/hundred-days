@@ -4,13 +4,15 @@ import * as THREE from '../../vendor/three.js';
 import { createFishScene } from '../../lib/scene-fish.js';
 import { createCameraRig } from '../../lib/camera.js';
 import { curveOwner } from '../../lib/contract.js';
+import { createSession, addSample, finish } from '../../lib/practice.js';
+import { measurePolyline, pointOnPath } from '../../lib/easing.js';
 import { stateAt } from '../../lib/timeline.js';
 import { getProcedure } from '../../lib/procedures/index.js';
 import aji from '../../lib/procedures/aji.js';
 
 // 描画先とDOMの札だけを置き換えます。魚・カメラ・レイキャスト・時間・ポインター処理は実物です。
-function fixture({ raw, search = '?freeze=1&seed=3', speciesId = 'aji', canDraw = true } = {}) {
-  const rect = { left: 30, top: 75, width: 570, height: 400 };
+function fixture({ raw, search = '?freeze=1&seed=3', speciesId = 'aji', canDraw = true,
+  rect = { left: 30, top: 75, width: 570, height: 400 } } = {}) {
   const host = { location: { search } }, doc = { defaultView: host, body: { dataset: {} } };
   const canvas = new EventTarget(), captured = new Set();
   Object.assign(canvas, { classList: { add() {} }, getBoundingClientRect: () => rect,
@@ -57,7 +59,7 @@ function fixture({ raw, search = '?freeze=1&seed=3', speciesId = 'aji', canDraw 
     return [rect.left + (v.x + 1) * rect.width / 2, rect.top + (1 - v.y) * rect.height / 2];
   }
   function fire(type, xy, id, time) {
-    const e = Object.assign(new Event(type), { button: 0, pointerId: id, clientX: xy[0], clientY: xy[1] });
+    const e = Object.assign(new Event(type), { button: 0, pointerType: 'touch', pointerId: id, clientX: xy[0], clientY: xy[1] });
     Object.defineProperty(e, 'timeStamp', { value: time });
     canvas.dispatchEvent(e);
   }
@@ -164,7 +166,7 @@ test('練習は切り始めに固定し、片手のドラッグを回転に渡�
     const world = t => f.project(expected[Math.floor((expected.length - 1) * t)], owner);
     f.tap(...world(0.48)); assert.ok(hits.length === 1 && hits[0].point.every(Number.isFinite));
     f.fire('pointerdown', [-5, -3], 5, 10); assert.equal(events.length, 0);
-    f.fire('pointerdown', world(0.25), 5, 100);
+    f.fire('pointerdown', world(0.05), 5, 100);
     f.fire('pointerdown', world(0.3), 6, 105);
     f.fire('pointermove', world(0.42), 6, 115);
     f.fire('pointermove', world(0.48), 5, 125);
@@ -179,7 +181,7 @@ test('練習は切り始めに固定し、片手のドラッグを回転に渡�
     assert.deepEqual(events.map(e => e.tMs), [100, 125, 150]);
     assert.deepEqual(events[2].point, events[1].point);
     assert.ok(new THREE.Vector3().fromArray(events[0].point)
-      .distanceTo(new THREE.Vector3().fromArray(expected[Math.floor((expected.length - 1) * 0.25)])) < 0.2);
+      .distanceTo(new THREE.Vector3().fromArray(expected[Math.floor((expected.length - 1) * 0.05)])) < 0.2);
     assert.equal(f.captured.size, 0);
     fish.setPractice(null); f.tick();
     assert.ok(status.enabled);
@@ -200,12 +202,128 @@ test('内側の練習は骨の位置に投影して透視し、終了すると�
     const events = [];
     fish.on('practice-sample', e => events.push(e));
     const p = points[Math.floor(points.length / 2)], xy = f.project(p, 'R.dorsal');
-    f.fire('pointerdown', xy, 1, 50); f.fire('pointerup', xy, 1, 75);
-    assert.deepEqual(events.map(e => e.phase), ['start', 'end']);
-    assert.ok(new THREE.Vector3().fromArray(events[0].point).distanceTo(new THREE.Vector3().fromArray(p)) < 1e-5);
+    f.fire('pointerdown', f.project(points.at(-1), 'R.dorsal'), 1, 25);
+    f.fire('pointermove', xy, 1, 50); f.fire('pointerup', xy, 1, 75);
+    assert.deepEqual(events.map(e => e.phase), ['start', 'move', 'end']);
+    assert.ok(new THREE.Vector3().fromArray(events[1].point).distanceTo(new THREE.Vector3().fromArray(p)) < 1e-5);
     fish.setPractice(null); fish.setStep(0); f.tick();
     assert.equal(xrayLevel(), 0, '練習を終えると皮の濃さが戻る');
   } finally { fish.dispose(); }
+});
+
+const phoneRect = { left: 0, top: 56, width: 390, height: 404 };
+
+test('アジ手順4で指を始点から3・30・40px上に置くと始まり、50px上では一筆を記録しません', async () => {
+  const raw = structuredClone(aji), step = raw.steps[3];
+  step.hands[0].anchor = 'headCutTop';
+  const f = fixture({ raw, rect: phoneRect }), { fish } = f;
+  try {
+    await fish.ready;
+    fish.setStep(3); fish.setLabels(true); fish.setPractice({ cutId: step.practice.cut }); f.tick();
+    const { start } = fish.practiceGuide(), at = dy => [start.x, start.y - dy];
+    const misses = [], samples = [], hits = [];
+    fish.on('practice-miss', e => misses.push(e));
+    fish.on('practice-sample', e => samples.push(e));
+    fish.on('pick', e => hits.push(e));
+    const hand = f.status.marks.at(-1).state.hands[0], xy = f.project(hand.pos, hand.owner);
+    assert.ok(Math.hypot(xy[0] - start.x, xy[1] - start.y) < 1e-6);
+    f.fire('pointerdown', at(50), 1, 0);
+    f.fire('pointermove', at(0), 1, 20); f.fire('pointerup', at(0), 1, 30);
+    assert.deepEqual(misses, [{ reason: 'far-from-start', distancePx: 50 }]);
+    assert.equal(f.captured.size, 0); assert.equal(samples.length, 0);
+    for (const dy of [3, 30, 40]) {
+      f.tap(...at(dy)); assert.equal(hits.length, 0, dy + 'px上は魚の輪郭の外');
+      f.fire('pointerdown', at(dy), 2, 100);
+      assert.ok(f.captured.has(2));
+      assert.equal(samples.at(-1).phase, 'start');
+      const first = samples.length;
+      f.fire('pointermove', at(30), 2, 115); assert.equal(samples.length, first);
+      f.fire('pointermove', at(14), 2, 125); assert.equal(samples.length, first + 1);
+      f.fire('pointerup', at(0), 2, 150); assert.equal(samples.at(-1).phase, 'end');
+    }
+    assert.equal(misses.length, 1);
+  } finally { fish.dispose(); }
+});
+
+test('幅390pxのアジ手順4で公開フックの点を一筆でなぞると、左右どちらでもSに届きます', async t => {
+  const f = fixture({ rect: phoneRect }), { fish } = f, step = getProcedure('aji').steps[3];
+  try {
+    assert.equal(fish.practiceGuide(), null);
+    await fish.ready;
+    fish.setStep(3); fish.setProgress(0.5); f.tick();
+    const normal = f.viewer.rig.serialize();
+    let session;
+    fish.on('practice-sample', e => {
+      if (e.phase === 'start') session = createSession({ curvePoints: e.curvePoints, tolerance: step.practice.tolerance });
+      addSample(session, e.point, e.tMs);
+    });
+    for (const left of [false, true]) {
+      fish.setLeftHanded(left); fish.setPractice({ cutId: step.practice.cut }); f.tick();
+      const { start, end, points } = fish.practiceGuide();
+      assert.deepEqual(start, points[0]); assert.deepEqual(end, points.at(-1));
+      const curve = f.host.__sabaki.anatomy.curve('headCut', 'L').points;
+      const ribbon = f.viewer.scene.getObjectByName('headCut/L');
+      let elapsed = 0;
+      points.forEach(({ x, y }, i) => {
+        const expected = f.project(curve[i], 'L.dorsal');
+        assert.ok(Math.hypot(expected[0] - x, expected[1] - y) < 1e-7);
+        const ink = new THREE.Vector3().fromBufferAttribute(ribbon.geometry.attributes.position, 2 * i)
+          .applyMatrix4(ribbon.matrixWorld).project(f.viewer.camera);
+        assert.ok(Math.abs(phoneRect.left + (1 + ink.x) * phoneRect.width / 2 - x) < 1e-5);
+        assert.ok(Math.abs(phoneRect.top + (1 - ink.y) * phoneRect.height / 2 - y) < 1e-5);
+        if (i) elapsed += 250 * new THREE.Vector3(...curve[i]).distanceTo(new THREE.Vector3(...curve[i - 1]));
+        const type = i === 0 ? 'pointerdown' : i === points.length - 1 ? 'pointerup' : 'pointermove';
+        f.fire(type, [x, y], 1, elapsed);
+      });
+      assert.equal(session.samples.length, points.length);
+      const result = finish(session);
+      t.diagnostic((left ? '左手' : '右手') + ' ' + result.score + '点・被覆' + Math.round(100 * result.coverage) + '%');
+      assert.ok(result.score >= 95 && result.grade === 'S');
+      fish.setPractice(null); f.tick();
+      assert.equal(fish.practiceGuide(), null);
+      assert.equal(f.viewer.rig.serialize().pitch, normal.pitch);
+    }
+  } finally { fish.dispose(); }
+  assert.equal(fish.practiceGuide(), null);
+});
+
+test('スマホ幅の朱色の線を画面上で等速になぞり、指の座標を整数pxに丸めてもSに届きます', async t => {
+  const f = fixture({ rect: phoneRect }), { fish } = f;
+  try {
+    await fish.ready;
+    const step = getProcedure('aji').steps[3];
+    fish.setStep(3); fish.setPractice({ cutId: step.practice.cut }); f.tick();
+    const screen = measurePolyline(fish.practiceGuide().points.map(({ x, y }) => [x, y, 0]));
+    let session;
+    fish.on('practice-sample', e => {
+      if (e.phase === 'start') session = createSession({ curvePoints: e.curvePoints, tolerance: step.practice.tolerance });
+      addSample(session, e.point, e.tMs);
+    });
+    for (let i = 0; i <= 45; i++) {
+      const [x, y] = pointOnPath(screen, i / 45);
+      const type = i === 0 ? 'pointerdown' : i === 45 ? 'pointerup' : 'pointermove';
+      f.fire(type, [Math.floor(x), Math.floor(y)], 1, i * 1500 / 45);
+    }
+    const result = finish(session);
+    t.diagnostic('画面上の等速入力 ' + result.score + '点');
+    assert.ok(result.score >= 92 && result.grade === 'S');
+  } finally { fish.dispose(); }
+});
+
+test('切り線の持ち主が隠れていれば、同じ位置に別の部品が見えても練習は始まりません', async () => {
+  const raw = structuredClone(aji);
+  raw.steps[2].moves = [{ piece: 'L.dorsal', window: [0.3, 0.8], visible: false }];
+  const f = fixture({ raw, rect: phoneRect });
+  try {
+    await f.fish.ready;
+    f.fish.setStep(3); f.fish.setPractice({ cutId: raw.steps[3].practice.cut }); f.tick();
+    const point = f.host.__sabaki.anatomy.curve('headCut', 'L').points[0];
+    const events = [];
+    f.fish.on('practice-sample', e => events.push(e));
+    f.fire('pointerdown', f.project(point, 'L.dorsal'), 1, 0);
+    assert.equal(f.fish.practiceGuide(), null);
+    assert.equal(events.length, 0); assert.equal(f.captured.size, 0);
+  } finally { f.fish.dispose(); }
 });
 
 test('WebGL2なし・魚や手順の欠落・初回描画の失敗・初期化前の解放を日本語で通知します', async () => {

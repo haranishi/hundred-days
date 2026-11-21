@@ -8,6 +8,7 @@ const vertexShader = `
   attribute vec2 aOffset;
   attribute float aArc;
   uniform vec2 uViewport;
+  uniform float uArrowScale;
   varying float vArc;
   varying float vEdge;
   void main() {
@@ -16,7 +17,12 @@ const vertexShader = `
     vec2 delta = (q.xy * p.w - p.xy * q.w) * uViewport;
     vec2 along = dot(delta, delta) > 1e-10 ? normalize(delta) : vec2(1.0, 0.0);
     vec2 across = vec2(-along.y, along.x);
-    p.xy += (along * aOffset.x + across * aOffset.y) * 2.0 * p.w / uViewport;
+    vec2 offset = aOffset;
+    if (uArrowScale > 1.0 && aArc < 0.0) {
+      offset = (offset - vec2(3.0, 0.0)) * uArrowScale;
+      p.z = -0.999 * p.w;
+    }
+    p.xy += (along * offset.x + across * offset.y) * 2.0 * p.w / uViewport;
     p.z -= 0.000025 * p.w;
     vArc = aArc;
     vEdge = aOffset.y;
@@ -83,14 +89,59 @@ function ribbon(points, anatomy, surface, clock, viewport) {
   }
   geometry.setIndex(indices);
   const material = new THREE.ShaderMaterial({ vertexShader, fragmentShader, uniforms: {
-    uViewport: { value: viewport }, uTime: clock, uStart: { value: 0 }, uOpacity: { value: 1 },
+    uViewport: { value: viewport }, uTime: clock, uStart: { value: 0 }, uOpacity: { value: 1 }, uArrowScale: { value: 1 },
     uSpacing: { value: Math.max(0.32, Math.min(anatomy.SL * 0.045, length / 4)) },
     uColor: { value: new THREE.Color('#e5422f') },
   }, transparent: true, depthWrite: false, side: THREE.DoubleSide, forceSinglePass: true, toneMapped: false });
   const mesh = new THREE.Mesh(geometry, material);
   mesh.matrixAutoUpdate = false;
   mesh.renderOrder = 8;
-  return { mesh, length };
+  function setPractice(active) {
+    const arrowScale = active ? 24 / 11 : 1;
+    if (material.uniforms.uArrowScale.value === arrowScale) return;
+    material.uniforms.uArrowScale.value = arrowScale;
+    if (!surface) return;
+    // ガイド表示では皮から少し浮かせます。練習では絵と採点が同じ中心線を使います。
+    const attribute = geometry.attributes.position;
+    if (active) {
+      for (let i = 0; i < points.length; i++) {
+        attribute.setXYZ(2 * i, ...points[i]);
+        attribute.setXYZ(2 * i + 1, ...points[i]);
+      }
+      for (let i = end; i < attribute.count; i++) attribute.setXYZ(i, ...points.at(-1));
+    } else {
+      attribute.array.set(positions);
+    }
+    attribute.needsUpdate = true;
+    geometry.computeBoundingSphere();
+  }
+  return { mesh, length, setPractice };
+}
+
+function makeStartRing(viewport) {
+  const geometry = new THREE.RingGeometry(12, 16, 48);
+  const material = new THREE.ShaderMaterial({
+    uniforms: { uViewport: { value: viewport }, uColor: { value: new THREE.Color('#2f8f5b') } },
+    vertexShader: `
+      uniform vec2 uViewport;
+      void main() {
+        vec4 center = projectionMatrix * modelViewMatrix * vec4(0.0, 0.0, 0.0, 1.0);
+        center.xy += position.xy * 2.0 * center.w / uViewport;
+        gl_Position = center;
+      }`,
+    fragmentShader: `
+      uniform vec3 uColor;
+      void main() {
+        gl_FragColor = vec4(uColor, 1.0);
+        #include <colorspace_fragment>
+      }`,
+    transparent: true, depthTest: false, depthWrite: false, side: THREE.DoubleSide, forceSinglePass: true, toneMapped: false,
+  });
+  const ring = new THREE.Mesh(geometry, material);
+  ring.name = 'practice-start';
+  ring.renderOrder = 14;
+  ring.frustumCulled = ring.matrixAutoUpdate = false;
+  return ring;
 }
 
 // 発生位置と初速は一度だけ抽選します。重力は常に盤の下向きで、巻き戻し時も同じ場所に戻ります。
@@ -191,6 +242,7 @@ export function createGuides(anatomy, rng) {
   const clock = { value: 0 }, viewport = new THREE.Vector2(1, 1);
   const curves = new Map(), ribbons = new Map(), effects = new Map();
   const trace = createTrace(group, Math.max(0.085, anatomy.SL * 0.0045));
+  let startRing;
   const keyFor = ({ curve, side, reverse }) => curve + '/' + (side ?? '') + (reverse ? '/r' : '');
   function curvePoints(cut) {
     const key = keyFor(cut);
@@ -201,6 +253,7 @@ export function createGuides(anatomy, rng) {
     return curves.get(key);
   }
   function update(state, step, pose, xray, practiceCut, boardTop) {
+    if (startRing) startRing.visible = false;
     for (const { mesh } of ribbons.values()) mesh.visible = false;
     for (const { mesh } of effects.values()) mesh.visible = false;
     function show(cut, opacity) {
@@ -216,13 +269,20 @@ export function createGuides(anatomy, rng) {
         ribbons.set(key, item);
         group.add(item.mesh);
       }
-      const { mesh, length } = ribbons.get(key);
+      const { mesh, length, setPractice } = ribbons.get(key);
       mesh.visible = true;
       mesh.matrix.copy(pose.matrixFor(owner));
       mesh.matrixWorldNeedsUpdate = true;
       mesh.material.depthTest = !(cut.through || (CURVE_INFO[cut.curve].inner && xray > 0.3));
       mesh.material.uniforms.uStart.value = practiceCut ? 0 : (incision?.progress ?? 0) * length;
       mesh.material.uniforms.uOpacity.value = opacity;
+      setPractice(Boolean(practiceCut));
+      if (practiceCut) {
+        if (!startRing) { startRing = makeStartRing(viewport); group.add(startRing); }
+        startRing.matrix.makeTranslation(...curvePoints(cut)[0]).premultiply(mesh.matrix);
+        startRing.matrixWorldNeedsUpdate = true;
+        startRing.visible = true;
+      }
     }
     if (practiceCut) { show(practiceCut, 1); return; }
     const cuts = step.cuts ?? [];
@@ -257,6 +317,8 @@ export function createGuides(anatomy, rng) {
         mesh.material.dispose();
       }
       trace.dispose();
+      startRing?.geometry.dispose();
+      startRing?.material.dispose();
       group.clear();
       group.removeFromParent();
       curves.clear(); ribbons.clear(); effects.clear();
@@ -264,23 +326,72 @@ export function createGuides(anatomy, rng) {
   };
 }
 
-// 内側をなぞるときは指の光線を切り面の深さまで通します。横のずれを採点に残します。
-const clip = new THREE.Matrix4(), start = new THREE.Vector3(), end = new THREE.Vector3();
-export function pointAtCutDepth(camera, ownerWorld, rect, clientX, clientY, points) {
-  const x = clientX - rect.left, y = clientY - rect.top;
-  clip.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse).multiply(ownerWorld);
-  start.fromArray(points[0]).applyMatrix4(clip);
-  let nearest = Infinity, depth;
-  for (let i = 1; i < points.length; i++) {
-    end.fromArray(points[i]).applyMatrix4(clip);
-    const dx = (end.x - start.x) * rect.width / 2, dy = (start.y - end.y) * rect.height / 2;
-    const ox = x - (start.x + 1) * rect.width / 2, oy = y - (1 - start.y) * rect.height / 2;
-    const t = THREE.MathUtils.clamp((ox * dx + oy * dy) / (dx * dx + dy * dy || 1), 0, 1);
-    const d = (ox - dx * t) ** 2 + (oy - dy * t) ** 2;
-    const z = THREE.MathUtils.lerp(start.z, end.z, t);
-    if (d < nearest && z >= -1 && z <= 1) { nearest = d; depth = z; }
-    start.copy(end);
+// 透視除算の後の x, y が、指の clientX, clientY と同じ CSS px になる行列です。
+function cutScreenMatrix(camera, ownerWorld, rect) {
+  const w = rect.width / 2, h = rect.height / 2;
+  return new THREE.Matrix4().set(
+    w, 0, 0, rect.left + w, 0, -h, 0, rect.top + h, 0, 0, 1, 0, 0, 0, 0, 1,
+  ).multiply(camera.projectionMatrix).multiply(camera.matrixWorldInverse).multiply(ownerWorld);
+}
+
+export function projectCutPoints(camera, ownerWorld, rect, points) {
+  if (!(rect.width > 0 && rect.height > 0) || !points.length) return null;
+  const matrix = cutScreenMatrix(camera, ownerWorld, rect), p = new THREE.Vector4(), pixels = [];
+  for (const point of points) {
+    p.set(...point, 1).applyMatrix4(matrix);
+    if (p.w <= 0 || Math.abs(p.z) > p.w) return null;
+    pixels.push({ x: p.x / p.w, y: p.y / p.w });
   }
-  if (depth === undefined) return null;
-  return end.set(2 * x / rect.width - 1, 1 - 2 * y / rect.height, depth).applyMatrix4(clip.invert()).toArray();
+  return pixels;
+}
+
+function closestOnScreen(matrix, x, y, points) {
+  const a = new THREE.Vector4(), b = new THREE.Vector4(), p = new THREE.Vector4(), q = new THREE.Vector4();
+  let squared = Infinity, length = 0, arc = 0, depth;
+  for (let i = 0; i < points.length; i++) {
+    b.set(...points[i], 1).applyMatrix4(matrix);
+    if (i) {
+      const prev = points[i - 1], next = points[i];
+      const size = Math.hypot(next[0] - prev[0], next[1] - prev[1], next[2] - prev[2]);
+      // カメラの手前・奥の面をまたぐ線分は、見える区間だけで距離を測ります。
+      let lo = 0, hi = 1;
+      for (const sign of [-1, 1]) {
+        const da = a.w + sign * a.z, db = b.w + sign * b.z;
+        if (da < 0 && db < 0) { hi = -1; break; }
+        if (da < 0) lo = Math.max(lo, da / (da - db));
+        if (db < 0) hi = Math.min(hi, da / (da - db));
+      }
+      if (lo <= hi) {
+        p.lerpVectors(a, b, lo); q.lerpVectors(a, b, hi);
+        const px = p.x / p.w, py = p.y / p.w, dx = q.x / q.w - px, dy = q.y / q.w - py;
+        const u = THREE.MathUtils.clamp(((x - px) * dx + (y - py) * dy) / (dx * dx + dy * dy || 1), 0, 1);
+        const d = (x - px - u * dx) ** 2 + (y - py - u * dy) ** 2;
+        if (d < squared) {
+          squared = d;
+          depth = THREE.MathUtils.lerp(p.z / p.w, q.z / q.w, u);
+          // 画面で補間した割合を、魚の座標での線分の割合へ戻します。
+          const local = u * p.w / ((1 - u) * q.w + u * p.w);
+          arc = length + size * THREE.MathUtils.lerp(lo, hi, local);
+        }
+      }
+      length += size;
+    }
+    a.copy(b);
+  }
+  return { distancePx: Math.sqrt(squared), t: length ? arc / length : 0, depth };
+}
+
+export function screenDistanceToCurve(camera, ownerWorld, rect, clientX, clientY, points) {
+  if (!(rect.width > 0 && rect.height > 0)) return { distancePx: Infinity, t: 0 };
+  const { distancePx, t } = closestOnScreen(cutScreenMatrix(camera, ownerWorld, rect), clientX, clientY, points);
+  return { distancePx, t };
+}
+
+// 線の奥行きだけを借り、横のずれを含む指の位置を魚の座標へ戻します。
+export function pointAtCutDepth(camera, ownerWorld, rect, clientX, clientY, points, reachPx = Infinity) {
+  if (!(rect.width > 0 && rect.height > 0)) return null;
+  const matrix = cutScreenMatrix(camera, ownerWorld, rect);
+  const { distancePx, depth } = closestOnScreen(matrix, clientX, clientY, points);
+  if (depth === undefined || distancePx > reachPx) return null;
+  return new THREE.Vector3(clientX, clientY, depth).applyMatrix4(matrix.invert()).toArray();
 }

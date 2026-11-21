@@ -282,11 +282,14 @@ export function createSceneOverlay(container) {
     }
     return slot;
   }
-  function setMarks(state, showLabels, pose, model, fishDisplay) {
+  function setMarks(state, showLabels, pose, model, fishDisplay, practiceCut = null) {
     display = fishDisplay;
     currentState = state;
     // 印が静止していても、その前を通る刃と切り線は毎回評価します。
     dirty = true;
+    // 手・部位の札はここで隠し、切り線と両端の目印は3Dに残します。
+    root.hidden = Boolean(practiceCut);
+    if (root.hidden) return;
     if (boardRoot !== model.group.parent) {
       boardRoot = model.group.parent;
       defaults = basicLabels.map(label => ({ ...label, owner: ANCHOR_OWNER[label.anchor], pos: model.anatomy.point(label.anchor) }));
@@ -315,6 +318,7 @@ export function createSceneOverlay(container) {
     }
   }
   function project(camera) {
+    if (root.hidden) return;
     const w = container.clientWidth, h = container.clientHeight;
     projection.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse);
     if (boardRoot) projection.multiply(boardRoot.matrixWorld);

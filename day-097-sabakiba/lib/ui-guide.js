@@ -259,20 +259,24 @@ export function mountGuideView(container, { speciesId, procedure, actions }) {
   }
 
   function renderPracticeArea({ stepView, practiceResult, statusText }) {
-    practicePanel.replaceChildren();
-
     if (!practiceResult) {
+      const message = statusText || '緑の丸から、朱色の線に沿って、一筆でなぞります。';
+      const liveStatus = practicePanel.querySelector('.practice-status');
+      if (liveStatus) {
+        const title = practicePanel.querySelector('.step-title');
+        if (title.textContent !== stepView.title) title.textContent = stepView.title;
+        if (liveStatus.textContent !== message) liveStatus.textContent = message;
+        return;
+      }
       const box = h('div', { class: 'practice-prompt' }, [
         h('div', { class: 'practice-head' }, [
           h('span', { class: 'badge badge--cut' }, [icon('cut', 'icon icon--cut'), 'なぞって練習']),
           h('h2', { class: 'step-title', 'aria-live': 'polite' }, [stepView.title]),
         ]),
-        h('p', { class: 'practice-inst' }, [
-          '指を離さず、朱色の線を一筆でなぞります。一定の速さで引いてみましょう。',
+        h('p', { class: 'practice-inst practice-status', role: 'status', 'aria-live': 'polite' }, [
+          message,
         ]),
-        h('p', { class: 'practice-status', role: 'status', 'aria-live': 'polite' }, [
-          statusText || '上の図の朱色の線に沿ってなぞってください。',
-        ]),
+        h('p', { class: 'small-note muted' }, ['指を離さず、最後まで同じ速さで引きます。']),
         h('div', { class: 'practice-actions' }, [
           h('button', {
             type: 'button',
@@ -282,7 +286,7 @@ export function mountGuideView(container, { speciesId, procedure, actions }) {
           }, ['ガイドに戻る（やめる）']),
         ]),
       ]);
-      practicePanel.append(box);
+      practicePanel.replaceChildren(box);
       return;
     }
 
@@ -326,7 +330,7 @@ export function mountGuideView(container, { speciesId, procedure, actions }) {
         }, ['次へ', icon('next')]),
       ]),
     ]);
-    practicePanel.append(card);
+    practicePanel.replaceChildren(card);
   }
 
   function update({ state, practiceResult, practiceStatus, speechSupported, forcePracticeButton = false }) {

@@ -10,9 +10,9 @@ import { clamp01 } from './easing.js';
 import { buildKnife } from './knife.js';
 import { createRng, hashString } from './rng.js';
 import { createPicker } from './pick.js';
-import { createSession, addSample } from './practice.js';
+import { createSession, addSample, PRACTICE_REACH_PX, PRACTICE_START_REACH_PX } from './practice.js';
 import { composePieceMatrix, groundPoseMatrix, hingePoint, knifeMatrix, slitMatrix } from './pose-compose.js';
-import { createGuides, pointAtCutDepth } from './guides.js';
+import { createGuides, pointAtCutDepth, projectCutPoints } from './guides.js';
 import { createSceneOverlay } from './scene-overlay.js';
 
 // 固定された小物を部品の内側で材質ごとにまとめます。色・UV・断面属性と三角形の向きも引き継ぎます。
@@ -367,6 +367,7 @@ export function createFishScene({ container, speciesId = 'aji', quality = 'auto'
   let requestedCut = null, practiceCut = null, dirty = true, still = frozen, viewSync = null;
   let state, lastStep, lastU, lastLeft, seconds = 0, forceCamera = false;
   const cameraBox = new THREE.Box3(), cameraFocus = new THREE.Vector3(), cameraHead = new THREE.Vector3();
+  const practiceBounds = new THREE.Box3(), cutSize = new THREE.Vector3();
   let preset, zoom;
   const point = new THREE.Vector3(), inverse = new THREE.Matrix4();
 
@@ -393,12 +394,24 @@ export function createFishScene({ container, speciesId = 'aji', quality = 'auto'
     }
     display.apply(state, rawStep, xray, practiceCut);
     display.guides.setTime(seconds);
-    overlay?.setMarks(state, labels, display.pose, display.model, display);
-    const nextPreset = chosenView ?? state.camera.preset;
-    const boundsChanged = !cameraBox.equals(display.bounds);
+    overlay?.setMarks(state, labels, display.pose, display.model, display, practiceCut);
+    // 頭の表面を斜めから見ると、背の始点より手前の皮に指の光線が当たります。
+    const frameNeck = !chosenView && practiceCut?.curve === 'headCut' && !practiceCut.through;
+    const nextPreset = chosenView ?? (frameNeck ? 'top' : state.camera.preset);
+    let bounds = display.bounds;
+    if (frameNeck) {
+      const placement = display.pose.matrixFor(curveOwner(practiceCut.curve, practiceCut.side));
+      practiceBounds.makeEmpty();
+      for (const p of display.guides.curvePoints(practiceCut)) {
+        practiceBounds.expandByPoint(point.fromArray(p).applyMatrix4(placement));
+      }
+      // 両端の外に切り口の大きさの半分ずつを見せ、指で区別できる大きさに寄せます。
+      bounds = practiceBounds.expandByScalar(practiceBounds.getSize(cutSize).length() / 2);
+    }
+    const boundsChanged = !cameraBox.equals(bounds);
     viewer.stage.setContactBounds(display.pose.extent);
     if (boundsChanged) {
-      cameraBox.copy(display.bounds);
+      cameraBox.copy(bounds);
       viewer.rig.setBounds(cameraBox, { immediate: false });
     }
     if (immediate || forceCamera || boundsChanged || nextPreset !== preset || zoom !== state.camera.zoom
@@ -456,16 +469,35 @@ export function createFishScene({ container, speciesId = 'aji', quality = 'auto'
     input?.redraw();
     if (debug) Object.assign(host.__sabaki ??= {}, { model, anatomy: model.anatomy, proc: display.proc });
   }
-  function pickPoint(e, cut) {
+  function practiceProjection(cut) {
+    if (!cut || !display) return null;
     apply();
-    const hit = picker(e.clientX, e.clientY);
-    if (!hit) return null;
     const owner = curveOwner(cut.curve, cut.side);
     if (!display.pose.visible(owner)) return null;
-    if (cut.through || CURVE_INFO[cut.curve].inner) {
-      const object = display.model.pieces[owner]?.object ?? display.model.group;
-      return pointAtCutDepth(viewer.camera, object.matrixWorld, viewer.renderer.domElement.getBoundingClientRect(),
-        e.clientX, e.clientY, display.guides.curvePoints(cut));
+    const object = display.model.pieces[owner]?.object ?? display.model.group;
+    object.updateWorldMatrix(true, false);
+    viewer.camera.updateWorldMatrix(true, false);
+    return { owner, matrix: object.matrixWorld, rect: viewer.renderer.domElement.getBoundingClientRect(), points: display.guides.curvePoints(cut) };
+  }
+  function pickPoint(e, cut) {
+    const projection = practiceProjection(cut);
+    if (!projection) return null;
+    const { owner, matrix, rect, points } = projection;
+    const starting = e.type === 'pointerdown';
+    if (starting) {
+      const start = projectCutPoints(viewer.camera, matrix, rect, [points[0]])?.[0];
+      if (!start) return null;
+      const distancePx = Math.hypot(e.clientX - start.x, e.clientY - start.y);
+      if (distancePx > PRACTICE_START_REACH_PX) {
+        emit('practice-miss', { reason: 'far-from-start', distancePx });
+        return null;
+      }
+    }
+    const hit = picker(e.clientX, e.clientY);
+    if (!hit || cut.through || CURVE_INFO[cut.curve].inner) {
+      // 押した瞬間だけは緑の丸の受付範囲を使い、一筆の途中からは線の受付幅に戻します。
+      const reach = starting || hit ? Infinity : PRACTICE_REACH_PX;
+      return pointAtCutDepth(viewer.camera, matrix, rect, e.clientX, e.clientY, points, reach);
     }
     // 皮と身が別々に動いたあとも、当たった部品から切りの持ち主の FLF へ戻します。
     return point.fromArray(hit.point).applyMatrix4(display.pose.matrixFor(hit.pieceId))
@@ -500,7 +532,7 @@ export function createFishScene({ container, speciesId = 'aji', quality = 'auto'
     viewer.setMirror(leftHanded);
     install(viewer.quality);
     overlay = makeOverlay(container);
-    overlay.setMarks(state, labels, display.pose, display.model, display);
+    overlay.setMarks(state, labels, display.pose, display.model, display, practiceCut);
     viewer.scene.onAfterRender = () => {
       overlay.project(viewer.camera);
       if (pendingShot && --pendingShot.frames === 0) {
@@ -524,6 +556,12 @@ export function createFishScene({ container, speciesId = 'aji', quality = 'auto'
 
   return {
     ready,
+    practiceGuide() {
+      const projection = practiceProjection(practiceCut);
+      if (!projection) return null;
+      const points = projectCutPoints(viewer.camera, projection.matrix, projection.rect, projection.points);
+      return points && { start: points[0], end: points.at(-1), points };
+    },
     setStep(i) {
       const n = Math.min(display ? display.proc.steps.length - 1 : Number.MAX_SAFE_INTEGER, Math.max(0, Math.trunc(Number(i) || 0)));
       viewSync = 'step';

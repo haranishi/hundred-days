@@ -1,6 +1,9 @@
 // 採点する位置と許容幅は魚の座標（cm）。時刻はポインターイベントのミリ秒で受ける。
 import { clamp01, lerp, measurePolyline } from './easing.js';
 
+export const PRACTICE_REACH_PX = 28;
+export const PRACTICE_START_REACH_PX = 40;
+
 export function createSession({ curvePoints, tolerance }) {
   if (!Number.isFinite(tolerance) || tolerance <= 0) throw new RangeError('許容幅は正のcmで指定します。');
   const path = measurePolyline(curvePoints);
@@ -88,15 +91,15 @@ function strokeSmoothness(samples, reversals) {
 function feedback({ n, first, last, span, meanDist, maxDist, accuracy, smoothness, reversals, score, tolerance }) {
   if (n === 0) return '軌跡がまだありません。線の始まりに触れて、そのままなぞってみましょう。';
   if (n === 1) return '触れた点を一つ記録しました。次は指を離す前に線の先まで進みましょう。';
-  if (first - last >= 0.15) return '矢印と逆に進んでいます。矢印の根元から先へなぞってみましょう。';
+  if (first - last >= 0.15) return '朱色の線を逆向きになぞっています。緑の丸から先へ進みましょう。';
   if (span < 0.05) return '同じ場所の近くに軌跡が集まっています。線に沿って少し先まで進みましょう。';
   if (reversals >= 2) return '小刻みに往復すると断面が荒れます。刃の全体を使って、一筆で長く引きましょう。';
   if (first > 0.15 && last < 0.85) return '線の中ほどをなぞれました。次は始まりから終わりまで線をつないでみましょう。';
-  if (first > 0.15) return '線の途中から始めています。矢印の根元に指を置いてから進みましょう。';
-  if (last < 0.85) return '軌跡が線の途中で終わっています。指を離す位置を矢印の先まで延ばしてみましょう。';
+  if (first > 0.15) return '線の途中から始めています。緑の丸に指を置いてから進みましょう。';
+  if (last < 0.85) return '軌跡が線の途中で終わっています。朱色の線の終わりまで指を進めてみましょう。';
   if (accuracy < 0.76) return '線から平均' + meanDist.toFixed(1) + 'cmずれました。少しゆっくり、線の中心を追ってみましょう。';
   if (maxDist > tolerance * 1.5) return '途中で線から大きく離れた所があります。曲がる手前で少しゆっくり進みましょう。';
-  if (reversals) return '線を少し戻った所があります。次は矢印の先を見て、ひと息で引いてみましょう。';
+  if (reversals) return '線を少し戻った所があります。次は朱色の線の先を見て、ひと息で引いてみましょう。';
   if (smoothness < 0.70) return '線を進む速さにむらがあります。始まりから終わりまで同じ調子で引いてみましょう。';
   if (score >= 95) return '線に沿って、端までなめらかに引けています。';
   return '始まりから終わりまで線を追えています。次は指の中心を線に重ねてみましょう。';
@@ -121,11 +124,14 @@ export function finish({ samples, path, tolerance }) {
   }
   const first = samples[0].a / path.length, last = samples.at(-1).a / path.length;
   const span = (max - min) / path.length;
-  // 両端の不足分を連続的に差し引く。全線を逆走した場合も始点・終点の条件にかかる。
-  const coverage = clamp01(span * clamp01((1 - first) / 0.85) * clamp01(last / 0.85));
+  // 端の3%に触れた位置は、被覆を測るときだけ端とみなします。向きは実際の始点と終点で判定します。
+  const reached = a => a <= 0.03 ? 0 : a >= 0.97 ? 1 : a;
+  const coveredSpan = reached(max / path.length) - reached(min / path.length);
+  const coverage = clamp01(coveredSpan * clamp01((1 - first) / 0.85) * clamp01(last / 0.85));
   const reversals = countReversals(samples, path.length);
   const smoothness = strokeSmoothness(samples, reversals);
-  const score = Math.min(coverage < 0.7 ? 60 : 100, Math.round(100 * (0.65 * accuracy + 0.2 * smoothness + 0.15 * coverage)));
+  const limit = coverage < 0.7 || first >= 0.2 ? 60 : 100;
+  const score = Math.min(limit, Math.round(100 * (0.65 * accuracy + 0.2 * smoothness + 0.15 * coverage)));
   const grade = score >= 92 ? 'S' : score >= 80 ? 'A' : score >= 65 ? 'B' : score >= 45 ? 'C' : 'D';
   const comment = feedback({ n: samples.length, first, last, span, meanDist, maxDist, accuracy, smoothness, reversals, score, tolerance });
   return { score, accuracy, smoothness, coverage, grade, comment, reversals, meanDist, maxDist };

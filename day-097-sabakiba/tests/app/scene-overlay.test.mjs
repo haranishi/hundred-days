@@ -14,6 +14,33 @@ const marker = (x, y, text, width = 95) => ({ x, y, text, width, height: 24, rad
 const separate = (a, b) => a.right <= b.left || a.left >= b.right || a.bottom <= b.top || a.top >= b.bottom;
 const near = (a, b) => assert.ok(Math.abs(a - b) < 1e-7, a + ' と ' + b);
 
+test('練習を始めると手の印と札が画面から消え、同じ手順のガイドに戻ると再表示します', t => {
+  function element() {
+    return { children: [], hidden: false, style: {}, offsetWidth: 25, offsetHeight: 18,
+      setAttribute() {}, remove() {}, append(...nodes) { this.children.push(...nodes); },
+      replaceChildren(...nodes) { this.children = nodes; } };
+  }
+  const doc = { createElement: element, createElementNS: element, createTextNode: text => ({ textContent: text }) };
+  const previous = globalThis.document;
+  globalThis.document = doc;
+  t.after(() => { if (previous === undefined) delete globalThis.document; else globalThis.document = previous; });
+  let root;
+  const overlay = createSceneOverlay({ ownerDocument: doc, clientWidth: 390, clientHeight: 404,
+    appendChild(el) { root = el; }, querySelector: () => null });
+  const camera = new THREE.OrthographicCamera(-5, 5, 5, -5, 0.1, 20);
+  camera.position.z = 8; camera.updateMatrixWorld();
+  const matrix = new THREE.Matrix4(), pose = { matrixFor: () => matrix, visible: () => true };
+  const model = { group: new THREE.Group(), anatomy: { point: () => [0, 0, 0] } };
+  const state = { hands: [{ owner: 'head', anchor: 'headCutTop', pos: [0, 0, 0], text: '左手で頭を支えます。' }], labels: [] };
+  const hands = () => root.children.filter(el => el.className?.includes('--hand') && !root.hidden && !el.hidden);
+  try {
+    for (const cut of [null, { curve: 'headCut', side: 'L' }, null]) {
+      overlay.setMarks(state, true, pose, model, null, cut); overlay.project(camera);
+      assert.equal(hands().length, cut ? 0 : 2);
+    }
+  } finally { overlay.dispose(); }
+});
+
 test('同じ手の文は先頭の輪だけに付き、部位札は残り、同じ入力から同じ配置を返します', () => {
   const text = '左手で身を支えます。';
   const args = { bounds, avoid: [], markers: [marker(62, 90, text), marker(231, 128, text),
