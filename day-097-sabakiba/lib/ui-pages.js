@@ -113,7 +113,7 @@ export function renderSafety(container) {
     icon('alert', 'icon icon--warn'),
     h('div', { class: 'callout-body' }, [
       h('p', { class: 'callout-title' }, ['参考情報・自己責任について']),
-      h('p', {}, [safetyContent.intro]),
+      ...String(safetyContent.intro).split('\n').filter(Boolean).map((line) => h('p', {}, [line])),
       h('p', { class: 'small-note' }, [
         'フグなど毒のある魚のさばき方は資格が必要なため、このアプリでは扱っていません。見分けがつかない魚や、毒の有無が不明な魚はさばかないでください。',
       ]),

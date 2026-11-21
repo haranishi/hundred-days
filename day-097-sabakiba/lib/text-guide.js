@@ -86,7 +86,7 @@ export function renderTextGuide(container, data, { onToggleLeftHanded } = {}) {
   const safetySec = h('section', { class: 'card-section callout callout--warn' }, [
     h('div', { class: 'callout-body' }, [
       h('p', { class: 'callout-title' }, [icon('shield', 'icon icon--warn'), 'さばく前の確認']),
-      h('p', {}, [data.safetyIntro]),
+      ...String(data.safetyIntro).split('\n').filter(Boolean).map((line) => h('p', {}, [line])),
       h('a', { class: 'text-link', href: '#/safety' }, ['「さばく前に」の詳しい注意を読む']),
     ]),
   ]);

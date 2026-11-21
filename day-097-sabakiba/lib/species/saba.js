@@ -16,5 +16,5 @@ export default {
   vent: 68, cavityEnd: 67, vertebrae: { pre: 14, caudal: 17 }, vertebraDia: 6.5,
   swimBladder: true, pinbones: { count: 16, from: 30, to: 70 },
   look: { colors: { dorsal: '#1E4D5C', flank: '#BCCAD0', belly: '#EEF2F5', fin: '#8A8D68', iris: '#D6D8C8' },
-    patterns: ['wavyStripes'], scale: { size: 0.08, gloss: 0.76 }, flesh: 'red' },
+    patterns: ['wavyStripes'], scale: { size: 0.08, gloss: 0.76 }, flesh: 'pink' },
 };

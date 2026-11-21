@@ -16,5 +16,5 @@ export default {
   swimBladder: true, pinbones: { count: 0, from: 27, to: 92 },
   scutes: { count: 32, from: 25, to: 76, position: 'ventral' },
   look: { colors: { dorsal: '#1F4A6E', flank: '#CFD8DF', belly: '#F0F4F8', fin: '#8A969E', iris: '#DCE2E6' },
-    patterns: ['flankSpots'], scale: { size: 0.16, gloss: 0.72 }, flesh: 'red' },
+    patterns: ['flankSpots'], scale: { size: 0.16, gloss: 0.72 }, flesh: 'pink' },
 };

@@ -15,5 +15,5 @@ export default {
   vent: 70, cavityEnd: 69, vertebrae: { pre: 41, caudal: 24 }, vertebraDia: 9,
   swimBladder: false, stomach: false, pinbones: { count: 26, from: 25, to: 90 },
   look: { colors: { dorsal: '#183854', flank: '#D8E2E8', belly: '#F2F6F9', fin: '#7D8A94', iris: '#DCE2E6' },
-    patterns: ['lateralBand'], scale: { size: 0.06, gloss: 0.8 }, flesh: 'red' },
+    patterns: ['lateralBand'], scale: { size: 0.06, gloss: 0.8 }, flesh: 'pink' },
 };
