@@ -304,7 +304,7 @@ body[data-route="guide"] .main { display: flex; flex-direction: column; overflow
 .u-slider { flex: 1 1 auto; min-width: 60px; height: 44px; margin: 0; accent-color: var(--cut-ink); cursor: pointer; }
 
 /* 手順カード側パネル */
-.panel-pane { display: grid; grid-template-rows: auto minmax(0, 1fr) auto; min-height: 0; background: var(--surface); }
+.panel-pane { display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr) auto; min-height: 0; background: var(--surface); }
 .step-bar {
   display: flex; align-items: center; gap: 8px;
   padding: 6px max(var(--gutter), env(safe-area-inset-right)) 6px max(var(--gutter), env(safe-area-inset-left));

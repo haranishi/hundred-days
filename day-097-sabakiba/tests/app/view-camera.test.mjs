@@ -84,7 +84,7 @@ test('料理する人から見た方位、頭側、注視点、接写距離、�
   near(presetOrbit('front', sphere, { headDirection: [1, 0, 0] }).yaw, Math.PI / 2);
   const focus = [-7, 3, -2];
   const close = presetOrbit('closeup', sphere, { focus });
-  near(close.distance, cook.distance * 0.45); near(close.fov, 35);
+  near(close.distance, cook.distance * 0.72); near(close.fov, 35);
   near(presetOrbit('closeup', sphere, { focus, zoom: 2 }).distance, close.distance / 2);
   const rig = createCameraRig(options);
   rig.applyPreset('closeup', { focus, zoom: 1.5 }, { immediate: true });

@@ -152,6 +152,7 @@ export function validateProcedure(raw, { pieceIds = ALL_PIECE_IDS, curveNames = 
     if (typeof v !== 'string' || !v.trim()) return E(id, `${key} が空`);
     if (v.length > max) E(id, `${key} が長い(${v.length}>${max})`);
     if (!TOKEN_OK(v)) E(id, `${key} の記号が {L}・{R} 以外`);
+    if (/[<>]/.test(v)) E(id, `${key} にHTMLの記号（読み仮名は「漢字(よみ)」と書く。画面が読み仮名を付ける）`);
     for (const w of BANNED) if (v.includes(w)) E(id, `${key} に禁止語「${w}」`);
   };
   const anchorOk = (a) => typeof a === 'string' && (anchorNames.includes(a) || (a.startsWith('piece:') && pieceIds.includes(a.slice(6))));

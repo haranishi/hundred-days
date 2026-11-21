@@ -5,7 +5,7 @@ export const RAD = Math.PI / 180;
 export const DEFAULT_FOV = 35;
 export const MIN_PITCH = 4 * RAD;
 export const MAX_PITCH = 88 * RAD;
-const CLOSE_SCALE = 0.45;
+const CLOSE_SCALE = 0.72;
 const pitches = { cook: 42, side: 10, top: 88, front: 10, closeup: 42 };
 
 export const clamp = (n, min, max) => Math.min(max, Math.max(min, n));

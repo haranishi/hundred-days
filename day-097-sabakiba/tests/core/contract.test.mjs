@@ -81,6 +81,7 @@ test('validateProcedure: 誤りを1つずつ検出する', () => {
   bad({ practice: { cut: 'zz', tolerance: 0.5 } }, /practice.cut/);
   bad({ tip: '絶対に失敗しません。' }, /禁止語/);
   bad({ place: '頭は{X}に' }, /記号/);
+  bad({ tip: '<ruby>中骨<rt>なかぼね</rt></ruby>に沿わせます。' }, /HTMLの記号/);
   assert.ok(validateProcedure(proc(3)).some((m) => /手順の数/.test(m)));
   const dup = proc(); dup.steps[1].id = dup.steps[0].id;
   assert.ok(validateProcedure(dup).some((m) => /重複/.test(m)));
