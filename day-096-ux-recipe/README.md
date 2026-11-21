@@ -52,4 +52,4 @@ npm run build
 npm run publish:check -- --day 96
 ```
 
-仕様と検証記録は [Day096仕様](../.kiro/specs/day-096-ux-recipe/tasks.md) を参照。診断の根拠調査は [research.md](../.kiro/specs/day-096-ux-recipe/research.md)。
+宣伝動画（一覧カードの `demo.mp4` と縦30秒の動画）の作り方は [tools/promo/README.md](tools/promo/README.md)。仕様と検証記録は [Day096仕様](../.kiro/specs/day-096-ux-recipe/tasks.md) を参照。診断の根拠調査は [research.md](../.kiro/specs/day-096-ux-recipe/research.md)。

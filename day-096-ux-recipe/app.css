@@ -71,7 +71,7 @@
 .app-subtle { border-color: transparent; background: transparent; color: var(--app-accent); }
 .app-shell :where(.app-btn, .ed-row-control, .ed-palette-choice):disabled { opacity: .48; cursor: default; }
 .ed-icon-btn { width: 44px; padding: 0; }
-.app-shell :where(h1, h2, h3, h4, .app-card-title, .ed-row-text strong, .ed-palette-choice strong) {
+.app-shell :where(h1, h2, h3, h4, .app-card-title, .app-card-note, .ed-row-text strong, .ed-palette-choice strong) {
   word-break: auto-phrase;
   text-wrap: balance;
 }

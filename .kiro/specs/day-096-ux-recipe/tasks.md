@@ -19,6 +19,7 @@
 - [ ] 11. 独立コードレビュー（実装者と別系統・読み取り専用）と、文言の事実の照合（根拠調査との突き合わせ）・権利と漏洩の全文確認。
 - [ ] 12. 公開の基盤（親）: meta.json（published・X投稿文・AI分担・失敗と直し）・README・screenshot・根の README と THIRD_PARTY・shared の同期・公開ゲート・`npm run check`。
 - [ ] 13. PR → 本人の承認 → マージ → 本番確認（`gh pr merge` の方式は個人リポの決まりに従う）。X投稿と実機の確認は本人。
+- [x] 14. 宣伝動画（親＋Codex。証拠は verification.md の「宣伝動画」）: 絵コンテ `tools/promo/timeline.mjs` → 撮影・書き出し `render-promo.mjs`（親）／BGM・効果音の合成と数値検査 `promo-audio.mjs`・`verify-audio.mjs`（Codex）→ 画像だけの採点（Grok・Codex・Antigravity・最大3周）→ `demo.mp4`・meta.json・README → PR → 本人の承認 → マージ。BGMは耳で聴くのは本人。 _Requirements: 13_
 
 ## 証拠の置き場
 `verification.md`（試験の件数・採点の点・独立レビューの指摘と対応・実機の確認を、実施のたびに追記する）。作業記録は `.agent-harness/runs/day096-ux-recipe.md`。
