@@ -13,10 +13,11 @@ const hasCut = (step, curve, side) => step.cuts?.some(c => c.curve === curve && 
 const near = (a, b) => assert.ok(Math.abs(a - b) < 1e-8, a + ' と ' + b);
 
 // 魚の座標で表した向きを、動いた片身の上で盤の座標に写す。
+// 動かした片身は、動かした手順の姿勢に固定される（poseLock）。固定されたあとは、その姿勢が回転の基準になる。
 function boardDirection(frame, side, direction) {
-  const { rot } = frame.pieces[side + '.dorsal'];
+  const own = frame.pieces[side + '.dorsal'], { rot } = own;
   return new Vector3(...direction)
-    .applyQuaternion(new Quaternion().fromArray(frame.pose.q))
+    .applyQuaternion(new Quaternion().fromArray((own.poseLock ?? frame.pose).q))
     .applyAxisAngle(new Vector3(...rot.axis), rot.deg * Math.PI / 180);
 }
 const skinNormalY = (frame, side) => boardDirection(frame, side, [0, 0, side === 'L' ? 1 : -1]).y;

@@ -106,7 +106,7 @@ export function headSide(k, side, last, changes = {}) {
     mistake: last ? '硬い骨に当てたまま刃をねじると、切り口から外れます。' : 'ひれから離れた所を横に切ると、肩の肉まで頭に付きます。',
     done: last ? '胸びれと腹びれが頭に付き、首の切り口が見えます。' : '片側は中骨まで開き、頭は反対の面で胴につながっています。',
     place: last ? headLeftBack : headLeft, pose: last ? LF : LB,
-    hands: [hand('opercleTop', '{L}手を頭に添え、指を刃筋から離します。')],
+    hands: [hand('eye', '{L}手を頭に添え、指を刃筋から離します。')],
     labels: [mark('pectoralBase', '胸鰭(むなびれ)')], camera: shot('closeup', line('headCut', side), 1.28),
     durationMs: last ? 6200 : 5100,
     cuts: [cut('neck', 'headCut', side, 'deba', last ? 'press' : 'pull', last ? 'heel' : 'mid', 15, [0.30, 0.67], last)],
@@ -212,7 +212,8 @@ export function ribs(k, changes = {}) {
     labels: [mark('piece:R.strip', '腹骨(はらぼね)')], camera: shot('top', 'bodyCenter', 0.87), durationMs: 7900,
     cuts: [cut('ribs-r', 'ribStrip', 'R', 'deba', 'slice', 'mid', 8, [0.28, 0.47], true),
       cut('ribs-l', 'ribStrip', 'L', 'deba', 'slice', 'mid', 8, [0.69, 0.84], true)],
-    moves: [turn('L.dorsal', 'z', 180, [0, 0.23]), move(k, 'R.strip', [2, 0, 3], [0.49, 0.61]),
+    // 片身は取り分けた手順の姿勢に固定される（右は皮が上・頭が左）。右は長軸まわりに返して皮を下に、左は z で返して頭を右に向ける。
+    moves: [turn('R.dorsal', 'x', 180, [0, 0.23]), turn('L.dorsal', 'z', 180, [0, 0.23]), move(k, 'R.strip', [2, 0, 3], [0.49, 0.61]),
       move(k, 'L.strip', [-2, 0, 3], [0.86, 1])],
     uniforms: { xray: { to: 0, window: [0, 0.22] } }, practice: practice('ribs-r', 0.4), ...changes,
   });
@@ -255,7 +256,8 @@ export function peel(k, byHand, changes = {}) {
     camera: shot('top', 'bodyCenter', 0.85), durationMs: 8100,
     cuts: [cut('skin-r', 'skinPeel', 'R', tool, 'peel', byHand ? 'tip' : 'mid', 6, [0.27, 0.47], false, byHand),
       cut('skin-l', 'skinPeel', 'L', tool, 'peel', byHand ? 'tip' : 'mid', 6, [0.64, 0.84], false, byHand)],
-    moves: [turn('R.dorsal', 'x', 180, [0, 0.22]), turn('L.dorsal', 'z', 0, [0, 0.22]),
+    // 固定された向き（どちらも皮が上・頭が左）が基準。手でむくときは皮を上のまま、包丁で引くときは皮を下・尾を左に返す。
+    moves: [turn('R.dorsal', byHand ? 'x' : 'z', byHand ? 0 : 180, [0, 0.22]), turn('L.dorsal', 'z', byHand ? 0 : 180, [0, 0.22]),
       move(k, 'skin.R', [byHand ? 5 : -5, 0.4, -3], [0.47, 0.61]),
       move(k, 'skin.L', [byHand ? 5 : -5, 0.4, 3], [0.84, 0.99])],
     ...changes,

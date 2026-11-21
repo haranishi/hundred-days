@@ -9,6 +9,7 @@ const vertexShader = `
   attribute float aArc;
   uniform vec2 uViewport;
   uniform float uArrowScale;
+  uniform float uArrowOn;
   varying float vArc;
   varying float vEdge;
   void main() {
@@ -18,7 +19,9 @@ const vertexShader = `
     vec2 along = dot(delta, delta) > 1e-10 ? normalize(delta) : vec2(1.0, 0.0);
     vec2 across = vec2(-along.y, along.x);
     vec2 offset = aOffset;
-    if (uArrowScale > 1.0 && aArc < 0.0) {
+    // 矢じりを出さない線では、3つの頂点を同じ点に重ねて面積を0にする。
+    if (aArc < 0.0 && uArrowOn < 0.5) offset = vec2(0.0);
+    else if (uArrowScale > 1.0 && aArc < 0.0) {
       offset = (offset - vec2(3.0, 0.0)) * uArrowScale;
       p.z = -0.999 * p.w;
     }
@@ -34,6 +37,7 @@ const fragmentShader = `
   uniform float uOpacity;
   uniform float uStart;
   uniform float uSpacing;
+  uniform float uFlow;
   uniform vec3 uColor;
   varying float vArc;
   varying float vEdge;
@@ -41,7 +45,7 @@ const fragmentShader = `
     float alpha = 1.0;
     if (vArc >= 0.0) {
       if (vArc < uStart) discard;
-      float d = abs(fract(vArc / uSpacing - uTime * 0.85) - 0.5);
+      float d = abs(fract(vArc / uSpacing - uTime * 0.85 * uFlow) - 0.5);
       float aa = clamp(fwidth(vArc / uSpacing), 0.015, 0.09);
       alpha = (1.0 - smoothstep(0.29 - aa, 0.29 + aa, d))
         * (1.0 - smoothstep(1.4, 2.7, abs(vEdge)));
@@ -51,7 +55,11 @@ const fragmentShader = `
     #include <colorspace_fragment>
   }`;
 
-function ribbon(points, anatomy, surface, clock, viewport) {
+/**
+ * guide=false の線（骨抜きの小骨の列）は、道具を引く向きを示す矢じりと流れる点線を出さない（点の並びだけで「ここに骨がある」と示す）。
+ * 練習中だけは、始点から終点までなぞるので矢じりも出す。
+ */
+function ribbon(points, anatomy, surface, clock, viewport, { directed = true } = {}) {
   const positions = [], tangents = [], offsets = [], arcs = [], indices = [];
   const tangent = new THREE.Vector3(), pos = new THREE.Vector3(), last = new THREE.Vector3();
   let length = 0;
@@ -89,7 +97,7 @@ function ribbon(points, anatomy, surface, clock, viewport) {
   }
   geometry.setIndex(indices);
   const material = new THREE.ShaderMaterial({ vertexShader, fragmentShader, uniforms: {
-    uViewport: { value: viewport }, uTime: clock, uStart: { value: 0 }, uOpacity: { value: 1 }, uArrowScale: { value: 1 },
+    uViewport: { value: viewport }, uTime: clock, uStart: { value: 0 }, uOpacity: { value: 1 }, uArrowScale: { value: 1 }, uArrowOn: { value: directed ? 1 : 0 }, uFlow: { value: directed ? 1 : 0 },
     uSpacing: { value: Math.max(0.32, Math.min(anatomy.SL * 0.045, length / 4)) },
     uColor: { value: new THREE.Color('#e5422f') },
   }, transparent: true, depthWrite: false, side: THREE.DoubleSide, forceSinglePass: true, toneMapped: false });
@@ -97,6 +105,8 @@ function ribbon(points, anatomy, surface, clock, viewport) {
   mesh.matrixAutoUpdate = false;
   mesh.renderOrder = 8;
   function setPractice(active) {
+    material.uniforms.uArrowOn.value = directed || active ? 1 : 0;
+    material.uniforms.uFlow.value = directed || active ? 1 : 0;
     const arrowScale = active ? 24 / 11 : 1;
     if (material.uniforms.uArrowScale.value === arrowScale) return;
     material.uniforms.uArrowScale.value = arrowScale;
@@ -264,7 +274,7 @@ export function createGuides(anatomy, rng) {
       if (!practiceCut && state.incisions.some(c => sameLine(c) && c.progress >= 1)) return;
       const incision = state.incisions.find(c => sameLine(c) && Boolean(c.reverse) === Boolean(cut.reverse));
       if (!ribbons.has(key)) {
-        const item = ribbon(curvePoints(cut), anatomy, !CURVE_INFO[cut.curve].inner, clock, viewport);
+        const item = ribbon(curvePoints(cut), anatomy, !CURVE_INFO[cut.curve].inner, clock, viewport, { directed: cut.motion !== 'pluck' });
         item.mesh.name = key;
         ribbons.set(key, item);
         group.add(item.mesh);

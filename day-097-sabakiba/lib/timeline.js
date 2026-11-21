@@ -300,6 +300,25 @@ function activeKnife(anatomy, cuts, u) {
     ...knifePose(anatomy, cut, t, { path, reference, liftCm }) };
 }
 
+// 手の印の持ち主（'R.dorsal'・'skin.L' など）が右か左か。
+const sideOfOwner = owner => /^([RL])\./u.exec(owner ?? '')?.[1] ?? /\.([RL])$/u.exec(owner ?? '')?.[1] ?? null;
+
+/**
+ * 同じ手・同じ文の印が複数あるとき（身が2枚あるなど）、いま包丁が働いている側の1つだけを残す。
+ * 2つ出すと「どちらの身を押さえるのか」が分からない。包丁が無い間は先頭を残す。
+ */
+export function activeHands(hands, knife) {
+  const groups = new Map();
+  for (const hand of hands) {
+    const key = hand.who + '|' + hand.text;
+    if (!groups.has(key)) groups.set(key, []);
+    groups.get(key).push(hand);
+  }
+  const side = sideOfOwner(knife?.owner);
+  // 組が最初に出た順に、各組から1つ。
+  return [...groups.values()].map(group => (side && group.find(hand => sideOfOwner(hand.owner) === side)) || group[0]);
+}
+
 export const stepCount = proc => proc.steps.length;
 
 /** 魚の置き直し（姿勢の補間）が終わる手順の進み具合。 */
@@ -318,13 +337,14 @@ export function stateAt(proc, i, progress, { leftHanded = false } = {}) {
   const highlights = (step.highlight ?? []).map(({ curve, side = null }) => ({
     curve, side, owner: curveOwner(curve, side), opacity: easeOut(windowT(u, [0, 0.1])),
   }));
+  const knife = activeKnife(proc.anatomy, frame.cuts, u);
   const effects = (step.effects ?? []).filter(e => u >= e.window[0] && u <= e.window[1]).map(e => ({
     kind: e.kind, t: windowT(u, e.window), curve: e.curve, side: e.side ?? null,
   }));
   return {
     ...persistentAt(frame, u),
     pose: { head, dorsal, q: slerpQuat(startPose.q, endPose.q, t), p: mixVector(startPose.p, endPose.p, t), t },
-    knife: activeKnife(proc.anatomy, frame.cuts, u), highlights, hands: marks(frame.hands), labels: marks(frame.labels), effects,
+    knife, highlights, hands: activeHands(marks(frame.hands), knife), labels: marks(frame.labels), effects,
     camera: { ...camera, focusPoint: [...camera.focusPoint] },
     title: text(step.title), summary: text(step.summary), how: step.how.map(text), tip: text(step.tip),
     mistake: text(step.mistake), done: text(step.done), place: text(step.place),

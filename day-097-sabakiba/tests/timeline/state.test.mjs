@@ -99,9 +99,10 @@ test('全ての左右の文章を置換し、左利きでも魚に付く位置�
         if (raw[key]) assert.equal(state[key], resolveText(raw[key], handed));
       }
       assert.deepEqual(state.how, raw.how.map(s => resolveText(s, handed)));
-      for (const key of ['hands', 'labels']) {
-        assert.deepEqual(state[key].map(m => m.text), (raw[key] ?? []).map(m => resolveText(m.text, handed)));
-      }
+      // 手の印は、同じ手・同じ文なら1つ（身が2枚ある手順）。ラベルはそのまま。
+      const uniqueHands = (raw.hands ?? []).filter((h, k, all) => all.findIndex(x => x.who === h.who && x.text === h.text) === k);
+      assert.deepEqual(state.hands.map(m => m.text), uniqueHands.map(m => resolveText(m.text, handed)));
+      assert.deepEqual(state.labels.map(m => m.text), (raw.labels ?? []).map(m => resolveText(m.text, handed)));
       assert.ok(!/[{}]/.test([state.place, ...state.hands.map(h => h.text), ...state.labels.map(l => l.text)].join('')));
     }
     assert.deepEqual(left.pieces, right.pieces);

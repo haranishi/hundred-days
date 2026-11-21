@@ -128,7 +128,8 @@ export default { curveLimits: { engawaCut: ['headCutTop', 'dorsalFinEnd'] }, ste
     tip: '腹骨のある頭側を手元に寄せると、骨の丸みに刃を合わせやすくなります。',
     place: '皮を下にし、頭側を手元に置きます。',
     hands: ['R', 'L'].map(side => hand('headCutBottom', '{L}手で腹の身を支えます。', side + '.ventral')),
-    moves: [turn('L.dorsal', 'z', 180, [0, 0.24]), move(k, 'L.dorsal', [-3.5, 0.25, 4], [0, 0.24]),
+    // 取り分けた時点で右の身は皮が上・頭が左に固定される。右は長軸まわりに返して皮を下に、左は z で返して頭を右に向ける。
+    moves: [turn('R.dorsal', 'x', 180, [0, 0.24]), turn('L.dorsal', 'z', 180, [0, 0.24]), move(k, 'L.dorsal', [-3.5, 0.25, 4], [0, 0.24]),
       move(k, 'R.dorsal', [3.5, 0.25, -4], [0, 0.24]), move(k, 'L.ventral', [0, 0, 0.15], [0, 0.24]),
       move(k, 'R.ventral', [0, 0, 0.15], [0, 0.24]),
       move(k, 'R.strip', [2, 0, 3], [0.49, 0.60]), move(k, 'R.ventral', [0, 0, 2.7], [0.61, 0.78]),

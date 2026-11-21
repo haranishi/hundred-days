@@ -96,7 +96,9 @@ for (const id of SPECIES_IDS) {
         assert.deepEqual(rendered.hands.map(h => [h.who, h.text].join(':')), [...new Set(handLines)], where);
         assert.deepEqual(allText({ ...rendered, hands: [] }),
           allText({ ...s, hands: [] }).map(w => resolveText(w, leftHanded)), where);
-        assert.deepEqual(allText(state), expected, where);
+        // 同じ手・同じ文の印は、包丁の側の1つだけが状態に出る。
+        const unique = s.hands.filter((h, k) => s.hands.findIndex(x => x.who === h.who && x.text === h.text) === k);
+        assert.deepEqual(allText(state), allText({ ...s, hands: unique }).map(w => resolveText(w, leftHanded)), where);
         expected.forEach(w => assert.doesNotMatch(w, /[{}]/u, where));
       }
     });
