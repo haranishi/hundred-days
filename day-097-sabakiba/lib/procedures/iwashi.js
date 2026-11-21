@@ -12,7 +12,7 @@ const openOnBoard = '頭側を{L}に、開いた身を上に置きます。';
 function fingerWash(side) {
   const window = [0.30, 0.82];
   return scaleSide(side, {
-    title: side === 'L' ? '指でうろこを払います' : '反対の面もすすぎます',
+    title: side === 'L' ? '指でうろこを払います' : '裏のうろこも払います',
     summary: '水を張ったボウルで薄いうろこを払います。',
     how: ['{L}手で頭を支え、{R}手の指の腹を尾から頭へ軽く滑らせます。'],
     tip: '水に浮いた丸いうろこと、ひれの際に残ったうろこを見比べます。',

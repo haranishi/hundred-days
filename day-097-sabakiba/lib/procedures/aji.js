@@ -111,7 +111,7 @@ export function headSide(k, side, last, changes = {}) {
 export function gut(k, changes = {}) {
   return step({
     id: 'gut', title: '腹を開いてわたを出します', summary: '首の切り口から肛門まで、内臓の上を覆う皮を浅く開きます。',
-    how: ['背側を{L}手で支え、首の下から切っ先を浅く入れます。腹の縁に沿って肛門へ引きます。',
+    how: ['背側を{L}手で支え、首の下から切っ先（刃の先端）を浅く入れます。腹の縁に沿って肛門へ引きます。',
       '包丁を置いて腹を広げ、わたを受け皿へ移します。'],
     tip: '刃先の向きを皮とそろえると、腹の奥へ突き込みにくくなります。',
     mistake: '切っ先を背骨へ向けて深く入れると、わたを傷つけます。',
@@ -145,7 +145,7 @@ export function wash(k, membrane = false, changes = {}) {
 }
 
 // 腹から入る面は腹を手前、背から入る面は背を手前にする。同じ側面を上にした半回転を別手順で示す。
-export function openEdge(side, edge) {
+export function openEdge(side, edge, changes = {}) {
   const belly = edge === 'ventralCut', right = side === 'R';
   const pose = belly ? (right ? RB : LB) : (right ? LF : RF);
   return step({
@@ -163,6 +163,7 @@ export function openEdge(side, edge) {
     labels: [mark(belly ? 'analFinStart' : 'dorsalFinStart', belly ? '尻鰭(しりびれ)' : '背鰭(せびれ)')],
     camera: shot('cook', line(edge, side), 1.14), durationMs: 5400,
     cuts: [cut('edge', edge, side, 'deba', 'pull', 'tip', 16, [0.28, 0.82])],
+    ...changes,
   });
 }
 
@@ -254,13 +255,22 @@ export function peel(k, byHand, changes = {}) {
   });
 }
 
+const filletsFleshUp = '皮を下にし、腹の縁を手前に置きます。頭側は一枚目が{L}、二枚目が{R}です。';
+
 const steps = [
-  prep(['deba', 'scaler', 'tweezers'], '出刃包丁、うろこ取り、骨抜き、ペーパーを用意します。', {
+  prep(['deba', 'scaler', 'tweezers'], '出刃包丁、うろこ取り、骨抜き、清潔な調理用ブラシ、ペーパーを用意します。', {
+    tip: '冷やしたまま持ち帰り、えらと内臓は早めに取ります。わたを受ける器と、身を置く冷たい皿を分けておきます。',
     labels: [mark('bodyCenter', '{L}手の位置')], safety: washHands,
   }),
-  scutes('L'), scutes('R'), headSide(k, 'L', false), headSide(k, 'R', true),
+  scutes('L'), scutes('R'),
+  headSide(k, 'L', false, { summary: '胸びれのすぐ後ろから腹びれの付け根へ、斜めに包丁を入れます。' }), headSide(k, 'R', true),
   gut(k), wash(k, true), openEdge('R', 'ventralCut'), freeFillet(k, 'R', 'dorsalCut'),
-  openEdge('L', 'dorsalCut'), freeFillet(k, 'L', 'ventralCut'), ribs(k), pinbones(k), peel(k, true),
+  openEdge('L', 'dorsalCut'), freeFillet(k, 'L', 'ventralCut'),
+  ribs(k, { place: filletsFleshUp }), pinbones(k, { place: filletsFleshUp }),
+  peel(k, true, {
+    place: '皮を上にして頭側を{L}にそろえ、一枚目は背、二枚目は腹を手前にします。',
+    safety: '刺身には「生食用」の表示がある身か、アニサキス対策の冷凍処理を確かめた身だけを使います。',
+  }),
   step({
     id: 'done', title: '三枚おろしの完成です', summary: '身を清潔な皿へ移し、頭と中骨を分けて置きます。',
     how: ['腹の縁と身の中央をそっとなで、残った骨先がないか確かめます。',

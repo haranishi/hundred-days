@@ -12,13 +12,14 @@ const firstMove = (steps, piece) => steps.findIndex(s => s.moves?.some(m => m.pi
 const hasCut = (step, curve, side) => step.cuts?.some(c => c.curve === curve && (side === undefined || c.side === side));
 const near = (a, b) => assert.ok(Math.abs(a - b) < 1e-8, a + ' と ' + b);
 
-// 魚の体側の法線を盤へ写し、寝かせた身・開き身の表裏をラベルに頼らず調べる。
-function skinNormalY(frame, side) {
+// 魚の座標で表した向きを、動いた片身の上で盤の座標に写す。
+function boardDirection(frame, side, direction) {
   const { rot } = frame.pieces[side + '.dorsal'];
-  return new Vector3(0, 0, side === 'L' ? 1 : -1)
+  return new Vector3(...direction)
     .applyQuaternion(new Quaternion().fromArray(frame.pose.q))
-    .applyAxisAngle(new Vector3(...rot.axis), rot.deg * Math.PI / 180).y;
+    .applyAxisAngle(new Vector3(...rot.axis), rot.deg * Math.PI / 180);
 }
+const skinNormalY = (frame, side) => boardDirection(frame, side, [0, 0, side === 'L' ? 1 : -1]).y;
 
 test('下処理は手元から見える面、腹骨と小骨は身の面、皮引きは用途に合う面で行います', () => {
   for (const id of SPECIES_IDS) {
@@ -33,6 +34,20 @@ test('下処理は手元から見える面、腹骨と小骨は身の面、皮�
         const frame = stateAt(proc, i, (c.window[0] + c.window[1]) / 2);
         assert.ok(expected * skinNormalY(frame, c.side) > 0.99, id + '/' + s.id + '/' + c.id);
       }
+    });
+  }
+});
+
+test('アジの二枚の頭と腹は、それぞれに道具が触れる時点で手順の置き方と一致します', () => {
+  const raw = getProcedure('aji'), proc = createProcedure(raw, fakeAnatomy);
+  // 盤では頭が左なら x は負、腹が手前なら z は正。二枚の加工順で検査する。
+  for (const [number, headX, bellyZ] of [[12, [-1, 1], [1, 1]], [13, [-1, 1], [1, 1]], [14, [-1, -1], [-1, 1]]]) {
+    const { cuts } = raw.steps[number - 1];
+    assert.equal(cuts.length, 2);
+    cuts.forEach((cut, i) => {
+      const frame = stateAt(proc, number - 1, (cut.window[0] + cut.window[1]) / 2);
+      assert.ok(headX[i] * boardDirection(frame, cut.side, [-1, 0, 0]).x > 0.99, cut.id);
+      assert.ok(bellyZ[i] * boardDirection(frame, cut.side, [0, -1, 0]).z > 0.99, cut.id);
     });
   }
 });

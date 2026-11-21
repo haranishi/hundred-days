@@ -14,10 +14,14 @@ function allText(step) {
     ...(step.safety ? [step.safety] : []), ...step.hands.map(h => h.text), ...(step.labels ?? []).map(l => l.text)];
 }
 
-// 定型文にない2件だけを、調査「安全と衛生の公的な基準」の魚・条件に限定する。
+// 共通の注意以外は調査で確認した文に限り、料理を選ぶ手順に表示されることも確かめる。
+const histamine = 'できたヒスタミンは加熱しても残ります。保冷が途切れて傷みが疑われる魚は食べません。';
 const extraSafety = new Map([
-  ['できたヒスタミンは加熱しても残ります。保冷が途切れて傷みが疑われる魚は食べません。', ['saba', 'katsuo']],
-  ['クドアは目で見分けられません。中心75℃で5分以上の加熱が対策になります。', ['hirame']],
+  ['saba/prep', histamine], ['katsuo/prep', histamine],
+  ['aji/peel', '刺身には「生食用」の表示がある身か、アニサキス対策の冷凍処理を確かめた身だけを使います。'],
+  ['hirame/prep', 'クドアは目で見分けられません。加熱は中心75℃で5分以上です。刺身は生食用の表示か両方の冷凍条件を確かめた身に限ります。'],
+  ['hirame/peel', 'クドア対策は−20℃で4時間以上冷凍します。アニサキス対策は−20℃以下で魚全体が完全に凍ってから24時間以上です。'],
+  ['katsuo/trim-bloodline', '表面だけをあぶるたたきは中心が生のままです。生食用で寄生虫対策を確認した魚を使います。'],
 ]);
 
 test('入口は調査した8種を登録し、未登録の名前は空を返します', () => {
@@ -79,7 +83,8 @@ for (const id of SPECIES_IDS) {
         assert.ok(lastEnd <= c.window[0], where);
         lastEnd = c.window[1];
       }
-      if (s.safety) assert.ok(safety.stepNotes.includes(s.safety) || extraSafety.get(s.safety)?.includes(id), where);
+      if (extraSafety.has(where)) assert.equal(s.safety, extraSafety.get(where), where);
+      else if (s.safety) assert.ok(safety.stepNotes.includes(s.safety), where);
       const words = allText(s);
       for (const word of words) assert.doesNotMatch(word, /[左右<>]|絶対|完璧|世界初|プロ並み/u, where);
       for (const leftHanded of [false, true]) {
@@ -96,8 +101,10 @@ for (const id of SPECIES_IDS) {
 }
 
 test('料理を選ぶ時点に、保冷・丸塩焼き・生食の条件があります', () => {
-  const hirameNotes = getProcedure('hirame').steps.map(s => s.safety ?? '').join('');
-  assert.match(hirameNotes, /クドア.*75℃で5分以上/u);
+  for (const id of ['aji', 'iwashi', 'sanma']) {
+    const prep = getProcedure(id).steps[0];
+    assert.match([prep.tip, prep.safety].join(''), /冷やしたまま持ち帰/u, id);
+  }
   for (const id of ['saba', 'katsuo']) {
     const notes = getProcedure(id).steps.map(s => s.safety ?? '').join('');
     assert.match(notes, /ヒスタミン.*加熱しても残/u);
@@ -108,5 +115,56 @@ test('料理を選ぶ時点に、保冷・丸塩焼き・生食の条件があ�
   const katsuo = getProcedure('katsuo').steps;
   const beforeSkin = katsuo.slice(0, katsuo.findIndex(s => s.moves?.some(m => m.piece === 'skin.R')));
   assert.match(beforeSkin.flatMap(allText).join(''), /たたき用.*皮付き/u);
-  assert.match(beforeSkin.flatMap(allText).join(''), /中心が生.*生食用/u);
+  const trim = beforeSkin.find(s => s.id === 'trim-bloodline');
+  assert.match(trim.safety, /中心が生.*生食用.*寄生虫対策/u);
+  assert.doesNotMatch(trim.mistake, /寄生虫|生食用/u);
+});
+
+test('ヒラメの準備と皮引きは、それぞれの手順だけで生食用の表示と二つの冷凍条件を確認できます', () => {
+  const steps = getProcedure('hirame').steps;
+  assert.match(steps[0].safety, /クドア.*中心75℃で5分以上/u);
+  for (const step of [steps[0], steps.at(-1)]) {
+    const text = allText(step).join('\n');
+    assert.match(text, /生食用の表示[^。]*か[^。]*冷凍条件/u);
+    assert.match(text, /クドア[^。]*−20℃で4時間以上/u);
+    assert.match(text, /アニサキス[^。]*−20℃以下で魚全体が完全に凍ってから24時間以上/u);
+  }
+});
+
+test('裏返す手順は上に向ける面を示し、キスの水洗いは首の切り口から行います', () => {
+  for (const [id, number, face] of [
+    ['tai', 10, /皮を上/u], ['katsuo', 8, /背びれの脇にまだ切れ目がない面を上/u], ['katsuo', 9, /最初に背びれの脇を切った面を上/u],
+  ]) {
+    const { summary, how } = getProcedure(id).steps[number - 1];
+    assert.match(summary, /返し/u);
+    assert.match([summary, ...how].join(''), face);
+  }
+  const wash = getProcedure('kisu').steps[5];
+  assert.match(wash.summary, /首の切り口.*中骨の下/u);
+  assert.doesNotMatch(wash.summary, /腹を広げ/u);
+});
+
+test('アジの二枚の頭側は腹骨と小骨を取るときは逆向きで、薄皮をむくときは同じ向きです', () => {
+  const steps = getProcedure('aji').steps;
+  for (const leftHanded of [false, true]) {
+    const first = leftHanded ? '右' : '左', second = leftHanded ? '左' : '右';
+    for (const s of steps.slice(11, 13)) {
+      const place = resolveText(s.place, leftHanded);
+      assert.match(place, /皮を下.*腹の縁を手前/u);
+      assert.match(place, new RegExp('一枚目が' + first + '、二枚目が' + second));
+    }
+    const skinUp = resolveText(steps[13].place, leftHanded);
+    assert.match(skinUp, new RegExp('皮を上.*頭側を' + first + 'にそろえ'));
+    assert.match(skinUp, /一枚目は背、二枚目は腹を手前/u);
+  }
+});
+
+test('魚別に切っ先と血合いが初めて出る手順では、本文かコツに意味があります', () => {
+  for (const id of SPECIES_IDS) {
+    const { steps } = getProcedure(id);
+    for (const [term, meaning] of [['切っ先', /刃の先端/u], ['血合い', /濃い赤色の筋肉/u]]) {
+      const first = steps.find(s => allText(s).some(t => t.includes(term)));
+      if (first) assert.match([...first.how, first.tip].join(''), meaning, id + '/' + first.id);
+    }
+  }
 });

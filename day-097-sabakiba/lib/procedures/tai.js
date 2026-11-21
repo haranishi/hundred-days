@@ -24,7 +24,11 @@ export default { steps: [
   openEdge('R', 'ventralCut'), freeFillet(k, 'R', 'dorsalCut', true, {
     tip: '硬い腹骨と背骨の継ぎ目は、場所が見えてから切っ先で一本ずつ切ります。',
   }),
-  openEdge('L', 'ventralCut'), freeFillet(k, 'L', 'dorsalCut', true),
+  openEdge('L', 'ventralCut', {
+    summary: '骨の付いた面を下に返し、もう一枚の身を腹側のひれの際から中骨まで開きます。',
+    how: ['皮を上にして腹を手前に置きます。腹の切り口から尻びれのすぐ上を、切っ先で尾の付け根まで浅く引きます。',
+      '同じ切り口に刃の中ほどを寝かせ、中骨に触れるまで開きます。'],
+  }), freeFillet(k, 'L', 'dorsalCut', true),
   ribs(k, { tip: '腹骨の端を少し浮かせ、骨の丸みに刃を合わせると、厚い腹の身を残せます。' }),
   pinbones(k, {
     title: '硬い小骨を帯で取ります', summary: '大きなタイの身の中央に並ぶ硬い小骨は、列の両脇に刃を入れて細い帯で取り除きます。',
