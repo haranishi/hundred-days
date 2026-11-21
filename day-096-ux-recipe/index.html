@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>UXレシピ — 目的を選ぶと、ページの組み立て方が出る</title>
+  <meta name="description" content="予約・購入・応募など、目的を選ぶとページの部品が順番に並び、並べ替えるたびに理由つきの診断が出ます。登録なし・無料・ブラウザだけで使えます。">
+  <meta name="share:text" content="UXレシピ — 目的を選ぶと、ページの組み立て方が出る。並べ替えるたびに、理由つきの診断が出ます。">
+  <meta name="theme-color" content="#eef0f3">
+  <link rel="icon" href="./favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./shared/share.css">
+  <link rel="stylesheet" href="./app.css">
+  <link rel="stylesheet" href="./panels.css">
+  <script type="module" src="./app.js"></script>
+  <script src="./shared/share.js" defer></script>
+</head>
+<body class="app-body">
+  <svg class="app-symbols" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <symbol id="i-reserve" viewBox="0 0 24 24"><rect x="3.5" y="5.5" width="17" height="15" rx="2"/><path d="M7.5 3v5m9-5v5m-13 2h17m-13 5 2 2 4-4"/></symbol>
+    <symbol id="i-buy" viewBox="0 0 24 24"><path d="M5 8h14l1 13H4L5 8Zm3.5 1V6a3.5 3.5 0 0 1 7 0v3"/></symbol>
+    <symbol id="i-inquire" viewBox="0 0 24 24"><path d="M4 4.5h16v12H9l-5 4v-16Z"/><path d="M8 9h8m-8 4h5"/></symbol>
+    <symbol id="i-signup" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 8h18m-9 2v7m-3.5-3.5h7"/></symbol>
+    <symbol id="i-apply" viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2M3 11.5c6 3 12 3 18 0M12 12v3"/></symbol>
+    <symbol id="i-event" viewBox="0 0 24 24"><path d="m2.5 10 15-6 4 10-15 6-1.2-3a2.3 2.3 0 0 0-1.8-4.4L2.5 10Zm11-1.5.6 1.5m.8 2 .6 1.5"/></symbol>
+    <symbol id="i-visit" viewBox="0 0 24 24"><path d="M19 10c0 5-7 11-7 11S5 15 5 10a7 7 0 0 1 14 0Z"/><circle cx="12" cy="10" r="2.5"/></symbol>
+    <symbol id="i-support" viewBox="0 0 24 24"><path d="M12 20S3.5 14.8 3.5 8.7a4.5 4.5 0 0 1 8.5-2 4.5 4.5 0 0 1 8.5 2C20.5 14.8 12 20 12 20Z"/></symbol>
+    <symbol id="i-right" viewBox="0 0 24 24"><path d="M4 12h15m-5-5 5 5-5 5"/></symbol>
+    <symbol id="i-back" viewBox="0 0 24 24"><path d="M20 12H5m5-5-5 5 5 5"/></symbol>
+    <symbol id="i-open" viewBox="0 0 24 24"><path d="M3 16V5h6l2 3h9v3M3 19l2-8h16l-2 8H3Z"/></symbol>
+    <symbol id="i-send" viewBox="0 0 24 24"><path d="M12 14V3m-4.5 4.5L12 3l4.5 4.5M6 11H4v10h16V11h-2"/></symbol>
+    <symbol id="i-undo" viewBox="0 0 24 24"><path d="m8 4-5 5 5 5M4 9h10a6 6 0 0 1 0 12"/></symbol>
+    <symbol id="i-redo" viewBox="0 0 24 24"><path d="m16 4 5 5-5 5m4-5H10a6 6 0 0 0 0 12"/></symbol>
+    <symbol id="i-grip" viewBox="0 0 24 24"><path d="M8 6h.5m7 0h.5M8 12h.5m7 0h.5M8 18h.5m7 0h.5" stroke-width="3.5"/></symbol>
+    <symbol id="i-up" viewBox="0 0 24 24"><path d="M12 19V5m-6 6 6-6 6 6"/></symbol>
+    <symbol id="i-down" viewBox="0 0 24 24"><path d="M12 5v14m-6-6 6 6 6-6"/></symbol>
+    <symbol id="i-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="13" rx="2"/><path d="M16 8V3H3v13h5"/></symbol>
+    <symbol id="i-remove" viewBox="0 0 24 24"><path d="M4 6h16M7 6l1 15h8l1-15M9 6V3h6v3m-5 4v7m4-7v7"/></symbol>
+    <symbol id="i-add" viewBox="0 0 24 24"><path d="M12 4v16M4 12h16"/></symbol>
+    <symbol id="i-phone" viewBox="0 0 24 24"><rect x="6.5" y="2.5" width="11" height="19" rx="2.5"/><path d="M10 18.5h4"/></symbol>
+    <symbol id="i-pc" viewBox="0 0 24 24"><rect x="2" y="3.5" width="20" height="14" rx="2"/><path d="M12 17.5V21m-5 0h10"/></symbol>
+  </svg>
+  <div id="app" class="app-shell" data-screen="goal">
+    <nav class="ed-skips" aria-label="編集画面の移動">
+      <a href="#slot-outline" data-skip="outline">構成へ</a>
+      <a href="#slot-preview" data-skip="preview">プレビューへ</a>
+      <a href="#slot-panel" data-skip="panel">編集パネルへ</a>
+    </nav>
+    <main id="screen-goal" class="app-goal">
+      <header class="app-mast"><div class="app-mast-inner">
+        <div class="app-brand"><img src="./favicon.svg" width="32" height="32" alt="">UXレシピ</div>
+        <button class="app-btn app-subtle" type="button" data-app-send>このアプリを共有する</button>
+      </div></header>
+      <div class="app-goal-inner">
+        <div class="app-goal-intro">
+          <h1 class="app-question" tabindex="-1">お客さんに、<wbr><span class="app-question-phrase">どうなってほしいですか？</span></h1>
+          <p class="app-intro-text">目的をひとつ選ぶと、ページの部品が順番に並びます。<br>部品を入れ替えながら、お客さんに伝わる流れを探せます。</p>
+        </div>
+        <div class="app-goal-actions">
+          <button type="button" class="app-btn app-primary" data-resume hidden>つづきから</button>
+          <span class="app-draft-name" data-draft-name hidden></span>
+          <button type="button" class="app-btn" data-slots><svg class="ed-icon" aria-hidden="true"><use href="#i-open"/></svg>保存を開く</button>
+        </div>
+        <section aria-label="ページの目的">
+          <div class="app-goals" data-goals></div>
+          <div class="app-legend"><span>帯は部品の並び順です</span><div class="app-legend-items" data-legend></div></div>
+        </section>
+      </div>
+    </main>
+    <div id="screen-edit" class="ed-editor" data-folded="true" hidden>
+      <header id="slot-topbar" class="ed-topbar">
+        <div class="ed-identity">
+          <button type="button" class="app-btn ed-icon-btn" data-goal aria-label="目的を選び直す" title="目的を選び直す"><svg class="ed-icon" aria-hidden="true"><use href="#i-back"/></svg></button>
+          <div class="ed-document"><span class="ed-goal-name" data-goal-name></span><h1 class="ed-site" data-site tabindex="-1"></h1></div>
+        </div>
+        <div class="ed-top-actions">
+          <span class="ed-save-status" data-save-status role="status" aria-live="polite"></span>
+          <div class="ed-history">
+            <button type="button" class="app-btn ed-icon-btn" data-undo aria-label="元に戻す" title="元に戻す"><svg class="ed-icon" aria-hidden="true"><use href="#i-undo"/></svg></button>
+            <button type="button" class="app-btn ed-icon-btn" data-redo aria-label="やり直す" title="やり直す"><svg class="ed-icon" aria-hidden="true"><use href="#i-redo"/></svg></button>
+          </div>
+          <button type="button" class="app-btn" data-slots aria-label="保存・開く" title="保存・開く"><svg class="ed-icon" aria-hidden="true"><use href="#i-open"/></svg><span class="ed-wide-label">保存・開く</span></button>
+          <button type="button" class="app-btn app-primary" data-send aria-label="共有・書き出し"><svg class="ed-icon" aria-hidden="true"><use href="#i-send"/></svg><span>共有<span class="ed-wide-label">・書き出し</span></span></button>
+        </div>
+      </header>
+      <div class="ed-workspace">
+        <section id="slot-outline" class="ed-outline" aria-label="ページの構成">
+          <div class="ed-outline-head"><h2 class="ed-heading">構成</h2><span class="ed-counter" data-count></span></div>
+          <p class="ed-sr" id="ed-grip-help">つまみをドラッグするか、Altキーを押しながら上下の矢印キーで移動します。</p>
+          <div class="ed-outline-scroll" data-scroller>
+            <ol class="ed-rows" role="list"></ol>
+            <p class="ed-empty" data-empty hidden>部品を足して、ページを組み立てましょう。</p>
+            <button type="button" class="app-btn ed-add" data-add><svg class="ed-icon" aria-hidden="true"><use href="#i-add"/></svg>部品を足す</button>
+            <p id="ed-add-limit" class="ed-limit-note" data-add-limit hidden></p>
+          </div>
+          <span class="ed-sr" aria-live="polite" aria-atomic="true" data-announcement></span>
+        </section>
+        <section id="slot-preview" class="ed-preview" aria-label="プレビュー">
+          <div class="ed-preview-head">
+            <div class="ed-preview-tools">
+              <h2 class="ed-heading">プレビュー</h2>
+              <div class="ed-devices" role="group" aria-label="表示の幅">
+                <button type="button" class="ed-device" data-device="phone" aria-label="スマホ表示"><svg class="ed-icon" aria-hidden="true"><use href="#i-phone"/></svg>スマホ</button>
+                <button type="button" class="ed-device" data-device="pc" aria-label="パソコン表示"><svg class="ed-icon" aria-hidden="true"><use href="#i-pc"/></svg>パソコン</button>
+              </div>
+              <button type="button" class="app-btn ed-score" data-score></button>
+            </div>
+            <ol class="ed-meter" aria-label="お客さんの流れ" role="list"></ol>
+            <p class="ed-scale-note" data-scale-note hidden>縮小して表示しています</p>
+          </div>
+          <div class="ed-preview-scroll" role="region" tabindex="0" aria-label="ページのプレビュー">
+            <div class="ed-frame" data-frame><div class="ed-paper-space"><div class="ed-page-surface" data-page></div></div></div>
+          </div>
+        </section>
+        <aside id="slot-panel" class="ed-panel" aria-label="構成と編集">
+          <div class="ed-tabs" role="tablist" aria-label="編集パネル">
+            <button type="button" id="tab-outline" class="ed-tab" role="tab" aria-controls="panel-outline" data-tab="outline">構成</button>
+            <button type="button" id="tab-edit" class="ed-tab" role="tab" aria-controls="panel-edit" data-tab="edit">編集</button>
+            <button type="button" id="tab-diagnosis" class="ed-tab" role="tab" aria-controls="panel-diagnosis" data-tab="diagnosis">診断</button>
+            <button type="button" id="tab-look" class="ed-tab" role="tab" aria-controls="panel-look" data-tab="look">見た目</button>
+          </div>
+          <button type="button" class="ed-fold" data-fold aria-controls="ed-panel-body" aria-expanded="true">パネルをたたむ</button>
+          <div id="ed-panel-body" class="ed-panel-body">
+            <div id="panel-outline" class="ed-panel-page" role="tabpanel" aria-labelledby="tab-outline" hidden></div>
+            <div id="panel-edit" class="ed-panel-page" role="tabpanel" aria-labelledby="tab-edit"></div>
+            <div id="panel-diagnosis" class="ed-panel-page" role="tabpanel" aria-labelledby="tab-diagnosis" hidden></div>
+            <div id="panel-look" class="ed-panel-page" role="tabpanel" aria-labelledby="tab-look" hidden></div>
+          </div>
+        </aside>
+      </div>
+    </div>
+    <div id="screen-view" class="app-view" hidden>
+      <header class="app-view-bar"><div class="app-mast-inner">
+        <div class="app-brand"><img src="./favicon.svg" width="32" height="32" alt="">UXレシピ</div>
+        <span class="app-view-score" data-score></span>
+        <div class="app-view-actions">
+          <button type="button" class="app-btn app-primary" data-adopt>このレシピをもとに作る</button>
+          <button type="button" class="app-btn" data-choose>目的を選んで作る</button>
+          <button type="button" class="app-btn app-subtle" data-app-send>このアプリを共有する</button>
+        </div>
+      </div></header>
+      <div class="app-view-page" data-view-page></div>
+    </div>
+    <dialog id="dlg-share" class="app-dialog" aria-label="共有・書き出し"></dialog>
+    <dialog id="dlg-slots" class="app-dialog" aria-label="保存・開く"></dialog>
+    <dialog id="dlg-palette" class="app-dialog ed-palette" aria-labelledby="ed-palette-title">
+      <div class="ed-dialog-head"><h2 class="ed-dialog-title" id="ed-palette-title">部品を足す</h2><form method="dialog"><button type="submit" class="app-btn">閉じる</button></form></div>
+      <p class="ed-palette-note" data-limit></p><div class="ed-palette-groups" data-groups></div>
+    </dialog>
+    <dialog id="dlg-app-share" class="app-dialog app-link-dialog" aria-label="このアプリを共有する">
+      <form method="dialog" class="ed-dialog-close"><button type="submit" class="app-btn">閉じる</button></form>
+      <div id="share"></div>
+    </dialog>
+    <dialog id="dlg-goal-change" class="app-dialog ed-confirm" aria-labelledby="ed-confirm-title" aria-describedby="ed-confirm-note">
+      <h2 id="ed-confirm-title" class="ed-dialog-title">目的を変えますか？</h2><p id="ed-confirm-note"></p>
+      <div class="ed-confirm-actions"><form method="dialog"><button type="submit" class="app-btn" autofocus>やめる</button></form><button type="button" class="app-btn app-primary" data-confirm>目的を変える</button></div>
+    </dialog>
+    <div id="toasts" class="app-toasts" aria-live="polite" aria-relevant="additions"></div>
+  </div>
+  <noscript>UXレシピを使うには、ブラウザでJavaScriptを有効にしてください。</noscript>
+</body>
+</html>

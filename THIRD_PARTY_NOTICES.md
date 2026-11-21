@@ -141,6 +141,7 @@ Day056の配信ビルドに含む第三者ライブラリ・移植実装・検�
 | 092 | BudouX 0.10.2（日本語の文節分けと日本語モデル。画面表示のビルドに同梱） | [BudouX](https://github.com/google/budoux)（Google LLC） | [Apache License 2.0](day-092-shuwa/THIRD_PARTY_NOTICES.txt) | Parser と日本語モデルを使用 |
 | 092 | 書体 Zen Maru Gothic（Medium・Bold） | [Zen Maru Gothic](https://github.com/googlefonts/zen-marugothic)（Yoshimichi Ohira） | [SIL Open Font License 1.1](day-092-shuwa/THIRD_PARTY_NOTICES.txt) | **加工あり**。アプリで使う文字だけに絞った woff2 を同梱（書体の名前は変えていない） |
 | 095 | `day-095-bonsai/vendor/three.js`（three.js 0.186.0・OrbitControlsを含むESMビルド） | [three.js](https://threejs.org/) | [MIT](day-095-bonsai/vendor/LICENSE-three.txt) | Day087の同梱版（esbuildでまとめただけ）を未改変で複製。木・葉・鉢・卓・壁の形と質感、音は実行時の計算で作り、外部の画像・音・書体・3Dモデルは使っていない |
+| 096 | BudouX 0.10.4（日本語の文節分けの Parser と日本語モデル。`day-096-ux-recipe/vendor/budoux/` に同梱） | [BudouX](https://github.com/google/budoux)（Google LLC） | [Apache License 2.0](day-096-ux-recipe/vendor/budoux/LICENSE) | 改変なし。ページの本文を文節で折り返すため、文節の境目に `<wbr>` を入れる（端末の中だけで動き、通信はしない） |
 
 ## Day64「漏洩の地図」の出典と描画依存
 
