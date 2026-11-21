@@ -1,0 +1,19 @@
+{
+  "day": 97,
+  "season": 3,
+  "title": "さばき場 — 魚のさばき方を、3Dで見ながら",
+  "description": "魚のさばき方を、台所の手元と同じ向きの3Dで見ながら学べる、登録なし・無料のブラウザアプリ。作成中。",
+  "tags": ["魚", "さばき方", "3D", "ブラウザ完結", "スマホ対応"],
+  "status": "draft",
+  "publicUrl": "https://rairakku.com/100days/day-097-sabakiba/",
+  "screenshot": "screenshot.webp",
+  "demo": "demo.mp4",
+  "startedAt": "2026-11-21",
+  "finishedAt": null,
+  "actualMinutes": null,
+  "sourceOfIdea": "本人が「魚のさばき方を3Dで教えてくれるウェブアプリ。いろんな種類の魚のさばき方を3Dで見ながらできる」と100日チャレンジのDay97として依頼した。",
+  "aiHandled": [],
+  "humanHandled": [],
+  "failuresAndFixes": [],
+  "social": { "x": { "codePublished": true } }
+}

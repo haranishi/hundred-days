@@ -27,7 +27,7 @@
 - 結果カード（P1）: 種・手順・得点・名前なしのPNG。書き出せない環境ではボタンを隠す。
 
 ## 試験用フック（`?debug=1` のときだけ）
-`window.__sabaki = { state(), goto(sp, step, u), ready(), model, anatomy, stats() }`。3D が出たら `document.body.dataset.ready='true'`。外部通信は0件（E2Eで見張る）。
+`window.__sabaki = { state(), goto(sp, step, u), ready(), model, anatomy, stats() }`。**`goto` は Promise を返し、カメラを即座に目標へ置き（ばねを飛ばす）、3フレーム描いてから resolve する**（撮影・採点の固定ショットが決定的になる）。`?freeze=1` のときは再生・自動の動きを止める（`u` は `goto` で決める）。3D が出たら `document.body.dataset.ready='true'`。外部通信は0件（E2Eで見張る）。
 
 ## 画面と3Dの境目 `FishScene`（WP-4 は `lib/scene-stub.js` で作り、本物 `lib/scene-fish.js` に差し替える。同じ形）
 ```
@@ -38,3 +38,4 @@ createFishScene({ container, speciesId, quality:'auto'|'high'|'standard'|'light'
   on('pick'|'practice-sample'|'camera-user', cb), resetCamera(), snapshot() -> Promise<Blob>, stats(), dispose() }
 ```
 `setProgress(u)` は手順の中の進み具合（`stateAt(proc, step, u)`）。再生はアプリ側が `u` を進める。
+- 撮影の補助: `stats()` は `{stepCount, triangles, quality, fps}`。`__sabaki` には `setXray(bool)`・`setView(v)`・`setLeft(bool)` もある（`tools/scoring-shots.mjs` が使う）。
