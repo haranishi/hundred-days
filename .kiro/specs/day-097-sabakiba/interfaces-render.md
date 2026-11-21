@@ -22,3 +22,5 @@
 - **画質**：`gfx` の段に応じて `buildFishModel({quality})` と `createMaterials({quality})` を作り直す。破棄は `dispose()` で全部（リーク試験）。
 - **フック**：`?debug=1` で `window.__sabaki` に `{state(), goto(sp, step, u), model, anatomy, stats()}`。`ready` が resolve したら `body[data-ready="true"]`。
 - 試験：Node で作れる範囲（部品の変換の合成・親子の visible・`slitOpen` の角度・包丁の位置が curve 上）。描画は親が撮る。
+- **カメラの枠**: どの視点でも魚の外接球が画面から切れない（接写も同じ。接写は注視点を中心から注目点へ4割寄せ、台所より1割弱だけ近い・手順の寄りは最大1.05倍）。刃の接触点のまわり（盤の面で4.5cm・上下は下0.5・上1.5cm）だけを枠に足す。板は魚の大きさに合わせて広がる（幅 `max(42, 2.0×全長)`・奥行 `max(28, 1.25×全長)`・上限は基準の1.6倍）。
+- **材質**: 部品ごとの変種の材質は、`transparent` が変わったとき `needsUpdate` で作り直す（不透明で作った材質は OPAQUE 定義で不透明度が1に固定され、透視で皮が透けない）。

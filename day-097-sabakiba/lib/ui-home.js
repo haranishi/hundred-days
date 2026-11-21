@@ -165,7 +165,7 @@ function speciesCard(sp, progress) {
     ]),
     h('div', { class: 'meta-item' }, [
       h('dt', {}, ['所要時間']),
-      h('dd', {}, [`初心者 約${sp.minutes.novice}分`,
+      h('dd', {}, [`初心者の目安 約${sp.minutes.novice}分`,
         h('span', { class: 'meta-skilled' }, [` ／ 慣れた人 約${sp.minutes.skilled}分`])]),
     ]),
     h('div', { class: 'meta-item meta-season' }, [

@@ -59,7 +59,7 @@ export function renderIntro(container, { speciesId, state }) {
     ]),
     h('div', { class: 'spec-cell' }, [
       h('dt', {}, ['所要時間']),
-      h('dd', {}, [`初心者 約${sp.minutes.novice}分 ／ 慣れた人 約${sp.minutes.skilled}分`]),
+      h('dd', {}, [`初心者の目安 約${sp.minutes.novice}分 ／ 慣れた人 約${sp.minutes.skilled}分`]),
     ]),
     h('div', { class: 'spec-cell' }, [
       h('dt', {}, ['大きさの目安']),

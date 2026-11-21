@@ -1,5 +1,5 @@
 import * as THREE from '../vendor/three.js';
-import { ANCHOR_OWNER } from './contract.js';
+import { ANCHOR_OWNER, curveOwner } from './contract.js';
 import { appendRubyText, icon, makeRuby } from './ui-icons.js';
 
 const basicLabels = [
@@ -260,8 +260,17 @@ export function createSceneOverlay(container) {
   const root = doc.createElement('div');
   root.className = 'fish-overlay';
   root.setAttribute('aria-hidden', 'true');
-  container.appendChild(root);
   const toolbar = container.querySelector('.stage-pills'), reset = container.querySelector('.stage-reset');
+  // 練習中だけ、線の始点（緑の丸）に「ここから」を添える。緑は「できた」の色でもあるので、始点だと文字で示す。
+  const startTag = doc.createElement('span');
+  startTag.className = 'fish-tag fish-tag--start';
+  startTag.setAttribute('aria-hidden', 'true');
+  startTag.textContent = 'ここから';
+  startTag.hidden = true;
+  container.appendChild(startTag);
+  container.appendChild(root);
+  const startPoint = new THREE.Vector3();
+  let startVisible = false;
   const slots = [];
   const projection = new THREE.Matrix4(), previous = new THREE.Matrix4();
   const screen = new THREE.Vector3();
@@ -289,6 +298,15 @@ export function createSceneOverlay(container) {
     dirty = true;
     // 手・部位の札はここで隠し、切り線と両端の目印は3Dに残します。
     root.hidden = Boolean(practiceCut);
+    startVisible = false;
+    if (practiceCut) {
+      const owner = curveOwner(practiceCut.curve, practiceCut.side);
+      const points = fishDisplay?.guides?.curvePoints?.(practiceCut);
+      if (points?.length && pose.visible(owner)) {
+        startPoint.fromArray(points[0]).applyMatrix4(pose.matrixFor(owner));
+        startVisible = true;
+      }
+    }
     if (root.hidden) return;
     if (boardRoot !== model.group.parent) {
       boardRoot = model.group.parent;
@@ -317,9 +335,26 @@ export function createSceneOverlay(container) {
       pin.remove(); tag.remove();
     }
   }
+  function placeStartTag(w, h) {
+    screen.copy(startPoint).applyMatrix4(projection);
+    const visible = startVisible && Math.abs(screen.x) <= 1 && Math.abs(screen.y) <= 1 && Math.abs(screen.z) <= 1;
+    startTag.hidden = !visible;
+    if (!visible) return;
+    const x = (screen.x + 1) * w / 2, y = (1 - screen.y) * h / 2, width = startTag.offsetWidth || 64;
+    // 丸の真上に置く。左右は画面の中に収める（上端の札の列にはかからない位置まで下げる）。
+    const top = Math.max(y - 44, toolbar ? toolbar.offsetTop + toolbar.offsetHeight + 4 : 5);
+    startTag.style.transform = translate(Math.min(Math.max(x - width / 2, 5), w - width - 5), top);
+  }
   function project(camera) {
-    if (root.hidden) return;
     const w = container.clientWidth, h = container.clientHeight;
+    if (root.hidden) {
+      if (!startVisible && startTag.hidden) return;
+      projection.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse);
+      if (boardRoot) projection.multiply(boardRoot.matrixWorld);
+      placeStartTag(w, h);
+      return;
+    }
+    startTag.hidden = true;
     projection.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse);
     if (boardRoot) projection.multiply(boardRoot.matrixWorld);
     if (!dirty && w === oldWidth && h === oldHeight && previous.equals(projection)) return;
@@ -346,5 +381,5 @@ export function createSceneOverlay(container) {
       if (m.rect) tag.style.transform = translate(m.rect.left, m.rect.top);
     }
   }
-  return { setMarks, project, dispose() { root.remove(); slots.length = 0; boardRoot = defaults = display = currentState = null; } };
+  return { setMarks, project, dispose() { root.remove(); startTag.remove(); slots.length = 0; boardRoot = defaults = display = currentState = null; } };
 }

@@ -1,5 +1,5 @@
 import * as THREE from '../vendor/three.js';
-import { boundingSphere, cameraAxes, clamp, DEFAULT_FOV, distanceForSphere, limitPan,
+import { boundingSphere, boxOf, cameraAxes, clamp, DEFAULT_FOV, distanceForSphere, limitPan,
   MAX_PITCH, MIN_PITCH, orbitToPosition, presetOrbit, shortestAngle, springStep, validFov, wrapAngle } from './camera-math.js';
 
 const copy = (pose) => ({ ...pose, target: [...pose.target] });
@@ -8,7 +8,7 @@ const stopped = () => ({ yaw: 0, pitch: 0, distance: 0, fov: 0, target: [0, 0, 0
 export function createCameraRig({ fov = DEFAULT_FOV, aspect = 1, bounds, reducedMotion = false } = {}) {
   const lens = validFov(fov);
   const camera = new THREE.PerspectiveCamera(lens, Number.isFinite(aspect) && aspect > 0 ? aspect : 1, 0.05, 500);
-  let sphere = boundingSphere(bounds);
+  let sphere = boundingSphere(bounds), box = boxOf(bounds);
   let preset = 'cook', options = {};
   let goal = home(), pose = copy(goal), velocity = stopped();
   let panOrigin = [...pose.target];
@@ -16,7 +16,7 @@ export function createCameraRig({ fov = DEFAULT_FOV, aspect = 1, bounds, reduced
   let coastYaw = 0, coastPitch = 0;
 
   function home() {
-    return presetOrbit(preset, sphere, { ...options, aspect: camera.aspect, fov: lens });
+    return presetOrbit(preset, sphere, { ...options, box, aspect: camera.aspect, fov: lens });
   }
 
   function place() {
@@ -149,6 +149,7 @@ export function createCameraRig({ fov = DEFAULT_FOV, aspect = 1, bounds, reduced
     },
     setBounds(bounds, { immediate = true } = {}) {
       sphere = boundingSphere(bounds);
+      box = boxOf(bounds);
       if (!manual) reset({ immediate });
     },
     setAspect(ratio) {

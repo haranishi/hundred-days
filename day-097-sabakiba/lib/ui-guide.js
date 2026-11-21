@@ -68,7 +68,7 @@ export function mountGuideView(container, { speciesId, procedure, actions }) {
     'aria-label': 'この手順の視点に戻す',
     dataset: { testid: 'btn-reset-camera' },
     onClick: () => actions.onResetCamera(),
-  }, [icon('reset')]);
+  }, [icon('reset'), h('span', { class: 'pill-label' }, ['視点を戻す'])]);
 
   stageBox.append(pillsBar, btnResetCam);
 
@@ -111,7 +111,7 @@ export function mountGuideView(container, { speciesId, procedure, actions }) {
     'aria-label': '繰り返し再生を切り替える',
     dataset: { testid: 'btn-loop' },
     onClick: () => actions.onToggleLoop(),
-  }, [icon('repeat')]);
+  }, [icon('repeat'), h('span', { class: 'ctrl-label' }, ['くり返し'])]);
 
   playbackBar.append(btnPlay, btnSpeed, slider, btnLoop);
   stagePane.append(stageBox, playbackBar);

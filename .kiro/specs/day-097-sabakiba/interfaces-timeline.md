@@ -36,6 +36,9 @@ poseTransform(pose) -> {q:[x,y,z,w], p:[x,y,z]} // 魚(FLF)→盤。頭の向き
 incisions:[{curve,side,progress,through}], knife:null|{tool,curve,side,t,motion,lead,angleDeg,pos,quat}, highlights, hands, labels, effects:[{kind,t,curve,side}], camera }`。
 - 魚に付く点（`knife.pos`・手・ラベル・focus）は **FLF**。部品の動きは盤の座標系。ビュー側は `toWorld` で合成する（部品に付けたものは、その部品の動きを含める）。
 - ポーズ変更は手順の最初の12%で補間（`POSE_WINDOW_END`。長いと途中の斜めの絵が「置き方」の文と食い違って見える）。切り替え前後の姿勢は直前の手順の終わりが起点。
+- **姿勢の固定（`poseLock`）**: 根の部品（頭・内臓・`R/L.dorsal`＝`POSE_LOCK_ROOTS`）は、盤の座標で `LOCK_MIN_MOVE_CM`（2cm）以上動かした手順の姿勢に固定され、以後は魚の置き直しでいっしょに回らない（外した頭の鼻先が手順ごとに入れ替わらない）。`state.pieces[id].poseLock` は `{head, dorsal, q, p}` か `null`。**固定後の `rot` は、固定した姿勢が基準**（三枚おろしでは右の身は皮が上・頭が左で固定される）。
+- **片身の表裏の契約**: 置き方に「皮を下／皮が下／皮を上」と書いた手順では、見えている片身の皮がその向きになる（`tests/timeline/fillet-orientation.test.mjs`。全種・進度55%と終端）。固定後の向きに合わせて `moves` の `rot` を書く。
+- **手の印**（`activeHands`）: 同じ手・同じ文の印が複数あるとき（身が2枚）は、いま包丁が働いている側の1つだけ（包丁が無い間は先頭）。
 
 ## 包丁 `lib/knife.js`（three）
 `buildKnife(tool)` → `Group`（局所座標＝原点は刃先の接触点・+x＝刃元→切っ先・+y＝峰・刃は±zの面）。実寸（出刃の刃渡り16cm・柳刃24cm・ペティ13cm）。

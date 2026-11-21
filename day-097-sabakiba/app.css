@@ -41,6 +41,7 @@ a { color: inherit; }
 :focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
 ruby { ruby-align: center; white-space: nowrap; }
 rt { font-size: 0.62em; color: var(--muted); font-weight: 500; }
+.chip rt, .chip-btn rt, .badge rt, .pill rt { font-size: max(0.62em, 10px); }
 
 .skip { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 .skip:focus {
@@ -116,6 +117,8 @@ body[data-route="guide"] .main { display: flex; flex-direction: column; overflow
 @media (hover: hover) { .icon-btn:hover { background: var(--recessed); } }
 
 .text-link { color: var(--hand-ink); font-weight: 600; text-underline-offset: 3px; }
+/* 単独の行のリンクは、指で押せる高さ（44px）を確保する。文中のリンク（出典など）は対象外。 */
+p > .text-link:only-child, .species-note > .text-link:only-child { display: inline-flex; align-items: center; min-height: 44px; }
 .muted { color: var(--muted); }
 .small-note { font-size: 13px; line-height: 1.55; margin: 6px 0 0; }
 
@@ -285,7 +288,7 @@ body[data-route="guide"] .main { display: flex; flex-direction: column; overflow
 .pill[aria-pressed="true"] { border-color: var(--ink); background: var(--ink); color: var(--surface); }
 .pill--practice { border-color: rgba(184, 45, 29, 0.55); color: var(--cut-ink); }
 .pill--practice[aria-pressed="true"] { border-color: var(--cut-ink); background: var(--cut-ink); color: #ffffff; }
-.stage-reset { position: absolute; right: 10px; bottom: 10px; z-index: 5; padding: 0; width: 44px; height: 44px; }
+.stage-reset { position: absolute; right: 10px; bottom: 10px; z-index: 5; padding: 5px 12px; min-width: 44px; height: 44px; }
 
 /* 再生バー */
 .playback-bar {

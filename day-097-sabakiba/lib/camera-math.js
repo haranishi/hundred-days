@@ -7,6 +7,8 @@ export const MIN_PITCH = 4 * RAD;
 export const MAX_PITCH = 88 * RAD;
 // 接写でも魚の外接球が画面から切れない近さまでにする（切る線や刃先が画面の端で見切れるのを避ける）。
 const CLOSE_SCALE = 0.92;
+// 箱で決める接写は、収まる距離より少し引く（実寸の包丁が近づいて画面をふさがないように。寄る代わりに注視点を注目点へ寄せる）。
+const CLOSE_BOX_SCALE = 1.18;
 const pitches = { cook: 42, side: 10, top: 88, front: 10, closeup: 42 };
 
 export const clamp = (n, min, max) => Math.min(max, Math.max(min, n));
@@ -48,6 +50,31 @@ export function boundingSphere(bounds) {
     return { center: lo.map((n, i) => n + half[i]), radius: Math.max(0.1, Math.hypot(...half)) };
   }
   return { center: [0, 2, 0], radius: 14 };
+}
+
+/** Box3 または {min, max} から箱を取り出す。外接球だけのときは null。 */
+export function boxOf(bounds) {
+  const lo = triple(bounds?.min), hi = triple(bounds?.max);
+  return lo && hi && hi.every((n, i) => n >= lo[i]) ? { min: lo, max: hi } : null;
+}
+
+/**
+ * 箱の8つの角がすべて画面に収まる最小の距離（視線の向き・画角・縦横比から）。
+ * 外接球で決めると、横に長い内容を横長の画面に映すとき、縦の幅に合わせて小さく写ってしまう。
+ */
+export function distanceForBox(box, { yaw, pitch, target, fov = DEFAULT_FOV, aspect = 1, pad = 1.06 }) {
+  const { right, up } = cameraAxes(yaw, pitch);
+  // 目標からカメラへ向かう単位ベクトル。奥行き＝距離 − (相対位置・dir)。
+  const dir = orbitToPosition({ yaw, pitch, distance: 1, target: [0, 0, 0] });
+  const tanV = Math.tan(validFov(fov) * RAD / 2), tanH = tanV * validAspect(aspect);
+  let need = 0;
+  for (const x of [box.min[0], box.max[0]]) for (const y of [box.min[1], box.max[1]]) for (const z of [box.min[2], box.max[2]]) {
+    const rel = [x - target[0], y - target[1], z - target[2]];
+    const dot = (a) => a[0] * rel[0] + a[1] * rel[1] + a[2] * rel[2];
+    const toward = dot(dir);
+    need = Math.max(need, Math.abs(dot(right)) * pad / tanH + toward, Math.abs(dot(up)) * pad / tanV + toward);
+  }
+  return Math.max(0.1, need);
 }
 
 export function focusPoint(bounds, focus) {
@@ -112,9 +139,14 @@ export function presetOrbit(name, bounds, options = {}) {
   // 頭は休めの姿勢で -x。置き方が変わる手順では盤上の頭の向きを渡せる。
   const head = triple(options.headDirection) ?? [-1, 0, 0];
   const heading = preset === 'front' ? Math.atan2(head[0], head[2]) : 0;
-  return {
-    yaw: Number.isFinite(options.yaw) ? wrapAngle(options.yaw) : heading,
-    pitch: clamp(Number.isFinite(options.pitch) ? options.pitch : pitches[preset] * RAD, MIN_PITCH, MAX_PITCH),
-    distance: distance / zoom, target, fov,
-  };
+  const yaw = Number.isFinite(options.yaw) ? wrapAngle(options.yaw) : heading;
+  const pitch = clamp(Number.isFinite(options.pitch) ? options.pitch : pitches[preset] * RAD, MIN_PITCH, MAX_PITCH);
+  // 箱が分かるときは、箱の角が画面に収まる距離で決める（球より、横長の画面で魚が大きく写る）。
+  const box = options.box ? boxOf(options.box) : null;
+  if (box) {
+    const fit = distanceForBox(box, { yaw, pitch, target, fov, aspect });
+    // 接写は少しだけ寄る。台所と真横・真上・正面は、箱の角がちょうど収まる距離。
+    distance = fit * (preset === 'closeup' ? CLOSE_BOX_SCALE : 1);
+  }
+  return { yaw, pitch, distance: distance / zoom, target, fov };
 }
