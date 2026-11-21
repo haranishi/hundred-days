@@ -85,7 +85,10 @@ test('料理する人から見た方位、頭側、注視点、接写距離、�
   const focus = [-7, 3, -2];
   const close = presetOrbit('closeup', sphere, { focus });
   near(close.distance, cook.distance * 0.72); near(close.fov, 35);
-  near(presetOrbit('closeup', sphere, { focus, zoom: 2 }).distance, close.distance / 2);
+  // 寄り（zoom>1）は控えめに効く（平方根・上限1.15）。引き（zoom<1）はそのまま。
+  near(presetOrbit('closeup', sphere, { focus, zoom: 2 }).distance, close.distance / 1.15);
+  near(presetOrbit('closeup', sphere, { focus, zoom: 1.21 }).distance, close.distance / 1.1);
+  near(presetOrbit('closeup', sphere, { focus, zoom: 0.5 }).distance, close.distance * 2);
   const rig = createCameraRig(options);
   rig.applyPreset('closeup', { focus, zoom: 1.5 }, { immediate: true });
   const center = new THREE.Vector3(...focus).project(rig.camera);
@@ -103,7 +106,8 @@ test('手動操作中は次の手順を覚え、リセットでその手順に�
   rig.reset();
   assert.equal(rig.userTouched, false);
   near(rig.serialize().pitch, MAX_PITCH);
-  assert.deepEqual(rig.serialize().target, [-4, 2, 1]);
+  // 全体を見せる視点の注視点は、魚の中心から注目点へ3割だけ寄せた点
+  rig.serialize().target.forEach((v, i) => near(v, sphere.center[i] + 0.3 * ([-4, 2, 1][i] - sphere.center[i])));
   rig.orbit(0.1, 0);
   assert.equal(rig.applyPreset('side', {}, { force: true }), true);
   near(rig.serialize().pitch, 10 * RAD);

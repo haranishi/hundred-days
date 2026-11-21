@@ -257,10 +257,10 @@ body[data-route="guide"] .main { display: flex; flex-direction: column; overflow
 
 /* ガイド画面（スマホ縦 390×844・横 844×390・PC 1280×800） */
 .guide-layout {
-  display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(220px, 47dvh) minmax(0, 1fr);
+  display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(240px, 55dvh) minmax(0, 1fr);
   flex: 1 1 auto; min-height: 0; overflow: hidden;
 }
-.guide-layout[data-mode="practice"] { grid-template-rows: minmax(210px, 42dvh) minmax(0, 1fr); }
+.guide-layout[data-mode="practice"] { grid-template-rows: minmax(240px, 52dvh) minmax(0, 1fr); }
 
 .stage-pane { display: grid; grid-template-rows: minmax(0, 1fr) auto; min-height: 0; border-bottom: 1px solid var(--line); background: #ece6da; }
 .stage { position: relative; min-height: 0; overflow: hidden; user-select: none; -webkit-user-select: none; }

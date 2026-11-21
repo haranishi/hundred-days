@@ -156,7 +156,9 @@ export function buildKnife(tool) {
   };
   if (BLADES[tool]) {
     const spec = BLADES[tool];
-    group.add(mesh('blade', bladeGeometry(spec), [materials.steel, materials.bevel]));
+    // 刃は半透明にして、刃の下の切り線と身の様子が見えるようにする（柄・口金・鋲は不透明のまま）。
+    const ghost = (m) => { const c = m.clone(); c.transparent = true; c.opacity = 0.74; c.depthWrite = false; return c; };
+    group.add(mesh('blade', bladeGeometry(spec), [ghost(materials.steel), ghost(materials.bevel)]));
     grip(group, -spec.length / 2, spec.height * 0.66, spec.handle, tool === 'petty' ? 1.0 : 1.23, materials);
   } else if (tool === 'shears') shears(group, materials);
   else if (tool === 'tweezers') tweezers(group, materials);

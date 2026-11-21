@@ -87,10 +87,15 @@ export function presetOrbit(name, bounds, options = {}) {
   const preset = CAMERA_PRESETS.includes(name) ? name : 'cook';
   const { center, radius } = boundingSphere(bounds);
   const focus = triple(options.focus);
-  const target = focusPoint({ center, radius }, focus);
+  const focused = focusPoint({ center, radius }, focus);
+  // 全体を見せる視点は、魚の中心を主にして、注目点へ少しだけ寄せる（頭や尾が画面から切れない）。接写は注目点そのもの。
+  const target = preset === 'closeup' ? focused : focused.map((n, i) => center[i] + 0.3 * (n - center[i]));
   const aspect = validAspect(options.aspect);
   let fov = validFov(options.fov);
-  const zoom = Number.isFinite(options.zoom) && options.zoom > 0 ? clamp(options.zoom, 0.25, 8) : 1;
+  // 手順が指定する寄りは控えめに効かせる（実寸の包丁が画面を覆わないように）。寄りは平方根・上限1.15、引きはそのまま。
+  const rawZoom = Number.isFinite(options.zoom) && options.zoom > 0 ? clamp(options.zoom, 0.25, 8) : 1;
+  // 全体を見せる視点（台所・真横・真上・正面）は寄らない（魚が画面から切れない）。寄りが効くのは接写だけ。
+  const zoom = rawZoom <= 1 ? rawZoom : preset === 'closeup' ? Math.min(1.15, Math.sqrt(rawZoom)) : 1;
   const offset = Math.hypot(...target.map((n, i) => n - center[i]));
   const frameRadius = radius + (preset === 'closeup' ? 0 : offset);
   let distance = Math.max(1.10 * distanceForSphere(frameRadius, fov, aspect), frameRadius * 1.08 / CLOSE_SCALE);
