@@ -1,8 +1,15 @@
 // アジを基準にした盤上の変位。刃の角度は実測値ではなく、立てる・寝かせる動きを示す作画値。
 import { SPECIES_META } from '../species/meta.js';
 import safety from '../content/safety.js';
+import { boardSizeFor } from '../timeline.js';
 
-const k = SPECIES_META.aji.sizeCm.typical / 21;
+// 魚と板の縁に1cmを残します。長辺には片身を移す8cm、短辺には中骨を移す約6.25cmを見込みます。
+export function moveScale(id, axis = 'width') {
+  const length = SPECIES_META[id].sizeCm.typical;
+  const room = (boardSizeFor(length)[axis] - length) / 2 - 1;
+  return Math.min(length / 21, Math.max(0, room) / (axis === 'depth' ? 6.25 : 8));
+}
+const k = moveScale('aji');
 export const [keepCold, washHands, , clearBlade, scuteWarning, , rinseBlood, dryFish, sashimiKnife] = safety.stepNotes;
 
 export const LB = { head: 'L', dorsal: 'B' }, LF = { head: 'L', dorsal: 'F' };
@@ -44,7 +51,7 @@ export function prep(tools, equipment, changes = {}) {
     tip: 'わたを受ける器と、身を置く冷たい皿を先に分けておきます。',
     mistake: '手や柄がぬれたままだと、包丁を握った手が滑ります。',
     done: '板に手を添えてもずれず、柄を乾いた手で握れます。',
-    place: headLeft, pose: LB, tools, hands: [hand('bodyCenter', '{L}手で胴が滑らないか確かめます。')],
+    place: headLeft, pose: LB, tools, hands: [],
     camera: shot('cook', 'bodyCenter'), durationMs: 3500, ...changes,
   });
 }
@@ -139,7 +146,7 @@ export function wash(k, membrane = false, changes = {}) {
     cuts: membrane ? [cut('membrane', 'kidneyLine', null, 'deba', 'push', 'tip', 8, [0.16, 0.36])] : [],
     effects: [{ kind: 'water', ...line('kidneyLine'), window: [0.46, 0.84] }],
     moves: [move(k, 'kidney', [0, 0.3, 1.2], [0.51, 0.84], { opacity: 0, visible: false })],
-    uniforms: { slitOpen: { to: 0, window: [0.85, 0.99] } }, highlight: [line('kidneyLine')], safety: rinseBlood,
+    uniforms: { slitOpen: { to: 0, window: [0.85, 1] } }, highlight: [line('kidneyLine')], safety: rinseBlood,
     ...changes,
   });
 }

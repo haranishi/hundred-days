@@ -61,7 +61,8 @@ for (const id of SPECIES_IDS) {
       const where = id + '/' + s.id;
       assert.match(s.summary, /^[^。]+。$/u, where);
       assert.ok(posesPerpendicular(s.pose), where);
-      assert.ok(s.hands.some(h => h.who === 'off'), where);
+      if (i === 0) assert.deepEqual(s.hands, [], where);
+      else assert.ok(s.hands.some(h => h.who === 'off'), where);
       assert.ok(s.camera.preset && s.camera.focus, where);
       for (const m of [...s.hands, ...(s.labels ?? [])]) {
         if (m.piece) assert.ok(PIECE_IDS.includes(m.piece), where);

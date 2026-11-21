@@ -1,10 +1,9 @@
 // 天ぷら用の背開き。首からわたを出すので、腹の皮に切り線を付けない。
-import { SPECIES_META } from '../species/meta.js';
 import {
-  RF, cut, dryFish, hand, hide, line, mark, move, neckRightBack, pinbones, practice, prep, scaleSide, shot, step, turn, wash,
+  RF, cut, dryFish, hand, hide, line, mark, move, neckRightBack, pinbones, practice, moveScale, prep, scaleSide, shot, step, turn, wash,
 } from './aji.js';
 
-const k = SPECIES_META.kisu.sizeCm.typical / 21;
+const k = moveScale('kisu', 'depth');
 const fleshUp = { head: 'R', dorsal: 'U' }, skinUp = { head: 'R', dorsal: 'D' };
 
 function fineScales(side) {

@@ -1,11 +1,10 @@
 // 大きなタイの硬い小骨は、骨の列を細い帯として取る。
-import { SPECIES_META } from '../species/meta.js';
 import {
-  clearBlade, cut, freeFillet, gut, hand, headSide, move, openEdge, peel, pinbones, practice, prep,
+  clearBlade, cut, freeFillet, gut, hand, headSide, move, openEdge, peel, pinbones, practice, moveScale, prep,
   ribs, sashimiKnife, scaleSide, wash,
 } from './aji.js';
 
-const k = SPECIES_META.tai.sizeCm.typical / 21;
+const k = moveScale('tai');
 const holdBody = [hand('bodyCenter', '{L}手で胴を支え、指先を刃筋から外します。')];
 
 export default { steps: [

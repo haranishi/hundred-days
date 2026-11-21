@@ -1,7 +1,9 @@
 import * as THREE from '../vendor/three.js';
 import { GFX_TIERS } from './gfx.js';
+import { boardSizeFor } from './timeline.js';
 
-const WIDTH = 42, DEPTH = 28, HEIGHT = 2, EDGE_RADIUS = 0.58;
+const { width: WIDTH, depth: DEPTH } = boardSizeFor(0);
+const HEIGHT = 2, EDGE_RADIUS = 0.58;
 const BOARD_TOP = 0;
 const browserCanvas = () => globalThis.document?.createElement('canvas');
 
@@ -200,6 +202,15 @@ export function createStage({ quality = 'standard', renderer, createCanvas = bro
     }
   }
 
+  function setBoardSize(width, depth) {
+    const sx = width / WIDTH, sz = depth / DEPTH;
+    board.scale.set(sx, 1, sz);
+    boardShadow.scale.set(50 * sx, 34 * sz, 1);
+    const scale = Math.max(sx, sz);
+    Object.assign(shadow.camera, { left: -29 * scale, right: 29 * scale, top: 27 * scale, bottom: -27 * scale });
+    shadow.camera.updateProjectionMatrix();
+  }
+
   function setContactBounds(bounds) {
     fishShadow.visible = Boolean(bounds);
     if (!bounds) return;
@@ -209,10 +220,11 @@ export function createStage({ quality = 'standard', renderer, createCanvas = bro
     const w = Math.max(0.1, dx * 1.04), d = Math.max(0.1, dz * 1.12);
     const left = x + (dx - w) / 2, back = z + (dz - d) / 2;
     // 盤からはみ出す魚でも、上面の縁の丸みにかかる手前で影を切る。
-    const clippedLeft = Math.max(left, -WIDTH / 2 + EDGE_RADIUS);
-    const clippedRight = Math.min(left + w, WIDTH / 2 - EDGE_RADIUS);
-    const clippedBack = Math.max(back, -DEPTH / 2 + EDGE_RADIUS);
-    const clippedFront = Math.min(back + d, DEPTH / 2 - EDGE_RADIUS);
+    const edgeX = (WIDTH / 2 - EDGE_RADIUS) * board.scale.x, edgeZ = (DEPTH / 2 - EDGE_RADIUS) * board.scale.z;
+    const clippedLeft = Math.max(left, -edgeX);
+    const clippedRight = Math.min(left + w, edgeX);
+    const clippedBack = Math.max(back, -edgeZ);
+    const clippedFront = Math.min(back + d, edgeZ);
     const width = clippedRight - clippedLeft, depth = clippedFront - clippedBack;
     fishShadow.visible = width > 0 && depth > 0;
     if (!fishShadow.visible) return;
@@ -224,7 +236,7 @@ export function createStage({ quality = 'standard', renderer, createCanvas = bro
 
   setQuality(quality);
   return {
-    group, lights, background, boardTop: BOARD_TOP, update, setQuality, setContactBounds,
+    group, lights, background, boardTop: BOARD_TOP, update, setQuality, setBoardSize, setContactBounds,
     get envTexture() { return envTarget?.texture ?? null; },
     get ready() { return woodSize === wantedSize && !needsEnv; },
     restoreEnvironment() {

@@ -1,11 +1,10 @@
 // 節取り。胸びれの周囲だけをそぎ、皮付きの四節を確認してから刺身用の皮引きへ進む。
-import { SPECIES_META } from '../species/meta.js';
 import {
   LB, LF, RF, clearBlade, cut, freeFillet, gut, hand, headLeft, headLeftBack, headSide, hide, line,
-  mark, move, neckLeftBack, neckRightBack, openEdge, peel, practice, prep, ribs, shot, step,
+  mark, move, neckLeftBack, neckRightBack, openEdge, peel, practice, moveScale, prep, ribs, shot, step,
 } from './aji.js';
 
-const k = SPECIES_META.katsuo.sizeCm.typical / 21;
+const k = moveScale('katsuo');
 const holdBody = [hand('bodyCenter', '{L}手で丸い胴を支えます。')];
 
 function shoulderScales(side) {
@@ -22,9 +21,8 @@ function shoulderScales(side) {
     hands: [hand('opercleTop', '{L}手で頭の後ろを支えます。')],
     labels: [mark('pectoralBase', '胸甲部(きょうこうぶ)'), mark('dorsalFinStart', '背鰭(せびれ)')],
     camera: shot('closeup', 'pectoralBase', 1.28), durationMs: 5800,
-    // 全身を走るうろこ取りの線を避け、胸びれの後ろから背へ向く局所の線を使う。
-    cuts: [cut('shield', 'headCut', side, 'deba', 'scrape', 'mid', 7, window, false, true)],
-    effects: [{ kind: 'scales', ...line('headCut', side), window }],
+    cuts: [cut('shield', 'scaleSweep', side, 'deba', 'scrape', 'mid', 7, window, false, true)],
+    effects: [{ kind: 'scales', ...line('scaleSweep', side), window }],
     uniforms: { scale: { to: first ? 0.5 : 0, window } },
   });
 }
@@ -46,11 +44,11 @@ function loosenFin(side) {
     place: last ? neckRightBack : neckLeftBack, pose: last ? RF : LF, hands: holdBody,
     labels: [mark('dorsalFinStart', '背びれの根元')], camera: shot('closeup', 'dorsalFinStart', 1.18), durationMs: last ? 6600 : 5000,
     cuts: [cut('fin-edge', 'dorsalCut', side, 'deba', 'pull', 'tip', 10, [0.30, last ? 0.62 : 0.80])],
-    uniforms: { slitOpen: { to: 0, window: [0, 0.23] } },
+    uniforms: { slitOpen: { to: 0, window: [0.85, 1] } },
   });
 }
 
-export default { steps: [
+export default { curveLimits: { scaleSweep: ['pectoralBase', 'dorsalFinStart'] }, steps: [
   prep(['deba', 'yanagi'], '魚が収まるまな板、出刃包丁、柳刃包丁、ペーパー、冷やしたバットを用意します。', {
     tip: 'カツオは丸くて転がりやすいので、胴を支えてから刃を当てます。待たせる身は冷蔵します。',
     safety: 'できたヒスタミンは加熱しても残ります。保冷が途切れて傷みが疑われる魚は食べません。',

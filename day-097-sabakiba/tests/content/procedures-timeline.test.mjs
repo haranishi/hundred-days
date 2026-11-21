@@ -43,7 +43,7 @@ function checkPlayback(id, anatomy) {
   // 順序を既知のカーブ自体と突き合わせる。表面のうろこ・皮の線はもともと尾から始まる。
   raw.steps.forEach((s, i) => {
     for (const c of s.cuts ?? []) {
-      const { points } = anatomy.curve(c.curve, c.side);
+      const { points } = proc.anatomy.curve(c.curve, c.side);
       for (const end of [0, 1]) {
         const blade = stateAt(proc, i, c.window[end]).knife;
         assert.deepEqual([blade.curve, blade.side, blade.tool], [c.curve, c.side, c.tool], s.id);
@@ -101,6 +101,20 @@ for (const id of SPECIES_IDS) {
   test(id + 'の全手順で11時点の往復・飛び越し・切りの両端が一致します', () => checkPlayback(id, fakeAnatomy));
   test(id + 'では表示中の部品を動かし、料理に応じた身・皮・骨が最後に残ります', () => checkPieces(id));
 }
+test('腹を閉じる手順は85%まで開き具合を保ち、最後の15%で閉じます', () => {
+  for (const id of SPECIES_IDS) {
+    const raw = getProcedure(id), proc = createProcedure(raw, fakeAnatomy);
+    for (const [i, s] of raw.steps.entries()) {
+      if (s.uniforms?.slitOpen?.to !== 0) continue;
+      const opening = u => stateAt(proc, i, u).uniforms.slitOpen;
+      assert.deepEqual(s.uniforms.slitOpen.window, [0.85, 1]);
+      assert.equal(opening(0.55), opening(0));
+      assert.equal(opening(0.85), opening(0));
+      assert.ok(Math.abs(opening(0.925) - opening(0) / 2) < 1e-8);
+      assert.equal(opening(1), 0);
+    }
+  }
+});
 test('アジの実際の解剖でも全手順を往復し、刃の出入りを確認できます', () => {
   checkPlayback('aji', createAnatomy(getSpecies('aji')));
 });

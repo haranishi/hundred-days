@@ -4,7 +4,7 @@ import { buildFishModel, visitPieceMeshes } from './pieces.js';
 import { createMaterials } from './materials.js';
 import { getSpecies } from './species/index.js';
 import { getProcedure } from './procedures/index.js';
-import { createProcedure, stateAt } from './timeline.js';
+import { boardSizeFor, createProcedure, stateAt } from './timeline.js';
 import { CURVE_INFO, PIECE_PARENT, curveOwner } from './contract.js';
 import { clamp01 } from './easing.js';
 import { buildKnife } from './knife.js';
@@ -116,6 +116,7 @@ function bindPieces(model, geometries, variants) {
     piece.object.matrixAutoUpdate = false;
   }
   const slit = new THREE.Matrix4();
+  const inverseGround = new THREE.Matrix4();
   const extent = new THREE.Box3();
   model.group.matrixAutoUpdate = false;
   return {
@@ -124,18 +125,25 @@ function bindPieces(model, geometries, variants) {
     visible: id => id == null || byId.get(id)?.visible === true,
     apply(state, boardTop, xray) {
       groundPoseMatrix(state.pose, anatomy.bounds, boardTop, model.group.matrix);
+      inverseGround.copy(model.group.matrix).invert();
       model.group.matrixWorldNeedsUpdate = true;
       extent.makeEmpty();
       for (const entry of entries) {
         const { piece, parent, hinges } = entry, { id, object } = piece, own = state.pieces[id];
-        composePieceMatrix(model.group.matrix, own, piece.pivot, null, object.matrix, hinges);
+        entry.ground = parent?.ground ?? model.group.matrix;
+        if (own.poseLock) {
+          entry.lockGround ??= new THREE.Matrix4();
+          entry.ground = groundPoseMatrix(own.poseLock, anatomy.bounds, boardTop, entry.lockGround);
+        }
+        composePieceMatrix(entry.ground, own, piece.pivot, null, object.matrix, hinges);
         if (state.uniforms.slitOpen && (id === 'L.dorsal' || id === 'R.dorsal')) {
           object.matrix.multiply(slitMatrix(id, state.uniforms.slitOpen, hinges.dorsalHinge, slit));
         }
+        // 盤上の行列を先に確定し、固定した根だけを現在の魚のローカル座標へ戻します。
+        entry.board.multiplyMatrices(parent?.board ?? entry.ground, object.matrix);
+        if (own.poseLock) object.matrix.multiplyMatrices(inverseGround, entry.board);
         object.matrixWorldNeedsUpdate = true;
         object.visible = own.visible;
-        // three が描画時に親子を合成します。こちらの合成結果は盤上の道具と注記にだけ使います。
-        entry.board.multiplyMatrices(parent?.board ?? model.group.matrix, object.matrix);
         entry.visible = own.visible && (parent?.visible ?? true);
         if (entry.visible && own.opacity > 0) extent.union(meshBox.copy(entry.box).applyMatrix4(entry.board));
         // 透視中の皮が不透明な影を落として骨を暗くするのを避けます。
@@ -144,7 +152,13 @@ function bindPieces(model, geometries, variants) {
           const alpha = base.opacity * own.opacity * (materials.setXray ? 1 : 1 - xray * (1 - ghost));
           mat.visible = base.visible && alpha > 0;
           mat.opacity = alpha;
-          mat.transparent = base.transparent || alpha < 1;
+          // 透明かどうかを切り替えたら、材質を作り直させます。最初に不透明で作った材質は OPAQUE 定義で
+          // 出力の不透明度が1に固定され、あとから transparent を立てても皮が透けません（透視・部品の消え際）。
+          const transparent = base.transparent || alpha < 1;
+          if (mat.transparent !== transparent) {
+            mat.transparent = transparent;
+            mat.needsUpdate = true;
+          }
           mat.depthWrite = base.depthWrite && alpha >= 1;
         }
       }
@@ -162,14 +176,15 @@ function createTools(geometries, materials) {
   holder.add(glow);
   let current;
   function load(tool) {
-    const object = buildKnife(tool), tip = new THREE.Vector3();
-    const blade = object.getObjectByName('blade');
-    if (blade) {
-      const attr = blade.geometry.attributes.position;
-      for (let i = 0; i < attr.count; i++) if (attr.getX(i) > tip.x) tip.fromBufferAttribute(attr, i);
-    }
+    const object = buildKnife(tool), bladeBox = new THREE.Box3();
+    // 材質でまとめる前に、刃と作業端の局所の箱を取ります。柄や口金は含めません。
+    object.updateMatrixWorld(true);
     object.traverse(mesh => {
       if (!mesh.isMesh) return;
+      if (['blade', 'head', 'tooth', 'jaw'].includes(mesh.name)) {
+        mesh.geometry.computeBoundingBox();
+        bladeBox.union(mesh.geometry.boundingBox.clone().applyMatrix4(mesh.matrixWorld));
+      }
       geometries.add(mesh.geometry);
       for (const mat of [mesh.material].flat()) materials.add(mat);
     });
@@ -177,10 +192,11 @@ function createTools(geometries, materials) {
     // 道具の主要な金属面で影を作ります。
     const metal = object.children.find(o => o.name === 'blade' || o.name === 'head' || o.name === 'jaw');
     for (const part of object.children) part.castShadow = part === metal;
-    return { object, tip };
+    return { object, bladeBox };
   }
   return {
     holder,
+    get bladeBox() { return holder.visible && current && !current.bladeBox.isEmpty() ? current.bladeBox : null; },
     update(knife, pose, practiceCut) {
       holder.visible = Boolean(knife && !practiceCut && pose.visible(knife.owner));
       if (!holder.visible) return;
@@ -218,12 +234,13 @@ export function createFishDisplay(model, raw, { boardTop = 0, rng = createRng(97
     const proc = createProcedure(raw, model.anatomy);
     const pose = bindPieces(model, geometries, materials);
     tools = createTools(geometries, materials);
-    guides = createGuides(model.anatomy, rng);
+    guides = createGuides(proc.anatomy, rng);
     group.add(model.group, guides.group, tools.holder);
     const triangles = Object.values(model.pieces).reduce((sum, piece) => sum + piece.triangles, 0);
     const rest = new THREE.Box3(new THREE.Vector3().fromArray(model.anatomy.bounds.min),
       new THREE.Vector3().fromArray(model.anatomy.bounds.max));
     const bounds = new THREE.Box3(), focus = new THREE.Vector3(), head = new THREE.Vector3();
+    const workSphere = new THREE.Sphere(new THREE.Vector3(), 8), workBox = new THREE.Box3();
     function apply(state, step, xray, practiceCut) {
       const m = model.materials, uniforms = state.uniforms;
       const seeInside = practiceCut && (practiceCut.through || CURVE_INFO[practiceCut.curve].inner);
@@ -238,12 +255,17 @@ export function createFishDisplay(model, raw, { boardTop = 0, rng = createRng(97
       bounds.copy(rest).applyMatrix4(model.group.matrix).union(pose.extent);
       guides.update(state, step, pose, amount, practiceCut, boardTop);
       tools.update(state.knife, pose, practiceCut);
+      if (tools.holder.visible) {
+        workSphere.center.setFromMatrixPosition(tools.holder.matrix);
+        bounds.union(workSphere.getBoundingBox(workBox));
+      }
       const key = step.camera.focus;
       const pivot = typeof key === 'string' && key.startsWith('piece:') && model.pieces[key.slice(6)]?.pivot;
       focus.fromArray(pivot || state.camera.focusPoint).applyMatrix4(pose.matrixFor(state.camera.focusOwner));
       head.set(-1, 0, 0).transformDirection(model.group.matrix);
     }
-    return { group, model, proc, pose, guides, knife: tools.holder, triangles, bounds, focus, head, apply, dispose };
+    return { group, model, proc, pose, guides, knife: tools.holder, get bladeBox() { return tools.bladeBox; },
+      triangles, bounds, focus, head, apply, dispose };
   } catch (error) {
     dispose();
     throw error;
@@ -365,12 +387,12 @@ export function createFishScene({ container, speciesId = 'aji', quality = 'auto'
     }
     display.apply(state, rawStep, xray, practiceCut);
     display.guides.setTime(seconds);
-    overlay?.setMarks(state, labels, display.pose, display.model);
+    overlay?.setMarks(state, labels, display.pose, display.model, display);
     const nextPreset = chosenView ?? state.camera.preset;
     const boundsChanged = !cameraBox.equals(display.bounds);
+    viewer.stage.setContactBounds(display.pose.extent);
     if (boundsChanged) {
       cameraBox.copy(display.bounds);
-      viewer.stage.setContactBounds(cameraBox);
       viewer.rig.setBounds(cameraBox, { immediate: false });
     }
     if (immediate || forceCamera || boundsChanged || nextPreset !== preset || zoom !== state.camera.zoom
@@ -418,6 +440,8 @@ export function createFishScene({ container, speciesId = 'aji', quality = 'auto'
     const raw = procedureFor(speciesId);
     if (!raw) { model.dispose(); throw new Error('この魚の手順はまだ準備中です'); }
     display = createFishDisplay(model, raw, { boardTop: viewer.stage.boardTop, rng: rng.fork('粒') });
+    const { width, depth } = boardSizeFor(model.anatomy.TL);
+    viewer.stage.setBoardSize(width, depth);
     viewer.scene.add(display.group);
     step = Math.min(step, display.proc.steps.length - 1);
     dirty = true;
@@ -470,7 +494,7 @@ export function createFishScene({ container, speciesId = 'aji', quality = 'auto'
     viewer.setMirror(leftHanded);
     install(viewer.quality);
     overlay = makeOverlay(container);
-    overlay.setMarks(state, labels, display.pose, display.model);
+    overlay.setMarks(state, labels, display.pose, display.model, display);
     viewer.scene.onAfterRender = () => {
       overlay.project(viewer.camera);
       if (pendingShot && --pendingShot.frames === 0) {

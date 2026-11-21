@@ -1,11 +1,10 @@
 // 有眼側は魚自身の L。画面を鏡映しても黒い側・白い側の呼び名は入れ替えない。
-import { SPECIES_META } from '../species/meta.js';
 import {
-  LB, LF, RB, RF, cut, hand, headSide, hide, line, mark, move, peel, pinbones, practice, prep, ribs,
+  LB, LF, RB, RF, cut, hand, headSide, hide, line, mark, move, peel, pinbones, practice, moveScale, prep, ribs,
   scaleSide, shot, step, turn,
 } from './aji.js';
 
-const k = SPECIES_META.hirame.sizeCm.typical / 21;
+const k = moveScale('hirame');
 const blackUp = '黒い面を上に、頭側を{L}、腹を手前に置きます。';
 const whiteUp = '白い面を上に、頭側を{R}、腹を手前に置きます。';
 const freezing = 'クドア対策は−20℃で4時間以上冷凍します。アニサキス対策は−20℃以下で魚全体が完全に凍ってから24時間以上です。';
@@ -76,7 +75,8 @@ function backQuarter(side) {
   });
 }
 
-export default { steps: [
+// 背びれは頭の上から始まります。外した背身には、首の切り口から後ろの縁だけが残ります。
+export default { curveLimits: { engawaCut: ['headCutTop', 'dorsalFinEnd'] }, steps: [
   prep(['deba', 'scaler', 'tweezers', 'yanagi'], '出刃包丁、うろこ用の目の細かいたわし、骨抜き、ペーパーを用意します。', {
     title: '板を整え黒い面を上にします', place: blackUp,
     summary: 'まな板の下に固く絞ったぬれ布巾を敷き、両目が見える黒い面を上に置きます。',

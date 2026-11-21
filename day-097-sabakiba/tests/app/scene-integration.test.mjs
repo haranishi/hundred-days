@@ -24,7 +24,7 @@ function fixture({ raw, search = '?freeze=1&seed=3', speciesId = 'aji', canDraw 
   let callbacks;
   const viewer = {
     renderer: { domElement: canvas }, camera: rig.camera, rig, scene, quality: 'standard',
-    stage: { boardTop: 0, update() {}, setContactBounds() {} },
+    stage: { boardTop: 0, update() {}, setContactBounds() {}, setBoardSize(w, d) { status.boardSize = [w, d]; } },
     controls: { setEnabled(b) { status.enabled = b; } },
     setMirror(b) { mirror.scale.x = b ? -1 : 1; mirror.updateMatrixWorld(true); rig.setMirror(b); },
     stats: () => ({ gl: 'webgl2', fps: 50, frames: status.frames }),
@@ -88,6 +88,7 @@ test('初回描画の後に ready が解決し、同じ進度では状態を再�
     assert.equal(first.gl, 'webgl2'); assert.equal(first.quality, 'standard');
     assert.equal(f.doc.body.dataset.ready, 'true');
     assert.equal(status.frames, 1);
+    assert.deepEqual(status.boardSize, [42, 28]);
     assert.equal(fish.stats().stepCount, getProcedure('aji').steps.length);
     assert.equal(fish.stats().triangles, first.triangles);
     assert.equal(host.__sabaki.anatomy, host.__sabaki.model.anatomy);
@@ -220,4 +221,28 @@ test('WebGL2なし・魚や手順の欠落・初回描画の失敗・初期化�
   const f = fixture();
   f.fish.dispose(); f.fish.dispose();
   await assert.rejects(f.fish.ready, /終了/); assert.equal(f.status.frames, 0);
+});
+
+test('透視を入れ切りすると、皮の変種の材質が作り直しに回り、変わらない間は作り直さない', async () => {
+  const f = fixture({ raw: aji }), { fish, host } = f;
+  await fish.ready;
+  try {
+    fish.setStep(0); fish.setProgress(0.5); f.tick();
+    const skins = [];
+    for (const id of ['skin.L', 'skin.R']) {
+      host.__sabaki.model.pieces[id].object.traverse(o => { if (o.isMesh) skins.push(...[o.material].flat()); });
+    }
+    assert.ok(skins.length >= 2);
+    assert.ok(skins.every(m => m.transparent === false), '透視の前は不透明');
+    const before = skins.map(m => m.version);
+    fish.setXray(true); f.tick();
+    assert.ok(skins.every(m => m.transparent === true), '透視中は透明扱い');
+    assert.ok(skins.every((m, i) => m.version > before[i]), '不透明で作った材質は、作り直しに回る');
+    const during = skins.map(m => m.version);
+    f.tick(); f.tick();
+    assert.deepEqual(skins.map(m => m.version), during, '状態が変わらない間は作り直さない');
+    fish.setXray(false); f.tick();
+    assert.ok(skins.every(m => m.transparent === false), '透視を切ると不透明に戻る');
+    assert.ok(skins.every((m, i) => m.version > during[i]));
+  } finally { fish.dispose(); }
 });

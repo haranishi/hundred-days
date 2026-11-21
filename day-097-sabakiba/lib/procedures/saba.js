@@ -1,10 +1,9 @@
 // サバは硬い腹骨の継ぎ目を切り、加熱用としめ鯖用の仕上げを分ける。
-import { SPECIES_META } from '../species/meta.js';
 import {
-  LB, freeFillet, gut, hand, headSide, mark, openEdge, peel, pinbones, prep, ribs, scaleSide, shot, step, wash,
+  LB, freeFillet, gut, hand, headSide, mark, openEdge, peel, pinbones, moveScale, prep, ribs, scaleSide, shot, step, wash,
 } from './aji.js';
 
-const k = SPECIES_META.saba.sizeCm.typical / 21;
+const k = moveScale('saba');
 const joint = {
   tip: '腹骨が背骨につながる所で抵抗が出ます。刃を止めて継ぎ目を見つけ、切っ先で短く切ります。',
   mistake: '引っかかったまま押し続けると、刃が柔らかい身の方へそれます。',

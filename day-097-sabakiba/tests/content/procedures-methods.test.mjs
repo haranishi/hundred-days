@@ -52,7 +52,7 @@ test('アジの二枚の頭と腹は、それぞれに道具が触れる時点�
   }
 });
 
-test('三枚おろしと節取りは両縁を先に開き、尾から頭へ骨をたどってから魚体に比例した距離だけ片身を動かします', () => {
+test('三枚おろしと節取りは両縁を開き、尾から頭へ骨をたどってから、板に合わせて同じ向きに片身を移します', () => {
   const reference = getProcedure('aji').steps;
   for (const id of ['aji', 'saba', 'sanma', 'tai', 'katsuo']) {
     const { steps } = getProcedure(id);
@@ -66,7 +66,8 @@ test('三枚おろしと節取りは両縁を先に開き、尾から頭へ骨�
       const shift = steps[i].moves.find(m => m.piece === side + '.dorsal' && m.move);
       assert.ok(shift.window[0] >= Math.max(...cuts.map(c => c.window[1])));
       const original = reference[firstMove(reference, side + '.dorsal')].moves.find(m => m.piece === side + '.dorsal');
-      const k = SPECIES_META[id].sizeCm.typical / SPECIES_META.aji.sizeCm.typical;
+      const k = shift.move[0] / original.move[0];
+      assert.ok(k > 0 && k <= SPECIES_META[id].sizeCm.typical / SPECIES_META.aji.sizeCm.typical + 1e-10);
       shift.move.forEach((v, axis) => near(v, original.move[axis] * k));
     }
   }
@@ -127,7 +128,11 @@ test('ヒラメは黒・白の順に中央から二枚ずつ外し、背身を�
 
 test('カツオは肩の硬いうろこを取り、両面を節に分け、血合いを整えた時点では両面に皮が残ります', () => {
   const raw = getProcedure('katsuo'), { steps } = raw, proc = createProcedure(raw, fakeAnatomy);
-  assert.ok(!steps.some(s => hasCut(s, 'scaleSweep')));
+  for (const [i, side] of sides.entries()) {
+    const shoulder = steps[i + 1];
+    assert.ok(hasCut(shoulder, 'scaleSweep', side) && !hasCut(shoulder, 'headCut'));
+    assert.ok(shoulder.effects.some(e => e.curve === 'scaleSweep' && e.side === side));
+  }
   for (const side of sides) {
     const division = steps.findIndex(s => hasCut(s, 'lateralSplit', side));
     const trim = steps.findIndex(s => hasCut(s, 'chiaiTrim', side));

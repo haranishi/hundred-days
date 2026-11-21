@@ -30,7 +30,8 @@ test('アジの15手順が契約を通り、片身を外すまで各面を調査
   assert.deepEqual(aji.steps.slice(0, 11).map(s => s.pose.head + s.pose.dorsal),
     ['LB', 'LB', 'LF', 'LB', 'LF', 'RB', 'RB', 'RB', 'LF', 'RF', 'LB']);
   for (const step of aji.steps) {
-    assert.ok(step.hands.some(h => h.who === 'off'));
+    if (step.id === 'prep') assert.deepEqual(step.hands, []);
+    else assert.ok(step.hands.some(h => h.who === 'off'));
     assert.ok(step.camera.focus);
     if (step.cuts?.length) assert.ok(step.cuts.some(c => c.id === step.practice.cut));
     for (const c of step.cuts ?? []) {
@@ -108,7 +109,8 @@ test('全ての左右の文章を置換し、左利きでも魚に付く位置�
   });
   const left = stateAt(proc, 0, 0, { leftHanded: true });
   assert.match(left.place, /頭を右/);
-  assert.match(left.hands[0].text, /右手/);
+  assert.deepEqual(left.hands, []);
+  assert.match(stateAt(proc, 1, 0, { leftHanded: true }).hands[0].text, /右手/);
   assert.match(left.labels[0].text, /右手/);
 });
 

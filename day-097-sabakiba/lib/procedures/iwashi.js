@@ -1,11 +1,10 @@
 // フライ用の手開き。背の皮と尾を残し、中骨を頭の方からめくる。
-import { SPECIES_META } from '../species/meta.js';
 import {
-  LB, cut, dryFish, hand, hide, keepCold, line, mark, move, neckLeft, pinbones, practice, prep,
+  LB, cut, dryFish, hand, hide, keepCold, line, mark, move, neckLeft, pinbones, practice, moveScale, prep,
   scaleSide, shot, step, turn, wash,
 } from './aji.js';
 
-const k = SPECIES_META.iwashi.sizeCm.typical / 21;
+const k = moveScale('iwashi');
 const bellyUp = { head: 'L', dorsal: 'D' };
 const openOnBoard = '頭側を{L}に、開いた身を上に置きます。';
 

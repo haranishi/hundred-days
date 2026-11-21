@@ -1,7 +1,8 @@
 // 部品の変位は盤の座標、刃・手・ラベル・焦点は魚の座標（cm）。
 // 完了済みの手順は作成時に畳む。再生中は指定された手順の窓だけを評価する。
 import {
-  ALL_PIECE_IDS, ANCHOR_OWNER, CURVE_INFO, PIECE_IDS, curveOwner, poseTransform, resolveText, validateProcedure,
+  ALL_PIECE_IDS, ANCHOR_OWNER, CURVE_INFO, LOCK_MIN_MOVE_CM, PIECE_IDS, POSE_LOCK_ROOTS,
+  curveOwner, poseTransform, resolveText, validateProcedure,
 } from './contract.js';
 import {
   clamp01, cross, dot, easeInOut, easeOut, lerp, measurePolyline, mixVector, pointOnPath, slerpQuat, unit, windowT,
@@ -14,6 +15,12 @@ const PADDING = 0.1;
 const radians = deg => deg * Math.PI / 180;
 const times = (v, factor) => v.map(x => x * factor);
 const difference = (a, b) => a.map((x, k) => x - b[k]);
+
+// 盤の寸法は手順の移動量と、描画する板で共有します。単位は cm です。
+export function boardSizeFor(totalLength) {
+  return { width: Math.min(42 * 1.6, Math.max(42, 2 * totalLength)),
+    depth: Math.min(28 * 1.6, Math.max(28, 1.25 * totalLength)) };
+}
 
 function perpendicular(v, tangent, fallback) {
   const project = n => difference(n, times(tangent, dot(n, tangent)));
@@ -137,6 +144,7 @@ function rotationAt(a, b, t) {
 function initialState() {
   const pieces = Object.fromEntries(ALL_PIECE_IDS.map(id => [id, {
     visible: PIECE_IDS.includes(id), opacity: 1, move: [0, 0, 0], rot: { axis: [...AXIS.y], deg: 0, pivot: 'pivot' },
+    poseLock: null,
   }]));
   return { pieces, uniforms: { scale: 1, scutes: 1, slitOpen: 0, xray: 0 }, incisions: [] };
 }
@@ -148,7 +156,12 @@ function pieceAt(base, tracks, u) {
     const { from, window: [a, b] } = track;
     if (u < a) break;
     const t = easeInOut(windowT(u, track.window));
-    if (track.move) result.move = mixVector(from.move, track.move, t);
+    if (track.move) {
+      result.move = mixVector(from.move, track.move, t);
+      // 次の移動窓が重なると、先の窓はその時点で終わります。窓の始点までに入った固定を引き継ぎます。
+      result.poseLock = from.poseLock ?? (track.lockPose && Math.hypot(...result.move) >= LOCK_MIN_MOVE_CM
+        ? track.lockPose : null);
+    }
     if (track.rot) result.rot = rotationAt(from.rot, track.rot, t);
     if (track.opacity !== undefined) result.opacity = lerp(from.opacity, track.opacity, t);
     const switchAt = track.visible ? a : b;
@@ -157,16 +170,20 @@ function pieceAt(base, tracks, u) {
       lastVisibility = switchAt;
     }
   }
+  if (result.poseLock) {
+    const { head, dorsal, q, p } = result.poseLock;
+    result.poseLock = { head, dorsal, q: [...q], p: [...p] };
+  }
   return result;
 }
 
-function compileMoves(base, moves) {
+function compileMoves(base, moves, endPose) {
   const byPiece = {};
   for (const move of [...moves].sort((a, b) => a.window[0] - b.window[0])) {
     const tracks = byPiece[move.piece] ??= [];
     const from = pieceAt(base.pieces[move.piece], tracks, move.window[0]);
     const rot = move.rot && { axis: AXIS[move.rot.axis], deg: move.rot.deg, pivot: move.rot.about ?? 'pivot' };
-    tracks.push({ ...move, from, rot });
+    tracks.push({ ...move, from, rot, lockPose: POSE_LOCK_ROOTS.includes(move.piece) ? endPose : null });
   }
   return byPiece;
 }
@@ -211,10 +228,32 @@ function cameraFor(anatomy, camera, pathFor) {
   return { preset, focusPoint: [...point], focusOwner: owner, zoom };
 }
 
-export function createProcedure(raw, anatomy) {
+// 手順で使う長手方向の線を、指定された二つの目印の間で切り出します。交点は元の折れ線上に取ります。
+function anatomyForProcedure(anatomy, limits) {
+  if (!limits) return anatomy;
+  return { ...anatomy, curve(name, side) {
+    const curve = anatomy.curve(name, side);
+    if (!Object.hasOwn(limits, name)) return curve;
+    const [lo, hi] = limits[name].map(anchor => anatomy.point(anchor)[0]).sort((a, b) => a - b);
+    const points = [];
+    for (const [i, p] of curve.points.entries()) {
+      const previous = curve.points[i - 1];
+      if (previous) {
+        for (const x of previous[0] < p[0] ? [lo, hi] : [hi, lo]) {
+          if ((previous[0] - x) * (p[0] - x) < 0) points.push(mixVector(previous, p, (x - previous[0]) / (p[0] - previous[0])));
+        }
+      }
+      if (lo <= p[0] && p[0] <= hi) points.push(p);
+    }
+    return { ...curve, points };
+  } };
+}
+
+export function createProcedure(raw, sourceAnatomy) {
   const errors = validateProcedure(raw);
   if (errors.length) throw new Error(errors.join('\n'));
   const steps = structuredClone(raw.steps);
+  const anatomy = anatomyForProcedure(sourceAnatomy, structuredClone(raw.curveLimits));
   const paths = new Map();
   const pathFor = (curve, side = null, reverse = false) => {
     const key = curve + '/' + (side ?? '') + (reverse ? '/r' : '');
@@ -229,9 +268,10 @@ export function createProcedure(raw, anatomy) {
     });
     const marks = entries => (entries ?? []).map(m => ({ ...m, ...attachment(anatomy, m.anchor, m.piece) }));
     const previous = steps[Math.max(0, i - 1)].pose;
+    const endPose = { head: step.pose.head, dorsal: step.pose.dorsal, ...poseTransform(step.pose) };
     const frame = {
-      step, base, tracks: compileMoves(base, step.moves ?? []), cuts, previous,
-      startPose: poseTransform(previous), endPose: poseTransform(step.pose),
+      step, base, tracks: compileMoves(base, step.moves ?? [], endPose), cuts, previous,
+      startPose: poseTransform(previous), endPose,
       camera: cameraFor(anatomy, step.camera, pathFor), hands: marks(step.hands), labels: marks(step.labels),
     };
     base = persistentAt(frame, 1);

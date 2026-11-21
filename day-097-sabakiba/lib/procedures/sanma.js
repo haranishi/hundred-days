@@ -1,11 +1,10 @@
 // 腹と背から先に開くのは、調査にある全国さんま漁協の型。丸塩焼きの分岐は頭を落とす前に伝える。
-import { SPECIES_META } from '../species/meta.js';
 import {
   LB, cut, freeFillet, gut, hand, headLeft, keepCold, line, mark, move, openEdge, peel, pinbones,
-  prep, ribs, scaleSide, shot, step, wash,
+  moveScale, prep, ribs, scaleSide, shot, step, wash,
 } from './aji.js';
 
-const k = SPECIES_META.sanma.sizeCm.typical / 21;
+const k = moveScale('sanma');
 function rinseScales(side) {
   const window = [0.30, 0.81];
   return scaleSide(side, {
