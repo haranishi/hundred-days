@@ -1,4 +1,4 @@
-// 手順の入口。親が管理する。本物の手順ができたら、ここの import を差し替える。
-import aji from './_sample.js';
+// 手順の入口。手順ができた魚から登録する（本物の手順の担当が8種に広げる）。
+import aji from './aji.js';
 export const PROCEDURES = { aji };
 export const getProcedure = (id) => PROCEDURES[id] || null;

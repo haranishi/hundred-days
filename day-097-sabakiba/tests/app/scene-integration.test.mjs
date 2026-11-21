@@ -1,0 +1,223 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import * as THREE from '../../vendor/three.js';
+import { createFishScene } from '../../lib/scene-fish.js';
+import { createCameraRig } from '../../lib/camera.js';
+import { curveOwner } from '../../lib/contract.js';
+import { stateAt } from '../../lib/timeline.js';
+import { getProcedure } from '../../lib/procedures/index.js';
+import aji from '../../lib/procedures/aji.js';
+
+// 描画先とDOMの札だけを置き換えます。魚・カメラ・レイキャスト・時間・ポインター処理は実物です。
+function fixture({ raw, search = '?freeze=1&seed=3', speciesId = 'aji', canDraw = true } = {}) {
+  const rect = { left: 30, top: 75, width: 570, height: 400 };
+  const host = { location: { search } }, doc = { defaultView: host, body: { dataset: {} } };
+  const canvas = new EventTarget(), captured = new Set();
+  Object.assign(canvas, { classList: { add() {} }, getBoundingClientRect: () => rect,
+    setPointerCapture: id => captured.add(id), releasePointerCapture: id => captured.delete(id),
+    hasPointerCapture: id => captured.has(id) });
+  const container = { ownerDocument: doc, clientWidth: rect.width, clientHeight: rect.height };
+  const mirror = new THREE.Group(), scene = new THREE.Scene();
+  mirror.add(scene);
+  const rig = createCameraRig({ aspect: rect.width / rect.height });
+  const status = { frames: 0, running: false, enabled: true, closed: 0, overlayClosed: 0, marks: [] };
+  let callbacks;
+  const viewer = {
+    renderer: { domElement: canvas }, camera: rig.camera, rig, scene, quality: 'standard',
+    stage: { boardTop: 0, update() {}, setContactBounds() {} },
+    controls: { setEnabled(b) { status.enabled = b; } },
+    setMirror(b) { mirror.scale.x = b ? -1 : 1; mirror.updateMatrixWorld(true); rig.setMirror(b); },
+    stats: () => ({ gl: 'webgl2', fps: 50, frames: status.frames }),
+    render(dt) {
+      if (!canDraw) return false;
+      if (!status.frames) assert.notEqual(doc.body.dataset.ready, 'true');
+      rig.update(dt);
+      mirror.updateMatrixWorld(true);
+      status.frames++;
+      scene.onAfterRender();
+      return true;
+    },
+    start() { status.running = true; }, dispose() { status.closed++; status.running = false; },
+    snapshot: async () => new Blob(['魚'], { type: 'image/png' }),
+  };
+  const fish = createFishScene({ container, debug: true, speciesId }, {
+    makeViewer(options) { callbacks = options; return viewer; },
+    makeOverlay: () => ({ setMarks: (state, labels) => status.marks.push({ state, labels }), project() {},
+      dispose() { status.overlayClosed++; } }),
+    procedureFor: raw === undefined ? getProcedure : () => raw,
+  });
+  function tick() {
+    assert.ok(status.running);
+    callbacks.onFrame(0.02);
+    viewer.render(0.02);
+  }
+  function project(p, owner) {
+    const m = host.__sabaki.model;
+    const v = new THREE.Vector3().fromArray(p).applyMatrix4((m.pieces[owner]?.object ?? m.group).matrixWorld).project(rig.camera);
+    return [rect.left + (v.x + 1) * rect.width / 2, rect.top + (1 - v.y) * rect.height / 2];
+  }
+  function fire(type, xy, id, time) {
+    const e = Object.assign(new Event(type), { button: 0, pointerId: id, clientX: xy[0], clientY: xy[1] });
+    Object.defineProperty(e, 'timeStamp', { value: time });
+    canvas.dispatchEvent(e);
+  }
+  return { fish, doc, host, status, viewer, tick, project, fire, captured,
+    lower() { viewer.quality = 'light'; callbacks.onQualityChange('light'); },
+    tap(x, y) { callbacks.onTap({ x, y }); }, touch() { rig.touch(); callbacks.onCameraUser(); } };
+}
+
+function countDisposals(root) {
+  const counts = new Map();
+  root.traverse(o => {
+    if (o.isInstancedMesh) counts.set(o, 0);
+    if (o.isMesh) for (const resource of [o.geometry, ...[o.material].flat()]) counts.set(resource, 0);
+  });
+  for (const r of counts.keys()) r.addEventListener('dispose', () => counts.set(r, counts.get(r) + 1));
+  return () => {
+    assert.ok(counts.size > 20);
+    for (const [r, n] of counts) assert.equal(n, 1, r.name || r.type);
+  };
+}
+
+test('初回描画の後に ready が解決し、同じ進度では状態を再計算せず、画質を下げても位置と設定が残ります', async () => {
+  const f = fixture(), { fish, status, host } = f;
+  fish.setStep(2); fish.setProgress(0.42); fish.setLeftHanded(true);
+  const first = await fish.ready;
+  try {
+    assert.deepEqual(Object.keys(first).sort(), ['gl', 'quality', 'triangles']);
+    assert.equal(first.gl, 'webgl2'); assert.equal(first.quality, 'standard');
+    assert.equal(f.doc.body.dataset.ready, 'true');
+    assert.equal(status.frames, 1);
+    assert.equal(fish.stats().stepCount, getProcedure('aji').steps.length);
+    assert.equal(fish.stats().triangles, first.triangles);
+    assert.equal(host.__sabaki.anatomy, host.__sabaki.model.anatomy);
+    const calls = status.marks.length, original = status.marks.at(-1).state;
+    assert.deepEqual(original, stateAt(host.__sabaki.proc, 2, 0.42, { leftHanded: true }));
+    for (let i = 0; i < 8; i++) { fish.setProgress(0.42); f.tick(); }
+    assert.equal(status.marks.length, calls);
+    fish.setLabels(true); fish.setXray(true); f.tick();
+    assert.equal(status.marks.at(-1).state, original);
+    assert.ok(status.marks.at(-1).labels);
+    const previous = host.__sabaki.model, disposed = countDisposals(f.viewer.scene);
+    const place = previous.group.matrixWorld.toArray();
+    f.lower(); f.tick();
+    disposed();
+    assert.notEqual(previous, host.__sabaki.model);
+    assert.deepEqual(host.__sabaki.model.group.matrixWorld.toArray(), place);
+    assert.deepEqual(status.marks.at(-1).state, stateAt(host.__sabaki.proc, 2, 0.42, { leftHanded: true }));
+    assert.equal(fish.stats().quality, 'light');
+    assert.ok(fish.stats().triangles < first.triangles);
+    assert.equal((await fish.snapshot()).type, 'image/png');
+    const final = countDisposals(f.viewer.scene);
+    fish.dispose(); fish.dispose(); final();
+    assert.equal(status.closed, 1); assert.equal(status.overlayClosed, 1);
+    assert.equal(host.__sabaki.model, undefined); assert.equal(host.__sabaki.proc, undefined);
+    await assert.rejects(fish.snapshot(), /終了後/);
+  } finally { fish.dispose(); }
+});
+
+test('手で回した視点を保ち、明示した視点と固定撮影では即座に移動し、描画3回を待ちます', async () => {
+  const f = fixture({ raw: aji }), { fish, viewer } = f;
+  await fish.ready;
+  try {
+    let touches = 0;
+    const off = fish.on('camera-user', () => touches++);
+    f.touch(); off(); f.touch();
+    assert.equal(touches, 1);
+    viewer.rig.orbit(0.3, 0.1); viewer.rig.update(2);
+    const manual = viewer.rig.serialize();
+    fish.setStep(3); fish.setProgress(0.5); fish.setView('cook'); f.tick();
+    assert.equal(viewer.rig.userTouched, true); assert.deepEqual(viewer.rig.serialize(), manual);
+    fish.setView('top'); f.tick();
+    assert.equal(viewer.rig.userTouched, false);
+    assert.ok(viewer.rig.serialize().pitch > 1.5);
+    fish.setView('side'); f.tick(); assert.ok(viewer.rig.serialize().pitch < 0.2);
+    let settled = false;
+    const shot = fish.resetCamera({ immediate: true, capture: true }).then(() => { settled = true; });
+    const target = viewer.rig.serialize();
+    f.tick(); f.tick(); await Promise.resolve(); assert.equal(settled, false);
+    f.tick(); await shot; assert.deepEqual(viewer.rig.serialize(), target);
+    const interrupted = assert.rejects(fish.resetCamera({ immediate: true, capture: true }), /中断/);
+    fish.dispose(); await interrupted;
+  } finally { fish.dispose(); }
+});
+
+test('練習は切り始めに固定し、片手のドラッグを回転に渡さず、反転後も逆順の曲線と表面座標を通知します', async () => {
+  const raw = structuredClone(aji);
+  const step = raw.steps[1], cut = step.cuts[0];
+  cut.reverse = true;
+  const f = fixture({ raw }), { fish, status, host } = f;
+  await fish.ready;
+  try {
+    const events = [], hits = [];
+    const off = fish.on('practice-sample', sample => events.push(sample));
+    fish.on('pick', hit => hits.push(hit));
+    fish.setStep(1); fish.setProgress(0.86); fish.setLeftHanded(true);
+    fish.setPractice({ cutId: cut.id }); f.tick();
+    assert.equal(status.enabled, false);
+    const locked = status.marks.at(-1).state;
+    assert.deepEqual(locked, stateAt(host.__sabaki.proc, 1, cut.window[0], { leftHanded: true }));
+    fish.setProgress(0.97); f.tick(); assert.equal(status.marks.at(-1).state, locked);
+    const expected = host.__sabaki.anatomy.curve(cut.curve, cut.side).points.reverse();
+    const owner = curveOwner(cut.curve, cut.side);
+    const world = t => f.project(expected[Math.floor((expected.length - 1) * t)], owner);
+    f.tap(...world(0.48)); assert.ok(hits.length === 1 && hits[0].point.every(Number.isFinite));
+    f.fire('pointerdown', [-5, -3], 5, 10); assert.equal(events.length, 0);
+    f.fire('pointerdown', world(0.25), 5, 100);
+    f.fire('pointerdown', world(0.3), 6, 105);
+    f.fire('pointermove', world(0.42), 6, 115);
+    f.fire('pointermove', world(0.48), 5, 125);
+    assert.ok(f.captured.has(5));
+    f.lower(); f.tick();
+    assert.equal(status.enabled, false);
+    f.fire('pointerup', [-5, -5], 5, 150);
+    assert.deepEqual(events.map(e => e.phase), ['start', 'move', 'end']);
+    for (const e of events) {
+      assert.equal(e.cutId, cut.id); assert.deepEqual(e.curvePoints, expected); assert.ok(e.point.every(Number.isFinite));
+    }
+    assert.deepEqual(events.map(e => e.tMs), [100, 125, 150]);
+    assert.deepEqual(events[2].point, events[1].point);
+    assert.ok(new THREE.Vector3().fromArray(events[0].point)
+      .distanceTo(new THREE.Vector3().fromArray(expected[Math.floor((expected.length - 1) * 0.25)])) < 0.2);
+    assert.equal(f.captured.size, 0);
+    fish.setPractice(null); f.tick();
+    assert.ok(status.enabled);
+    assert.deepEqual(status.marks.at(-1).state, stateAt(host.__sabaki.proc, 1, 0.97, { leftHanded: true }));
+    off(); f.fire('pointerdown', world(0.4), 7, 200); assert.equal(events.length, 3);
+  } finally { fish.dispose(); }
+});
+
+test('内側の練習は骨の位置に投影して透視し、終了すると皮の濃さが戻ります', async () => {
+  const f = fixture({ raw: aji }), { fish, host } = f;
+  await fish.ready;
+  try {
+    fish.setStep(8); fish.setProgress(1); fish.setView('top'); fish.setPractice({ cutId: 'spine' }); f.tick();
+    const { model, anatomy } = host.__sabaki, points = anatomy.curve('boneCut', 'R').points;
+    const skin = model.pieces['skin.R'].object.children.find(o => o.isMesh).material;
+    const xrayLevel = () => (model.materials.setXray ? model.materials.uniforms.uXray.value : skin.transparent ? 1 - skin.opacity : 0);
+    assert.ok(xrayLevel() >= 0.8, '内側の練習中は透視が効く');
+    const events = [];
+    fish.on('practice-sample', e => events.push(e));
+    const p = points[Math.floor(points.length / 2)], xy = f.project(p, 'R.dorsal');
+    f.fire('pointerdown', xy, 1, 50); f.fire('pointerup', xy, 1, 75);
+    assert.deepEqual(events.map(e => e.phase), ['start', 'end']);
+    assert.ok(new THREE.Vector3().fromArray(events[0].point).distanceTo(new THREE.Vector3().fromArray(p)) < 1e-5);
+    fish.setPractice(null); fish.setStep(0); f.tick();
+    assert.equal(xrayLevel(), 0, '練習を終えると皮の濃さが戻る');
+  } finally { fish.dispose(); }
+});
+
+test('WebGL2なし・魚や手順の欠落・初回描画の失敗・初期化前の解放を日本語で通知します', async () => {
+  const fish = createFishScene({ container: { ownerDocument: { createElement: () => ({ getContext: () => null }) } } });
+  await assert.rejects(fish.ready, /3D表示を開始できません/); fish.dispose(); fish.dispose();
+  for (const [opts, reason] of [[{ speciesId: 'missing-fish' }, /この魚の3Dはまだ準備中です/],
+    [{ raw: null }, /この魚の手順はまだ準備中です/], [{ canDraw: false }, /最初の画面/]]) {
+    const f = fixture(opts);
+    await assert.rejects(f.fish.ready, reason);
+    f.fish.dispose(); f.fish.dispose();
+    assert.equal(f.status.closed, 1); assert.equal(f.doc.body.dataset.ready, undefined);
+  }
+  const f = fixture();
+  f.fish.dispose(); f.fish.dispose();
+  await assert.rejects(f.fish.ready, /終了/); assert.equal(f.status.frames, 0);
+});

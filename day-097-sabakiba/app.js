@@ -12,7 +12,7 @@ import {
 } from './lib/app-state.js';
 import { loadPersisted, savePersisted } from './lib/persist.js';
 import { formatRoute, parseRoute, resolveInitialLocation } from './lib/router.js';
-import { createFishScene } from './lib/scene-stub.js';
+import { createFishScene } from './lib/scene-fish.js';
 import { buildStepSpeechText, formatStepView } from './lib/ui-format.js';
 import { renderHome } from './lib/ui-home.js';
 import { renderIntro } from './lib/ui-intro.js';
@@ -738,11 +738,12 @@ document.addEventListener('keydown', (e) => {
 });
 
 // 試験・撮影用フック（?debug=1 のときだけ公開）
+if (new URLSearchParams(window.location.search).get('freeze') === '1') clockFrozen = true;
 if (params.debug) {
   window.__sabaki = {
     state: () => cloneState(state),
-    goto(sp, step = 0, u = 0) {
-      const targetSp = SPECIES_META[sp] ? sp : state.species;
+    async goto(sp, step = 0, u = 0) {
+      const targetSp = Object.hasOwn(SPECIES_META, sp) ? sp : state.species;
       const proc = getProcedure(targetSp);
       const maxIdx = proc ? Math.max(0, proc.steps.length - 1) : 0;
       const idx = Math.min(maxIdx, Math.max(0, Math.trunc(Number(step) || 0)));
@@ -753,14 +754,31 @@ if (params.debug) {
         window.history.replaceState(null, '', formatRoute(route));
       }
       renderCurrentRoute();
-      if (scene) {
-        scene.setStep(idx);
-        scene.setProgress(state.u);
-      }
+      const target = scene;
+      if (!target) throw new Error(glReason || 'この魚の3Dはまだ準備中です');
+      await target.ready;
+      if (target !== scene) throw new Error('撮影する魚が切り替わりました。');
+      await target.resetCamera({ immediate: true, capture: true });
       return cloneState(state);
     },
     ready: () => readyPromise,
-    stats: () => (scene ? scene.stats() : { stub: true, gl: glDisabled ? 'off' : 'none' }),
+    stats: () => scene?.stats() ?? { stepCount: getProcedure(state.species)?.steps.length ?? 0, gl: glDisabled ? 'off' : 'none' },
+    setXray(value) {
+      state = setXray(state, value);
+      scene?.setXray(state.xray);
+      syncGuideUI();
+    },
+    setView(value) {
+      state = setView(state, value);
+      scene?.setView(state.view);
+      syncGuideUI();
+    },
+    setLeft(value) {
+      state = setLeftHanded(state, value);
+      scene?.setLeftHanded(state.leftHanded);
+      syncGuideUI();
+      syncSettingsUI();
+    },
     demoPractice(autoFinish = false) {
       if (route.name !== 'guide') return false;
       const started = startPracticeMode({ cut: 'demo-cut', tolerance: 0.5 });

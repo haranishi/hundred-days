@@ -2,6 +2,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { SPECIES_META, SPECIES_ORDER } from '../../lib/species/meta.js';
+import { TOOL_LABELS } from '../../lib/contract.js';
 import { getProcedure } from '../../lib/procedures/index.js';
 import partsContent from '../../lib/content/parts.js';
 import safetyContent from '../../lib/content/safety.js';
@@ -59,12 +60,12 @@ test('ui-format: 全手順の文章が resolveText で左右反転でき、記�
     }
 
     // 右利きと左利きで左右が入れ替わることを確認
-    assert.ok(right.place.includes('左'));
-    assert.ok(left.place.includes('右'));
-    assert.ok(right.how[0].includes('右手') && right.how[0].includes('左手'));
-    assert.ok(left.how[0].includes('左手') && left.how[0].includes('右手'));
-    assert.ok(right.hands[0].text.includes('左手'));
-    assert.ok(left.hands[0].text.includes('右手'));
+    // 元の文に {L}・{R} があれば、右利きと左利きで左右の語が入れ替わる
+    const raw = proc.steps[i];
+    const flips = (rawText, a, b) => !rawText.includes('{L}') || (a.includes('左') && b.includes('右'));
+    assert.ok(flips(raw.place, right.place, left.place), `place: ${raw.place}`);
+    raw.how.forEach((h, k) => assert.ok(flips(h, right.how[k], left.how[k]), `how: ${h}`));
+    (raw.hands || []).forEach((h, k) => assert.ok(flips(h.text, right.hands[k].text, left.hands[k].text), `hands: ${h.text}`));
   }
 
   // 音声台本にも未解決記号が残らない
@@ -97,7 +98,8 @@ test('ui-format: 読み仮名分割（ruby）と練習結果の整形（歩留�
 test('ui-format: つづきから・道具抽出・次の魚', () => {
   const proc = getProcedure('aji');
   const tools = collectProcedureTools(proc);
-  assert.deepEqual(tools, [{ id: 'deba', label: '出刃包丁' }]);
+  const expectedTools = [...new Set(proc.steps.flatMap((st) => st.tools))].map((id) => ({ id, label: TOOL_LABELS[id] }));
+  assert.deepEqual(tools, expectedTools);
 
   const resume = getResumeEntries({ aji: 2, saba: 1 }, 'aji', SPECIES_META, getProcedure);
   assert.equal(resume.length, 1, '手順がある魚のみ返す');
@@ -120,7 +122,7 @@ test('text-guide: 全手順の文章・道具・安全・部位を1つも落と�
   });
 
   assert.equal(rightData.steps.length, proc.steps.length, '全手順が落ちずに出る');
-  assert.equal(rightData.tools.length, 1);
+  assert.equal(rightData.tools.length, collectProcedureTools(proc).length);
   assert.equal(rightData.parts.length, partsContent.aji.parts.length);
   assert.ok(rightData.keep.length > 0);
   assert.ok(rightData.reason.includes('WebGL'));
@@ -142,8 +144,8 @@ test('text-guide: 全手順の文章・道具・安全・部位を1つも落と�
     safetyIntro: safetyContent.intro,
     leftHanded: true,
   });
-  for (const st of leftData.steps) {
-    assert.ok(st.place.includes('右'));
+  for (const [i, st] of leftData.steps.entries()) {
+    if (proc.steps[i].place.includes('{L}')) assert.ok(st.place.includes('右'));
     assert.equal(/[{}]/.test(st.place), false);
     for (const h of st.how) assert.equal(/[{}]/.test(h), false);
   }
