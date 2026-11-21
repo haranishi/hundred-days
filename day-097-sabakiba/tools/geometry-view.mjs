@@ -47,13 +47,21 @@ export function preparePreview(model, options) {
     if (!owner.boundingBox) owner.computeBoundingBox();
     bounds.union(meshBounds.copy(owner.boundingBox).applyMatrix4(mesh.matrixWorld));
   });
-  if (bounds.isEmpty()) throw new RangeError('指定した部品が見つかりません。');
+  if (bounds.isEmpty() && ![...options.only].some(id => Object.hasOwn(pieces, id))) {
+    throw new RangeError('指定した部品が見つかりません。');
+  }
   return bounds;
 }
 
 function start(canvas, info) {
   const options = previewOptions(location.search), model = buildFishModel(options.species, { quality: options.quality });
   const bounds = preparePreview(model, options);
+  if (bounds.isEmpty()) {
+    canvas.hidden = true; info.hidden = false;
+    info.textContent = '選んだ部品は、この魚では0個です。';
+    model.dispose();
+    return;
+  }
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false });
   renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 2));
   renderer.outputColorSpace = THREE.SRGBColorSpace;

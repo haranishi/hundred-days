@@ -12,17 +12,19 @@ export function addHead(group, a, species, stations, m, q) {
     // 眼球の後半は頬の中に埋め、虹彩の中央に瞳孔と小さな映り込みを重ねます。
     const centers = species.family === 'flat' ? (side === 'L' ? [eye, a.flank(eye[0] / a.SL + 0.035, 0.63)] : []) : [eye];
     for (const [i, center] of centers.entries()) {
+      const depth = species.family === 'flat' ? Math.min(radius, center[2] / 1.2) : radius;
       const drawEye = (name, dx, dy, dz, axes, mat) => group.add(namedMesh(name + side + (i ? '2' : ''),
-        ellipsoid([center[0] + dx * radius, center[1] + dy * radius, sign * (center[2] + dz * radius)],
-          axes.map(x => x * radius), q + 1, 2 * q, 0), mat));
+        ellipsoid([center[0] + dx * radius, center[1] + dy * radius, sign * (center[2] + dz * depth)],
+          [axes[0] * radius, axes[1] * radius, axes[2] * depth], q + 1, 2 * q, 0), mat));
       drawEye('虹彩', 0, 0, -0.31, [1, 0.98, 0.82], m.iris ?? m.bone);
       drawEye('瞳孔', -0.04, 0.01, 0.32, [0.62, 0.64, 0.25], m.eye ?? m.organ);
       drawEye('目の光', -0.21, 0.27, 0.54, [0.12, 0.11, 0.044], m.glint ?? m.bone);
     }
     const mouthLength = headLength * (shape.mouthLength ?? 38) / 100;
+    const mouthStart = shape.jawProjection ? shape.jawProjection / 100 : 0.001;
     const mouth = samples(q + 3, t => {
       const rise = shape.mouth === 'superior' ? 0.30 : shape.mouth === 'inferior' ? -0.30 : 0;
-      return a.flank(0.001 + t * mouthLength, rise * (1 - t) - 0.30 * Math.sin(t * Math.PI / 2), side);
+      return a.flank(mouthStart + t * mouthLength, rise * (1 - t) - 0.30 * Math.sin(t * Math.PI / 2), side);
     });
     group.add(namedMesh('口の溝' + side, tube(mouth, mouth.map((_, i) =>
       a.SL * (0.00045 + 0.00125 * Math.sin(Math.PI * i / (mouth.length - 1)))), 5, 0), m.dark ?? m.organ));

@@ -3,12 +3,16 @@ import { samples, loft, sectionVertex, tube, joinGeometries, namedMesh } from '.
 
 export function addSkeleton(group, a, species, m, q) {
   const pre = species.vertebrae?.pre ?? 10, caudal = species.vertebrae?.caudal ?? 14;
+  // 椎骨の数は保ち、密に並ぶ小さな椎体は円周やくびれの分割を減らします。
+  const detail = Math.min(1, 24 / (pre + caudal));
+  const sides = Math.max(4, 4 * Math.floor((q < 10 ? 12 : q * 2) * detail / 4));
+  const rings = detail < 1 && q < 10 ? 3 : q < 10 ? 5 : 7;
+  const spineRings = detail < 1 && q < 10 ? 2 : 4;
   const bodies = [], spines = [], trimmings = [];
   for (let i = 0; i < pre + caudal; i++) {
     const front = i < pre, step = front ? (a.cavityEnd - a.head) / pre : (a.tail - a.cavityEnd) / caudal;
     const start = front ? a.head + i * step : a.cavityEnd + (i - pre) * step;
-    const axis = samples(q < 10 ? 5 : 7, t => start + (0.006 + 0.988 * t) * step);
-    const sides = q < 10 ? 12 : q * 2;
+    const axis = samples(rings, t => start + (0.006 + 0.988 * t) * step);
     const vertebra = axis.map((center, j) => Array.from({length: sides}, (_, k) => sectionVertex(a, center, s => {
       const r = a.spineRadius(s), phi = 2 * Math.PI * k / sides;
       const radius = r - Math.min(0.013, r * 0.18) * Math.sin(j * Math.PI / (axis.length - 1)) ** 2;
@@ -19,7 +23,7 @@ export function addSkeleton(group, a, species, m, q) {
     for (const direction of front ? [1] : [1, -1]) {
       const end = (direction > 0 ? p.top : p.bottom) * 0.86;
       // 棘の根元は幅のある楔、先端は後ろ向きです。身のS面の間に収めます。
-      const rows = samples(4, t => {
+      const rows = samples(spineRings, t => {
         const x = s * a.SL + step * a.SL * 0.82 * t, y = p.axisY + direction * (r * 0.77 + (end - r * 0.77) * t);
         const dx = step * a.SL * (0.22 * (1 - t) + 0.009), dz = r * (0.28 * (1 - t) + 0.013);
         return [[x-dx,y,0], [x,y,dz], [x+dx,y,0], [x,y,-dz]];
@@ -28,7 +32,7 @@ export function addSkeleton(group, a, species, m, q) {
     }
     // 溝の平らな中央部に残る中落ち。椎体の上下面から棘と同じ傾きで伸びます。
     for (const direction of [1, -1]) {
-      const slab = samples(3, t => {
+      const slab = samples(spineRings === 2 ? 2 : 3, t => {
         return [[0.02,-1], [0.98,-1], [0.98,1], [0.02,1]].map(([along, sign]) => {
           const center = start + step * (along + (1 - along) * 0.47 * t);
           return sectionVertex(a, center, s => {
@@ -48,16 +52,23 @@ export function addSkeleton(group, a, species, m, q) {
 
 export function addRibs(group, layer, a, species, side, m, q) {
   const sign = side === 'L' ? 1 : -1, ribs = [], count = Math.max(1, (species.vertebrae?.pre ?? 10) - 2);
+  const detail = Math.min(1, 8 / count);
+  const samplesPerRib = q < 10 ? Math.max(5, Math.ceil((q + 2) * detail)) : q + 2;
+  const sides = q < 10 ? Math.max(3, Math.floor(5 * (q + 2) * detail / samplesPerRib)) : 6;
+  const sweep = Math.min(0.022, (a.cavityEnd - a.head) * 0.1);
   const sectionMesh = new THREE.Mesh(layer.geometry, new THREE.MeshBasicMaterial({ side: THREE.DoubleSide }));
   const ray = new THREE.Raycaster(), origin = new THREE.Vector3(), inward = new THREE.Vector3(0,0,-sign), hits = [];
   for (let i = 0; i < count; i++) {
     const portion = (i + 1) / (count + 1);
     const base = a.head + (a.cavityEnd - a.head) * (0.12 + 0.76 * portion);
-    const rows = samples(q + 2, t => {
-      const s = base + 0.022 * t * t, sec = a.filletSection(s, false);
-      const depth = 0.10 + 0.81 * t, wall = sec.wall(sec.roof + (sec.floor - sec.roof) * depth);
+    const atBase = a.filletSection(base, false);
+    // 面の間隔が層厚を超えると、骨の端が丸まった腹壁を弦のように横切ります。
+    const coarse = samplesPerRib < q + 2 || (atBase.floor - atBase.roof) / q > 1.25 * a.stripT;
+    const rows = samples(samplesPerRib, t => {
+      const s = base + sweep * t * t, sec = a.filletSection(s, false);
+      const depth = coarse ? 0.20 + 0.56 * t : 0.10 + 0.81 * t;
+      const wall = sec.wall(sec.roof + (sec.floor - sec.roof) * depth);
       const radius = Math.min((wall.boundary - wall.inside) * 0.23, a.SL * (0.0017 - 0.0013 * t));
-      const sides = q < 10 ? 5 : 6;
       // 管の外周も壁の座標から作り、腹腔が閉じる尾側で骨が薄い層を突き抜けるのを防ぎます。
       return Array.from({length: sides}, (_, j) => {
         const phi = j * Math.PI * 2 / sides, station = s + radius * Math.cos(phi) / a.SL;
@@ -81,6 +92,7 @@ export function addRibs(group, layer, a, species, side, m, q) {
 
 export function pinbones(a, species, side, variations, m, q) {
   const sign = side === 'L' ? 1 : -1, count = variations.length;
+  if (!count) return new THREE.Group();
   const start = Math.max(a.head + 0.018, (species.pinbones?.from ?? 30) / 100);
   const end = Math.min(a.tail, (species.pinbones?.to ?? 65) / 100);
   const geometry = tube([[0,0,0], [0.76,0,0], [1,0,0]],
@@ -119,18 +131,20 @@ export function addOrgans(viscera, kidney, a, species, m, q) {
     viscera.add(namedMesh(name, loft(rows, { caps: [false, false] }), mat));
   }
   if (species.swimBladder !== false) sac('鰾', 0.045, 0.96, 0.18, 0.155, 0, 0.88, m.bladder ?? m.skin);
-  sac('胃', 0.016, 0.76, 0.57, 0.41, -0.38, 0.58, m.stomach ?? m.organ);
+  if (species.stomach !== false) sac('胃', 0.016, 0.76, 0.57, 0.41, -0.38, 0.58, m.stomach ?? m.organ);
   sac('肝臓', 0.006, 0.69, 0.56, 0.39, 0.55, 0.41, m.liver ?? m.organ);
   const radii = [];
+  const straight = species.stomach === false;
   const intestine = samples(q * 6 + 1, t => {
-    const s = station(0.43 + 0.51 * t), phi = 2 * Math.PI * 2.7 * t;
-    const depth = 0.59 + 0.17 * Math.sin(phi), lateral = 0.50 * Math.cos(phi);
+    const s = station(straight ? 0.06 + 0.88 * t : 0.43 + 0.51 * t), phi = 2 * Math.PI * 2.7 * t;
+    const depth = straight ? 0.48 + 0.12 * t : 0.59 + 0.17 * Math.sin(phi);
+    const lateral = straight ? -0.18 : 0.50 * Math.cos(phi);
     const p = cavity(s, depth, lateral), sec = a.filletSection(s, false);
     const width = sec.wall(sec.axisY - p[1]).inside;
     radii.push(Math.min(a.SL * 0.0062, width * 0.23));
     return p;
   });
-  viscera.add(namedMesh('腸のとぐろ', tube(intestine, radii, q < 10 ? 6 : 8, 4), m.organ));
+  viscera.add(namedMesh(straight ? '腸' : '腸のとぐろ', tube(intestine, radii, q < 10 ? 6 : 8, 4), m.organ));
   const ridge = samples(q * 2 + 1, (t, i) => Array.from({length: q + 2}, (_, j) => {
     const phi = j * 2 * Math.PI / (q + 2), scale = i === 0 || i === q * 2 ? 0 : Math.sin(t * Math.PI) ** 0.38;
     return sectionVertex(a, a.head + (a.vent - a.head) * t, s => {

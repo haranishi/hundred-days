@@ -2,6 +2,7 @@ import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import * as THREE from '../vendor/three.js';
 import { buildFishModel, visitPieceMeshes } from '../lib/pieces.js';
+import { SPECIES } from '../lib/species/index.js';
 
 // 同じFLF位置の頂点を1 µm未満の精度で溶接し、材質境界とインスタンスをまたいで数えます。
 export function measure(object) {
@@ -12,7 +13,9 @@ export function measure(object) {
   visitPieceMeshes(object, mesh => {
     mesh.updateWorldMatrix(true, false);
     const g = mesh.geometry, pos = g.attributes.position, normal = g.attributes.normal;
-    for (const name of ['position', 'normal', 'uv', 'aSeg']) {
+    const attributes = ['position', 'normal', 'uv', 'aSeg'];
+    if (g.attributes.color) attributes.push('color');
+    for (const name of attributes) {
       if (g.attributes[name]?.count !== pos.count || !g.attributes[name]?.array.every(Number.isFinite)) badAttributes++;
     }
     for (let i = 0; i < normal.count; i++) {
@@ -57,8 +60,9 @@ export function measure(object) {
     if (e.count > 2) nonmanifold++;
     if (e.count === 2 && e.direction) twisted++;
   }
-  return { triangles, volume, area, centroid: centroid.map(x => x / area), min, max, boundary, nonmanifold, twisted,
-    degenerate, normalError, badAttributes, closed: boundary === 0 && nonmanifold === 0 && twisted === 0 && degenerate === 0 };
+  if (!triangles) { min.fill(0); max.fill(0); }
+  return { triangles, volume, area, centroid: area ? centroid.map(x => x / area) : [0,0,0], min, max, boundary, nonmanifold, twisted,
+    degenerate, normalError, badAttributes, closed: triangles > 0 && boundary === 0 && nonmanifold === 0 && twisted === 0 && degenerate === 0 };
 }
 
 // 閉じたメッシュとは独立に、吻から尾ビレの付け根までの超楕円断面を数値積分します。
@@ -76,27 +80,48 @@ export function envelopeVolume(anatomy) {
   return sum * anatomy.SL / (axial * vertical);
 }
 
-function report(id, quality) {
-  const fish = buildFishModel(id, {quality});
-  const rows = [], lower = [Infinity,Infinity,Infinity], upper = [-Infinity,-Infinity,-Infinity];
-  const vector = p => p.map(v => v.toFixed(2)).join(', ');
+function inspectFish(id, quality) {
+  const fish = buildFishModel(id, {quality}), parts = [];
   let triangles = 0, volume = 0;
-  for (const piece of Object.values(fish.pieces)) {
-    const m = measure(piece.object);
-    rows.push({ 部品: piece.id, 三角形: m.triangles, '体積 cm³': m.closed ? m.volume.toFixed(4) : '—',
-      形: m.closed ? '閉' : '開', 境界辺: m.boundary, '最小座標 cm': vector(m.min), '最大座標 cm': vector(m.max) });
-    triangles += m.triangles;
-    if (m.closed) volume += m.volume;
-    for (let j = 0; j < 3; j++) { lower[j] = Math.min(lower[j], m.min[j]); upper[j] = Math.max(upper[j], m.max[j]); }
+  try {
+    for (const piece of Object.values(fish.pieces)) {
+      const m = measure(piece.object);
+      parts.push({id: piece.id, kind: piece.kind, ...m});
+      triangles += m.triangles;
+      if (m.closed) volume += m.volume;
+    }
+    return {anatomy: fish.anatomy, triangles, volume, parts};
+  } finally {
+    fish.dispose();
   }
+}
+
+function report(id, quality) {
+  if (id === 'all') {
+    console.table(Object.values(SPECIES).map(sp => {
+      const {anatomy, triangles, parts, volume} = inspectFish(sp.id, quality);
+      const solids = parts.filter(p => p.kind !== 'skin' && p.triangles > 0);
+      return { ID: sp.id, 魚: sp.name, '標準体長 cm': anatomy.SL.toFixed(2), '全長 cm': anatomy.TL,
+        三角形: triangles, 固体: solids.length, 開いた固体: solids.filter(p => !p.closed).length,
+        空の部品: parts.filter(p => !p.triangles).length, '固体体積 cm³': volume.toFixed(3) };
+    }));
+    return;
+  }
+  const {anatomy, triangles, volume, parts} = inspectFish(id, quality);
+  const vector = p => p.map(v => v.toFixed(2)).join(', ');
+  const rows = parts.map(m => ({ 部品: m.id, 三角形: m.triangles, '体積 cm³': m.closed ? m.volume.toFixed(4) : '—',
+    形: !m.triangles ? '空' : m.closed ? '閉' : '開', 境界辺: m.boundary,
+    '最小座標 cm': m.triangles ? vector(m.min) : '—', '最大座標 cm': m.triangles ? vector(m.max) : '—' }));
+  const present = parts.filter(p => p.triangles);
+  const lower = [0,1,2].map(i => Math.min(...present.map(p => p.min[i])));
+  const upper = [0,1,2].map(i => Math.max(...present.map(p => p.max[i])));
   rows.push({ 部品: '合計', 三角形: triangles, '体積 cm³': volume.toFixed(4), 形: '', 境界辺: '',
     '最小座標 cm': vector(lower), '最大座標 cm': vector(upper) });
   console.table(rows);
-  const outer = envelopeVolume(fish.anatomy);
-  console.log(`標準体長 ${fish.anatomy.SL.toFixed(3)} cm、全長 ${fish.anatomy.TL.toFixed(3)} cm。`);
+  const outer = envelopeVolume(anatomy);
+  console.log(`標準体長 ${anatomy.SL.toFixed(3)} cm、全長 ${anatomy.TL.toFixed(3)} cm。`);
   console.log(`吻から尾ビレの付け根までの外形は ${outer.toFixed(3)} cm³ です。閉じた部品の体積合計との差は ${(100 * (volume / outer - 1)).toFixed(2)}% です。`);
   console.log('体積合計は皮の開いた面を除き、目やヒレを含む各立体の符号付き体積を足した値です。');
-  fish.dispose();
 }
 
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {

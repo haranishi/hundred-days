@@ -15,7 +15,8 @@ export function makeBasicMaterials(species = {}) {
   return {
     skin, flesh: standard('身', fleshColor, 0.52), cap: standard('切り口', fleshColor, 0.61),
     bone: standard('骨', '#eae1c5', 0.57), organ: standard('腸', '#cd8981', 0.40),
-    fin: standard('ヒレの膜', colors.fin ?? '#A5A882', 0.52, 0.07), ray: standard('ヒレのすじ', '#858568', 0.51),
+    fin: standard('ヒレの膜', colors.fin ?? '#A5A882', 0.52, 0.07, {vertexColors: !!species.look?.blindSide}),
+    ray: standard('ヒレのすじ', '#858568', 0.51),
     iris: standard('虹彩', colors.iris ?? '#D8D6C8', 0.29, 0.22), eye: standard('瞳孔', '#101c23', 0.16),
     glint: standard('目の光', '#f5f8f5', 0.15), dark: standard('口と鰓の縁', '#39454a', 0.57),
     stomach: standard('胃', '#e4b7a8', 0.43), liver: standard('肝臓', '#9f5854', 0.39),

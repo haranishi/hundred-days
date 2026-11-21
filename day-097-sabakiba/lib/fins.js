@@ -1,7 +1,7 @@
 import { loft, samples, tube, joinGeometries, sectionVertex, namedMesh, bandAngle, bodyRing } from './loft.js';
 
 // 根元と先を結ぶ鰭条の間を膜でつなぎます。両面と側縁があり、真上からも厚みが見えます。
-function fin(group, name, rayAt, count, thickness, materials, q) {
+function fin(group, name, rayAt, count, thickness, materials, q, insetRays = false) {
   const rays = samples(count, rayAt);
   const rings = rays.map(({root, tip}) => [
     [root, 1], [tip, 0.26], [tip, -0.26], [root, -1],
@@ -9,36 +9,50 @@ function fin(group, name, rayAt, count, thickness, materials, q) {
   group.add(namedMesh(name, loft(rings, { capTag: 0 }), materials.fin ?? materials.skin));
   const rods = rays.slice(1, -1).map(({root, tip}) => {
     const start = root.slice(), end = tip.slice();
+    if (insetRays) end[0] -= thickness * 0.5;
     start[2] += thickness * 0.82; end[2] += thickness * 0.18;
     return tube([start, end], [thickness * 0.75, thickness * 0.37], q >= 10 ? 5 : 4, 0);
   });
   if (rods.length) group.add(namedMesh(name + 'のすじ', joinGeometries(rods), materials.ray ?? materials.bone));
 }
 
-function medianFin(group, a, data, up, name, m, q) {
+function medianFin(group, a, data, up, name, m, q, fringe) {
   const start = data.origin / 100, end = data.end / 100, direction = up ? 1 : -1;
   const long = (data.softRays ?? 0) > 8, count = Math.max(6, (data.spines ?? 0) + (data.softRays ?? 7));
   fin(group, name, t => {
     const s = start + (end - start) * t;
     const root = a.flank(s, direction), peak = long ? 0.11 : 0.23;
-    const envelope = t < peak ? Math.sin(t / peak * Math.PI / 2)
-      : (1 - (t - peak) / (1 - peak)) ** (long ? 0.64 : 1.45);
+    const envelope = fringe ? Math.sin(Math.PI * t) ** 0.75 : t < peak
+      ? Math.sin(t / peak * Math.PI / 2) : (1 - (t - peak) / (1 - peak)) ** (long ? 0.64 : 1.45);
     const height = (0.025 + envelope * 0.975) * data.height / 100 * a.SL;
     return { root, tip: [root[0] + height * (long ? 0.45 : 0.32), root[1] + direction * height, 0] };
   }, count + 2, a.SL * 0.0019, m, q);
 }
 
+// 最後の主鰭の後ろから尾柄まで。根元と頂点の位置を別々に取り、背腹とも同じ三角形を使います。
+function addFinlets(group, a, lastFin, count, up, m) {
+  if (!lastFin || !count) return;
+  const start = lastFin.end / 100 + 0.02, interval = (0.96 - start) / count;
+  const direction = up ? 1 : -1;
+  for (let i = 0; i < count; i++) {
+    const s = start + interval * i, taper = 1 - 0.42 * i / Math.max(1, count - 1);
+    const span = interval * 0.72 * taper, height = a.SL * Math.min(0.018, interval * 0.68) * taper;
+    const back = a.flank(s + span, direction), tip = a.flank(s + span * 0.66, direction);
+    tip[1] += direction * height;
+    const outline = [a.flank(s, direction), tip, back];
+    const rings = [-1, 1].map(sign => outline.map(([x, y]) => [x, y, sign * height * 0.07]));
+    group.add(namedMesh('小離ビレ', loft(rings, {tag: 0, capTag: 0}), m.fin ?? m.skin));
+  }
+}
+
 export function addMedianFins(group, a, species, stations, m, q) {
   const fins = species.fins ?? {};
-  for (const [i, data] of (fins.dorsal ?? []).entries()) medianFin(group, a, data, true, `第${i + 1}背ビレ`, m, q);
-  if (fins.anal) medianFin(group, a, fins.anal, false, '尻ビレ', m, q);
-  for (const [side, count] of Object.entries(fins.finlets ?? {})) {
-    for (let i = 0; i < count; i++) {
-      const origin = 84 + i * 13 / count;
-      medianFin(group, a, { origin, end: origin + 7 / count, height: 1.7, softRays: 3 }, side === 'dorsal', '小離ビレ', m, q);
-    }
-  }
-  fin(group, '尾ビレ', t => a.caudalRay(2 * t - 1), 2 * q + 1, a.finThickness, m, q);
+  const fringe = species.family === 'flat';
+  for (const [i, data] of (fins.dorsal ?? []).entries()) medianFin(group, a, data, true, `第${i + 1}背ビレ`, m, q, fringe);
+  if (fins.anal) medianFin(group, a, fins.anal, false, '尻ビレ', m, q, fringe);
+  addFinlets(group, a, fins.dorsal?.at(-1), fins.finlets?.dorsal, true, m);
+  addFinlets(group, a, fins.anal, fins.finlets?.anal, false, m);
+  fin(group, '尾ビレ', t => a.caudalRay(2 * t - 1), 2 * q + 1, a.finThickness, m, q, fins.caudal?.forkDepth === 0);
   const trunk = stations.filter(s => s >= a.head && s <= a.tail);
   const stockParts = [], recess = new Map();
   for (const direction of [1, -1]) {

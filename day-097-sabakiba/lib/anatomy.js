@@ -7,6 +7,15 @@ const smooth = (t) => { const u = clamp01(t); return u * u * (3 - 2 * u); };
 const unit = (v) => { const length = Math.hypot(...v); return v.map(k => k / length); };
 const signedPower = (x, power) => Math.abs(x) < 1e-14 ? 0 : Math.sign(x) * Math.abs(x) ** power;
 
+// 胸ビレ上の弧を、手順の線と体表の彩色で共有します。
+export function lateralLineRatio(species, s) {
+  const height = species.shape?.lateralLineHeight ?? 0.15;
+  if (species.family !== 'flat') return height;
+  const pectoral = (species.fins?.pectoral?.base ?? 28) / 100;
+  const t = clamp01((s - pectoral) / 0.20);
+  return height + 0.45 * Math.sin(Math.PI * t) ** 2;
+}
+
 export function createAnatomy(species, { segments = 44 } = {}) {
   const shape = species.shape ?? {};
   const TL = species.sizeCm.typical, SL = TL / (shape.TL_over_SL ?? 1.16);
@@ -15,7 +24,8 @@ export function createAnatomy(species, { segments = 44 } = {}) {
   const opercle = (shape.opercleEdge ?? shape.headLength ?? 27.5) / 100;
   const eyeS = (shape.eyePos ?? (shape.headLength ?? 27.5) * ((shape.snout ?? 31) + (shape.eyeDia ?? 22.6) / 2) / 100) / 100;
   const vent = (species.vent ?? 50) / 100, cavityEnd = (species.cavityEnd ?? vent * 100) / 100;
-  const skinT = 0.05, wallT = 0.012 * SL, stripT = 0.014 * SL;
+  const skinT = Math.min(0.08, Math.max(0.03, (shape.skinThicknessMm ?? 0.5) / 10));
+  const wallT = 0.012 * SL, stripT = 0.014 * SL;
   const diameter = species.vertebraDia ?? shape.vertebraDia;
   const peak = profile((shape.maxDepthPos ?? 40) / 100);
   const radius = diameter == null ? 0.0125 * SL : (peak.top + peak.bottom) * diameter / 200;
@@ -45,9 +55,12 @@ export function createAnatomy(species, { segments = 44 } = {}) {
     const phi = Math.asin(signedPower(Math.max(-1, Math.min(1, ratio)), n / 2));
     return coordinates(s, side === 'R' ? Math.PI - phi : phi, pr);
   }
-  const headCutTop = flank(opercle + 0.01, 1), headCutBottom = flank(opercle - 0.04, -1);
+  const headCutTop = flank(opercle + 0.01, 1);
+  const headCutBottom = flank(shape.headCutBottom == null ? opercle - 0.04 : shape.headCutBottom / 100, -1);
   const headSlope = (headCutTop[0] - headCutBottom[0]) / (headCutTop[1] - headCutBottom[1]);
   const head = (headCutTop[0] - headSlope * headCutTop[1]) / SL, tail = 0.94, tailSlope = 0.14;
+  // 腹腔の横幅は未計測です。作図では長さ24% SLを基準に、長い腹腔と鰾のない腹腔を細く見積もります。
+  const cavityWidth = 0.24 / Math.max(0.24, cavityEnd - head) * (species.swimBladder === false ? 0.5 : 1);
   function cutPlane(name) {
     if (name === 'head') return { point: [...headCutTop], normal: unit([1, -headSlope, 0]) };
     if (name === 'tail') return { point: [tail * SL, 0, 0], normal: unit([1, -tailSlope, 0]) };
@@ -55,7 +68,10 @@ export function createAnatomy(species, { segments = 44 } = {}) {
   }
   // 切断面の近傍だけ駅を傾けます。頭と身、皮と帯も同じ面と輪郭の交点を使います。
   function stationOnSection(center, ordinate) {
-    const slope = headSlope * smooth(1 - Math.abs(center - head) / 0.12)
+    // 腹側の傾きを腹腔の後端までに解きます。短い腹腔でも腹骨層の最後の輪が同じ辺に閉じます。
+    const shortCavity = cavityEnd - head < 0.12 && center > head && center < head + 0.12;
+    const reach = shortCavity && ordinate(center) < 0 ? cavityEnd - head : 0.12;
+    const slope = headSlope * smooth(1 - Math.abs(center - head) / reach)
       + tailSlope * smooth(1 - Math.abs(center - tail) / 0.05);
     if (slope === 0) return center;
     let s = center;
@@ -91,7 +107,8 @@ export function createAnatomy(species, { segments = 44 } = {}) {
       const room = Math.max(0, widthAt(d) - seam);
       const outerWall = Math.max(room * 0.30, room - wallT);
       const layer = Math.min(outerWall * 0.58, stripT);
-      return { seam, boundary: seam + outerWall * bulge, inside: seam + (outerWall - layer) * bulge };
+      const muscle = (outerWall - layer) * (1 - cavityWidth);
+      return { seam, boundary: seam + (outerWall - muscle) * bulge, inside: seam + (outerWall - layer - muscle) * bulge };
     }
     return { axisY: pr.axisY, height, width, n, r, limit, roof, floor, widthAt, wall };
   }
@@ -99,9 +116,10 @@ export function createAnatomy(species, { segments = 44 } = {}) {
   const base = profile(1), tailLength = TL - SL, fork = clamp01(fins.caudal?.forkDepth ?? 0.72);
   const finHeight = Math.max(base.top, base.bottom) * 0.75 + tailLength * 0.87;
   const finThickness = 0.003 * SL;
+  const tailReach = t => fork === 0 ? 1 - 0.24 * t * t : 1 - fork + fork * Math.abs(t);
   function caudalRay(t) {
     return { root: [SL, base.axisY + t * (t < 0 ? base.bottom : base.top), 0],
-      tip: [SL + tailLength * (1 - fork + fork * Math.abs(t)), base.axisY + t * finHeight, 0] };
+      tip: [SL + tailLength * tailReach(t), base.axisY + t * finHeight, 0] };
   }
   function inside(p) {
     if (!Array.isArray(p) || p.length !== 3 || !p.every(Number.isFinite)) return false;
@@ -109,14 +127,15 @@ export function createAnatomy(species, { segments = 44 } = {}) {
     if (x < -eps || x > TL + eps) return false;
     if (x > SL + eps) {
       const u = (x - SL) / tailLength, dy = y - base.axisY;
-      const outer = mix(dy >= 0 ? base.top : base.bottom, finHeight, u);
+      const outer = mix(dy >= 0 ? base.top : base.bottom, finHeight, Math.min(1, u / tailReach(1)));
       const inner = fork > 0 ? Math.max(0, (u - 1 + fork) / fork) * finHeight : 0;
       if (Math.abs(dy) > outer + eps || Math.abs(dy) < inner - eps) return false;
+      if (!fork && u > tailReach(dy / finHeight) + eps / tailLength) return false;
       // 同じ高さを通る鰭条を逆算し、先端に向かって薄くなる膜の厚みを求めます。
       let lo = 0, hi = 1;
       for (let i = 0; i < 24; i++) {
         const t = (lo + hi) / 2, ray = Math.abs(dy) / mix(dy >= 0 ? base.top : base.bottom, finHeight, t);
-        if (t * (1 - fork + fork * ray) < u) lo = t;
+        if (t * tailReach(ray) < u) lo = t;
         else hi = t;
       }
       return Math.abs(z) <= finThickness * (1 - 0.74 * (lo + hi) / 2) + eps;
@@ -130,13 +149,15 @@ export function createAnatomy(species, { segments = 44 } = {}) {
   const analStart = (fins.anal?.origin ?? 53) / 100, analEnd = (fins.anal?.end ?? 90) / 100;
   const axial = (s) => [s * SL, profile(s).axisY, 0];
   const anchors = {
-    snout: axial(0), eye: flank(eyeS, 0.20), mouth: flank(0.014, shape.mouth === 'inferior' ? -0.12 : 0.12),
+    snout: axial(0), eye: flank(eyeS, shape.eyeHeight ?? 0.20),
+    mouth: flank(shape.jawProjection ? shape.jawProjection / 100 : 0.014,
+      shape.mouth === 'inferior' ? -0.12 : shape.mouth === 'terminal' ? 0 : 0.12),
     opercleTop: flank(opercle - 0.015, 0.78), opercleBottom: flank(opercle - 0.044, -0.78),
     headCutTop, headCutBottom, pectoralBase: flank((fins.pectoral?.base ?? 28) / 100, -0.03),
     pelvicBase: flank((fins.pelvic?.origin ?? 31) / 100, -0.83), cavityStart: [head * SL, profile(head).axisY - spineRadius(head), 0],
     vent: flank(vent, -1), dorsalFinStart: flank(dorsalStart, 1), dorsalFinEnd: flank(dorsalEnd, 1),
     analFinStart: flank(analStart, -1), analFinEnd: flank(analEnd, -1), peduncle: axial(1),
-    tailTip: caudalRay(1).tip, spineHeadEnd: axial(head), bodyCenter: axial(0.50),
+    tailTip: caudalRay(fork ? 1 : 0).tip, spineHeadEnd: axial(head), bodyCenter: axial(0.50),
   };
   function point(name) {
     if (!Object.hasOwn(anchors, name)) throw new RangeError(`目印「${name}」はありません。`);
@@ -163,9 +184,12 @@ export function createAnatomy(species, { segments = 44 } = {}) {
         }); break;
       case 'dorsalMidline': points = fromHead(outer(1), 1); break;
       case 'ventralMidline': points = fromHead(outer(-1), 1); break;
-      case 'lateralLine': points = fromHead(outer(0.15), 1); break;
+      case 'lateralLine': points = fromHead(s => flank(s, lateralLineRatio(species, s), side), 1); break;
       case 'scaleSweep': points = span(outer(0), 1, opercle); break;
-      case 'scuteRow': points = span(outer(0.15), 1, Math.max((species.scutes?.from ?? 0) / 100, 0.53)); break;
+      case 'scuteRow':
+        points = species.scutes?.position === 'ventral'
+          ? span(outer(-1), species.scutes.to / 100, species.scutes.from / 100)
+          : span(outer(0.15), 1, Math.max((species.scutes?.from ?? 0) / 100, 0.53)); break;
       case 'bellySlit': points = span(outer(-1), vent, headCutBottom[0] / SL); break;
       case 'kidneyLine': points = fromHead(s => inner(s, -spineRadius(s), 0), vent); break;
       case 'dorsalCut': points = fromHead(outer(0.88)); break;

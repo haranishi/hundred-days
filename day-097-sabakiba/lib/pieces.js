@@ -1,24 +1,30 @@
 import * as THREE from '../vendor/three.js';
 import { PIECE_IDS, PIECE_PARENT } from './contract.js';
-import { createAnatomy } from './anatomy.js';
+import { createAnatomy, lateralLineRatio } from './anatomy.js';
 import { samples, loft, sectionVertex, namedMesh, quadrantAngle, joinGeometries } from './loft.js';
 import { addHead } from './head.js';
 import { addMedianFins } from './fins.js';
 import { addSkeleton, addRibs, addOrgans, pinbones } from './bones.js';
 import { createRng, hashString } from './rng.js';
+import { valueNoise2 } from './noise.js';
 import { makeBasicMaterials } from './materials-basic.js';
 import { getSpecies } from './species/index.js';
 
 const QUALITY = { high: [64, 56], standard: [44, 40], light: [28, 28] };
 
 // 境目を駅として含めたうえで、残る駅を区間長に比例して配ります。
-function longitudes(a, count) {
-  const stops = [0, a.head, a.cavityEnd, a.tail, 1];
+function longitudes(a, count, jaw) {
+  const stops = [0, ...(jaw > 0 ? [jaw] : []), a.head, a.cavityEnd, a.tail, 1];
   const ideal = stops.slice(1).map((s, i) => (s - stops[i]) * (count - 1));
-  const sizes = ideal.map(x => Math.max(1, Math.floor(x)));
-  while (sizes.reduce((sum, n) => sum + n, 0) < count - 1) {
-    const remainder = ideal.map((x, i) => x - sizes[i]);
-    sizes[remainder.indexOf(Math.max(...remainder))]++;
+  // 腹腔が短くても、腹壁の膨らみと閉じ際の両方を標本化します。
+  const minimum = stops.slice(1).map(s => s === a.cavityEnd ? Math.ceil(count / 6) : 1);
+  const sizes = ideal.map((x, i) => Math.max(minimum[i], Math.floor(x)));
+  let remaining = count - 1 - sizes.reduce((sum, n) => sum + n, 0);
+  while (remaining !== 0) {
+    const step = Math.sign(remaining);
+    const priority = ideal.map((x, i) => step < 0 && sizes[i] === minimum[i] ? -Infinity : step * (x - sizes[i]));
+    sizes[priority.indexOf(Math.max(...priority))] += step;
+    remaining -= step;
   }
   const stations = [0];
   for (let k = 0; k < sizes.length; k++) {
@@ -99,18 +105,38 @@ function skin(a, centers, side, dorsal, m, q) {
   return namedMesh(dorsal ? '背側の皮' : '腹側の皮', joinGeometries(surfaces), m.skin);
 }
 
-function tintSkin(root, anatomy, species, skinMaterial) {
+function tintSkin(root, anatomy, species, materials) {
   const palette = species.look?.colors ?? {};
   const back = new THREE.Color(palette.dorsal ?? '#2F4858'), flank = new THREE.Color(palette.flank ?? '#B8C7CC');
   const belly = new THREE.Color(palette.belly ?? '#EEF2F5'), c = new THREE.Color();
+  const blind = species.look?.blindSide && new THREE.Color(species.look.blindSide);
+  const fin = new THREE.Color(palette.fin ?? '#A5A882');
+  const spotted = species.look?.patterns?.includes('flatSpots'), seed = spotted ? hashString(species.id ?? '') : 0;
   root.traverse(mesh => {
-    if (!mesh.isMesh || ![mesh.material].flat().includes(skinMaterial)) return;
+    if (!mesh.isMesh) return;
+    const membrane = blind && mesh.material === materials.fin;
+    if (!membrane && ![mesh.material].flat().includes(materials.skin)) return;
+    const base = membrane ? fin : flank;
     const geometry = mesh.geometry, attr = geometry.attributes.position, colors = [];
     for (let j = 0; j < attr.count; j++) {
-      const pr = anatomy.profile(attr.getX(j) / anatomy.SL), h = attr.getY(j) - pr.axisY;
+      const s = attr.getX(j) / anatomy.SL, pr = anatomy.profile(s), h = attr.getY(j) - pr.axisY;
       const ratio = Math.min(1, Math.abs(h) / (h >= 0 ? pr.top || 1 : pr.bottom || 1));
-      c.copy(flank).lerp(h >= 0 ? back : belly, h >= 0 ? ratio ** 1.3 : ratio);
-      colors.push(c.r / Math.max(flank.r, 1e-6), c.g / Math.max(flank.g, 1e-6), c.b / Math.max(flank.b, 1e-6));
+      if (blind) {
+        if (attr.getZ(j) < 0) c.copy(blind);
+        else if (membrane) c.copy(fin);
+        else {
+          c.copy(flank).lerp(back, 0.25 + 0.55 * ratio);
+          if (spotted) {
+            const patch = valueNoise2(s * 28, h / anatomy.SL * 40, seed);
+            c.multiplyScalar(0.45 + patch).lerp(blind, 0.48 * THREE.MathUtils.smoothstep(patch, 0.70, 0.95));
+          }
+          if (s >= anatomy.head) {
+            const distance = Math.abs(h / pr.top - lateralLineRatio(species, s));
+            c.multiplyScalar(0.63 + 0.37 * THREE.MathUtils.smoothstep(distance, 0.01, 0.13));
+          }
+        }
+      } else c.copy(flank).lerp(h >= 0 ? back : belly, h >= 0 ? ratio ** 1.3 : ratio);
+      colors.push(c.r / Math.max(base.r, 1e-6), c.g / Math.max(base.g, 1e-6), c.b / Math.max(base.b, 1e-6));
     }
     geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
   });
@@ -160,7 +186,8 @@ export function buildFishModel(species, { quality = 'standard', rng, materialFac
   const source = typeof rng === 'number' ? createRng(rng) : rng ?? createRng(hashString(species.id));
   const m = materialFactory(species, { quality, rng: source.fork?.('材質') ?? source }), group = new THREE.Group(), pieces = {};
   group.name = species.name ?? species.id;
-  const centers = longitudes(a, segments), trunk = centers.filter(s => s >= a.head && s <= a.tail);
+  const centers = longitudes(a, segments, (species.shape?.jawProjection ?? 0) / 100);
+  const trunk = centers.filter(s => s >= a.head && s <= a.tail);
   const objects = Object.fromEntries(PIECE_IDS.map(id => [id, new THREE.Group()]));
   const local = source.fork?.('血合い骨') ?? source;
   const variations = Array.from({length: species.pinbones?.count ?? 20}, () => typeof local === 'function' ? local() : local.next());
@@ -184,7 +211,6 @@ export function buildFishModel(species, { quality = 'standard', rng, materialFac
   for (const id of PIECE_IDS) {
     const object = objects[id], parent = objects[PIECE_PARENT[id]] ?? group;
     object.name = id; object.userData.pieceId = id;
-    tintSkin(object, a, species, m.skin);
     let triangles = 0;
     visitPieceMeshes(object, mesh => {
       triangles += (mesh.geometry.index?.count ?? mesh.geometry.attributes.position.count) / 3 * (mesh.isInstancedMesh ? mesh.count : 1);
@@ -199,6 +225,7 @@ export function buildFishModel(species, { quality = 'standard', rng, materialFac
   }
   group.userData.centroid = centroid.multiplyScalar(1 / volume).toArray();
   for (const piece of Object.values(pieces)) piece.group.add(piece.object);
+  tintSkin(group, a, species, m);
   group.updateMatrixWorld(true);
   let disposed = false;
   function dispose() {

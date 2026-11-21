@@ -47,6 +47,7 @@ export function profileFromKeyMeasures(shape = {}, family = 'round') {
   const peak = (shape.maxDepthPos ?? 40) / 100, wide = peak * 0.9;
   const peduncle = (shape.peduncleDepth ?? 4) / 100;
   const belly = shape.belly ?? 0.94;
+  const jaw = (shape.jawProjection ?? 0) / 100;
   // 吻から肩は丸みのある弧、肩から尾柄は両端の傾きが 0 の曲線です。
   function outline(s, at, maximum, end, fullness) {
     if (s < at) {
@@ -57,13 +58,18 @@ export function profileFromKeyMeasures(shape = {}, family = 'round') {
     return end + (maximum - end) * (1 - t) ** 2 * (1 + 2 * t);
   }
   const stations = new Set([0, 0.001, 0.004, 0.012, peak, wide, 1]);
+  if (jaw > 0) { stations.add(jaw); stations.add(3 * jaw); }
   for (let i = 1; i < 32; i++) stations.add(i / 32);
   return [...stations].sort((a, b) => a - b).map((s) => {
-    const height = outline(s, peak, depth, peduncle, 0.75);
+    const height = outline(s, peak, depth, peduncle, shape.foreheadFullness ?? 0.75);
     const half = outline(s, wide, width / 2, Math.min(width * 0.24, peduncle * 0.32), 0.65);
     const blend = clamp01(s / (peak * 0.6));
     const ease = blend * blend * (3 - 2 * blend);
-    return { s, top: height / (1 + belly), bottom: height * belly / (1 + belly), half,
+    // 下あごが突出する区間は薄く、上あごの始点から額と頬が滑らかに立ち上がります。
+    const lip = jaw > 0 ? clamp01((s - jaw) / (2 * jaw)) : 1;
+    const open = lip * lip * (3 - 2 * lip);
+    return { s, top: height / (1 + belly) * (0.12 + 0.88 * open),
+      bottom: height * belly / (1 + belly) * (0.38 + 0.62 * open), half: half * (0.32 + 0.68 * open),
       nTop: 2 + (flat ? 0.6 : 0.3) * ease, nBottom: 2 + (flat ? 0.6 : 0.1) * ease, axisY: 0 };
   });
 }
