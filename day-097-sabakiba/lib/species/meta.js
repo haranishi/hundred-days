@@ -1,0 +1,28 @@
+// 魚の「画面に出す情報」（形・色の数値は species/<id>.js）。暫定値: 手順の担当（WP-5）が調査 research/ で確定するまで、公開に使わない。
+export const SPECIES_META = {
+  aji: { id: 'aji', name: 'アジ', nameFull: 'マアジ', kana: 'あじ', method: 'sanmai', family: 'round', season: '初夏〜夏', difficulty: 1,
+    sizeCm: { typical: 21, min: 15, max: 30 }, minutes: { novice: 25, skilled: 5 }, similar: ['マルアジ', 'ムロアジ', 'シマアジ'],
+    blurb: '一尾をさばく最初の練習台。小さく扱いやすく、三枚おろしの基本がぜんぶ入っています。' },
+  iwashi: { id: 'iwashi', name: 'イワシ', nameFull: 'マイワシ', kana: 'いわし', method: 'tebiraki', family: 'round', season: '夏〜秋', difficulty: 1,
+    sizeCm: { typical: 15, min: 12, max: 20 }, minutes: { novice: 15, skilled: 4 }, similar: ['カタクチイワシ', 'ウルメイワシ'],
+    blurb: '包丁なしで、指だけで開けます。新鮮なうちの、いちばん気持ちのいいさばき方。' },
+  saba: { id: 'saba', name: 'サバ', nameFull: 'マサバ', kana: 'さば', method: 'sanmai', family: 'round', season: '秋〜冬', difficulty: 2,
+    sizeCm: { typical: 30, min: 25, max: 45 }, minutes: { novice: 30, skilled: 8 }, similar: ['ゴマサバ'],
+    blurb: '身が柔らかく傷みも早い魚。手早さと、腹骨・小骨の扱いがコツです。' },
+  sanma: { id: 'sanma', name: 'サンマ', nameFull: 'サンマ', kana: 'さんま', method: 'sanmai', family: 'round', season: '秋', difficulty: 2,
+    sizeCm: { typical: 28, min: 24, max: 32 }, minutes: { novice: 25, skilled: 6 }, similar: ['サヨリ'],
+    blurb: '細長くて骨が少ない魚。焼くだけなら下処理は最小で、刺身にするなら三枚おろし。' },
+  tai: { id: 'tai', name: 'タイ', nameFull: 'マダイ', kana: 'たい', method: 'sanmai', family: 'round', season: '春・秋', difficulty: 3,
+    sizeCm: { typical: 35, min: 25, max: 60 }, minutes: { novice: 45, skilled: 12 }, similar: ['クロダイ', 'スズキ'],
+    blurb: '大きくてうろこも骨も硬い魚。力まず、骨の上に刃を寝かせる練習になります。' },
+  hirame: { id: 'hirame', name: 'ヒラメ', nameFull: 'ヒラメ', kana: 'ひらめ', method: 'gomai', family: 'flat', season: '冬', difficulty: 4,
+    sizeCm: { typical: 45, min: 35, max: 70 }, minutes: { novice: 60, skilled: 15 }, similar: ['カレイ類'],
+    blurb: '平たい魚は、身が4枚＋中骨の五枚おろし。ヒレの付け根のエンガワも取れます。' },
+  kisu: { id: 'kisu', name: 'キス', nameFull: 'シロギス', kana: 'きす', method: 'seabiraki', family: 'round', season: '初夏〜秋', difficulty: 2,
+    sizeCm: { typical: 18, min: 12, max: 25 }, minutes: { novice: 30, skilled: 8 }, similar: ['ハゼ', 'ニギス'],
+    blurb: '天ぷらの定番。背から開いて中骨を外す、背開きを覚えられます。' },
+  katsuo: { id: 'katsuo', name: 'カツオ', nameFull: 'カツオ', kana: 'かつお', method: 'fushi', family: 'round', season: '春〜初夏・秋', difficulty: 3,
+    sizeCm: { typical: 45, min: 40, max: 60 }, minutes: { novice: 40, skilled: 12 }, similar: ['ソウダガツオ'],
+    blurb: '三枚におろしてから、背と腹の4つの「節」に分ける節取り。たたきの前の下ごしらえです。' },
+};
+export const SPECIES_ORDER = ['aji', 'iwashi', 'sanma', 'saba', 'kisu', 'tai', 'katsuo', 'hirame'];
