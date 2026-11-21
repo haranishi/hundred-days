@@ -13,7 +13,7 @@
   pose:{ head:'L', dorsal:'B' },         // 盤（まな板）の上の置き方。L R F(手前) B(奥) U D。頭の向きと背の向き（直交）
   camera:{ preset:'cook', focus:'opercleTop', zoom:1 },   // preset: cook side top front closeup・focus: アンカー名|{curve,side}|[x,y,z]
   durationMs:6000,                        // 2500〜9000
-  cuts:[{ id:'c1', curve:'headCut', side:'L', tool:'deba', motion:'pull', lead:'heel', angleDeg:25, window:[0.05,0.55], through:false }],
+  cuts:[{ id:'c1', curve:'headCut', side:'L', tool:'deba', motion:'pull', lead:'heel', angleDeg:25, window:[0.05,0.55], through:false, reverse:false }],   // reverse:true＝カーブの逆（尾→頭）に引く
   moves:[{ piece:'head', window:[0.6,0.95], move:[-6,0,2], rot:{axis:'y',deg:-10,about:'pivot'}, opacity:1, visible:true }],  // 盤の座標系（+x右 +y上 +z手前）・cm
   uniforms:{ scale:{to:0,window:[0.1,0.9]}, slitOpen:{to:0}, xray:{to:0}, scutes:{to:0} },
   effects:[{ kind:'scales', curve:'scaleSweep', side:'L', window:[0.1,0.9] }],     // scales | water

@@ -176,6 +176,7 @@ export function validateProcedure(raw, { pieceIds = ALL_PIECE_IDS, curveNames = 
       if (!TOOL_IDS.includes(c.tool)) E(id, `cuts の道具が不正: ${c.tool}`);
       if (!MOTIONS.includes(c.motion)) E(id, `cuts の motion が不正: ${c.motion}`);
       if (c.lead !== undefined && !LEADS.includes(c.lead)) E(id, 'cuts の lead が不正');
+      if (c.reverse !== undefined && typeof c.reverse !== 'boolean') E(id, 'cuts の reverse が不正');
       if (c.angleDeg !== undefined && !(c.angleDeg >= 0 && c.angleDeg <= 90)) E(id, 'angleDeg が範囲外');
       if (!isWin(c.window)) E(id, `cuts[${c.id}] の window が不正`);
     }
