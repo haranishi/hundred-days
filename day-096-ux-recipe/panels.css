@@ -177,6 +177,7 @@ textarea.cs-input[rows="2"] {
   padding: 10px 0;
   font-weight: 700;
   cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
 }
 .cs-summary::marker, .cs-rule-summary::marker { color: var(--cs-muted); }
 .cs-why, .cs-guide, .cs-notice {
