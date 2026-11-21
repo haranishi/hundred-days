@@ -43,15 +43,18 @@ const fragmentShader = `
   varying float vEdge;
   void main() {
     float alpha = 1.0;
+    // 朱の線は、白い縁取りをつける（暗い皮や刃の上でも向きが読める）。矢じりは朱のまま。
+    float core = 1.0;
     if (vArc >= 0.0) {
       if (vArc < uStart) discard;
       float d = abs(fract(vArc / uSpacing - uTime * 0.85 * uFlow) - 0.5);
       float aa = clamp(fwidth(vArc / uSpacing), 0.015, 0.09);
       alpha = (1.0 - smoothstep(0.29 - aa, 0.29 + aa, d))
-        * (1.0 - smoothstep(1.4, 2.7, abs(vEdge)));
+        * (1.0 - smoothstep(2.9, 3.6, abs(vEdge)));
+      core = 1.0 - smoothstep(2.0, 2.6, abs(vEdge));
     }
     if (alpha < 0.015) discard;
-    gl_FragColor = vec4(uColor, uOpacity * alpha);
+    gl_FragColor = vec4(mix(vec3(1.0), uColor, core), uOpacity * alpha);
     #include <colorspace_fragment>
   }`;
 
@@ -81,8 +84,8 @@ function ribbon(points, anatomy, surface, clock, viewport, { directed = true } =
       pos.y += 0.065 * dy / radius;
       pos.z += 0.065 * pos.z / radius;
     }
-    vertex(0, -2.7, length);
-    vertex(0, 2.7, length);
+    vertex(0, -3.6, length);
+    vertex(0, 3.6, length);
     if (i) {
       const n = i * 2;
       indices.push(n - 2, n - 1, n, n, n - 1, n + 1);
@@ -129,9 +132,9 @@ function ribbon(points, anatomy, surface, clock, viewport, { directed = true } =
 }
 
 function makeStartRing(viewport) {
-  const geometry = new THREE.RingGeometry(12, 16, 48);
-  const material = new THREE.ShaderMaterial({
-    uniforms: { uViewport: { value: viewport }, uColor: { value: new THREE.Color('#2f8f5b') } },
+  // 緑は「できた」の色なので、始点には使わない。濃い紺の輪に白い縁をつけ、明るい板・暗い皮のどちらでも見えるようにする。
+  const material = color => new THREE.ShaderMaterial({
+    uniforms: { uViewport: { value: viewport }, uColor: { value: new THREE.Color(color) } },
     vertexShader: `
       uniform vec2 uViewport;
       void main() {
@@ -147,10 +150,15 @@ function makeStartRing(viewport) {
       }`,
     transparent: true, depthTest: false, depthWrite: false, side: THREE.DoubleSide, forceSinglePass: true, toneMapped: false,
   });
-  const ring = new THREE.Mesh(geometry, material);
+  const ring = new THREE.Mesh(new THREE.RingGeometry(12, 16, 48), material('#1c2b33'));
   ring.name = 'practice-start';
   ring.renderOrder = 14;
   ring.frustumCulled = ring.matrixAutoUpdate = false;
+  const halo = new THREE.Mesh(new THREE.RingGeometry(10, 18, 48), material('#ffffff'));
+  halo.name = 'practice-start-halo';
+  halo.renderOrder = 13;
+  halo.frustumCulled = halo.matrixAutoUpdate = false;
+  ring.add(halo);
   return ring;
 }
 

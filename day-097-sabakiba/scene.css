@@ -39,7 +39,7 @@
   overflow-wrap: anywhere;
 }
 .fish-tag--hand { color: #154779; border-color: #2b7bd6; background: #f5fafff5; }
-.fish-tag--start { color: #1c5c3a; border-color: #2f8f5b; background: #f3fbf6f5; font-weight: 800; white-space: nowrap; }
+.fish-tag--start { color: #ffffff; border-color: #ffffff; background: #1c2b33; font-weight: 800; white-space: nowrap; }
 .fish-tag rt { font-size: .66em; }
 @media (max-width: 480px), (max-height: 480px) {
   .fish-tag { max-width: min(13em, calc(100% - 10px)); padding: 2px 5px; font-size: 11px; }

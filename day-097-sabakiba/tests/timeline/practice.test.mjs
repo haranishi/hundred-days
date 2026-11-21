@@ -137,7 +137,7 @@ test('端の3%は一度触れれば届いたと数え、2割からの一筆は60
   near(trace([0.2, 0.2]).coverage, 0);
   const late = trace(range(2, 10));
   assert.equal(late.score, 60);
-  assert.match(late.comment, /緑の丸/);
+  assert.match(late.comment, /「ここから」の丸/);
   const reverse = trace(range(10, 0));
   assert.equal(reverse.coverage, 0);
   assert.ok(reverse.score <= 60 && reverse.reversals === 1);

@@ -245,7 +245,7 @@ function handlePracticeSample(payload) {
   if (state.mode !== 'practice' || !activePracticeConfig) return;
   if (payload?.reason === 'far-from-start') {
     practiceResult = null;
-    practiceStatus = '線の始まり（緑の丸）に触れてから、そのまま引きます。';
+    practiceStatus = '線の始まり（「ここから」の丸）に触れてから、そのまま引きます。';
     syncGuideUI();
     return;
   }
@@ -280,7 +280,7 @@ function startPracticeMode(overrideCfg = null) {
   activePracticeConfig = { cut: cfg.cut || 'cut', tolerance: cfg.tolerance || 0.5 };
   practiceSession = null;
   practiceResult = null;
-  practiceStatus = '緑の丸から、朱色の線に沿って、一筆でなぞります。';
+  practiceStatus = '「ここから」の丸から、朱色の線に沿って、一筆でなぞります。';
   state = enterPractice(state, true);
   stopLoop();
   if (scene) scene.setPractice({ cutId: activePracticeConfig.cut });

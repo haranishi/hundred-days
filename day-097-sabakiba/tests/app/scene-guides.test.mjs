@@ -158,7 +158,7 @@ test('斜めの遠近投影でも t は魚の弧長に一致し、反転とカ�
   assert.equal(screenDistanceToCurve(camera, identity, rect, 190, 220, behind).distancePx, Infinity);
 });
 
-test('練習のときだけ逆向きの始点に32pxの緑の輪を置き、終点の矢じりを24pxにします', () => {
+test('練習のときだけ逆向きの始点に32pxの濃い紺の輪（白い縁つき）を置き、終点の矢じりを24pxにします', () => {
   const g = createGuides(anatomy, createRng(4));
   const cut = { curve: 'headCut', side: 'L', reverse: true }, step = { cuts: [cut] };
   const update = (practice, placement = pose) => g.update(empty, step, placement, 0, practice, 0);
@@ -172,7 +172,8 @@ test('練習のときだけ逆向きの始点に32pxの緑の輪を置き、終�
     update(cut);
     const ring = g.group.getObjectByName('practice-start');
     assert.ok(ring.visible && !ring.material.depthTest && ring.renderOrder > mesh.renderOrder);
-    assert.equal(ring.material.uniforms.uColor.value.getHexString(), '2f8f5b');
+    assert.equal(ring.material.uniforms.uColor.value.getHexString(), '1c2b33');
+    assert.equal(ring.children[0].material.uniforms.uColor.value.getHexString(), 'ffffff');
     assert.equal(ring.geometry.parameters.outerRadius * 2, 32);
     const start = new THREE.Vector3(...g.curvePoints(cut)[0]).applyMatrix4(matrix);
     assert.ok(new THREE.Vector3().setFromMatrixPosition(ring.matrix).distanceTo(start) < 1e-9);

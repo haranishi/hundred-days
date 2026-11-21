@@ -91,11 +91,11 @@ function strokeSmoothness(samples, reversals) {
 function feedback({ n, first, last, span, meanDist, maxDist, accuracy, smoothness, reversals, score, tolerance }) {
   if (n === 0) return '軌跡がまだありません。線の始まりに触れて、そのままなぞってみましょう。';
   if (n === 1) return '触れた点を一つ記録しました。次は指を離す前に線の先まで進みましょう。';
-  if (first - last >= 0.15) return '朱色の線を逆向きになぞっています。緑の丸から先へ進みましょう。';
+  if (first - last >= 0.15) return '朱色の線を逆向きになぞっています。「ここから」の丸から先へ進みましょう。';
   if (span < 0.05) return '同じ場所の近くに軌跡が集まっています。線に沿って少し先まで進みましょう。';
   if (reversals >= 2) return '小刻みに往復すると断面が荒れます。刃の全体を使って、一筆で長く引きましょう。';
   if (first > 0.15 && last < 0.85) return '線の中ほどをなぞれました。次は始まりから終わりまで線をつないでみましょう。';
-  if (first > 0.15) return '線の途中から始めています。緑の丸に指を置いてから進みましょう。';
+  if (first > 0.15) return '線の途中から始めています。「ここから」の丸に指を置いてから進みましょう。';
   if (last < 0.85) return '軌跡が線の途中で終わっています。朱色の線の終わりまで指を進めてみましょう。';
   if (accuracy < 0.76) return '線から平均' + meanDist.toFixed(1) + 'cmずれました。少しゆっくり、線の中心を追ってみましょう。';
   if (maxDist > tolerance * 1.5) return '途中で線から大きく離れた所があります。曲がる手前で少しゆっくり進みましょう。';

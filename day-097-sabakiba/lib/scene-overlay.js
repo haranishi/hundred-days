@@ -261,7 +261,7 @@ export function createSceneOverlay(container) {
   root.className = 'fish-overlay';
   root.setAttribute('aria-hidden', 'true');
   const toolbar = container.querySelector('.stage-pills'), reset = container.querySelector('.stage-reset');
-  // 練習中だけ、線の始点（緑の丸）に「ここから」を添える。緑は「できた」の色でもあるので、始点だと文字で示す。
+  // 練習中だけ、線の始点の丸に「ここから」を添える（丸の色は緑でなく濃い紺。緑は「できた」の色）。
   const startTag = doc.createElement('span');
   startTag.className = 'fish-tag fish-tag--start';
   startTag.setAttribute('aria-hidden', 'true');

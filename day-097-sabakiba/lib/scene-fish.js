@@ -495,7 +495,7 @@ export function createFishScene({ container, speciesId = 'aji', quality = 'auto'
     }
     const hit = picker(e.clientX, e.clientY);
     if (!hit || cut.through || CURVE_INFO[cut.curve].inner) {
-      // 押した瞬間だけは緑の丸の受付範囲を使い、一筆の途中からは線の受付幅に戻します。
+      // 押した瞬間だけは始点の丸の受付範囲を使い、一筆の途中からは線の受付幅に戻します。
       const reach = starting || hit ? Infinity : PRACTICE_REACH_PX;
       return pointAtCutDepth(viewer.camera, matrix, rect, e.clientX, e.clientY, points, reach);
     }

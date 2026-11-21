@@ -260,7 +260,7 @@ export function mountGuideView(container, { speciesId, procedure, actions }) {
 
   function renderPracticeArea({ stepView, practiceResult, statusText }) {
     if (!practiceResult) {
-      const message = statusText || '緑の丸から、朱色の線に沿って、一筆でなぞります。';
+      const message = statusText || '「ここから」の丸から、朱色の線に沿って、一筆でなぞります。';
       const liveStatus = practicePanel.querySelector('.practice-status');
       if (liveStatus) {
         const title = practicePanel.querySelector('.step-title');

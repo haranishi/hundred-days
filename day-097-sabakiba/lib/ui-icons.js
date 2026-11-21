@@ -68,6 +68,9 @@ export function makeRuby(base, kana) {
   rp1.textContent = '（';
   const rt = document.createElement('rt');
   rt.textContent = kana;
+  // 読みが親文字より長いと、ふりがなが前後の語を押し広げて空きが出る。親文字の幅＋少しに収まる大きさに縮める（下限は0.5em）。
+  const fit = (Array.from(base).length + 0.3) / Array.from(kana).length;
+  if (fit < 0.62 && rt.style) rt.style.fontSize = Math.max(0.5, fit).toFixed(3) + 'em';
   const rp2 = document.createElement('rp');
   rp2.textContent = '）';
   ruby.append(rp1, rt, rp2);

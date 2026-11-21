@@ -101,7 +101,7 @@ test('なぞって練習: 切りのある手順で練習を始め、なぞると
   await ready3d(page);
   await page.getByTestId('btn-practice').click();
   await expect(page.getByTestId('practice-panel')).toBeVisible();
-  // 練習は、緑の丸（線の始点）から押し始める。線の位置は、試験用フックが画面の座標で返す。
+  // 練習は、「ここから」の丸（線の始点）から押し始める。線の位置は、試験用フックが画面の座標で返す。
   const guide = await page.evaluate(async () => {
     await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
     return window.__sabaki.practiceGuide();
@@ -187,7 +187,7 @@ test.describe('スマホ（390×844・指）', () => {
 
 async function enterPractice(page) {
   await page.getByTestId('btn-practice').click();
-  await expect(page.locator('.practice-status')).toHaveText('緑の丸から、朱色の線に沿って、一筆でなぞります。');
+  await expect(page.locator('.practice-status')).toHaveText('「ここから」の丸から、朱色の線に沿って、一筆でなぞります。');
   // 練習に切り替わった後の盤の寸法とカメラで位置を読みます。
   const guide = await page.evaluate(async () => {
     await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
@@ -246,12 +246,12 @@ test.describe('幅390pxのアジ手順4・なぞって練習', () => {
     expect(Number(await result.locator('.result-score strong').textContent())).toBeGreaterThanOrEqual(75);
   });
 
-  test('始点の60px横で押すと緑の丸を案内し、そのまま線へ動かしても採点しません', async ({ page }) => {
+  test('始点の60px横で押すと「ここから」の丸を案内し、そのまま線へ動かしても採点しません', async ({ page }) => {
     const { start, end } = await enterPractice(page);
     const status = page.locator('.practice-status');
     await page.mouse.move(start.x + 60, start.y);
     await page.mouse.down();
-    await expect(status).toHaveText('線の始まり（緑の丸）に触れてから、そのまま引きます。');
+    await expect(status).toHaveText('線の始まり（「ここから」の丸）に触れてから、そのまま引きます。');
     await page.mouse.move(start.x, start.y);
     await page.mouse.move(end.x, end.y);
     await page.mouse.up();
