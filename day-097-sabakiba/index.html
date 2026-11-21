@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>さばき場 — 魚のさばき方を、3Dで見ながら</title>
+  <meta name="description" content="魚のさばき方を、台所と同じ向きの3Dで見ながら学べる無料Webアプリ。三枚おろし・手開き・背開き・五枚おろし・節取りの8種に対応し、骨の透視や切り線のなぞり練習もできます。">
+  <meta name="share:text" content="さばき場 — 魚のさばき方を、3Dで見ながら。">
+  <link rel="canonical" href="https://rairakku.com/100days/day-097-sabakiba/">
+  <meta property="og:title" content="さばき場 — 魚のさばき方を、3Dで見ながら">
+  <meta property="og:description" content="魚のさばき方を、台所と同じ向きの3Dで見ながら学べる無料Webアプリ。">
+  <meta property="og:image" content="https://rairakku.com/100days/day-097-sabakiba/screenshot.webp">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://rairakku.com/100days/day-097-sabakiba/">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="さばき場 — 魚のさばき方を、3Dで見ながら">
+  <meta name="twitter:description" content="魚のさばき方を、台所と同じ向きの3Dで見ながら学べる無料Webアプリ。">
+  <meta name="twitter:image" content="https://rairakku.com/100days/day-097-sabakiba/screenshot.webp">
+  <link rel="icon" href="./favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./app.css">
+  <link rel="stylesheet" href="./shared/share.css">
+</head>
+<body>
+  <a class="skip" href="#main">本文へ移る</a>
+
+  <div id="app" class="app-shell">
+    <header class="top-bar">
+      <div class="top-inner">
+        <a class="brand" href="#/" data-testid="nav-home">
+          <svg class="brand-mark" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M3 12.5c3.2-4.6 8.8-6.4 14.5-4.3l3-2.5v12.6l-3-2.5C11.8 18 6.2 16.2 3 12.5z" fill="#356887" stroke="#1c2b33" stroke-width="1.5" stroke-linejoin="round"/>
+            <circle cx="8" cy="11.2" r="1.2" fill="#f4f0e8"/>
+            <path d="M11 6.5l4 11" stroke="#e5422f" stroke-width="2" stroke-linecap="round" stroke-dasharray="2.5 2"/>
+          </svg>
+          <span class="brand-text">
+            <h1 class="brand-name">さばき場</h1>
+            <span class="brand-tagline">魚のさばき方を、3Dで見ながら。</span>
+          </span>
+        </a>
+
+        <nav class="top-actions" aria-label="共通メニュー">
+          <a class="top-action" href="#/safety" data-testid="nav-safety">
+            <svg class="icon" viewBox="0 0 20 20" aria-hidden="true" focusable="false">
+              <path d="M10 3l6 2.5v4.8c0 3.6-2.5 6-6 7.2-3.5-1.2-6-3.6-6-7.2V5.5L10 3z"/>
+              <path d="M10 7.5v3.2"/>
+              <circle cx="10" cy="13.2" r="0.8" fill="currentColor" stroke="none"/>
+            </svg>
+            <span>さばく前に</span>
+          </a>
+          <button type="button" class="top-action" id="btn-share" aria-label="このアプリを共有する" data-testid="btn-share">
+            <svg class="icon" viewBox="0 0 20 20" aria-hidden="true" focusable="false">
+              <path d="M10 3.5v8.5"/>
+              <path d="M6.8 6.7L10 3.5l3.2 3.2"/>
+              <path d="M4.5 11.5v4a1 1 0 0 0 1 1h9a1 1 0 0 0 1-1v-4"/>
+            </svg>
+            <span>共有</span>
+          </button>
+          <button type="button" class="top-action" id="btn-settings" aria-label="設定を開く" data-testid="btn-settings">
+            <svg class="icon" viewBox="0 0 20 20" aria-hidden="true" focusable="false">
+              <circle cx="10" cy="10" r="2.6"/>
+              <path d="M10 3.2v1.8M10 15v1.8M3.2 10H5M15 10h1.8M5.2 5.2l1.3 1.3M13.5 13.5l1.3 1.3M14.8 5.2l-1.3 1.3M6.5 13.5l-1.3 1.3"/>
+            </svg>
+            <span>設定</span>
+          </button>
+        </nav>
+      </div>
+    </header>
+
+    <main id="main" class="main" tabindex="-1"></main>
+  </div>
+
+  <!-- 手順一覧シート（ガイド画面から開く） -->
+  <dialog id="steps-dialog" class="sheet" aria-labelledby="steps-dialog-title">
+    <div class="sheet-head">
+      <h2 id="steps-dialog-title">手順の一覧</h2>
+      <button type="button" class="icon-btn" data-dialog-close aria-label="手順の一覧を閉じる">
+        <svg class="icon" viewBox="0 0 20 20" aria-hidden="true" focusable="false">
+          <path d="M5.5 5.5l9 9M14.5 5.5l-9 9"/>
+        </svg>
+      </button>
+    </div>
+    <div id="steps-dialog-body" class="sheet-body"></div>
+  </dialog>
+
+  <!-- 設定ダイアログ -->
+  <dialog id="settings-dialog" class="sheet" aria-labelledby="settings-dialog-title">
+    <div class="sheet-head">
+      <h2 id="settings-dialog-title">設定</h2>
+      <button type="button" class="icon-btn" data-dialog-close aria-label="設定を閉じる">
+        <svg class="icon" viewBox="0 0 20 20" aria-hidden="true" focusable="false">
+          <path d="M5.5 5.5l9 9M14.5 5.5l-9 9"/>
+        </svg>
+      </button>
+    </div>
+    <div class="sheet-body">
+      <div class="setting-group">
+        <label class="setting-check" for="setting-left">
+          <input type="checkbox" id="setting-left" data-testid="setting-left">
+          <span class="setting-check-text">
+            <strong>左利きモード</strong>
+            <span class="setting-desc">3Dの向きと文章の「左・右」を入れ替えます。ボタンの配置は変わりません。</span>
+          </span>
+        </label>
+      </div>
+
+      <div class="setting-group">
+        <label class="setting-check" for="setting-speech">
+          <input type="checkbox" id="setting-speech" data-testid="setting-speech">
+          <span class="setting-check-text">
+            <strong>手順の読み上げ（日本語）</strong>
+            <span id="setting-speech-note" class="setting-desc">手順を切り替えたときに声で読み上げます。</span>
+          </span>
+        </label>
+      </div>
+
+      <div class="setting-group">
+        <label class="setting-check" for="setting-wake">
+          <input type="checkbox" id="setting-wake" data-testid="setting-wake">
+          <span class="setting-check-text">
+            <strong>画面を消さない</strong>
+            <span id="setting-wake-note" class="setting-desc">ガイドを開いているあいだ、画面を点灯したままにします。</span>
+          </span>
+        </label>
+      </div>
+
+      <div class="setting-group">
+        <label class="setting-select-label" for="setting-quality">
+          <strong>3Dの画質</strong>
+          <select id="setting-quality" class="setting-select" data-testid="setting-quality">
+            <option value="auto">自動（端末に合わせる）</option>
+            <option value="high">高</option>
+            <option value="standard">標準</option>
+            <option value="light">軽め（動作優先）</option>
+          </select>
+        </label>
+      </div>
+
+      <details class="setting-keys">
+        <summary>キーボードの操作一覧</summary>
+        <dl class="key-list">
+          <dt><kbd>←</kbd> <kbd>→</kbd></dt><dd>前の手順・次の手順へ移ります</dd>
+          <dt><kbd>Space</kbd></dt><dd>動きの再生と一時停止を切り替えます</dd>
+          <dt><kbd>X</kbd></dt><dd>骨の透視を切り替えます</dd>
+          <dt><kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd></dt><dd>視点（台所・真横・真上）を切り替えます</dd>
+          <dt><kbd>L</kbd></dt><dd>左利きモードを切り替えます</dd>
+          <dt><kbd>Esc</kbd></dt><dd>開いているシートや練習を閉じます</dd>
+        </dl>
+      </details>
+    </div>
+  </dialog>
+
+  <!-- 共有ダイアログ（shared/share.js が #share に中身を据え付ける） -->
+  <dialog id="share-dialog" class="sheet" aria-labelledby="share-dialog-title">
+    <div class="sheet-head">
+      <h2 id="share-dialog-title">このアプリを共有する</h2>
+      <button type="button" class="icon-btn" data-dialog-close aria-label="共有ダイアログを閉じる">
+        <svg class="icon" viewBox="0 0 20 20" aria-hidden="true" focusable="false">
+          <path d="M5.5 5.5l9 9M14.5 5.5l-9 9"/>
+        </svg>
+      </button>
+    </div>
+    <div class="sheet-body" id="share-panel">
+      <div id="share"></div>
+    </div>
+  </dialog>
+
+  <script type="module" src="./app.js"></script>
+  <script src="./shared/share.js" defer></script>
+</body>
+</html>
