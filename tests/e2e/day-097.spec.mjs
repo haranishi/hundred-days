@@ -101,11 +101,15 @@ test('なぞって練習: 切りのある手順で練習を始め、なぞると
   await ready3d(page);
   await page.getByTestId('btn-practice').click();
   await expect(page.getByTestId('practice-panel')).toBeVisible();
-  const box = await page.locator('#stage canvas').boundingBox();
-  const y = box.y + box.height * 0.55;
-  await page.mouse.move(box.x + box.width * 0.35, y);
+  // 練習は、緑の丸（線の始点）から押し始める。線の位置は、試験用フックが画面の座標で返す。
+  const guide = await page.evaluate(async () => {
+    await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+    return window.__sabaki.practiceGuide();
+  });
+  expect(guide.points.length).toBeGreaterThan(1);
+  await page.mouse.move(guide.start.x, guide.start.y);
   await page.mouse.down();
-  for (let i = 0; i <= 12; i++) await page.mouse.move(box.x + box.width * (0.35 + 0.3 * i / 12), y + (i % 2) * 3, { steps: 2 });
+  for (const p of guide.points) await page.mouse.move(p.x, p.y, { steps: 2 });
   await page.mouse.up();
   await expect(page.getByTestId('practice-result')).toBeVisible({ timeout: 20_000 });
   expect(errors).toEqual([]);
