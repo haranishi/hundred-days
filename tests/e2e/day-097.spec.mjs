@@ -111,7 +111,7 @@ test('手順の一覧シートから好きな手順へ移れる（選ぶと閉�
 });
 
 test('なぞって練習: 切りのある手順で練習を始め、なぞると採点が出る', async ({ page }) => {
-  test.setTimeout(150_000);
+  test.setTimeout(240_000);
   const { errors } = await open(page, '#/fish/aji/4');
   await ready3d(page);
   await page.getByTestId('btn-practice').click();
@@ -124,7 +124,9 @@ test('なぞって練習: 切りのある手順で練習を始め、なぞると
   expect(guide.points.length).toBeGreaterThan(1);
   await page.mouse.move(guide.start.x, guide.start.y);
   await page.mouse.down();
-  for (const p of guide.points) await page.mouse.move(p.x, p.y, { steps: 2 });
+  // 動かす回数は少なく（遅いCIでは1回ごとの描画に数秒かかる）。線の上の点を間引いて、終点までたどる。
+  const last = guide.points.length - 1;
+  for (const [i, p] of guide.points.entries()) if (i % 5 === 0 || i === last) await page.mouse.move(p.x, p.y);
   await page.mouse.up();
   await expect(page.getByTestId('practice-result')).toBeVisible({ timeout: 20_000 });
   expect(errors).toEqual([]);
