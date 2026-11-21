@@ -6,20 +6,82 @@
   <title>さばき場 — 魚のさばき方を、3Dで見ながら</title>
   <meta name="description" content="魚のさばき方を、台所と同じ向きの3Dで見ながら学べる無料Webアプリ。三枚おろし・手開き・背開き・五枚おろし・節取りの8種に対応し、骨の透視や切り線のなぞり練習もできます。">
   <meta name="share:text" content="さばき場 — 魚のさばき方を、3Dで見ながら。">
-  <link rel="canonical" href="https://rairakku.com/100days/day-097-sabakiba/">
-  <meta property="og:title" content="さばき場 — 魚のさばき方を、3Dで見ながら">
-  <meta property="og:description" content="魚のさばき方を、台所と同じ向きの3Dで見ながら学べる無料Webアプリ。">
-  <meta property="og:image" content="https://rairakku.com/100days/day-097-sabakiba/screenshot.webp">
-  <meta property="og:type" content="website">
-  <meta property="og:url" content="https://rairakku.com/100days/day-097-sabakiba/">
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="さばき場 — 魚のさばき方を、3Dで見ながら">
-  <meta name="twitter:description" content="魚のさばき方を、台所と同じ向きの3Dで見ながら学べる無料Webアプリ。">
-  <meta name="twitter:image" content="https://rairakku.com/100days/day-097-sabakiba/screenshot.webp">
   <link rel="icon" href="./favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="./app.css">
   <link rel="stylesheet" href="./scene.css">
   <link rel="stylesheet" href="./shared/share.css">
+  <!-- modulepreload:start（tools/sync-modulepreload.mjs が作る。手で直さない） -->
+  <link rel="modulepreload" href="./lib/anatomy.js">
+  <link rel="modulepreload" href="./lib/app-state.js">
+  <link rel="modulepreload" href="./lib/bones.js">
+  <link rel="modulepreload" href="./lib/camera-math.js">
+  <link rel="modulepreload" href="./lib/camera.js">
+  <link rel="modulepreload" href="./lib/capture.js">
+  <link rel="modulepreload" href="./lib/content/glossary.js">
+  <link rel="modulepreload" href="./lib/content/parts.js">
+  <link rel="modulepreload" href="./lib/content/safety.js">
+  <link rel="modulepreload" href="./lib/contract.js">
+  <link rel="modulepreload" href="./lib/controls-gesture.js">
+  <link rel="modulepreload" href="./lib/controls.js">
+  <link rel="modulepreload" href="./lib/easing.js">
+  <link rel="modulepreload" href="./lib/fins.js">
+  <link rel="modulepreload" href="./lib/gfx-governor.js">
+  <link rel="modulepreload" href="./lib/gfx-select.js">
+  <link rel="modulepreload" href="./lib/gfx.js">
+  <link rel="modulepreload" href="./lib/guides.js">
+  <link rel="modulepreload" href="./lib/head.js">
+  <link rel="modulepreload" href="./lib/knife.js">
+  <link rel="modulepreload" href="./lib/loft.js">
+  <link rel="modulepreload" href="./lib/materials-basic.js">
+  <link rel="modulepreload" href="./lib/materials.js">
+  <link rel="modulepreload" href="./lib/noise.js">
+  <link rel="modulepreload" href="./lib/persist.js">
+  <link rel="modulepreload" href="./lib/pick.js">
+  <link rel="modulepreload" href="./lib/pieces.js">
+  <link rel="modulepreload" href="./lib/pixels.js">
+  <link rel="modulepreload" href="./lib/pose-compose.js">
+  <link rel="modulepreload" href="./lib/practice.js">
+  <link rel="modulepreload" href="./lib/procedures/aji.js">
+  <link rel="modulepreload" href="./lib/procedures/hirame.js">
+  <link rel="modulepreload" href="./lib/procedures/index.js">
+  <link rel="modulepreload" href="./lib/procedures/iwashi.js">
+  <link rel="modulepreload" href="./lib/procedures/katsuo.js">
+  <link rel="modulepreload" href="./lib/procedures/kisu.js">
+  <link rel="modulepreload" href="./lib/procedures/saba.js">
+  <link rel="modulepreload" href="./lib/procedures/sanma.js">
+  <link rel="modulepreload" href="./lib/procedures/tai.js">
+  <link rel="modulepreload" href="./lib/profile.js">
+  <link rel="modulepreload" href="./lib/rng.js">
+  <link rel="modulepreload" href="./lib/router.js">
+  <link rel="modulepreload" href="./lib/scene-fish.js">
+  <link rel="modulepreload" href="./lib/scene-overlay.js">
+  <link rel="modulepreload" href="./lib/shader-chunks.js">
+  <link rel="modulepreload" href="./lib/species/aji.js">
+  <link rel="modulepreload" href="./lib/species/hirame.js">
+  <link rel="modulepreload" href="./lib/species/index.js">
+  <link rel="modulepreload" href="./lib/species/iwashi.js">
+  <link rel="modulepreload" href="./lib/species/katsuo.js">
+  <link rel="modulepreload" href="./lib/species/kisu.js">
+  <link rel="modulepreload" href="./lib/species/meta.js">
+  <link rel="modulepreload" href="./lib/species/saba.js">
+  <link rel="modulepreload" href="./lib/species/sanma.js">
+  <link rel="modulepreload" href="./lib/species/tai.js">
+  <link rel="modulepreload" href="./lib/speech.js">
+  <link rel="modulepreload" href="./lib/stage.js">
+  <link rel="modulepreload" href="./lib/text-guide.js">
+  <link rel="modulepreload" href="./lib/textures-flesh.js">
+  <link rel="modulepreload" href="./lib/textures-skin.js">
+  <link rel="modulepreload" href="./lib/timeline.js">
+  <link rel="modulepreload" href="./lib/ui-format.js">
+  <link rel="modulepreload" href="./lib/ui-guide.js">
+  <link rel="modulepreload" href="./lib/ui-home.js">
+  <link rel="modulepreload" href="./lib/ui-icons.js">
+  <link rel="modulepreload" href="./lib/ui-intro.js">
+  <link rel="modulepreload" href="./lib/ui-pages.js">
+  <link rel="modulepreload" href="./lib/view3d.js">
+  <link rel="modulepreload" href="./lib/wake-lock.js">
+  <link rel="modulepreload" href="./vendor/three.js">
+  <!-- modulepreload:end -->
 </head>
 <body>
   <a class="skip" href="#main">本文へ移る</a>

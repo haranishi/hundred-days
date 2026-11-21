@@ -47,7 +47,9 @@ export const SOURCE_DIRS_BY_APP = {
   // day-074 の tools/ は、観測APIを実在のサイトで確かめる検証の道具（api-check.mjs）。配信には要らない
   'day-074-link-dokumi': ['tools'],
   // Day75の解探索・ブラウザ検証は開発用で、静的配信に含めない。
-  'day-075-amegumo-sokoban': ['tools']
+  'day-075-amegumo-sokoban': ['tools'],
+  // Day97 の tools/ は、撮影・採点・宣伝動画・形と材質の確認の開発用の道具。配信には要らない
+  'day-097-sabakiba': ['tools'],
 };
 
 const EXCLUDED_FILES = ['package.json', 'package-lock.json', '_headers'];
