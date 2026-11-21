@@ -74,6 +74,8 @@ test('validateProcedure: 誤りを1つずつ検出する', () => {
   bad({ cuts: [{ id: 'c1', curve: 'headCut', side: 'L', tool: 'deba', motion: 'pull', window: [0.6, 0.2] }] }, /window/);
   bad({ moves: [{ piece: 'tail', window: [0, 1] }] }, /部品が無い/);
   bad({ uniforms: { shine: { to: 1 } } }, /uniforms/);
+  bad({ moves: [{ piece: 'L.dorsal', window: [0, 1], rot: { axis: 'x', deg: 90, about: 'middle' } }] }, /rot.about/);
+  assert.deepEqual(validateProcedure(proc(6, { moves: [{ piece: 'L.dorsal', window: [0, 1], rot: { axis: 'x', deg: 150, about: 'dorsalHinge' } }] })), []);
   bad({ hands: [{ anchor: 'nowhere', who: 'off', text: 'x' }] }, /hands/);
   bad({ labels: [{ anchor: 'piece:L.dorsal', text: 'あ'.repeat(LIMITS.label + 1) }] }, /labels.text が長い/);
   bad({ practice: { cut: 'zz', tolerance: 0.5 } }, /practice.cut/);

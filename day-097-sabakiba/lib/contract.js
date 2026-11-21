@@ -83,6 +83,8 @@ export const DIRS = ['L', 'R', 'F', 'B', 'U', 'D'];
 export const EFFECT_KINDS = ['scales', 'water'];
 export const UNIFORM_NAMES = ['scale', 'slitOpen', 'xray', 'scutes'];
 export const WHO = ['dom', 'off'];
+// 回転の中心: pivot＝その部品の重心・dorsalHinge／ventralHinge＝背／腹の正中線（部品の長さ方向の中ほど）を通る蝶番（手開き・背開きで左右を本のように開く）・[x,y,z]＝魚の座標の点
+export const ABOUT = ['pivot', 'dorsalHinge', 'ventralHinge'];
 
 export const LIMITS = {
   title: 14, summary: 60, howLines: 3, how: 70, tip: 70, mistake: 70, done: 50, place: 40, safety: 60, label: 16, handText: 30,
@@ -185,6 +187,7 @@ export function validateProcedure(raw, { pieceIds = ALL_PIECE_IDS, curveNames = 
       if (!isWin(m.window)) E(id, `moves[${m.piece}] の window が不正`);
       if (m.move !== undefined && !isVec3(m.move)) E(id, `moves[${m.piece}] の move が不正`);
       if (m.rot !== undefined && !(['x', 'y', 'z'].includes(m.rot.axis) && Number.isFinite(m.rot.deg))) E(id, `moves[${m.piece}] の rot が不正`);
+      if (m.rot !== undefined && m.rot.about !== undefined && !(ABOUT.includes(m.rot.about) || isVec3(m.rot.about))) E(id, `moves[${m.piece}] の rot.about が不正`);
       if (m.opacity !== undefined && !(m.opacity >= 0 && m.opacity <= 1)) E(id, `moves[${m.piece}] の opacity が範囲外`);
     }
     for (const [k, u] of Object.entries(st.uniforms || {})) {

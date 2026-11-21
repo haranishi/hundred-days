@@ -14,7 +14,7 @@ export const SPECIES_META = {
   },
   aji: {
     id: 'aji', name: 'アジ', nameFull: 'マアジ', kana: 'あじ', method: 'sanmai', family: 'round',
-    season: '春〜夏', difficulty: 2, sizeCm: sizeRange(18, 30), minutes: { novice: 20, skilled: 10 },
+    season: '春〜夏', difficulty: 2, sizeCm: sizeRange(18, 30, 21), minutes: { novice: 20, skilled: 10 },
     similar: ['マサバ（腹と背から身を外す手順）'], tools: ['scaler', 'deba', 'tweezers', 'yanagi'],
     blurb: '尾の硬いぜいごを取り、腹と背から骨に沿って身を外します。',
   },
