@@ -5,7 +5,8 @@ export const RAD = Math.PI / 180;
 export const DEFAULT_FOV = 35;
 export const MIN_PITCH = 4 * RAD;
 export const MAX_PITCH = 88 * RAD;
-const CLOSE_SCALE = 0.72;
+// 接写でも魚の外接球が画面から切れない近さまでにする（切る線や刃先が画面の端で見切れるのを避ける）。
+const CLOSE_SCALE = 0.92;
 const pitches = { cook: 42, side: 10, top: 88, front: 10, closeup: 42 };
 
 export const clamp = (n, min, max) => Math.min(max, Math.max(min, n));
@@ -88,16 +89,17 @@ export function presetOrbit(name, bounds, options = {}) {
   const { center, radius } = boundingSphere(bounds);
   const focus = triple(options.focus);
   const focused = focusPoint({ center, radius }, focus);
-  // 全体を見せる視点は、魚の中心を主にして、注目点へ少しだけ寄せる（頭や尾が画面から切れない）。接写は注目点そのもの。
-  const target = preset === 'closeup' ? focused : focused.map((n, i) => center[i] + 0.3 * (n - center[i]));
+  // 魚の中心を主にして、注目点へ寄せる（頭や尾が画面から切れない）。接写は寄せ方をやや強くする。
+  const bias = preset === 'closeup' ? 0.4 : 0.3;
+  const target = focused.map((n, i) => center[i] + bias * (n - center[i]));
   const aspect = validAspect(options.aspect);
   let fov = validFov(options.fov);
-  // 手順が指定する寄りは控えめに効かせる（実寸の包丁が画面を覆わないように）。寄りは平方根・上限1.15、引きはそのまま。
+  // 手順が指定する寄りは控えめに効かせる（実寸の包丁が画面を覆わないように）。寄りは平方根・上限1.05、引きはそのまま。
   const rawZoom = Number.isFinite(options.zoom) && options.zoom > 0 ? clamp(options.zoom, 0.25, 8) : 1;
   // 全体を見せる視点（台所・真横・真上・正面）は寄らない（魚が画面から切れない）。寄りが効くのは接写だけ。
-  const zoom = rawZoom <= 1 ? rawZoom : preset === 'closeup' ? Math.min(1.15, Math.sqrt(rawZoom)) : 1;
+  const zoom = rawZoom <= 1 ? rawZoom : preset === 'closeup' ? Math.min(1.05, Math.sqrt(rawZoom)) : 1;
   const offset = Math.hypot(...target.map((n, i) => n - center[i]));
-  const frameRadius = radius + (preset === 'closeup' ? 0 : offset);
+  const frameRadius = radius + offset;
   let distance = Math.max(1.10 * distanceForSphere(frameRadius, fov, aspect), frameRadius * 1.08 / CLOSE_SCALE);
   if (preset === 'closeup') {
     distance *= CLOSE_SCALE;

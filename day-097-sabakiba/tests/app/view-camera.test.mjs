@@ -55,14 +55,14 @@ test('縦長・横長・正方形の全視点で、外接球は投影した6面�
   for (const aspect of [0.38, 0.78, 1, 1.85, 3.2]) {
     for (const fov of [28, 35, 58]) {
       const rig = createCameraRig({ ...options, fov, aspect });
-      for (const name of CAMERA_PRESETS) {
-        rig.applyPreset(name, {}, { immediate: true });
+      for (const name of CAMERA_PRESETS) for (const focus of [undefined, [-9, 3, -2], [10, -1, 2]]) {
+        rig.applyPreset(name, { focus }, { immediate: true });
         const { camera } = rig;
         const matrix = new THREE.Matrix4().multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse);
         const frustum = new THREE.Frustum().setFromProjectionMatrix(matrix);
         for (const plane of frustum.planes) {
-          assert.ok(plane.distanceToPoint(new THREE.Vector3(...sphere.center)) >= sphere.radius,
-            `${name}・縦横比${aspect}・画角${fov}度で外接球が切れます`);
+          assert.ok(plane.distanceToPoint(new THREE.Vector3(...sphere.center)) >= sphere.radius - 1e-9,
+            `${name}・注目点${focus}・縦横比${aspect}・画角${fov}度で外接球が切れます`);
         }
       }
     }
@@ -84,15 +84,19 @@ test('料理する人から見た方位、頭側、注視点、接写距離、�
   near(presetOrbit('front', sphere, { headDirection: [1, 0, 0] }).yaw, Math.PI / 2);
   const focus = [-7, 3, -2];
   const close = presetOrbit('closeup', sphere, { focus });
-  near(close.distance, cook.distance * 0.72); near(close.fov, 35);
-  // 寄り（zoom>1）は控えめに効く（平方根・上限1.15）。引き（zoom<1）はそのまま。
-  near(presetOrbit('closeup', sphere, { focus, zoom: 2 }).distance, close.distance / 1.15);
-  near(presetOrbit('closeup', sphere, { focus, zoom: 1.21 }).distance, close.distance / 1.1);
+  // 接写でも外接球は切らない：注視点は中心から注目点へ4割寄せ、台所の視点より1割弱だけ近い。
+  const shift = Math.hypot(...[0, 1, 2].map(i => 0.4 * (focus[i] - sphere.center[i])));
+  near(close.distance, 0.92 * 1.10 * distanceForSphere(sphere.radius + shift, 35, 1)); near(close.fov, 35);
+  close.target.forEach((v, i) => near(v, sphere.center[i] + 0.4 * (focus[i] - sphere.center[i])));
+  // 寄り（zoom>1）は控えめに効く（平方根・上限1.05）。引き（zoom<1）はそのまま。
+  near(presetOrbit('closeup', sphere, { focus, zoom: 2 }).distance, close.distance / 1.05);
+  near(presetOrbit('closeup', sphere, { focus, zoom: 1.0201 }).distance, close.distance / 1.01);
   near(presetOrbit('closeup', sphere, { focus, zoom: 0.5 }).distance, close.distance * 2);
   const rig = createCameraRig(options);
   rig.applyPreset('closeup', { focus, zoom: 1.5 }, { immediate: true });
+  // 注目点は画面の内側（端に寄らない）に入る。
   const center = new THREE.Vector3(...focus).project(rig.camera);
-  near(center.x, 0); near(center.y, 0);
+  assert.ok(Math.abs(center.x) < 0.85 && Math.abs(center.y) < 0.85, `注目点の画面位置 ${center.x}, ${center.y}`);
 });
 
 test('手動操作中は次の手順を覚え、リセットでその手順に復帰する', () => {
