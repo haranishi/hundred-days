@@ -10,7 +10,7 @@ const withReverse = (flag) => {
   const raw = structuredClone(aji);
   const step = raw.steps.find((s) => (s.cuts || []).some((c) => c.curve === 'boneCut'));
   const cut = step.cuts.find((c) => c.curve === 'boneCut');
-  if (flag) cut.reverse = true;
+  cut.reverse = !!flag; // 手順側が逆向きでも、ここで明示的に決める
   return { raw, index: raw.steps.indexOf(step), cut };
 };
 

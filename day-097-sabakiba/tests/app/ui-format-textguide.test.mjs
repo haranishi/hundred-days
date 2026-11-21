@@ -101,8 +101,8 @@ test('ui-format: つづきから・道具抽出・次の魚', () => {
   const expectedTools = [...new Set(proc.steps.flatMap((st) => st.tools))].map((id) => ({ id, label: TOOL_LABELS[id] }));
   assert.deepEqual(tools, expectedTools);
 
-  const resume = getResumeEntries({ aji: 2, saba: 1 }, 'aji', SPECIES_META, getProcedure);
-  assert.equal(resume.length, 1, '手順がある魚のみ返す');
+  const resume = getResumeEntries({ aji: 2, saba: 1, fugu: 4 }, 'aji', SPECIES_META, getProcedure);
+  assert.equal(resume.length, 2, '手順がある魚（アジ・サバ）だけ返す。存在しない魚は捨てる');
   assert.equal(resume[0].species, 'aji');
   assert.equal(resume[0].stepNumber, 3);
   assert.equal(resume[0].totalSteps, proc.steps.length);

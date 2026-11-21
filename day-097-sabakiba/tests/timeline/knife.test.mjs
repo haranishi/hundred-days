@@ -22,8 +22,9 @@ function rotate(q, v) {
 }
 
 // 実装の弧長表を使わず、一端から線分を測り直して正解の接触点を作る。
-function track(curve, side) {
-  const points = anatomy.curve(curve, side).points;
+function track(curve, side, reverse = false) {
+  const base = anatomy.curve(curve, side).points;
+  const points = reverse ? [...base].reverse() : base;
   const lengths = points.slice(1).map((p, i) => distance(p, points[i]));
   const total = lengths.reduce((a, b) => a + b, 0);
   function at(t) {
@@ -39,7 +40,7 @@ function track(curve, side) {
 
 test('アジの全ての切りで101時点の接触点が弧長に一致し、位置と向きが連続する', () => {
   for (const cut of aji.steps.flatMap(step => step.cuts ?? [])) {
-    const guide = track(cut.curve, cut.side);
+    const guide = track(cut.curve, cut.side, !!cut.reverse);
     let prev;
     for (let i = 0; i <= 100; i++) {
       const t = i / 100, blade = knifePose(anatomy, cut, t);

@@ -1,227 +1,277 @@
-// アジの三枚おろし。画面の左右は料理する人から見た位置で、L/R の部品名は魚自身の側を指す。
-// 資料に度数の指定はない。angleDeg は3Dで刃の向きが読み取れるように選んだ角度。
-const LB = { head: 'L', dorsal: 'B' }, LF = { head: 'L', dorsal: 'F' };
-const RB = { head: 'R', dorsal: 'B' }, RF = { head: 'R', dorsal: 'F' };
-const headLeft = '頭を{L}に、腹を手前に置きます。';
-const headLeftBack = '頭を{L}に、背を手前に置きます。';
-const neckRight = '頭の切り口を{R}に、腹を手前に置きます。';
-const neckLeft = '頭の切り口を{L}に、腹を手前に置きます。';
-const supported = (anchor, text, piece) => [{ anchor, who: 'off', text, ...(piece && { piece }) }];
-const line = (curve, side) => ({ curve, side });
-const shot = (preset, focus, zoom = 1) => ({ preset, focus, zoom });
-const cut = (id, curve, side, tool, motion, lead, angleDeg, window, through = false) =>
-  ({ id, curve, side, tool, motion, lead, angleDeg, window, through });
-const practice = (cut, tolerance = 0.5) => ({ cut, tolerance });
-const turn = (piece, axis, deg, window) => ({ piece, rot: { axis, deg, about: 'pivot' }, window });
+// アジを基準にした盤上の変位。刃の角度は実測値ではなく、立てる・寝かせる動きを示す作画値。
+import { SPECIES_META } from '../species/meta.js';
+import safety from '../content/safety.js';
 
-function cleanSide(side) {
-  const first = side === 'L';
-  const scales = [0.28, 0.47], scutes = [0.69, 0.87];
+const k = SPECIES_META.aji.sizeCm.typical / 21;
+export const [keepCold, washHands, , clearBlade, scuteWarning, , rinseBlood, dryFish, sashimiKnife] = safety.stepNotes;
+
+export const LB = { head: 'L', dorsal: 'B' }, LF = { head: 'L', dorsal: 'F' };
+export const RB = { head: 'R', dorsal: 'B' }, RF = { head: 'R', dorsal: 'F' };
+export const headLeft = '頭を{L}に、腹を手前に置きます。';
+export const headLeftBack = '頭を{L}に、背を手前に置きます。';
+export const neckRight = '頭の切り口を{R}に、腹を手前に置きます。';
+export const neckLeft = '頭の切り口を{L}に、腹を手前に置きます。';
+export const neckRightBack = '頭の切り口を{R}に、背を手前に置きます。';
+export const neckLeftBack = '頭の切り口を{L}に、背を手前に置きます。';
+
+export const line = (curve, side = null) => ({ curve, side });
+export const shot = (preset, focus, zoom = 1) => ({ preset, focus, zoom });
+export const mark = (anchor, text, piece) => ({ anchor, text, ...(piece && { piece }) });
+export const hand = (anchor, text, piece) => ({ ...mark(anchor, text, piece), who: 'off' });
+export const practice = (cut, tolerance = 0.5) => ({ cut, tolerance });
+export const cut = (id, curve, side, tool, motion, lead, angleDeg, window, through = false, reverse = false) =>
+  ({ id, curve, side, tool, motion, lead, angleDeg, window, through, reverse });
+export const move = (k, piece, distance, window, extra = {}) =>
+  ({ piece, move: distance.map(cm => cm * k), window, ...extra });
+export const turn = (piece, axis, deg, window, about = 'pivot') => ({ piece, rot: { axis, deg, about }, window });
+export const hide = (piece, window) => ({ piece, window, opacity: 0, visible: false });
+
+// 道具札・光る線・練習の対象を、実際に再生する切りから作る。
+export function step(data) {
+  const cuts = data.cuts ?? [];
   return {
-    id: first ? 'scales-left' : 'scales-right', title: first ? 'うろことぜいごを取ります' : '裏側のぜいごも取ります',
-    summary: first ? '尾から頭へうろこを払い、尾に近い硬いうろこの列「ぜいご」を薄くそぎます。'
-      : '頭の位置を保って裏返し、もう一方の面に残ったうろことぜいごを取ります。',
-    how: ['{L}手にペーパーを当てて頭を支え、うろこ取りを尾から頭へ滑らせます。',
-      '出刃の先を尾に近いぜいごの下に入れ、刃を皮に寝かせたまま頭の方へ進めます。'],
-    tip: first ? 'ひれの付け根はうろこが残りやすいので、魚を少し傾けて見ます。' : '横から光を当てると、取り残したうろこの縁が光って見えます。',
-    mistake: '刃を立ててぜいごを起こすと、その下の身まで削れます。',
-    done: '尾の近くの硬い列が取れ、皮に深い溝が残っていません。',
-    place: first ? headLeft : headLeftBack, pose: first ? LB : LF, tools: ['scaler', 'deba'],
-    hands: supported('opercleTop', '{L}手で頭を包むように支えます。'),
-    camera: shot('cook', line('scuteRow', side), 1.2), durationMs: 7500,
-    cuts: [cut('scales', 'scaleSweep', side, 'scaler', 'scrape', 'mid', 14, scales),
-      cut('scutes', 'scuteRow', side, 'deba', 'scrape', 'tip', 9, scutes)],
-    uniforms: { scale: { to: first ? 0.5 : 0, window: scales }, scutes: { to: first ? 0.5 : 0, window: scutes } },
-    effects: [{ kind: 'scales', ...line('scaleSweep', side), window: scales }],
-    highlight: [line('scaleSweep', side), line('scuteRow', side)], labels: [{ anchor: 'peduncle', text: 'ぜいご' }],
-    safety: 'ぜいごはとがっています。尾から頭へ素手でこすると指を傷つけます。', practice: practice('scutes'),
+    tools: [...new Set(cuts.map(c => c.tool))],
+    highlight: cuts.map(c => line(c.curve, c.side)),
+    ...(cuts.length ? { practice: practice(cuts[0].id) } : {}),
+    ...data,
   };
 }
 
-const steps = [
-  {
-    id: 'prep', title: '板と道具を整えます', summary: 'まな板の下に絞った布巾を敷き、アジを横向きに置きます。',
-    how: ['出刃(でば)包丁、うろこ取り、骨抜き、ペーパーを用意します。',
-      'わたを受ける器と身を置く皿を分け、{L}手を添えて板が滑らないか確かめます。'],
-    tip: '皿を先に置くと、身を外したときに包丁を持ったまま探さずに済みます。',
-    mistake: '板の下に水がたまると、魚を押さえたときに板ごと動きます。',
-    done: '板が安定し、魚の両側に道具を置ける空きがあります。', place: headLeft, pose: LB,
-    tools: ['deba', 'scaler', 'tweezers'], hands: supported('bodyCenter', '{L}手で魚の滑りを確かめます。'),
-    labels: [{ anchor: 'opercleTop', text: '{L}手の位置' }], camera: shot('cook', 'bodyCenter'), durationMs: 3500,
-  },
-  cleanSide('L'), cleanSide('R'),
-  {
-    id: 'head-first', title: '頭の片側を切ります', summary: '胸びれを頭側へ寄せ、その後ろから中骨(なかぼね)まで切ります。',
-    how: ['頭を{L}に戻し、胸びれを起こして根元を見ます。刃を入れる前に指を頭側へ移します。',
-      '出刃の中ほどを胸びれの後ろに当て、腹びれの付け根を目印に斜めに引きます。'],
-    tip: '切り始めを胸びれの根元に寄せると、肩の厚い身が胴に残ります。',
-    mistake: '魚の真横をまっすぐ輪切りにすると、肩の身まで頭に付きます。',
-    done: '刃が中骨に触れ、頭と胴はまだつながっています。',
-    place: headLeft, pose: LB, tools: ['deba'], hands: supported('opercleTop', '{L}手を頭側に寄せて押さえます。'),
-    camera: shot('closeup', line('headCut', 'L'), 1.35), durationMs: 5200,
-    cuts: [cut('neck', 'headCut', 'L', 'deba', 'pull', 'heel', 16, [0.31, 0.78])],
-    highlight: [line('headCut', 'L')], labels: [{ anchor: 'pectoralBase', text: '胸びれの根元' }], practice: practice('neck'),
-  },
-  {
-    id: 'head-second', title: '反対から頭を外します', summary: '魚を返して同じ位置に刃を入れ、二つの切り口を合わせます。',
-    how: ['{L}手で頭を支え、胸びれの後ろから最初の切り口へ刃を進めます。',
-      '首の骨に刃元(はもと)を当てて押し切り、包丁を置いて頭を板の端へ移します。'],
-    tip: '首の両側に切り口がそろうと、刃元を当てる骨が見えます。',
-    mistake: '骨に当たった刃を横にねじると、刃元が切り口から外れます。',
-    done: '胸びれが頭に付き、胴から頭が離れています。', place: headLeftBack, pose: LF, tools: ['deba'],
-    hands: supported('opercleTop', '{L}手で頭が転がらないよう支えます。'),
-    camera: shot('closeup', line('headCut', 'R'), 1.3), durationMs: 6000,
-    cuts: [cut('neck', 'headCut', 'R', 'deba', 'press', 'heel', 12, [0.30, 0.64], true)],
-    moves: [{ piece: 'head', window: [0.75, 0.96], move: [-8, 0, -7], rot: { axis: 'y', deg: -14, about: 'pivot' } }],
-    highlight: [line('headCut', 'R')], practice: practice('neck'),
-  },
-  {
-    id: 'gut', title: '腹を開いてわたを出します', summary: '腹の皮に浅い切れ目を入れ、包丁を置いてからわたを取り出します。',
-    how: ['肛門(こうもん)に刃先を浅く入れ、頭の切り口へ向けて腹の皮を開きます。',
-      '刃を板の端に置き、腹を開いて内臓を受け皿へ移します。'],
-    tip: '切っ先を腹の奥へ向けず、皮のすぐ下を通します。', mistake: '刃先を深く入れると、内臓の袋を破りやすくなります。',
-    done: '腹の中が開き、背骨の下に暗い色の筋が見えます。', place: neckRight, pose: RB,
-    tools: ['petty'], hands: supported('dorsalFinStart', '{L}手を背側に添えて支えます。'),
-    camera: shot('closeup', 'vent', 1.3), durationMs: 7000,
-    cuts: [cut('slit', 'bellySlit', null, 'petty', 'push', 'tip', 14, [0.30, 0.57])],
-    uniforms: { slitOpen: { to: 1, window: [0.43, 0.69] } },
-    moves: [{ piece: 'viscera', window: [0.68, 0.85], move: [0, 1.1, 3.4] },
-      { piece: 'viscera', window: [0.85, 0.98], opacity: 0, visible: false }],
-    highlight: [line('bellySlit', null)], practice: practice('slit', 0.4),
-  },
-  {
-    id: 'wash', title: '背骨の溝を洗います', summary: '背骨の下の薄い膜を開き、溝に残った血を洗い流します。',
-    how: ['膜に切っ先(きっさき)を浅く通します。包丁を置き、弱い流水とブラシで溝を洗います。',
-      '腹の内側と皮の水をペーパーで拭き、手と包丁とまな板も洗います。'],
-    tip: '腹を少し広げると、背骨のすぐ下まで水が届きます。', mistake: '腹の薄い身まで強くこすると、身が崩れます。',
-    done: '背骨の溝に血の塊が見えず、腹に水がたまっていません。', place: neckRight, pose: RB,
-    tools: ['petty'], hands: supported('cavityStart', '{L}手で腹の縁を広げます。'),
-    camera: shot('closeup', 'cavityStart', 1.35), durationMs: 6200,
-    cuts: [cut('membrane', 'kidneyLine', null, 'petty', 'push', 'tip', 8, [0.16, 0.36])],
-    effects: [{ kind: 'water', ...line('kidneyLine', null), window: [0.49, 0.87] }],
-    uniforms: { slitOpen: { to: 0, window: [0.88, 1] } },
-    moves: [{ piece: 'kidney', window: [0.52, 0.85], opacity: 0, visible: false }],
-    highlight: [line('kidneyLine', null)], practice: practice('membrane', 0.35),
-  },
-  {
-    id: 'right-belly', title: '腹側に切り口を作ります', summary: '上を向いた身の腹側に、尾へ続く浅い切り口を作ります。',
-    how: ['腹の後ろのひれを目印に、切っ先を付け根のすぐ上から尾へ進めます。',
-      '同じ切り口に刃の中ほどを入れ、骨に沿って少しずつ身を開きます。'],
-    tip: '先に皮に道を作ると、刃がひれの付け根を追いやすくなります。',
-    mistake: '一度で深く切ると、刃が骨から離れて身に入ります。',
-    done: '腹側から尾の近くまで皮が開き、中央に骨の手応えがあります。', place: neckRight, pose: RB,
-    tools: ['deba'], hands: supported('bodyCenter', '{L}手を背寄りに添えます。', 'R.dorsal'),
-    camera: shot('cook', line('ventralCut', 'R'), 1.18), durationMs: 5300,
-    cuts: [cut('belly', 'ventralCut', 'R', 'deba', 'push', 'tip', 17, [0.22, 0.81])],
-    highlight: [line('ventralCut', 'R')], practice: practice('belly'),
-  },
-  {
-    id: 'right-fillet', title: '一枚目の身を外します', summary: '同じ面を上に保って板の上で半回転させ、背側から中骨まで開きます。',
-    how: ['背びれの際を尾へ切り、腹から入れた刃の道につなぎます。',
-      '頭の切り口から刃を中骨に寝かせ、尾へ滑らせます。尾の付け根のつながりを切ります。'],
-    tip: '引っかかった所は少し開いて見ます。骨と身をつなぐ所だけに刃を当てます。',
-    mistake: '身を先に引っぱると、骨に付いたままの部分が裂けます。',
-    done: '片身(かたみ)が外れ、中骨がもう一方の身に残っています。',
-    place: '頭の切り口を{L}に、背を手前に置きます。', pose: LF, tools: ['deba'],
-    hands: supported('bodyCenter', '{L}手で腹寄りの身を支えます。', 'R.dorsal'),
-    camera: shot('cook', line('boneCut', 'R'), 1.15), durationMs: 8800,
-    cuts: [cut('back', 'dorsalCut', 'R', 'deba', 'push', 'tip', 18, [0.26, 0.40]),
-      cut('spine', 'boneCut', 'R', 'deba', 'push', 'tip', 7, [0.62, 0.78], true),
-      cut('tail', 'tailCut', 'R', 'deba', 'press', 'mid', 8, [0.80, 0.85], true)],
-    moves: [{ piece: 'R.dorsal', move: [10, 0.4, -6], window: [0.87, 1] }],
-    uniforms: { xray: { to: 0.48, window: [0.28, 0.45] } },
-    highlight: [line('dorsalCut', 'R'), line('boneCut', 'R')], practice: practice('spine', 0.45),
-  },
-  {
-    id: 'left-back', title: 'もう片面の背を開きます', summary: '残った身を裏返し、中骨が板の方を向くように置いて背から切ります。',
-    how: ['頭の切り口から背びれの付け根を見て、切っ先で尾まで皮に筋を付けます。',
-      'その筋に刃を戻し、中骨に触れる深さまで背側の身を開きます。'],
-    tip: '骨の付いた面を板に置くと、厚みが半分になった身も支えやすくなります。',
-    mistake: '肩を強く押すと、刃が進む高さが変わって身に段が付きます。',
-    done: '背から中骨まで切り口が続き、腹側はまだつながっています。',
-    place: '頭の切り口を{R}に、背を手前に置きます。', pose: RF, tools: ['deba'],
-    hands: supported('bodyCenter', '{L}手で身の厚い所を支えます。', 'L.dorsal'),
-    camera: shot('cook', line('dorsalCut', 'L'), 1.18), durationMs: 5200,
-    cuts: [cut('back', 'dorsalCut', 'L', 'deba', 'push', 'tip', 18, [0.31, 0.82])],
-    highlight: [line('dorsalCut', 'L')], practice: practice('back'),
-  },
-  {
-    id: 'left-fillet', title: 'もう一枚の身を外します', summary: '身を半回転させて腹側を開き、骨に沿って残りの身を離します。',
-    how: ['腹びれの後ろから尾へ浅く切り、刃を寝かせて背側の切り口につなぎます。',
-      '刃の中ほどを中骨の上に滑らせ、尾の近くに残るつながりを切ります。'],
-    tip: '骨にうっすら身が付くくらいの高さで、刃を尾へ運びます。',
-    mistake: '刃が骨の下に入ると進まなくなります。刃を抜き、骨の上に置き直します。',
-    done: '片身が二枚と、尾の付いた中骨が一本に分かれています。', place: neckLeft, pose: LB, tools: ['deba'],
-    hands: supported('bodyCenter', '{L}手を刃の出口からずらします。', 'L.dorsal'),
-    camera: shot('cook', line('boneCut', 'L'), 1.15), durationMs: 8800,
-    cuts: [cut('belly', 'ventralCut', 'L', 'deba', 'push', 'tip', 17, [0.26, 0.40]),
-      cut('spine', 'boneCut', 'L', 'deba', 'push', 'tip', 7, [0.62, 0.78], true),
-      cut('tail', 'tailCut', 'L', 'deba', 'press', 'mid', 8, [0.80, 0.85], true)],
-    moves: [{ piece: 'L.dorsal', move: [-10, 0.4, 6], window: [0.87, 1] }],
-    highlight: [line('ventralCut', 'L'), line('boneCut', 'L')], practice: practice('spine', 0.45),
-  },
-  {
-    id: 'ribs', title: '腹の骨をすきます', summary: '二枚とも皮を下に置き、腹骨(はらぼね)を膜ごと薄く外します。',
-    how: ['腹のカーブに沿って並ぶ骨の根元に、切っ先を入れます。',
-      '背側を支え、刃の中ほどを骨に沿わせたまま腹の縁へ抜きます。もう一枚も同じようにすきます。'],
-    tip: '骨と一緒に持ち上がるのが薄い膜だけなら、腹の身を多く残せます。',
-    mistake: '刃を板へ押し下げると、腹の身まで厚く取れてしまいます。',
-    done: '腹の縁に身が残り、二枚とも弓なりの骨が外れています。',
-    place: '二枚の皮を下にし、腹の縁を手前に置きます。', pose: LB, tools: ['deba'],
-    hands: [...supported('bodyCenter', '{L}手で背側の身を支えます。', 'R.dorsal'),
-      ...supported('bodyCenter', 'こちらも背側を支えます。', 'L.dorsal')],
-    camera: shot('top', 'bodyCenter', 0.9), durationMs: 8400,
-    cuts: [cut('ribs-r', 'ribStrip', 'R', 'deba', 'slice', 'tip', 9, [0.28, 0.47], true),
-      cut('ribs-l', 'ribStrip', 'L', 'deba', 'slice', 'tip', 9, [0.69, 0.87], true)],
-    moves: [turn('L.dorsal', 'z', 180, [0, 0.22]),
-      { piece: 'R.strip', move: [2, 0, 4], window: [0.50, 0.64] },
-      { piece: 'L.strip', move: [-2, 0, 4], window: [0.88, 1] }],
-    uniforms: { xray: { to: 0, window: [0, 0.22] } }, highlight: [line('ribStrip', 'R'), line('ribStrip', 'L')],
-    practice: practice('ribs-r', 0.4),
-  },
-  {
-    id: 'pinbones', title: '小骨を一本ずつ抜きます', summary: '身の中央を指でなで、指先に触れた骨を骨抜きでつまみます。',
-    how: ['尾から頭へ指の腹を滑らせると、血合い骨(ちあいぼね)の先が指に当たります。',
-      '骨の両脇を支え、根元を骨抜きではさんで頭側へ低く引きます。もう一枚の身も確かめます。'],
-    tip: '骨のすぐ横に指を添えると、抜くときに身が持ち上がりにくくなります。',
-    mistake: '骨先だけをつまんで真上へ引くと、骨が途中で折れやすくなります。',
-    done: '中央の列を指でなでても、小骨の先が指に当たりません。',
-    place: '皮を下に、切り口を上にして置きます。', pose: LB, tools: ['tweezers'],
-    hands: [...supported('bodyCenter', '{L}手で小骨の両脇を支えます。', 'R.dorsal'),
-      ...supported('bodyCenter', 'こちらも根元の両脇を支えます。', 'L.dorsal')],
-    camera: shot('top', 'bodyCenter', 0.9), durationMs: 7600,
-    cuts: [cut('pluck-r', 'pinBoneLine', 'R', 'tweezers', 'pluck', 'tip', 23, [0.15, 0.38], true),
-      cut('pluck-l', 'pinBoneLine', 'L', 'tweezers', 'pluck', 'tip', 23, [0.62, 0.85], true)],
-    moves: [{ piece: 'pinbones.R', move: [-2, 1.3, 0], opacity: 0, visible: false, window: [0.39, 0.53] },
-      { piece: 'pinbones.L', move: [2, 1.3, 0], opacity: 0, visible: false, window: [0.86, 0.99] }],
-    highlight: [line('pinBoneLine', 'R'), line('pinBoneLine', 'L')], practice: practice('pluck-r', 0.35),
-  },
-  {
-    id: 'peel', title: '薄皮を手でむきます', summary: '頭の切り口で薄皮をつまみ、身を支えながら尾へむきます。',
-    how: ['皮を上に返して頭の切り口を{L}に置き、肩の端で浮いた薄皮を{R}手でつまみます。',
-      '{L}手を皮と身の境目に添え、皮を折り返すように尾へ低く引きます。'],
-    tip: '皮がはがれる所へ支える指を移していくと、薄い尾の身が裂けにくくなります。',
-    mistake: '皮を高く持ち上げると、皮に身が付いてきます。',
-    done: '二枚とも薄皮が外れ、身の表面に銀色が残っています。',
-    place: '二枚とも皮を上に、頭の切り口を{L}に置きます。', pose: LB, tools: [],
-    hands: [...supported('headCutTop', '{L}手で皮の際の身を支えます。', 'R.dorsal'),
-      ...supported('headCutTop', 'こちらも皮の際に指を添えます。', 'L.dorsal')],
-    camera: shot('top', 'bodyCenter', 0.9), durationMs: 7600,
-    moves: [turn('R.dorsal', 'x', 180, [0, 0.20]), turn('L.dorsal', 'z', 0, [0, 0.20]),
-      { piece: 'skin.R', move: [7, 0.5, -5], rot: { axis: 'z', deg: 160, about: 'pivot' }, window: [0.23, 0.54] },
-      { piece: 'skin.L', move: [7, 0.5, 5], rot: { axis: 'z', deg: 160, about: 'pivot' }, window: [0.61, 0.94] }],
-  },
-  {
-    id: 'done', title: '三枚おろしの完成です', summary: '二枚の身と中骨を見比べて、下ごしらえのできあがりを確かめます。',
-    how: ['切り口を見て、骨先が残っていないか指でそっと確かめます。',
-      '身を清潔な皿へ移します。頭と中骨は、えらや血を取り除いてあら汁に使えます。'],
-    tip: 'すぐに調理しない身は、水気を拭いて冷蔵庫へ移します。',
-    mistake: 'わたを入れた器に仕上げた身を戻すと、汚れが移ります。',
-    done: '二枚の片身を中骨と分けて置けています。', place: '身を二枚並べ、中骨を中央に置きます。', pose: LB,
-    tools: [], hands: supported('bodyCenter', '{L}手を添えて身を確かめます。', 'L.dorsal'),
-    labels: [{ anchor: 'piece:R.dorsal', text: 'かたみ' }, { anchor: 'piece:L.dorsal', text: 'かたみ' },
-      { anchor: 'spineHeadEnd', text: 'なかぼね' }], camera: shot('top', 'bodyCenter', 0.85), durationMs: 3500,
-  },
-];
+export function prep(tools, equipment, changes = {}) {
+  return step({
+    id: 'prep', title: '板と道具を整えます', summary: 'ぬれ布巾を固く絞ってまな板の下に敷き、板が動かないか確かめます。',
+    how: [equipment, '手と柄の水気を拭き、包丁を置くときは刃を奥へ向けます。'],
+    tip: 'わたを受ける器と、身を置く冷たい皿を先に分けておきます。',
+    mistake: '手や柄がぬれたままだと、包丁を握った手が滑ります。',
+    done: '板に手を添えてもずれず、柄を乾いた手で握れます。',
+    place: headLeft, pose: LB, tools, hands: [hand('bodyCenter', '{L}手で胴が滑らないか確かめます。')],
+    camera: shot('cook', 'bodyCenter'), durationMs: 3500, ...changes,
+  });
+}
 
+export function scaleSide(side, changes = {}) {
+  const first = side === 'L', window = [0.30, 0.84];
+  return step({
+    id: first ? 'scales-left' : 'scales-right', title: first ? 'うろこを落とします' : '裏のうろこを取ります',
+    summary: first ? '尾から頭へうろこ取りを動かし、皮の表面を整えます。' : '魚を裏返し、反対の面も尾から頭へこすります。',
+    how: ['{L}手で頭を支え、うろこ取りを尾の付け根から頭へ短く動かします。'],
+    tip: '胸びれの陰と腹の縁も見ます。', mistake: 'ひれのまわりを飛ばすと、付け根にうろこが残ります。',
+    done: 'ひれの際まで、浮いたうろこが見当たりません。',
+    place: first ? headLeft : headLeftBack, pose: first ? LB : LF,
+    hands: [hand('opercleTop', '{L}手でえらぶたの外を支えます。')],
+    camera: shot('cook', line('scaleSweep', side), 1.12), durationMs: 5100,
+    cuts: [cut('scales', 'scaleSweep', side, 'scaler', 'scrape', 'mid', 16, window)],
+    uniforms: { scale: { to: first ? 0.5 : 0, window } },
+    effects: [{ kind: 'scales', ...line('scaleSweep', side), window }],
+    ...changes,
+  });
+}
+
+function scutes(side) {
+  const first = side === 'L', scales = [0.28, 0.46], row = [0.58, 0.87];
+  return scaleSide(side, {
+    title: first ? 'うろことぜいごを取ります' : '裏のぜいごもそぎます',
+    summary: first ? '普通のうろこを払ってから、尾に並ぶ硬いうろこ「ぜいご」を薄くそぎます。'
+      : '頭の位置を保って裏返し、もう一方の面に残ったうろことぜいごを取ります。',
+    how: ['ペーパー越しに{L}手で頭を支え、うろこ取りを尾から頭へ軽く動かします。',
+      '出刃包丁の先をぜいごの下に入れ、刃を寝かせます。小さく前後させながら頭へ進めます。'],
+    tip: '尾の付け根で硬い列の端を見つけると、身を削らずに刃を入れられます。',
+    mistake: '硬さにつられて刃を立てると、ぜいごの下に深い溝ができます。',
+    done: '尾に沿った硬い列が取れ、その下に身が残っています。',
+    camera: shot('closeup', line('scuteRow', side), 1.22), durationMs: 7300,
+    cuts: [cut('scales', 'scaleSweep', side, 'scaler', 'scrape', 'mid', 16, scales),
+      cut('scutes', 'scuteRow', side, 'deba', 'scrape', 'tip', 8, row)],
+    uniforms: { scale: { to: first ? 0.5 : 0, window: scales }, scutes: { to: first ? 0.5 : 0, window: row } },
+    effects: [{ kind: 'scales', ...line('scaleSweep', side), window: scales }],
+    labels: [mark('peduncle', 'ぜいご')], practice: practice('scutes', 0.42), safety: scuteWarning,
+  });
+}
+
+export function headSide(k, side, last, changes = {}) {
+  return step({
+    id: last ? 'head-second' : 'head-first', title: last ? '反対から頭を外します' : '胸びれの後ろを切ります',
+    summary: last ? '反対の面から切り口を合わせ、首の骨を断ちます。' : '胸びれの根元から腹びれの後ろへ、斜めに包丁を入れます。',
+    how: last ? ['胸びれの後ろから先ほどの切り口へ刃を引きます。',
+      '首の骨の継ぎ目に刃元(はもと)を当て、板の方へ押し切ります。包丁を置いてから頭を移します。']
+      : ['胸びれを頭の方へ寄せ、{L}手を切る線から外します。',
+        '出刃包丁の中ほどをやや頭の方へ傾け、腹びれの付け根へ引きます。中骨に触れた所で止めます。'],
+    tip: last ? '硬い所で止まったら刃を抜き、骨の継ぎ目に当て直します。' : '胸びれのすぐ後ろから入ると、肩の厚い身を胴に残せます。',
+    mistake: last ? '硬い骨に当てたまま刃をねじると、切り口から外れます。' : 'ひれから離れた所を横に切ると、肩の肉まで頭に付きます。',
+    done: last ? '胸びれと腹びれが頭に付き、首の切り口が見えます。' : '片側は中骨まで開き、頭は反対の面で胴につながっています。',
+    place: last ? headLeftBack : headLeft, pose: last ? LF : LB,
+    hands: [hand('opercleTop', '{L}手を頭に添え、指を刃筋から離します。')],
+    labels: [mark('pectoralBase', '胸鰭(むなびれ)')], camera: shot('closeup', line('headCut', side), 1.28),
+    durationMs: last ? 6200 : 5100,
+    cuts: [cut('neck', 'headCut', side, 'deba', last ? 'press' : 'pull', last ? 'heel' : 'mid', 15, [0.30, 0.67], last)],
+    moves: last ? [move(k, 'head', [-7, 0, -5], [0.74, 0.96])] : [],
+    ...changes,
+  });
+}
+
+export function gut(k, changes = {}) {
+  return step({
+    id: 'gut', title: '腹を開いてわたを出します', summary: '首の切り口から肛門まで、内臓の上を覆う皮を浅く開きます。',
+    how: ['背側を{L}手で支え、首の下から切っ先を浅く入れます。腹の縁に沿って肛門へ引きます。',
+      '包丁を置いて腹を広げ、わたを受け皿へ移します。'],
+    tip: '刃先の向きを皮とそろえると、腹の奥へ突き込みにくくなります。',
+    mistake: '切っ先を背骨へ向けて深く入れると、わたを傷つけます。',
+    done: '腹が開き、背骨の下の暗い筋が見えます。', place: neckRight, pose: RB,
+    hands: [hand('dorsalFinStart', '{L}手を背側に添えます。', 'R.dorsal')],
+    labels: [mark('vent', '肛門(こうもん)')], camera: shot('closeup', 'cavityStart', 1.24), durationMs: 6800,
+    cuts: [cut('slit', 'bellySlit', null, 'deba', 'pull', 'tip', 12, [0.30, 0.55], false, true)],
+    uniforms: { slitOpen: { to: 1, window: [0.32, 0.63] } },
+    moves: [move(k, 'viscera', [0, 1.1, 3.4], [0.63, 0.81]), hide('viscera', [0.82, 0.97])],
+    practice: practice('slit', 0.4), ...changes,
+  });
+}
+
+export function wash(k, membrane = false, changes = {}) {
+  return step({
+    id: 'wash', title: '背骨の溝を洗います', summary: '腹を広げ、背骨の下の溝に残った血を流水で落とします。',
+    how: [membrane ? '切っ先で溝を覆う膜だけを浅く開きます。包丁を置き、弱い流水と清潔なブラシで溝を洗います。'
+      : '腹の縁を広げて背骨の下をのぞき、弱い流水で溝の血を洗い流します。',
+    'ペーパーで腹と皮の水を拭きます。身に触れる前に、手と包丁とまな板を洗います。'],
+    tip: '水をかける前に腹を広げると、血の塊が残った場所を見つけやすくなります。',
+    mistake: '薄い腹の身を強くこすると、身まで崩れます。',
+    done: '溝から血の塊が取れ、腹の内側に水がたまっていません。',
+    place: neckRight, pose: RB, hands: [hand('cavityStart', '{L}手で腹の縁を支えます。', 'R.ventral')],
+    labels: [mark('cavityStart', '血わた')], camera: shot('closeup', 'cavityStart', 1.3), durationMs: 5900,
+    cuts: membrane ? [cut('membrane', 'kidneyLine', null, 'deba', 'push', 'tip', 8, [0.16, 0.36])] : [],
+    effects: [{ kind: 'water', ...line('kidneyLine'), window: [0.46, 0.84] }],
+    moves: [move(k, 'kidney', [0, 0.3, 1.2], [0.51, 0.84], { opacity: 0, visible: false })],
+    uniforms: { slitOpen: { to: 0, window: [0.85, 0.99] } }, highlight: [line('kidneyLine')], safety: rinseBlood,
+    ...changes,
+  });
+}
+
+// 腹から入る面は腹を手前、背から入る面は背を手前にする。同じ側面を上にした半回転を別手順で示す。
+export function openEdge(side, edge) {
+  const belly = edge === 'ventralCut', right = side === 'R';
+  const pose = belly ? (right ? RB : LB) : (right ? LF : RF);
+  return step({
+    id: right ? 'right-belly' : 'left-edge', title: right ? '腹から中骨を探ります' : (belly ? 'もう片面の腹を開きます' : 'もう片面の背を開きます'),
+    summary: belly ? '腹側のひれの際に切り口を作り、そこから中骨まで身を開きます。'
+      : '骨の付いた面を下に置き直し、背びれの際から中骨まで開きます。',
+    how: [belly ? '切っ先を腹の切り口へ戻し、尻びれのすぐ上を尾の付け根へ浅く引きます。'
+      : '切っ先を背びれのすぐ脇に入れ、頭の切り口から尾の付け根へ引きます。',
+    'できた筋に刃の中ほどを戻し、寝かせた刃に骨の手応えが伝わるまで切り口を深めます。'],
+    tip: '皮を浅く開いてから同じ道をたどると、ひれの際を追えます。',
+    mistake: '最初から深く押し込むと、骨から刃が離れて身に入ります。',
+    done: '尾の近くまで切り口が続き、刃に骨が軽く触れます。',
+    place: belly ? (right ? neckRight : neckLeft) : (right ? neckLeftBack : neckRightBack), pose,
+    hands: [hand(belly ? 'headCutTop' : 'headCutBottom', belly ? '{L}手を背寄りに平らに添えます。' : '{L}手で肩の腹寄りを支えます。', side + '.dorsal')],
+    labels: [mark(belly ? 'analFinStart' : 'dorsalFinStart', belly ? '尻鰭(しりびれ)' : '背鰭(せびれ)')],
+    camera: shot('cook', line(edge, side), 1.14), durationMs: 5400,
+    cuts: [cut('edge', edge, side, 'deba', 'pull', 'tip', 16, [0.28, 0.82])],
+  });
+}
+
+export function freeFillet(k, side, edge, tailFirstOnBack = false, changes = {}) {
+  const right = side === 'R', back = edge === 'dorsalCut', reverseEdge = back && tailFirstOnBack;
+  const pose = back ? (right ? LF : RF) : (right ? RB : LB);
+  return step({
+    id: right ? 'right-fillet' : 'left-fillet', title: right ? '一枚目の身を外します' : 'もう一枚の身を外します',
+    summary: '同じ面を上にして魚を半回転させ、反対の縁からも中骨まで開きます。',
+    how: [back ? (reverseEdge ? '背びれの際へ切っ先を入れ、尾から頭の方へ引いて中骨に届かせます。' : '背びれの際を頭側から尾へ引き、先ほどの腹側の切り口まで刃を寝かせて開きます。')
+      : '腹の縁を尾へ浅く引き、刃の中ほどを寝かせて背側の切り口につなぎます。',
+    '尾の付け根で身と中骨の間に刃を入れます。刃の中ほどを骨に沿わせ、尾から頭の切り口へ滑らせます。',
+    '尾に残ったつながりを切り、包丁を置いてから身を移します。'],
+    tip: '引っかかる所は身を少し開き、骨につながった所だけを切ります。',
+    mistake: '刃が届く前に身を引き上げると、骨に付いている身が裂けます。',
+    done: right ? '片身(かたみ)が一枚外れ、もう一方の身に中骨が残っています。' : '身が二枚に分かれ、尾の付いた中骨が一本残っています。',
+    place: back ? (right ? neckLeftBack : neckRightBack) : (right ? neckRight : neckLeft), pose,
+    hands: [hand(back ? 'analFinStart' : 'dorsalFinStart', '{L}手で身を支え、刃の出口を空けます。', side + '.dorsal')],
+    camera: shot('cook', line('boneCut', side), 1.12), durationMs: 8700,
+    cuts: [cut('edge', edge, side, 'deba', 'pull', 'tip', 16, [0.26, 0.41], false, reverseEdge),
+      cut('spine', 'boneCut', side, 'deba', 'pull', 'mid', 7, [0.51, 0.73], true, true),
+      cut('tail', 'tailCut', side, 'deba', 'press', 'mid', 8, [0.76, 0.84], true)],
+    moves: [move(k, side + '.dorsal', right ? [7, 0.3, -5] : [-7, 0.3, 5], [0.86, 1])],
+    uniforms: { xray: { to: 0.42, window: [0.29, 0.46] } },
+    labels: [mark('spineHeadEnd', '中骨(なかぼね)')], practice: practice('spine', 0.45), ...changes,
+  });
+}
+
+export function ribs(k, changes = {}) {
+  return step({
+    id: 'ribs', title: '腹骨を薄くすきます', summary: '片身の皮を下にし、頭寄りのくぼみに並ぶ腹骨を薄く外します。',
+    how: ['骨の根元に切っ先を入れます。刃の中ほどを寝かせ、骨の丸みに沿って腹の縁へ薄く引きます。',
+      'もう一枚も腹の縁を手前に置き、同じように骨をすきます。'],
+    tip: '背側の身を支えると、腹骨の丸みを目で追いながら刃を通せます。',
+    mistake: '板へまっすぐ押し下げると、骨に腹の身が厚く付きます。',
+    done: '弓なりの骨が膜と一緒に外れ、腹の縁に身が残っています。',
+    place: '皮を下にし、腹の縁を手前にそろえます。', pose: LB,
+    hands: ['R', 'L'].map(side => hand('headCutTop', '{L}手で背側の身を支えます。', side + '.dorsal')),
+    labels: [mark('piece:R.strip', '腹骨(はらぼね)')], camera: shot('top', 'bodyCenter', 0.87), durationMs: 7900,
+    cuts: [cut('ribs-r', 'ribStrip', 'R', 'deba', 'slice', 'mid', 8, [0.28, 0.47], true),
+      cut('ribs-l', 'ribStrip', 'L', 'deba', 'slice', 'mid', 8, [0.69, 0.84], true)],
+    moves: [turn('L.dorsal', 'z', 180, [0, 0.23]), move(k, 'R.strip', [2, 0, 3], [0.49, 0.61]),
+      move(k, 'L.strip', [-2, 0, 3], [0.86, 1])],
+    uniforms: { xray: { to: 0, window: [0, 0.22] } }, practice: practice('ribs-r', 0.4), ...changes,
+  });
+}
+
+export function pinbones(k, changes = {}) {
+  return step({
+    id: 'pinbones', title: '小骨を一本ずつ抜きます', summary: '身を指でなで、中央に並んだ小骨の先を探します。',
+    how: ['指の腹を尾から頭へ滑らせ、触れた骨を骨抜きでつまみます。',
+      '根元の身を{L}手で支え、頭側へ傾いている骨をその向きに低く引き抜きます。両方の身を確かめます。'],
+    tip: '骨をつまむ指と、身が浮かないように添える指を、骨の根元に寄せます。',
+    mistake: '身から遠い骨先だけを真上に引くと、骨が折れたり身が浮いたりします。',
+    done: '身の中央を指で往復しても、骨先が指に当たりません。',
+    place: '皮を下に、身の切り口を上に置きます。', pose: LB,
+    hands: ['R', 'L'].map(side => hand('cavityStart', '{L}手で小骨の脇を支えます。', side + '.dorsal')),
+    labels: [mark('piece:pinbones.R', '血合骨(ちあいぼね)')], camera: shot('top', 'bodyCenter', 0.9), durationMs: 7100,
+    cuts: [cut('pluck-r', 'pinBoneLine', 'R', 'tweezers', 'pluck', 'tip', 16, [0.27, 0.44], true),
+      cut('pluck-l', 'pinBoneLine', 'L', 'tweezers', 'pluck', 'tip', 16, [0.61, 0.81], true)],
+    moves: [move(k, 'pinbones.R', [-1.6, 1, 0], [0.46, 0.60], { opacity: 0, visible: false }),
+      move(k, 'pinbones.L', [1.6, 1, 0], [0.82, 0.98], { opacity: 0, visible: false })],
+    practice: practice('pluck-r', 0.35), ...changes,
+  });
+}
+
+export function peel(k, byHand, changes = {}) {
+  const tool = byHand ? 'thumb' : 'yanagi';
+  return step({
+    id: 'peel', title: byHand ? '薄皮を手でむきます' : '尾から皮を引きます',
+    summary: byHand ? '頭の切り口で薄皮をつまみ、尾へ低く引いてむきます。' : '尾の端で皮をつかみ、寝かせた柳刃包丁を頭の方へ通します。',
+    how: byHand ? ['頭の切り口を{L}にそろえ、肩の端から薄皮を{R}手でつまみます。',
+      '{L}手で身を押さえ、はがれ際に指を寄せながら、薄皮を尾へ折り返すように引きます。']
+      : ['皮を下に置き、尾の端で刃の中ほどを皮と身の間に入れます。',
+        'ペーパー越しに{L}手で皮をつかみます。板に沿って刃を頭側へ送りながら、皮を尾の方へ引きます。'],
+    tip: byHand ? '身が皮についてきたら、いったん止めて、身を押さえる指をはがれ際へ寄せます。' : '尾の皮を引くと、身を押しつぶさずに刃を進められます。',
+    mistake: byHand ? '皮を上向きに引くと、薄い尾の身まで持ち上がります。' : '刃を起こして皮の方へ切り込むと、途中で皮が切れます。',
+    done: byHand ? '薄皮が外れ、身の表面に銀色が残っています。' : '皮が一枚で離れ、皮の裏に身が厚く付いていません。',
+    place: byHand ? '皮を上にし、頭の切り口を{L}にそろえます。' : '皮を下にし、尾の端を{L}にそろえます。', pose: byHand ? LB : RB,
+    hands: ['R', 'L'].map(side => hand(byHand ? 'headCutTop' : 'peduncle',
+      byHand ? '{L}手で皮の際の身を支えます。' : '{L}手で尾の皮をつかみます。', byHand ? side + '.dorsal' : 'skin.' + side)),
+    camera: shot('top', 'bodyCenter', 0.85), durationMs: 8100,
+    cuts: [cut('skin-r', 'skinPeel', 'R', tool, 'peel', byHand ? 'tip' : 'mid', 6, [0.27, 0.47], false, byHand),
+      cut('skin-l', 'skinPeel', 'L', tool, 'peel', byHand ? 'tip' : 'mid', 6, [0.64, 0.84], false, byHand)],
+    moves: [turn('R.dorsal', 'x', 180, [0, 0.22]), turn('L.dorsal', 'z', 0, [0, 0.22]),
+      move(k, 'skin.R', [byHand ? 5 : -5, 0.4, -3], [0.47, 0.61]),
+      move(k, 'skin.L', [byHand ? 5 : -5, 0.4, 3], [0.84, 0.99])],
+    ...changes,
+  });
+}
+
+const steps = [
+  prep(['deba', 'scaler', 'tweezers'], '出刃包丁、うろこ取り、骨抜き、ペーパーを用意します。', {
+    labels: [mark('bodyCenter', '{L}手の位置')], safety: washHands,
+  }),
+  scutes('L'), scutes('R'), headSide(k, 'L', false), headSide(k, 'R', true),
+  gut(k), wash(k, true), openEdge('R', 'ventralCut'), freeFillet(k, 'R', 'dorsalCut'),
+  openEdge('L', 'dorsalCut'), freeFillet(k, 'L', 'ventralCut'), ribs(k), pinbones(k), peel(k, true),
+  step({
+    id: 'done', title: '三枚おろしの完成です', summary: '身を清潔な皿へ移し、頭と中骨を分けて置きます。',
+    how: ['腹の縁と身の中央をそっとなで、残った骨先がないか確かめます。',
+      '頭と中骨は、えらや血を取り除いてあら汁に使えます。'],
+    tip: 'すぐに調理しない身は、水気を拭いて冷蔵します。',
+    mistake: '内臓を入れた器に身を戻すと、身に汚れが移ります。',
+    done: '骨先の触れない片身が二枚、尾の付いた中骨が一本に分かれています。',
+    place: '二枚の身を中骨の両脇に置きます。', pose: LB,
+    hands: [hand('bodyCenter', '{L}手で身を支えます。', 'L.dorsal')],
+    labels: [mark('piece:R.dorsal', '片身(かたみ)'), mark('piece:L.dorsal', '片身(かたみ)'), mark('spineHeadEnd', '中骨(なかぼね)')],
+    camera: shot('top', 'bodyCenter', 0.82), durationMs: 3800,
+  }),
+];
 export default { steps };
