@@ -59,6 +59,13 @@ const EXTERNAL_DAYS = [
     title: 'スーパーやりたい放題',
     dir: 'day-094-super-yaritai',
     url: 'https://day94.rairakku.com/'
+  },
+  {
+    day: '098',
+    title: '残火の鎌倉 — 隠れ谷の灯',
+    dir: 'day-098-zanka-no-kamakura',
+    url: 'https://day98.rairakku.com/',
+    demo: false // 紹介動画はまだ無い。カードはスクリーンショットだけで、デモ再生ボタンは出さない
   }
 ];
 

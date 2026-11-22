@@ -15,6 +15,7 @@ export const EXTERNAL_DAYS = [
   { number: 91, folder: 'day-091-virtual-office' }, // 紹介ページなし
   { number: 93, folder: 'day-093-find' },   // 紹介ページなし
   { number: 94, folder: 'day-094-super-yaritai' }, // 紹介ページなし
+  { number: 98, folder: 'day-098-zanka-no-kamakura' }, // 紹介ページなし
 ];
 
 const target = (day, rest, url) => `https://day${day.number}.rairakku.com${rest ?? '/'}${url.search}`;
