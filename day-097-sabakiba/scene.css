@@ -1,0 +1,48 @@
+.fish-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  overflow: hidden;
+  pointer-events: none;
+  color: #1c2b33;
+}
+.fish-pin, .fish-tag { position: absolute; top: 0; left: 0; pointer-events: none; }
+.fish-pin[hidden], .fish-tag[hidden] { display: none; }
+.fish-pin {
+  box-sizing: border-box;
+  width: 8px; height: 8px;
+  margin: -4px;
+  background: #334852;
+  border: 2px solid #fffdf9;
+  border-radius: 50%;
+  box-shadow: 0 1px 3px #1c2b3340;
+}
+.fish-pin--hand {
+  display: grid; place-items: center;
+  width: 27px; height: 27px;
+  margin: -13.5px;
+  color: #fff;
+  background: #2b7bd6;
+  border-color: #fff;
+  box-shadow: 0 0 0 2px #2b7bd6, 0 1px 4px #163f6d59;
+}
+.fish-pin--hand svg { width: 21px; height: 21px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.fish-tag {
+  box-sizing: border-box;
+  max-width: min(19em, calc(100% - 10px));
+  padding: 3px 7px;
+  background: #fffdf8f5;
+  border: 1px solid #a29e93;
+  border-radius: 4px;
+  box-shadow: 0 1px 3px #1c2b3326;
+  font: 600 12px/1.35 system-ui, sans-serif;
+  overflow-wrap: anywhere;
+}
+.fish-tag--hand { color: #154779; border-color: #2b7bd6; background: #f5fafff5; }
+.fish-tag--start { color: #ffffff; border-color: #ffffff; background: #1c2b33; font-weight: 800; white-space: nowrap; }
+.fish-tag rt { font-size: .66em; }
+@media (max-width: 480px), (max-height: 480px) {
+  .fish-tag { max-width: min(13em, calc(100% - 10px)); padding: 2px 5px; font-size: 11px; }
+  .fish-pin--hand { width: 23px; height: 23px; margin: -11.5px; }
+  .fish-pin--hand svg { width: 18px; height: 18px; }
+}
