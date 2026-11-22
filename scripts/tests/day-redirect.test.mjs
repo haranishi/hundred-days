@@ -173,3 +173,13 @@ test('Day094：/day94/ と正の住所を day94.rairakku.com へ転送し、カ�
   assert.equal(target('/100days/day-094-super-yaritai/'), 'https://day94.rairakku.com/');
   assert.equal(target('/100days/day-094-super-yaritai/screenshot.webp'), null, 'カードの画像は転送しない');
 });
+
+test('Day098：/day98/ と正の住所を day98.rairakku.com へ転送し、カードの画像は素通しする', () => {
+  assert.equal(target('/day98'), 'https://day98.rairakku.com/');
+  assert.equal(target('/day98/'), 'https://day98.rairakku.com/');
+  assert.equal(target('/day098/'), 'https://day98.rairakku.com/');
+  assert.equal(target('/day98/?touch=1'), 'https://day98.rairakku.com/?touch=1', '問い合わせを引き継ぐ');
+  assert.equal(target('/100days/day-098-zanka-no-kamakura'), 'https://day98.rairakku.com/');
+  assert.equal(target('/100days/day-098-zanka-no-kamakura/'), 'https://day98.rairakku.com/');
+  assert.equal(target('/100days/day-098-zanka-no-kamakura/screenshot.webp'), null, 'カードの画像は転送しない');
+});

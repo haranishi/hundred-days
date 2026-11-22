@@ -13,4 +13,5 @@ routes = [
   { pattern = "rairakku.com/100days/day-091-virtual-office*", zone_name = "rairakku.com" },
   { pattern = "rairakku.com/100days/day-093-find*", zone_name = "rairakku.com" },
   { pattern = "rairakku.com/100days/day-094-super-yaritai*", zone_name = "rairakku.com" },
+  { pattern = "rairakku.com/100days/day-098-zanka-no-kamakura*", zone_name = "rairakku.com" },
 ]

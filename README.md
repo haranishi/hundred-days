@@ -143,6 +143,7 @@ Day 051「ハコニワ」も外部公開アプリです。本体は独立リポ�
 | 095 | 盆栽日和 — 3Dの盆栽を、切って曲げて育てる | [day-095-bonsai/](day-095-bonsai/) | [アプリを開く](https://rairakku.com/100days/day-095-bonsai/) |
 | 096 | UXレシピ — 目的を選ぶと、ページの組み立て方が出る | [day-096-ux-recipe/](day-096-ux-recipe/) | [アプリを開く](https://rairakku.com/100days/day-096-ux-recipe/) |
 | 097 | さばき場 — 魚のさばき方を、3Dで見ながら | [day-097-sabakiba/](day-097-sabakiba/) | [アプリを開く](https://rairakku.com/100days/day-097-sabakiba/) |
+| 098 | 残火の鎌倉 — 隠れ谷の灯 | [制作記録のみ](day-098-zanka-no-kamakura/) | [紹介ページ](https://day98.rairakku.com/) |
 <!-- day-index:end -->
 
 ## 1日アプリのルール
