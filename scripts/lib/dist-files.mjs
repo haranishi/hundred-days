@@ -50,6 +50,8 @@ export const SOURCE_DIRS_BY_APP = {
   'day-075-amegumo-sokoban': ['tools'],
   // Day97 の tools/ は、撮影・採点・宣伝動画・形と材質の確認の開発用の道具。配信には要らない
   'day-097-sabakiba': ['tools'],
+  // Day98 は本体を day98.rairakku.com で配信し、source/ にゲームのソースと3D素材、tools/ に宣伝動画の道具を置く。どちらもこのサイトには配信しない
+  'day-098-zanka-no-kamakura': ['source', 'tools'],
 };
 
 const EXCLUDED_FILES = ['package.json', 'package-lock.json', '_headers'];

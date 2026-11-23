@@ -1,0 +1,176 @@
+// CPU tests with shipped Three. Canvas is a double; no GPU rendering or browser.
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { createGrassCell, createGrassWindows, grassExclusions, grassEnabled, grassFrameBudget, grassEdge } from '../dist/valley/kamakura-grass-field.js';
+import { SHORT, TALL, FERN, SUSUKI, nearTile, midTile, tilesAround } from '../dist/valley/grass-field.js';
+import { buildColliders, addColliderCircles } from '../dist/valley/collision.js';
+import { createKamakuraTerrain } from '../dist/valley/kamakura-terrain.js';
+import { fixture } from './helpers/kamakura-fixture.mjs';
+import { load, THREE, source } from './helpers/tree-modules.mjs';
+const flat = () => ({ heightAt: (x,z) => 10 + x*.01 + z*.02, slopeAt: () => 2, waterAt: () => 0, walkable: () => true, riverDistanceAt: () => Infinity });
+const cell = (code = 2, terrain = flat(), options = {}) => createGrassCell(terrain,{surfaceCodeAt:()=>code,...options});
+const finish = w => { w.work(()=>0); const f=w.commit(); assert(f); return f; };
+const at = (f,x,z) => (z-f.z0)*f.nx+x-f.x0;
+const bounds = {minX:-1000,maxX:1000,minZ:-1000,maxZ:1000};
+test('world metre cells repeat; overlapping windows reuse exact raw values and corner heights',()=>{
+  let evaluations=0; const evaluate=cell(),w=createGrassWindows((x,z)=>{evaluations++;return evaluate(x,z);});
+  assert.deepEqual(evaluate(-12,7),evaluate(-12,7));
+  w.plan({x:0,z:0});const a=finish(w);assert.equal(evaluations,65536);
+  assert(!w.plan({x:31.99,z:0}));assert(w.plan({x:32,z:0}));const b=finish(w);
+  assert.deepEqual(b.stats,{evaluated:8192,reused:57344});assert.equal(evaluations,73728);
+  for(let z=-128;z<128;z++)for(let x=-96;x<128;x++) {
+    const ai=at(a,x,z),bi=at(b,x,z);
+    for(const key of ['rawDensity','rawMidPatch','species','height'])assert.equal(a[key][ai],b[key][bi]);
+    if(grassEdge(a,x,z)===1&&grassEdge(b,x,z)===1)for(const key of ['placeable','density','midPatch'])assert.equal(a[key][ai],b[key][bi]);
+  }
+  const cold=createGrassWindows(evaluate);cold.plan({x:32,z:0});const c=finish(cold);
+  for(const key of ['density','midPatch','species','height','heights','placeable'])assert.deepEqual(b[key],c[key]);
+  w.plan({x:1000,z:-1000});assert.equal(finish(w).stats.evaluated,65536);
+});
+test('classes determine density/species; rice, wet sand, rock, gravel and unknown never get blades',()=>{
+  const grass=cell()(7,9);assert([SHORT,TALL].includes(grass.species));assert(grass.density>0);
+  for(const [code,kind,factor] of [[3,FERN,.3],[0,SUSUKI,.15],[4,SHORT,.2]]){
+    const c=cell(code)(7,9);assert.equal(c.species,kind);assert(Math.abs(c.density/grass.density-factor)<.015);assert(Math.abs(c.midPatch/grass.midPatch-factor)<1e-8);
+  }
+  for(const code of [1,5,6,7,255])assert.equal(cell(code)(7,9).placeable,0);
+  const kinds=new Set();for(let x=0;x<200;x++)kinds.add(cell(2,{...flat(),riverDistanceAt:()=>12})(x,5).species);
+  assert(kinds.has(FERN)&&kinds.has(SUSUKI));
+});
+test('excludes water, slope including corner gradients, non-walkable land and river banks',()=>{
+  for(const terrain of [{...flat(),waterAt:()=>.4},{...flat(),walkable:()=>false},{...flat(),slopeAt:()=>32.1},{...flat(),heightAt:(x)=>x*2},{...flat(),riverDistanceAt:()=>1}])assert.equal(cell(2,terrain)(5,7).placeable,0);
+  assert.equal(cell(2,{...flat(),slopeAt:()=>32})(5,7).placeable,1);
+  assert.equal(cell(2,{...flat(),riverDistanceAt:()=>2})(5,7).placeable,1);
+});
+test('boxes (house/facility), rotated margins, paths and live trunk grid exclusions; the start point is not excluded',()=>{
+  const col=buildColliders({bounds,extraBoxes:[{x:0,z:0,w:4,d:4,rotY:Math.PI/4},{x:20,z:0,w:4,d:4}],extraCircles:[{x:40,z:0,r:.5}]});
+  // A start point may be passed by older callers; it must not carve a bare disc (real-Chrome finding 2026-11-07).
+  const ex=grassExclusions(flat(),{colliders:col,paths:{road:{xyz_m:[[60,0,0],[60,-10,0]]}},spawn:{x:80,z:0}});
+  for(const [x,z,reason] of [[0,0,'box'],[20,0,'box'],[22.4,0,'box'],[40,0,'trunk'],[62.5,5,'path'],[80,3,null],[80,0,null]])assert.equal(ex(x,z),reason);
+  assert.equal(ex(25,0),null);assert.equal(ex(63.3,5),null);assert.equal(ex(80,3.8),null);
+  // A box turned 45 degrees reaches sqrt(2) times its margin along the world axes; the 8 m collision grid registers it without margin.
+  // This corner cell lies in the next grid cell (found in review): it must still be excluded.
+  const turned=buildColliders({bounds,extraBoxes:[{x:5.11,z:.5,w:4,d:4,rotY:Math.PI/4}]}),exTurned=grassExclusions(flat(),{colliders:turned});
+  assert.equal(exTurned(9.5,.5),'box');assert.equal(exTurned(9.7,.5),null);assert.equal(exTurned(5.11,.5),'box');
+  const release=addColliderCircles(col,[{x:90,z:0,r:1}]);assert.equal(ex(90,0),'trunk');release();assert.equal(ex(90,0),null);
+  assert.equal(cell(2,flat(),{exclude:ex})(20,0).placeable,0);
+});
+test('time budget splits all work, old field stays committed until ready; edges fade both LODs',()=>{
+  const w=createGrassWindows(cell());w.plan({x:0,z:0});assert.equal(w.commit(),null);
+  let tick=0;assert.equal(w.work(()=>++tick,2),2);assert.equal(w.field,null);const f=finish(w);
+  w.plan({x:32,z:0});tick=0;w.work(()=>++tick,1.5);assert.equal(w.field,f);assert.equal(w.commit(),null);
+  const pending=w.pending;assert(!w.plan({x:100,z:0}));assert.equal(w.pending,pending);finish(w);
+  assert.equal(grassEdge(f,-128,0),0);assert(grassEdge(f,-125,0)>0&&grassEdge(f,-125,0)<1);assert.equal(grassEdge(f,-122,0),1);
+  assert.equal(f.density[at(f,-128,0)],0);assert.equal(f.midPatch[at(f,-128,0)],0);
+  assert.equal(grassFrameBudget('standard'),2);assert.equal(grassFrameBudget('light'),1.5);
+  w.plan({x:500,z:0});w.cancel();assert.equal(w.commit(),null);
+  assert.throws(()=>w.plan({x:NaN,z:0}),RangeError);
+});
+test('valley field contract works for near/mid sampling and both quality levels',()=>{
+  const w=createGrassWindows(cell());w.plan({x:-5,z:7});const f=finish(w);
+  for(const quality of ['standard','light']){
+    const tiles=tilesAround(f,0,0,{quality});assert(tiles.near.length&&tiles.mid.length);
+    for(const [kind,make]of [['near',nearTile],['mid',midTile]])for(const t of tiles[kind]){
+      const d=make(f,t.tx,t.tz,{quality});assert(d.count>=0);assert(d.y.every(Number.isFinite));
+    }
+  }
+});
+// Only card-atlas drawing is substituted, as in the existing valley grass tests.
+globalThis.document={createElement(){const c={width:0,height:0,getContext:()=>({createLinearGradient:()=>({addColorStop(){}}),beginPath(){},moveTo(){},quadraticCurveTo(){},fill(){},getImageData:()=>({data:new Uint8ClampedArray(c.width*c.height*4)})})};return c;}};
+const {buildKamakuraGrass}=await load('kamakura-grass-view.js');
+const wind={uTime:{value:0},uWind:{value:1},uWindDir:{value:new THREE.Vector2(1,0)},uGuideMix:{value:0}};
+const camera=x=>({position:new THREE.Vector3(x,12,0)});
+function view(code=2,search='',quality='standard') {
+  const data=fixture();data.meta.surface={};data.surface=new Uint8Array(data.meta.grid.width*data.meta.grid.height).fill(code);
+  return buildKamakuraGrass({data,terrain:createKamakuraTerrain(data),search,quality,wind,sunDir:new THREE.Vector3(1,1,0)});
+}
+// W2c-9r2: the 400m band window is time-sliced, so a slow machine needs many more updates; the loops end as soon as the window settles.
+function settle(v,c) {for(let i=0;i<20000;i++){v.update(c);if(!v.stats().pending&&v.stats().switches&&v.stats().queue===0)return;}assert.fail('grass did not settle');}
+test('shipped Three CPU view streams, retains interior chunks, adapts without rebuilding and disposes each resource once',()=>{
+  for(const quality of ['standard','light']){
+    const v=view(2,'&grass9=0',quality); /* R9: this test pins the pre-stream path; the 30 m stream has its own tests (kamakura-grass-stream.test.mjs) */ settle(v,camera(0));const before=v.stats();assert(before.nearBlades>0&&before.midCards>0);
+    const allocated=new Map();const watch=()=>v.group.traverse(o=>{for(const r of [o.geometry,...[].concat(o.material||[]),o.material?.map].filter(Boolean))if(!allocated.has(r)){allocated.set(r,0);r.addEventListener('dispose',()=>allocated.set(r,allocated.get(r)+1));}});
+    watch();const builds=before.builds;v.setAdapt(2);const reduced=v.stats();assert.equal(reduced.builds,builds);assert(reduced.tallBlades/before.tallBlades>.55&&reduced.tallBlades/before.tallBlades<.65);assert.equal(reduced.lawn,0);assert.equal(reduced.flowers,0);
+    // Step 2 must thin by an independent hash: the card pattern and the far fade both read iShape.w.
+    {const cards=new Set();let nearMaxW=0;v.group.traverse(o=>{if(!o.isMesh||!(o.geometry.instanceCount>0))return;const a=o.geometry.getAttribute('iShape').data.array;
+      for(let i=0;i<o.geometry.instanceCount;i++){const w=a[i*15+7];if(o.material.alphaTest>0)cards.add(Math.floor(w*3.999));else nearMaxW=Math.max(nearMaxW,w);}});
+      assert.deepEqual([...cards].sort(),[0,1,2,3]);assert(nearMaxW>.95,`near blades must keep the whole w range, max ${nearMaxW}`);}
+    v.setAdapt(3);assert.equal(v.group.visible,false);const switches=v.stats().switches;v.update(camera(500));assert.equal(v.stats().switches,switches);
+    v.setAdapt(0);assert.equal(v.stats().nearBlades,before.nearBlades);assert.equal(v.group.visible,true);
+    const central=new Map();v.group.traverse(o=>{if(o.geometry?.instanceCount>0&&Math.abs(o.geometry.boundingSphere.center.x)<10&&Math.abs(o.geometry.boundingSphere.center.z)<10)central.set(o,o.geometry.getAttribute('iRoot').data.array.slice());});
+    // Move the CPU window while holding the render camera, proving retained chunks remain exact.
+    for(let i=0;i<20000;i++){v.update(camera(0),{x:32,z:0});if(!v.stats().pending&&v.stats().switches>switches)break;}
+    assert.equal(v.stats().switches,switches+1);for(const [o,a]of central)assert.deepEqual(o.geometry.getAttribute('iRoot').data.array,a);
+    for(const x of [48,72,96,-72,0]){settle(v,camera(x));watch();}
+    v.group.traverse(o=>{if(o.isMesh)assert(!o.castShadow&&o.receiveShadow);});
+    v.dispose();v.dispose();v.update(camera(0));assert.equal(v.group.children.length,0);for(const n of allocated.values())assert.equal(n,1);
+  }
+});
+test('grass=0, absent/invalid surface and paused views allocate no grass meshes',()=>{
+  assert(!grassEnabled('?grass=0'));assert(grassEnabled(''));
+  const off=view(2,'?grass=0');for(let i=0;i<20;i++)off.update(camera(0));assert(!off.enabled);assert.equal(off.group.children.length,0);off.dispose();
+  const data=fixture();for(const surface of [undefined,new Uint8Array(1)]){
+    data.surface=surface;const v=buildKamakuraGrass({data,terrain:flat()});v.update(camera(0));assert(!v.enabled);assert.equal(v.group.children.length,0);v.dispose();
+  }
+  const paused=view();paused.update(camera(0),{x:0,z:0},true);assert.equal(paused.stats().switches,0);paused.dispose();
+});
+test('composition uses shared wind/sun, flight position, pause, adaptive step and disposal',()=>{
+  const s=source('world-kamakura.js');assert.match(s,/buildKamakuraGrass\(\{[^\n]*wind, sunDir: atmosphere.sunDir/);assert.match(s,/grass.update\(camera, flight.pos, paused\)/);assert.match(s,/grass\?\.setAdapt\(adapt.step\)/);assert.match(s,/grass\?\.dispose\(\)/);
+});
+test('private v0.9 window uses provided surface/height and reuses overlap (no private values emitted)',{skip:!process.env.KZ_WORLD_DIR&&'KZ_WORLD_DIR未設定：私有v0.9地表データが必要'},async t=>{
+  const {verifyPrivateGrass}=await import('../tools/lib/kamakura-grass-validation.mjs');
+  const result=await verifyPrivateGrass(process.env.KZ_WORLD_DIR);if(result.skipped)return t.skip(result.skipped);
+  assert.equal(result.newCells,8192);assert.equal(result.reusedCells,57344);
+  assert(result.samples.grass.nearBlades>0);assert(result.samples.forest.nearBlades>0);
+  t.diagnostic(JSON.stringify(result));
+});
+test('9b window commits update the existing mid-card tint from linear terrain color',()=>{
+  const data=fixture();data.meta.surface={};data.surface=new Uint8Array(data.meta.grid.width*data.meta.grid.height).fill(2);
+  const terrain=createKamakuraTerrain(data);let level=.2,calls=0;
+  terrain.groundColorAt=()=>{calls++;return [level,.3,.4];};
+  const v=buildKamakuraGrass({data,terrain,wind,sunDir:new THREE.Vector3(1,1,0)});
+  try{
+    settle(v,camera(0));assert.equal(calls,9);
+    const mesh=v.group.children[0].children.find(o=>o.material.alphaTest>0),shader={uniforms:{},vertexShader:THREE.ShaderLib.lambert.vertexShader,fragmentShader:THREE.ShaderLib.lambert.fragmentShader};
+    mesh.material.onBeforeCompile(shader);const tint=shader.uniforms.uGroundTint.value;
+    assert(Math.abs(tint.r-.2*.68)<1e-10);assert(Math.abs(tint.g-.3*.68)<1e-10);assert(Math.abs(tint.b-.4*.68)<1e-10);
+    level=.6;const switches=v.stats().switches;
+    for(let i=0;i<20000&&v.stats().switches===switches;i++)v.update(camera(0),{x:32,z:0});
+    assert.equal(v.stats().switches,switches+1);assert.equal(calls,18);assert(Math.abs(tint.r-.6*.68)<1e-10);
+  }finally{v.dispose();}
+});
+
+test('9p expanding the boot window preserves every final cell and edge byte',()=>{
+  const evaluate=cell(),partial=createGrassWindows(evaluate,{size:352}),cold=createGrassWindows(evaluate,{size:352});
+  const pos={x:-7,z:11};partial.plan(pos,120);const first=finish(partial);
+  partial.plan(pos);const expanded=finish(partial);cold.plan(pos);const expected=finish(cold);
+  assert.equal(expanded.stats.reused,120*120);
+  for(const key of ['density','midPatch','species','height','heights','placeable'])assert.deepEqual(expanded[key],expected[key]);
+  assert.equal(first.nx,120);
+});
+test('9p close grass is usable while outer cells are pending; fake-clock jobs switch once and cancel on disposal',()=>{
+  let time=0,id=0;const jobs=new Map();
+  const data=fixture();data.meta.surface={};data.surface=new Uint8Array(data.meta.grid.width*data.meta.grid.height).fill(2);
+  const options={data,terrain:createKamakuraTerrain(data),wind,sunDir:new THREE.Vector3(1,1,0),now:()=>time+=.05,
+    schedule:fn=>{jobs.set(++id,fn);return id;},cancel:id=>jobs.delete(id)};
+  const v=buildKamakuraGrass(options),c=camera(0);v.warm(c);
+  const first=v.stats();assert(first.nearBlades>0);assert.equal(first.switches,1);assert.equal(jobs.size,0);
+  v.update(c);assert(v.stats().pending);assert(v.stats().nearBlades>0);assert.equal(jobs.size,1);
+  // Walking/hero updates do not wait for completion.
+  v.updateHero({x:1,y:10,z:0},3,false,1/60);v.update(c,{x:1,z:0});
+  for(let i=0;jobs.size&&i<10000;i++){const [id,fn]=jobs.entries().next().value;jobs.delete(id);fn();}
+  assert.equal(jobs.size,0);v.update(c);assert.equal(v.stats().switches,2);assert(!v.stats().pending);
+  const n=v.stats().nearBlades;for(let i=0;i<5;i++)v.update(c);assert.equal(v.stats().switches,2);assert.equal(v.stats().nearBlades,n);
+  v.dispose();v.dispose();assert.equal(jobs.size,0);
+  const cancelled=buildKamakuraGrass(options);cancelled.warm(c);cancelled.update(c);assert.equal(jobs.size,1);
+  cancelled.dispose();assert.equal(jobs.size,0);cancelled.update(c);assert.equal(cancelled.group.children.length,0);
+});
+test('9p ecology reuses a supplied river band and computes normals only on demand',async()=>{
+  const {createGrassEnvironment}=await import('../dist/valley/kamakura-grass-look.js');
+  let rivers=0,heights=0;
+  const terrain={...flat(),heightAt:(x,z)=>{heights++;return 10+x*.01+z*.02;},riverDistanceAt:()=>{rivers++;return 7;}};
+  const e=createGrassEnvironment(terrain),evaluate=createGrassCell(terrain,{surfaceCodeAt:()=>2,environmentAt:e});
+  evaluate(-3,8);assert.equal(rivers,1);const base=e(-2.5,8.5);assert.equal(rivers,1);assert.equal(base.normalY,undefined);
+  const h=heights;const normal=e(-2.5,8.5,true);assert.equal(heights,h+4);assert.equal(rivers,1);e(-2.5,8.5,true);assert.equal(heights,h+4);
+  const cold=createGrassEnvironment(terrain);assert.deepEqual(normal,cold(-2.5,8.5,true));
+  e.retain({x0:100,z0:100,nx:10,nz:10});e(-2.5,8.5);assert.equal(rivers,3);e.dispose();cold.dispose();
+});

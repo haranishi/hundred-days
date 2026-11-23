@@ -1,0 +1,121 @@
+// 縦切り（dist/valley/）の配布検査。ブラウザなしで、ファイルの欠け・読み込みの鎖・純粋な層の汚れ・GLBの中身・出所の記録を確かめる。
+// 実行：node tools/check-valley.mjs（tools/check-package.mjs からも呼ばれる）
+import fs from 'node:fs';
+import path from 'node:path';
+import assert from 'node:assert/strict';
+import { createHash } from 'node:crypto';
+import { fileURLToPath } from 'node:url';
+import { referencedClips } from './lib/character-clips.mjs';
+import { storyProblems } from './lib/story-check.mjs';
+import { STORY, SPEAKERS } from '../dist/valley/story-data.js';
+
+const root = fileURLToPath(new URL('../', import.meta.url));
+const dir = path.join(root, 'dist/valley');
+const read = f => fs.readFileSync(path.join(root, f), 'utf8');
+
+// 1 入口・主要なモジュールと素材がある
+const modules = ['mist-field', 'paddy', 'paddy-view', 'river-rocks', 'opening-data', 'opening', 'opening-scenes', 'opening-fire', 'opening-stage', 'banter', 'narrative', 'relic-view', 'sword-path', 'arm-ik', 'sword-layer', 'hand-grip', 'hand-rig', 'leg-plant', 'leg-ik', 'upper-body', 'upper-rig', 'slash-trail', 'clash', 'actors', 'ai-world', 'anim-data', 'atmosphere', 'shadow-snap', 'audio-valley', 'audio-rules', 'combat-synth', 'voice-bank', 'foot-contacts', 'step-surface', 'step-synth', 'battle', 'bow', 'buildings', 'batch', 'life-rules', 'life-kit', 'life-view', 'camera-rig', 'camera-follow', 'characters', 'collision', 'combat', 'companion-ai', 'config',
+  'enemy-ai', 'fx', 'game', 'guide-nav', 'guide-view', 'guide-renderer', 'guide', 'grade', 'grass-view', 'grass-schedule', 'grass-field', 'hud', 'input', 'main', 'nav', 'perf-stats', 'wind', 'post', 'props', 'qa', 'quest', 'ridges', 'save', 'scatter', 'share-ui', 'touch-math', 'valley-touch', 'tree-species', 'tree-lod', 'tree-branches', 'tree-impostor', 'tree-geometry', 'tree-textures', 'tree-materials', 'tree-bake', 'tree-view', 'shots', 'story-data', 'terrain-height', 'kamakura-terrain', 'kamakura-surface', 'kamakura-grass-field', 'kamakura-spawn', 'kamakura-fly', 'kamakura-chunks', 'kamakura-chunk-jobs', 'kamakura-adapt', 'kamakura-houses', 'kamakura-facilities', 'kamakura-veg', 'kamakura-stands', 'kamakura-atmosphere', 'kamakura-rivers', 'kamakura-layers', 'kamakura-drift', 'kamakura-gust', 'kamakura-habitat', 'kamakura-crowd', 'kamakura-horizon', 'kamakura-horizon-view', 'kamakura-lamps', 'kamakura-lamps-view', 'kamakura-crowd-view', 'kamakura-fire', 'kamakura-fire-view', 'kamakura-stairs', 'kamakura-crag', 'kamakura-crag-view', 'kamakura-works', 'kamakura-works-kit', 'kamakura-works-view', 'kamakura-town-dress', 'kamakura-town-dress-kit', 'kamakura-town-dress-view', 'kamakura-house-build', 'kamakura-house-parts', 'kamakura-town-fill', 'kamakura-bridges', 'kamakura-river-rocks', 'kamakura-riverlife-kit', 'kamakura-riverlife-view', 'kamakura-ruin-hall', 'kamakura-ruin-hall-view', 'kamakura-far-shadow', 'kamakura-far-shadow-view', 'kamakura-harbor', 'kamakura-harbor-kit', 'kamakura-harbor-view', 'kamakura-ground-far', 'kamakura-ground-cliff', 'kamakura-avenue', 'kamakura-avenue-view', 'kamakura-canopy', 'kamakura-house-far', 'kamakura-sea-far', 'kamakura-backdrop', 'kamakura-backdrop-view', 'kamakura-mist', 'kamakura-flight-shadow', 'kamakura-hero-gear', 'kamakura-hero-move', 'kamakura-people', 'kamakura-people-view', 'kamakura-sando', 'kamakura-hero-moves', 'kamakura-roads', 'kamakura-fields', 'kamakura-fields-kit', 'kamakura-props', 'kamakura-fauna', 'kamakura-soundscape', 'kamakura-voices', 'kamakura-time-switch', 'kamakura-mix', 'kamakura-water-synth', 'kamakura-hero-life', 'kamakura-sky-fx', 'terrain', 'vegetation', 'water', 'weapons', 'world-colliders', 'world-data', 'kamakura-wisp', 'kamakura-wisp-view'];
+for (const m of modules) assert(fs.statSync(path.join(dir, m + '.js')).size > 0, `missing dist/valley/${m}.js`);
+for (const f of ['index.html', 'valley.css', 'valley-touch.css', 'share-ui.css', 'favicon.svg', 'og.jpg']) assert(fs.statSync(path.join(dir, f)).size > 0, `missing dist/valley/${f}`);
+
+// 2 import の鎖が切れていない（相対 import は実在し、export 名が実在する）
+const exportsOf = src => { const out = new Set(); for (const m of src.matchAll(/export\s+(?:async\s+)?(?:function\*?|class|const|let|var)\s+([A-Za-z0-9_$]+)/g)) out.add(m[1]); for (const m of src.matchAll(/export\s*\{([^}]+)\}/g)) for (const n of m[1].split(',')) out.add(n.trim().split(/\s+as\s+/).pop()); return out; };
+const sources = Object.fromEntries(fs.readdirSync(dir).filter(f => f.endsWith('.js')).map(f => [f, fs.readFileSync(path.join(dir, f), 'utf8')]));
+for (const [file, src] of Object.entries(sources)) {
+  for (const m of src.matchAll(/import\s+(?:\*\s+as\s+\w+|\{([^}]*)\}|(\w+))\s+from\s+'(\.[^']+)'/g)) {
+    const target = m[3].replace(/^\.\//, '');
+    if (target.startsWith('../')) { assert(fs.existsSync(path.join(dir, target)), `${file}: ${m[3]} not found`); continue; }
+    assert(sources[target], `${file}: import './${target}' not found`);
+    if (m[1]) {
+      const have = exportsOf(sources[target]);
+      for (const raw of m[1].split(',')) { const name = raw.trim().split(/\s+as\s+/)[0]; if (name) assert(have.has(name), `${file}: './${target}' has no export '${name}'`); }
+    }
+  }
+}
+
+// 3 純粋な層（規則・データ）は Three.js・DOM・乱数・時計に触れない
+const pure = ['mist-field', 'paddy', 'river-rocks', 'opening-data', 'opening', 'opening-scenes', 'banter', 'narrative', 'sword-path', 'arm-ik', 'leg-plant', 'sword-layer', 'hand-grip', 'slash-trail', 'clash', 'audio-rules', 'combat-synth', 'voice-bank', 'foot-contacts', 'step-surface', 'step-synth', 'guide-nav', 'guide-view', 'guide', 'perf-stats', 'wind', 'combat', 'enemy-ai', 'companion-ai', 'quest', 'life-rules', 'save', 'nav', 'terrain-height', 'touch-math', 'kamakura-terrain', 'kamakura-surface', 'kamakura-grass-field', 'kamakura-spawn', 'kamakura-fly', 'kamakura-chunks', 'kamakura-chunk-jobs', 'kamakura-adapt', 'kamakura-houses', 'kamakura-facilities', 'kamakura-veg', 'kamakura-stands', 'kamakura-atmosphere', 'kamakura-rivers', 'kamakura-drift', 'kamakura-gust', 'kamakura-habitat', 'kamakura-crowd', 'kamakura-horizon', 'kamakura-lamps', 'kamakura-fire', 'kamakura-stairs', 'kamakura-crag', 'kamakura-works', 'kamakura-town-dress', 'kamakura-house-build', 'kamakura-house-parts', 'kamakura-town-fill', 'kamakura-bridges', 'kamakura-river-rocks', 'kamakura-ruin-hall', 'kamakura-far-shadow', 'kamakura-harbor', 'kamakura-avenue', 'kamakura-canopy', 'kamakura-house-far', 'kamakura-sea-far', 'kamakura-backdrop', 'kamakura-mist', 'kamakura-flight-shadow', 'kamakura-hero-move', 'kamakura-people', 'kamakura-sando', 'kamakura-roads', 'kamakura-fields', 'kamakura-fields-kit', 'kamakura-props', 'kamakura-fauna', 'kamakura-soundscape', 'kamakura-voices', 'kamakura-time-switch', 'kamakura-mix', 'kamakura-water-synth', 'kamakura-hero-life', 'kamakura-sky-fx', 'scatter', 'tree-species', 'tree-lod', 'tree-branches', 'tree-impostor', 'shadow-snap', 'grass-schedule', 'grass-field', 'collision', 'anim-data', 'world-data', 'world-colliders', 'story-data', 'ai-world', 'kamakura-wisp'];
+for (const m of pure) {
+  const code = sources[m + '.js'].replace(/\/\/.*$/gm, '').replace(/\/\*[\s\S]*?\*\//g, '');
+  for (const bad of [/from\s+'three/, /\bMath\.random\b/, /\bDate\.now\b/, /\bperformance\.now\b/, /\bdocument\./, /\bwindow\./, /\blocalStorage\b/, /\b(?:AudioContext|OfflineAudioContext|webkitAudioContext)\b/]) assert(!bad.test(code), `${m}.js (pure layer) uses ${bad}`);
+}
+
+// 植生4種は同じ一組の風uniformを共有する。生成を各材質へ分散させない。
+const vegetation = sources['vegetation.js'].replace(/\/\/.*$/gm, '').replace(/\/\*[\s\S]*?\*\//g, '');
+assert.equal([...vegetation.matchAll(/(?<!function\s)\bwindUniforms\s*\(/g)].length, 1, 'vegetation must call windUniforms once');
+assert.match(vegetation, /const wind = windUniforms\(\)/, 'vegetation must bind the shared wind');
+for (const [name, factory] of [['trees', 'new TreeField'], ['grass', 'buildGrass'], ['rice', 'makeTufts'], ['crops', 'makeTufts']]) {
+  const line = vegetation.split('\n').find(line => line.includes(`const ${name} =`));
+  assert(line?.includes(factory) && /\bwind\s*[,}]/.test(line) && !/\bwind\s*:/.test(line), `${name} must receive the shared wind`);
+}
+
+// 4 index.html：id の重複なし。hud.js・main.js が引く id がすべて存在する
+const html = read('dist/valley/index.html');
+const ids = [...html.matchAll(/\bid="([^"]+)"/g)].map(m => m[1]);
+assert.equal(new Set(ids).size, ids.length, 'duplicate ids in index.html: ' + ids.filter((x, i) => ids.indexOf(x) !== i).join(','));
+const wanted = new Set();
+for (const f of ['hud.js', 'main.js']) {
+  for (const m of sources[f].matchAll(/\$\('([^']+)'\)/g)) wanted.add(m[1]);
+  for (const m of sources[f].matchAll(/getElementById\('([^']+)'\)/g)) wanted.add(m[1]);
+}
+const hudList = sources['hud.js'].match(/Object\.fromEntries\(\[([\s\S]*?)\]\.map/);
+if (hudList) for (const m of hudList[1].matchAll(/'([^']+)'/g)) wanted.add(m[1]);
+for (const id of wanted) assert(ids.includes(id), `index.html lacks id="${id}" (used by hud.js/main.js)`);
+
+// 5 GLB：ヘッダ・内蔵画像・予算。人物は動作が入っている
+const glbInfo = f => {
+  const b = fs.readFileSync(f);
+  assert.equal(b.toString('ascii', 0, 4), 'glTF', f); assert.equal(b.readUInt32LE(4), 2, f); assert.equal(b.readUInt32LE(8), b.length, f);
+  const json = JSON.parse(b.toString('utf8', 20, 20 + b.readUInt32LE(12)));
+  assert((json.images || []).every(x => x.bufferView !== undefined && !x.uri), f + ': images must be embedded');
+  return { json, bytes: b.length, sha256: createHash('sha256').update(b).digest('hex') };
+};
+const characters = ['hero', 'archer', 'soldier', 'officer', 'villager_m', 'villager_f', 'child'];
+let total = 0; const shas = {};
+const requiredClips = referencedClips(root);
+const characterMeta = JSON.parse(read('dist/assets/characters/clips.json'));
+for (const c of characters) {
+  const f = path.join(root, 'dist/assets/characters', c + '.glb'), g = glbInfo(f);
+  const shippedClips = new Set((g.json.animations || []).map(a => a.name));
+  for (const name of characterMeta.characters[c].clips.filter(requiredClips.keep)) assert(shippedClips.has(name), `${c}.glb missing referenced clip: ${name}`);
+  assert(g.json.skins?.length === 1, `${c}.glb needs one skin`);
+  assert(g.bytes <= 12 * 1024 * 1024, `${c}.glb over 12 MB`); total += g.bytes; shas['dist/assets/characters/' + c + '.glb'] = g.sha256;
+}
+const clips = JSON.parse(read('dist/assets/characters/clips.json'));
+for (const c of characters) assert(clips.characters[c]?.clips?.length >= 30, `clips.json lacks ${c}`);
+const props = ['farmhouse', 'temple', 'bridge', 'fence', 'boulder', 'firewood', 'well', 'cart', 'lantern', 'hasa', 'jizo', 'firepit', 'gatehouse', 'fort', 'barricade', 'dozo', 'naya', 'wara', 'kakashi', 'hokora', 'boulder_lo'];
+const limitMB = { temple: 11, farmhouse: 7 };      // 建物は大きい。それ以外の小道具は 2MB まで
+for (const p of props) { const f = path.join(root, 'dist/assets/valley/models', p + '.glb'), g = glbInfo(f), lim = limitMB[p] ?? 2; assert(g.bytes <= lim * 1024 * 1024, `${p}.glb over ${lim} MB`); total += g.bytes; shas['dist/assets/valley/models/' + p + '.glb'] = g.sha256; }
+assert(total <= 115 * 1024 * 1024, `model budget exceeded: ${(total / 1048576).toFixed(1)} MB`);
+
+// 3b 8.3a・8.3b・8.4a・8.4b・8.5a の純粋な層（見た目の踏み込み・線状の火花・腕の開きの上限・押し戻し・血の表現・時間の進み）：あること、Three.js・DOM・乱数・時計に触れないこと
+// （表とは別に置いてある。lunge と spark-streaks は 2026-11-03 の統合の点検で、純粋と自称しながら検査に入っていなかったのを足した）
+// gait-table（生成物の足運びの表）と smooth-flags（滑らかさの切替）も同じ扱い（2026-11-04 M0）。loco（速さの表と加減速・M1）も。upper-body（走りの形の式・M3）も。camera-follow（追従カメラの式・M4）も
+for (const m of ['knockback', 'time-warp', 'lunge', 'spark-streaks', 'arm-spread', 'blood', 'cinematics-data', 'cinematics', 'cinematics-frame', 'gait-table', 'smooth-flags', 'loco', 'gait-phase', 'upper-body', 'camera-follow']) {
+  assert(sources[m + '.js'], `missing dist/valley/${m}.js`);
+  const code = sources[m + '.js'].replace(/\/\/.*$/gm, '').replace(/\/\*[\s\S]*?\*\//g, '');
+  for (const bad of [/from\s+'three/, /\bMath\.random\b/, /\bDate\.now\b/, /\bperformance\.now\b/, /\bdocument\./, /\bwindow\./, /\blocalStorage\b/]) assert(!bad.test(code), `${m}.js (pure layer) uses ${bad}`);
+}
+
+// 6 出所：Meshy で作った素材は provenance/meshy-v19.json に task_id と SHA256 がある
+const prov = JSON.parse(read('provenance/meshy-v19.json'));
+for (const [file, sha] of Object.entries(shas)) {
+  const e = prov.assets.find(a => a.file === file);
+  if (!e) continue;                       // Drive由来の建物などは別の記録（provenance/valley-textures.json 等）
+  assert(e.task_id && e.sha256, `provenance entry incomplete: ${file}`);
+  assert.equal(e.sha256, sha, `provenance sha256 differs from the shipped file: ${file}`);
+}
+// 足運びの表は生成物：生成元が記録した GLB・clips.json の SHA256 が同梱のものと同じ（素材を差し替えたら node tools/gait-sample.mjs で作り直す）
+const { GAIT_SOURCE } = await import('../dist/valley/gait-table.js');
+assert.equal(GAIT_SOURCE.tool, 'tools/gait-sample.mjs', 'gait-table.js must name its generator');
+assert.equal(GAIT_SOURCE.clipsJson, createHash('sha256').update(fs.readFileSync(path.join(root, 'dist/assets/characters/clips.json'))).digest('hex'), 'gait-table.js was sampled from another clips.json: rerun node tools/gait-sample.mjs');
+for (const c of characters) assert.equal(GAIT_SOURCE.glb[c], shas['dist/assets/characters/' + c + '.glb'], `gait-table.js was sampled from another ${c}.glb: rerun node tools/gait-sample.mjs`);
+for (const c of characters) assert(prov.assets.some(a => a.file === 'dist/assets/characters/' + c + '.glb'), `provenance lacks ${c}`);
+for (const p of ['well', 'cart', 'lantern', 'hasa', 'jizo', 'firepit', 'gatehouse', 'fort', 'barricade', 'dozo', 'naya', 'wara', 'kakashi', 'hokora']) assert(prov.assets.some(a => a.file === 'dist/assets/valley/models/' + p + '.glb'), `provenance lacks ${p}`);
+
+// 7 物語のデータ（design-narrative.md §7）：id の重複・一画面40字・未知の話者・満たされない条件・断片の欠け・呼ばれない会話
+const storyIssues = storyProblems({ story: STORY, speakers: SPEAKERS, sources: sources['quest.js'] + '\n' + sources['game.js'] });
+assert.deepEqual(storyIssues, [], 'story data problems:\n' + storyIssues.join('\n'));
+
+console.log(`Valley check passed: ${modules.length} modules, imports resolved, ${pure.length} pure layers clean, ${wanted.size} HTML ids, ${characters.length + props.length} GLBs (${(total / 1048576).toFixed(1)} MB), provenance matched, story data clean (${STORY.banter.length} banter, ${Object.keys(STORY.dialogues).length} dialogues, ${STORY.fragments.length} fragments).`);

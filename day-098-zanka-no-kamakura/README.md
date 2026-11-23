@@ -4,7 +4,7 @@
 
 - 公開サイト: https://day98.rairakku.com/
 - `rairakku.com` の中の住所: https://rairakku.com/day98/（`day98.rairakku.com` へ転送します）
-- ソースコード・詳細記録: https://github.com/haranishi/kamakura-no-zanka
+- 同梱ソースコード: [`source/`](source/)（別リポジトリ https://github.com/haranishi/kamakura-no-zanka と同じ第一章のコードと素材）
 
 架空の谷を舞台にした創作です。初回は約78MBの3Dモデル等を読み込むため、Wi-Fi環境での利用をおすすめします。
 
@@ -15,14 +15,13 @@
 - **スマホとPC**：スマホでは左ドラッグで移動（外側の輪まで倒すと走る）・右ドラッグで視点・右下のボタンで斬る／受ける／避ける／強斬り／調べる（とどめ・闇討ち）を操作できます。タッチ端末は初回自動で「軽量」品質から始まります
 - **ログイン・外部通信なし**：進行の保存と設定は端末のブラウザ内（`localStorage`）のみ。効果音24種は Web Audio API で合成しています
 
-## 素材とライセンス
+## コード・素材と宣伝動画
 
-本体は別リポジトリ [haranishi/kamakura-no-zanka](https://github.com/haranishi/kamakura-no-zanka) で公開しています。
+ゲームのソースと第一章の3D素材一式は [`source/`](source/) に同梱しています（コードはリポジトリ直下の MIT ライセンス、3Dモデル・動き・物語は CC BY 4.0＝[`source/LICENSE-ASSETS.md`](source/LICENSE-ASSETS.md)）。動かし方・試験・公開用ビルド手順は [`source/README.md`](source/README.md)、設計書は [`source/docs/`](source/docs/) にあります。
 
-- コード：MIT License
-- 3Dモデル・動き・画像・物語：CC BY 4.0（詳細はリポジトリの `LICENSE-ASSETS.md`）
-- 第三者ライブラリ・素材：Three.js 0.180.0（MIT）、地面と自然の質感は Poly Haven（CC0 1.0）、歩行・走行モーションの一部は CMU Graphics Lab Motion Capture Database（NSF EIA-0196217）、人物7体と小道具14点は有料プランの Meshy で生成し Blender で動きを焼いています（出所と SHA-256 はリポジトリの `NOTICE.md` / `provenance/` に記録）
+- 第三者ライブラリ・素材：Three.js 0.180.0（MIT・[`source/licenses/THREE-LICENSE.txt`](source/licenses/THREE-LICENSE.txt)）、地面と自然の質感は Poly Haven（CC0 1.0）、歩行・走行モーションの一部は CMU Graphics Lab Motion Capture Database（NSF EIA-0196217）、人物7体と小道具14点は有料プランの Meshy で生成し Blender で動きを焼いています（出所と SHA-256 は [`source/NOTICE.md`](source/NOTICE.md) / [`source/provenance/`](source/provenance/) およびリポジトリ直下の [THIRD_PARTY_NOTICES.md](../THIRD_PARTY_NOTICES.md) に記録）
+- 宣伝動画（縦型30秒・BGM 2案）の撮影・組み立て・BGM合成の道具は [`tools/promo/`](tools/promo/README.md) です。一覧のカードの動画（`demo.mp4`）は、その映像から切り出した16秒です。
 
 ## このDayの記録
 
-78.4 MiB の3Dモデル群と CC BY 4.0 素材を `hundred-days` リポジトリや `rairakku.com` の中継枠から分離するため、Day083・088・091・093・094 と同じ外部Day方式で公開します。ここには一覧掲載用の記録（`meta.json`・`screenshot.webp`）と、共通転送 Worker の設定だけを置いています。
+構成は Day094 と同じ外部Dayです。ゲーム本体の配信（78.4 MiB）は専用の `day98.rairakku.com`（Cloudflare Static Assets）で行い、このリポジトリにはゲームのソース一式（`source/`・本番には配信しない）、宣伝動画の道具（`tools/promo/`）、および一覧のカード用の画像と動画（`screenshot.webp`・`demo.mp4`）を置いています。
