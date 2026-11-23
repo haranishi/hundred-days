@@ -8,8 +8,9 @@
   - `https://rairakku.com/day98/` → 302 → `https://day98.rairakku.com/`
   - `https://rairakku.com/100days/day-098-zanka-no-kamakura/` → 302 → `https://day98.rairakku.com/`
   - `https://rairakku.com/100days/day-098-zanka-no-kamakura/screenshot.webp` は素通し（カード画像保護）
-- **ライセンス**：`status: "external"` かつ `source/` を置かないため `day-license.test.mjs` の対象外。コード（MIT）と3D素材/物語（CC BY 4.0）の公開リポジトリ `https://github.com/haranishi/kamakura-no-zanka` を `README.md` と `social.x` に明記する。
+- **ライセンスとコード同梱**：初回掲載（2026-11-22）は `source/` を置かず、`day-license.test.mjs` の対象外だった。2026-11-23 の PR #239 から `source/` にコードと第一章の素材を同梱する（Day094 と同方式）ので、フォルダ直下に `LICENSE`（リポジトリ直下と同じ MIT）を置き、置き忘れを `day-license.test.mjs` が見張る。3Dモデルと物語は CC BY 4.0（`source/LICENSE-ASSETS.md`）。人物7体と小道具14点は有料プランの Meshy で生成して Blender で動きを焼いたもので、出所と SHA-256 は `source/NOTICE.md`・`source/provenance/` に記録する（概要は `README.md` と `THIRD_PARTY_NOTICES.md` の Day098 節）。`source/` と `tools/` は本番サイトに配信しない（`scripts/lib/dist-files.mjs`）。元の作業リポジトリ `https://github.com/haranishi/kamakura-no-zanka` も引き続き公開し、`README.md` と `social.x` に明記する。
 - **スクリーンショット**：`kamakura-no-zanka` の公開用ビルドを実ブラウザ（1280×720）で開いた最新画面（PR #222 磨き済み）を撮影し、`cwebp` で `day-098-zanka-no-kamakura/screenshot.webp` を生成する。
+- **カード用デモ**（2026-11-23 追加）：`demo.mp4`（縦540×960・16秒・無音・約2.5MB）を、一覧カードの再生ボタン（`.thumb__play` の `data-demo`）から見せる。`meta.json` の `demo` に書き、`tests/e2e/external-days.spec.mjs` が再生ボタンと動画の実体を検査する。縦1080×1920・30秒の宣伝動画の本体はこのリポジトリに置かず、生成と検査の道具だけを `tools/promo/` に置く。
 
 ## 公開ゲート（`publish:check`）
 
