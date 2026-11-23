@@ -1,0 +1,140 @@
+import { STORY } from './story-data.js';
+import { CINEMATICS_STORAGE_KEY, normalizeCinematicsRecord } from './cinematics.js';
+export const VALLEY_KEY = 'kamakura-valley-progress';
+export const VALLEY_SCHEMA_VERSION = 1;
+const beats = ['b0_temple', 'b1_boy', 'b2_road', 'b3_viewpoint', 'b4_village', 'b5_archer', 'b6_escort', 'b7_result', 'done'];
+const checkpoints = [null, 'cp_leave_temple', 'cp_viewpoint', 'cp_archer_joined', 'cp_result'];
+const modes = ['follow', 'hold', 'cover', 'retreat'];
+const fragmentOrder = STORY.fragments.map(f => f.id);
+export function initialSave() {
+  return { schema: 'kamakura-valley-progress', version: 1, savedAt: 0, checkpoint: null, beat: 'b0_temple',
+    flags: { plan: null, approach: null, archerJoined: false, ambush: null, fragments: [], seen: false },
+    resources: { food: 60, material: 0, funds: 0, morale: 50 }, trust: 40,
+    party: { archer: { joined: false, hp: 100, mode: 'follow' } }, player: { hp: 100, posture: 100 },
+    world: { enemies: {} } };
+}
+const fail = () => { throw new TypeError('保存の値が正しくない'); };
+const object = v => { if (!v || typeof v !== 'object' || Array.isArray(v) || ![Object.prototype, null].includes(Object.getPrototypeOf(v))) fail(); return v; };
+const number = v => { if (typeof v !== 'number' || !Number.isFinite(v) || v < 0 || v > 1000) fail(); return v; };
+const bool = v => { if (typeof v !== 'boolean') fail(); return v; };
+const choice = (v, values) => { if (!values.includes(v)) fail(); return v; };
+// 拾った断片（任意の項目。版は上げない）。無ければ空。あれば、知っている id の重なりのない並び。物語の順に並べ直す
+const fragments = v => {
+  if (v === undefined) return [];
+  if (!Array.isArray(v) || v.length > fragmentOrder.length || new Set(v).size !== v.length || !v.every(id => fragmentOrder.includes(id))) fail();
+  return fragmentOrder.filter(id => v.includes(id));
+};
+export function sanitize(raw) {
+  object(raw);
+  if (raw.schema !== VALLEY_KEY || raw.version !== VALLEY_SCHEMA_VERSION) fail();
+  const result = initialSave();
+  result.savedAt = number(raw.savedAt);
+  result.checkpoint = choice(raw.checkpoint, checkpoints);
+  result.beat = choice(raw.beat, beats);
+  const flags = object(raw.flags);
+  result.flags = { plan: choice(flags.plan, [null, 'front', 'flank']), approach: choice(flags.approach, [null, 'front', 'flank']),
+    archerJoined: bool(flags.archerJoined), ambush: choice(flags.ambush, [null, 'active', 'cleared']), fragments: fragments(flags.fragments),
+    seen: flags.seen === undefined ? false : bool(flags.seen) };                // 里で見つかったか（任意。版は上げない）
+  const resources = object(raw.resources);
+  for (const k of Object.keys(result.resources)) result.resources[k] = number(resources[k]);
+  result.trust = number(raw.trust);
+  const archer = object(object(raw.party).archer), player = object(raw.player);
+  result.party.archer = { joined: bool(archer.joined), hp: number(archer.hp), mode: choice(archer.mode, modes) };
+  if (result.party.archer.joined !== result.flags.archerJoined) fail();
+  result.player = { hp: number(player.hp), posture: number(player.posture) };
+  const enemies = object(object(raw.world).enemies);
+  if (Object.keys(enemies).length > 256) fail();
+  result.world.enemies = Object.fromEntries(Object.entries(enemies).map(([id, value]) => {
+    if (!/^[a-zA-Z0-9_-]{1,64}$/.test(id) || ['__proto__', 'prototype', 'constructor'].includes(id)) fail();
+    return [id, { alive: bool(object(value).alive) }];
+  }));
+  return result;
+}
+export function migrate(raw) {
+  // 旧版は存在しない。未知版を版1と誤認させない。
+  return sanitize(raw);
+}
+export function loadValley(storage) {
+  try {
+    if (!storage || typeof storage.getItem !== 'function') return { state: initialSave(), hasSave: false, notice: '保存を読み込めない' };
+    const text = storage.getItem(VALLEY_KEY);
+    if (text === null || text === undefined) return { state: initialSave(), hasSave: false, notice: '' };
+    const raw = JSON.parse(text);
+    if (raw && raw.version !== 1) return { state: initialSave(), hasSave: false, notice: '保存の版に対応していない' };
+    return { state: migrate(raw), hasSave: true, notice: '' };
+  } catch {
+    return { state: initialSave(), hasSave: false, notice: '保存が壊れているため最初から始める' };
+  }
+}
+// 端末ごとの小さな記録（オープニングを見たか）。進行の保存とは別のキーに置く。「はじめから」は進行の保存を作り直すので、同じ所に置くと消える。
+export const META_KEY = 'kamakura-valley-meta';
+export const META_VERSION = 1;
+export function initialMeta() { return { schema: META_KEY, version: META_VERSION, openingSeen: false }; }
+export function sanitizeMeta(raw) {
+  object(raw);
+  if (raw.schema !== META_KEY || raw.version !== META_VERSION) fail();
+  return { schema: META_KEY, version: META_VERSION, openingSeen: bool(raw.openingSeen) };
+}
+// 無い・読めない・壊れている・知らない版は、初回（まだ見ていない）として扱う
+export function loadMeta(storage) {
+  try {
+    if (!storage || typeof storage.getItem !== 'function') return { meta: initialMeta(), notice: '記録を読み込めない' };
+    const text = storage.getItem(META_KEY);
+    if (text === null || text === undefined) return { meta: initialMeta(), notice: '' };
+    return { meta: sanitizeMeta(JSON.parse(text)), notice: '' };
+  } catch {
+    return { meta: initialMeta(), notice: '記録が壊れているため初回として扱う' };
+  }
+}
+// 書けなくても遊びは止めない。戻り値で知らせるだけ
+export function saveMeta(storage, patch) {
+  try {
+    if (!storage || typeof storage.setItem !== 'function') return { ok: false, notice: 'この環境では記録できない' };
+    storage.setItem(META_KEY, JSON.stringify(sanitizeMeta({ ...loadMeta(storage).meta, ...patch })));
+    return { ok: true, notice: '' };
+  } catch {
+    return { ok: false, notice: '記録を保存できない' };
+  }
+}
+// 節目の演出の記録（章末を見終えたか）。進行・meta とは別のキー。形の検査は normalizeCinematicsRecord（cinematics.js）。
+// 無い・読めない・型が違う・知らない版は未完了（false）として読み、読めなかったときだけ notice で知らせる。
+export function loadCinematicsRecord(storage) {
+  let raw;
+  try {
+    if (!storage || typeof storage.getItem !== 'function') throw new Error('no storage');
+    raw = storage.getItem(CINEMATICS_STORAGE_KEY);
+  } catch (e) { raw = e instanceof Error ? e : new Error('read failed'); }
+  return normalizeCinematicsRecord(raw);
+}
+// 書けなくても遊びは止めない。読み直した記録に patch を重ね、同じ検査を通った形だけを書く
+export function saveCinematicsRecord(storage, patch) {
+  try {
+    if (!storage || typeof storage.setItem !== 'function') return { ok: false, notice: 'この環境では演出の記録を保存できない' };
+    const { record, notice } = normalizeCinematicsRecord({ ...loadCinematicsRecord(storage).record, ...patch });
+    if (notice) return { ok: false, notice: '演出の記録の形が正しくない' };
+    storage.setItem(CINEMATICS_STORAGE_KEY, JSON.stringify(record));
+    return { ok: true, notice: '' };
+  } catch {
+    return { ok: false, notice: '演出の記録を保存できない' };
+  }
+}
+// fresh: はじめからの最初の保存。前の遊びの死亡記録を引き継がない（引き継ぐと、つづきから再開したとき倒していない敵が倒した扱いになり、里の戦いが終わらなくなる）。
+export function saveValley(storage, state, { fresh = false } = {}) {
+  try {
+    if (!storage || typeof storage.setItem !== 'function') return { ok: false, notice: 'この環境では保存できない' };
+    const clean = sanitize(state);
+    // 同じ遊びの死亡記録は、生存スナップショットで上書きしない。
+    if (!fresh && typeof storage.getItem === 'function') {
+      const previous = loadValley(storage);
+      if (previous.hasSave) {
+        for (const [id, enemy] of Object.entries(previous.state.world.enemies)) {
+          if (!enemy.alive) clean.world.enemies[id] = { alive: false };
+        }
+      }
+    }
+    storage.setItem(VALLEY_KEY, JSON.stringify(sanitize(clean)));
+    return { ok: true, notice: '' };
+  } catch {
+    return { ok: false, notice: '進行を保存できない' };
+  }
+}

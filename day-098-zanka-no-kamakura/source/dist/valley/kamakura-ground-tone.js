@@ -1,0 +1,319 @@
+import { groundFarEnabled, groundFarToneGLSL, installGroundFar } from './kamakura-ground-far.js';
+import { kamakuraPaths } from './kamakura-roads.js';
+import { GROUND8_GLSL } from './kamakura-ground-mosaic.js';
+import { SLOPE7_GLSL } from './kamakura-ground-slope.js';
+import { createGroundDensity } from './kamakura-ground-density.js';
+import { installGroundPath } from './kamakura-ground-path.js';
+import { GROUND7_GLSL } from './kamakura-ground-open.js';
+import { installGroundContact } from './kamakura-ground-contact.js';
+import { GROUND6_GLSL } from './kamakura-ground-turf.js';
+import { groundAxes, yardTexel, YARD_GLSL } from './kamakura-ground-yard.js';
+import { toneStrength, groundUseBoxes, toneTexel, toneWeightGrid } from './kamakura-ground-tone-rules.js';
+import { groundPhotoUniforms, GROUND_PHOTO_DECL, GROUND_PHOTO_GLSL, GROUND_PHOTO_NORMAL } from './kamakura-ground-photo.js';
+import { SOIL_GRAIN_GLSL, SCATTER_GLSL } from './kamakura-ground-pattern.js';
+
+export function installGroundTone(THREE,material,data,owner,{quality='standard',search=''}={}) {
+  if(new URLSearchParams(search).get('gtone')==='0'||!data?.ground||!owner.uniforms)return;
+  const slope7=new URLSearchParams(search).get('slope7')!=='0';
+  const ground6=new URLSearchParams(search).get('ground6')!=='0';
+  // W2c-12: legacy exports without route data retain their original shader and resources.
+  const ground7=new URLSearchParams(search).get('ground7')!=='0' && kamakuraPaths(data)!=null;
+  const ground8=new URLSearchParams(search).get('ground8')!=='0' && ground7;
+  const atlas=ground6||ground7||groundFarEnabled(search);
+  const r3Enabled=new URLSearchParams(search).get('gyard')!=='0';
+  const {width:w,height:h}=data.meta.grid;
+  const grid=toneWeightGrid(data),count=grid.width*grid.height;
+  const density=slope7?createGroundDensity(data.veg,grid.width*grid.dx,grid.height*grid.dz):null;
+  const weights=new Uint8Array(count*4),boxes=groundUseBoxes(data);
+  // W2c-9r1 ground: the source bytes are uploaded as they are (no CPU copy) and 4m weights are baked in slices.
+  // The base stays a plain RGB8 texture and is decoded from sRGB in the shader: WebGL2 cannot generate mipmaps for SRGB8
+  // (glGenerateMipmap fails, every level above zero stays empty, and far ground and the whole aerial view turn grey).
+  // RGB8 must be named: left to Three.js, RGBFormat asks for the unsized RGB, glTexStorage2D rejects it and the texture is black.
+  const baseTexture=new THREE.DataTexture(data.ground,w,h,THREE.RGBFormat);
+  baseTexture.internalFormat='RGB8';
+  const weightTexture=new THREE.DataTexture(weights,grid.width,grid.height,THREE.RGBAFormat);
+  weightTexture.internalFormat='RGBA8';
+  const yardBytes=new Uint8Array(count*4),axes=groundAxes(data,boxes);
+  const yardTexture=new THREE.DataTexture(yardBytes,grid.width,grid.height,THREE.RGBAFormat);
+  yardTexture.internalFormat='RGBA8';
+  // W2c-11 ground6: two class samplers -> one atlas, freeing a slot for contact R8.
+  const classAtlas=atlas?new Uint8Array(count*8):null;
+  const classA=atlas?classAtlas.subarray(0,count*4):new Uint8Array(count*4),classB=atlas?classAtlas.subarray(count*4):new Uint8Array(count*4);
+  const classTextures=[classA,classB].map(bytes=>{const t=new THREE.DataTexture(bytes,grid.width,grid.height,THREE.RGBAFormat);t.internalFormat='RGBA8';return t;});
+  const textures=[baseTexture,weightTexture,yardTexture,...classTextures];
+  for(const t of textures){t.minFilter=THREE.LinearMipmapLinearFilter;t.magFilter=THREE.LinearFilter;t.generateMipmaps=true;t.unpackAlignment=1;}
+  if(atlas){
+    classTextures[0].image={data:classAtlas,width:grid.width,height:grid.height*2};
+    // Retain the original mip-capable format; atlas reads explicitly use level zero to avoid cross-layer bleed.
+  }
+  // The base is sampled from the first frame; only the weights wait for the bake.
+  baseTexture.needsUpdate=true;
+  const uniforms={uToneGrid:{value:new THREE.Vector3(w,h,data.meta.grid.cell_m)},uToneWeightSpan:{value:new THREE.Vector2(grid.width*grid.dx,grid.height*grid.dz)},uToneBase:{value:baseTexture},uToneWeights:{value:weightTexture},uToneYard:{value:yardTexture},uToneYardDebug:{value:new URLSearchParams(search).get('gyard')==='2'?1:0},uToneR3:{value:r3Enabled?toneStrength(quality):0},uToneReady:{value:0},uToneBlend:{value:0},uToneBaked:{value:material.vertexColors?1:0},uToneStrength:{value:toneStrength(quality)},uToneSoil:{value:new URLSearchParams(search).get('gsoil')==='0'?0:1}};
+  Object.assign(uniforms,groundPhotoUniforms(classTextures,quality,search,owner.uniforms));
+  if(slope7)Object.assign(uniforms,{uSlope7:{value:quality==='light'?.5:1},uSlope7Fine:{value:quality==='light'?0:1}});
+  if(ground8)Object.assign(uniforms,{uGround8:{value:1},uGround8Fine:{value:quality==='light'?0:1}});
+  Object.assign(owner.uniforms,uniforms);
+  let cursor=0,timer,fadeTimer,disposed=false,resolveReady,resolveFaded;
+  const ready=new Promise(resolve=>{resolveReady=resolve;}),faded=new Promise(resolve=>{resolveFaded=resolve;});
+  const stats={bytes:weights.byteLength,slices:0,maxSliceMs:0,yardBytes:yardBytes.byteLength,classBytes:classA.byteLength+classB.byteLength};
+  // Until the weights exist the shader runs on neutral land weights (relief and grain only); they then fade in, so the
+  // ground is never flat while loading and nothing pops when the bake ends.
+  function fade(from){
+    if(disposed)return;
+    const t=Math.min(1,(performance.now()-from)/TONE_FADE_MS);uniforms.uToneBlend.value=t;
+    if(t<1)fadeTimer=setTimeout(()=>fade(from),50);else resolveFaded();
+  }
+  function prepare(){
+    if(disposed)return;
+    const start=performance.now(),end=Math.min(cursor+4096,count);
+    for(;cursor<end;cursor++){toneTexel(data,boxes,cursor,weights,grid,classA,classB);
+      const x=(cursor%grid.width-(grid.width-1)/2)*grid.dx,z=(Math.floor(cursor/grid.width)-(grid.height-1)/2)*grid.dz;
+      yardTexel(boxes,axes,x,z,yardBytes,cursor*4);if(density)yardBytes[cursor*4+3]=Math.round(density.at(x,z));if((cursor&63)===63&&performance.now()-start>=1.5){cursor++;break;}}
+    stats.slices++;stats.maxSliceMs=Math.max(stats.maxSliceMs,performance.now()-start);
+    if(cursor<count)timer=setTimeout(prepare,0);
+    else {
+      classTextures.forEach(t=>{t.needsUpdate=true;});yardTexture.needsUpdate=true;weightTexture.needsUpdate=true;uniforms.uToneReady.value=1;stats.readyMs=performance.now();resolveReady();fade(performance.now());
+      try{performance.mark('kz-tone-ready');}catch{/* marks are optional */}
+    }
+  }
+  prepare();
+  const prior=material.onBeforeCompile,priorKey=material.customProgramCacheKey,cacheKey=priorKey.call(material)+'|tone-r4-photo'+(ground6?'|ground6':'')+(ground7?'|ground7':'')+(slope7?'|slope7':'')+(ground8?'|ground8':'');
+  let toneGLSL=atlas?TONE_GLSL.replace('vec3 groundTone(',GROUND6_GLSL+'\nvec3 groundTone(').replace('  return result;','  float turf6=0.0;\n  if(uToneBlend>0.0 && dist<600.0)turf6=ground6Class((p+warp)/uToneWeightSpan+.5,0.0).b*(1.0-use)*(1.0-steep)*uToneBlend;\n  return ground6Color(result,p,dist,px,turf6,dry);'):TONE_GLSL;
+  const photoDecl=atlas?GROUND_PHOTO_DECL.replace('uGroundPhotoA,uGroundPhotoB','uGroundPhotoA'):GROUND_PHOTO_DECL;
+  let photoGLSL=atlas?GROUND_PHOTO_GLSL.replace('texture2D(uGroundPhotoA,uv)','ground6Class(uv,0.0)').replace('texture2D(uGroundPhotoB,uv)','ground6Class(uv,1.0)'):GROUND_PHOTO_GLSL;
+  if(ground7){
+    // W2c-12 ground7: share a fixed R8 atlas; preserve GD2 only outside the new open-land band.
+    toneGLSL=toneGLSL.replace('vec3 groundTone(',GROUND7_GLSL+'\nvec3 groundTone(')
+      .replace('  if(uToneBlend>0.0 && dist<600.0)turf6=ground6Class((p+warp)/uToneWeightSpan+.5,0.0).b*(1.0-use)*(1.0-steep)*uToneBlend;',`  vec4 openClass=vec4(0.0);
+  if(uToneBlend>0.0 && dist<600.0)openClass=ground6Class((p+warp)/uToneWeightSpan+.5,0.0);
+  turf6=openClass.b*(1.0-use)*(1.0-steep)*uToneBlend;`)
+      .replace('clamp(uv,0.0,1.0),0.0).r','vec2(clamp(uv.x,.001953125,.998046875),clamp(uv.y,.001953125,.998046875)/3.0),0.0).r')
+      .replace('  return ground6Color(result,p,dist,px,turf6,dry);',`  float land=0.0;
+  if(uGround7>0.0 && uToneBlend>0.0 && dist<600.0){
+  vec4 soilClass=ground6Class((p+warp)/uToneWeightSpan+.5,1.0);
+  land=clamp(openClass.b+soilClass.r+use,0.0,1.0)*(1.0-steep)*weights.a*uToneBlend;
+  ground7Avoid=max(ground7Water,smoothstep(0.0,.15,ground7PathWeight));
+  vec2 rootUV=(p-uGroundContactOrigin)/128.0;
+  if(min(min(rootUV.x,rootUV.y),min(1.0-rootUV.x,1.0-rootUV.y))>0.0)
+    ground7Avoid=max(ground7Avoid,1.0-smoothstep(.7,1.0,textureLod(uGroundContact,vec2(clamp(rootUV.x,.001953125,.998046875),clamp(rootUV.y,.001953125,.998046875)/3.0),0.0).r));
+  }
+  #ifdef GROUND_PHOTO_SHORE
+  if(uGroundPhotoShore>0.0 && dist<600.0){
+    float coast=-texture2D(uShoreSea,(p-uShoreGrid.xy+4.0)/uShoreGrid.zw).r;
+    land*=smoothstep(2.0,5.0,coast);
+  }
+  #endif
+  result=ground7Color(result,world,facing,cavity,dry,dist,px,land);
+  return ground6Color(result,p,dist,px,turf6,dry);`);
+    photoGLSL=photoGLSL.replace('  float noisyDist=', '  ground7PathWeight=ground7Path(p,dist);\n  float noisyDist=')
+      .replace('  float moist=',`  // Rebalance the existing two-photo budget toward soil, never add a third lookup.
+  float pathSoil=ground7PathWeight*.55*(1.0-groundPhotoSand)*(1.0-groundPhotoWet);
+  for(int i=0;i<7;i++)w[i]*=1.0-pathSoil;
+  w[5]+=pathSoil;
+  float moist=`);
+  }
+  if(ground8){
+    // W2c-14 GD6/GD7: preserve baseline detail, transfer masses before wet/path rebalancing.
+    // All helpers are declared after toneNoise and before the photograph preparation.
+    photoGLSL=GROUND8_GLSL+'\n'+photoGLSL;
+    const insertion8='  // Rebalance the existing two-photo budget';
+    photoGLSL=photoGLSL.replace(insertion8,`  float avoid8=0.0;
+  vec2 root8=(p-uGroundContactOrigin)/128.0;
+  if(min(min(root8.x,root8.y),min(1.0-root8.x,1.0-root8.y))>0.0)
+    avoid8=max(avoid8,1.0-smoothstep(.7,1.0,textureLod(uGroundContact,vec2(clamp(root8.x,.001953125,.998046875),clamp(root8.y,.001953125,.998046875)/3.0),0.0).r));
+  vec2 route8=(p-uGroundPathOrigin)/128.0;
+  float border8=min(min(route8.x,route8.y),min(1.0-route8.x,1.0-route8.y));
+  // No new detail where the bounded exclusions are unknown; soften the six-metre window rim.
+  avoid8=max(avoid8,1.0-smoothstep(0.0,.046875,border8));
+  if(border8>0.0){
+    vec2 routeUV8=clamp(route8,.001953125,.998046875);
+    float road8=textureLod(uGroundContact,vec2(routeUV8.x,(1.0+routeUV8.y)/3.0),0.0).r;
+    float water8=textureLod(uGroundContact,vec2(routeUV8.x,(2.0+routeUV8.y)/3.0),0.0).r;
+    avoid8=max(avoid8,max(water8,smoothstep(0.0,.15,road8)));
+  }
+  #ifdef GROUND_PHOTO_SHORE
+  if(uGroundPhotoShore>0.0){
+    float coast8=max(0.0,shoreD);
+    avoid8=max(avoid8,1.0-smoothstep(2.0,5.0,coast8));
+  }
+  #endif
+  ground8Weights(w,p,dist,avoid8,max(length(dx),length(dy)));
+  ${insertion8}`);
+    toneGLSL=toneGLSL.replace('vec3 groundTone(', 'vec3 ground8Color(vec3 color,vec2 p,float px);\nvec3 groundTone(')
+      .replace('  result*=1.0-.24*groundPhotoWet*groundPhotoAmount*groundPhotoEarth;',
+        '  result*=1.0-.24*groundPhotoWet*groundPhotoAmount*groundPhotoEarth;\n  result=ground8Color(result,p,px);');
+  }
+  if(slope7){
+    // W2c-13 slope7: additive ecology, after all baseline detail; no new sampler or world wiring.
+    if(atlas)toneGLSL=toneGLSL.replace('vec3 groundTone(',SLOPE7_GLSL+'\nvec3 groundTone(')
+      .replace('  result*=1.0-.24*groundPhotoWet*groundPhotoAmount*groundPhotoEarth;',`  result*=1.0-.24*groundPhotoWet*groundPhotoAmount*groundPhotoEarth;
+  result=slope7Color(result,world,facing,normalY,cavity,dist,px,weights.a);
+  result=slope7Forest(result,p,dist);`);
+    else toneGLSL+='\n'+SLOPE7_GLSL+`
+// Preserve the exact legacy TONE_GLSL when both class-atlas features are disabled.
+vec3 slope7LegacyTone(vec3 fallback,vec3 world,float normalY,float dist){
+  vec3 facing=normalize(cross(dFdx(world),dFdy(world)));if(facing.y<0.0)facing=-facing;
+  float cavity=clamp((dFdx(facing.x)+dFdy(facing.z))*.5,-1.0,1.0);
+  float px=max(length(fwidth(world.xz)),.0001),land=1.0;
+  if(uToneBlend>0.0)land=mix(1.0,texture2D(uToneWeights,world.xz/uToneWeightSpan+.5).a,uToneBlend);
+  vec3 result=groundTone(fallback,world,normalY,dist);
+  result=slope7Color(result,world,facing,normalY,cavity,dist,px,land);
+  return slope7Forest(result,world.xz,dist);
+}`;
+  }
+  if(groundFarEnabled(search))toneGLSL=groundFarToneGLSL(toneGLSL);
+  material.onBeforeCompile=shader=>{
+    prior(shader);Object.assign(shader.uniforms,uniforms);
+    shader.vertexShader=shader.vertexShader.replace('#include <common>','#include <common>\nvarying vec3 vGroundPhotoView;')
+      .replace('#include <begin_vertex>','#include <begin_vertex>\nvGroundPhotoView=-(modelViewMatrix*vec4(position,1.0)).xyz;');
+    // W2c-9r1 ground round 3: declare after detail's helpers, then multiply
+    // their output onto the continuous base. Never re-enable nearest class IDs.
+    // The tone runs from the first frame (neutral weights until the bake ends), so the legacy detail never has to stand in.
+    shader.fragmentShader=shader.fragmentShader.replace('void main() {',`${owner.uniforms.uShoreSea?'#define GROUND_PHOTO_SHORE\n':''}${photoDecl}\n${toneGLSL}\n${photoGLSL}\nvoid main() {`)
+      .replace('if(uGroundStrength>0.0){','if(uGroundStrength>0.0 && uToneStrength<=0.0){')
+      .replace('#include <color_fragment>',`#include <color_fragment>
+        groundPhotoPrepare(vGroundWorld,distance(vGroundWorld,cameraPosition));
+        if(uToneStrength>0.0)diffuseColor.rgb=groundTone(diffuseColor.rgb,vGroundWorld,vGroundSlope,distance(vGroundWorld,cameraPosition));`)
+      .replace('#include <normal_fragment_maps>',`#include <normal_fragment_maps>\n${GROUND_PHOTO_NORMAL}`)
+      .replace('wind*.055+grain*.12','wind*.055*(1.0-groundPhotoAmount)+grain*.12')
+      .replace('#include <opaque_fragment>',`
+        // W2c-10 ground: Lambert has no roughness channel; a restrained sky sheen stands in for damp soil.
+        #ifdef GROUND_PHOTO_SHORE
+        outgoingLight+=uGroundPhotoSky*groundPhotoWet*groundPhotoAmount*groundPhotoEarth*.035
+          *pow(1.0-abs(normalize(cameraPosition-vGroundWorld).y),4.0);
+        #endif
+        // W2c-9r3 ground: grain at PCF edges -> suppress its amplitude using the
+        // already-lit direct irradiance gradient; no second shadow-map lookup.
+        if(uToneR3>0.0){
+        vec3 toneIrradiance=reflectedLight.directDiffuse/max(diffuseColor.rgb,vec3(.00001));
+        float toneShadowEdge=smoothstep(.02,.12,length(fwidth(toneIrradiance)));
+        outgoingLight*=mix(1.0,1.0/toneFineMultiplier,toneShadowEdge*uToneR3);
+        }
+        #include <opaque_fragment>`);
+    if(slope7&&!atlas)shader.fragmentShader=shader.fragmentShader.replace('diffuseColor.rgb=groundTone(', 'diffuseColor.rgb=slope7LegacyTone(');
+    // W2c-18: with the far ground on, the ground no longer adds its own haze. Far houses and tree clumps stand on it now,
+    // and only the scene fog (which they share) may fade them; a ground-only haze left brown houses on a pale blue plain.
+    if(slope7&&!groundFarEnabled(search))shader.fragmentShader=shader.fragmentShader.replace('#include <opaque_fragment>',`
+      #ifdef USE_FOG
+      outgoingLight=slope7Haze(outgoingLight,fogColor,distance(vGroundWorld,cameraPosition));
+      #endif
+      #include <opaque_fragment>`);
+    // Keep absent shore uniforms out of the source too (Node's declaration check expands all branches).
+    if(!owner.uniforms.uShoreSea)shader.fragmentShader=shader.fragmentShader.replace(/#ifdef GROUND_PHOTO_SHORE[\s\S]*?#endif/g,'');
+    // Diagnostic colours bypass lighting, fog and output transforms. No new shader variant.
+    shader.fragmentShader=shader.fragmentShader.replace('#include <dithering_fragment>',`#include <dithering_fragment>
+      if(uToneYardDebug>0.5 && uToneR3>0.0 && uToneStrength>0.0)gl_FragColor.rgb=toneYardDebug;
+    `);
+  };
+  material.customProgramCacheKey=()=>cacheKey;
+  const oldAdapt=owner.setAdapt,oldDispose=owner.dispose;
+  owner.setAdapt=function(policy){oldAdapt.call(this,policy);if(ground8){const step=typeof policy==='number'?policy:policy.step;uniforms.uGround8.value=step>=3?0:step>=2?.5:1;uniforms.uGround8Fine.value=quality==='light'||step>=2?0:1;}if(slope7){const step=typeof policy==='number'?policy:policy.step;uniforms.uSlope7.value=step>=3?0:(quality==='light'?.5:1)*(step>=2?.5:1);uniforms.uSlope7Fine.value=quality==='light'||step>=2?0:1;}uniforms.uToneR3.value=r3Enabled?toneStrength(quality,typeof policy==='number'?policy:policy.step):0;uniforms.uToneStrength.value=toneStrength(quality,typeof policy==='number'?policy:policy.step);};
+  owner.dispose=function(){if(disposed)return;disposed=true;clearTimeout(timer);clearTimeout(fadeTimer);textures.forEach(t=>t.dispose());resolveReady();resolveFaded();oldDispose.call(this);};
+  owner.tone={uniforms,textures,ready,faded,stats,density};
+  if(atlas){
+    uniforms.uGroundClassSize={value:new THREE.Vector2(grid.width,grid.height)};
+    const contact=installGroundContact(THREE,data,owner,quality);
+    Object.assign(uniforms,contact.uniforms);
+    if(!ground6){
+      contact.uniforms.uGround6.value=0;
+      const adapt=owner.setAdapt;owner.setAdapt=function(policy){adapt.call(this,policy);contact.uniforms.uGround6.value=0;};
+    }
+    if(ground7){const path=installGroundPath(THREE,data,owner,contact,quality);Object.assign(uniforms,path.uniforms);}
+  }
+  if(groundFarEnabled(search))installGroundFar(THREE,material,data,owner,{quality,search});
+}
+
+export const TONE_FADE_MS=1200;
+export const TONE_GLSL=`
+// W2c-9r1 ground round 2: continuous filtered class weights, visible relief, independent uniforms.
+uniform vec3 uToneGrid;
+uniform vec2 uToneWeightSpan;
+uniform sampler2D uToneBase,uToneWeights,uToneYard;
+uniform float uToneR3,uToneYardDebug;
+float toneFineMultiplier=1.0;
+vec3 toneYardDebug=vec3(0.0);
+uniform float uToneReady,uToneBlend,uToneStrength,uToneSoil,uToneBaked;
+${SOIL_GRAIN_GLSL}
+${SCATTER_GLSL}
+// The base texture holds the source sRGB bytes (mipmaps need a plain RGB8 format); decode after filtering.
+vec3 toneLinear(vec3 c){return mix(c/12.92,pow((c+.055)/1.055,vec3(2.4)),step(.04045,c));}
+float toneHash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453123);}
+float toneNoise(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.0-2.0*f);return mix(mix(toneHash(i),toneHash(i+vec2(1,0)),f.x),mix(toneHash(i+vec2(0,1)),toneHash(i+vec2(1,1)),f.x),f.y);}
+${YARD_GLSL}
+// W2c-9r2 ground: root-coloured, zero-centred variation; y is map south.
+float grassTintAt(float x,float y,float dist){
+  if(dist<=20.0 || dist>=1500.0)return 0.0;
+  vec2 p=vec2(x,y);
+  float n=(toneNoise(p/5.0)-.5)*.10+(toneNoise(p/20.0)-.5)*mix(.6,.85,uToneR3)+(toneNoise(p/80.0)-.5)*mix(1.3,1.9,uToneR3);
+  float streak=sin(x*.25+y*.7+toneNoise(p/20.0)*4.0)*.025;
+  return clamp(n+streak,-mix(.28,.40,uToneR3),mix(.28,.40,uToneR3))*smoothstep(20.0,60.0,dist)*(1.0-smoothstep(400.0,1500.0,dist));}
+vec3 groundTone(vec3 fallback,vec3 world,float normalY,float dist){
+  vec2 p=world.xz,uv=p/(uToneGrid.z*uToneGrid.xy)+.5;
+  vec3 base=uToneBaked>.5?toneLinear(texture2D(uToneBase,uv).rgb):fallback;
+  // Warp the continuous weights, never interpolate numeric class IDs.
+  vec2 warp=1.6*(vec2(toneNoise(p/23.0),toneNoise((p+vec2(71.0,-37.0))/23.0))-.5);
+  // Neutral land (no grass, rock or yard) until the baked weights fade in: relief and grain are right everywhere.
+  vec4 weights=vec4(0.0,0.0,0.0,1.0);
+  if(uToneBlend>0.0)weights=mix(weights,texture2D(uToneWeights,(p+warp)/uToneWeightSpan+.5),uToneBlend);
+  float px=max(length(fwidth(p)),.0001);
+  float noisyDist=max(0.0,dist+(toneNoise(p/29.0)-.5)*18.0);
+  float macro=toneNoise(p/43.0),dry=smoothstep(0.0,180.0,world.y),steep=1.0-smoothstep(.55,.95,normalY);
+  // Screen derivatives approximate cavity; existing Lambert still supplies physical cast shadows.
+  vec3 facing=normalize(cross(dFdx(world),dFdy(world)));if(facing.y<0.0)facing=-facing;
+  float cavity=clamp((dFdx(facing.x)+dFdy(facing.z))*.5,-1.0,1.0);
+  float shade=clamp(-facing.z,0.0,1.0);
+  float relief=clamp(1.15*(macro*2.0-1.0)+.12*dry-.18*steep-.14*max(0.0,cavity)-.10*shade,-.85,.85);
+  relief*=mix(.1,1.0,smoothstep(12.0,65.0,noisyDist));
+  // The 43 m noise is about four pixels wide from the air: it read as a mosaic. Walking ranges keep all of it.
+  relief*=1.0-smoothstep(1500.0,5000.0,dist);
+  // W2c-9r2 ground: regular 6/14cm dots -> three independently filtered irregular sizes.
+  float grain=0.0,pebble=0.0;
+  if(uToneSoil>0.0 && dist<312.0 && px<.288){
+  float density=uToneR3>0.0?mix(1.18,yardDensity(p),uToneR3):1.18;
+  grain=(uToneR3>0.0?yardStone(p,.08,density):groundScatter(p,.08))*groundScatterFade(p,dist,px,.08)*1.2
+    +(uToneR3>0.0?yardStone(p+vec2(13.7,-9.3),.16,density):groundScatter(p+vec2(13.7,-9.3),.16))*groundScatterFade(p,dist,px,.16)*.95
+    +(uToneR3>0.0?yardStone(p+vec2(-5.1,17.9),.32,density):groundScatter(p+vec2(-5.1,17.9),.32))*groundScatterFade(p,dist,px,.32)*.8;
+  pebble=groundScatter(p+vec2(37.1,-21.3),.24)*groundScatterFade(p,dist,px,.24);
+  }
+  float use=weights.b*smoothstep(.55,.9,normalY)*weights.a;
+  float grass=weights.r*(1.0-use)*(1.0-steep);
+  float distantGrass=grass*grassTintAt(p.x,p.y,dist);
+  vec3 natural=base*(vec3(1.0)+weights.a*uToneStrength*(vec3(relief)+vec3(.015,-.005,-.02)*steep+vec3(.26,.34,.12)*distantGrass));
+  // Packed earth and gravel use the same base hue. Apply near detail AFTER
+  // both tone branches so neither relief nor the yard mix can overwrite it.
+  // W2c-9r3 ground: flat yard -> zero-centred 37/113m moisture and wear.
+  // Fade additions from walking range to an exact zero at aerial distances.
+  float r3=uToneR3*(1.0-smoothstep(400.0,1500.0,noisyDist));
+  vec3 wear=vec3(32.0,0.0,0.0);
+  if(uToneBlend>0.0 && r3>0.0 && use>.001){
+    vec3 encoded=texture2D(uToneYard,p/uToneWeightSpan+.5).rgb;
+    wear=vec3((encoded.r-.5)*64.0,encoded.g,encoded.b)*vec3(1.0,uToneBlend,uToneBlend);
+  }
+  float track=0.0,broad=0.0;
+  if(r3>0.0 && use>.001){
+    track=yardTrack(wear.x,p,px)*wear.y*(1.0-smoothstep(1.0,5.0,px));
+    broad=yardMacro(p);
+  }
+  float margin=wear.z*(.95+.1*(macro-.5));
+  if(uToneYardDebug>0.5)toneYardDebug=use*vec3(track,wear.z,clamp(.5+broad*4.0,0.0,1.0))*uToneBlend;
+  // W2c-9r3 ground fix: imperceptible linear +7%/-4.5% -> visible +18%/-9% wear.
+  vec3 yard=yardColor(base*1.08+vec3(.008),track,margin,broad,r3);
+  vec3 result=mix(natural,yard,use*uToneStrength);
+  result*=groundGrassDetail(p,dist,weights.r*smoothstep(.45,.85,normalY));
+
+  // Larger margin stones reuse the irregular kernel; no regular centred disks.
+  if(r3>0.0 && margin>.001 && uToneSoil>0.0 && dist<312.0 && px<.288)
+    pebble+=groundScatter(p+vec2(-11.3,49.7),.48)*groundScatterFade(p,dist,px,.48)*margin*.22*r3;
+  // W2c-10 ground: round procedural yard/gravel spots -> photographic gravel (6% residual).
+  float photoStones=mix(1.0,.06,groundPhotoAmount*clamp(use+groundPhotoGravel,0.0,1.0));
+  grain*=photoStones;pebble*=photoStones;
+  toneFineMultiplier=1.0+uToneSoil*weights.a*uToneStrength*clamp((grain*.8+pebble*.22*use)*(1.0-track*.35*r3),-.35,.35);
+  result*=toneFineMultiplier+uToneSoil*weights.a*uToneStrength*(macro-.5)*.05*weights.g;
+
+  // W2c-10 ground: retain the source palette and all earlier relief; detail is an achromatic mean-1 ratio.
+  result=clamp(result,0.0,1.0);
+  result*=mix(1.0,groundPhotoRatio,groundPhotoAmount);
+  result*=1.0-.24*groundPhotoWet*groundPhotoAmount*groundPhotoEarth;
+  return result;
+}
+`;

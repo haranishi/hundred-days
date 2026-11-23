@@ -7,8 +7,10 @@ CLAUDE.md
 # wranglerのローカルキャッシュ（CloudflareアカウントIDを含むため公開しない）
 .wrangler/
 
-# ビルド成果物
+# ビルド成果物（Day 098 はビルド工程なしの素のESモジュール構成で source/dist/ が手書きのソース正本のため例外）
 dist/
+!day-098-zanka-no-kamakura/source/dist/
+!day-098-zanka-no-kamakura/source/dist/**
 
 # SNS投稿準備のローカル出力（動画の絶対パス等を含む）
 .social-output/

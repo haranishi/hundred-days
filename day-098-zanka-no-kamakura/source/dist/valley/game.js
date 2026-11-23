@@ -1,0 +1,1122 @@
+// game.js — 隠れ谷の縦切りの本体（app層）。任務（quest.js）の効果を世界へ配り、操作・カメラ・敵・仲間・UI・保存を結ぶ。
+// 規則は論理モジュールが持つ。ここは「いつ何を出し、何を見せ、どこへ戻すか」だけを決める。
+import * as THREE from 'three';
+import { WORLD } from './world-data.js';
+import { buildColliders, rayClip } from './collision.js';
+import { createAIWorld } from './ai-world.js';
+import { propColliders, rockColliders } from './world-colliders.js';
+import { HeroActor, EnemyActor, AllyActor, NpcActor, SPEED, yawOf, dist2, angleDiff } from './actors.js';
+import { createBanterState, stepBanter, areasAt, lineSeconds } from './banter.js';
+import { linesFor, relicInReach, ringPlacement, ENDING_NEXT } from './narrative.js';
+import { RelicView } from './relic-view.js';
+import { Battle } from './battle.js';
+import { CameraRig } from './camera-rig.js';
+import { FX } from './fx.js';
+import { createQuest, reduce, exportProgress, restoreProgress, summarize } from './quest.js';
+import { STORY } from './story-data.js';
+import { loadValley, saveValley, loadMeta, saveMeta, loadCinematicsRecord, saveCinematicsRecord } from './save.js';
+import { planResume } from './cinematics.js';
+import { cinematicFor } from './cinematics-data.js';
+import { CinematicDirector } from './cinematics-view.js';
+import { OPENING } from './opening-data.js';
+import { createOpening, stepOpening } from './opening.js';
+import { OpeningStage } from './opening-stage.js';
+import { FEEL } from './config.js';
+import { LOCO } from './loco.js';
+import { UPPER_ENV } from './upper-rig.js';
+import { warpScale, requestSlow } from './time-warp.js';
+import { mulberry32 } from './scatter.js';
+import { createWind, stepWind, toUniforms, requestGuide, particleCount } from './wind.js';
+import { SHOTS } from './shots.js';
+import { lifeScene, lifeInputFromQuest, lifeItem } from './life-rules.js';
+
+import { buildBaseline, buildRecovery, assess, roadDistance, RECOVERY_PENDING } from './guide.js';
+import { createGuideNav } from './guide-nav.js';
+import { normalizeWaymarks, switchGuidePlan, nearestGuideEntrance, sampleGuidePath, guideRouteHead } from './guide-view.js';
+import { GuideRenderer } from './guide-renderer.js';
+const CINE_TEXT = Object.fromEntries(Object.entries(STORY.cineLines).map(([id, l]) => [id, l.text]));   // 演出の字幕の識別子→文
+
+// 迷いの助けの復帰探索に使う1コマの時間（ms）。未測定の設計値。探索全体（20〜70ms）を1コマでやると走行中に引っかかった（tasks-polish3.md G）。
+const RECOVERY_BUDGET_MS = 2;
+const PLACE_ZONES = ['viewpoint', 'temple_steps'];
+const GROUP_KINDS = { boy: 'npc', road_scout: 'enemy', village_enemies: 'enemy', escort_ambush: 'enemy' };
+
+export class Game {
+  constructor({ scene, camera, renderer, post, atmosphere, veg, props, water, terrain, scatter, roster, hud, audio, input, storage, models = {}, seed = 1333 }) {
+    Object.assign(this, { scene, camera, renderer, post, atmosphere, veg, props, water, terrain, scatter, roster, hud, audio, input, storage, models });
+    this.wind = createWind(); this.windUniforms = veg.wind;
+    this.world = WORLD; this.rng = mulberry32(seed);
+    this.time = 0; this.stopT = 0; this.slowT = 0; this.slowDur = 0; this.timers = []; this.paused = false; this.aiPaused = false;
+    this.flow = 'idle';                       // idle | intro | play | cinematic | choice | dead | result（cinematic：節目の演出。世界を止める）
+    this.enemies = []; this.npcs = new Map(); this.ally = null; this.noises = [];
+    this.exitPoint = { ...WORLD.exit };
+    const extra = propColliders(WORLD);
+    this.col = buildColliders({ buildings: WORLD.buildings, props: WORLD.props, trees: scatter.trees, bounds: WORLD.bounds, extraCircles: [...extra.circles, ...rockColliders(scatter.rocks)], extraBoxes: extra.boxes });
+    this.aiWorld = createAIWorld({ terrain, col: this.col, bounds: WORLD.bounds, now: () => this.time });
+    this.tokens = this.aiWorld.createTokens(2);
+    this.rig = new CameraRig(camera);
+    this.fx = new FX(scene);
+    this.battle = new Battle(this);
+    this.hero = new HeroActor(this, { x: WORLD.start.x, z: WORLD.start.z, yaw: WORLD.start.yaw });
+    this.hero.character.root.visible = false;           // タイトルでは姿を出さない（始めたとき見せる）
+    this.quest = createQuest(); this.cpPos = {}; this.inZone = {}; this.pendingDialogue = null; this.ending = null;
+    this.lostFood = 0; this.pillageT = 0; this.promptKey = ''; this.deathT = 0; this.heroWasAlive = true;
+    this.lock = null; this.listenerT = 0; this.markerT = 0; this.enemySnaps = null; this.enemySnapsAt = -1;
+    this.cine = null; this.opening = null; this.openingOut = null; this.stage = null;   // opening：オープニングの進行（opening.js）、stage：その舞台
+    this.stats = { kills: 0, parries: 0, stealth: 0 };
+    this.guideNav = createGuideNav({ world: WORLD, terrain, col: this.col });
+    this.guideRenderer = new GuideRenderer(scene, terrain);
+    this.guideMotion = globalThis.matchMedia?.('(prefers-reduced-motion: reduce)');
+    this.guideTime = 0; this.guideEpoch = 0; this.guide = null;
+    this.settings = { waymarks: 'bold', blood: 'subtle', sens: 1, invert: false, shake: 1, subs: true };   // blood：血の表現（R18.11。既定ひかえめ）
+    this.relicView = new RelicView(scene, terrain);
+    this.cinema = new CinematicDirector(this);           // 節目の演出（cinematics-view.js）
+    // 章末の演出（chapter1_end）の復帰先：手送りの会話 ending_coda へ（決定U8）。終わりの保存・結果画面は、その会話の終わりで1回だけ（onDialogueEnd）
+    this.cinema.returns.register('result', () => { this.flow = 'play'; this.pendingDialogue = { id: 'ending_coda', since: this.time, delay: 0 }; });
+    this.resetStory();
+    this.syncLife();
+  }
+  // 物語の進み（掛け合い・出来事・読んだ手がかり・落とし物）。はじめから・つづきからで新しくし、やり直しでは残す（同じ台詞を繰り返さない）
+  resetStory() { this.banter = createBanterState(); this.storyEvents = []; this.cluesSeen = []; this.drops = {}; this.c3Shown = false; this.beatAt = this.time; this.gaze = null; this.flareT = 0; this.burnBadge = null; this.raidBarks = 0; this.raidBarkAt = -99; }
+
+  // ------------------------------------------------------------------ 時間・小道具
+  after(sec, fn) { this.timers.push({ t: this.time + sec, fn }); }
+  hitStop(sec) { this.stopT = Math.max(this.stopT, sec * (this.settings.shake > 0 ? 1 : 0.5)); }
+  // とどめ・弾きの瞬間の軽いスロー（8.5a・time-warp.js）。停止が明けてから約0.25秒。揺れの設定では短くしない（揺れでも光でもない）
+  slowMo(sec) { requestSlow(this, sec); }
+  pan(p) {
+    const dx = p.x - this.camera.position.x, dz = p.z - this.camera.position.z, l = Math.hypot(dx, dz) || 1;
+    const rx = Math.cos(this.rig.yaw), rz = -Math.sin(this.rig.yaw);
+    return Math.max(-1, Math.min(1, (dx * rx + dz * rz) / l * 0.8));
+  }
+  emitNoise(x, z, radius, kind) { this.noises.push({ t: this.time, kind, x, z, radius }); }
+  alertedEnemies() { let n = 0; for (const e of this.enemies) if (e.fighter.alive && !e.departed && !e.dormant && e.brain.state === 'combat') n++; return n; }
+
+  aiView(e) {
+    if (this.enemySnapsAt !== this.time) { this.enemySnaps = this.enemies.filter(o => o.fighter.alive && !o.departed).map(o => o.snapshot()); this.enemySnapsAt = this.time; }
+    return { t: this.time, self: e.snapshot(), hero: this.hero.snapshot(), allies: this.enemySnaps, noises: this.noises, world: this.aiWorld, tokens: this.tokens };
+  }
+
+  // ------------------------------------------------------------------ 世界の組み立て
+  clearActors() {
+    for (const e of this.enemies) e.remove();
+    for (const n of this.npcs.values()) n.remove();
+    this.ally?.remove();
+    this.enemies = []; this.npcs.clear(); this.ally = null; this.tokens.reset(); this.aiWorld.clear(); this.battle.clear(); this.lock = null; this.hero.lockTarget = null;
+    this.fx.trails.clear();                   // 刃の軌跡（8.3a）：作り直す前の人の帯を残さない（やり直し・つづき・はじめから）
+    this.fx.streaks.clear();                  // 線状の火花（8.3a 第3周）も同じ
+    this.fx.clearBlood();                     // 血の飛沫としみ（8.4b）も同じ
+  }
+
+  makeEnemies(group, { alert = 'unaware', dormant = false } = {}) {
+    for (const def of WORLD.spawns[group]) {
+      if (this.enemies.some(e => e.id === def.id)) continue;
+      const e = new EnemyActor(this, { ...def, group }, { alert });
+      e.dormant = dormant; this.enemies.push(e);
+    }
+  }
+  makeNpc(id) {
+    const def = WORLD.spawns.villagers.find(v => v.id === id);
+    if (!def || this.npcs.has(id)) return this.npcs.get(id);
+    const n = new NpcActor(this, def); this.npcs.set(id, n); return n;
+  }
+  // 里を取り戻したあと家から出てくる人々。walk=true なら戸口から持ち場へ歩く、false ならもう持ち場にいる（つづき・やり直し）
+  makeRevived(walk) {
+    const made = [];
+    for (const d of WORLD.spawns.revived) {
+      if (this.npcs.has(d.id)) continue;
+      const from = walk ? d.door : d.route ? d.route[1] : d.spot;
+      const n = new NpcActor(this, { id: d.id, who: d.who, x: from[0], z: from[1], yaw: d.yaw, role: d.role });
+      this.npcs.set(d.id, n); made.push([n, d]);
+    }
+    for (const [n, d] of made) {                                    // 相手が揃ってから向きを決める
+      const settle = () => { if (d.route) n.setRoute(d.route, 2); else if (d.face) n.lookAt(this.npcs.get(d.face)?.pos || null); };
+      const goal = d.route ? d.route[1] : d.spot;
+      if (walk) n.runTo(goal[0], goal[1], settle, SPEED.villager); else settle();
+    }
+  }
+  makeCaptive(joined = false) {
+    if (this.ally) return;
+    const c = WORLD.spawns.captive;
+    this.ally = new AllyActor(this, { x: c.x, z: c.z, yaw: c.yaw, captive: !joined });
+  }
+
+  // 任務の段階に合わせて、世界にいる人を作り直す（はじめから・つづきから・やり直しで共通）
+  buildWorld() {
+    this.clearActors(); this.syncLife();
+    const q = this.quest, beat = q.beat, flags = q.flags;
+    const order = ['b0_temple', 'b1_boy', 'b2_road', 'b3_viewpoint', 'b4_village', 'b5_archer', 'b6_escort', 'b7_result', 'done'];
+    const at = order.indexOf(beat);
+    // 里の人
+    for (const id of ['v_work1', 'v_work2']) this.makeNpc(id);
+    const old = this.makeNpc('v_old'), tsu = this.makeNpc('v_tsubaki');
+    const raid = at <= 4;                                          // 略奪の最中は里の人が座り込んで隠れている
+    old.setCower(raid); tsu.setCower(raid);
+    if (at >= 1 && at <= 6) { const boy = this.makeNpc('boy'); boy.place(-88.4, -74.5, 2.3); if (at >= 2) boy.setCower(true); }
+    // 敵
+    if (at === 2) this.makeEnemies('road_scout', { alert: 'unaware' });
+    if (at <= 4) this.makeEnemies('village_enemies', { alert: at === 4 && flags.approach === 'front' ? 'high' : 'unaware', dormant: at < 3 });
+    if (at >= 5 && at <= 6) this.makeRevived(false);
+    if (at <= 5 && !flags.archerJoined) this.makeCaptive(false);
+    if (flags.archerJoined || at >= 6) {
+      this.makeCaptive(true); this.ally.join(true);
+      const h = this.hero.pos; this.ally.place(h.x - Math.sin(this.rig.yaw + 2.6) * 3, h.z - Math.cos(this.rig.yaw + 2.6) * 3);
+      this.hud.setParty(true, this.modeLabel('follow'));
+    } else this.hud.setParty(false);
+    if (at === 6 && flags.ambush !== 'cleared') this.makeEnemies('escort_ambush', { alert: flags.ambush === 'active' ? 'high' : 'unaware', dormant: flags.ambush !== 'active' });
+    if (at >= 7) this.setupResultScene(true);
+    this.inZone = {};
+    this.hud.setObjective(q.story.beats[beat].objective);
+  }
+
+  // ------------------------------------------------------------------ 開始・つづき・やり直し
+  placeHeroAt(p, hpRatio = 1) {
+    this.guideEpoch++; this.guide = null; this.guideEntrance = null;
+    this.hero.reset(p.x, p.z, p.yaw ?? 0, hpRatio);
+    this.rig.yaw = p.yaw ?? 0; this.rig.pitch = 0.2; this.rig.snap();
+    this.rig.update(0.016, this.hero.pos, { rayClip: null });
+  }
+  startNew() {
+    this.stopOpening();
+    this.cinema.abort(); this.cinema.resetRun(); this.resetCinematicsRecord();   // はじめから・もう一度：章末の完了も今回の上映記録も初期化（openingSeen は別キーで残す）
+    this.freshRun = true;
+    this.quest = createQuest(); this.cpPos = {}; this.ending = null; this.lostFood = 0; this.stats = { kills: 0, parries: 0, stealth: 0 };
+    this.resetStory();
+    this.hero.character.root.visible = true;
+    const y = WORLD.zones.temple_yard;
+    this.placeHeroAt({ x: WORLD.start.x, z: WORLD.start.z, yaw: yawOf(y.x - WORLD.start.x, y.z - WORLD.start.z) });
+    this.buildWorld(); this.begin();
+    if (this.skipIntro) this.hud.hint('move', STORY.hints.move, 9000); else this.startIntro();
+  }
+  continueGame() {
+    this.stopOpening();
+    const { state, hasSave } = loadValley(this.storage);
+    if (!hasSave) return this.startNew();
+    this.freshRun = false;
+    this.quest = restoreProgress(STORY, state); this.ending = null; this.lostFood = 0;
+    this.resetStory();
+    this.cinema.abort(); this.cinema.resetRun();
+    this.resumePlan = this.cinematicResumePlan();      // 章末の出し直し／結果へ直行の判定（R29.4）。再生の接続は C1
+    const cp = WORLD.checkpoints[this.quest.checkpoint] || { x: WORLD.start.x, z: WORLD.start.z, yaw: -2.2 };
+    this.placeHeroAt(cp);
+    this.buildWorld(); this.begin();
+    if (this.quest.beat === 'done') this.showResult();
+    // クリア後の保存は結果の区切り(b7_result)。つづきからは焚き火の前で結果の会話を出し直す（出さないと何も起きない）
+    else if (this.quest.beat === 'b7_result') {
+      this.ending = summarize(this.quest); this.hud.showHUD(false);                 // 結末の間は HUD を隠す
+      // 章末の演出を見終えていれば結果へ直行（結果の会話を済ませた扱いにして保存・結果画面を1回）。未完了なら結果の会話から出し直す（R29.4）
+      if (this.resumePlan === 'to-result') { this.dispatch({ type: 'dialogue_end', id: 'result' }); this.persist(); this.showResult(); }
+      else this.queueDialogue('result');
+    }
+    // 見晴らしの区切りからのつづきも、道を選ぶ場面を飛ばさない（やり直しと同じ）
+    else if (this.quest.beat === 'b3_viewpoint') this.after(0.9, () => { if (this.flow === 'play' && this.quest.beat === 'b3_viewpoint') this.showChoice(); });
+  }
+  begin() {
+    this.hero.character.root.visible = true;
+    this.flow = this.quest.beat === 'done' ? 'result' : 'play';
+    this.hud.setState('play'); this.hud.showHUD(true); this.hud.hideTitle(); this.hud.showDeath(false); this.hud.hideResult(); this.hud.fade(false);
+    this.hud.setBars(this.hero.fighter.hp, this.hero.fighter.hpMax, this.hero.fighter.posture, this.hero.fighter.postureMax);
+    this.input.setEnabled(true); this.heroWasAlive = true; this.deathT = 0; this.deathShown = false;
+    this.hud.setObjective(this.quest.story.beats[this.quest.beat].objective);
+    this.hud.setFood(this.quest.beat === 'b4_village' ? this.quest.resources.food / 100 : null);
+  }
+  retry() {
+    if (this.flow !== 'dead') return;
+    this.hud.showDeath(false); this.hud.fade(true);
+    this.after(0.6, () => {
+      this.dispatch({ type: 'retry' });
+      this.cinema.nextAttempt();                                           // 区切りへのやり直し：予約を捨て、新しい試行で節目を1回出せる（R29.5）
+      const cp = WORLD.checkpoints[this.quest.checkpoint];
+      const y = WORLD.zones.temple_yard;
+      this.placeHeroAt(cp || { x: WORLD.start.x, z: WORLD.start.z, yaw: yawOf(y.x - WORLD.start.x, y.z - WORLD.start.z) });
+      this.pendingDialogue = null; this.lostFood = 0;
+      this.drops = {}; this.gaze = null; this.beatAt = this.time;          // 物見は立ち直るので、落とし物は倒し直したときに落ちる
+      this.buildWorld();
+      this.flow = 'play'; this.heroWasAlive = true; this.deathT = 0; this.deathShown = false; this.input.requestLock();
+      if (this.quest.beat === 'b3_viewpoint') this.after(0.9, () => { if (this.flow === 'play' && this.quest.beat === 'b3_viewpoint') this.showChoice(); });   // 道を選び直せる
+      this.hud.setBars(this.hero.fighter.hp, this.hero.fighter.hpMax, this.hero.fighter.posture, this.hero.fighter.postureMax);
+      this.hud.setFood(this.quest.beat === 'b4_village' ? this.quest.resources.food / 100 : null);
+      this.hud.fade(false);
+    });
+  }
+  toCheckpoint() { if (this.flow === 'cinematic') this.cinema.abort(); if (this.flow === 'play' || this.flow === 'dead') { this.flow = 'dead'; if (!this.quest.pendingRetry) this.dispatch({ type: 'player_down' }); this.retry(); } }
+
+  // ------------------------------------------------------------------ オープニング・冒頭の目覚め・演出カメラ
+  // オープニング（語りと絵のような場面）→ 廃寺の庭で目覚める。進行は opening.js（純粋層）、舞台は谷とは別のシーン（opening-stage.js）。
+  // 初回は通常版（約52秒）、見たことがあれば短い版（約15秒）。いつでも E・Space・クリックで飛ばせる（0.6秒で暗転→目覚め）。
+  startIntro() {
+    const seen = loadMeta(this.storage).meta.openingSeen;
+    this.opening = createOpening({ version: seen ? 'short' : 'full' }); this.openingWasSeen = seen; this.introHint = 0;
+    this.flow = 'intro';
+    const h = this.hero, st = WORLD.start;
+    h.scripted = true; h.place(st.x, st.z, yawOf(-0.6, 0.8)); h.character.armRelax = false;
+    this.hud.showHUD(false); this.hud.fadeInstant(false);
+    this.hud.narration(true, { colors: OPENING.colors, title: OPENING.title.text, note: OPENING.title.note });
+    this.stage = new OpeningStage({ renderer: this.renderer, models: this.models, roster: this.roster, quality: this.post.quality });
+    this.post.beginDissolve();
+    this.prepareValley();
+    this.updateIntro(0);
+  }
+  // 目覚めの最初の1コマで止まらないよう、谷の材質（主人公など、まだ描いていないもの）を暗転の下で先に組み立て、絵を送っておく。
+  // 後処理は谷を HalfFloat の絵へ・階調なしで描くので、同じ状態で組み立てる（画面向けで組み立てると別の版になり、効かない）
+  // compileAsync は主の材質だけを組み立てる（影の深さの材質は描いたときに組み立てられる）ので、最後に小さな絵へ1回だけ谷を描く。
+  // 描く向きは目覚めの最初の画角に固定する（そのとき谷のカメラがどこにあっても、毎回同じものだけを送る）。絵もこの1回で、目覚めに映る分だけが送られる
+  // （谷の全部の絵を initTexture で送る案は捨てた：映らない人物の絵まで送り、上映を繰り返す検査で画像の数が増えた）
+  prepareValley() {
+    const r = this.renderer, rt = r.getRenderTarget(), tone = r.toneMapping, st = WORLD.start, T = this.terrain;
+    const cam = new THREE.PerspectiveCamera(42, this.camera.aspect, this.camera.near, this.camera.far);
+    cam.position.set(st.x + 5.2, 0.95 + T.heightAt(st.x + 5.2, st.z + 5.6), st.z + 5.6); cam.lookAt(st.x, 0.45 + T.heightAt(st.x, st.z), st.z); cam.updateMatrixWorld();
+    r.setRenderTarget(this.post.target); r.toneMapping = THREE.NoToneMapping;
+    const done = r.compileAsync(this.scene, cam).catch(() => {});
+    const tiny = new THREE.WebGLRenderTarget(16, 16, { type: THREE.HalfFloatType });
+    r.setRenderTarget(tiny); r.render(this.scene, cam);
+    r.setRenderTarget(rt); r.toneMapping = tone; tiny.dispose();
+    return done;
+  }
+  // オープニングの舞台と語りの枠を片づける（目覚めに入ったとき・途中で始め直したとき）。谷の資源には触れない
+  closeStage() {
+    if (this.stage) { this.stage.dispose(); this.stage = null; }
+    this.post.endDissolve(); this.hud.narration(false);
+  }
+  stopOpening() {
+    if (!this.opening && !this.stage) return;
+    this.closeStage(); this.opening = null; this.openingOut = null; this.cine = null;
+    const c = this.hero.character; this.hero.scripted = false; c.armRelax = true; c.locoName = null; c.gait = 'idle';
+  }
+  updateIntro(dt) {
+    if (!this.opening) return;
+    const skip = this.input.wasPressed('KeyE') || this.input.wasPressed('Space') || this.input.mouseWasPressed(0);
+    const r = stepOpening(this.opening, { dt, skip, reduced: this.reducedMotion() });
+    this.opening = r.state; this.openingOut = r.out;
+    for (const e of r.events) {
+      if (e === 'cut') this.post.holdFrame();                                  // 前の場面の最後の1枚を残して、新しい場面へ溶け合わせる
+      else if (e === 'seen' && !this.openingWasSeen) saveMeta(this.storage, { openingSeen: true });   // 書けなくても続ける
+      else if (e === 'wake') { this.closeStage(); this.startWake(); }
+      else if (e === 'getup') { this.hero.character.playAction('getup', { timeScale: 1.45 }); this.cine && (this.cine.shot = { pos: [WORLD.start.x + 4.2, 1.5, WORLD.start.z + 4.6], look: [WORLD.start.x, 1.0, WORLD.start.z], fov: 44 }); }
+      else if (e === 'done') { this.endIntro(); return; }
+    }
+    // 飛ばしの案内は、入力があったときだけ出す（2.5秒触らなければ消える）。いつ出せるか（0.6秒の待ち・飛ばした後は出さない）は opening.js の hint のまま
+    const touched = this.input.pressed.size > 0 || this.input.mousePressed.size > 0 || this.input.held.size > 0;
+    this.introHint = touched ? 2.5 : Math.max(0, (this.introHint || 0) - dt);
+    if (this.stage) { this.post.setDissolve(r.out.dissolve); this.stage.update(r.out, dt, this.camera.aspect, { reduced: this.reducedMotion() }); this.hud.setNarration({ ...r.out, hint: r.out.hint * Math.min(1, this.introHint / 0.4) }); }
+  }
+  // 廃寺の庭で目覚める（横たわる → 頭をもたげる → 立ち上がる）。オープニングの最後の区間
+  startWake() {
+    const h = this.hero, st = WORLD.start;
+    h.scripted = true; h.place(st.x, st.z, yawOf(-0.6, 0.8));
+    h.character.armRelax = false; h.character.playAction('wake', { timeScale: 1.25 });
+    this.hud.showHUD(false); this.hud.fadeInstant(true);
+    this.after(0.3, () => this.hud.fade(false));
+    this.setCine({ pos: [st.x + 5.2, 0.95, st.z + 5.6], look: [st.x, 0.45, st.z], fov: 42 }, 1);
+  }
+  endIntro() {
+    const h = this.hero; this.opening = null; this.closeStage();
+    h.scripted = false; h.character.armRelax = true; h.character.locoName = null; h.character.gait = 'idle';
+    this.flow = 'play'; this.clearCine();
+    // 起き上がった向きのまま、庭（廃寺の石段の方）へ向けてカメラを置く
+    const y = WORLD.zones.temple_yard; this.rig.yaw = yawOf(y.x - h.pos.x, y.z - h.pos.z); this.rig.pitch = 0.2;
+    this.hud.showHUD(true); this.hud.hint('move', STORY.hints.move, 9000);
+  }
+  // 検査用（?qa=1）：オープニングのいまの見え方
+  openingView() {
+    const o = this.openingOut; if (!this.opening || !o) return null;
+    return { version: o.version, t: +o.t.toFixed(3), segment: o.segment, line: o.line?.id ?? null, lineAlpha: o.line ? +o.line.alpha.toFixed(3) : 0,
+      black: +o.black.toFixed(3), dissolve: +o.dissolve.toFixed(3), title: +o.title.toFixed(3), camera: o.camera && { shot: o.camera.shot, k: +o.camera.k.toFixed(3) },
+      skipped: o.skipped, stage: !!this.stage, shot: this.stage?.shot ?? null };
+  }
+  // 固定の演出カメラへ滑らかに移る（k が 0→1）。解除すると元のカメラへ戻る。pos/look の y は地面からの高さ（m）
+  setCine(shot, k0 = 0) { this.cine = { shot, k: k0, target: 1 }; }
+  clearCine() { if (this.cine) this.cine.target = 0; }
+  applyCine(dt) {
+    const c = this.cine; if (!c) return;
+    c.k += (c.target - c.k) * (1 - Math.exp(-(c.target ? 3.2 : 4.5) * dt));
+    if (c.target === 0 && c.k < 0.01) { this.cine = null; return; }
+    const sh = c.shot, T = this.terrain, pos = new THREE.Vector3(sh.pos[0], sh.pos[1] + T.heightAt(sh.pos[0], sh.pos[2]), sh.pos[2]);
+    const look = new THREE.Vector3(sh.look[0], sh.look[1] + T.heightAt(sh.look[0], sh.look[2]), sh.look[2]);
+    const m = new THREE.Matrix4().lookAt(pos, look, new THREE.Vector3(0, 1, 0)), q = new THREE.Quaternion().setFromRotationMatrix(m);
+    const e = c.k * c.k * (3 - 2 * c.k);
+    this.camera.position.lerp(pos, e); this.camera.quaternion.slerp(q, e);
+    if (sh.fov) { const f = this.camera.fov + (sh.fov - this.camera.fov) * e; if (Math.abs(f - this.camera.fov) > 0.01) { this.camera.fov = f; this.camera.updateProjectionMatrix(); } }
+  }
+
+  // ------------------------------------------------------------------ 任務
+  dispatch(event) {
+    const prev = this.quest.beat;
+    const { state, effects } = reduce(this.quest, event);
+    this.quest = state;
+    for (const fx of effects) this.applyEffect(fx);
+    if (state.beat !== prev) this.onBeatChange(prev, state.beat);
+    this.syncLife();
+    this.log?.push({ t: +this.time.toFixed(2), event, beat: state.beat });
+  }
+  applyEffect(e) {
+    switch (e.type) {
+      case 'objective': this.hud.setObjective(e.text); break;
+      case 'dialogue': this.queueDialogue(e.id); break;
+      case 'spawn': this.activateGroup(e.group, e.alert, e.late); break;
+      case 'despawn': this.despawnGroup(e.group); break;
+      case 'checkpoint': this.saveCheckpoint(e.id); break;
+      case 'resources': this.onResources(e.delta); break;
+      case 'ending': this.ending = e.summary; break;
+      case 'toast': this.hud.toast(e.text); break;
+      default: break;
+    }
+  }
+  onBeatChange(prev, next) {
+    this.beatAt = this.time;
+    if (next === 'b4_village') this.guideEntrance = nearestGuideEntrance(WORLD.zones, this.hero.pos);
+    if (next === 'b3_viewpoint') for (const e of this.enemies) if (e.group === 'village_enemies') e.dormant = false;
+    if (next === 'b6_escort') this.makeEnemies('escort_ambush', { alert: 'unaware', dormant: true });
+    if (next === 'b7_result') this.setupResultScene(false);
+    if (next !== 'b4_village') this.hud.setFood(null);
+    const hints = { b2_road: 'crouch', b6_escort: 'command' };
+    if (hints[next]) this.hud.hint(hints[next], STORY.hints[hints[next]], 7000);
+  }
+  // 谷の暮らしの「見せる物」（life-rules）を、任務の段階・選んだ道・残った米から決め直して、置き物（life-view）へ配る
+  syncLife() { this.lifeState = lifeScene(lifeInputFromQuest(this.quest)); this.props?.life?.apply(this.lifeState); }
+  lifeShows(id) { return !!(this.lifeState && lifeItem(this.lifeState, id)?.show); }
+  reportDown(enemy, how, extra = {}) {
+    if (enemy.reported) return;
+    enemy.reported = how; this.tokens.release(enemy.id); this.aiWorld.forget(enemy.id);
+    if (how === 'killed') this.stats.kills++;
+    // 物見が倒れた：独り言の出来事と、落とした書き付け（C1）の位置
+    if (enemy.id === 'road_scout') { this.storyEvents.push('scout_' + (extra.stealth ? 'stealth' : how)); for (const r of STORY.relics) if (r.drop === enemy.id) this.drops[r.id] = { x: enemy.pos.x, z: enemy.pos.z }; }
+    this.dispatch({ type: 'enemy_down', id: enemy.id, how, ...extra });
+  }
+  onResources(delta) {
+    if (delta.food) {
+      this.lostFood += -delta.food;
+      if (this.lostFood >= 5) { this.lostFood = 0; this.hud.toast('倉の米が荷車へ運ばれていく', 1600); }
+      this.hud.setFood(this.quest.resources.food / 100);
+    }
+    if (delta.morale) this.hud.toast('仲間の士気が上がった', 1800);
+  }
+  saveCheckpoint(id) {
+    const p = this.hero.pos;
+    this.cpPos[id] = { x: p.x, z: p.z, yaw: this.hero.yaw };
+    if (id !== 'cp_result') this.hud.toast('区切りを保存した', 1400);
+    this.persist();
+  }
+  // 保存。はじめからの最初の保存だけは、前の遊びの記録を引き継がない
+  persist() {
+    if (this.cineResetPending && !this.resetCinematicsRecord()) return;   // 前回の章末の完了を新しい遊びへ混ぜない（書けるまで進行の保存を保留）
+    const r = saveValley(this.storage, exportProgress(this.quest), { fresh: this.freshRun });
+    if (r.ok) this.freshRun = false;
+  }
+
+  // 敵・村人の出現と退場
+  activateGroup(group, alert, late = false) {
+    if (GROUP_KINDS[group] === 'npc') { this.startBoy(); return; }
+    if (group === 'road_scout') this.makeEnemies('road_scout', { alert: 'unaware' });
+    if (group === 'village_enemies') {
+      this.makeEnemies('village_enemies', { alert: alert === 'high' ? 'high' : 'unaware' });
+      for (const e of this.enemies) {
+        if (e.group !== 'village_enemies') continue;
+        e.dormant = false;
+        if (alert === 'high' && e.brain.state !== 'combat') { e.brain.state = 'combat'; e.brain.awareness = 1; e.brain.lastSeen = { x: this.hero.pos.x, z: this.hero.pos.z }; e.fighter.aware = true; }
+        if (e.reported) this.after(0.1, () => this.dispatch({ type: 'enemy_down', id: e.id, how: e.reported }));   // 里に入る前に倒してしまった分も数える
+      }
+      this.hud.setFood(this.quest.resources.food / 100);
+      this.pillageT = 0;
+    }
+    if (group === 'escort_ambush') {
+      this.makeEnemies('escort_ambush', { alert: 'high' });
+      for (const e of this.enemies) if (e.group === 'escort_ambush') {
+        e.dormant = false;
+        if (e.brain.state !== 'combat') { e.brain.state = 'combat'; e.brain.awareness = 1; e.brain.lastSeen = { x: this.hero.pos.x, z: this.hero.pos.z }; e.fighter.aware = true; }
+      }
+      this.audio.play('taiko', { gain: 0.8 });
+      if (late) this.hud.toast('追手が、寺まで追ってきた', 2800);          // 待ち伏せを避けても、石段で追いつかれる
+    }
+  }
+  despawnGroup(group) {
+    if (group === 'village_enemies_rest') {
+      // 侍大将が崩れたら、残りは退いていく
+      for (const e of this.enemies) if (e.group === 'village_enemies' && e.fighter.alive && !e.departed && e.brain.state !== 'surrendered') { e.brain.state = 'retreat'; e.dormant = false; }
+      this.battle.ceaseFire();
+      return;
+    }
+    const keep = [];
+    for (const e of this.enemies) { if (e.group === group) e.remove(); else keep.push(e); }
+    this.enemies = keep;
+    if (group === 'boy') { this.npcs.get('boy')?.remove(); this.npcs.delete('boy'); }
+  }
+
+  // 穂太が来られなかったとき、主人公の少し手前（歩いてきた向き）へ置く
+  seatBoy(boy) {
+    const h = this.hero.pos, d = Math.hypot(h.x - boy.pos.x, h.z - boy.pos.z) || 1, k = 2.6 / d;
+    boy.goal = null; boy.place(h.x - (h.x - boy.pos.x) * k, h.z - (h.z - boy.pos.z) * k, yawOf(h.x - boy.pos.x, h.z - boy.pos.z));
+    boy.arrived = true; boy.mode = 'idle'; boy.lookAt(h);
+  }
+  startBoy() {
+    const boy = this.makeNpc('boy');
+    boy.place(-66, -58, yawOf(this.hero.pos.x + 66, this.hero.pos.z + 58));
+    boy.setCower(false); boy.arrived = false;
+    const toward = () => { const h = this.hero.pos, d = Math.hypot(h.x - boy.pos.x, h.z - boy.pos.z) || 1; return { x: h.x - (h.x - boy.pos.x) / d * 2.4, z: h.z - (h.z - boy.pos.z) / d * 2.4 }; };
+    const t = toward();
+    boy.runTo(t.x, t.z, b => { b.arrived = true; b.lookAt(this.hero.pos); b.character.play('Catching_Breath', { fade: 0.2, from: 2.2, restart: true }); });
+  }
+
+  // ------------------------------------------------------------------ 会話
+  // 会話の最中は主人公が傷を受けない。勝った場面の余韻に、退く兵の一撃や飛んでいる矢が当たって倒れ、守った里が元に戻るのを防ぐ
+  heroProtected() { return this.hud.talking || !!this.pendingDialogue; }
+  queueDialogue(id) {
+    if (id === 'ambush_cleared') this.battle.ceaseFire();         // 待ち伏せを退けた瞬間に、逃げる兵の振りと飛んでいる矢を止める
+    // 子が駆けつけてから話し始める（間に合わなくても6秒で始める）。結果は場面の入れ替え（暗転）が終わってから
+    this.pendingDialogue = { id, since: this.time, delay: id === 'result' ? 1.1 : id.startsWith('ending_') ? 0.8 : 0 };
+  }
+  startDialogue(id) {
+    this.pendingDialogue = null;
+    if (id === 'viewpoint_overlook') { const o = SHOTS.overlook; this.setCine({ pos: [o.pos[0], o.eye, o.pos[1]], look: [o.look[0], o.look[2] ?? 1.2, o.look[1]], fov: o.fov }); }
+    const relic = STORY.relics.find(r => r.dialogue === id);
+    if (relic) {                                                              // 調べる物：主人公がそちらを向き、画角が寄る
+      const at = relic.view || (relic.drop ? this.drops[relic.id] : relic.at), h = this.hero;
+      if (at && Math.hypot(at.x - h.pos.x, at.z - h.pos.z) > 0.3) { h.yaw = yawOf(at.x - h.pos.x, at.z - h.pos.z); h.sync(); }
+      this.setCine(this.relicShot(relic));
+    }
+    if (id.startsWith('ending_')) this.setCine(this.endingShot(id), 1);       // 結末の二つ目・三つ目の会話は、画角を切り替えて始める
+    // 行は状況で選ぶ（久作の第一声・断片の数で深くなる結末）。narrative.js
+    const lines = linesFor(STORY, id, this.quest); if (!lines?.length) return;
+    this.hud.hideHint();
+    this.hud.startDialogue(id, lines, did => this.onDialogueEnd(did), line => this.onDialogueLine(line));
+    this.audio.play('dialogue');
+  }
+  // 行ごとの演出：見つめる間（主人公が相手へ向き、肩越しに寄る）と、袖印をくべた焚き火
+  onDialogueLine(line) {
+    if (this.gaze) { const prev = this.gaze.prev; this.gaze = null; if (prev) this.setCine(prev, 1); else this.clearCine(); }
+    if (line.look === 'boy') {
+      const boy = this.npcs.get('boy');
+      if (boy) { this.gaze = { target: boy, prev: this.cine && this.cine.target === 1 ? this.cine.shot : null }; this.setCine(this.gazeShot(boy), this.gaze.prev ? 1 : 0); }
+    }
+    if (line.fx === 'sode_burn') this.burnBadge = { t0: this.time };     // 袖印が手から火へ落ち、落ちたところで炎が上がる（updateStory）
+  }
+  onDialogueEnd(id) {
+    if (this.gaze) { this.gaze = null; this.clearCine(); }
+    this.dispatch({ type: 'dialogue_end', id });
+    if (id === 'viewpoint_overlook') this.after(0.2, () => this.clearCine());
+    if (STORY.relics.some(r => r.dialogue === id)) this.after(0.2, () => this.clearCine());
+    if (ENDING_NEXT[id]) this.queueDialogue(ENDING_NEXT[id]);                   // 結末：result → ending_truth →（章末の演出）→ ending_coda
+    if (id === 'ending_truth') this.playChapterEnd();
+    if (id === 'boy_arrives') { const boy = this.npcs.get('boy'); if (boy) boy.runTo(-88.4, -74.5, b => { b.setCower(true); }); }
+    if (id === 'viewpoint_overlook') this.showChoice();
+    if (id === 'village_cleared') this.healHero(40, 'つばきが傷の手当てをしてくれた');
+    if (id === 'ambush_cleared') {
+      this.healHero(25, '弥十郎が傷に布を巻いてくれた');
+      const z = WORLD.zones.temple_steps;
+      if (Math.hypot(this.hero.pos.x - z.x, this.hero.pos.z - z.z) < z.r) this.inZone.temple_steps = false;   // 石段で待ち伏せを退けたなら、もう一度「着いた」を数える
+    }
+    if (id === 'village_cleared') { for (const n of ['v_old', 'v_tsubaki']) this.npcs.get(n)?.setCower(false); this.after(1.2, () => { if (this.quest.beat === 'b5_archer' || this.quest.beat === 'b6_escort') this.makeRevived(true); }); }
+    if (id === 'archer_joins') {
+      this.ally?.join(false);
+      this.after(2.6, () => { this.dispatch({ type: 'party_joined', id: 'archer' }); this.hud.setParty(true, this.modeLabel('follow')); this.hud.hint('command', STORY.hints.command, 7000); });
+    }
+    if (id === 'ending_coda') this.after(0.4, () => { this.clearCine(); this.persist(); this.showResult(); });
+  }
+  // 調べる物の画角：足もとの物は主人公の側から見下ろし、遠くを見る場所は谷の向こうの山並みへ
+  relicShot(r) {
+    if (r.look === 'far') {                                                   // 遠くを見る：主人公の背の、右後ろから、同じ向きの遠景へ
+      const h = this.hero.pos, v = r.view, d = Math.hypot(v.x - h.x, v.z - h.z) || 1, ux = (v.x - h.x) / d, uz = (v.z - h.z) / d;
+      return { pos: [h.x - ux * 2.6 - uz * 0.9, 1.95, h.z - uz * 2.6 + ux * 0.9], look: [v.x, v.h, v.z], fov: 46 };
+    }
+    // 足もとの物：主人公の体に入らないよう、物の横から低く見る（主人公は画の端に入る）
+    const at = r.drop ? this.drops[r.id] : r.at, h = this.hero.pos, d = Math.hypot(at.x - h.x, at.z - h.z) || 1;
+    const ux = d > 0.2 ? (at.x - h.x) / d : -Math.sin(this.hero.yaw), uz = d > 0.2 ? (at.z - h.z) / d : -Math.cos(this.hero.yaw);
+    return { pos: [at.x - uz * 1.15 + ux * 0.45, 0.95, at.z + ux * 1.15 + uz * 0.45], look: [at.x, 0.06, at.z], fov: 42 };
+  }
+  // 子を見つめる画角：主人公の右肩の後ろから、子の顔へ
+  gazeShot(boy) {
+    const h = this.hero.pos, b = boy.pos, d = Math.hypot(b.x - h.x, b.z - h.z) || 1, ux = (b.x - h.x) / d, uz = (b.z - h.z) / d;
+    // 二人を横から撮る（子へ向く景継の横顔が見える。肩越しでは後頭部しか映らず、隣の子は背に隠れた）。焚き火と反対の側から。
+    // 子の顔と景継の顔が、どちらも会話の枠より上に入る高さ
+    const f = WORLD.props.find(p => p.id === 'bonfire'), mx = (h.x + b.x) / 2, mz = (h.z + b.z) / 2, r = Math.max(2.6, d * 1.15);
+    const s = Math.hypot(mx - uz * r - f.x, mz + ux * r - f.z) > Math.hypot(mx + uz * r - f.x, mz - ux * r - f.z) ? 1 : -1;
+    return { pos: [mx - s * uz * r, 1.2, mz + s * ux * r], look: [mx, 1.3, mz], fov: 44 };
+  }
+  // 結末の画角（焚き火の向こうから二人を／火越しに主人公を）
+  endingShot(id) {
+    const f = WORLD.props.find(p => p.id === 'bonfire');
+    // どちらも少し高い所から見下ろし、火床を画の中ほど（会話の枠の上）に置く。景継は火の真後ろに立たせない（炎が体に重なって靄に見えた）
+    return id === 'ending_truth' ? { pos: [f.x - 1.6, 2.3, f.z + 3.5], look: [f.x - 0.4, 0.2, f.z - 1.1], fov: 46 }
+      : { pos: [f.x - 0.4, 2.6, f.z + 4.0], look: [f.x - 0.3, 0.2, f.z - 1.0], fov: 46 };
+  }
+  // 体力と構えを戻す（里を守ったあと・待ち伏せを退けたあと。戦いの合間に息をつける）
+  healHero(amount, text) {
+    const f = this.hero.fighter; if (!f.alive) return;
+    f.hp = Math.min(f.hpMax, f.hp + amount); f.posture = f.postureMax;
+    this.hud.setBars(f.hp, f.hpMax, f.posture, f.postureMax); this.hud.toast(text, 2600);
+  }
+  showChoice() {
+    this.flow = 'choice'; this.input.releaseLock();
+    this.hud.clearTransient();                       // 案内・通知が選択の枠に重ならないよう、選ぶあいだは消す
+    this.hud.showChoice(true, plan => { this.hud.showChoice(false); this.dispatch({ type: 'choose_plan', plan }); this.flow = 'play'; this.input.requestLock(); this.hud.toast(plan === 'front' ? '正面から入る' : '脇道から回る', 1400); });
+  }
+  showResult() {
+    const s = this.ending || { saved: this.quest.flags.archerJoined ? 4 : 3, food: this.quest.resources.food, morale: this.quest.resources.morale, trust: this.quest.trust, lines: [] };
+    this.flow = 'result'; this.input.releaseLock();
+    this.hud.showResult(s);
+  }
+  // ------------------------------------------------------------------ 節目の演出（C0a の枠・C1 の章末。大将・救出・待ち伏せは C2〜C4）
+  // 遊びの最中（flow='play'）だけ始まる。演出の間は世界を止め、終われば entry.returnTarget の復帰先へ1回だけ渡す
+  playCinematic(entry, opts = {}) { return this.cinema.play(entry, opts); }
+  // 章末（帰還の区切り）：断片の数で版を選んで流す。カメラは先に結びの会話の画角へ置き、演出はそこから入ってそこへ戻る
+  playChapterEnd() {
+    const entry = cinematicFor('chapter1_end', { fragments: this.quest.flags.fragments.length });
+    this.setCine(this.endingShot('ending_coda'), 1); this.applyCine(0);
+    const r = this.cinema.play(entry, { textById: CINE_TEXT });
+    if (!r.ok && r.reason !== 'invalid') this.cinema.returns.resolve('result')({ entry, skipped: false, failed: true });   // 流せない（予約済み等）：会話へそのまま
+    return r;
+  }
+  resetCinematicsRecord() {
+    const r = saveCinematicsRecord(this.storage, { chapter1EndSeen: false });
+    this.cineResetPending = !r.ok;
+    if (!r.ok) this.hud.toast(r.notice + '（進行の保存を待っている）', 3200);
+    return r.ok;
+  }
+  cinematicResumePlan() {
+    const { record, notice } = loadCinematicsRecord(this.storage);
+    if (notice) this.hud.toast(notice, 3200);
+    return planResume({ checkpoint: this.quest.checkpoint, record });
+  }
+  // 演出の毎コマ：演出の時計・カメラ・語りの枠だけを進める。人物・戦闘・判断・押し出し・米と区域・矢・タイマー・ゲームの時計は呼ばない
+  updateCinematic(rawDt) {
+    this.cinema.step(rawDt);
+    if (this.flow === 'cinematic') {
+      this.updateGuide(0); this.updateWorld(0);            // 見た目だけ：新しい画角で木や草の近さを選び直す（風・時刻は進めない）
+      this.fx.update(this.cinema.cast.fxDt, this.camera, this.renderer.domElement.clientHeight || 800);   // 粒は焚き火の映る演出だけ進める（ほかは0）
+    }
+    this.input.endFrame();                                  // 演出中の押下は遊びへ持ち越さない
+  }
+
+  worldInteract() {
+    const a = this.ally;
+    if (this.quest.beat === 'b5_archer' && a && a.role === 'captive' && dist2(this.hero.pos, a.pos) < 2.8 && !this.quest.captiveFreed) return this.dispatch({ type: 'interact', id: 'archer_captive' });
+    // 調べる（袖印・遠くを見る・書き付け）。会話の枠で出す。断片は quest が数える
+    const r = this.relicNear();
+    if (r && !this.hud.talking && !this.pendingDialogue) { if (r.clue) this.cluesSeen.push(r.clue); this.dispatch({ type: 'examine', relic: r.id }); }
+  }
+  // いま案内を出せる調べる物。気づいた敵が近くにいるときは出さない（とどめ・闇討ち・縛めを解く、より後。updatePrompt）
+  relicNear() {
+    const h = this.hero.pos, danger = this.enemies.some(e => e.fighter.alive && !e.departed && !e.dormant && e.brain.state === 'combat' && dist2(e.pos, h) < 24);
+    return relicInReach(STORY, { beat: this.quest.beat, pos: h, fragments: this.quest.flags.fragments, clues: this.cluesSeen, drops: this.drops, danger });
+  }
+
+  // 結果の場面：焚き火のそばに弥十郎が座り、村人が食糧を運んでくる。暗転のあいだに全員を輪に並べ、廃寺を背に火を囲む画角へ
+  setupResultScene(instant) {
+    const place = () => {
+      const f = WORLD.props.find(p => p.id === 'bonfire'), at = (dx, dz, from = { x: f.x, z: f.z }) => ({ x: f.x + dx, z: f.z + dz, yaw: yawOf(from.x - (f.x + dx), from.z - (f.z + dz)) });
+      const h = at(1.0, -2.5); this.hero.place(h.x, h.z, h.yaw);
+      const old = at(-2.0, 1.6), tsu = at(2.5, -0.4);
+      // 里の人々も焚き火に集まる（里を救った結果。カメラの反対側＝奥に座を作る）
+      this.makeRevived(false);
+      // 焚き火の輪との距離は、信頼で変わる（高いと内側に座り、低いと少し離れて立つ。§5.3）。久作とつばきは話者なので、いつも画面に残す
+      const ring = ringPlacement(this.quest.trust);
+      for (const [id, dx, dz] of [['r_man', -3.6, -2.3], ['r_woman', -1.2, -3.7], ['r_child', -4.2, 0.9]]) {
+        const n = this.npcs.get(id); if (!n) continue;
+        const p = at(dx * ring.scale, dz * ring.scale); n.place(p.x, p.z, p.yaw); n.route = null; n.goal = null; n.lookAt({ x: f.x, z: f.z });
+        if (ring.sit) n.setCower(true); else n.mode = 'idle';
+      }
+      // 穂太は火のそば、主人公の隣にいる（結末で景継が見る相手）
+
+      const boy = this.npcs.get('boy') || this.makeNpc('boy');
+      if (boy) { const bp = at(2.1, -1.5); boy.goal = null; boy.place(bp.x, bp.z, bp.yaw); boy.setCower(false); boy.lookAt({ x: f.x, z: f.z }); }   // 主人公の右隣に立つ（座ると、見つめる間の画で子の顔が会話の枠に隠れた）
+      const walker = this.npcs.get('r_walker'); if (walker) { walker.remove(); this.npcs.delete('r_walker'); }
+      this.npcs.get('v_old')?.place(old.x, old.z, old.yaw); this.npcs.get('v_old')?.setCower(false);
+      this.npcs.get('v_tsubaki')?.place(tsu.x, tsu.z, tsu.yaw); this.npcs.get('v_tsubaki')?.setCower(false);
+      for (const id of ['v_old', 'v_tsubaki']) this.npcs.get(id)?.lookAt(this.hero.pos);
+      if (this.ally) { const a = at(-2.1, -0.9); this.ally.place(a.x, a.z, a.yaw); this.ally.role = 'captive'; this.ally.character.weapons.yumi.holder.visible = true; this.ally.character.play('Sit_Cross_Legged_on_Floor', { fade: 0.2 }); }
+      this.hud.setParty(false); this.hud.showHUD(false);             // 結末の間は、体力・構え・目的の欄を隠す（会話の枠は HUD の外）
+      this.lock = null; this.hero.lockTarget = null;
+      this.rig.yaw = yawOf(f.x - h.x, f.z - h.z); this.rig.snap();
+      this.hud.clearTransient();
+      if (!instant) this.setCine({ pos: [f.x + 6.0, 1.6, f.z + 3.2], look: [f.x - 0.5, 1.0, f.z - 0.6], fov: 48 }, 1);
+    };
+    if (instant) place(); else { this.hud.fade(true); this.after(0.7, () => { place(); this.hud.fade(false); }); }
+  }
+
+  // ------------------------------------------------------------------ 主人公の死・仲間への指示
+  onHeroDown() {
+    if (this.quest.pendingRetry) return;
+    this.hero.die(); this.dispatch({ type: 'player_down' }); this.flow = 'dead'; this.deathT = 0;
+    this.battle.clear();
+  }
+  modeLabel(mode) { return { follow: '同行', hold: '待機', cover: '援護', retreat: '撤退' }[mode]; }
+  commandAlly(mode) {
+    if (!this.ally?.inParty) return;
+    if (mode === 'next') { const order = ['follow', 'hold', 'cover', 'retreat']; mode = order[(order.indexOf(this.ally.companion.mode) + 1) % 4]; }
+    this.ally.setMode(mode); this.hud.setParty(true, this.modeLabel(mode));
+    this.hud.toast('弥十郎：' + this.modeLabel(mode), 1200); this.audio.play('ui');
+  }
+
+  // ------------------------------------------------------------------ 毎フレーム
+  controlFrame() {
+    const input = this.input, yaw = this.rig.yaw, ax = input.axis();
+    const fx = -Math.sin(yaw), fz = -Math.cos(yaw), rx = Math.cos(yaw), rz = -Math.sin(yaw);
+    const vx = fx * ax.forward + rx * ax.right, vz = fz * ax.forward + rz * ax.right, vl = Math.hypot(vx, vz) || 1;
+    return { input, axis: ax, moveYaw: yawOf(vx, vz), moveDir: { x: vx / vl, z: vz / vl },
+      talking: this.hud.talking || !!this.pendingDialogue, frozen: this.flow !== 'play', worldInteract: () => this.worldInteract() };
+  }
+
+  update(rawDt) {
+    let dt = Math.min(rawDt, 0.05);
+    if (this.paused) {
+      this.cinema.pauseStep();
+      for (const a of [this.hero, ...this.enemies, this.ally, ...this.npcs.values()]) a?.character.resetContacts();
+      this.updateGuide(0); return;
+    }
+    if (this.flow === 'cinematic') { this.updateCinematic(Math.min(rawDt, 0.1)); return; }
+    if (rawDt > 0.05) {
+      for (const a of [this.hero, ...this.enemies, this.ally, ...this.npcs.values()]) a?.character.resetContacts();
+    }
+    this.guideTime += rawDt;
+    // 命中の停止：時間を完全には止めず、ごく遅くする。とどめ・弾きでは、停止が明けてから軽いスロー（重ねない。time-warp.js）
+    dt *= warpScale(this, dt, FEEL.hitStopScale);
+    this.contactTimeScale = rawDt > 0 ? dt / rawDt : 1;
+    this.time += dt;
+    this.hud.tick(rawDt);
+    this.runTimers();
+    const input = this.input;
+    if (this.flow === 'idle') { this.fx.update(dt, this.camera, this.renderer.domElement.clientHeight || 800); this.updateAmbientFx(dt); this.updateWorld(dt); input.endFrame(); return; }
+
+    this.cinema.filterInput(input);           // 飛ばしに使った操作は、離すまで遊びへ渡さない
+    if (this.god) { const f = this.hero.fighter; if (f.alive) { f.hp = f.hpMax; f.posture = f.postureMax; } }
+    const ctl = this.controlFrame();          // 会話を閉じる E が、同じ瞬間に別の操作にならないよう先に作る
+    this.handleUiKeys();
+    if (this.pendingDialogue) {
+      const pd = this.pendingDialogue, boy = this.npcs.get('boy');
+      const near = boy && dist2(boy.pos, this.hero.pos) < 4.5;
+      const waiting = (pd.id === 'boy_arrives' && boy && !boy.arrived && !near && this.time - pd.since < 10) || this.time - pd.since < pd.delay;
+      if (!waiting && !this.hud.talking) {
+        if (pd.id === 'boy_arrives' && boy && !boy.arrived && !near) this.seatBoy(boy);      // 間に合わなければ、主人公の近くへ置いてから話す（画面の外から話しかけない）
+        this.startDialogue(pd.id);
+      }
+    }
+    const legIk = LOCO.smoothIk;
+    UPPER_ENV.reduce = this.reducedMotion();   // 走りの形（M3）：「動きを減らす」で二次運動の振り幅を下げる
+    if (legIk) this.markLegIk();   // 脚のIK（M2b）：人物の更新を分け、押し分けの後に脚→刀→握りを解く（?smooth=ik で M2a の順へ戻る）
+    this.hero.update(dt, ctl);
+    if (this.gaze) { const t = this.gaze.target.pos, h = this.hero, d = angleDiff(h.yaw, yawOf(t.x - h.pos.x, t.z - h.pos.z)); h.yaw += Math.sign(d) * Math.min(Math.abs(d), 4 * dt); h.sync(); }   // 見つめる相手へ、ゆっくり向く
+    for (const e of this.enemies) e.update(dt);
+    this.ally?.update(dt);
+    for (const n of this.npcs.values()) n.update(dt);
+    this.separateActors();
+    if (legIk) this.finishPoses();
+    this.battle.update(dt);
+    this.noises = this.noises.filter(n => this.time - n.t < 0.6);
+    if (this.flow === 'intro') this.updateIntro(dt);
+    if (this.flow === 'play' || this.flow === 'dead') { this.updateZones(); this.updatePillage(dt); }
+    this.updateLock(input);
+    this.updateCamera(dt);
+    this.updatePrompt();
+    this.updateStory();
+    this.updateGuide(rawDt);
+    this.updateHud(dt);
+    this.updateDeath(dt);
+    this.fx.update(dt, this.camera, this.renderer.domElement.clientHeight || 800);
+    this.updateAmbientFx(dt);
+    this.updateWorld(dt);
+    input.endFrame();
+  }
+
+  // 脚のIK（M2b・leg-ik.js）を使う人：主人公と、近くの敵・仲間（上限8人・24m以内）。軽量の品質は主人公だけ。どの人も更新を2つに分ける
+  markLegIk() {
+    const hero = this.hero, pick = this.legPick ||= [];
+    pick.length = 0;
+    this.legPrep(hero); for (const e of this.enemies) this.legPrep(e); this.legPrep(this.ally); for (const n of this.npcs.values()) this.legPrep(n);
+    hero.character.legIk = true;
+    if (this.post?.quality === 'light') return;
+    for (const e of this.enemies) this.legCand(e); this.legCand(this.ally);
+    if (pick.length > 8) pick.sort(this.legNearer ||= (a, b) => dist2(a.pos, this.hero.pos) - dist2(b.pos, this.hero.pos));
+    for (let i = 0; i < pick.length && i < 8; i++) pick[i].character.legIk = true;
+  }
+  // 毎コマ呼ぶので、関数を作らない（使い回すメソッドで1人ずつ）
+  legPrep(a) { if (!a) return; const ch = a.character; ch.splitPose = true; ch.legIk = false; ch.legTerrain = this.terrain; }
+  legCand(a) { if (a && !a.departed && a.character.root.visible && (!a.fighter || a.fighter.alive) && dist2(a.pos, this.hero.pos) < 24) this.legPick.push(a); }
+  legDone(a) { if (!a) return; const ch = a.character; if (ch.poseDt != null) { a.sync(); ch.finishPose(); } else { ch.splitPose = false; ch.legIk = false; } }
+  finishPoses() { this.legDone(this.hero); for (const e of this.enemies) this.legDone(e); this.legDone(this.ally); for (const n of this.npcs.values()) this.legDone(n); }
+
+  // 人物どうしが重ならないよう、近すぎる組を左右へ押し分ける（死んだ・倒れた・降った者は押さない）
+  separateActors() {
+    const list = [this.hero];
+    for (const e of this.enemies) if (e.fighter.alive && !e.departed && !e.dormant && e.brain.state !== 'surrendered') list.push(e);
+    if (this.ally?.inParty && !this.ally.down) list.push(this.ally);
+    if (list.length < 2 || !this.hero.alive) return;
+    const MIN = 0.72;
+    for (let i = 0; i < list.length; i++) for (let j = i + 1; j < list.length; j++) {
+      const a = list[i], b = list[j];
+      if (a.fighter.team === b.fighter.team && a !== this.hero && b !== this.hero) { /* 敵どうし・味方どうしも離す */ }
+      const dx = b.pos.x - a.pos.x, dz = b.pos.z - a.pos.z, d = Math.hypot(dx, dz);
+      if (d >= MIN) continue;
+      const ux = d > 1e-4 ? dx / d : Math.cos(i * 2.4 + j), uz = d > 1e-4 ? dz / d : Math.sin(i * 2.4 + j), push = (MIN - d);
+      // 主人公は動かされにくい（操作が乱れないよう3割）。それ以外は半分ずつ
+      const ka = a === this.hero ? 0.3 : 0.5, kb = b === this.hero ? 0.3 : 0.5, sum = ka + kb;
+      a.step(-ux * push * ka / sum, -uz * push * ka / sum); b.step(ux * push * kb / sum, uz * push * kb / sum);
+    }
+  }
+
+  // 世界の見た目の更新（大気・風・木の近さ・影の追従・環境音）
+  updateWorld(dt) {
+    this.atmosphere.update(this.camera, dt);
+    // 品質切替で植生を作り直したときも、既存同様に新uniformの時刻から始める。
+    if (this.windUniforms !== this.veg.wind) {
+      this.wind = { ...this.wind, t: this.veg.wind.uTime.value }; this.windUniforms = this.veg.wind;
+    }
+    this.wind = stepWind(this.wind, this.guideWindDt ?? dt, { reduced: this.reducedMotion() });
+    this.guideWindDt = null;
+    const wind = toUniforms(this.wind, { reduced: this.reducedMotion() });
+    this.veg.wind.uTime.value = wind.uTime; this.veg.wind.uWind.value = wind.uWind;
+    this.veg.wind.uWindDir.value.set(...wind.uWindDir); this.veg.wind.uGuideMix.value = wind.uGuideMix;
+    this.veg.trees.update(this.camera); this.veg.grass.update(this.camera); this.veg.rice.update(this.camera); this.veg.crops?.update(this.camera); this.props?.update(this.time); this.props?.life?.update(this.time, this.camera, this.veg.wind); this.water?.update(this.time);
+    const h = this.hero.pos;
+    this.atmosphere.follow(new THREE.Vector3(h.x - Math.sin(this.rig.yaw) * 8, h.y, h.z - Math.cos(this.rig.yaw) * 8));
+    this.listenerT -= dt;
+    if (this.listenerT <= 0) {
+      this.listenerT = 0.5;
+      const bonfire = WORLD.props.find(p => p.id === 'bonfire');
+      this.audio.updateListener({ river: Math.max(0, this.terrain.riverInfo(h.x, h.z).d - WORLD.river.halfWidth), fire: Math.hypot(h.x - bonfire.x, h.z - bonfire.z) });
+    }
+  }
+  runTimers() {
+    if (!this.timers.length) return;
+    const due = this.timers.filter(t => t.t <= this.time);
+    if (!due.length) return;
+    this.timers = this.timers.filter(t => t.t > this.time);
+    for (const t of due) t.fn();
+  }
+
+  handleUiKeys() {
+    const input = this.input;
+    if (this.hud.talking) {
+      if (input.wasPressed('KeyE') || input.mouseWasPressed(0) || input.wasPressed('Space')) { this.hud.advanceDialogue(); this.audio.play('dialogue'); }
+      return;
+    }
+    if (this.flow !== 'play') return;
+    if (input.wasPressed('KeyG')) this.pressGuide();
+    if (input.wasPressed('Tab')) this.toggleLock();
+    if (input.wasPressed('KeyQ')) this.commandAlly('next');
+    for (const [k, m] of [['Digit1', 'follow'], ['Digit2', 'hold'], ['Digit3', 'cover'], ['Digit4', 'retreat']]) if (input.wasPressed(k)) this.commandAlly(m);
+    if (input.wasPressed('KeyH')) document.body.classList.toggle('hide-hud');
+  }
+
+  toggleLock() {
+    if (this.lock) { this.lock = null; this.hero.lockTarget = null; return; }
+    let best = null, bd = FEEL.lockRange;
+    for (const e of this.enemies) {
+      if (!e.fighter.alive || e.departed || e.dormant || e.brain.state === 'surrendered') continue;
+      const d = dist2(e.pos, this.hero.pos);
+      const ang = Math.abs(((yawOf(e.pos.x - this.hero.pos.x, e.pos.z - this.hero.pos.z) - this.rig.yaw + Math.PI * 3) % (Math.PI * 2)) - Math.PI);
+      const score = d + ang * 6;
+      if (d < bd && score < (best?.score ?? 1e9)) { best = { e, score }; }
+    }
+    if (best) { this.lock = best.e; this.hero.lockTarget = best.e; }
+  }
+  updateLock() {
+    if (!this.lock) return;
+    const l = this.lock;
+    if (!l.fighter.alive || l.departed || l.brain.state === 'surrendered' || dist2(l.pos, this.hero.pos) > FEEL.lockRange + 6) { this.lock = null; this.hero.lockTarget = null; }
+  }
+
+  updateCamera(dt) {
+    const look = this.input.look(dt);
+    // 戦闘中、カメラを動かしていなければ、いちばん近い敵の方へゆるくカメラを向ける（敵が主人公の陰に隠れないよう）
+    if (Math.abs(look.dx) + Math.abs(look.dy) > 2) this.lastLookT = this.time;
+    if (this.flow === 'play' && !this.lock && !this.camOverride && !this.cine && this.time - (this.lastLookT ?? -9) > 1.0 && this.alertedEnemies() > 0) {
+      let best = null, bd = 9;
+      for (const e of this.enemies) if (e.fighter.alive && !e.departed && !e.dormant && e.brain.state === 'combat') { const d = dist2(e.pos, this.hero.pos); if (d < bd) { bd = d; best = e; } }
+      if (best) {
+        const want = yawOf(best.pos.x - this.hero.pos.x, best.pos.z - this.hero.pos.z), diff = Math.atan2(Math.sin(want - this.rig.yaw), Math.cos(want - this.rig.yaw));
+        if (Math.abs(diff) > 0.45) this.rig.yaw += Math.sign(diff) * Math.min(Math.abs(diff) - 0.35, 0.9 * dt) * 1.0;
+      }
+    }
+    if (this.camOverride) {                  // 検査用：カメラを固定して撮る（?qa=1）
+      const c = this.camOverride; this.camera.position.set(...c.pos); this.camera.lookAt(...c.look);
+      if (c.fov && this.camera.fov !== c.fov) { this.camera.fov = c.fov; this.camera.updateProjectionMatrix(); }
+      return;
+    }
+    const lockTarget = this.lock && this.flow === 'play' ? this.lock.pos : null;
+    const frozen = this.flow === 'choice' || this.flow === 'result';
+    this.rig.update(dt, this.hero.pos, {
+      lookDx: frozen ? 0 : look.dx, lookDy: frozen ? 0 : look.dy, lockTarget,
+      rayClip: (a, b) => rayClip(this.col, this.terrain, a, b, 0.3, { ignoreThin: 0.2 }), groundAt: (x, z) => this.terrain.heightAt(x, z), zoom: this.input.wheel, reduced: this.reducedMotion(),
+    });
+    this.applyCine(dt);
+  }
+
+  // 範囲に入った瞬間を任務へ知らせる
+  updateZones() {
+    if (!this.hero.alive) return;
+    const p = this.hero.pos;
+    for (const [name, z] of Object.entries(WORLD.zones)) {
+      const inside = Math.hypot(p.x - z.x, p.z - z.z) < z.r;
+      if (inside && !this.inZone[name]) {
+        this.inZone[name] = true;
+        this.dispatch({ type: 'enter_zone', zone: name });
+        if (PLACE_ZONES.includes(name)) this.dispatch({ type: 'arrived', place: name });
+      } else if (!inside) this.inZone[name] = false;
+    }
+  }
+  updatePillage(dt) {
+    if (this.quest.beat !== 'b4_village') return;
+    this.pillageT += dt;
+    if (this.pillageT < 0.5) return;
+    const dtp = this.pillageT; this.pillageT = 0;
+    let raiders = 0, loud = false;
+    for (const e of this.enemies) if (e.group === 'village_enemies' && e.fighter.alive && !e.departed && !['retreat', 'surrendered'].includes(e.brain.state)) { raiders++; if (e.brain.state === 'combat' && !e.stealthStruck) loud = true; }
+    this.dispatch({ type: 'pillage_tick', dt: dtp * FEEL.pillageScale, pillagers: raiders, loud });
+  }
+
+  // ------------------------------------------------------------------ HUD
+  objectiveTarget() {
+    const spec = STORY.beats[this.quest.beat]?.guideTarget;
+    const id = spec && typeof spec === 'object' ? spec[this.guide?.plan || 'front'] : spec;
+    return WORLD.zones[id] || (id === 'boy' ? WORLD.spawns.villagers.find(n => n.id === 'boy') : WORLD.spawns[id]) || null;
+  }
+  reducedMotion() { return this.settings.reducedMotion ?? this.guideMotion?.matches ?? false; }
+  guideMode() {
+    if (this.paused) return 'paused';
+    if (this.hud.talking) return 'dialogue';
+    if (this.flow !== 'play' || !this.hero.alive || this.hud.el.fade.classList.contains('on')) return 'result';
+    return this.enemies.some(e => e.fighter.alive && e.brain.state === 'combat') ? 'combat' : 'free';
+  }
+  rebuildGuide(plan, from = this.hero.pos) {
+    const started = performance.now(), objectiveId = this.quest.beat;
+    const baseline = buildBaseline(WORLD, this.guideNav, { objectiveId, plan, from: { x: from.x, z: from.z } });
+    if (objectiveId === 'b4_village') this.guideEntrance = plan;
+    this.guideRenderer.startParticles([]);
+    this.guide = { objectiveId, plan, epoch: this.guideEpoch, baseline, state: null, assessment: null, recovery: null,
+      recoveryAt: -Infinity, baselineMs: performance.now()-started, recoveryMs: 0, reached: false, switchState: null, variants: {} };
+    // b3の両側の固定路を同じ開始位置で用意する。毎コマ探索しない。
+    if (objectiveId === 'b3_viewpoint') {
+      const start = performance.now();
+      for (const side of ['north','south']) this.guide.variants[side] = side === plan ? baseline : buildBaseline(WORLD,this.guideNav,{objectiveId,plan:side,from:{x:from.x,z:from.z}});
+      this.guide.variantRoads = Object.fromEntries(Object.entries(this.guide.variants).filter(([,b])=>b).map(([key,b])=>[key,{points:b.points.map(p=>[p.x,p.z])}]));
+      this.guide.baselineMs += performance.now()-start;
+    }
+  }
+  updateGuide(rawDt) {
+    this.guideWindDt = rawDt;
+    const objectiveId = this.quest.beat, mode = this.guideMode();
+    if (this.flow === 'idle') { this.guideRenderer.hide(); return; }
+    const selected = objectiveId === 'b3_viewpoint' ? (this.quest.flags.plan === 'flank' ? 'north' : 'front') :
+      objectiveId === 'b4_village' ? (this.guideEntrance || nearestGuideEntrance(WORLD.zones,this.hero.pos)) : 'front';
+    if (!this.guide || this.guide.objectiveId !== objectiveId || this.guide.epoch !== this.guideEpoch ||
+        this.guide.selection !== selected) { this.rebuildGuide(selected); this.guide.selection = selected; }
+    const g = this.guide, pos = this.hero.pos;
+    if (objectiveId === 'b3_viewpoint' && ['north','south'].includes(g.plan)) {
+      const other = g.plan === 'north' ? 'south' : 'north', a = g.variants[g.plan], b = g.variants[other];
+      if (a && b && (g.mode !== mode || this.guideTime-(g.switchAt ?? -Infinity)>=1/30)) {
+        g.switchAt=this.guideTime;
+        const next = switchGuidePlan(g.plan,g.switchState,{currentDistance:roadDistance(g.variantRoads[g.plan],pos),
+          otherDistance:roadDistance(g.variantRoads[other],pos),t:this.guideTime,active:mode==='free'});
+        g.switchState=next.state;
+        if(next.plan!==g.plan) { g.plan=next.plan; g.baseline=g.variants[g.plan]; g.state=null; g.recovery=null; g.recoveryJob=null; g.recoveryAt=-Infinity; }
+      }
+    }
+    const baseline = g.baseline;
+    if (!baseline) { this.guideRenderer.hide(); return; }
+    // assessは30Hz以下。mode境界は待たずに履歴を消す。
+    if (!g.state || !g.assessment || this.guideTime-(g.assessedAt ?? -Infinity)>=1/30 || g.mode!==mode) {
+      g.assessment=assess(baseline,g.state,{t:this.guideTime,pos:{x:pos.x,z:pos.z},mode,objectiveId,plan:g.plan,baselineId:baseline.id});
+      g.state=g.assessment.state; g.assessedAt=this.guideTime;
+    }
+    g.mode=mode;
+    const center=WORLD.zones.village_center;
+    if(objectiveId==='b4_village' && Math.hypot(pos.x-center.x,pos.z-center.z)<=center.r) g.reached=true;
+    const helping=g.assessment.emphasized && normalizeWaymarks(this.settings.waymarks)!=='off';
+    // 復帰探索は0.5秒ごとに始め、1コマRECOVERY_BUDGET_MSまでで区切って数コマで仕上げる（途中は前の復帰路を使う）。
+    if ((helping || this.wind.guideElapsed!==null) && (mode==='free' || mode==='combat') && !g.reached && (g.recoveryJob || this.guideTime-g.recoveryAt>=.5)) this.refreshGuideRecovery(RECOVERY_BUDGET_MS);
+    if (!helping && this.wind.guideElapsed===null) { g.recovery=null; g.recoveryJob=null; }
+    let direction=g.assessment.direction;
+    if(g.recovery) {
+      const head=guideRouteHead(g.recovery.points,pos,g.recoverySegment || 0);
+      g.recoverySegment=head.segment; direction=head.direction;
+    }
+    g.direction=direction;
+    // 縁は基準路の前方15m。復帰中は復帰路の曲がりにも従う。
+    if(!g.ahead || this.guideTime-(g.aheadAt ?? -Infinity)>=.1) { g.ahead=sampleGuidePath(this.guidePath(),2,15).at(-1); g.aheadAt=this.guideTime; }
+    this.guideRenderer.update({pos,direction,target:baseline.points.at(-1),ahead:g.ahead,remaining:g.assessment.remaining,
+      level:this.settings.waymarks,mode,emphasized:helping,reached:g.reached,reduced:this.reducedMotion(),hidden:document.body.classList.contains('hide-hud'),t:this.guideTime,wind:this.wind,camera:this.camera});
+    if(mode==='free' && ['b0_temple','b1_boy','b2_road'].includes(objectiveId) && !this.hud.hintBusy() && !this.banterWaiting && !this.pendingDialogue) this.hud.hint('guide-g','迷ったら G で、導きの風を呼べます');
+  }
+  guidePath() {
+    const g=this.guide, pos=this.hero.pos;
+    return [{x:pos.x,z:pos.z},...(g.recovery?.points.slice((g.recoverySegment || 0)+1) || g.baseline.points.slice((g.state?.segment || 0)+1))];
+  }
+  // budgetMsなし（Gを押したとき）は、その場で現在地から最後まで探す。あり（迷いの助け）は、始めた位置から区切って探す。
+  refreshGuideRecovery(budgetMs) {
+    const g=this.guide, start=performance.now();
+    if(budgetMs===undefined || !g.recoveryJob) {
+      g.recoveryJob={pos:{x:this.hero.pos.x,z:this.hero.pos.z},progress:g.state?.progress || 0,ms:0}; g.recoveryAt=this.guideTime;
+    }
+    const job=g.recoveryJob, until=start+(budgetMs ?? 0);
+    let cells=0; // 1コマに最低8セルは進め、やり直しだけで予算が尽きても止まらないようにする
+    const spend=budgetMs===undefined ? null : () => cells++ < 8 || performance.now() < until;
+    const recovery=buildRecovery(g.baseline,this.guideNav,{pos:job.pos,progress:job.progress,spend});
+    job.ms+=performance.now()-start;
+    if(recovery===RECOVERY_PENDING) return false;
+    g.recovery=recovery; g.recoverySegment=0; g.recoveryMs=job.ms; g.recoveryJob=null;
+    return true;
+  }
+  pressGuide() {
+    if(!['free','combat'].includes(this.guideMode())) return false;
+    this.updateGuide(0);
+    const g=this.guide;
+    if(!g?.baseline || g.reached || this.wind.guideElapsed!==null || this.wind.cooldown>0) return false;
+    this.refreshGuideRecovery();
+    const path=this.guidePath(), pos=this.hero.pos, next=path.find(p=>Math.hypot(p.x-pos.x,p.z-pos.z)>.05);
+    const dir=next ? [next.x-pos.x,next.z-pos.z] : [g.assessment.direction.x,g.assessment.direction.z];
+    const result=requestGuide(this.wind,dir); this.wind=result.state;
+    if(result.accepted) { this.guideRenderer.startParticles(sampleGuidePath(path,particleCount(120,{reduced:this.reducedMotion()}))); this.updateGuide(0); }
+    return result.accepted;
+  }
+  setGuidePlan(plan) {
+    if(!['front','north','south'].includes(plan)) throw new TypeError('Invalid guide plan');
+    this.rebuildGuide(plan); this.guide.selection=this.quest.beat==='b3_viewpoint'?(this.quest.flags.plan==='flank'?'north':'front'):
+      this.quest.beat==='b4_village'?(this.guideEntrance || nearestGuideEntrance(WORLD.zones,this.hero.pos)):'front';
+    this.updateGuide(0);
+  }
+  // 道しるべの探索が使う「通れる判定」を、読み込み中に温める。冷えた最初の1回が数百msかかり、b3の開始で固まるため。
+  // 結果は捨てる（キャッシュだけを残す）。入口・区切りの位置は、実際の遊びと同じ点を使う。
+  warmGuide() {
+    const started = performance.now(), z = WORLD.zones, cp = WORLD.checkpoints;
+    for (const [objectiveId, plan, p] of [['b2_road', 'front', cp.cp_leave_temple], ['b3_viewpoint', 'north', cp.cp_viewpoint], ['b3_viewpoint', 'south', cp.cp_viewpoint],
+      ['b4_village', 'front', z.village_front], ['b4_village', 'north', z.village_north], ['b4_village', 'south', z.village_south], ['b6_escort', 'front', z.village_center]]) {
+      buildBaseline(WORLD, this.guideNav, { objectiveId, plan, from: { x: p.x, z: p.z } });
+    }
+    return this.guideWarmMs = performance.now() - started;
+  }
+  guideView() {
+    const g=this.guide, a=g?.assessment;
+    return { enabled:!!g?.baseline && !g?.reached, level:normalizeWaymarks(this.settings.waymarks),objectiveId:this.quest.beat,
+      plan:g?.plan || 'front',baselineId:g?.baseline?.id || null,remaining:a?.remaining ?? 0,direction:g?.direction || {x:0,z:0},
+      emphasized:!!a?.emphasized,offRoad:!!a?.offRoad,stalled:!!a?.stalled,mode:this.guideMode(),reached:!!g?.reached,
+      baselineMs:g?.baselineMs || 0,recoveryMs:g?.recoveryMs || 0,warmMs:this.guideWarmMs || 0,...this.guideRenderer.snapshot };
+  }
+
+  updatePrompt() {
+    let text = '';
+    if (this.flow === 'play' && !this.hud.talking && this.hero.alive) {
+      const h = this.hero, f = h.fighter;
+      for (const e of this.enemies) if (e.fighter.alive && e.fighter.state === 'stagger' && dist2(e.pos, h.pos) < 3.4) { text = 'とどめを刺す'; break; }
+      if (!text) for (const e of this.enemies) {
+        if (!e.fighter.alive || e.fighter.aware !== false) continue;
+        const dx = h.pos.x - e.pos.x, dz = h.pos.z - e.pos.z, d = Math.hypot(dx, dz);
+        if (d <= 1.9 && (-Math.sin(e.yaw + Math.PI) * dx - Math.cos(e.yaw + Math.PI) * dz) / (d || 1) >= Math.cos(Math.PI / 4)) { text = '背後から闇討ち'; break; }
+      }
+      if (!text && this.quest.beat === 'b5_archer' && this.ally?.role === 'captive' && dist2(h.pos, this.ally.pos) < 2.8) text = '縛めを解く';
+      if (!text && !this.pendingDialogue) text = this.relicNear()?.prompt || '';
+      if (f.state !== 'idle') text = '';
+    }
+    let key = 'E';
+    if (this.flow === 'play' && this.hero.alive && this.hero.fighter.counterT > 0 && this.hero.fighter.state === 'idle') { text = '弾いた。いま反撃'; key = '左クリック'; }
+    if (text !== this.promptKey) { this.promptKey = text; this.hud.prompt(text, key); }
+    if (text === 'とどめを刺す') this.hud.hint('finisher', STORY.hints.finisher);
+    if (text === '背後から闇討ち') this.hud.hint('stealth', STORY.hints.stealth);
+  }
+  // 物語の毎コマ：侍大将の開戦の一言（C3。出来事で必ず出す）、掛け合い（banter.js が選ぶ）、地面の調べる物の見た目
+  updateStory() {
+    const q = this.quest;
+    if (!this.c3Shown && q.beat === 'b4_village' && this.enemies.some(e => e.kind === 'officer' && e.group === 'village_enemies' && e.fighter.alive && !e.dormant && e.brain.state === 'combat')) {
+      const c = STORY.clues.find(x => x.id === 'C3');
+      this.c3Shown = true; this.hud.subtitle(c.speaker, c.text, lineSeconds(c.text) * 1000 + 800, 'clue');
+      this.battle.barkAt = this.time + 2.6;                        // 掛け声で上書きしない
+    }
+    const kind = this.hud.subtitleKind();
+    const talking = this.hud.talking || !!this.pendingDialogue, fighting = this.alertedEnemies() > 0;
+    const blocked = this.flow !== 'play' || !this.hero.alive || talking || fighting || kind === 'bark' || kind === 'clue'
+      || !this.hud.subsOn || !!this.cine || this.hud.el.fade.classList.contains('on');
+    const r = stepBanter(this.banter, { t: this.time, beat: q.beat, beatT: this.time - this.beatAt, areas: areasAt(STORY.areas, this.hero.pos), events: this.storyEvents,
+      plan: q.flags.plan, approach: q.flags.approach, ambush: q.flags.ambush, companion: q.flags.archerJoined, captiveFreed: q.captiveFreed, seen: q.seen,
+      trust: q.trust, food: q.resources.food, fragments: q.flags.fragments.length, blocked, held: this.hud.hintBusy() }, STORY.banter);
+    this.banter = r.state; this.banterWaiting = r.waiting;
+    if ((talking || fighting) && kind === 'banter') this.hud.hideSubtitle('banter');   // 戦闘・会話が始まったら、掛け合いの字幕を残さない
+    if (r.show) this.hud.subtitle({ 榊三郎景継: '景継', 梓弥十郎: '弥十郎' }[r.show.speaker] || r.show.speaker, r.show.text, r.show.seconds * 1000, 'banter');
+    // C2：まだ気づいていない里の兵が、荒らしながら上げる声（近づいたときだけ。14秒おき、3回まで。乱数は使わない）
+    if (q.beat === 'b4_village' && !kind && !talking && (this.raidBarks || 0) < 3 && this.time - (this.raidBarkAt ?? -99) > 14) {
+      const e = this.enemies.find(e => e.group === 'village_enemies' && e.kind !== 'officer' && e.fighter.alive && !e.dormant && !e.departed && ['patrol', 'suspicious'].includes(e.brain.state) && dist2(e.pos, this.hero.pos) < 22);
+      if (e) { this.raidBarkAt = this.time; this.raidBarks = (this.raidBarks || 0) + 1; this.hud.subtitle('追手', STORY.barks.raid[0], 1800); }
+    }
+    const items = [];
+    const b = this.burnBadge, f = WORLD.props.find(p => p.id === 'bonfire');
+    if (b) {
+      const k = Math.min(1, (this.time - b.t0) / 0.7), h = this.hero.pos, sx = h.x - Math.sin(this.hero.yaw) * 0.45, sz = h.z - Math.cos(this.hero.yaw) * 0.45;
+      if (k >= 1) { this.burnBadge = null; this.flareT = 1.6; }
+      else items.push({ id: 'sode_burn', kind: 'sode', x: sx + (f.x - sx) * k, z: sz + (f.z - sz) * k, y: 1.0 + (0.3 - 1.0) * k + 0.35 * Math.sin(Math.PI * k), yaw: k * 3 });
+    }
+    for (const rel of STORY.relics) {
+      const at = rel.drop ? this.drops[rel.id] : rel.at;
+      const reading = this.hud.dialogue?.id === rel.dialogue || this.pendingDialogue?.id === rel.dialogue;   // 調べている間は、まだ地面にある（寄った画に写す）
+      if (rel.look !== 'down' || !at || !rel.beats.includes(q.beat) || (!reading && ((rel.fragment && q.flags.fragments.includes(rel.fragment)) || (rel.clue && this.cluesSeen.includes(rel.clue))))) continue;
+      items.push({ id: rel.id, kind: rel.fragment ? 'sode' : 'note', x: at.x, z: at.z, yaw: rel.fragment ? 0.7 : 2.1 });
+    }
+    this.relicView.update(items, this.time, this.camera, this.reducedMotion());
+  }
+  updateHud(dt) {
+    const f = this.hero.fighter;
+    this.hud.setBars(f.hp, f.hpMax, f.posture, f.postureMax);
+    this.hud.setCompass(0, this.guide?.assessment?.remaining ?? 0, !!this.guide?.baseline);
+    // 官名つきの体力帯（侍大将）
+    const off = this.enemies.find(e => e.kind === 'officer' && e.fighter.alive && !e.departed && !e.dormant && e.brain.state === 'combat');
+    this.hud.setBoss(!!off, '追手の侍大将', off ? off.fighter.hp / off.fighter.hpMax : 0);
+    this.markerT -= dt;
+    if (this.markerT <= 0) { this.markerT = 0.033; this.updateMarkers(); }
+  }
+  updateMarkers() {
+    const list = [], el = this.renderer.domElement, W = el.clientWidth, H = el.clientHeight, v = new THREE.Vector3();
+    if (this.flow === 'play') for (const e of this.enemies) {
+      const f = e.fighter, b = e.brain;
+      if (!f.alive || e.departed || e.dormant || b.state === 'surrendered') continue;
+      const d = dist2(e.pos, this.hero.pos);
+      if (d > FEEL.markerRange) continue;
+      const combat = b.state === 'combat', sus = b.state === 'suspicious' || b.state === 'search' || (b.state === 'patrol' && b.awareness > 0.05);
+      if (!combat && !sus && d > 12 && this.lock !== e) continue;
+      v.set(e.pos.x, e.pos.y + e.character.height + 0.35, e.pos.z).project(this.camera);
+      if (v.z > 1 || v.z < -1 || Math.abs(v.x) > 1.1 || Math.abs(v.y) > 1.1) continue;
+      const state = f.telegraphing ? 'tele' : combat ? 'alert' : sus ? 'sus' : '';
+      list.push({ id: e.id, x: (v.x * 0.5 + 0.5) * W, y: (-v.y * 0.5 + 0.5) * H, ratio: combat ? f.posture / f.postureMax : b.awareness, state, locked: this.lock === e, hideBar: !combat && !sus && this.lock !== e });
+    }
+    this.hud.updateMarkers(list);
+  }
+  updateDeath(dt) {
+    if (this.flow !== 'dead') return;
+    this.deathT += dt;
+    if (this.deathT > 1.9 && !this.deathShown) { this.hud.showDeath(true); this.deathShown = true; this.input.releaseLock(); }
+  }
+
+  // 焚き火・煙・舞う塵などの常時の演出
+  updateAmbientFx(dt) {
+    this.fxT = (this.fxT || 0) - dt;
+    if (this.fxT > 0) return;
+    this.fxT = 0.06;
+    const hp = this.hero.pos, f = WORLD.props.find(p => p.id === 'bonfire');
+    if (Math.hypot(hp.x - f.x, hp.z - f.z) < 90) {
+      const p = { x: f.x, y: this.terrain.heightAt(f.x, f.z) + 0.15, z: f.z };
+      this.fx.flame(p); if (this.rng() < 0.4) this.fx.ember({ ...p, y: p.y + 0.4 }); if (this.rng() < 0.12) this.fx.smoke({ ...p, y: p.y + 0.9 });
+      // 袖印をくべた：炎が少しのあいだ高く上がり、火の粉が増える（音なし）
+      if (this.flareT > 0) { this.flareT -= 0.06; for (let i = 0; i < 2; i++) this.fx.flame({ ...p, y: p.y + 0.15 + i * 0.14 }); this.fx.ember({ ...p, y: p.y + 0.6 }); }
+    }
+    // 農家の煙突から細い煙（近くの家だけ）。兵に荒らされている間は止め、野営の燠から灰色の煙を1本だけ上げる（S7-A 見4）
+    this.chimneyT = (this.chimneyT || 0) - 0.06;
+    if (this.chimneyT <= 0) {
+      this.chimneyT = 0.45;
+      const camp = this.lifeShows('camp_smoke') && WORLD.life?.items.find(d => d.id === 'hearth');
+      if (camp && Math.hypot(hp.x - camp.x, hp.z - camp.z) < 140) for (const o of [0, 0.6]) this.fx.chimney({ x: camp.x, y: this.terrain.heightAt(camp.x, camp.z) + 0.2 + o, z: camp.z }, [0.3, 0.3, 0.32], 0.5);   // 細く暗い灰色の1本（近くで白い塊・遠くで光に見えないように）
+      // 襲撃中（thin）は、野営から遠い家の順に1〜2軒だけ細く（隠れて暮らしが続いている）。救ったあと（rising）は全部の家
+      const hs = this.lifeShows('house_smoke') ? lifeItem(this.lifeState, 'house_smoke') : null, thin = hs?.state === 'thin';
+      const away = this.smokeOrder ||= ((h = WORLD.life?.items.find(d => d.id === 'hearth') || { x: 0, z: 0 }) => WORLD.buildings.filter(b => b.kind === 'farmhouse')
+        .sort((a, b) => Math.hypot(b.x - h.x, b.z - h.z) - Math.hypot(a.x - h.x, a.z - h.z)))();   // 炊き場（入2）から遠い順。1回だけ作る
+      if (hs) for (const b of thin ? away.slice(0, hs.count) : WORLD.buildings) {
+        if (b.kind !== 'farmhouse' || Math.hypot(hp.x - b.x, hp.z - b.z) > 140) continue;
+        const y = this.terrain.heightAt(b.x, b.z) + 5.6 * (0.98 + (b.variant || 0) * 0.04);
+        this.fx.chimney({ x: b.x + Math.sin(b.rotY) * 0.8, y, z: b.z + Math.cos(b.rotY) * 0.8 }, undefined, thin ? 0.45 : 1);
+      }
+      // 里の荒れ（§5.2。見た目だけ）：倉が荒らされたほど、荷車のあたりから煙が上がる（蓄え35未満は太く、50未満は細く。帰り道まで）
+      const q = this.quest, food = q.resources.food;
+      if (['b5_archer', 'b6_escort'].includes(q.beat) && food < 50 && Math.hypot(hp.x + 27.5, hp.z - 6.5) < 160 && (food < 35 || (this.raidSmokeOdd = !this.raidSmokeOdd))) this.fx.chimney({ x: -27.5, y: this.terrain.heightAt(-27.5, 6.5) + 0.6, z: 6.5 });
+    }
+    // 光の筋の中を舞う塵（主人公のまわり）
+    if (this.rng() < 0.45 && this.flow !== 'idle') this.fx.mote({ x: hp.x + (this.rng() - 0.5) * 14, y: hp.y + 0.4 + this.rng() * 3.2, z: hp.z + (this.rng() - 0.5) * 14 });
+  }
+
+  // オープニングの間は、谷を描かずに舞台だけを描く
+  render(dt) { this.renderer.info.reset(); if (this.stage) this.post.render(this.stage.scene, this.stage.camera, dt); else this.post.render(this.scene, this.camera, dt); }
+}
