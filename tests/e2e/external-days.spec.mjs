@@ -64,8 +64,7 @@ const EXTERNAL_DAYS = [
     day: '098',
     title: '残火の鎌倉 — 隠れ谷の灯',
     dir: 'day-098-zanka-no-kamakura',
-    url: 'https://day98.rairakku.com/',
-    demo: false // 紹介動画はまだ無い。カードはスクリーンショットだけで、デモ再生ボタンは出さない
+    url: 'https://day98.rairakku.com/'
   }
 ];
 
