@@ -450,8 +450,10 @@ async function capture(opts) {
     readValues: {},
     missing: [],
     warnings: [],
+    textExtents: {},
     msPerFrame: 0,
   };
+  const reportedBounds = new Set();
 
   const liveState = { appJpeg: null, logoPng: null };
   // meibo を先に起動する。ステージ用サーバーを先に開くと、meibo の起動に失敗したとき、開いたまま残って Node が終わらなくなる。
@@ -1680,6 +1682,21 @@ async function capture(opts) {
         callout,
         end: T.endCardAt(t),
       });
+
+      // 10コマごとに、見えている文字・札の左右の端を測る。左右の安全域（x=49..491）を出たら警告し、最大の広がりを記録に残す。
+      if (f % 10 === 0) {
+        const boxes = await stagePage.evaluate(() => window.stage.measureText());
+        for (const b of boxes) {
+          const ext = (report.textExtents[b.name] ??= { left: b.left, right: b.right });
+          ext.left = Math.min(ext.left, b.left);
+          ext.right = Math.max(ext.right, b.right);
+        }
+        for (const b of T.textBoundsViolations(boxes)) {
+          if (reportedBounds.has(b.name)) continue;
+          reportedBounds.add(b.name);
+          report.warnings.push(`t=${t.toFixed(2)}s ${b.name} が左右の安全域（x=${T.STAGE.safeX.min}..${T.STAGE.safeX.max}）の外: x=${b.left}..${b.right}`);
+        }
+      }
 
       await stagePage.screenshot({ path: join(frameDir, `${String(f).padStart(4, '0')}.jpg`), type: 'jpeg', quality: 95 });
       if (f % 60 === 0) console.log(`frame ${f}/${T.TOTAL_FRAMES}  t=${t.toFixed(2)}s  ${Math.round((Date.now() - started) / 1000)}s elapsed`);

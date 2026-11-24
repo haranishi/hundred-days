@@ -239,3 +239,37 @@ test('公開する文面に「営業日」を使わない（土日を除く翌�
   ].join('\n');
   assert.equal(copy.includes('営業日'), false);
 });
+
+// スマホで全画面に敷き詰められると、9:16 の動画は左右が約9%ずつ切れる（縦長の画面）。文字は左右の安全域（x=49..491）に収める。
+test('textBoundsViolations は、左右の安全域（49..491）を出た文字・札だけを返す（許容 1.5px）', () => {
+  const boxes = [
+    { name: 'ちょうど', left: 49, right: 491 },
+    { name: '許容内', left: 47.6, right: 300 },
+    { name: '左に出た', left: 40, right: 300 },
+    { name: '右に出た', left: 100, right: 493 },
+  ];
+  assert.deepEqual(T.textBoundsViolations(boxes).map((b) => b.name), ['左に出た', '右に出た']);
+});
+
+test('長い字幕の fontSize を外すと、左右の安全域を超えるとして絵コンテの自己検査が止める', () => {
+  const caption = T.CAPTIONS.find((c) => c.lines.some((line) => line.includes('不在のため再架電を予約')));
+  assert.equal(caption.fontSize, 30);
+  const saved = caption.fontSize;
+  delete caption.fontSize;
+  try {
+    const result = T.selftestStoryboard();
+    assert.equal(result.ok, false);
+    assert.ok(result.errors.some((e) => e.includes('推定幅') && e.includes('442px')), result.errors.join(' / '));
+  } finally {
+    caption.fontSize = saved;
+  }
+  assert.equal(T.selftestStoryboard().ok, true);
+});
+
+test('下端注記は窓の下・縦の安全域の中にあり、窓は字幕の下に収まる（窓を上げた分の整合）', () => {
+  const windowBottom = T.STAGE.window.y + T.STAGE.window.height;
+  assert.ok(T.STAGE.footerNote.y >= windowBottom + 4);
+  assert.ok(T.STAGE.footerNote.y + T.STAGE.footerNote.height <= T.STAGE.safeY.max);
+  assert.ok(T.STAGE.window.y >= T.STAGE.captionBand.top + 2 * T.STAGE.captionBand.bigFontSize * T.STAGE.captionBand.lineHeight + 8);
+  assert.equal(T.STAGE.footerNote.padX, T.STAGE.safeX.min);
+});

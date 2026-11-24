@@ -37,6 +37,7 @@ node "$promo/render-promo.mjs" --out-dir "$OUT" --encode-only --audio-dir "$OUT/
 ## 踏んだ罠と対策
 
 - **アプリのCSPが撮影用CSSを止める**：meiboは `style-src 'self'` で配信するため、遷移停止のスタイルの差し込み（`addStyleTag`）が拒否された。撮影用のコンテキストだけ `bypassCSP: true` にした（アプリ本体のヘッダーは変えない）。
+- **縦長のスマホでは、9:16 の動画の左右が約9%切れる**：全画面に敷き詰められる（cover）ため。字幕と注記の端が欠けるので、文字・札は左右 x=49..491 に収める（`STAGE.safeX`）。撮影中に実測して警告し、`capture-report.json` の `textExtents` に最大の広がりを残す。窓の中身（画像）は端が切れてよい作り。断り書きは16px以上（13〜14px だとスマホ幅で約9px）。
 - **CI は依存を入れる前に単体試験を走らせる**：`render-promo.mjs` の先頭で `@playwright/test` を読んでいたため、試験がこの道具を読み込むだけで CI が「パッケージが無い」と落ちた（手元には入っていたので気づかなかった）。Playwright は撮影を始める関数の中で `await import()` する。道具の先頭で第三者パッケージを読まないことは、`tests/promo/cli.test.mjs` が見張る。
 - **`hidden` 属性が効かず、AIの仮絵が実クリップを覆った**：`#ai-placeholder` に `display` を指定していたため、`hidden` が無視された。`[hidden]{display:none!important}` を足した。
 - **活動メモは必須（`required`）**：架電フォームの `#activity-note` が空だと「保存して次へ」がバリデーションで止まる。撮影前の準備で短い合成メモを入れておく。

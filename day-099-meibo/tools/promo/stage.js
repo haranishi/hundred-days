@@ -60,6 +60,34 @@
   }
 
   window.stage = {
+    // 画面に見えている文字・札の左右の端（CSS px）。左右の安全域の検査に使う（render-promo.mjs が10コマごとに呼ぶ）。
+    measureText() {
+      const out = [];
+      const visible = (node, min = 0.5) => {
+        for (let n = node; n && n !== document.body; n = n.parentElement) {
+          const cs = getComputedStyle(n);
+          if (cs.visibility === 'hidden' || cs.display === 'none' || Number(cs.opacity) < min) return false;
+        }
+        return true;
+      };
+      const textBox = (node) => {
+        const range = document.createRange();
+        range.selectNodeContents(node);
+        return range.getBoundingClientRect();
+      };
+      const push = (name, node, box) => {
+        if (!node || !visible(node)) return;
+        const b = box || node.getBoundingClientRect();
+        out.push({ name, left: Math.round(b.left * 10) / 10, right: Math.round(b.right * 10) / 10 });
+      };
+      [...el.cap.querySelectorAll('.ln')].forEach((ln, i) => push(`字幕${i + 1}行目`, ln, textBox(ln)));
+      push('字幕の札', el.capTag);
+      push('下端注記（左）', $('#footer-brand'));
+      push('下端注記（右）', el.footerNote);
+      push('大きな札', el.callout);
+      [...document.querySelectorAll('#end-inner > *')].forEach((n, i) => push(`終わりのカード${i + 1}`, n));
+      return out;
+    },
     async init(cfg) {
       $('#end-series').textContent = cfg.end.series;
       $('#end-title-fallback').textContent = cfg.end.title;
@@ -153,10 +181,13 @@
         lastCapTag = '';
       } else {
         el.cap.style.visibility = 'visible';
-        const key = JSON.stringify([c.lines, c.big]);
+        const key = JSON.stringify([c.lines, c.big, c.fontSize]);
         if (key !== lastCapKey) {
           lastCapKey = key;
           el.cap.className = c.big ? 'big' : '';
+          // 字幕ごとの文字の大きさ（左右の安全域に収まらない長い行だけ小さくする）。無ければ CSS の既定。
+          if (c.fontSize) el.cap.style.setProperty('--cap-size', `${c.fontSize}px`);
+          else el.cap.style.removeProperty('--cap-size');
           el.cap.replaceChildren(...c.lines.map((line) => {
             const span = document.createElement('span');
             span.className = 'ln';
