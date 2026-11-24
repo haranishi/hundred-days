@@ -10,6 +10,6 @@
 - [x] T6 `meta.json`・`screenshot.webp`・`demo.mp4`・READMEを置く。`npm run precheck`・`npm run build`・`npm run publish:check -- --day 99`
 - [x] T7 Xの投稿文（本文・返信2本）を `social.x` に入れ、`npm run x:prepare -- --day 99` で検査する
 - [x] T8 別系統の読み取りレビュー（文書・コード）。指摘はコードと実画面で裏取りしてから直す
-- [ ] T9 PR（AI署名なし・公開用の状態）
-- [ ] T10 動画と投稿文を、納品用のフォルダ（Drive）へ入れ、到着を確認する。Obsidianに、Dayの記録と索引を書く
-- [ ] T11 本人の確認：BGMの試聴（A/B）・実機・X投稿・マージの承認・名前の商標・法務
+- [x] T9 PR（AI署名なし・公開用の状態）。PR241を出し、CIの失敗を直し、2026-11-24にマージした（`verification-release.md`）
+- [x] T10 動画と投稿文を、納品用のフォルダ（Drive）へ入れ、到着を確認する。Obsidianに、Dayの記録と索引を書く
+- [ ] T11 本人の確認：BGMの試聴（A/B）・実機・X投稿・名前の商標・法務（マージの承認は済み）
