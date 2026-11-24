@@ -82,7 +82,7 @@ Codex・Grokは利用枠切れで未実施。OpusとAntigravityの2系統。
 |---|---|
 | `npm run precheck` | OK（漏洩パターンなし） |
 | `npm run check:syntax` | OK（2955ファイル・エラー0） |
-| `npm run test:unit` | 6661件中 6660件合格・1件スキップ・失敗0（Day99の試験は23件） |
+| `npm run test:unit` | 6661件中 6660件合格・1件スキップ・失敗0（Day99の試験は23件）。CIの1回目で落ちた原因を直したあとは、6663件中6662件合格・Day99は25件（`verification-release.md`） |
 | `npm run audit:deps` | 19プロジェクト・失敗0 |
 | `npm run build` | OK（公開99・うち外部12・動画73）。`dist/day-099-meibo/` に出るのは `screenshot.webp` と `demo.mp4` だけ |
 | `npm run publish:check -- --day 99` | 対象外（アプリ本体を持たない外部Day） |
@@ -92,4 +92,4 @@ Codex・Grokは利用枠切れで未実施。OpusとAntigravityの2系統。
 画面は、自作アプリの合成データ。人物映像は、Flow（Gemini Omni 1.2 Flash）で生成（動画の終わりのカードと返信3本目に、AI生成と明記）。BGMと効果音は、Nodeの計算だけで合成。字幕の書体は Zen Kaku Gothic New（OFL・リポジトリ非同梱）。ロゴはmeibo自身のもの。
 
 ### 5-7 本人の確認（未了）
-BGMの試聴（A・B）／スマホ実機での見え方／X投稿／マージの承認／名前の商標の照合／個人情報・営業活動の法規の専門家確認。
+BGMの試聴（A・B）／スマホ実機での見え方／X投稿／名前の商標の照合／個人情報・営業活動の法規の専門家確認。マージは本人の承認を得て済み。CIの失敗と修正、マージ、本番での確認は `verification-release.md` に続ける。
