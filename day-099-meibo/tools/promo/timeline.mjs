@@ -18,17 +18,21 @@ export const at = (barNo, beatNo = 0) => Math.round((barNo * BAR + beatNo * BEAT
 export const frameAt = (seconds) => Math.round(seconds * FPS);
 
 // ステージの寸法（CSS px。DPR 2 で 1080x1920）。
-// 字幕と終わりのカードの文字は、縦の安全域 y=77..768 に収める。
+// 文字は、縦の安全域 y=77..768 と、左右の安全域 x=49..491（左右9%）に収める。
+// 左右9%の理由：縦長のスマホで動画が全画面に敷き詰められる（cover）と、9:16 の動画は左右が約9%ずつ切れる。
+// 下は画面の80%（y=768）まで。投稿アプリの操作・本文が下の約20%に重なる。
 export const STAGE = {
   width: 540,
   height: 960,
   dpr: 2,
   safeY: { min: 77, max: 768 },
-  captionBand: { top: 77, bottom: 200, padX: 22, fontSize: 34, bigFontSize: 36, lineHeight: 1.35 },
-  captionTag: { top: 205, fontSize: 20, height: 40, padX: 22 },
-  window: { x: 20, y: 212, width: 500, height: 540, radius: 14 },
-  footerBrand: { text: '営業リスト向けのCRM', logoHeight: 16, fontSize: 12 },
-  footerNote: { y: 754, height: 14, text: '画面は合成データです' },
+  safeX: { min: 49, max: 491 },
+  captionBand: { top: 77, bottom: 200, padX: 49, fontSize: 34, bigFontSize: 36, lineHeight: 1.35 },
+  captionTag: { top: 205, fontSize: 20, height: 40, padX: 49 },
+  // 窓は画像なので左右の安全域の外に出てよい（中身の外側の約6%は切れても伝わる作り）。下端注記の分だけ、窓を16px上げた。
+  window: { x: 20, y: 196, width: 500, height: 540, radius: 14 },
+  footerBrand: { text: '営業リスト向けのCRM', logoHeight: 18, fontSize: 16 },
+  footerNote: { y: 742, height: 22, fontSize: 16, padX: 49, text: '画面は合成データです' },
   colors: {
     navyTop: '#0B2545',
     navyBottom: '#13315C',
@@ -72,7 +76,8 @@ export const STORYBOARD = [
 export const CAPTIONS = [
   { start: 0.2, end: 2.0, scene: 'ai-a', lines: ['電話、つながらなかった。'], big: true },
   { start: 2.0, end: 4.0, scene: 'ai-a', lines: ['かけ直し、忘れてない？'], big: true, tag: '営業リストの架電に' },
-  { start: 4.0, end: 7.3, scene: 'ui-1', lines: ['「不在のため再架電を予約」に', 'チェックして、保存して次へ。'] },
+  // 14字の行が左右の安全域（442px）を超えるため、この字幕だけ 30px（34px だと約 480px になる）。
+  { start: 4.0, end: 7.3, scene: 'ui-1', lines: ['「不在のため再架電を予約」に', 'チェックして、保存して次へ。'], fontSize: 30 },
   { start: 7.3, end: 11.5, scene: 'ui-1', lines: ['土日を除く翌日の朝9時に、', '再架電が入る。'] },
   { start: 11.5, end: 14.0, scene: 'ui-2', lines: ['商談は、', '段階ごとにひと目で。'] },
   { start: 14.0, end: 17.0, scene: 'ui-2', lines: ['段階は、', '選んで動かすだけ。'] },
@@ -97,15 +102,15 @@ export const END_CARD = {
 // 終わりのカードの縦配置寸法（stage.css の #end-inner と一致させ、安全域 y=77..768 と非重複を計算で確かめる）。
 export const END_CARD_LAYOUT = {
   top: 152,
-  padX: 32,
+  padX: 49,
   items: [
-    { key: 'series', marginTop: 0, fontSize: 15, lineHeight: 1.35, padY: 0, borderY: 0 },
+    { key: 'series', marginTop: 0, fontSize: 16, lineHeight: 1.35, padY: 0, borderY: 0 },
     { key: 'brandCard', marginTop: 24, fixedHeight: 86 },
     { key: 'sub', marginTop: 26, fontSize: 30, lineHeight: 1.35, padY: 0, borderY: 0 },
     { key: 'badge', marginTop: 22, fontSize: 22, lineHeight: 1.35, padY: 20, borderY: 0 },
     { key: 'cta', marginTop: 28, fontSize: 18, lineHeight: 1.3, padY: 0, borderY: 0 },
     { key: 'url', marginTop: 10, fontSize: 21, lineHeight: 1.35, padY: 26, borderY: 3 },
-    { key: 'disclosure', marginTop: 36, fontSize: 15, lineHeight: 1.5, padY: 0, borderY: 0 },
+    { key: 'disclosure', marginTop: 36, fontSize: 17, lineHeight: 1.5, padY: 0, borderY: 0 },
   ],
 };
 
@@ -199,6 +204,7 @@ export function captionAt(t) {
   return {
     lines: cap.lines,
     big: Boolean(cap.big),
+    fontSize: cap.fontSize ?? null,
     tag: cap.tag ?? null,
     scene: cap.scene,
     alpha: 1,
@@ -390,6 +396,11 @@ export function computeEndCardLayout(card = END_CARD, layout = END_CARD_LAYOUT) 
   return { boxes, topY, bottomY, maxWidthPx, hasOverlap, withinSafeY };
 }
 
+// ステージの文字・札の左右の端（stage.measureText の結果）が、左右の安全域に収まっているかを調べる（純粋な関数）。
+export function textBoundsViolations(boxes, safeX = STAGE.safeX, tolerance = 1.5) {
+  return boxes.filter((b) => b.left < safeX.min - tolerance || b.right > safeX.max + tolerance);
+}
+
 // ブラウザなしで絵コンテの整合性を一括検査する（render-promo.mjs --selftest および単体テストから呼ぶ）。
 export function selftestStoryboard() {
   const errors = [];
@@ -409,12 +420,12 @@ export function selftestStoryboard() {
   }
 
   // 字幕の並び・安全域・幅・任意タグ（札）のチェック
-  const maxWidthPx = STAGE.width - STAGE.captionBand.padX * 2;
+  const maxWidthPx = STAGE.safeX.max - STAGE.safeX.min; // 左右の安全域（442px）
   for (let i = 0; i < CAPTIONS.length; i++) {
     const c = CAPTIONS[i];
     if (c.start < 0 || c.end > END_CARD.start || c.end <= c.start) errors.push(`CAPTIONS[${i}] の時刻が不正`);
     if (i > 0 && c.start < CAPTIONS[i - 1].end - 1e-9) errors.push(`CAPTIONS[${i}] が前の字幕と重なっている`);
-    const fontSize = c.big ? STAGE.captionBand.bigFontSize : STAGE.captionBand.fontSize;
+    const fontSize = c.fontSize ?? (c.big ? STAGE.captionBand.bigFontSize : STAGE.captionBand.fontSize);
     const totalHeight = c.lines.length * fontSize * STAGE.captionBand.lineHeight;
     const topY = STAGE.captionBand.top;
     const bottomY = topY + totalHeight;
@@ -451,9 +462,15 @@ export function selftestStoryboard() {
     }
   }
 
-  // 下端注記が安全域内（y=742..772 かつ safeY 内）
-  if (STAGE.footerNote.y < 742 || STAGE.footerNote.y + STAGE.footerNote.height > STAGE.safeY.max) {
-    errors.push('下端注記の位置が想定外');
+  // 下端注記：窓の下に収まり、縦の安全域内で、左右の安全域（442px）に横幅が収まる（左ブランド＋右注記＋すき間12px）
+  const windowBottom = STAGE.window.y + STAGE.window.height;
+  if (STAGE.footerNote.y < windowBottom + 4 || STAGE.footerNote.y + STAGE.footerNote.height > STAGE.safeY.max) {
+    errors.push(`下端注記の位置が想定外: y=${STAGE.footerNote.y}..${STAGE.footerNote.y + STAGE.footerNote.height}（窓の下端 ${windowBottom}・安全域の下端 ${STAGE.safeY.max}）`);
+  }
+  const footerBrandPx = estimateTextEm(STAGE.footerBrand.text) * STAGE.footerBrand.fontSize + 6 + STAGE.footerBrand.logoHeight * 3.4;
+  const footerNotePx = estimateTextEm(STAGE.footerNote.text) * STAGE.footerNote.fontSize;
+  if (footerBrandPx + footerNotePx + 12 > maxWidthPx) {
+    errors.push(`下端注記の推定幅 ${(footerBrandPx + footerNotePx + 12).toFixed(0)}px > ${maxWidthPx}px`);
   }
 
   // ACTIONS の整合性（時刻順・廃止手順の残存禁止・UI-1幅1280維持・大きな札の引数・札の残像防止）

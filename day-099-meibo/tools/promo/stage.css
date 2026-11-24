@@ -1,7 +1,7 @@
 [hidden] { display: none !important; } /* hidden 属性を display 指定で上書きしない（AIの仮絵が実クリップを覆った） */
 /* Day099 meibo 宣伝動画ステージ（CSS 540x960・DPR 2 = 1080x1920）。
-   字幕帯: y 77..200 / アプリ窓: x 20, y 212, 500x540 / 下端注記: y 754..768（帯 742..772 内）。
-   すべての文字を縦の安全域 y=77..768 に収める。 */
+   字幕帯: y 77..200 / アプリ窓: x 20, y 196, 500x540 / 下端注記: y 742..764。
+   文字は、縦の安全域 y=77..768 と、左右の安全域 x=49..491（左右9%）に収める。 */
 :root {
   --navy-top: #0B2545;
   --navy-bottom: #13315C;
@@ -55,7 +55,7 @@ body {
 #app-window {
   position: absolute;
   left: 20px;
-  top: 212px;
+  top: 196px;
   width: 500px;
   height: 540px;
   border-radius: 14px;
@@ -144,9 +144,9 @@ body {
 #callout {
   position: absolute;
   left: 50%;
-  top: 516px;
-  width: 452px;
-  margin-left: -226px;
+  top: 500px;
+  width: 440px;
+  margin-left: -220px;
   padding: 18px 22px 20px;
   border-radius: 18px;
   background: #fff;
@@ -236,10 +236,10 @@ body {
 
 #footer-row {
   position: absolute;
-  left: 20px;
-  right: 20px;
-  top: 751px;
-  height: 18px;
+  left: 49px;
+  right: 49px;
+  top: 742px;
+  height: 22px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -264,26 +264,26 @@ body {
 }
 
 #footer-brand-fallback {
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 900;
-  line-height: 18px;
+  line-height: 22px;
   color: var(--white);
   white-space: nowrap;
 }
 
 #footer-brand-sub {
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 700;
-  line-height: 18px;
+  line-height: 22px;
   letter-spacing: 0.03em;
   color: rgba(255, 255, 255, 0.9);
   white-space: nowrap;
 }
 
 #footer-note {
-  line-height: 18px;
+  line-height: 22px;
   text-align: right;
-  font-size: 13px;
+  font-size: 16px;
   font-weight: 700;
   letter-spacing: 0.04em;
   color: rgba(255, 255, 255, 0.82);
@@ -391,8 +391,8 @@ body {
 /* 字幕帯（y=77..200） */
 #caption-band {
   position: absolute;
-  left: 22px;
-  right: 22px;
+  left: 49px;
+  right: 49px;
   top: 77px;
   height: 123px;
   z-index: 10;
@@ -414,22 +414,22 @@ body {
   display: block;
   white-space: nowrap;
   font-weight: 900;
-  font-size: 34px;
+  font-size: var(--cap-size, 34px);
   line-height: 1.35;
   letter-spacing: 0.02em;
   font-feature-settings: 'palt' 1;
 }
 
 #cap.big .ln {
-  font-size: 36px;
+  font-size: var(--cap-size, 36px);
   line-height: 1.35;
 }
 
 /* 字幕下の小さな札（2.0–4.0秒「営業リストの架電に」。y=205あたり・安全域内） */
 #caption-tag-band {
   position: absolute;
-  left: 22px;
-  right: 22px;
+  left: 49px;
+  right: 49px;
   top: 205px;
   z-index: 10;
   display: flex;
@@ -480,8 +480,8 @@ body {
 
 #end-inner {
   position: absolute;
-  left: 32px;
-  right: 32px;
+  left: 49px;
+  right: 49px;
   top: 152px;
   display: flex;
   flex-direction: column;
@@ -491,7 +491,7 @@ body {
 }
 
 #end-series {
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 700;
   line-height: 1.35;
   letter-spacing: 0.2em;
@@ -573,7 +573,7 @@ body {
 
 #end-disclosure {
   margin-top: 36px;
-  font-size: 15px;
+  font-size: 17px;
   font-weight: 700;
   line-height: 1.5;
   letter-spacing: 0.02em;
