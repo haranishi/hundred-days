@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=540, initial-scale=1, maximum-scale=1">
+<title>meibo 宣伝動画ステージ（撮影用）</title>
+<link rel="stylesheet" href="/stage/stage.css">
+</head>
+<body>
+<div id="stage">
+  <div id="bg"></div>
+
+  <div id="ui-layer">
+    <div id="app-window">
+      <img id="app-img" alt="">
+    </div>
+    <div id="fx">
+      <div id="hls"></div>
+      <div id="ripple"></div>
+      <div id="finger"><i></i></div>
+      <div id="callout">
+        <div class="callout-label"></div>
+        <div class="callout-sub" hidden></div>
+        <div class="callout-value"></div>
+        <div class="callout-rows" hidden></div>
+      </div>
+    </div>
+    <div id="footer-row">
+      <div id="footer-brand">
+        <img id="footer-logo" alt="meibo" hidden>
+        <span id="footer-brand-fallback"></span>
+        <span id="footer-brand-sub"></span>
+      </div>
+      <div id="footer-note">画面は合成データです</div>
+    </div>
+  </div>
+
+  <div id="ai-layer">
+    <img id="ai-img" alt="">
+    <div id="ai-placeholder" hidden>
+      <div class="ph-glow"></div>
+      <div class="ph-grid"></div>
+      <div class="ph-badge">仮映像（AIクリップ未指定）</div>
+      <div class="ph-title"></div>
+      <div class="ph-sub"></div>
+    </div>
+  </div>
+
+  <div id="ai-scrim"></div>
+
+  <div id="caption-band">
+    <div id="cap"></div>
+  </div>
+  <div id="caption-tag-band">
+    <div id="cap-tag"></div>
+  </div>
+
+  <div id="endcard">
+    <div id="end-bar"></div>
+    <div id="end-inner">
+      <div id="end-series"></div>
+      <div id="end-brand-card">
+        <img id="end-logo" alt="meibo" hidden>
+        <div id="end-title-fallback"></div>
+      </div>
+      <div id="end-sub"></div>
+      <div id="end-badge"></div>
+      <div id="end-cta"></div>
+      <div id="end-url"></div>
+      <div id="end-disclosure"></div>
+    </div>
+  </div>
+
+  <div id="fade-curtain"></div>
+</div>
+<script src="/stage/stage.js"></script>
+</body>
+</html>

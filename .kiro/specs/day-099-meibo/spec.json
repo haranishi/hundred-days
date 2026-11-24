@@ -1,0 +1,12 @@
+{
+  "feature_name": "day-099-meibo",
+  "created_at": "2026-11-24T09:00:00+09:00",
+  "language": "ja",
+  "phase": "implementation",
+  "approvals": {
+    "requirements": { "generated": true, "approved": true },
+    "design": { "generated": true, "approved": true },
+    "tasks": { "generated": true, "approved": true }
+  },
+  "approval_basis": "2026-11-24の本人指示（Day99はmeibo・名前はmeiboのまま・動画はFlowとGoogleの動画生成で作る・出し方は任せる）。マージとX投稿は本人の操作として残す"
+}
