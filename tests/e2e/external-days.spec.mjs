@@ -65,6 +65,12 @@ const EXTERNAL_DAYS = [
     title: '残火の鎌倉 — 隠れ谷の灯',
     dir: 'day-098-zanka-no-kamakura',
     url: 'https://day98.rairakku.com/'
+  },
+  {
+    day: '099',
+    title: 'meibo',
+    dir: 'day-099-meibo',
+    url: 'https://github.com/haranishi/meibo'
   }
 ];
 
