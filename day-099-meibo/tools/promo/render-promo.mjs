@@ -8,7 +8,8 @@
 //     [--ai-a a.mp4 --ai-b b.mp4] [--ai-a-in 0 --ai-b-in 0.5] \
 //     [--audio-dir "$OUT/audio"] [--mux a,b] \
 //     [--frames 120-240] [--no-encode] [--encode-only] [--selftest]
-import { chromium } from '@playwright/test';
+// 注意: Playwright はここで読み込まない。撮影を始める関数の中で動的に読む。
+// CI は依存を入れる前に単体試験を走らせる。先頭で読むと、この道具の純粋な関数を試験が読むだけで「パッケージが無い」と落ちる。
 import { createHash } from 'node:crypto';
 import { spawn, spawnSync } from 'node:child_process';
 import { copyFileSync, existsSync, mkdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs';
@@ -476,6 +477,7 @@ async function capture(opts) {
   const writeReport = () => writeFileSync(reportPath, JSON.stringify(report, null, 2) + '\n');
 
   try {
+    const { chromium } = await import('@playwright/test');
     browser = await chromium.launch({ args: ['--lang=ja-JP'] }); // 日付・月の入力欄の表示を日本語にする（既定は英語）
     const appViewport = { width: 1280, height: 2200 };
     const appContext = await browser.newContext({

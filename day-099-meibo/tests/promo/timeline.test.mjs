@@ -239,4 +239,3 @@ test('公開する文面に「営業日」を使わない（土日を除く翌�
   ].join('\n');
   assert.equal(copy.includes('営業日'), false);
 });
-

@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { readdirSync, readFileSync } from 'node:fs';
 import { test } from 'node:test';
 import {
   buildDemoFilter, computeBoardTopPad, computeLogoClip, createCalloutState,
@@ -143,4 +144,28 @@ test('computeLogoClip と computeBoardTopPad は外接矩形＋2px余白とボ�
   assert.equal(computeBoardTopPad(240, 224), 10);
   assert.equal(computeBoardTopPad(240, 228), 8);
   assert.ok(computeBoardTopPad(240, 233) <= 6);
+});
+
+// CI は `npm ci` より先に単体試験を走らせる（依存が無い状態）。道具の先頭で第三者パッケージ（例 @playwright/test）を
+// 静的に読むと、試験が純粋な関数を読み込むだけで「パッケージが無い」と落ちる（PR241で実際に落ちた）。
+// 撮影の中など、実行時にだけ要るものは `await import()` で読む。
+test('撮影・音の道具は、先頭で第三者パッケージを静的に読み込まない（CI は依存の導入前に試験を走らせる）', () => {
+  const dir = new URL('../../tools/promo/', import.meta.url);
+  const files = readdirSync(dir).filter((name) => name.endsWith('.mjs'));
+  assert.ok(files.length >= 4, `道具のファイルが見つからない: ${files.join(',')}`);
+  const bad = [];
+  for (const name of files) {
+    const source = readFileSync(new URL(name, dir), 'utf8');
+    for (const m of source.matchAll(/^\s*import\s+(?:[^;'"]*?\sfrom\s+)?['"]([^'"]+)['"]/gm)) {
+      const spec = m[1];
+      if (!spec.startsWith('node:') && !spec.startsWith('.') && !spec.startsWith('/')) bad.push(`${name}: ${spec}`);
+    }
+  }
+  assert.deepEqual(bad, []);
+});
+
+test('その検査は、実際に先頭の静的 import を見つけられる（見逃しの確認）', () => {
+  const sample = "import { chromium } from '@playwright/test';\nimport 'left-pad';\nimport { a } from './x.mjs';\nconst c = await import('@playwright/test');\n";
+  const found = [...sample.matchAll(/^\s*import\s+(?:[^;'"]*?\sfrom\s+)?['"]([^'"]+)['"]/gm)].map((m) => m[1]);
+  assert.deepEqual(found, ['@playwright/test', 'left-pad', './x.mjs']);
 });
