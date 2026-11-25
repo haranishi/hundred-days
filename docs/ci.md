@@ -39,7 +39,7 @@ npm run test:e2e
 ```
 
 対象Dayだけのブラウザ確認では `npm run test:e2e -- tests/e2e/day-066.spec.mjs` のように指定する。
-CIの分割を再現する場合は、担当のファイルを `node scripts/e2e-shards.mjs plan 1/6` で出して渡す（`mapfile -t files < <(node scripts/e2e-shards.mjs plan 1/6) && npm run test:e2e -- "${files[@]}"`）。
+CIの分割を再現する場合は、担当のファイルを `node scripts/e2e-shards.mjs plan 1/6` で出して渡す（`npm run test:e2e -- $(node scripts/e2e-shards.mjs plan 1/6)`）。出力が空だと全テストが流れるので、先に出力を確かめる。
 フォークPRでは非公開の語句を渡さず、`npm run precheck -- --public` で共通の漏洩検査を行う。
 通常の `npm run precheck` は、NGワード設定が欠落・空・不正な場合に失敗する。
 
@@ -65,7 +65,7 @@ SIGKILL や電源断のようにプロセスがその場で止まると、後始
 
 ## ブラウザテストが失敗したら資料を開く
 
-GitHub Actionsの該当実行で、Artifactsの `browser-failure-1`〜`browser-failure-4` を取得する。
+GitHub Actionsの該当実行で、Artifactsの `browser-failure-1`〜`browser-failure-6` を取得する。
 失敗した分割のHTMLレポート、失敗時のスクリーンショット、トレースを7日間保存する。
 ブラウザ起動前に失敗した場合など、資料が生成されないケースはジョブログを確認する。
 
