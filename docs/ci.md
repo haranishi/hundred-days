@@ -16,12 +16,13 @@
 | ビルド | README一覧・共有ファイルの同期漏れと公開サイトの生成失敗 |
 | ブラウザテスト | 各Dayの既存テスト、共有機能、セキュリティヘッダなどの回帰 |
 
-ブラウザテストは4台に分割し、各テストファイル内の順序と1 workerを維持する。
+ブラウザテストは6台に分割し、各テストファイル内の順序と1 workerを維持する。
+どのファイルをどの台で流すかは、CIで測ったテストファイルごとの所要時間から決める（件数ではなく時間で均等にする。`scripts/e2e-shards.mjs`・[仕様](../.kiro/specs/ci-e2e-shard-balance/requirements.md)）。
 CIでは `test.only` をエラーにし、一部のテストだけを実行した状態での成功を防ぐ。
 アプリが増えても、変更されたDayだけに絞らず、既存の全ブラウザテストを実行する。
 
 `Build and browser test` は既存のブランチ保護で必須になっている共通CIの集約結果。
-前段の検査か4分割のブラウザテストが失敗・キャンセル・skipになると、このチェックも失敗する。
+前段の検査か6分割のブラウザテストが失敗・キャンセル・skipになると、このチェックも失敗する。
 mainへのマージ後も同じ検査を行い、成功した場合に既存の本番デプロイへ進む。
 Day56・58・64のソース検証は、引き続き各Day専用ワークフローの対象パス変更時に実行する。
 
@@ -38,7 +39,7 @@ npm run test:e2e
 ```
 
 対象Dayだけのブラウザ確認では `npm run test:e2e -- tests/e2e/day-066.spec.mjs` のように指定する。
-CIの分割を再現する場合は `npm run test:e2e -- --shard=1/4` を使う。
+CIの分割を再現する場合は、担当のファイルを `node scripts/e2e-shards.mjs plan 1/6` で出して渡す（`mapfile -t files < <(node scripts/e2e-shards.mjs plan 1/6) && npm run test:e2e -- "${files[@]}"`）。
 フォークPRでは非公開の語句を渡さず、`npm run precheck -- --public` で共通の漏洩検査を行う。
 通常の `npm run precheck` は、NGワード設定が欠落・空・不正な場合に失敗する。
 
@@ -94,9 +95,25 @@ npx playwright show-trace path/to/test-results/test-name/trace.zip
 
 Day80のソース39件・固定lockからの公開物再生成・全40ブラウザも共通の必須集約に含める。sourceの検査が失敗するとデプロイへ進まない。
 
-Day80の公開版4件は、1番目のブラウザ分割で `/100days/` でも実行する。手元では `npx playwright test --config playwright.day080-mounted.config.mjs` で再現する。
+Day80の公開版4件は、1番目のブラウザ分割で `/100days/` でも実行する（割り当ての重さには、この実行の時間も足してある）。手元では `npx playwright test --config playwright.day080-mounted.config.mjs` で再現する。
 
 ## APIのBot対策
 共通の単体テストに加え、API Bot protection runtimeジョブが固定したWranglerでPagesのMiddlewareを実行する。
 連打・署名偽装・Day74の個別制限・静的配信を外部取得なしで確認し、失敗すると必須の集約も失敗する。
 手元ではWranglerがあるPATHでnpm run test:api-abuseを実行する。
+
+## ブラウザテストの分割の時間配分を更新する
+
+Playwrightの `--shard` は、ファイル単位で、テストの**件数**が均等になるよう分ける（`fullyParallel: false` のとき・[公式](https://playwright.dev/docs/test-sharding)）。件数が揃っても、時間は揃わない。このリポジトリは、CIで測ったテストファイルごとの所要時間（`scripts/e2e-shard-durations.json`）をもとに、時間の長いファイルから順に、いちばん軽い台へ入れる。
+
+- 新しいDayのテストファイルは、記録に無いので、記録の中央値の時間として入る。CIは落ちず、`plan` が警告を出す。新しいDayが増えたら、記録を更新する。
+- CIは、台ごとの所要時間を、artifact `e2e-timing-<番号>`（30日）に毎回保存する。
+- 更新の手順（mainのCIが成功した実行を使う）:
+
+```bash
+gh run download <run-id> -p 'e2e-timing-*' -D /tmp/e2e-timing
+node scripts/e2e-shards.mjs update /tmp/e2e-timing --source "GitHub Actions run <run-id>" --mounted-seconds <Day80のmountedの秒数>
+node scripts/e2e-shards.mjs report 6   # 見積もり。最長が、合計÷台数の1.2倍以内か
+```
+
+- 台数を変えるときは、`ci-deploy.yml` の、ジョブ名・`matrix.shard`・`E2E_SHARDS` の3か所をそろえる（単体テストが食い違いを検出する）。

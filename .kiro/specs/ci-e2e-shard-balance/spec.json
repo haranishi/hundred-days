@@ -1,7 +1,7 @@
 {
   "feature_name": "ci-e2e-shard-balance",
   "language": "ja",
-  "phase": "requirements-design-approved-implementing",
+  "phase": "implemented-verifying-in-ci",
   "created_at": "2026-11-25",
   "approvals": {
     "requirements": { "generated": true, "approved": true },
