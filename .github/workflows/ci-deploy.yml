@@ -98,7 +98,7 @@ jobs:
           retention-days: 7
 
   browser:
-    name: Browser tests (${{ matrix.shard }}/4)
+    name: Browser tests (${{ matrix.shard }}/8)
     needs: checks
     runs-on: ubuntu-latest
     # 直近の全E2Eは約51分。ファイル単位で分割し、テスト内の実行順と1 workerを維持する。
@@ -106,7 +106,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        shard: [1, 2, 3, 4]
+        shard: [1, 2, 3, 4, 5, 6, 7, 8]
     steps:
       - name: Check out repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -128,14 +128,27 @@ jobs:
         timeout-minutes: 5
         run: npx playwright install chromium
 
+      # 第1段（2026-11-25）：テストファイルごとの所要時間を測るため、8分割にして、時間を残す。
       - name: Run browser tests
         id: browser
-        run: npm run test:e2e -- --shard=${{ matrix.shard }}/4
+        env:
+          E2E_TIMING_FILE: .cache/e2e-timing-${{ matrix.shard }}.json
+        run: npm run test:e2e -- --shard=${{ matrix.shard }}/8
 
       - name: Play Day080 under the production mount prefix
         id: mounted
         if: matrix.shard == 1
         run: npx playwright test --config playwright.day080-mounted.config.mjs
+
+      # 分割の時間配分に使う、テストファイルごとの所要時間（scripts/e2e-shards.mjs update が読む）。
+      - name: Save per-file timing
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
+        with:
+          name: e2e-timing-${{ matrix.shard }}
+          path: .cache/e2e-timing-${{ matrix.shard }}.json
+          retention-days: 30
+          if-no-files-found: warn
 
       - name: Save failure report, screenshots and traces
         if: ${{ !cancelled() && (steps.browser.outcome == 'failure' || steps.mounted.outcome == 'failure') }}
