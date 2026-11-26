@@ -28,6 +28,10 @@ test.beforeEach(async ({ page }) => {
 
 for (const width of [390, 768, 1440]) {
   test.describe(`一覧 ${width}px`, () => {
+    // CIの実測（2026-11-25・PR244）では、この一覧の対話の試験は、13〜26秒かかる（手元は約2秒）。
+    // 30秒の上限に近く、実行環境が遅い回に、4つの試験が3つの画面幅すべてで30秒を超えて落ちた。
+    // 試験の中身と各操作の待ち時間は変えず、上限だけを2倍にして、遅い回でも落ちないようにする。
+    test.describe.configure({ timeout: 60_000 });
     test.beforeEach(async ({ page }) => {
       await page.setViewportSize({ width, height: 900 });
       await page.goto('/');

@@ -98,15 +98,19 @@ jobs:
           retention-days: 7
 
   browser:
-    name: Browser tests (${{ matrix.shard }}/4)
+    name: Browser tests (${{ matrix.shard }}/6)
     needs: checks
     runs-on: ubuntu-latest
-    # 直近の全E2Eは約51分。ファイル単位で分割し、テスト内の実行順と1 workerを維持する。
+    # ファイル単位で分割し、テスト内の実行順と1 workerを維持する。
+    # 担当のファイルは、実測の時間から決める（scripts/e2e-shards.mjs・.kiro/specs/ci-e2e-shard-balance/）。
+    # 分割数は、ジョブ名・下の matrix・E2E_SHARDS の3か所をそろえる（単体テストが食い違いを検出する）。
     timeout-minutes: 60
+    env:
+      E2E_SHARDS: 6
     strategy:
       fail-fast: false
       matrix:
-        shard: [1, 2, 3, 4]
+        shard: [1, 2, 3, 4, 5, 6]
     steps:
       - name: Check out repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -128,14 +132,34 @@ jobs:
         timeout-minutes: 5
         run: npx playwright install chromium
 
+      # 担当のテストファイルは、実測の時間（scripts/e2e-shard-durations.json）から決める。
+      # 担当が空のときに、全テストを流してしまわないよう、件数を確かめてから実行する。
       - name: Run browser tests
         id: browser
-        run: npm run test:e2e -- --shard=${{ matrix.shard }}/4
+        env:
+          E2E_TIMING_FILE: .cache/e2e-timing-${{ matrix.shard }}.json
+        run: |
+          mkdir -p .cache
+          node scripts/e2e-shards.mjs plan "${{ matrix.shard }}/${E2E_SHARDS}" > .cache/e2e-files.txt
+          mapfile -t files < .cache/e2e-files.txt
+          test "${#files[@]}" -gt 0
+          printf '%s\n' "${files[@]}"
+          npm run test:e2e -- "${files[@]}"
 
       - name: Play Day080 under the production mount prefix
         id: mounted
         if: matrix.shard == 1
         run: npx playwright test --config playwright.day080-mounted.config.mjs
+
+      # 分割の時間配分に使う、テストファイルごとの所要時間（scripts/e2e-shards.mjs update が読む）。
+      - name: Save per-file timing
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
+        with:
+          name: e2e-timing-${{ matrix.shard }}
+          path: .cache/e2e-timing-${{ matrix.shard }}.json
+          retention-days: 30
+          if-no-files-found: warn
 
       - name: Save failure report, screenshots and traces
         if: ${{ !cancelled() && (steps.browser.outcome == 'failure' || steps.mounted.outcome == 'failure') }}

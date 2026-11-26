@@ -1,0 +1,19 @@
+{
+  "feature_name": "ci-e2e-shard-balance",
+  "language": "ja",
+  "phase": "implemented-verified-in-ci",
+  "created_at": "2026-11-25",
+  "approvals": {
+    "requirements": { "generated": true, "approved": true },
+    "design": { "generated": true, "approved": true },
+    "tasks": { "generated": true, "approved": true }
+  },
+  "approval_basis": "本人の「CI続編を、全部作成してほしい」（2026-11-25）の依頼と、自律進行の共通ルールによる。マージは本人の操作。",
+  "updated_at": "2026-11-25",
+  "delivery": {
+    "repository": "haranishi/hundred-days",
+    "base": "main",
+    "branch": "ci/e2e-shard-balance",
+    "remote_evidence": "PRのCI（分割ごとの所要時間）とmainの実行が、公式の記録"
+  }
+}

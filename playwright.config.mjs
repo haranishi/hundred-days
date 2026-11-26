@@ -12,8 +12,16 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   retries: 0,
   workers: 1,
+  // CIで E2E_TIMING_FILE があるときだけ、テストごとの所要時間をJSONで残す。
+  // 分割の時間配分（scripts/e2e-shards.mjs）の元になる。手元の実行は変わらない。
   reporter: process.env.CI
-    ? [['github'], ['html', { open: 'never' }]]
+    ? [
+        ['github'],
+        ['html', { open: 'never' }],
+        ...(process.env.E2E_TIMING_FILE
+          ? [['json', { outputFile: process.env.E2E_TIMING_FILE }]]
+          : []),
+      ]
     : 'list',
   use: {
     baseURL: `http://127.0.0.1:${port}`,
