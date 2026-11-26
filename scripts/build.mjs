@@ -283,8 +283,9 @@ const appCsp = (dir) => dir === 'day-084-airpresenter' ? AIRPRESENTER_CSP : [
   "default-src 'self'",
   // Day64 compiles its local Rust module in a same-origin Worker.
   // Day92 は手の形の読み取り（MediaPipe の wasm）を、カメラの問題で使うときだけ読み込む。
+  // Day100 は kamoku の画面・会計の処理・SQLite（メモリ上）を、ブラウザの中の wasm で動かす。
   // Permit Wasm compilation for this app without permitting JavaScript eval.
-  `script-src 'self'${['day-064-breach-atlas', 'day-076-henkan-desk', 'day-092-shuwa'].includes(dir) ? " 'wasm-unsafe-eval'" : ''}`,
+  `script-src 'self'${['day-064-breach-atlas', 'day-076-henkan-desk', 'day-092-shuwa', 'day-100-kamoku'].includes(dir) ? " 'wasm-unsafe-eval'" : ''}`,
   "style-src 'self' 'unsafe-inline'",
   `img-src 'self' data: blob:${IMG_BY_APP[dir] || ''}`,
   `media-src 'self'${MEDIA_BY_APP[dir] || ''}`,

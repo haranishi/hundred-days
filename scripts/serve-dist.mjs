@@ -17,6 +17,8 @@ const types = {
   '.webp': 'image/webp',
   '.woff2': 'font/woff2',
   '.txt': 'text/plain; charset=utf-8',
+  // 本番（Cloudflare Pages）と同じ種類で返す。違うと、ブラウザは遅い読み込み方に切り替える
+  '.wasm': 'application/wasm',
 };
 
 const server = createServer((request, response) => {

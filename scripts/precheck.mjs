@@ -36,6 +36,15 @@ const FAIL_PATTERNS = [
 ];
 const WARN_PATTERNS = [['メールアドレス', /\b[\w.+-]+@[\w-]+\.[a-z]{2,}\b/i]];
 
+/* Day100 は kamoku（別の公開リポジトリ）の組み立て結果を配るので、kamoku の著作権表示を書き換えずに残す
+   （2026-11-26 本人の判断）。外すのは、取り込んだ組み立て結果のファイルの中の「年・英字の名前・
+   and the kamoku contributors」の著作権表示の部分だけで、個人の非公開語の検査にだけ効く。
+   同じ行のほかの部分、このDayの手で書くファイル、ほかの場所は検査する */
+const ALLOWED_NOTICES = [{
+  files: /^day-100-kamoku\/(?:(?:css|rust|web)\/|(?:index\.html|favicon\.svg|THIRD_PARTY_LICENSES\.txt|kamoku-LICENSE-(?:MIT|APACHE)\.txt)$)/,
+  pattern: /(?:SPDX-FileCopyrightText:|Copyright \(c\)) \d{4} [A-Za-z][A-Za-z .'-]{0,38} and the kamoku contributors/g,
+}];
+
 const NG_FILE = '.precheck-ng.txt';
 let fails = 0;
 let warns = 0;
@@ -82,11 +91,15 @@ for (const file of files) {
   } catch {
     continue;
   }
+  const notices = ALLOWED_NOTICES.filter((allowed) => allowed.files.test(file));
   text.split('\n').forEach((line, i) => {
-    for (const [label, re] of [...FAIL_PATTERNS, ...ngPatterns]) {
-      if (re.test(line)) {
-        console.log(`✖ ${label}: ${file}:${i + 1}`);
-        fails++;
+    const withoutNotice = notices.reduce((rest, { pattern }) => rest.replace(pattern, ''), line);
+    for (const [patterns, target] of [[FAIL_PATTERNS, line], [ngPatterns, withoutNotice]]) {
+      for (const [label, re] of patterns) {
+        if (re.test(target)) {
+          console.log(`✖ ${label}: ${file}:${i + 1}`);
+          fails++;
+        }
       }
     }
     for (const [label, re] of WARN_PATTERNS) {

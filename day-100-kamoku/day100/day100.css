@@ -1,0 +1,75 @@
+/* 100日チャレンジのDay100で足す帯と、共有の窓。色は kamoku の画面の値（css/tokens.css）に合わせる。 */
+
+.d100-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 2px 12px;
+  border-bottom: 1px solid var(--c-border);
+  background: var(--c-surface);
+  color: var(--c-text);
+  font-size: 14px;
+}
+
+.d100-bar a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: var(--c-text);
+  font-weight: 600;
+}
+
+.d100-day {
+  color: var(--c-muted);
+}
+
+.d100-share,
+.d100-close {
+  min-width: 64px;
+  min-height: 44px;
+  padding: 0 16px;
+  border: 1px solid var(--c-border-strong);
+  border-radius: var(--radius-s);
+  background: var(--c-surface);
+  color: var(--c-text);
+  font-weight: 600;
+}
+
+.d100-share {
+  margin-left: auto;
+}
+
+.d100-bar a:focus-visible,
+.d100-share:focus-visible,
+.d100-close:focus-visible {
+  outline: 2px solid var(--c-primary);
+  outline-offset: 2px;
+}
+
+.d100-dialog {
+  width: min(520px, calc(100vw - 24px));
+  max-width: calc(100vw - 24px);
+  max-height: calc(100dvh - 24px);
+  overflow: auto;
+  padding: 16px;
+  border: 1px solid var(--c-border-strong);
+  border-radius: var(--radius-m);
+  background: var(--c-surface);
+  color: var(--c-text);
+}
+
+.d100-dialog::backdrop {
+  background: var(--c-backdrop);
+}
+
+.d100-dialog-head {
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* 共通の共有欄は、置き場所より広い最低幅（420px）を持つ。窓の中では窓の幅に合わせる */
+.d100-dialog .share {
+  min-width: 0;
+  max-width: 100%;
+  margin-top: 8px;
+}
