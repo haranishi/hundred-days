@@ -1,0 +1,404 @@
+[hidden] { display: none !important; }
+/* Day100 kamoku 宣伝。CSS 540x960、DPR 2 で 1080x1920。
+   文字と札は x=49..491、y=77..768。字幕は透明にしない。断り書きは 16px。 */
+:root {
+  --ink: #14324f;
+  --navy: #1f4e79;
+  --paper: #f7f4ee;
+  --line: #d7c7a3;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  width: 540px;
+  height: 960px;
+  overflow: hidden;
+  background: #102033;
+}
+
+body {
+  font-family: "Zen Kaku Gothic New", "Hiragino Sans", "Hiragino Kaku Gothic ProN", sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+#stage {
+  position: relative;
+  width: 540px;
+  height: 960px;
+  overflow: hidden;
+  background: #102033;
+}
+
+/* 字幕専用の帯（紺一色）と、その下のアプリの窓。窓の高さ＝iframe 560px × 540/415。 */
+#band {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 540px;
+  height: 210px;
+  z-index: 5;
+  background: #102033;
+}
+
+#win {
+  position: absolute;
+  left: 0;
+  top: 218px;
+  width: 540px;
+  height: 728.67px;
+  overflow: hidden;
+  border-radius: 22px;
+  background: #fff;
+  z-index: 1;
+}
+
+#app {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 415px;
+  height: 560px;
+  border: 0;
+  background: #fff;
+  transform-origin: 0 0;
+}
+
+#scrim, #top-shade, #fx, #calm-card, #cap, #cap-note, #cap-tag, #endcard, #band {
+  position: absolute;
+  pointer-events: none;
+}
+
+#scrim {
+  inset: 0;
+  z-index: 1;
+  background: #102033;
+  opacity: 0;
+}
+
+#top-shade {
+  left: 0;
+  top: 0;
+  width: 540px;
+  height: 230px;
+  z-index: 4;
+  background: linear-gradient(180deg, rgba(16, 32, 51, 0.78) 0%, rgba(16, 32, 51, 0.42) 58%, rgba(16, 32, 51, 0) 100%);
+}
+
+#fx { inset: 0; z-index: 6; }
+
+#finger {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 0;
+  height: 0;
+  opacity: 0;
+}
+
+#finger i {
+  position: absolute;
+  width: 54px;
+  height: 54px;
+  margin: -27px 0 0 -27px;
+  border-radius: 50%;
+  border: 3px solid rgba(31, 78, 121, 0.9);
+  background: rgba(31, 78, 121, 0.18);
+  box-shadow: 0 8px 18px rgba(16, 32, 51, 0.28);
+}
+
+#callout {
+  position: absolute;
+  z-index: 7;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 12px 16px;
+  border-radius: 18px;
+  background: var(--navy);
+  color: #fff;
+  text-align: center;
+  box-shadow: 0 16px 36px rgba(16, 32, 51, 0.35);
+  opacity: 1;
+}
+
+#callout .callout-label {
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  line-height: 1.3;
+}
+
+#callout .callout-value {
+  font-size: 72px;
+  font-weight: 900;
+  line-height: 1.05;
+  letter-spacing: 0.01em;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+#callout.is-compact .callout-value { font-size: 44px; }
+#callout.is-orange { border: 3px solid #f08a24; }
+#callout.is-orange .callout-value { color: #ffb15c; }
+#callout .callout-row.is-up span { color: #7be3a0; font-size: 40px; }
+#callout .callout-row.is-up b { color: #7be3a0; }
+
+#callout .callout-rows {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-top: 8px;
+}
+
+#callout .callout-row {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+#callout .callout-row b {
+  font-size: 20px;
+  font-weight: 700;
+  color: #f3e2b8;
+}
+
+#callout .callout-row span {
+  font-size: 34px;
+  font-weight: 900;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+#calm-card {
+  left: 27px;
+  top: 262px;
+  width: 486px;
+  height: 268px;
+  z-index: 7;
+  border-radius: 22px;
+  background: rgba(247, 244, 238, 0.96);
+  box-shadow: 0 18px 40px rgba(8, 16, 28, 0.28);
+  opacity: 0;
+}
+
+#cap {
+  left: 49px;
+  top: 88px;
+  width: 442px;
+  z-index: 8;
+  opacity: 1;
+  color: #fff;
+  font-weight: 900;
+  font-size: 32px;
+  line-height: 1.35;
+  letter-spacing: 0.01em;
+  text-align: center;
+  text-shadow: 0 2px 10px rgba(8, 16, 28, 0.45);
+}
+
+#cap:not(.is-card) { text-shadow: none; }
+
+#cap.is-card {
+  color: var(--ink);
+  text-shadow: none;
+  letter-spacing: -0.04em;
+}
+
+#cap .ln { display: block; white-space: nowrap; }
+
+#cap-note {
+  left: 49px;
+  top: 466px;
+  width: 442px;
+  height: 34px;
+  z-index: 8;
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 34px;
+  text-align: center;
+  color: #5c6b7a;
+  opacity: 1;
+}
+
+#cap-tag {
+  left: 49px;
+  top: 158px;
+  z-index: 9;
+  display: inline-block;
+  height: 44px;
+  padding: 0 14px;
+  border-radius: 999px;
+  background: #fff;
+  color: var(--navy);
+  font-size: 28px;
+  font-weight: 900;
+  line-height: 44px;
+  letter-spacing: 0.02em;
+  box-shadow: 0 8px 18px rgba(8, 16, 28, 0.18);
+  opacity: 1;
+}
+
+#endcard {
+  inset: 0;
+  z-index: 12;
+  opacity: 0;
+  background: #102033;
+}
+
+#end-group { position: absolute; inset: 0; }
+
+#end-brand-tile, #end-pills, #end-cta, #end-url, #end-series, #end-disclaimer {
+  position: absolute;
+  text-align: center;
+  opacity: 1;
+}
+
+/* ロゴの台。色は撮影時にアプリの上の帯の色を読んで合わせる。 */
+#end-brand-tile {
+  left: 95px;
+  top: 118px;
+  width: 350px;
+  height: 112px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 22px;
+  background: #fff;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.28);
+}
+
+#end-brand { max-width: 310px; max-height: 84px; }
+
+#end-brand-fallback {
+  color: var(--ink);
+  font-size: 56px;
+  font-weight: 900;
+}
+
+#end-pills {
+  left: 80px;
+  top: 262px;
+  width: 380px;
+  height: 56px;
+  font-size: 28px;
+  font-weight: 900;
+  line-height: 56px;
+  color: var(--navy);
+  background: #fff;
+  border-radius: 999px;
+}
+
+#end-cta {
+  left: 49px;
+  top: 340px;
+  width: 442px;
+  height: 56px;
+  font-size: 32px;
+  font-weight: 900;
+  line-height: 56px;
+  color: #fff;
+}
+
+#end-url {
+  left: 49px;
+  top: 416px;
+  width: 442px;
+  height: 104px;
+  font-size: 30px;
+  font-weight: 900;
+  line-height: 49px;
+  color: #fff;
+  white-space: pre-line;
+  letter-spacing: 0.01em;
+  border: 3px solid #f3e2b8;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+#end-series {
+  left: 49px;
+  top: 560px;
+  width: 442px;
+  height: 40px;
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 40px;
+  color: #f3e2b8;
+}
+
+#end-disclaimer {
+  left: 49px;
+  top: 636px;
+  width: 442px;
+  height: 78px;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.45;
+  color: #dfe7ef;
+  white-space: pre-line;
+}
+
+/* 仕訳のプレビューの札（アプリの表を読んで大きく出す）。 */
+#pv {
+  position: absolute;
+  left: 49px;
+  top: 554px;
+  width: 442px;
+  height: 206px;
+  z-index: 7;
+  padding: 10px 18px;
+  border-radius: 20px;
+  background: #fff;
+  color: var(--ink);
+  box-shadow: 0 18px 40px rgba(8, 16, 28, 0.32);
+  border: 3px solid var(--navy);
+  visibility: hidden;
+}
+
+#pv .pv-head { display: flex; justify-content: space-between; align-items: center; height: 34px; }
+#pv .pv-title { font-size: 22px; font-weight: 900; color: var(--navy); }
+#pv .pv-stamp {
+  font-size: 18px; font-weight: 900; color: #fff; background: #2e7d4f;
+  border-radius: 999px; padding: 2px 12px;
+}
+#pv .pv-rows { display: flex; flex-direction: column; gap: 4px; margin-top: 6px; }
+#pv .pv-row {
+  display: grid;
+  grid-template-columns: 64px 1fr auto;
+  align-items: center;
+  gap: 10px;
+  min-height: 62px;
+  padding: 4px 0;
+  border-top: 1px solid #d9e1ea;
+}
+#pv .pv-side {
+  font-size: 20px; font-weight: 900; color: #fff; background: var(--navy);
+  border-radius: 10px; text-align: center; line-height: 36px;
+}
+#pv .pv-row.is-credit .pv-side { background: #8a5a14; }
+#pv .pv-acc { font-size: 22px; font-weight: 900; line-height: 1.25; white-space: pre-line; }
+#pv .pv-amt { font-size: 30px; font-weight: 900; text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+#pv .pv-amt small { display: block; font-size: 16px; font-weight: 700; color: #5c6b7a; }
+
+#ff {
+  position: absolute;
+  left: 405px;
+  top: 100px;
+  width: 80px;
+  height: 30px;
+  z-index: 10;
+  border-radius: 999px;
+  background: #f3e2b8;
+  color: var(--ink);
+  font-size: 16px;
+  font-weight: 900;
+  line-height: 30px;
+  text-align: center;
+  visibility: hidden;
+}
+#ff::after { content: "▶▶"; font-size: 10px; margin-left: 2px; }
