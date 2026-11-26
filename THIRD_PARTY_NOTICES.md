@@ -240,3 +240,7 @@ PowerPoint のブラウザ内変換は、未改変の公式 ZetaOffice 24.2.8.0.
 `source/dist/assets/` の3Dモデル（人物7体・建物・小道具のGLB）と物語（`source/docs/10_STORY_AND_DESIGN_JA.md`・`source/dist/valley/story-data.js`）は CC BY 4.0（`source/LICENSE-ASSETS.md`）です。
 同梱の three.js 0.180.0（本体・GLTFLoader・OrbitControls）は MIT（`source/licenses/THREE-LICENSE.txt`）、地面と自然の質感画像21枚は Poly Haven（CC0 1.0・来歴は `source/provenance/valley-textures.json` と `source/dist/assets/valley/credits.json`）、歩行・走行モーションの一部は CMU Graphics Lab Motion Capture Database（NSF EIA-0196217）、人物7体と小道具14点は有料プランの Meshy で生成し Blender で動きを焼いています（`source/NOTICE.md`・`source/provenance/meshy-v19.json`）。
 効果音と宣伝動画のBGMは、コードで合成した自作です。
+
+## Day100 kamoku
+
+`day-100-kamoku/` の `index.html`・`favicon.svg`・`css/`・`rust/`・`web/` は、[haranishi/kamoku](https://github.com/haranishi/kamoku)（MIT OR Apache-2.0。同じフォルダの `kamoku-LICENSE-MIT.txt`・`kamoku-LICENSE-APACHE.txt`）から組み立てたもので、元のコミットは `build-info.json` にあります。組み立てに含まれる第三者の Rust のライブラリと SQLite の許諾は、`day-100-kamoku/THIRD_PARTY_LICENSES.txt` にまとめて同梱しています。画面のイラストと書体は追加していません。

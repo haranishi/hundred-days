@@ -1,0 +1,248 @@
+/* SPDX-FileCopyrightText: 2026 Ikki Nishihara and the kamoku contributors */
+/* SPDX-License-Identifier: MIT OR Apache-2.0 */
+
+/* 選ぶ部品: 候補つきの入力欄（combobox）、種別の切り替え（segmented）、タブ。色は tokens.css の変数だけを使う。 */
+
+/* ---- 候補つきの入力欄（combobox） ---- */
+.combo {
+  position: relative;
+  min-width: 0;
+}
+
+.combo .input {
+  padding-right: 36px;
+}
+
+/* 選択欄（.select の背景の矢印）と同じ位置・大きさ・色。 */
+.combo-chevron {
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  color: var(--c-muted);
+  pointer-events: none;
+  transform: translateY(-50%);
+}
+
+/* 位置と幅は combobox.js が入力欄の位置から決める（表の横スクロールの中でも切れないように fixed）。 */
+.combo-list {
+  position: fixed;
+  z-index: var(--z-overlay);
+  max-width: calc(100vw - 16px);
+  max-height: 288px;
+  overflow-y: auto;
+  padding: var(--sp-1);
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius-m);
+  background: var(--c-surface);
+  box-shadow: var(--shadow-1);
+}
+
+.combo-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  min-height: 36px;
+  padding: var(--sp-1) var(--sp-3);
+  border-radius: var(--radius-s);
+  cursor: pointer;
+}
+
+.combo-option-hint {
+  color: var(--c-muted);
+  font-size: var(--fs-xs);
+  white-space: nowrap;
+}
+
+/* 印のある候補: 色に加えて、左の帯で示す。 */
+.combo-option[aria-selected="true"] {
+  background: var(--c-primary-soft);
+  box-shadow: inset 3px 0 0 var(--c-primary);
+}
+
+.combo-empty {
+  padding: var(--sp-2) var(--sp-3);
+  color: var(--c-muted);
+  font-size: var(--fs-sm);
+}
+
+/* 「新しい取引先として足す」の行（一覧の最後）。候補と取り違えないよう、線で分けて、藍の文字と＋の印にする。 */
+.combo-option--new {
+  position: relative;
+  justify-content: flex-start;
+  color: var(--c-primary);
+  font-weight: 600;
+}
+
+.combo-option + .combo-option--new {
+  margin-top: 9px;
+}
+
+.combo-option + .combo-option--new::before {
+  position: absolute;
+  top: -5px;
+  right: 0;
+  left: 0;
+  border-top: 1px solid var(--c-border);
+  content: "";
+}
+
+.combo-option--new .combo-option-label {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  overflow-wrap: anywhere;
+}
+
+/* 候補が0件のときの一言。一覧と同じ場所に出す（位置と幅は combobox.js）。一覧は開かない。 */
+.combo-msg {
+  position: fixed;
+  z-index: var(--z-overlay);
+  max-width: calc(100vw - 16px);
+  padding: var(--sp-2) var(--sp-3);
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius-m);
+  background: var(--c-surface);
+  box-shadow: var(--shadow-1);
+  color: var(--c-muted);
+  font-size: var(--fs-sm);
+}
+
+@media (max-width: 1023px) {
+  .combo-option {
+    min-height: 44px;
+  }
+}
+
+/* ---- 種別の切り替え（segmented） ---- */
+.seg {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.seg legend {
+  margin-bottom: 6px;
+  padding: 0;
+}
+
+.seg-options {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  padding: 3px;
+  border: 1px solid var(--c-border-strong);
+  border-radius: var(--radius-m);
+  background: var(--c-surface);
+}
+
+.seg-option {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  height: 34px;
+  padding: 0 var(--sp-4);
+  border-radius: 7px;
+  color: var(--c-muted);
+  font-weight: 600;
+  cursor: pointer;
+  user-select: none;
+}
+
+.seg-option input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.seg-option:hover {
+  background: var(--c-surface-2);
+  color: var(--c-text);
+}
+
+.seg-check {
+  display: none;
+}
+
+.seg-option:has(input:checked) {
+  background: var(--c-primary);
+  color: var(--c-on-primary);
+}
+
+.seg-option:has(input:checked) .seg-check {
+  display: inline-flex;
+}
+
+.seg-option:has(input:focus-visible) {
+  outline: 2px solid var(--c-primary);
+  outline-offset: 2px;
+}
+
+.seg-option kbd {
+  border-color: currentColor;
+  background: transparent;
+  color: inherit;
+}
+
+/* 指で触る幅（1024px未満）では、選択肢を44px以上の高さにする（AC-11.7）。 */
+@media (max-width: 1023px) {
+  .seg-option {
+    height: 44px;
+  }
+}
+
+/* ---- タブ ---- */
+/* 横に動くとき、キーで移ったタブを端のぼかし（下）の内側に止める。 */
+.tabs {
+  display: flex;
+  gap: var(--sp-1);
+  overflow-x: auto;
+  scroll-padding-inline: 40px;
+  border-bottom: 1px solid var(--c-border);
+}
+
+/*
+ * 横に入りきらないタブの並び（tabs.js の data-more）: 続きのある側の端を、文字ごと薄くぼかす（色は使わない。覆いの形だけ）。
+ * スクロールして端まで来たら、その側のぼかしは消える。
+ */
+.tabs[data-more="right"] {
+  mask-image: linear-gradient(to right, var(--c-text) calc(100% - 40px), transparent);
+}
+
+.tabs[data-more="left"] {
+  mask-image: linear-gradient(to left, var(--c-text) calc(100% - 40px), transparent);
+}
+
+.tabs[data-more="left right"] {
+  mask-image: linear-gradient(to right, transparent, var(--c-text) 40px, var(--c-text) calc(100% - 40px), transparent);
+}
+
+.tab {
+  flex-shrink: 0;
+  height: 40px;
+  margin-bottom: -1px;
+  padding: 0 var(--sp-4);
+  border: 0;
+  border-bottom: 3px solid transparent;
+  background: transparent;
+  color: var(--c-muted);
+  font-weight: 600;
+}
+
+.tab:hover {
+  color: var(--c-text);
+}
+
+.tab[aria-selected="true"] {
+  border-bottom-color: var(--c-primary);
+  color: var(--c-primary);
+  font-weight: 700;
+}
+
+@media (max-width: 1023px) {
+  .tab {
+    height: 44px;
+  }
+}

@@ -89,3 +89,31 @@ test('leading whitespace in the first filename cannot bypass the public scan', a
     });
   }
 });
+
+test('Day100 の kamoku の著作権表示は、取り込んだ組み立て結果の中だけ非公開語の検査から外す', (t) => {
+  const f = fixture(t);
+  f.write('.precheck-ng.txt', 'private-fixture-marker\n');
+  const notice = 'Copyright (c) 2026 Private-Fixture-Marker and the kamoku contributors';
+  const spdx = '/* SPDX-FileCopyrightText: 2026 Private-Fixture-Marker and the kamoku contributors */';
+  const built = ['day-100-kamoku/kamoku-LICENSE-MIT.txt', 'day-100-kamoku/css/base.css', 'day-100-kamoku/web/pkg/x.wasm'];
+  for (const file of built) f.write(file, `${notice}\n${spdx}\n`);
+  assert.equal(f.run('precheck.mjs').status, 0);
+  // 同じ行でも、表示の外にある語は止める
+  f.write(built[0], `${notice} private-fixture-marker\n`);
+  assert.equal(f.run('precheck.mjs').status, 1);
+  // 表示の形でなければ止める
+  f.write(built[0], 'made by private-fixture-marker\n');
+  assert.equal(f.run('precheck.mjs').status, 1);
+  f.write(built[0], 'ok\n');
+  // 手で書くファイルと、ほかのフォルダでは、同じ表示でも止める
+  for (const file of ['day-100-kamoku/README.md', 'day-100-kamoku/day100/day100.css', 'day-099-meibo/LICENSE.txt']) {
+    f.write(file, `${notice}\n`);
+    const result = f.run('precheck.mjs');
+    assert.equal(result.status, 1, file);
+    assert.ok(result.output.includes(`NGワード: ${file}:1`), file);
+    f.write(file, 'ok\n');
+  }
+  // 秘密の値の検査は、表示の行でも変えない
+  f.write(built[1], `${notice} ${['sk', '-'].join('') + 'a'.repeat(24)}\n`);
+  assert.match(f.run('precheck.mjs').output, /APIキー\/トークン/);
+});
